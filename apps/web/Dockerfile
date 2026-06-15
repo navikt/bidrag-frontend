@@ -1,5 +1,5 @@
 FROM node:26-alpine AS builder
-RUN corepack enable && corepack prepare pnpm@11.6.0 --activate
+RUN npm install -g pnpm@11.6.0
 WORKDIR /app
 
 # Setup registries (kept here so private packages can be resolved during install)
