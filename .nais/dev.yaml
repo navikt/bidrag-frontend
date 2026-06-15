@@ -1,0 +1,34 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: <NAME_OF_YOUR_APP>
+  namespace: <NAME_OF_YOUR_NAMESPACE>
+  labels:
+    team: <NAME_OF_YOUR_TEAM>
+spec: 
+  image: {{ image }}
+  port: 8080
+  team: <NAME_OF_YOUR_TEAM>
+  liveness:
+    path: /isalive
+    port: 8080
+    initialDelay: 20
+    timeout: 60
+  readiness:
+    path: /isready
+    port: 8080
+    initialDelay: 20
+    timeout: 60
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  replicas:
+    min: 1
+    max: 2
+    cpuThresholdPercentage: 80
+  ingresses:
+    - https://<YOUR_INGRESS_HERE>
