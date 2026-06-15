@@ -1,45 +1,47 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: bidrag-frontend
-  namespace: bidrag
-  labels:
-    team: bidrag
+    name: bidrag-frontend
+    namespace: bidrag
+    labels:
+        team: bidrag
 spec:
-  image: {{image}}
-  port: 3000
-  ingresses:
-    - {{ingress}}
-  azure:
-    application:
-      enabled: true
-  wonderwall:
-    enabled: true
-    ingress: {{ingress}}
-    logoutRedirectUrl: {{ingress}}
-    autoLogin: true
-  accessPolicy:
-    outbound:
-      rules:
-        - application: bidrag-sak
-  resources:
-    requests:
-      memory: 256Mi
-    limits:
-      memory: 1Gi
-  replicas:
-    min: 1
-    max: 1
-  liveness:
-    path: /internal/health/liveness
-    initialDelay: 10
-    periodSeconds: 10
-  readiness:
-    path: /internal/health/readiness
-    initialDelay: 10
-    periodSeconds: 10
-  env:
-    - name: NODE_ENV
-      value: production
-    - name: PORT
-      value: "3000"
+    image: {{image}}
+    port: 3000
+    ingresses:
+        - {{ingress}}
+    azure:
+        sidecar:
+            enabled: true
+            autoLogin: true
+        application:
+            enabled: true
+            allowAllUsers: true
+            claims:
+                extra:
+                    - NAVident
+    accessPolicy:
+        outbound:
+            rules:
+                -   application: bidrag-sak
+    resources:
+        requests:
+            memory: 256Mi
+        limits:
+            memory: 1Gi
+    replicas:
+        min: 1
+        max: 1
+    liveness:
+        path: /internal/health/liveness
+        initialDelay: 10
+        periodSeconds: 10
+    readiness:
+        path: /internal/health/readiness
+        initialDelay: 10
+        periodSeconds: 10
+    env:
+        -   name: NODE_ENV
+            value: production
+        -   name: PORT
+            value: "3000"
