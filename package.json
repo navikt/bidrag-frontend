@@ -1,0 +1,25 @@
+{
+    "name": "bidrag-frontend",
+    "private": true,
+    "scripts": {
+        "build": "pnpm --filter web build",
+        "dev": "pnpm --filter web dev",
+        "typecheck": "pnpm -r typecheck",
+        "lint": "biome lint .",
+        "format": "biome format --write .",
+        "check": "biome check --write .",
+        "test": "pnpm -r test"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.4.16",
+        "@types/node": "^25.9.2",
+        "@types/react": "catalog:",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.8"
+    },
+    "engines": {
+        "node": ">=24",
+        "pnpm": ">=11"
+    },
+    "packageManager": "pnpm@11.6.0"
+}

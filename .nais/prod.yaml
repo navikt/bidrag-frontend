@@ -1,0 +1,3 @@
+ingress: https://bidrag-frontend.intern.nav.no
+minReplicas: 2
+maxReplicas: 4

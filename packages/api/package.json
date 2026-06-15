@@ -1,0 +1,23 @@
+{
+    "name": "@bidrag/api",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": "./src/index.ts"
+        },
+        "./sak": {
+            "import": "./src/sak.ts"
+        }
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@bidrag/types": "workspace:*"
+
+    },
+    "devDependencies": {
+    }
+}

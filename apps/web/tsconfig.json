@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "include": [
+        "app",
+        ".react-router/types/**/*"
+    ],
+    "compilerOptions": {
+        "paths": {
+            "~/*": [
+                "./app/*"
+            ],
+            "+types/*": [
+                "/.react-router/types/app/+types/*"
+            ]
+        }
+    }
+}
