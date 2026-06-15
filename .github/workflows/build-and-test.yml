@@ -42,5 +42,6 @@ jobs:
                 uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
                 id: docker-build-push
                 with:
-                    docker_context: "./apps/web"
+                    docker_context: .
+                    dockerfile: ./apps/web/Dockerfile
                     team: bidrag
