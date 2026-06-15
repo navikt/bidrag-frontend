@@ -31,7 +31,7 @@ jobs:
                 env:
                     CLUSTER: dev-gcp
                     RESOURCE: .nais/nais.yaml
-                    VARS: .nais/dev.json
+                    VARS: .nais/dev.yaml
                     IMAGE: ${{ needs.build.outputs.image }}
                     TELEMETRY: ${{ needs.build.outputs.telemetry }}
 
@@ -52,6 +52,6 @@ jobs:
 #                env:
 #                    CLUSTER: prod-gcp
 #                    RESOURCE: .nais/nais.yaml
-#                    VARS: .nais/prod.json
+#                    VARS: .nais/prod.yaml
 #                    IMAGE: ${{ needs.build.outputs.image }}
 #                    TELEMETRY: ${{ needs.build.outputs.telemetry }}
