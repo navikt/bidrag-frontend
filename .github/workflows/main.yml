@@ -1,0 +1,57 @@
+name: main
+
+on:
+    push:
+        branches: [ main ]
+
+
+jobs:
+    build:
+        uses: ./.github/workflows/build-and-test.yml
+        secrets: inherit
+        permissions:
+            packages: write
+            contents: read
+            id-token: write
+
+    deploy_dev:
+        needs:
+            - build
+        name: "Deploy til dev"
+        runs-on: ubuntu-latest
+        permissions:
+            packages: read
+            contents: read
+            id-token: write
+        steps:
+            -   uses: actions/checkout@v6
+
+            -   name: Deploy til dev-gcp
+                uses: nais/deploy/actions/deploy@8a6fb62e73f837af6287d5db84a46ea96aa6c30d # v2
+                env:
+                    CLUSTER: dev-gcp
+                    RESOURCE: .nais/nais.yaml
+                    VARS: .nais/dev.yaml
+                    IMAGE: ${{ needs.build.outputs.image }}
+                    TELEMETRY: ${{ needs.build.outputs.telemetry }}
+
+#    deploy_prod:
+#        needs:
+#            - build
+#            - deploy_dev
+#        name: "Deploy til prod"
+#        runs-on: ubuntu-latest
+#        permissions:
+#            packages: read
+#            contents: read
+#            id-token: write
+#        steps:
+#            -   uses: actions/checkout@v6
+#            -   name: Deploy til prod-gcp
+#                uses: nais/deploy/actions/deploy@8a6fb62e73f837af6287d5db84a46ea96aa6c30d # v2
+#                env:
+#                    CLUSTER: prod-gcp
+#                    RESOURCE: .nais/nais.yaml
+#                    VARS: .nais/prod.yaml
+#                    IMAGE: ${{ needs.build.outputs.image }}
+#                    TELEMETRY: ${{ needs.build.outputs.telemetry }}
