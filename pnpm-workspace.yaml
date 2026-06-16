@@ -1,6 +1,7 @@
 allowBuilds:
     esbuild: true
 injectWorkspacePackages: true
+forceLegacyDeploy: true
 
 packages:
   - "apps/*"
