@@ -17,6 +17,8 @@ runs:
                 cache-dependency-path: |
                     pnpm-lock.yaml
                 registry-url: "https://npm.pkg.github.com"
+                scope: @navikt
+
 
         -   name: Installere node moduler
             shell: bash

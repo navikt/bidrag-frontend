@@ -15,15 +15,15 @@
         "deploy:docker": "pnpm run build:all && pnpm run deploy:clean && pnpm run deploy:web"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.16",
-        "@types/node": "^25.9.2",
+        "@biomejs/biome": "^2.5.0",
+        "@types/node": "^25.9.3",
         "@types/react": "catalog:",
         "typescript": "^6.0.3",
-        "vitest": "^4.1.8"
+        "vitest": "^4.1.9"
     },
     "engines": {
         "node": ">=24",
         "pnpm": ">=11"
     },
-    "packageManager": "pnpm@11.6.0"
+    "packageManager": "pnpm@11.7.0"
 }
