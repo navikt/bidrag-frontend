@@ -1,5 +1,5 @@
 allowBuilds:
-    esbuild: true
+  esbuild: true
 injectWorkspacePackages: true
 # Denne trengs for bygging av Docker-image, men vi bør kanskje finne en annen løsning
 forceLegacyDeploy: true

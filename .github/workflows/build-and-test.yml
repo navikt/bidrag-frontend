@@ -1,48 +1,48 @@
 name: Build reusable workflow
 on:
-    workflow_call:
-        secrets:
-            READER_TOKEN:
-                required: true
-                description: 'Token with read access to the repository'
-        outputs:
-            image:
-                description: 'Docker image'
-                value: ${{ jobs.bygg.outputs.image }}
-            telemetry:
-                description: 'Telemetry data'
-                value: ${{ jobs.bygg.outputs.telemetry }}
+  workflow_call:
+    secrets:
+      READER_TOKEN:
+        required: true
+        description: 'Token with read access to the repository'
+    outputs:
+      image:
+        description: 'Docker image'
+        value: ${{ jobs.bygg.outputs.image }}
+      telemetry:
+        description: 'Telemetry data'
+        value: ${{ jobs.bygg.outputs.telemetry }}
 
 jobs:
-    bygg:
-        name: "Test, bygg og push Docker-image"
-        runs-on: ubuntu-latest
-        permissions:
-            packages: write
-            contents: read
-            id-token: write
-        outputs:
-            image: ${{ steps.docker-build-push.outputs.image }}
-            telemetry: ${{ steps.docker-build-push.outputs.telemetry }}
-        steps:
-            -   uses: actions/checkout@v6
+  bygg:
+    name: "Test, bygg og push Docker-image"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+      telemetry: ${{ steps.docker-build-push.outputs.telemetry }}
+    steps:
+      - uses: actions/checkout@v6
 
-            -   name: Setup
-                uses: ./.github/actions/setup
-                with:
-                    node-auth-token: ${{ secrets.READER_TOKEN }}
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          node-auth-token: ${{ secrets.READER_TOKEN }}
 
-            -   name: Test
-                run: pnpm run test
+      - name: Test
+        run: pnpm run test
 
-            -   name: Bygg applikasjon
-                run: pnpm run build:all
+      - name: Bygg applikasjon
+        run: pnpm run build:all
 
-            -   name: Bygg Bygg deploybar applikasjon for Docker
-                run: pnpm run deploy:docker
+      - name: Bygg Bygg deploybar applikasjon for Docker
+        run: pnpm run deploy:docker
 
-            -   name: Push Docker-image til GAR
-                uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
-                id: docker-build-push
-                with:
-                    team: bidrag
+      - name: Push Docker-image til GAR
+        uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
+        id: docker-build-push
+        with:
+          team: bidrag
