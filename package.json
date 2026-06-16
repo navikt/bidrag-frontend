@@ -2,13 +2,17 @@
     "name": "bidrag-frontend",
     "private": true,
     "scripts": {
-        "build": "pnpm --filter web build",
+        "build:all": "pnpm run -r build",
+        "build:web": "pnpm --filter web build",
         "dev": "pnpm --filter web dev",
         "typecheck": "pnpm -r typecheck",
         "lint": "biome lint .",
         "format": "biome format --write .",
         "check": "biome check --write .",
-        "test": "echo TODO lag tester og greier"
+        "test": "echo TODO lag tester og greier",
+        "deploy:clean": "rm -rf deploy_dist",
+        "deploy:web": "pnpm --filter web --prod deploy deploy_dist",
+        "deploy:docker": "pnpm run build:all && pnpm run deploy:clean && pnpm run deploy:web"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.4.16",
