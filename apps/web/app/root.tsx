@@ -2,13 +2,13 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } f
 import "@navikt/ds-css";
 import { AppLayout } from "@bidrag/ui";
 import { authMiddleware } from "~/auth/auth.middleware.server.ts";
-import { getUser } from "~/auth/auth.utils.server.ts";
 import type { Route } from "../.react-router/types/app/+types/root.ts";
+import {userContext} from "~/context.ts";
 
 export const middleware = [authMiddleware];
 
-export async function loader({ request }: Route.LoaderArgs) {
-   const user = getUser(request);
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const user= context.get(userContext);
     return { user };
 }
 

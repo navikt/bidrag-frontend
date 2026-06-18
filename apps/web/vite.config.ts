@@ -1,9 +1,11 @@
 import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-    plugins: [reactRouter(), tsconfigPaths()],
+    plugins: [reactRouter()],
+    resolve:{
+        tsconfigPaths: true
+    },
     server: {
         port: 3000,
         host: true, // Lytt på 0.0.0.0 slik at host.docker.internal kan nå serveren
