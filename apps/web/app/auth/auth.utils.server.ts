@@ -1,4 +1,4 @@
-import {expiresIn, getToken, parseAzureUserToken, requestOboToken, validateToken} from "@navikt/oasis"
+import {parseAzureUserToken, requestOboToken, validateToken} from "@navikt/oasis"
 import type {NavUser} from "./NavUser.ts";
 
 export async function getOnBehalfOfToken(user: NavUser, audience: string) {
@@ -35,5 +35,5 @@ export function parseToken(token: string): NavUser {
             token,
         }
     }
-    throw new Error("Failed to parse Azure user token")
+    throw  new Response('Failed to parse azure token', {status: 401})
 }

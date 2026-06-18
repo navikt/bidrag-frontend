@@ -1,8 +1,8 @@
-import type {Route} from "../../.react-router/types/app/auth/+types/token.ts";
-import {userContext} from "~/context.ts";
-import {getOnBehalfOfToken} from "./auth.utils.server.ts";
-import {NavUser} from "~/auth/NavUser.ts";
 import {getApiConfig} from "~/api.env.ts";
+import type {NavUser} from "~/auth/NavUser.ts";
+import {userContext} from "~/context.ts";
+import type {Route} from "../../.react-router/types/app/auth/+types/token.ts";
+import {getOnBehalfOfToken} from "./auth.utils.server.ts";
 
 const getOnbehalfOfToken = async (app: string, user: NavUser) => {
     const audience = getApiConfig(app).audience
