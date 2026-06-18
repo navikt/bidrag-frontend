@@ -1,8 +1,8 @@
 import {expiresIn, getToken, parseAzureUserToken, requestOboToken, validateToken} from "@navikt/oasis"
 import type {NavUser} from "./NavUser.ts";
 
-export async function getOnBehalfOfToken(request: Request, audience: string) {
-    const token = getToken(request)
+export async function getOnBehalfOfToken(user: NavUser, audience: string) {
+    const token = user.token
     if (!token) {
         console.error('Missing token')
         throw new Response('Missing token', {status: 401})
@@ -18,11 +18,6 @@ export async function getOnBehalfOfToken(request: Request, audience: string) {
     if (!obo.ok) {
         console.error(`Failed to get OBO token: ${obo.error}`)
         throw new Response('Unauthorized', {status: 401})
-    }
-
-    if (expiresIn(obo.token) <= 0) {
-        console.error('Expired token')
-        throw new Response('Expired token', {status: 401})
     }
 
     return obo.token

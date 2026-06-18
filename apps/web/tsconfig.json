@@ -10,7 +10,7 @@
                 "./app/*"
             ],
             "+types/*": [
-                "/.react-router/types/app/+types/*"
+                ".react-router/types/app/+types/*"
             ]
         }
     }

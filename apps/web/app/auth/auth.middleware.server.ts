@@ -20,8 +20,6 @@ export const authMiddleware: Route.MiddlewareFunction = async ({request, context
         return redirect(loginUrl);
     }
 
-    //
-
     const valid = await validateToken(token);
 
     if (!valid.ok) {
