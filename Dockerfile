@@ -3,4 +3,4 @@ WORKDIR /app
 
 COPY deploy_dist/ .
 
-CMD ["./node_modules/@react-router/serve/bin.js", "./build/server/index.js"]
+CMD ["./node_modules/@react-router/serve/bin.cjs", "./build/server/index.js"]
