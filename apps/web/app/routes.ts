@@ -5,5 +5,6 @@ export default [
     index("routes/_index.tsx"),
     route("/internal/health/liveness", "routes/liveness.tsx"),
     route("/internal/health/readiness", "routes/readiness.tsx"),
+    route("/token", "auth/token.ts"),
 
 ] satisfies RouteConfig;

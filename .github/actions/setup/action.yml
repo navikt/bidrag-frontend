@@ -1,29 +1,29 @@
 name: Bygg og test
 description: Installer avhengigheter, lint, typesjekk, test og bygg applikasjon
 inputs:
-    node-auth-token:
-        description: 'Token for npm registry'
-        required: true
+  node-auth-token:
+    description: 'Token for npm registry'
+    required: true
 
 runs:
-    using: composite
-    steps:
-        -   uses: pnpm/action-setup@v6
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
 
-        -   uses: actions/setup-node@v6
-            with:
-                node-version: '26'
-                cache: pnpm
-                cache-dependency-path: |
-                    pnpm-lock.yaml
-                registry-url: "https://npm.pkg.github.com"
-                scope: "@navikt"
+    - uses: actions/setup-node@v6
+      with:
+        node-version: '26'
+        cache: pnpm
+        cache-dependency-path: |
+          pnpm-lock.yaml
+        registry-url: "https://npm.pkg.github.com"
+        scope: "@navikt"
 
 
-        -   name: Installere node moduler
-            shell: bash
-            run: pnpm install --frozen-lockfile
-            env:
-                NODE_AUTH_TOKEN: ${{ inputs.node-auth-token }}
+    - name: Installere node moduler
+      shell: bash
+      run: pnpm install --frozen-lockfile
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.node-auth-token }}
 
 #

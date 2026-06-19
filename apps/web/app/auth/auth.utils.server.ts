@@ -1,7 +1,8 @@
-import {expiresIn, getToken, parseAzureUserToken, requestOboToken, validateToken} from "@navikt/oasis"
+import {parseAzureUserToken, requestOboToken, validateToken} from "@navikt/oasis"
+import type {NavUser} from "./NavUser.ts";
 
-export async function getOnBehalfOfToken(request: Request, audience: string) {
-    const token = getToken(request)
+export async function getOnBehalfOfToken(user: NavUser, audience: string) {
+    const token = user.token
     if (!token) {
         console.error('Missing token')
         throw new Response('Missing token', {status: 401})
@@ -19,22 +20,10 @@ export async function getOnBehalfOfToken(request: Request, audience: string) {
         throw new Response('Unauthorized', {status: 401})
     }
 
-    if (expiresIn(obo.token) <= 0) {
-        console.error('Expired token')
-        throw new Response('Expired token', {status: 401})
-    }
-
     return obo.token
 }
 
-type NavUser = {
-    NAVident: string
-    name: string
-}
-
-export function getUser(request: Request): NavUser {
-    const token = getToken(request)
-    console.log("token", token)
+export function parseToken(token: string): NavUser {
     if (!token) {
         throw new Error('Missing token')
     }
@@ -43,8 +32,8 @@ export function getUser(request: Request): NavUser {
         return {
             NAVident: parse.NAVident,
             name: parse.preferred_username,
+            token,
         }
     }
-    console.log("Parsed token ", parse)
-    throw new Error("Failed to parse Azure user token")
+    throw  new Response('Failed to parse azure token', {status: 401})
 }
