@@ -22,10 +22,11 @@ spec:
           - NAVident
   accessPolicy:
     outbound:
-      rules:
-        - application: bidrag-sak
-          namespace: bidrag
-          cluster: dev-fss
+      external:
+        {{#each outbound.external as |host|}}
+          - host: {{host}}
+        {{/each}}
+
   observability:
     autoInstrumentation:
       enabled: true

@@ -8,7 +8,8 @@ type ApiConfig = {
 
 const APIS: Record<string, ApiConfig> = {
     "bidrag-sak": {
-        url: "https://bidrag-sak-q2.intern.dev.nav.no",
+        // url: "https://bidrag-sak-q2.intern.dev.nav.no",
+        url: "https://bidrag-sak-q2.dev-fss-pub.nais.io",
         audience: "api://dev-fss.bidrag.bidrag-sak-q2/.default"
     }
 }
