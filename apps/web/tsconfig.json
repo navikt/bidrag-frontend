@@ -5,12 +5,13 @@
         ".react-router/types/**/*"
     ],
     "compilerOptions": {
+        "types": ["node", "react", "react-dom"],
         "paths": {
             "~/*": [
                 "./app/*"
             ],
-            "+types/*": [
-                ".react-router/types/app/+types/*"
+            "+/*": [
+                "./.react-router/types/app/*"
             ]
         }
     }

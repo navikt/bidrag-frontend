@@ -7,16 +7,19 @@
         ".": {
             "import": "./src/index.ts"
         },
-        "./sak": {
-            "import": "./src/sak.ts"
+        "./*": {
+            "import": "./src/api/*.ts"
         }
     },
     "scripts": {
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@bidrag/types": "workspace:*"
-
+        "@bidrag/types": "workspace:*",
+        "@bidrag/common": "workspace:*",
+        "axios": "^1.18.0",
+        "@tanstack/react-query": "catalog:",
+        "@types/node": "^25"
     },
     "devDependencies": {
     }

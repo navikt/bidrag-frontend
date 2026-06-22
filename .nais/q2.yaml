@@ -1,0 +1,16 @@
+name: bidrag-frontend-q2
+
+ingresses:
+  - https://bidrag.intern.dev.nav.no
+  - https://bidrag-q2.intern.dev.nav.no
+
+env:
+  - name: BIDRAG_SAK_URL
+    value: https://bidrag-sak-q2.dev-fss-pub.nais.io
+  - name: BIDRAG_SAK_AUDIENCE
+    value: api://dev-fss.bidrag.bidrag-sak-q2/.default
+
+outbound:
+  external:
+    - bidrag-sak-q2.dev-fss-pub.nais.io
+

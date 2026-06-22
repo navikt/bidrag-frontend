@@ -3,15 +3,17 @@
     "version": "0.0.0",
     "private": true,
     "type": "module",
+    "scripts": {
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
+    },
     "exports": {
         ".": {
             "import": "./src/index.ts"
         }
     },
-    "scripts": {
-        "test": "vitest run",
-        "typecheck": "tsc --noEmit"
-    },
     "devDependencies": {
+        "date-fns": "^4.4.0"
+
     }
 }
