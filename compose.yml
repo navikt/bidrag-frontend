@@ -28,12 +28,6 @@ services:
       --cookie.secure=false
     restart: on-failure
 
-  upstream:
-    image: mendhak/http-https-echo:40
-    environment:
-      HTTP_PORT: 5000
-      JWT_HEADER: Authorization
-
   texas:
     image: ghcr.io/nais/texas:latest
     ports: [ "4010:4010" ]
