@@ -1,4 +1,13 @@
-ingress: https://bidrag.intern.nav.no
+name: bidrag-frontend
+
+ingresses:
+  - https://bidrag.intern.nav.no
+
+env:
+  - name: BIDRAG_SAK_URL
+    value: https://bidrag-sak.prod-fss-pub.nais.io
+  - name: BIDRAG_SAK_AUDIENCE
+    value: api://prod-fss.bidrag.bidrag-sak/.default
 
 outbound:
   external:

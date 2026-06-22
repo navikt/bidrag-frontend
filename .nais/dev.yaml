@@ -1,7 +1,0 @@
-ingress: https://bidrag.intern.dev.nav.no
-
-
-outbound:
-  external:
-    -host: bidrag-sak-q2.dev-fss-pub.nais.io
-

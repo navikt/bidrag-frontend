@@ -1,4 +1,4 @@
-type DeployEnvironment = "q1" | "q2" | "prod"
+import * as process from "node:process";
 
 type ApiConfig = {
     url: string
@@ -8,9 +8,8 @@ type ApiConfig = {
 
 const APIS: Record<string, ApiConfig> = {
     "bidrag-sak": {
-        // url: "https://bidrag-sak-q2.intern.dev.nav.no",
-        url: "https://bidrag-sak-q2.dev-fss-pub.nais.io",
-        audience: "api://dev-fss.bidrag.bidrag-sak-q2/.default"
+        url: process.env.BIDRAG_SAK_URL || "",
+        audience: process.env.BIDRAG_SAK_AUDIENCE || ""
     }
 }
 
@@ -18,6 +17,7 @@ export type ApiAppName = keyof typeof APIS | string
 
 export function getApiConfig(app: ApiAppName ): ApiConfig {
     const api = APIS[app]
+    process.env.NODE_ENV = process.env.NODE_ENV || "development"
     if (!api) {
         throw new Error(`API config not found for app: ${app}`)
     }

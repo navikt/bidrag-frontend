@@ -8,6 +8,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 export const middleware = [authMiddleware];
 
+
 export async function loader({request, context}: Route.LoaderArgs) {
     const user = context.get(userContext);
     return {user};

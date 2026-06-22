@@ -25,12 +25,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Deploy til dev-gcp
+      - name: Deploy til dev-gcp q2
         uses: nais/deploy/actions/deploy@8a6fb62e73f837af6287d5db84a46ea96aa6c30d # v2
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
-          VARS: .nais/dev.yaml
+          VARS: .nais/q2.yaml
           IMAGE: ${{ needs.build.outputs.image }}
           TELEMETRY: ${{ needs.build.outputs.telemetry }}
 

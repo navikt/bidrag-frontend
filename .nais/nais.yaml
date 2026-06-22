@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: bidrag-frontend
+  name: {{name}}
   namespace: bidrag
   labels:
     team: bidrag
@@ -9,7 +9,9 @@ spec:
   image: {{image}}
   port: 3000
   ingresses:
-    - {{ingress}}
+    {{ #each ingresses as |url|}}
+      - {{url }}
+    {{/each}}
   azure:
     sidecar:
       enabled: true
@@ -56,3 +58,7 @@ spec:
       value: production
     - name: PORT
       value: "3000"
+  {{ #each env}}
+    - name: {{this.name }}
+      value: "{{this.value}}"
+  {{/each}}
