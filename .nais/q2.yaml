@@ -12,5 +12,5 @@ env:
 
 outbound:
   external:
-    - host: bidrag-sak-q2.dev-fss-pub.nais.io
+    - bidrag-sak-q2.dev-fss-pub.nais.io
 

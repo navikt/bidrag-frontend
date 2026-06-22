@@ -11,4 +11,4 @@ env:
 
 outbound:
   external:
-    -host: bidrag-sak.prod-fss-pub.nais.io
+    - bidrag-sak.prod-fss-pub.nais.io
