@@ -9,9 +9,9 @@ spec:
   image: {{image}}
   port: 3000
   ingresses:
-    {{ #each ingresses as |url|}}
-      - {{url }}
-    {{/each}}
+  {{#each ingresses as |url|}}
+    - {{url}}
+  {{/each}}
   azure:
     sidecar:
       enabled: true
@@ -25,9 +25,9 @@ spec:
   accessPolicy:
     outbound:
       external:
-        {{#each outbound.external as |host|}}
-          - host: {{host}}
-        {{/each}}
+      {{#each outbound.external as |host|}}
+        - host: {{host}}
+      {{/each}}
 
   observability:
     autoInstrumentation:
@@ -58,7 +58,7 @@ spec:
       value: production
     - name: PORT
       value: "3000"
-  {{ #each env}}
+  {{#each env}}
     - name: {{this.name }}
       value: "{{this.value}}"
   {{/each}}
