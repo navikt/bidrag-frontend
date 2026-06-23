@@ -120,9 +120,6 @@ importers:
       react-router:
         specifier: 'catalog:'
         version: 8.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      tailwindcss:
-        specifier: ^4.3.1
-        version: 4.3.1
     devDependencies:
       '@react-router/dev':
         specifier: 'catalog:'
@@ -191,9 +188,6 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
-      tailwindcss:
-        specifier: ^4.3.1
-        version: 4.3.1
       uuid:
         specifier: ^14
         version: 14.0.0
@@ -2353,9 +2347,6 @@ packages:
   tabbable@6.4.0:
     resolution: {integrity: sha512-05PUHKSNE8ou2dwIxTngl4EzcnsCDZGJ/iCLtDflR/SHB/ny14rXc+qU5P4mG9JkusiV7EivzY9Mhm55AzAvCg==}
 
-  tailwindcss@4.3.1:
-    resolution: {integrity: sha512-hk+TB1m+K8CYNrP6rjQaq/Y+4Zylwpa87mLYBKCunwnnQ9p+fHb7kmSfGqyEJoxF/O6CDyABWVFEafNSYKll+Q==}
-
   tdigest@0.1.2:
     resolution: {integrity: sha512-+G0LLgjjo9BZX2MfdvPfH+MKLCrxlXSYec5DaPYP1fe6Iyhf0/fSmJ0bFiZ1F8BT6cGXl2LpltQptzjXKWEkKA==}
 
@@ -2837,7 +2828,6 @@ snapshots:
       axios: 1.18.0
       echarts: 6.1.0
       lodash.debounce: 4.0.8
-      tailwindcss: 4.3.1
       uuid: 14.0.0
     transitivePeerDependencies:
       - '@types/react'
@@ -4846,8 +4836,6 @@ snapshots:
       - encoding
 
   tabbable@6.4.0: {}
-
-  tailwindcss@4.3.1: {}
 
   tdigest@0.1.2:
     dependencies:
