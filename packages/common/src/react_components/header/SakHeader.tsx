@@ -1,9 +1,7 @@
-import { BodyShort, CopyButton } from "@navikt/ds-react";
+import {Bleed, BodyShort, Box, CopyButton, HStack, VStack} from "@navikt/ds-react";
 
-import { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
-import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
-import BidragCell from "../grid/BidragCell";
-import BidragGrid from "../grid/BidragGrid";
+import {IRolleDetaljer} from "../../types/roller/IRolleDetaljer";
+import {RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName} from "../../types/roller/RolleType";
 import RolleDetaljer from "../roller/RolleDetaljer";
 
 interface ISkjermbildeDetaljer {
@@ -17,62 +15,57 @@ interface ISakHeaderProps {
     skjermbilde?: ISkjermbildeDetaljer;
 }
 
-export default function SakHeader({ saksnummer, roller, skjermbilde }: ISakHeaderProps) {
+export default function SakHeader({saksnummer, roller, skjermbilde}: ISakHeaderProps) {
     return (
-        <div className="bg-[var(--ax-neutral-100)] border-[var(--ax-border-neutral-subtle)] border-solid border-b w-full border-0">
-            {/** @ts-ignore **/}
-            <div className="px-6 py-1 flex items-center border-[var(--ax-border-neutral-subtle)] border-solid border-b border-0">
-                <SkjermbildeDetaljer saksnummer={saksnummer} skjermbilde={skjermbilde} />
-            </div>
-            <BidragGrid
-                className={
-                    "max-w-fit grid-flow-row grid-rows-none md:grid-flow-col sm:grid-rows-4 md:grid-rows-4 lg:grid-rows-3 xl:grid-rows-3 2xl:grid-rows-2 !gap-1 grid-cols-[max-content]"
-                }
-            >
-                {roller
-                    ?.filter((r) => r.rolleType != RolleTypeAbbreviation.BA && r.rolleType != RolleTypeFullName.BARN)
-                    ?.sort((a, b) =>
-                        a.rolleType == RolleTypeAbbreviation.BM || a.rolleType == RolleTypeDeprecated.BIDRAGS_MOTTAKER
-                            ? 1
-                            : -1
-                    )
-                    .map((rolle, i) => (
-                        <BidragCell key={rolle.ident + i} xs={12} md={7} lg={7}>
-                            <RolleDetaljer rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År} />
-                        </BidragCell>
-                    ))}
-                {roller
-                    ?.filter((r) => r.rolleType == RolleTypeAbbreviation.BA || r.rolleType == RolleTypeFullName.BARN)
-                    .map((rolle, i) => (
-                        <BidragCell key={rolle.ident + i} xs={12} md={7} lg={7}>
-                            <RolleDetaljer rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År} />
-                        </BidragCell>
-                    ))}
-            </BidragGrid>
-        </div>
+        <Bleed asChild marginInline="full">
+            <Box background="neutral-moderate" borderWidth="0 0 1 0" borderColor="neutral-subtle">
+                <Box paddingInline="space-24" paddingBlock="space-4" borderWidth="0 0 1 0" borderColor="neutral-subtle">
+                    <HStack align="center">
+                        <SkjermbildeDetaljer saksnummer={saksnummer} skjermbilde={skjermbilde}/>
+                    </HStack>
+                </Box>
+                <HStack wrap gap="space-4">
+                    {roller
+                        ?.filter((r) => r.rolleType !== RolleTypeAbbreviation.BA && r.rolleType !== RolleTypeFullName.BARN)
+                        ?.sort((a, b) =>
+                            a.rolleType === RolleTypeAbbreviation.BM || a.rolleType === RolleTypeDeprecated.BIDRAGS_MOTTAKER
+                                ? 1
+                                : -1
+                        )
+                        .map((rolle, i) => (
+                            <RolleDetaljer key={rolle.ident + i} rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År}/>
+                        ))}
+                    {roller
+                        ?.filter((r) => r.rolleType === RolleTypeAbbreviation.BA || r.rolleType === RolleTypeFullName.BARN)
+                        .map((rolle, i) => (
+                            <RolleDetaljer key={rolle.ident + i} rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År}/>
+                        ))}
+                </HStack>
+            </Box>
+        </Bleed>
     );
 }
 
-function SkjermbildeDetaljer({ saksnummer, skjermbilde }: { saksnummer: string; skjermbilde?: ISkjermbildeDetaljer }) {
+function SkjermbildeDetaljer({saksnummer, skjermbilde}: { saksnummer: string; skjermbilde?: ISkjermbildeDetaljer }) {
     return (
-        <div className="flex flex-row">
-            <span className="text-base flex items-center font-normal">
-                <BodyShort size={"small"} className="saksnr">
+        <HStack align="center" gap="space-4">
+            <HStack align="center">
+                <BodyShort size="small" className="saksnr">
                     Saksnr. {saksnummer}
                 </BodyShort>
-                <CopyButton size="small" copyText={saksnummer} activeText="Kopierte saksnummer" />
-            </span>
+                <CopyButton size="small" copyText={saksnummer} activeText="Kopierte saksnummer"/>
+            </HStack>
             {skjermbilde && (
                 <>
-                    <div className="mx-1 self-center">/</div>
-                    <span className="text-base flex items-center font-normal">
-                        <BodyShort size={"small"}>
+                    <BodyShort size="small">/</BodyShort>
+                    <VStack align="center">
+                        <BodyShort size="small">
                             {skjermbilde.navn} {skjermbilde.referanse}
                         </BodyShort>
-                        <CopyButton size="small" copyText={skjermbilde.referanse?.toString()} activeText="Kopiert" />
-                    </span>
+                        <CopyButton size="small" copyText={skjermbilde.referanse?.toString()} activeText="Kopiert"/>
+                    </VStack>
                 </>
             )}
-        </div>
+        </HStack>
     );
 }
