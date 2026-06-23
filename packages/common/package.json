@@ -12,8 +12,8 @@
     },
     "dependencies": {
         "@navikt/ds-css": "catalog:",
-        "@navikt/ds-icons": "catalog:",
         "@navikt/ds-react": "catalog:",
+        "@navikt/aksel-icons": "catalog:",
         "@tanstack/react-query": "catalog:",
         "api": "^6.1.3",
         "axios": "^1.18.0",

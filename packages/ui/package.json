@@ -12,7 +12,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@navikt/ds-icons": "catalog:",
+        "@navikt/aksel-icons": "catalog:",
         "@navikt/ds-react": "catalog:"
     },
     "devDependencies": {

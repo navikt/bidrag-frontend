@@ -11,7 +11,7 @@
         "check": "biome check --write .",
         "test": "echo TODO lag tester og greier",
         "deploy:clean": "rm -rf deploy_dist",
-        "deploy:web": "pnpm --filter web --prod deploy deploy_dist",
+        "deploy:web": "pnpm --filter web --prod --legacy deploy deploy_dist",
         "deploy:docker": "pnpm run build:all && pnpm run deploy:clean && pnpm run deploy:web"
     },
     "devDependencies": {

@@ -20,4 +20,13 @@ export default defineConfig({
             },
         },
     },
+    optimizeDeps: {
+        exclude: [
+            "@bidrag/common",
+            "@bidrag/api",
+            "@bidrag/ui",
+            "@bidrag/utils",
+            "@bidrag/types",
+        ],
+    }
 });
