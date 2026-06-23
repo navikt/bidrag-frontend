@@ -9,7 +9,7 @@ env:
   - name: BIDRAG_SAK_AUDIENCE
     value: api://dev-fss.bidrag.bidrag-sak-q2/.default
   - name: BIDRAG_ORGANISASJON_URL
-    value: https://bidrag-organisasjon-feature.dev-fss-pub.nais.io
+    value: https://bidrag-organisasjon-feature.dev-fss-pub.nais.io/bidrag-organisasjon
   - name: BIDRAG_ORGANISASJON_AUDIENCE
     value: api://dev-fss.bidrag.bidrag-organisasjon-feature/.default
 
