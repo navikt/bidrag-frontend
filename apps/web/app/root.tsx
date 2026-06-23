@@ -6,17 +6,14 @@ import { FaroErrorBoundary } from "@grafana/faro-react";
 import { authMiddleware } from "~/auth/auth.middleware.server.ts";
 import type { Route } from "../.react-router/types/app/+types/root.ts";
 import { userContext } from "~/context.ts";
-import { initFaro, getFaro } from "./faro.client";
+import { getFaro } from "./faro.client";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 
 export const middleware = [authMiddleware];
 
-export async function loader({ request, context }: Route.LoaderArgs) {
+export async function loader({ context }: Route.LoaderArgs) {
     const user = context.get(userContext);
-    return {
-        user,
-        faroConfig: { appName: process.env.NAIS_APP_NAME ?? "" },
-    };
+    return { user };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -39,12 +36,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
     const data = useRouteLoaderData<typeof loader>("root");
-
-    useEffect(() => {
-        if (data?.faroConfig) {
-            initFaro(data.faroConfig);
-        }
-    }, [data?.faroConfig]);
 
     useEffect(() => {
         if (data?.user?.NAVident) {

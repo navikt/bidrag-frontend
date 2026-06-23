@@ -1,28 +1,19 @@
 import { initializeFaro, getWebInstrumentations } from "@grafana/faro-web-sdk";
+import nais from "nais.js";
 
 let faroInstance: ReturnType<typeof initializeFaro> | null = null;
 
-export interface FaroConfig {
-    appName: string;
-}
-
-export function initFaro(config: FaroConfig) {
+export function initFaro() {
     if (faroInstance) {
         return faroInstance;
     }
 
-    const collectorUrl =
-        process.env.NAIS_CLUSTER_NAME === "prod-gcp"
-            ? "https://telemetry.nav.no/collect"
-            : "https://telemetry.ekstern.dev.nav.no/collect";
+    const collectorUrl = nais.telemetryCollectorURL;
 
     faroInstance = initializeFaro({
         url: collectorUrl,
         paused: window.location.hostname === "localhost",
-        app: {
-            name: config.appName,
-            namespace: "bidrag",
-        },
+        app: nais.app,
         instrumentations: [
             ...getWebInstrumentations({
                 captureConsole: true,
