@@ -14,7 +14,7 @@ interface UseApiOptions {
 
 export function proxy<T extends AxiosClient>(api: T, options: UseApiOptions): T {
     api.instance.defaults.baseURL = `/proxy/${options.app}`
-    console.log("proxy", options, api.instance.defaults.baseURL);
+    console.debug("proxy", options, api.instance.defaults.baseURL);
     return api
 
 }

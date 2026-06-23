@@ -10,17 +10,21 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
 
     const apiConfig = getApiConfig(app);
     const token = await getOnBehalfOfToken(user, apiConfig.audience);
+    console.log(apiConfig);
 
-    // Bygg backend-URL: behold path etter /proxy/:app
+    // Bygg backend-URL: behold path etter /proxy/:app, legg til base-URL sin path
     const incomingUrl = new URL(request.url);
-    const backendUrl = new URL(incomingUrl.pathname.replace(`/proxy/${app}`, "") + incomingUrl.search, apiConfig.url);
+    const subPath = incomingUrl.pathname.replace(`/proxy/${app}`, "");
 
+    const baseUrl = new URL(apiConfig.url);
+    const backendUrl = new URL(
+        baseUrl.pathname.replace(/\/$/, "") + subPath + incomingUrl.search,
+        baseUrl.origin
+    );
     // Kopier headers fra original request, bytt ut Authorization
     const headers = new Headers(request.headers);
     headers.set("Authorization", `Bearer ${token}`);
     headers.delete("host");
-
-    console.log("proxy", request.method,incomingUrl , "->", backendUrl);
 
     const backendResponse = await fetch(backendUrl.toString(), {
         method: request.method,
@@ -28,6 +32,8 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
         body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
         duplex: "half",
     } as RequestInit);
+
+    console.info("proxy", request.method, incomingUrl.href, "->", backendUrl.href, "status", backendResponse.status);
 
     return new Response(backendResponse.body, {
         status: backendResponse.status,
@@ -37,7 +43,6 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
 }
 
 export async function loader({params, request, context}: Route.LoaderArgs) {
-    console.log("proxy", request.url);
     return proxyRequest(request, params.app, context);
 }
 
