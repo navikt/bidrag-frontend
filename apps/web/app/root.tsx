@@ -1,18 +1,17 @@
-import {Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData} from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } from "react-router";
 import { useEffect } from "react";
 import "@navikt/ds-css";
-import {AppLayout} from "@bidrag/ui";
+import { AppLayout } from "@bidrag/ui";
 import { FaroErrorBoundary } from "@grafana/faro-react";
-import {authMiddleware} from "~/auth/auth.middleware.server.ts";
-import type {Route} from "../.react-router/types/app/+types/root.ts";
-import {userContext} from "~/context.ts";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { authMiddleware } from "~/auth/auth.middleware.server.ts";
+import type { Route } from "../.react-router/types/app/+types/root.ts";
+import { userContext } from "~/context.ts";
 import { initFaro, getFaro } from "./faro.client";
+import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 
 export const middleware = [authMiddleware];
 
-
-export async function loader({request, context}: Route.LoaderArgs) {
+export async function loader({ request, context }: Route.LoaderArgs) {
     const user = context.get(userContext);
     return {
         user,
@@ -23,21 +22,20 @@ export async function loader({request, context}: Route.LoaderArgs) {
     };
 }
 
-
-export function Layout({children}: { children: React.ReactNode }) {
+export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="nb">
-        <head>
-            <meta charSet="utf-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <Meta/>
-            <Links/>
-        </head>
-        <body>
-        {children}
-        <ScrollRestoration/>
-        <Scripts/>
-        </body>
+            <head>
+                <meta charSet="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <Meta />
+                <Links />
+            </head>
+            <body>
+                {children}
+                <ScrollRestoration />
+                <Scripts />
+            </body>
         </html>
     );
 }
@@ -58,13 +56,13 @@ export default function App() {
     }, [data?.user?.NAVident]);
 
     return (
-        <QueryClientProvider client={new QueryClient()}>
+        <QueryClientWrapper>
             <FaroErrorBoundary fallback={<div>Noe gikk galt</div>}>
                 <AppLayout brukerNavn={data?.user?.name}>
                     <Outlet />
                 </AppLayout>
             </FaroErrorBoundary>
-        </QueryClientProvider>
+        </QueryClientWrapper>
     );
 }
 

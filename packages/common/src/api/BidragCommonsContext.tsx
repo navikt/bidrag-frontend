@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, UseSuspenseQueryResult } from "@tanstack/react-query";
 import React, { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 
-import { Graderingsinfo, PersonDto } from "./PersonApi";
+import type { Graderingsinfo, PersonDto } from "@bidrag/api/PersonApi";
 import { useHentPersonData, useHentPersonSkjermingInfo } from "./useApiData";
 
 // Define context type

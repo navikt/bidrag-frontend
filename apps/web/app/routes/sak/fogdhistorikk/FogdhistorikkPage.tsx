@@ -1,9 +1,9 @@
 import {Box, Heading, LocalAlert, VStack} from "@navikt/ds-react";
 
-import PageLoadingSpinner from "../../components/loadingspinner/PageLoadingSpinner";
+import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import {useHentFogdhistorikk} from "../useApi.ts";
 import FogdhistorikkTabell from "./components/FogdhistorikkTabell";
-import type {Route} from "+/routes/sak/fogdhistorikk/+types/FogdhistorikkPage.ts";
+import type {Route} from "+/routes/sak/fogdhistorikk/+types/FogdhistorikkPage";
 
 export default function FogdhistorikkPage({params}: Route.ComponentProps) {
     const {saksnummer} = params;

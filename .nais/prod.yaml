@@ -8,12 +8,54 @@ env:
     value: https://bidrag-sak.prod-fss-pub.nais.io
   - name: BIDRAG_SAK_AUDIENCE
     value: api://prod-fss.bidrag.bidrag-sak/.default
+
   - name: BIDRAG_ORGANISASJON_URL
     value: https://bidrag-organisasjon.prod-fss-pub.nais.io/bidrag-organisasjon
   - name: BIDRAG_ORGANISASJON_AUDIENCE
     value: api://prod-fss.bidrag.bidrag-organisasjon/.default
 
+  - name: BIDRAG_PERSON_URL
+    value: https://bidrag-person.prod-fss-pub.nais.io/bidrag-person
+  - name: BIDRAG_PERSON_AUDIENCE
+    value: api://prod-fss.bidrag.bidrag-person/.default
+
+  - name: BIDRAG_TILGANGSKONTROLL_URL
+    value: http://bidrag-tilgangskontroll
+  - name: BIDRAG_TILGANGSKONTROLL_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-tilgangskontroll/.default
+
+  - name: BIDRAG_SAMHANDLER_URL
+    value: http://bidrag-samhandler
+  - name: BIDRAG_SAMHANDLER_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-samhandler/.default
+
+  - name: BIDRAG_BELOPSHISTORIKK_URL
+    value: http://bidrag-belopshistorikk
+  - name: BIDRAG_BELOPSHISTORIKK_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-belopshistorikk/.default
+
+  - name: BIDRAG_VEDTAK_URL
+    value: http://bidrag-vedtak
+  - name: BIDRAG_VEDTAK_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-vedtak/.default
+
+  - name: BIDRAG_RESKONTRO_URL
+    value: http://bidrag-reskontro
+  - name: BIDRAG_RESKONTRO_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-reskontro/.default
+
+  - name: BISYS_URL
+    value: https://wasapp.adeo.no/rtv-bidrag/
+
+
 outbound:
+  rules:
+    - application: bidrag-tilgangskontroll
+    - application: bidrag-samhandler
+    - application: bidrag-belopshistorikk
+    - application: bidrag-vedtak
+    - application: bidrag-reskontro
   external:
     - bidrag-sak.prod-fss-pub.nais.io
     - bidrag-organisasjon.prod-fss-pub.nais.io
+    - bidrag-person.prod-fss-pub.nais.io
