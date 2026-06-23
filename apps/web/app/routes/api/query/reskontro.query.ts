@@ -1,7 +1,7 @@
-import { SecureLoggerService } from "@navikt/bidrag-ui-common";
+import { SecureLoggerService } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
 
-import { BIDRAG_RESKONTRO_API } from "../../api";
+import { BIDRAG_RESKONTRO_API } from "@bidrag/api";
 import { withQueryErrorHandling } from "./withQueryErrorHandling";
 
 export function hentReskontroTransaksjonerForSaksnummer(saksnummer: string) {

@@ -145,15 +145,6 @@ importers:
 
   packages/api:
     dependencies:
-      '@bidrag/common':
-        specifier: workspace:*
-        version: file:packages/common(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@bidrag/types':
-        specifier: workspace:*
-        version: link:../types
-      '@tanstack/react-query':
-        specifier: 'catalog:'
-        version: 5.101.0(react@19.2.7)
       '@types/node':
         specifier: ^25
         version: 25.9.3
@@ -386,9 +377,6 @@ packages:
 
   '@bidrag/common@file:packages/common':
     resolution: {directory: packages/common, type: directory}
-
-  '@bidrag/types@file:packages/types':
-    resolution: {directory: packages/types, type: directory}
 
   '@biomejs/biome@2.5.0':
     resolution: {integrity: sha512-4kURkd9hAPrdDM3C9n82ycYgx8hvQcW6MjKTEejruj8rK0N8P3OPpdy8BvI8kt3KWY4ycF5XtDOrktetEfhfuw==}
@@ -2928,25 +2916,17 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@bidrag/api@file:packages/api(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@bidrag/api@file:packages/api':
     dependencies:
-      '@bidrag/common': file:packages/common(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@bidrag/types': file:packages/types
-      '@tanstack/react-query': 5.101.0(react@19.2.7)
       '@types/node': 25.9.3
       axios: 1.18.0
     transitivePeerDependencies:
-      - '@types/react'
       - debug
-      - encoding
-      - openapi-types
-      - react
-      - react-dom
       - supports-color
 
   '@bidrag/common@file:packages/common(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@bidrag/api': file:packages/api(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@bidrag/api': file:packages/api
       '@navikt/ds-css': 8.12.1
       '@navikt/ds-icons': 3.4.3(@types/react@19.2.17)(react@19.2.7)
       '@navikt/ds-react': 8.12.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -2964,8 +2944,6 @@ snapshots:
       - react
       - react-dom
       - supports-color
-
-  '@bidrag/types@file:packages/types': {}
 
   '@biomejs/biome@2.5.0':
     optionalDependencies:

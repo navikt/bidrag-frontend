@@ -1,14 +1,9 @@
 import { SecureLoggerService } from "@bidrag/common";
-import { ProblemDetail } from "./ProblemDetail";
+import { type ProblemDetail, TilgangsFeilError } from "@bidrag/api";
 import axios, { AxiosError } from "axios";
 
 
-export class TilgangsFeilError extends Error {
-    constructor(message: string = "Du har ikke tilgang til denne ressursen") {
-        super(message);
-        this.name = "TilgangsFeilError";
-    }
-}
+
 
 export async function withQueryErrorHandling<T>(
     queryName: string,
