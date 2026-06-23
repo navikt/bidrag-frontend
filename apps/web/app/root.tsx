@@ -4,7 +4,7 @@ import {AppLayout} from "@bidrag/ui";
 import {authMiddleware} from "~/auth/auth.middleware.server.ts";
 import type {Route} from "../.react-router/types/app/+types/root.ts";
 import {userContext} from "~/context.ts";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {QueryClientWrapper} from "~/common/QueryClientWrapper"
 
 export const middleware = [authMiddleware];
 
@@ -37,11 +37,11 @@ export default function App() {
     const data = useRouteLoaderData<typeof loader>("root");
 
     return (
-        <QueryClientProvider client={new QueryClient()}>
+        <QueryClientWrapper>
             <AppLayout brukerNavn={data?.user?.name}>
                 <Outlet/>
             </AppLayout>
-        </QueryClientProvider>
+        </QueryClientWrapper>
     );
 }
 

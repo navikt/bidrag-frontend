@@ -1,6 +1,6 @@
 import { SecureLoggerService } from "@navikt/bidrag-ui-common";
 
-import { BIDRAG_VEDTAK_API } from "../api";
+import { BIDRAG_VEDTAK_API } from "../../api";
 import { withQueryErrorHandling } from "./withQueryErrorHandling";
 
 export function hentVedtakQuery(vedtaksId: number) {
