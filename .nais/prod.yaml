@@ -8,7 +8,12 @@ env:
     value: https://bidrag-sak.prod-fss-pub.nais.io
   - name: BIDRAG_SAK_AUDIENCE
     value: api://prod-fss.bidrag.bidrag-sak/.default
+  - name: BIDRAG_ORGANISASJON_URL
+    value: https://bidrag-organisasjon.prod-fss-pub.nais.io/bidrag-organisasjon
+  - name: BIDRAG_ORGANISASJON_AUDIENCE
+    value: api://prod-fss.bidrag.bidrag-organisasjon/.default
 
 outbound:
   external:
     - bidrag-sak.prod-fss-pub.nais.io
+    - bidrag-organisasjon.prod-fss-pub.nais.io
