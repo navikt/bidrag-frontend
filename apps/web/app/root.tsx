@@ -1,17 +1,26 @@
 import {Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData} from "react-router";
+import { useEffect } from "react";
 import "@navikt/ds-css";
 import {AppLayout} from "@bidrag/ui";
+import { FaroErrorBoundary } from "@grafana/faro-react";
 import {authMiddleware} from "~/auth/auth.middleware.server.ts";
 import type {Route} from "../.react-router/types/app/+types/root.ts";
 import {userContext} from "~/context.ts";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { initFaro, getFaro } from "./faro.client";
 
 export const middleware = [authMiddleware];
 
 
 export async function loader({request, context}: Route.LoaderArgs) {
     const user = context.get(userContext);
-    return {user};
+    return {
+        user,
+        faroConfig: {
+            appName: process.env.NAIS_APP_NAME ?? "",
+            collectorUrl: process.env.NAIS_FRONTEND_TELEMETRY_COLLECTOR_URL ?? "",
+        },
+    };
 }
 
 
@@ -36,11 +45,25 @@ export function Layout({children}: { children: React.ReactNode }) {
 export default function App() {
     const data = useRouteLoaderData<typeof loader>("root");
 
+    useEffect(() => {
+        if (data?.faroConfig) {
+            initFaro(data.faroConfig);
+        }
+    }, [data?.faroConfig]);
+
+    useEffect(() => {
+        if (data?.user?.NAVident) {
+            getFaro()?.api.setUser({ id: data.user.NAVident });
+        }
+    }, [data?.user?.NAVident]);
+
     return (
         <QueryClientProvider client={new QueryClient()}>
-            <AppLayout brukerNavn={data?.user?.name}>
-                <Outlet/>
-            </AppLayout>
+            <FaroErrorBoundary fallback={<div>Noe gikk galt</div>}>
+                <AppLayout brukerNavn={data?.user?.name}>
+                    <Outlet />
+                </AppLayout>
+            </FaroErrorBoundary>
         </QueryClientProvider>
     );
 }
