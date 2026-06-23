@@ -15,10 +15,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     const user = context.get(userContext);
     return {
         user,
-        faroConfig: {
-            appName: process.env.NAIS_APP_NAME ?? "",
-            collectorUrl: process.env.NAIS_FRONTEND_TELEMETRY_COLLECTOR_URL ?? "",
-        },
+        faroConfig: { appName: process.env.NAIS_APP_NAME ?? "" },
     };
 }
 

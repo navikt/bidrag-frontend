@@ -4,7 +4,6 @@ let faroInstance: ReturnType<typeof initializeFaro> | null = null;
 
 export interface FaroConfig {
     appName: string;
-    collectorUrl: string;
 }
 
 export function initFaro(config: FaroConfig) {
@@ -12,8 +11,13 @@ export function initFaro(config: FaroConfig) {
         return faroInstance;
     }
 
+    const collectorUrl =
+        process.env.NODE_ENV === "production"
+            ? "https://telemetry.nav.no/collect"
+            : "https://telemetry.ekstern.dev.nav.no/collect";
+
     faroInstance = initializeFaro({
-        url: config.collectorUrl,
+        url: collectorUrl,
         paused: window.location.hostname === "localhost",
         app: {
             name: config.appName,
