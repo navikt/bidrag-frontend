@@ -7,14 +7,57 @@ env:
   - name: BIDRAG_SAK_URL
     value: https://bidrag-sak-q1.dev-fss-pub.nais.io
   - name: BIDRAG_SAK_AUDIENCE
-    value: api://dev-fss.bidrag.bidrag-sak-q2/.default
+    value: api://dev-fss.bidrag.bidrag-sak-q1/.default
+
   - name: BIDRAG_ORGANISASJON_URL
     value: https://bidrag-organisasjon-feature.dev-fss-pub.nais.io/bidrag-organisasjon
   - name: BIDRAG_ORGANISASJON_AUDIENCE
     value: api://dev-fss.bidrag.bidrag-organisasjon-feature/.default
 
+  - name: BIDRAG_PERSON_URL
+    value: https://bidrag-person-q1.dev-fss-pub.nais.io/bidrag-person
+  - name: BIDRAG_PERSON_AUDIENCE
+    value: api://dev-fss.bidrag.bidrag-person-q1/.default
+
+  - name: BIDRAG_TILGANGSKONTROLL_URL
+    value: http://bidrag-tilgangskontroll-feature
+  - name: BIDRAG_TILGANGSKONTROLL_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-tilgangskontroll-feature/.default
+
+  - name: BIDRAG_SAMHANDLER_URL
+    value: http://bidrag-samhandler-q1
+  - name: BIDRAG_SAMHANDLER_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-samhandler-q1/.default
+
+  - name: BIDRAG_BELOPSHISTORIKK_URL
+    value: http://bidrag-belopshistorikk-q1
+  - name: BIDRAG_BELOPSHISTORIKK_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-belopshistorikk-q1/.default
+
+  - name: BIDRAG_VEDTAK_URL
+    value: http://bidrag-vedtak-q1
+  - name: BIDRAG_VEDTAK_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-vedtak-q1/.default
+
+  - name: BIDRAG_RESKONTRO_URL
+    value: http://bidrag-reskontro-q1
+  - name: BIDRAG_RESKONTRO_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-reskontro-q1/.default
+
+  - name: BISYS_URL
+    value: https://wasapp-q1.adeo.no/rtv-bidrag/
+
 outbound:
+  rules:
+    - application: bidrag-tilgangskontroll-feature
+    - application: bidrag-samhandler-q1
+    - application: bidrag-belopshistorikk-q1
+    - application: bidrag-vedtak-q1
+    - application: bidrag-reskontro-q1
   external:
     - bidrag-sak-q1.dev-fss-pub.nais.io
     - bidrag-organisasjon-feature.dev-fss-pub.nais.io
+    - bidrag-person-q1.dev-fss-pub.nais.io
+
+
 

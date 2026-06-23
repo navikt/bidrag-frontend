@@ -24,6 +24,10 @@ spec:
           - NAVident
   accessPolicy:
     outbound:
+      rules:
+      {{#each outbound.rules as |rule|}}
+        - application: {{rule.application }}
+      {{/each}}
       external:
       {{#each outbound.external as |host|}}
         - host: {{host}}

@@ -23,7 +23,7 @@ export default function SakLayout({params}: Route.ComponentProps) {
     return (
         <VStack gap={"space-32"}>
             <Suspense fallback={<Loader size="xsmall"/>}>
-                {/*<SakHeader saksnummer={saksnummer} roller={roller}/>*/}
+                <SakHeader saksnummer={saksnummer} roller={roller}/>
             </Suspense>
             <Page>
                 <Page.Block width="xl" gutters={true}>
