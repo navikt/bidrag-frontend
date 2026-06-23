@@ -40,7 +40,7 @@ export function initFaro() {
 
             // Drop items that may contain fødselsnummer (11-digit pattern)
             const payload = JSON.stringify(item);
-            if (/\d{11}/.test(payload)) {
+            if (/\b\d{11}\b/.test(payload)) {
                 return null;
             }
 
