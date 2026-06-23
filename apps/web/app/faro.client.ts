@@ -12,7 +12,7 @@ export function initFaro(config: FaroConfig) {
     }
 
     const collectorUrl =
-        process.env.NODE_ENV === "production"
+        process.env.NAIS_CLUSTER_NAME === "prod-gcp"
             ? "https://telemetry.nav.no/collect"
             : "https://telemetry.ekstern.dev.nav.no/collect";
 
