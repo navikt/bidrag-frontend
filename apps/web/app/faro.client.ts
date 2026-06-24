@@ -1,5 +1,5 @@
 import { initializeFaro, getWebInstrumentations } from "@grafana/faro-web-sdk";
-import nais from "nais.js";
+import nais from "./nais.js";
 
 let faroInstance: ReturnType<typeof initializeFaro> | null = null;
 
