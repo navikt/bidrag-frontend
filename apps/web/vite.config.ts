@@ -3,8 +3,8 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
     plugins: [reactRouter()],
-    resolve:{
-        tsconfigPaths: true
+    resolve: {
+        tsconfigPaths: true,
     },
     server: {
         port: 3000,
@@ -12,12 +12,7 @@ export default defineConfig({
     },
     build: {
         rollupOptions: {
-            external: ["nais.js"],
-            output: {
-                paths: {
-                    "nais.js": "/nais.js",
-                },
-            },
+            external: ["./nais.js"],
         },
     },
     optimizeDeps: {
@@ -28,5 +23,5 @@ export default defineConfig({
             "@bidrag/utils",
             "@bidrag/types",
         ],
-    }
+    },
 });
