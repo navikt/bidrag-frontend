@@ -8,10 +8,8 @@ export function initFaro() {
         return faroInstance;
     }
 
-    const collectorUrl = nais.telemetryCollectorURL;
-
     faroInstance = initializeFaro({
-        url: collectorUrl,
+        url: nais.telemetryCollectorURL,
         paused: window.location.hostname === "localhost",
         app: nais.app,
         instrumentations: [
