@@ -1,5 +1,5 @@
 import { initializeFaro, getWebInstrumentations } from "@grafana/faro-web-sdk";
-import nais from "nais.js";
+import nais from "./nais.js";
 
 let faroInstance: ReturnType<typeof initializeFaro> | null = null;
 
@@ -8,10 +8,8 @@ export function initFaro() {
         return faroInstance;
     }
 
-    const collectorUrl = nais.telemetryCollectorURL;
-
     faroInstance = initializeFaro({
-        url: collectorUrl,
+        url: nais.telemetryCollectorURL,
         paused: window.location.hostname === "localhost",
         app: nais.app,
         instrumentations: [
