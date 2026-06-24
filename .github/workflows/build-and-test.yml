@@ -5,6 +5,12 @@ on:
       READER_TOKEN:
         required: true
         description: 'Token with read access to the repository'
+    inputs:
+      docker:
+        description: 'Build Docker image'
+        required: false
+        default: true
+        type: boolean
     outputs:
       image:
         description: 'Docker image'
@@ -42,6 +48,7 @@ jobs:
         run: pnpm run deploy:docker
 
       - name: Push Docker-image til GAR
+        if : ${{ inputs.docker }}
         uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
         id: docker-build-push
         with:

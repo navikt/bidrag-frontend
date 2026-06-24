@@ -1,8 +1,5 @@
-name: PR
-
 on:
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,10 +10,10 @@ jobs:
       contents: read
       id-token: write
 
-  deploy_dev:
+  deploy_q1:
     needs:
       - build
-    name: "Deploy til dev"
+    name: "Deploy til q1"
     runs-on: ubuntu-latest
     permissions:
       packages: read
@@ -25,12 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Deploy til dev-gcp q2
+      - name: Deploy til dev-gcp q1
         uses: nais/deploy/actions/deploy@8a6fb62e73f837af6287d5db84a46ea96aa6c30d # v2
         env:
+          ENVIRONMENT: q1
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
-          VARS: .nais/q2.yaml
+          VARS: .nais/q1.yaml
           IMAGE: ${{ needs.build.outputs.image }}
           TELEMETRY: ${{ needs.build.outputs.telemetry }}
-

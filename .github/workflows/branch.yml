@@ -1,0 +1,16 @@
+on:
+  push:
+    branches-ignore: [ main ]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-test.yml
+    with:
+      docker: false
+    secrets: inherit
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+
+
