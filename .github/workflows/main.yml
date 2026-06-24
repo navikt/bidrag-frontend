@@ -1,3 +1,4 @@
+name: "Deploy til prod"
 on:
   push:
     branches: [ main ]

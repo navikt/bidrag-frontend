@@ -1,3 +1,4 @@
+name: Deploy til q1
 on:
   workflow_dispatch:
 
