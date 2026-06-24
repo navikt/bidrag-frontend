@@ -1,10 +1,9 @@
-import { Box } from "@navikt/ds-react";
-import type { ReactNode } from "react";
+import { Page } from "@navikt/ds-react";
 import { AppHeader } from "./AppHeader.tsx";
 import { NavMenu, type NavMenuItem } from "./NavMenu.tsx";
 
 interface AppLayoutProps {
-    children: ReactNode;
+    children: React.ReactNode;
     brukerNavn?: string;
     navItems?: NavMenuItem[];
 }
@@ -15,17 +14,12 @@ export function AppLayout({ children, brukerNavn, navItems }: AppLayoutProps) {
     };
 
     return (
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <Page>
             <AppHeader brukerNavn={brukerNavn} onLoggUt={handleLoggUt} />
             {navItems && navItems.length > 0 && <NavMenu items={navItems} />}
-            <Box
-                as="main"
-                paddingBlock={{ xs: "space-16", md: "space-24" }}
-                paddingInline={{ xs: "space-16", md: "space-40" }}
-                style={{ flex: 1 }}
-            >
+            <Page.Block as="main" gutters>
                 {children}
-            </Box>
-        </div>
+            </Page.Block>
+        </Page>
     );
 }
