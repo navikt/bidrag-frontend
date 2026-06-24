@@ -1,34 +1,35 @@
-import {Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData} from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } from "react-router";
+import { useEffect } from "react";
 import "@navikt/ds-css";
-import {AppLayout} from "@bidrag/ui";
-import {authMiddleware} from "~/auth/auth.middleware.server.ts";
-import type {Route} from "../.react-router/types/app/+types/root.ts";
-import {userContext} from "~/context.ts";
-import {QueryClientWrapper} from "~/common/QueryClientWrapper"
+import { AppLayout } from "@bidrag/ui";
+import { FaroErrorBoundary } from "@grafana/faro-react";
+import { authMiddleware } from "~/auth/auth.middleware.server.ts";
+import type { Route } from "../.react-router/types/app/+types/root.ts";
+import { userContext } from "~/context.ts";
+import { getFaro } from "./faro.client";
+import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 
 export const middleware = [authMiddleware];
 
-
-export async function loader({request, context}: Route.LoaderArgs) {
+export async function loader({ context }: Route.LoaderArgs) {
     const user = context.get(userContext);
-    return {user};
+    return { user };
 }
 
-
-export function Layout({children}: { children: React.ReactNode }) {
+export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="nb">
-        <head>
-            <meta charSet="utf-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <Meta/>
-            <Links/>
-        </head>
-        <body>
-        {children}
-        <ScrollRestoration/>
-        <Scripts/>
-        </body>
+            <head>
+                <meta charSet="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <Meta />
+                <Links />
+            </head>
+            <body>
+                {children}
+                <ScrollRestoration />
+                <Scripts />
+            </body>
         </html>
     );
 }
@@ -36,11 +37,19 @@ export function Layout({children}: { children: React.ReactNode }) {
 export default function App() {
     const data = useRouteLoaderData<typeof loader>("root");
 
+    useEffect(() => {
+        if (data?.user?.NAVident) {
+            getFaro()?.api.setUser({ id: data.user.NAVident });
+        }
+    }, [data?.user?.NAVident]);
+
     return (
         <QueryClientWrapper>
-            <AppLayout brukerNavn={data?.user?.name}>
-                <Outlet/>
-            </AppLayout>
+            <FaroErrorBoundary fallback={<ErrorBoundary />}>
+                <AppLayout brukerNavn={data?.user?.name}>
+                    <Outlet />
+                </AppLayout>
+            </FaroErrorBoundary>
         </QueryClientWrapper>
     );
 }

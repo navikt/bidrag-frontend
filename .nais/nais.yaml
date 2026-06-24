@@ -33,6 +33,10 @@ spec:
         - host: {{host}}
       {{/each}}
 
+  frontend:
+    generatedConfig:
+      mountPath: /app/build/client/nais.js
+
   observability:
     autoInstrumentation:
       enabled: true

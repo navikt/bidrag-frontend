@@ -10,4 +10,14 @@ export default defineConfig({
         port: 3000,
         host: true, // Lytt på 0.0.0.0 slik at host.docker.internal kan nå serveren
     },
+    build: {
+        rollupOptions: {
+            external: ["nais.js"],
+            output: {
+                paths: {
+                    "nais.js": "/nais.js",
+                },
+            },
+        },
+    },
 });
