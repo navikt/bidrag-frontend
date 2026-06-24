@@ -6,7 +6,7 @@ import {Api as BidragPersonApi} from "./api/PersonApi";
 import {Api as BidragSakApi} from "./api/SakApi";
 import {Api as BidragSamhandler} from "./api/SamhandlerApi";
 import {Api as BidragTilgangskontroll} from "./api/TilgangskontrollApi";
-import {proxy} from "./api/proxyApi";
+import {proxy} from "./proxyApi";
 
 export const BIDRAG_TILGANGSKONTROLL_API = proxy(
     new BidragTilgangskontroll(),

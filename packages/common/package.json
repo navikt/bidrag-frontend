@@ -11,16 +11,18 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@bidrag/api": "workspace:",
         "@navikt/ds-css": "catalog:",
-        "@navikt/ds-icons": "catalog:",
         "@navikt/ds-react": "catalog:",
+        "@navikt/aksel-icons": "catalog:",
         "@tanstack/react-query": "catalog:",
         "api": "^6.1.3",
         "axios": "^1.18.0",
         "echarts": "^6.1",
         "lodash.debounce": "^4.0.8",
         "uuid": "^14"
+    },
+    "peerDependencies": {
+        "@bidrag/api": "workspace:"
     },
     "devDependencies": {
         "@opentelemetry/api": "^1.9.0",

@@ -11,6 +11,7 @@ import {
 import { AxiosError } from "axios";
 
 import {
+    TilgangsFeilError,
     BIDRAG_ORGANISASJON_API,
     BIDRAG_PERSON_API,
     BIDRAG_SAK_API,
@@ -27,9 +28,7 @@ import {
     OpprettSakRequest,
 } from "@bidrag/api/SakApi";
 import { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
-import environment from "@bidrag/api/environment";
-import { ISamhandlerPersonInfo } from "./types/person.ts";
-import {TilgangsFeilError} from "@bidrag/api/query/withQueryErrorHandling";
+import { ISamhandlerPersonInfo } from "./types/person";
 
 
 
@@ -112,12 +111,6 @@ export function useOpprettSak() {
         mutationKey: ["opprett_sak"],
         mutationFn: async (request: OpprettSakRequest) => {
             try {
-                if (environment.system.debugMode === true) {
-                    const DELAY_MS = 3000;
-                    await new Promise((resolve) => setTimeout(resolve, DELAY_MS));
-                    console.log(`Simulert opprettelse av sak med request ${JSON.stringify(request)}`);
-                    return "2600614";
-                }
                 const response = await BIDRAG_SAK_API.sak.opprettSak(request);
                 const saksnummer = response.data.saksnummer;
                 await SecureLoggerService.info(
@@ -263,14 +256,6 @@ export function useOppdaterSaksroller() {
         mutationKey: ["oppdater_saksroller"],
         mutationFn: async (request: OppdaterRollerISakRequest) => {
             try {
-                if (environment.system.debugMode === true) {
-                    const DELAY_MS = 3000;
-                    await new Promise((resolve) => setTimeout(resolve, DELAY_MS));
-                    // @ts-ignore
-                    return queryClient.getQueryData<BidragssakDto>(
-                        QueryKeys.hentSak(request.saksnummer)
-                    ) as OppdaterSakResponse;
-                }
                 const response = await BIDRAG_SAK_API.sak.oppdaterSakRoller(request);
                 const sak = response.data;
                 await SecureLoggerService.info(

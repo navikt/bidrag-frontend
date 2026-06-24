@@ -24,10 +24,7 @@
 
     },
     "dependencies": {
-        "@bidrag/types": "workspace:*",
-        "@bidrag/common": "workspace:*",
         "axios": "^1.18.0",
-        "@tanstack/react-query": "catalog:",
         "@types/node": "^25"
     },
     "devDependencies": {

@@ -1,9 +1,9 @@
 allowBuilds:
   es5-ext: false
   esbuild: true
-injectWorkspacePackages: true
+#injectWorkspacePackages: true
 # Denne trengs for bygging av Docker-image, men vi bør kanskje finne en annen løsning
-forceLegacyDeploy: true
+#forceLegacyDeploy: true
 
 packages:
   - "apps/*"
@@ -16,17 +16,9 @@ catalog:
   "@types/react-dom": "^19.2.3"
   "@navikt/ds-react": "^8.12.1"
   "@navikt/ds-css": "^8.12.1"
-  "@navikt/ds-tokens": "^8.12.1"
-  "@navikt/ds-icons": "^3.4.3"
+  "@navikt/aksel-icons": "^8.13.1"
   "@tanstack/react-query": "^5.101.0"
   "react-router": "^8.0.0"
   "@react-router/node": "^8.0.0"
   "@react-router/serve": "^8.0.0"
   "@react-router/dev": "^8.0.0"
-
-minimumReleaseAgeExclude:
-  - '@react-router/dev@8.0.0'
-  - '@react-router/express@8.0.0'
-  - '@react-router/node@8.0.0'
-  - '@react-router/serve@8.0.0'
-  - react-router@8.0.0
