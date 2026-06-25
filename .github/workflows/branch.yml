@@ -1,3 +1,4 @@
+name: Bygg og test på branch
 on:
   push:
     branches-ignore: [ main ]

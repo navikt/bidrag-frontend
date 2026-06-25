@@ -30,7 +30,7 @@ jobs:
           ENVIRONMENT: q1
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
-          VARS: .nais/q2.yaml
+          VARS: .nais/q1.yaml
           IMAGE: ${{ needs.build.outputs.image }}
           TELEMETRY: ${{ needs.build.outputs.telemetry }}
 
