@@ -46,7 +46,7 @@ export default function App() {
     return (
         <QueryClientWrapper>
             <FaroErrorBoundary fallback={<ErrorBoundary />}>
-                <AppLayout brukerNavn={data?.user?.name}>
+                <AppLayout bruker={data?.user}>
                     <Outlet />
                 </AppLayout>
             </FaroErrorBoundary>
