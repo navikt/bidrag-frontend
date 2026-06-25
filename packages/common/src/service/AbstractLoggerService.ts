@@ -1,4 +1,4 @@
-import { context, propagation } from "@opentelemetry/api";
+// import { context, propagation } from "@opentelemetry/api";
 
 import { CustomError, IErrorContext } from "../types";
 import { ErrorInfo, LogErrorType, LogInfo, LogLevel, LogResponse } from "../types";
@@ -52,12 +52,12 @@ export abstract class AbstractLoggerService {
         const parentCtx = window.__otelSessionContext || context.active();
         const carrier: Record<string, string> = {};
 
-        propagation.inject(parentCtx, carrier);
+        // propagation.inject(parentCtx, carrier);
         const logInfo: LogInfo = {
             message,
             level,
-            appName: StringUtils.isEmpty(window.appName) ? "bidrag-ui" : window.appName,
-            moduleName: StringUtils.isEmpty(window.moduleName) ? "ukjent" : window.moduleName,
+            appName: "bidrag-frontend",
+            moduleName: "ukjent",
             correlationId: SecuritySessionUtils.getCorrelationId(),
         };
         const errorInfo = this.normalizeErrorInfo(error);
