@@ -1,7 +1,6 @@
-name: "Deploy til prod"
+name: Deploy til q1
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,27 +30,5 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
           VARS: .nais/q1.yaml
-          IMAGE: ${{ needs.build.outputs.image }}
-          TELEMETRY: ${{ needs.build.outputs.telemetry }}
-
-  deploy_prod:
-    needs:
-      - build
-      - deploy_q1
-    name: "Deploy til prod"
-    runs-on: ubuntu-latest
-    permissions:
-      packages: read
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v6
-      - name: Deploy til prod-gcp
-        uses: nais/deploy/actions/deploy@8a6fb62e73f837af6287d5db84a46ea96aa6c30d # v2
-        env:
-          ENVIRONMENT: prod
-          CLUSTER: prod-gcp
-          RESOURCE: .nais/nais.yaml
-          VARS: .nais/prod.yaml
           IMAGE: ${{ needs.build.outputs.image }}
           TELEMETRY: ${{ needs.build.outputs.telemetry }}
