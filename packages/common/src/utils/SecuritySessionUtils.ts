@@ -1,4 +1,4 @@
-import { context, propagation, Span, trace } from "@opentelemetry/api";
+// import { context, propagation, Span, trace } from "@opentelemetry/api";
 import { v4 as uuidV4 } from "uuid";
 
 import { SessionStorage } from "./Storage";
@@ -8,21 +8,22 @@ const tracerName = "bidrag-ui-session";
 interface RequestTraceContext {
     correlationId: string;
     headers: Record<string, string>;
-    span: Span;
+    // span: Span;
 }
 
 export class SecuritySessionUtils {
-    static async hentSecuritySessionTokenFromBackend() {
-        const tokenReq = await fetch("/session", { method: "GET" });
-        return (await tokenReq.json()).id_token;
-    }
+    // static async hentSecuritySessionTokenFromBackend() {
+    //     const tokenReq = await fetch("/session", { method: "GET" });
+    //     return (await tokenReq.json()).id_token;
+    // }
+    //
+    // static async isLoggedIn(): Promise<boolean> {
+    //     return fetch("/me", { method: "GET" })
+    //         .then((res) => res.status == 200)
+    //         .catch(() => false);
+    // }
 
-    static async isLoggedIn(): Promise<boolean> {
-        return fetch("/me", { method: "GET" })
-            .then((res) => res.status == 200)
-            .catch(() => false);
-    }
-
+    // @deprecated
     static async getSecurityTokenForApp(app: string, cluster?: string, scope?: string) {
         const tokenReq = await fetch("/token", {
             method: "POST",
@@ -37,31 +38,31 @@ export class SecuritySessionUtils {
     }
 
     static createRequestTrace(spanName: string): RequestTraceContext {
-        const tracer = trace.getTracer(tracerName);
+        // const tracer = trace.getTracer(tracerName);
         // @ts-ignore
         const parentContext = window.__otelSessionContext || context.active();
-        const span = tracer.startSpan(spanName, undefined, parentContext);
-        const traceContext = trace.setSpan(parentContext, span);
+        // const span = tracer.startSpan(spanName, undefined, parentContext);
+        // const traceContext = trace.setSpan(parentContext, span);
         const headers: Record<string, string> = {};
 
-        propagation.inject(traceContext, headers);
+        // propagation.inject(traceContext, headers);
 
         return {
             correlationId: headers.traceparent ?? this.getCorrelationId(),
             headers,
-            span,
+            // span,
         };
     }
 
     static getAppModuleName() {
-        if (window.appName) {
-            return `${window.appName}/${window.moduleName ?? "ukjent"}`;
-        }
+        // if (window.appName) {
+        //     return `${window.appName}/${window.moduleName ?? "ukjent"}`;
+        // }
         return "bidrag-ui";
     }
 
     static getAppName() {
-        return window.appName ?? "bidrag-ui";
+        return  "bidrag-frontend";
     }
 
     static async getSession(): Promise<SessionResponse> {
