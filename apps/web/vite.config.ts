@@ -11,6 +11,7 @@ export default defineConfig({
         host: true, // Lytt på 0.0.0.0 slik at host.docker.internal kan nå serveren
     },
     build: {
+        sourcemap: true,
         rollupOptions: {
             external: ["./nais.js"],
         },
