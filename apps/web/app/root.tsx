@@ -3,9 +3,9 @@ import { useEffect } from "react";
 import "@navikt/ds-css";
 import { AppLayout } from "@bidrag/ui";
 import { FaroErrorBoundary } from "@grafana/faro-react";
-import { authMiddleware } from "~/auth/auth.middleware.server.ts";
+import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
 import type { Route } from "../.react-router/types/app/+types/root.ts";
-import { userContext } from "~/context.ts";
+import { userContext } from "~/server/context.ts";
 import { getFaro } from "./faro.client";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 

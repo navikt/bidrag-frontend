@@ -1,8 +1,8 @@
 import {getApiConfig} from "~/api.env.ts";
-import {userContext} from "~/context.ts";
-import type {Route} from "../../.react-router/types/app/auth/+types/proxy.ts";
+import {userContext} from "~/server/context.ts";
 import {getOnBehalfOfToken} from "./auth.utils.server.ts";
-
+import {Route} from "+/server/auth/+types/proxy.ts";
+import {navLogger} from "~/server/logger/navLogger.ts";
 
 async function proxyRequest(request: Request, app: string, context: Route.LoaderArgs["context"]): Promise<Response> {
     const user = context.get(userContext);
@@ -10,7 +10,6 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
 
     const apiConfig = getApiConfig(app);
     const token = await getOnBehalfOfToken(user, apiConfig.audience);
-    console.log(apiConfig);
 
     // Bygg backend-URL: behold path etter /proxy/:app, legg til base-URL sin path
     const incomingUrl = new URL(request.url);
@@ -33,7 +32,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
         duplex: "half",
     } as RequestInit);
 
-    console.info("proxy", request.method, incomingUrl.href, "->", backendUrl.href, "status", backendResponse.status);
+    navLogger.debug(`proxy ${request.method} ${incomingUrl.href} -> ${backendUrl.href} status ${backendResponse.status}`);
 
     return new Response(backendResponse.body, {
         status: backendResponse.status,

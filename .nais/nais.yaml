@@ -25,6 +25,8 @@ spec:
   accessPolicy:
     outbound:
       rules:
+        - application: logging
+          namespace: nais-system
       {{#each outbound.rules as |rule|}}
         - application: {{rule.application }}
       {{/each}}
