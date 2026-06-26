@@ -3,19 +3,20 @@ import {LogInfo, LogLevel, LogResponse} from "@bidrag/common";
 import pino from "pino";
 import {symbolicateStackTrace} from "~/server/logger/utils/SymbolicateStackTrace.ts";
 import exceptionToErrorCode from "~/server/logger/utils/ExceptionHasher.ts";
-import {secureNavLogger} from "./navLogger.ts";
+import {navLogger, secureNavLogger} from "./navLogger.ts";
 import {Route} from "+/server/logger/+types/logRoute.ts";
 
 export async function action({params, request, context}: Route.ActionArgs) {
     const {type} = params
-    if (type === "secure") {}
+    const isSecureLog = type === "secure";
+    const logger = isSecureLog ? secureNavLogger : navLogger
 
     const user = context.get(userContext);
-    return doLog(secureNavLogger, request, user?.NAVident ?? "ukjent");
+    return doLog(logger, request, user?.NAVident ?? "ukjent");
 }
 
 async function doLog(loggerInstance: pino.Logger, req: Request, user: string): Promise<LogResponse> {
-    const payload: LogInfo = await req.json()
+    const payload: LogInfo = await req.json();
     const {moduleName, appName = "bidrag-frontend", level, error, message, correlationId} = payload;
     const errorPayload = error as LogInfo["error"] & {
         stack?: string;
@@ -56,7 +57,7 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
         };
     }
 
-    const logResonse: LogResponse = {} as LogResponse;
+    const logResponse: LogResponse = {} as LogResponse;
     switch (level) {
         case LogLevel.FEEDBACK:
         case LogLevel.INFO:
@@ -84,8 +85,8 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
                 exceptionCode,
             };
 
-            logResonse.errorCode = errorCode;
-            logResonse.exceptionCode = exceptionCode;
+            logResponse.errorCode = errorCode;
+            logResponse.exceptionCode = exceptionCode;
 
             loggerInstance.error(
                 errorMetadata,
@@ -93,6 +94,6 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
             );
         }
     }
-    return logResonse
+    return logResponse;
 }
 

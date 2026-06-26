@@ -249,6 +249,7 @@ function getSourceMapConsumer(scriptUrl: string): Promise<SourceMapConsumer | nu
     if (sourceMapConsumerCache.size > MAX_CACHE_SIZE) {
         const oldestKey = sourceMapConsumerCache.keys().next().value;
         if (oldestKey) {
+            void sourceMapConsumerCache.get(oldestKey)?.then((consumer) => consumer?.destroy());
             sourceMapConsumerCache.delete(oldestKey);
         }
     }

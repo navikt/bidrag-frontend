@@ -1,10 +1,9 @@
-import { ErrorCode } from "@bidrag/common";
-import { randomBytes, webcrypto } from "crypto";
+import {ErrorCode} from "@bidrag/common";
+import {randomBytes, webcrypto} from "crypto";
 
-const { subtle } = webcrypto;
+const {subtle} = webcrypto;
 const INSTANCE_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const INSTANCE_CODE_LENGTH = 5;
-const generatedInstanceCodes = new Set<string>();
 
 export default async function exceptionToErrorCode(stack_trace: string, _appName: string): Promise<ErrorCode> {
     const errorCode = await exceptionToExceptionCode(stack_trace);
@@ -27,16 +26,11 @@ function exceptionToInstanceCode(errorCode: string) {
 }
 
 function createReadableUniqueCode(): string {
-    while (true) {
-        const code = Array.from(randomBytes(INSTANCE_CODE_LENGTH))
-            .map((randomValue) => INSTANCE_CODE_ALPHABET[randomValue % INSTANCE_CODE_ALPHABET.length])
-            .join("");
+    const code = Array.from(randomBytes(INSTANCE_CODE_LENGTH))
+        .map((randomValue) => INSTANCE_CODE_ALPHABET[randomValue % INSTANCE_CODE_ALPHABET.length])
+        .join("");
 
-        if (!generatedInstanceCodes.has(code)) {
-            generatedInstanceCodes.add(code);
-            return code;
-        }
-    }
+    return code;
 }
 
 async function sha256(message: string): Promise<string> {
