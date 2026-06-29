@@ -49,7 +49,7 @@ export abstract class AbstractLoggerService {
 
     protected static mapAndLog(message: string, level: LogLevel, error?: LogErrorType | ErrorInfo | IErrorContext) {
         // @ts-ignore
-        const parentCtx = window.__otelSessionContext || context.active();
+        // const parentCtx = window.__otelSessionContext || context.active();
         const carrier: Record<string, string> = {};
 
         // propagation.inject(parentCtx, carrier);
