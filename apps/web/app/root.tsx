@@ -4,12 +4,14 @@ import "@navikt/ds-css";
 import { AppLayout } from "@bidrag/ui";
 import { FaroErrorBoundary } from "@grafana/faro-react";
 import { authMiddleware } from "~/auth/auth.middleware.server.ts";
+import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import type { Route } from "../.react-router/types/app/+types/root.ts";
 import { userContext } from "~/context.ts";
 import { getFaro } from "./faro.client";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 
 export const middleware = [authMiddleware];
+export const clientMiddleware = [bisysParamsMiddleware];
 
 export async function loader({ context }: Route.LoaderArgs) {
     const user = context.get(userContext);
