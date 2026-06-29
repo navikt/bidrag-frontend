@@ -43,6 +43,7 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
                 // sessionId: req.session.sessionId,
                 correlationId: correlationId //?? getCorrelationIdFromThread(),
             };
+    console.log(metadata, message)
 
     if (error) {
         metadata = {
