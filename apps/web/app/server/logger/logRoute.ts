@@ -1,10 +1,10 @@
-import {userContext} from "~/server/auth/auth.context.ts";
+import {userContext} from "~/server/auth/auth.context";
 import {LogInfo, LogLevel, LogResponse} from "@bidrag/common";
 import pino from "pino";
-import {symbolicateStackTrace} from "~/server/logger/utils/SymbolicateStackTrace.ts";
-import exceptionToErrorCode from "~/server/logger/utils/ExceptionHasher.ts";
-import {navLogger, secureNavLogger} from "./navLogger.ts";
-import {Route} from "+/server/logger/+types/logRoute.ts";
+import {symbolicateStackTrace} from "~/server/logger/utils/SymbolicateStackTrace";
+import exceptionToErrorCode from "~/server/logger/utils/ExceptionHasher";
+import {navLogger, secureNavLogger} from "./navLogger";
+import {Route} from "+/server/logger/+types/logRoute";
 
 export async function action({params, request, context}: Route.ActionArgs) {
     const {type} = params
@@ -43,7 +43,6 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
                 // sessionId: req.session.sessionId,
                 correlationId: correlationId //?? getCorrelationIdFromThread(),
             };
-    console.log(metadata, message)
 
     if (error) {
         metadata = {
