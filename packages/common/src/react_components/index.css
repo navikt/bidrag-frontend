@@ -1,7 +1,5 @@
-@import "./autosuggest/autosuggest.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './autosuggest/autosuggest.css' layer(base);
+@import 'tailwindcss';
 
 .disk,
 .skjermet {

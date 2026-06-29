@@ -5,7 +5,7 @@
         ".react-router/types/**/*"
     ],
     "compilerOptions": {
-        "types": ["node", "react", "react-dom"],
+        "types": ["node", "react", "react-dom", "vite/client"],
         "paths": {
             "~/*": [
                 "./app/*"
