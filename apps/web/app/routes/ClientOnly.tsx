@@ -1,10 +1,12 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {type ReactNode, useEffect, useState} from "react";
+
+interface ClientOnlyProps {
+    children: ReactNode;
+    fallback?: ReactNode;
+}
 
 /** Hack for å sørge for at ting kun kjøres på klienten */
-export function ClientOnly({ children, fallback = null }: {
-    children: React.ReactNode;
-    fallback?: React.ReactNode
-}) {
+export function ClientOnly({children, fallback = null}: ClientOnlyProps) {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
