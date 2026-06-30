@@ -15,7 +15,7 @@ export const authMiddleware: Route.MiddlewareFunction = async ({request, context
 
     const token = getToken(request);
 
-    const loginUrl = `/oauth2/login`;
+    const loginUrl = `/oauth2/login?redirect=${encodeURIComponent(url.pathname + url.search)}`;
     if (!token) {
         return redirect(loginUrl);
     }

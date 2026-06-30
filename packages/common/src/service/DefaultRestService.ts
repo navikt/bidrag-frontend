@@ -67,7 +67,7 @@ export class DefaultRestService {
         config?: FetchConfig
     ): Promise<ApiResponse<T>> {
         const requestTrace = SecuritySessionUtils.createRequestTrace(`${method} ${this.baseUrl}${url}`);
-        const headers = await this.createDefaultHeaders(requestTrace.correlationId);
+        const headers = await this.createDefaultHeaders(SecuritySessionUtils.getCorrelationId());
         const requestStart = performance.now();
         return fetch(`${this.baseUrl}${url}`, {
             mode: "cors",
@@ -126,7 +126,7 @@ export class DefaultRestService {
                 throw error;
             })
             .finally(() => {
-                requestTrace.span.end();
+                // requestTrace.span.end();
             });
     }
 
