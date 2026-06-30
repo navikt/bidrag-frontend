@@ -1,6 +1,6 @@
 import {getToken, validateToken} from "@navikt/oasis";
 import {redirect} from "react-router";
-import type {Route} from "../../.react-router/types/app/+types/root";
+import type {Route} from "+/+types/root.ts";
 import {parseToken} from "./auth.utils.server.ts";
 import {userContext} from "./auth.context.ts";
 

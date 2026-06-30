@@ -27,7 +27,6 @@ jobs:
       - name: Deploy til dev-gcp q1
         uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
-          ENVIRONMENT: q1
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
           VARS: .nais/q1.yaml
@@ -49,7 +48,6 @@ jobs:
       - name: Deploy til prod-gcp
         uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
-          ENVIRONMENT: prod
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais.yaml
           VARS: .nais/prod.yaml
