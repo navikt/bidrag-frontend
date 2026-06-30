@@ -28,6 +28,11 @@ spec:
       allowAllUsers: true
       # uncomment below if you don't use the default tenant in dev
       # tenant: nav.no
+  accessPolicy:
+    outbound:
+      rules:
+        - application: "*"
+          namespace: bidrag
   env:
     - name: LOCALAUTH_PUBLIC_URL
       value: "https://localauth-bidrag.intern.dev.nav.no"
