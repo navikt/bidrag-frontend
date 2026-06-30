@@ -1,6 +1,7 @@
 import { LeaveIcon } from "@navikt/aksel-icons";
 import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
 import {NavUser} from "~/server/auth/NavUser.ts";
+import {BisysLink} from "@bidrag/common";
 
 interface AppHeaderProps {
     bruker?: NavUser;
@@ -11,6 +12,7 @@ export function AppHeader({ bruker }: AppHeaderProps) {
         <InternalHeader>
             <InternalHeader.Title href="/">Bidrag</InternalHeader.Title>
             <Spacer />
+            {/*<BisysLink bisysUrl={ ""} page="sakshistorikk" />*/}
             <ActionMenu>
                 <ActionMenu.Trigger>
                     <InternalHeader.UserButton name={bruker?.name ?? "Ukjent bruker"} description={bruker?.NAVident} />

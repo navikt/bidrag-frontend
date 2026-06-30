@@ -1,10 +1,10 @@
-import type { Route } from "+/routes/sak/+types/SakLayout.ts";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader } from "@bidrag/common";
 import { Loader, Page, VStack } from "@navikt/ds-react";
 import { Suspense } from "react";
 import { Outlet } from "react-router";
 import { useHentSak } from "./useApi";
+import {Route} from "./+types/SakLayout.ts";
 
 export default function SakLayout({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;

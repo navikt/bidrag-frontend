@@ -5,13 +5,19 @@
         ".react-router/types/**/*"
     ],
     "compilerOptions": {
-        "types": ["node", "react", "react-dom", "vite/client"],
+        "rootDirs": [
+            ".",
+            "./.react-router/types"
+        ],
+        "types": [
+            "node",
+            "react",
+            "react-dom",
+            "vite/client"
+        ],
         "paths": {
             "~/*": [
                 "./app/*"
-            ],
-            "+/*": [
-                "./.react-router/types/app/*"
             ],
             "nais.js": [
                 "./app/nais.d.ts"
