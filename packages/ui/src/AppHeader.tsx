@@ -1,16 +1,28 @@
-import { InternalHeader } from "@navikt/ds-react";
+import { LeaveIcon } from "@navikt/aksel-icons";
+import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
+import type { NavUser } from "~/auth/NavUser";
 
 interface AppHeaderProps {
-    brukerNavn?: string;
-    onLoggUt?: () => void;
+    bruker?: NavUser;
 }
 
-export function AppHeader({ brukerNavn, onLoggUt }: AppHeaderProps) {
+export function AppHeader({ bruker }: AppHeaderProps) {
     return (
         <InternalHeader>
             <InternalHeader.Title href="/">Bidrag</InternalHeader.Title>
-            {brukerNavn && <InternalHeader.User name={brukerNavn} description="Saksbehandler" />}
-            {onLoggUt && <InternalHeader.Button onClick={onLoggUt}>Logg ut</InternalHeader.Button>}
+            <Spacer />
+            <ActionMenu>
+                <ActionMenu.Trigger>
+                    <InternalHeader.UserButton name={bruker?.name ?? "Ukjent bruker"} description={bruker?.NAVident} />
+                </ActionMenu.Trigger>
+                <ActionMenu.Content align="end">
+                    <ActionMenu.Group aria-label="Handlinger">
+                        <ActionMenu.Item as="a" href="/oauth2/logout" style={{ cursor: "pointer" }}>
+                            Logg ut <LeaveIcon aria-hidden />
+                        </ActionMenu.Item>
+                    </ActionMenu.Group>
+                </ActionMenu.Content>
+            </ActionMenu>
         </InternalHeader>
     );
 }

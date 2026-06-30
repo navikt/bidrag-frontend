@@ -1,6 +1,5 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } from "react-router";
 import { useEffect } from "react";
-import "@navikt/ds-css";
 import { AppLayout } from "@bidrag/ui";
 import { FaroErrorBoundary } from "@grafana/faro-react";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
@@ -8,6 +7,7 @@ import type { Route } from "../.react-router/types/app/+types/root.ts";
 import { userContext } from "~/server/context.ts";
 import { getFaro } from "./faro.client";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
+import "./index.css";
 
 export const middleware = [authMiddleware];
 
@@ -46,7 +46,7 @@ export default function App() {
     return (
         <QueryClientWrapper>
             <FaroErrorBoundary fallback={<ErrorBoundary />}>
-                <AppLayout brukerNavn={data?.user?.name}>
+                <AppLayout bruker={data?.user}>
                     <Outlet />
                 </AppLayout>
             </FaroErrorBoundary>
