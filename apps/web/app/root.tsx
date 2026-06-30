@@ -1,14 +1,14 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } from "react-router";
 import { useEffect } from "react";
-import { AppLayout } from "@bidrag/ui";
 import { FaroErrorBoundary } from "@grafana/faro-react";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
-import type { Route } from "../.react-router/types/app/+types/root.ts";
+import type { Route } from "+/+types/root.ts";
 import { userContext } from "~/server/context.ts";
 import { getFaro } from "./faro.client";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import "./index.css";
 import {bisysParamsMiddleware} from "~/common/bisys/bisys-params.middleware.ts";
+import {AppLayout} from "~/common/header/AppLayout.tsx";
 
 export const middleware = [authMiddleware];
 export const clientMiddleware = [bisysParamsMiddleware];

@@ -1,7 +1,7 @@
 import { Page } from "@navikt/ds-react";
-import type { NavUser } from "~/auth/NavUser.ts";
 import { AppHeader } from "./AppHeader.tsx";
 import { NavMenu, type NavMenuItem } from "./NavMenu.tsx";
+import {NavUser} from "~/server/auth/NavUser.ts";
 
 interface AppLayoutProps {
     children: React.ReactNode;

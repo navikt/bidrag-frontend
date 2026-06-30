@@ -11,8 +11,6 @@
     "dependencies": {
         "@bidrag/api": "workspace:*",
         "@bidrag/common": "workspace:*",
-        "@bidrag/types": "workspace:*",
-        "@bidrag/ui": "workspace:*",
         "@bidrag/utils": "workspace:*",
         "@grafana/faro-react": "^2.7.1",
         "@grafana/faro-web-sdk": "^2.7.1",

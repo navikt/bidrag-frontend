@@ -1,6 +1,6 @@
 import { LeaveIcon } from "@navikt/aksel-icons";
 import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
-import type { NavUser } from "~/auth/NavUser";
+import {NavUser} from "~/server/auth/NavUser.ts";
 
 interface AppHeaderProps {
     bruker?: NavUser;
