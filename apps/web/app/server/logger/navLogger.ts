@@ -66,5 +66,5 @@ const combinedLogger: Logger = {
     }
 }
 
-export const navLogger = combinedLogger
+export const navLogger = logger
 export const secureNavLogger = teamLogger
