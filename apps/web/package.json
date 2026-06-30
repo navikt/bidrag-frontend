@@ -27,7 +27,9 @@
         "isbot": "^5.1.42",
         "react": "catalog:",
         "react-dom": "catalog:",
-        "react-router": "catalog:"
+        "react-router": "catalog:",
+        "tailwindcss": "catalog:",
+        "@tailwindcss/vite": "catalog:"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",

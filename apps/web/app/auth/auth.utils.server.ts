@@ -31,9 +31,10 @@ export function parseToken(token: string): NavUser {
     if (parse.ok) {
         return {
             NAVident: parse.NAVident,
-            name: parse.preferred_username,
+            name: parse.name,
+            username: parse.preferred_username,
             token,
-        }
+        };
     }
     throw  new Response('Failed to parse azure token', {status: 401})
 }

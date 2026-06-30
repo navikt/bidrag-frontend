@@ -1,6 +1,5 @@
-import { BodyShort, CopyButton } from "@navikt/ds-react";
-
-import { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
+import { Bleed, BodyShort, CopyButton } from "@navikt/ds-react";
+import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
 import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
 import BidragCell from "../grid/BidragCell";
 import BidragGrid from "../grid/BidragGrid";
@@ -19,37 +18,36 @@ interface ISakHeaderProps {
 
 export default function SakHeader({ saksnummer, roller, skjermbilde }: ISakHeaderProps) {
     return (
-        <div className="bg-[var(--ax-neutral-100)] border-[var(--ax-border-neutral-subtle)] border-solid border-b w-full border-0">
-            {/** @ts-ignore **/}
-            <div className="px-6 py-1 flex items-center border-[var(--ax-border-neutral-subtle)] border-solid border-b border-0">
-                <SkjermbildeDetaljer saksnummer={saksnummer} skjermbilde={skjermbilde} />
+        <Bleed marginInline="full">
+            <div className="bg-(--ax-neutral-100) border-(--ax-border-neutral-subtle) border-solid border-b w-full border-0">
+                <div className="px-6 py-1 flex items-center border-(--ax-border-neutral-subtle) border-solid border-b border-0">
+                    <SkjermbildeDetaljer saksnummer={saksnummer} skjermbilde={skjermbilde} />
+                </div>
+                <BidragGrid
+                    className={
+                        "max-w-fit grid-flow-row grid-rows-none md:grid-flow-col sm:grid-rows-4 md:grid-rows-4 lg:grid-rows-3 xl:grid-rows-3 2xl:grid-rows-2 gap-1! grid-cols-[max-content]"
+                    }
+                >
+                    {roller
+                        ?.filter((r) => r.rolleType != RolleTypeAbbreviation.BA && r.rolleType != RolleTypeFullName.BARN)
+                        ?.sort((a, b) =>
+                            a.rolleType == RolleTypeAbbreviation.BM || a.rolleType == RolleTypeDeprecated.BIDRAGS_MOTTAKER ? 1 : -1,
+                        )
+                        .map((rolle, i) => (
+                            <BidragCell key={rolle.ident + i} xs={12} md={7} lg={7}>
+                                <RolleDetaljer rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År} />
+                            </BidragCell>
+                        ))}
+                    {roller
+                        ?.filter((r) => r.rolleType == RolleTypeAbbreviation.BA || r.rolleType == RolleTypeFullName.BARN)
+                        .map((rolle, i) => (
+                            <BidragCell key={rolle.ident + i} xs={12} md={7} lg={7}>
+                                <RolleDetaljer rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År} />
+                            </BidragCell>
+                        ))}
+                </BidragGrid>
             </div>
-            <BidragGrid
-                className={
-                    "max-w-fit grid-flow-row grid-rows-none md:grid-flow-col sm:grid-rows-4 md:grid-rows-4 lg:grid-rows-3 xl:grid-rows-3 2xl:grid-rows-2 !gap-1 grid-cols-[max-content]"
-                }
-            >
-                {roller
-                    ?.filter((r) => r.rolleType != RolleTypeAbbreviation.BA && r.rolleType != RolleTypeFullName.BARN)
-                    ?.sort((a, b) =>
-                        a.rolleType == RolleTypeAbbreviation.BM || a.rolleType == RolleTypeDeprecated.BIDRAGS_MOTTAKER
-                            ? 1
-                            : -1
-                    )
-                    .map((rolle, i) => (
-                        <BidragCell key={rolle.ident + i} xs={12} md={7} lg={7}>
-                            <RolleDetaljer rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År} />
-                        </BidragCell>
-                    ))}
-                {roller
-                    ?.filter((r) => r.rolleType == RolleTypeAbbreviation.BA || r.rolleType == RolleTypeFullName.BARN)
-                    .map((rolle, i) => (
-                        <BidragCell key={rolle.ident + i} xs={12} md={7} lg={7}>
-                            <RolleDetaljer rolle={rolle} withBorder={false} stønad18År={rolle.stønad18År} />
-                        </BidragCell>
-                    ))}
-            </BidragGrid>
-        </div>
+        </Bleed>
     );
 }
 

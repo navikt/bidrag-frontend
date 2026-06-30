@@ -1,6 +1,7 @@
 export type NavUser = {
-    NAVident: string
-    name: string
-    token: string
-}
+    NAVident: string;
+    name: string;
+    username: string;
+    token: string;
+};
 
