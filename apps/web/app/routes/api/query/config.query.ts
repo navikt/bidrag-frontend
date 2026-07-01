@@ -5,7 +5,7 @@ export const configQuery = {
     queryFn: async () => {
         const response = await fetch("/internal/config");
         if (!response.ok) {
-            throw new Error("Failed to config");
+            throw new Error("Failed to get config");
         }
       return (await response.json()) as ConfigResponse;
     },

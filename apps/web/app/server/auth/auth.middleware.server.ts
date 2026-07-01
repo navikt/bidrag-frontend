@@ -31,7 +31,7 @@ export const authMiddleware: Route.MiddlewareFunction = async (
 
     const user = parseToken(token);
     context.set(userContext, user);
-    context.set (authTokenContext, token);
+    context.set(authTokenContext, token);
 
     return next();
 };

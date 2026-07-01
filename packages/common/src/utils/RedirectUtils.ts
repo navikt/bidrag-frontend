@@ -1,5 +1,5 @@
 export function getSessionStateFromParam() {
-    const sessionState = getParamFromUrl("sessionState") ?? sessionStorage.getItem(`bidrag.sessionState`);
+    const sessionState = getParamFromUrl("sessionState") ?? sessionStorage.getItem(`bisys.sessionState`);
     return sessionState ? `sessionState=${getParamFromUrl("sessionState")}` : "";
 }
 

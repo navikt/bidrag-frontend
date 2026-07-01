@@ -93,7 +93,7 @@ async function doLog(
             if (!error) {
                 loggerInstance.error(
                     metadata,
-                    `Det skjedde en teknisk  feil i applikasjonen ${appName}: ${message}`,
+                    `Det skjedde en teknisk feil i applikasjonen ${appName}: ${message}`,
                 );
                 break;
             }

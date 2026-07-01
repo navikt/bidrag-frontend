@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 import { configQuery } from "~/routes/api/query/config.query.ts";
-import { ConfigResponse } from "~/server/configRoute.ts";
 import { getBisysSessionParams } from "./bisys-params.ts";
 
 const SESSION_BISYS_LINK_TARGET = "bisys.linktarget";
@@ -18,7 +17,7 @@ const bisysPaths: Record<BisysLinkTarget, string> = {
 
 export function useBisysLink() {
     const {data: config} = useQuery(configQuery);
-    const bisysBaseUrl = config?.bisysBaseUrl
+    const bisysBaseUrl = config?.bisysBaseUrl;
     const [searchParams] = useSearchParams();
     const bisysLinkTarget = sessionStorage.getItem(
         SESSION_BISYS_LINK_TARGET,
