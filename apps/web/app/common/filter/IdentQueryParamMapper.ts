@@ -27,7 +27,7 @@ export class IdentQueryParamMapper {
         if (index === null) {
             return null;
         }
-        return this.allIdents.at(index)?? null;
+        return this.allIdents.at(index) ?? null;
     }
 
     private safeParseInt(value: string, radix: number = 10): number | null {
