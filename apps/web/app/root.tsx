@@ -8,8 +8,8 @@ import {getFaro} from "./faro.client";
 import "./index.css";
 import {Loader} from "@navikt/ds-react";
 import {bisysParamsMiddleware} from "~/common/bisys/bisys-params.middleware.ts";
+import {ClientOnly} from "~/common/ClientOnly.tsx";
 import {AppLayout} from "~/common/header/AppLayout.tsx";
-import {ClientOnly} from "~/routes/ClientOnly.tsx";
 import type {Route} from "./+types/root.ts";
 
 export const middleware = [authMiddleware];
@@ -17,12 +17,11 @@ export const clientMiddleware = [bisysParamsMiddleware];
 
 export async function loader({context}: Route.LoaderArgs) {
     const navUser = context.get(userContext);
-    const bisysUrl = process.env.BISYS_URL;
-    return {navUser, bisysUrl};
+    return {navUser};
 }
 
 export default function App({loaderData}: Route.ComponentProps) {
-    const {navUser, bisysUrl} = loaderData;
+    const {navUser} = loaderData;
 
     useEffect(() => {
         if (navUser?.NAVident) {

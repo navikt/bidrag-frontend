@@ -1,18 +1,21 @@
-import { BisysLink } from "@bidrag/common";
-import { LeaveIcon } from "@navikt/aksel-icons";
-import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
-import type { NavUser } from "~/common/NavUser.ts";
+import {LeaveIcon} from "@navikt/aksel-icons";
+import {ActionMenu, InternalHeader, Spacer} from "@navikt/ds-react";
+import {ClientOnly} from "~/common/ClientOnly.tsx";
+import BisysHeaderLink from "~/common/header/BisysHeaderLink.tsx";
+import type {NavUser} from "~/common/NavUser.ts";
 
 interface AppHeaderProps {
     bruker?: NavUser;
 }
 
-export function AppHeader({ bruker }: AppHeaderProps) {
+export function AppHeader({bruker}: AppHeaderProps) {
     return (
         <InternalHeader>
             <InternalHeader.Title href="/">Bidrag</InternalHeader.Title>
-            <Spacer />
-            {/*<BisysLink bisysUrl={ ""} page="sakshistorikk" />*/}
+            <Spacer/>
+            <ClientOnly>
+               <BisysHeaderLink />
+            </ClientOnly>
             <ActionMenu>
                 <ActionMenu.Trigger>
                     <InternalHeader.UserButton
@@ -25,9 +28,9 @@ export function AppHeader({ bruker }: AppHeaderProps) {
                         <ActionMenu.Item
                             as="a"
                             href="/oauth2/logout"
-                            style={{ cursor: "pointer" }}
+                            style={{cursor: "pointer"}}
                         >
-                            Logg ut <LeaveIcon aria-hidden />
+                            Logg ut <LeaveIcon aria-hidden/>
                         </ActionMenu.Item>
                     </ActionMenu.Group>
                 </ActionMenu.Content>

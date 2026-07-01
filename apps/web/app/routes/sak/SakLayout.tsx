@@ -1,15 +1,29 @@
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader } from "@bidrag/common";
+import {
+    type IRolleDetaljer,
+    type RolleTypeAbbreviation,
+    SakHeader,
+} from "@bidrag/common";
 import { Loader, Page, VStack } from "@navikt/ds-react";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Outlet } from "react-router";
+import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
+import type { Route } from "./+types/SakLayout.ts";
 import { useHentSak } from "./useApi";
-import {Route} from "./+types/SakLayout.ts";
 
 export default function SakLayout({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;
+    const { setBisysLinkTarget } = useBisysLink();
+
+    useEffect(() => {
+        setBisysLinkTarget("sak", { saksnr: saksnummer });
+    }, [saksnummer]);
+
     const { data: sak } = useHentSak(saksnummer);
-    const mapToRolleDetalj = (rolle: RolleDto, index: number): IRolleDetaljer => {
+    const mapToRolleDetalj = (
+        rolle: RolleDto,
+        index: number,
+    ): IRolleDetaljer => {
         return {
             id: index,
             rolleType: rolle.type as unknown as RolleTypeAbbreviation,
@@ -18,7 +32,8 @@ export default function SakLayout({ params }: Route.ComponentProps) {
             saksnummer: saksnummer,
         };
     };
-    const roller: Array<IRolleDetaljer> = sak?.roller.map((r, index) => mapToRolleDetalj(r, index)) ?? [];
+    const roller: Array<IRolleDetaljer> =
+        sak?.roller.map((r, index) => mapToRolleDetalj(r, index)) ?? [];
     return (
         <VStack gap={"space-32"}>
             <Suspense fallback={<Loader size="xsmall" />}>

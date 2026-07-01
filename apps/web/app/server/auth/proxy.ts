@@ -1,6 +1,5 @@
 import { getApiConfig } from "~/api.env.ts";
 import { authTokenContext } from "~/server/auth/auth.context.ts";
-import { userContext } from "~/server/context.ts";
 import { navLogger } from "~/server/logger/navLogger.ts";
 import type { Route } from "./+types/proxy.ts";
 import { getOnBehalfOfToken } from "./auth.utils.server.ts";
