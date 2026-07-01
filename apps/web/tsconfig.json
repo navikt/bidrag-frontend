@@ -21,6 +21,9 @@
             ],
             "nais.js": [
                 "./app/nais.d.ts"
+            ],
+            "@shared/*": [
+                "./shared/*"
             ]
         }
     }
