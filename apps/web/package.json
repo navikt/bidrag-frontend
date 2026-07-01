@@ -31,7 +31,8 @@
         "react-router": "catalog:",
         "tailwindcss": "catalog:",
         "@tailwindcss/vite": "catalog:",
-        "source-map": "^0.7.6"
+        "source-map": "^0.7.6",
+        "date-fns": "^4.4.0"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",

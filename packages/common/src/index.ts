@@ -7,3 +7,4 @@ export * from "./service/DefaultRestService";
 export * from "./types";
 export * from "./utils";
 export * from "./windowTypes";
+export * from "./api"
