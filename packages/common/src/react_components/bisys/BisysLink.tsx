@@ -1,12 +1,14 @@
-import { Link } from "@navikt/ds-react";
-import React, { ReactElement } from "react";
+import {Link} from "@navikt/ds-react";
+import React, {ReactElement} from "react";
 
 interface BisysLinkProps {
     bisysUrl: string;
     page: "sakshistorikk" | "oppgaveliste" | "sak";
 }
-export default function BisysLink({ bisysUrl, page }: BisysLinkProps): ReactElement {
-    const sessionState = new URLSearchParams(window.location.href).get("sessionState");
+
+export default function BisysLink({bisysUrl, page}: BisysLinkProps): ReactElement {
+    const sessionState = new URLSearchParams(window.location.href).get("sessionState") ?? sessionStorage.getItem("bidrag.sessionState");
+
     function getBisysLink() {
         switch (page) {
             case "oppgaveliste":

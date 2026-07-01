@@ -21,9 +21,7 @@ export default defineConfig({
         exclude: [
             "@bidrag/common",
             "@bidrag/api",
-            "@bidrag/ui",
             "@bidrag/utils",
-            "@bidrag/types",
         ],
     },
 });
