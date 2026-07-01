@@ -1,31 +1,28 @@
-import {Links, Meta, Outlet, Scripts, ScrollRestoration} from "react-router";
-import {useEffect} from "react";
 import {FaroErrorBoundary} from "@grafana/faro-react";
+import {useEffect} from "react";
+import {Links, Meta, Outlet, Scripts, ScrollRestoration} from "react-router";
+import {QueryClientWrapper} from "~/common/QueryClientWrapper";
 import {authMiddleware} from "~/server/auth/auth.middleware.server.ts";
 import {userContext} from "~/server/context.ts";
 import {getFaro} from "./faro.client";
-import {QueryClientWrapper} from "~/common/QueryClientWrapper";
 import "./index.css";
+import {Loader} from "@navikt/ds-react";
 import {bisysParamsMiddleware} from "~/common/bisys/bisys-params.middleware.ts";
 import {AppLayout} from "~/common/header/AppLayout.tsx";
-import {Loader} from "@navikt/ds-react";
 import {ClientOnly} from "~/routes/ClientOnly.tsx";
-import {Route} from "./+types/root.ts";
-import {NavUser} from "~/server/auth/NavUser.ts";
+import type {Route} from "./+types/root.ts";
 
 export const middleware = [authMiddleware];
 export const clientMiddleware = [bisysParamsMiddleware];
 
 export async function loader({context}: Route.LoaderArgs) {
-    const user = context.get(userContext);
-    // TODO flytte token ut av userContext
-    const navUser = {...user, token: ""} as NavUser
+    const navUser = context.get(userContext);
     const bisysUrl = process.env.BISYS_URL;
     return {navUser, bisysUrl};
 }
 
 export default function App({loaderData}: Route.ComponentProps) {
-    const {navUser, bisysUrl} = loaderData
+    const {navUser, bisysUrl} = loaderData;
 
     useEffect(() => {
         if (navUser?.NAVident) {
@@ -43,8 +40,7 @@ export default function App({loaderData}: Route.ComponentProps) {
                 </AppLayout>
             </FaroErrorBoundary>
         </QueryClientWrapper>
-    )
-
+    );
 }
 
 export function Layout({children}: { children: React.ReactNode }) {
@@ -52,7 +48,10 @@ export function Layout({children}: { children: React.ReactNode }) {
         <html lang="nb">
         <head>
             <meta charSet="utf-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1"
+            />
             <Meta/>
             <Links/>
         </head>

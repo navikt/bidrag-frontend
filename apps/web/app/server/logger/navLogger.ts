@@ -1,6 +1,6 @@
-import {teamLogger} from "@navikt/pino-logger/team-log";
-import {logger} from "@navikt/pino-logger";
-import {Logger} from "pino";
+import { logger } from "@navikt/pino-logger";
+import { teamLogger } from "@navikt/pino-logger/team-log";
+import type { Logger } from "pino";
 
 const combinedLogger: Logger = {
     level: logger.level,
@@ -8,7 +8,6 @@ const combinedLogger: Logger = {
     fatal: (obj: any, ...args: any[]) => {
         logger.fatal(obj, ...args);
         teamLogger.fatal(obj, ...args);
-
     },
     error: (obj: any, ...args: any[]) => {
         logger.error(obj, ...args);
@@ -30,7 +29,7 @@ const combinedLogger: Logger = {
         logger.trace(obj, ...args);
         teamLogger.debug(obj, ...args);
     },
-    //@ts-ignore
+    //@ts-expect-error
     child: (bindings: pino.Bindings) => {
         const childLogger = logger.child(bindings);
         const teamChildLogger = teamLogger.child(bindings);
@@ -63,8 +62,8 @@ const combinedLogger: Logger = {
                 teamChildLogger.trace(obj, ...args);
             },
         };
-    }
-}
+    },
+};
 
-export const navLogger = combinedLogger
-export const secureNavLogger = teamLogger
+export const navLogger = combinedLogger;
+export const secureNavLogger = teamLogger;
