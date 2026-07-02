@@ -1,20 +1,14 @@
-import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
-import { PersonNavnIdent } from "@bidrag/common";
-import { formaterBelop } from "@bidrag/utils/belopUtils";
-import { formaterDato, sortByDateAsc } from "@bidrag/utils/datoUtils";
-import {
-    Box,
-    Pagination,
-    type SortState,
-    Table,
-    VStack,
-} from "@navikt/ds-react";
-import { useMemo, useState } from "react";
+import type {Transaksjon} from "@bidrag/api/BidragReskontroApi";
+import {PersonNavnIdent} from "@bidrag/common";
+import {formaterBelop} from "@bidrag/utils/belopUtils";
+import {formaterDato, sortByDateAsc} from "@bidrag/utils/datoUtils";
+import {Box, Pagination, type SortState, Table, VStack,} from "@navikt/ds-react";
+import {useMemo, useState} from "react";
 
-import { FiltrertTransaksjonSummer } from "./FiltrertTransaksjonSummer";
-import { visningsnavnForSøknadstype } from "./søknadstyper";
-import { aggregerTransaksjoner } from "./TransaksjonAggregat";
-import { TransaksjonType } from "./TransaksjonType";
+import {FiltrertTransaksjonSummer} from "./FiltrertTransaksjonSummer";
+import {visningsnavnForSøknadstype} from "./søknadstyper";
+import {aggregerTransaksjoner} from "./TransaksjonAggregat";
+import {TransaksjonType} from "./TransaksjonType";
 
 interface TransaksjonerAggregertTabellProps {
     transaksjoner: Transaksjon[];
@@ -23,7 +17,7 @@ interface TransaksjonerAggregertTabellProps {
 
 const ROWS_PER_PAGE = 50;
 
-function SubTabell({ transaksjoner }: { transaksjoner: Transaksjon[] }) {
+function SubTabell({transaksjoner}: { transaksjoner: Transaksjon[] }) {
     return (
         <Table size="small" stickyHeader>
             <Table.Header>
@@ -42,10 +36,10 @@ function SubTabell({ transaksjoner }: { transaksjoner: Transaksjon[] }) {
                 {transaksjoner.map((t) => (
                     <Table.Row key={`${t.transaksjonsid}-${t.delytelsesid}`}>
                         <Table.DataCell>
-                            {formaterDato(t.periode?.fom) ?? "–"}
+                            {formaterDato(t.periode?.fom)}
                         </Table.DataCell>
                         <Table.DataCell>
-                            <PersonNavnIdent ident={t.barn} bareFornavn />
+                            <PersonNavnIdent ident={t.barn} bareFornavn/>
                         </Table.DataCell>
                         <Table.DataCell>{t.saksnummer}</Table.DataCell>
                         <Table.DataCell>
@@ -75,15 +69,14 @@ function SubTabell({ transaksjoner }: { transaksjoner: Transaksjon[] }) {
 }
 
 export default function TransaksjonerAggregertTabell({
-    transaksjoner,
-    totalTransCount,
-}: TransaksjonerAggregertTabellProps) {
+                                                         transaksjoner,
+                                                         totalTransCount,
+                                                     }: TransaksjonerAggregertTabellProps) {
     const aggregater = useMemo(
         () =>
             aggregerTransaksjoner(transaksjoner)
-                .sort((a, b) => sortByDateAsc(a.dato, b.dato))
-                .reverse(),
-        [transaksjoner],
+                .sort((a, b) => sortByDateAsc(b.dato, a.dato))
+        , [transaksjoner]
     );
     const [sort, setSort] = useState<SortState | undefined>();
     const [page, setPage] = useState(1);
@@ -94,7 +87,7 @@ export default function TransaksjonerAggregertTabell({
             const dir = sort.direction === "ascending" ? 1 : -1;
             switch (sort.orderBy) {
                 case "dato":
-                    return dir * sortByDateAsc(a.dato, b.dato);
+                    return sort.direction === "ascending" ? sortByDateAsc(a.dato, b.dato) : sortByDateAsc(b.dato, a.dato);
                 case "transaksjonskode":
                     return (
                         dir *
@@ -130,14 +123,14 @@ export default function TransaksjonerAggregertTabell({
             prevSort.direction === "descending"
                 ? undefined
                 : {
-                      orderBy: sortKey,
-                      direction:
-                          prevSort &&
-                          sortKey === prevSort.orderBy &&
-                          prevSort.direction === "ascending"
-                              ? "descending"
-                              : "ascending",
-                  },
+                    orderBy: sortKey,
+                    direction:
+                        prevSort &&
+                        sortKey === prevSort.orderBy &&
+                        prevSort.direction === "ascending"
+                            ? "descending"
+                            : "ascending",
+                },
         );
     };
 

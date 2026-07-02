@@ -39,7 +39,7 @@ function SubTabell({transaksjoner}: { transaksjoner: Transaksjon[] }) {
                 {transaksjoner.map((t) => (
                     <Table.Row key={`${t.transaksjonsid}-${t.delytelsesid}`}>
                         <Table.DataCell>
-                            {formaterDato(t.periode?.fom) ?? "–"}
+                            {formaterDato(t.periode?.fom)}
                         </Table.DataCell>
                         <Table.DataCell>
                             <PersonNavnIdent ident={t.barn} bareFornavn/>
@@ -71,9 +71,8 @@ export default function BrukerTransaksjonerAggregertTabell({
     const aggregater = useMemo(
         () =>
             aggregerTransaksjoner(transaksjoner)
-                .sort((a, b) => sortByDateAsc(a.dato, b.dato))
-                .reverse(),
-        [transaksjoner],
+                .sort((a, b) => sortByDateAsc(b.dato, a.dato))
+        , [transaksjoner]
     );
     const [sort, setSort] = useState<SortState | undefined>();
     const [page, setPage] = useState(1);
@@ -84,7 +83,7 @@ export default function BrukerTransaksjonerAggregertTabell({
             const dir = sort.direction === "ascending" ? 1 : -1;
             switch (sort.orderBy) {
                 case "dato":
-                    return dir * sortByDateAsc(a.dato, b.dato);
+                    return sort.direction === "ascending" ? sortByDateAsc(a.dato, b.dato) : sortByDateAsc(b.dato, a.dato);
                 case "transaksjonskode":
                     return (
                         dir *

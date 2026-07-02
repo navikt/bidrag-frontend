@@ -4,7 +4,7 @@ import {formatISO, parseISO} from "date-fns";
  * Formaterer dato til norsk format
  */
 export function formaterDato(dato?: string | null): string {
-    if (!dato) return "";
+    if (!dato) return "-";
     return new Date(dato).toLocaleDateString("nb-NO", {
         day: "2-digit",
         month: "2-digit",
