@@ -6,13 +6,14 @@ import { getBisysSessionParams } from "./bisys-params.ts";
 const SESSION_BISYS_LINK_TARGET = "bisys.linktarget";
 const SESSION_BISYS_LINK_PARAMS = "bisys.linkParams";
 
-type BisysLinkTarget = "sak" | "sakForside" | "sakHistorikk";
+type BisysLinkTarget = "sak" | "sakForside" | "sakHistorikk" | "oppgaveliste";
 type BisysParamName = "saksnr";
 
 const bisysPaths: Record<BisysLinkTarget, string> = {
     sak: "Sak.do",
     sakForside: "Sak.do",
     sakHistorikk: "Sakshistorikk.do",
+    oppgaveliste: "Oppgaveliste.do",
 };
 
 export function useBisysLink() {

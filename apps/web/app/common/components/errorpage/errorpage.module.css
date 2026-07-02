@@ -1,0 +1,42 @@
+.stacktrace-container {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #262626;
+}
+
+.stacktrace-headline {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #8a1f11;
+}
+
+.stacktrace-section {
+  margin-top: 10px;
+}
+
+.stacktrace-section-title {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #525252;
+  margin-bottom: 6px;
+}
+
+.stacktrace-frames {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.stacktrace-frame {
+  margin: 2px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.stacktrace-extra-lines {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
