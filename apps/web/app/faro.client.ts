@@ -1,4 +1,5 @@
 import { initializeFaro, getWebInstrumentations } from "@grafana/faro-web-sdk";
+import { ReactIntegration } from "@grafana/faro-react";
 import nais from "./nais.js";
 
 let faroInstance: ReturnType<typeof initializeFaro> | null = null;
@@ -16,6 +17,7 @@ export function initFaro() {
             ...getWebInstrumentations({
                 captureConsole: true,
             }),
+            new ReactIntegration(),
         ],
         pageTracking: {
             generatePageId: (location) => {
