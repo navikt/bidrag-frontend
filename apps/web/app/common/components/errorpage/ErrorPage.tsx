@@ -75,13 +75,17 @@ function ButtonRow() {
     const { bisysUrl, setBisysLinkTarget } = useBisysLink();
     const { saksnummer } = useParams();
 
-    setBisysLinkTarget("oppgaveliste", { saksnr: saksnummer ?? "" });
+    useEffect(() => {
+        setBisysLinkTarget("oppgaveliste", { saksnr: saksnummer ?? "" });
+    }, [saksnummer]);
 
     return (
         <HStack gap="space-4" align="center">
-            <Button as="a" href={bisysUrl ?? ""} variant="primary" size="small">
-                Tilbake til oppgavelisten
-            </Button>
+            {bisysUrl && (
+                <Button as="a" href={bisysUrl} variant="primary" size="small">
+                    Tilbake til oppgavelisten
+                </Button>
+            )}
             <Button onClick={() => window.location.reload()} variant="tertiary" size="small">
                 Oppdater side
             </Button>
@@ -204,7 +208,11 @@ function ContactInformation({ exceptionCode }: { exceptionCode: string }) {
             <div style={{ display: "flex", justifyContent: "row" }}>
                 <BodyShort size="small">
                     Vennligst lim inn koden over i feltet "Tittel", da du oppretter sak i{" "}
-                    <Link href={"https://jira.adeo.no/plugins/servlet/desk/portal/541/create/1861"} target="_blank">
+                    <Link
+                        href={"https://jira.adeo.no/plugins/servlet/desk/portal/541/create/1861"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         Porten
                         <ExternalLinkIcon aria-hidden fontSize="1.5rem" />
                     </Link>
