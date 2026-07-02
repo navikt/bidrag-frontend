@@ -63,7 +63,7 @@ export function EChartLineChart({ option, style }: ReactEChartsProps): ReactElem
     useEffect(() => {
         const canvas = chartRef.current!.querySelector<HTMLCanvasElement>("canvas");
         const chart = getInstanceByDom(chartRef.current as HTMLDivElement);
-        const dataLen = (option.series as LineSeriesOption[])[0].data?.length ?? 0;
+        const dataLen = (option.series as LineSeriesOption[])[0]?.data?.length ?? 0;
 
         const handleKeydown = (e: KeyboardEvent) => {
             if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
