@@ -1,25 +1,25 @@
-import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
+import type {Transaksjon} from "@bidrag/api/BidragReskontroApi";
 
 export class TransaksjonAggregat {
-    readonly dato: string | null;
-    readonly transaksjonskode: string | null;
-    readonly beskrivelse: string | null;
-    readonly mottaker: string | null;
-    readonly søknadstype: string | null;
+    readonly dato?: string ;
+    readonly transaksjonskode?: string ;
+    readonly beskrivelse?: string ;
+    readonly mottaker?: string ;
+    readonly søknadstype?: string ;
 
     private readonly _transaksjoner: Transaksjon[];
 
     constructor(transaksjon: Transaksjon) {
-        this.dato = transaksjon.dato ?? null;
-        this.transaksjonskode = transaksjon.transaksjonskode ?? null;
-        this.beskrivelse = transaksjon.beskrivelse ?? null;
-        this.mottaker = transaksjon.mottaker ?? null;
-        this.søknadstype = transaksjon.søknadstype ?? null;
+        this.dato = transaksjon.dato ?? undefined;
+        this.transaksjonskode = transaksjon.transaksjonskode ?? undefined;
+        this.beskrivelse = transaksjon.beskrivelse ?? undefined;
+        this.mottaker = transaksjon.mottaker ?? undefined;
+        this.søknadstype = transaksjon.søknadstype ?? undefined;
         this._transaksjoner = [transaksjon];
     }
 
     private shouldNegateSum(): boolean {
-        return ["B10", "D10", "E10", "F10"].includes(this.transaksjonskode??"");
+        return ["B10", "D10", "E10", "F10"].includes(this.transaksjonskode ?? "");
     }
 
     add(transaksjon: Transaksjon): void {
@@ -27,7 +27,7 @@ export class TransaksjonAggregat {
     }
 
     get nøkkel(): string {
-        return generateNøkkel(this._transaksjoner.at(0));
+        return generateNøkkel(this._transaksjoner[0]!);
     }
 
     get antall(): number {

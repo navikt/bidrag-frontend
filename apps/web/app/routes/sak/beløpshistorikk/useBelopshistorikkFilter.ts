@@ -7,13 +7,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
+import { hentBelopshistorikkQuery } from "~/routes/api/query/belopshistorikk.query.ts";
 import {
     PARAM_BARN,
     PARAM_FRA,
     PARAM_TIL,
     PARAM_TYPE,
-} from "~/common/filter/konstanter.ts";
-import { hentBelopshistorikkQuery } from "~/routes/api/query/belopshistorikk.query.ts";
+} from "~/routes/sak/beløpshistorikk/konstanter.ts";
 import { erInnenforPeriode } from "./periode.utils";
 
 interface StonadMedPeriode

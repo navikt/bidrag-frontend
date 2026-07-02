@@ -324,7 +324,6 @@ export function useHentSakSuspense(saksnummer: string) {
 }
 
 export function useOppdaterSaksroller() {
-    const queryClient = useQueryClient();
     return useMutation<
         OppdaterSakResponse,
         AxiosError | TilgangsFeilError,

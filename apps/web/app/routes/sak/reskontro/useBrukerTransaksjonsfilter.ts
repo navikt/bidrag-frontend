@@ -2,7 +2,7 @@ import { parseDateQueryParam } from "@bidrag/utils/datoUtils";
 import { isAfter, isBefore } from "date-fns";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
-import { IdentQueryParamMapper } from "./IdentQueryParamMapper";
+import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
 import {
     PARAM_BARN,
     PARAM_FRA,
@@ -19,7 +19,7 @@ import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner";
 
 export function useBrukerTransaksjonsfilter(ident: string) {
     const { alletransaksjoner, unikeMottakere, unikeBarn } =
-        useBrukerTransaksjoner(ident!);
+        useBrukerTransaksjoner(ident);
     const { search: searchString } = useLocation();
 
     const mottakerMapper = new IdentQueryParamMapper(unikeMottakere);

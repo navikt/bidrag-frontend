@@ -15,7 +15,7 @@ import {
     PARAM_FRA,
     PARAM_TIL,
     PARAM_TYPE,
-} from "~/common/filter/konstanter.ts";
+} from "./konstanter.ts";
 import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";
 
 interface PerioderFilterPanelProps {

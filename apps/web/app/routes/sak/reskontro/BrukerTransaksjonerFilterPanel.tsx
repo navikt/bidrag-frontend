@@ -9,7 +9,7 @@ import {
 } from "@navikt/ds-react";
 import { useMemo } from "react";
 import { useParams, useSearchParams } from "react-router";
-import { IdentQueryParamMapper } from "./IdentQueryParamMapper";
+import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
 import {
     PARAM_BARN,
     PARAM_FRA,

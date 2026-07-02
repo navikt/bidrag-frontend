@@ -15,6 +15,7 @@ const SOKNADSTYPER: Record<string, string> = {
     MP: "Månedlig påløp",
 };
 
-export function visningsnavnForSøknadstype(kode: string): string | null {
+export function visningsnavnForSøknadstype(kode?: string | null): string | null {
+    if (!kode) return null;
     return SOKNADSTYPER[kode] ?? kode;
 }

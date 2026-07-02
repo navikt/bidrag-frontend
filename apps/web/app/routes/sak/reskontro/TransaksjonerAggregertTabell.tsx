@@ -1,10 +1,15 @@
+import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
 import { PersonNavnIdent } from "@bidrag/common";
-import { Box, Pagination, SortState, Table, VStack } from "@navikt/ds-react";
-import { useMemo, useState } from "react";
-
-import { Transaksjon } from "@bidrag/api/BidragReskontroApi";
 import { formaterBelop } from "@bidrag/utils/belopUtils";
 import { formaterDato, sortByDateAsc } from "@bidrag/utils/datoUtils";
+import {
+    Box,
+    Pagination,
+    type SortState,
+    Table,
+    VStack,
+} from "@navikt/ds-react";
+import { useMemo, useState } from "react";
 
 import { FiltrertTransaksjonSummer } from "./FiltrertTransaksjonSummer";
 import { visningsnavnForSøknadstype } from "./søknadstyper";
@@ -35,21 +40,33 @@ function SubTabell({ transaksjoner }: { transaksjoner: Transaksjon[] }) {
             </Table.Header>
             <Table.Body>
                 {transaksjoner.map((t) => (
-                    <Table.Row key={t.transaksjonsid + t.delytelsesid}>
-                        <Table.DataCell>{formaterDato(t.periode?.fom) ?? "–"}</Table.DataCell>
+                    <Table.Row key={`${t.transaksjonsid}-${t.delytelsesid}`}>
+                        <Table.DataCell>
+                            {formaterDato(t.periode?.fom) ?? "–"}
+                        </Table.DataCell>
                         <Table.DataCell>
                             <PersonNavnIdent ident={t.barn} bareFornavn />
                         </Table.DataCell>
                         <Table.DataCell>{t.saksnummer}</Table.DataCell>
                         <Table.DataCell>
-                            <PersonNavnIdent ident={t.skyldner} variant={"ident"} />
+                            <PersonNavnIdent
+                                ident={t.skyldner}
+                                variant={"ident"}
+                            />
                         </Table.DataCell>
                         <Table.DataCell>
-                            <PersonNavnIdent ident={t.mottaker} variant={"ident"} />
+                            <PersonNavnIdent
+                                ident={t.mottaker}
+                                variant={"ident"}
+                            />
                         </Table.DataCell>
                         <Table.DataCell>{t.valutakode ?? "NOK"}</Table.DataCell>
-                        <Table.DataCell align="right">{formaterBelop(t.beløp)}</Table.DataCell>
-                        <Table.DataCell align="right">{formaterBelop(t.restBeløp)}</Table.DataCell>
+                        <Table.DataCell align="right">
+                            {formaterBelop(t.beløp)}
+                        </Table.DataCell>
+                        <Table.DataCell align="right">
+                            {formaterBelop(t.restBeløp)}
+                        </Table.DataCell>
                     </Table.Row>
                 ))}
             </Table.Body>
@@ -66,7 +83,7 @@ export default function TransaksjonerAggregertTabell({
             aggregerTransaksjoner(transaksjoner)
                 .sort((a, b) => sortByDateAsc(a.dato, b.dato))
                 .reverse(),
-        [transaksjoner]
+        [transaksjoner],
     );
     const [sort, setSort] = useState<SortState | undefined>();
     const [page, setPage] = useState(1);
@@ -79,9 +96,16 @@ export default function TransaksjonerAggregertTabell({
                 case "dato":
                     return dir * sortByDateAsc(a.dato, b.dato);
                 case "transaksjonskode":
-                    return dir * (a.transaksjonskode ?? "").localeCompare(b.transaksjonskode ?? "");
+                    return (
+                        dir *
+                        (a.transaksjonskode ?? "").localeCompare(
+                            b.transaksjonskode ?? "",
+                        )
+                    );
                 case "mottaker":
-                    return dir * (a.mottaker ?? "").localeCompare(b.mottaker ?? "");
+                    return (
+                        dir * (a.mottaker ?? "").localeCompare(b.mottaker ?? "")
+                    );
                 case "sumBeløp":
                     return dir * (a.sumBeløp - b.sumBeløp);
                 case "sumRestBeløp":
@@ -93,22 +117,27 @@ export default function TransaksjonerAggregertTabell({
     }, [aggregater, sort?.orderBy, sort?.direction]);
 
     const paginertData = useMemo(
-        () => sortertData.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE),
-        [sortertData, page]
+        () =>
+            sortertData.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE),
+        [sortertData, page],
     );
 
     const handleSortChange = (sortKey: string) => {
         setPage(1);
         setSort((prevSort) =>
-            prevSort && sortKey === prevSort.orderBy && prevSort.direction === "descending"
+            prevSort &&
+            sortKey === prevSort.orderBy &&
+            prevSort.direction === "descending"
                 ? undefined
                 : {
                       orderBy: sortKey,
                       direction:
-                          prevSort && sortKey === prevSort.orderBy && prevSort.direction === "ascending"
+                          prevSort &&
+                          sortKey === prevSort.orderBy &&
+                          prevSort.direction === "ascending"
                               ? "descending"
                               : "ascending",
-                  }
+                  },
         );
     };
 
@@ -118,8 +147,17 @@ export default function TransaksjonerAggregertTabell({
 
     return (
         <VStack gap="space-16">
-            <FiltrertTransaksjonSummer totalTransCount={totalTransCount} aggregater={aggregater} />
-            <Table zebraStripes size="small" stickyHeader={true} sort={sort} onSortChange={handleSortChange}>
+            <FiltrertTransaksjonSummer
+                totalTransCount={totalTransCount}
+                aggregater={aggregater}
+            />
+            <Table
+                zebraStripes
+                size="small"
+                stickyHeader={true}
+                sort={sort}
+                onSortChange={handleSortChange}
+            >
                 <Table.Header>
                     <Table.Row>
                         <Table.ColumnHeader sortKey="dato" sortable>
@@ -129,13 +167,23 @@ export default function TransaksjonerAggregertTabell({
                             Transaksjonstype
                         </Table.ColumnHeader>
                         <Table.HeaderCell>Søknadstype</Table.HeaderCell>
-                        <Table.ColumnHeader sortKey="sumBeløp" sortable align="right">
+                        <Table.ColumnHeader
+                            sortKey="sumBeløp"
+                            sortable
+                            align="right"
+                        >
                             Beløp
                         </Table.ColumnHeader>
-                        <Table.ColumnHeader sortKey="sumRestBeløp" sortable align="right">
+                        <Table.ColumnHeader
+                            sortKey="sumRestBeløp"
+                            sortable
+                            align="right"
+                        >
                             Restbeløp
                         </Table.ColumnHeader>
-                        <Table.HeaderCell colSpan={2}>Transaksjoner</Table.HeaderCell>
+                        <Table.HeaderCell colSpan={2}>
+                            Transaksjoner
+                        </Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -146,18 +194,32 @@ export default function TransaksjonerAggregertTabell({
                             expandOnRowClick
                             content={
                                 <Box padding="space-4">
-                                    <SubTabell transaksjoner={aggregat.transaksjoner} />
+                                    <SubTabell
+                                        transaksjoner={aggregat.transaksjoner}
+                                    />
                                 </Box>
                             }
                         >
-                            <Table.DataCell>{formaterDato(aggregat.dato)}</Table.DataCell>
                             <Table.DataCell>
-                                <TransaksjonType kode={aggregat.transaksjonskode} />
+                                {formaterDato(aggregat.dato)}
                             </Table.DataCell>
-                            <Table.DataCell>{visningsnavnForSøknadstype(aggregat.søknadstype)}</Table.DataCell>
-                            <Table.DataCell align="right">{formaterBelop(aggregat.sumBeløp)}</Table.DataCell>
-                            <Table.DataCell align="right">{formaterBelop(aggregat.sumRestBeløp)}</Table.DataCell>
-                            <Table.DataCell align="right">{aggregat.antall}</Table.DataCell>
+                            <Table.DataCell>
+                                <TransaksjonType
+                                    kode={aggregat.transaksjonskode}
+                                />
+                            </Table.DataCell>
+                            <Table.DataCell>
+                                {visningsnavnForSøknadstype(aggregat.søknadstype)}
+                            </Table.DataCell>
+                            <Table.DataCell align="right">
+                                {formaterBelop(aggregat.sumBeløp)}
+                            </Table.DataCell>
+                            <Table.DataCell align="right">
+                                {formaterBelop(aggregat.sumRestBeløp)}
+                            </Table.DataCell>
+                            <Table.DataCell align="right">
+                                {aggregat.antall}
+                            </Table.DataCell>
                         </Table.ExpandableRow>
                     ))}
                 </Table.Body>

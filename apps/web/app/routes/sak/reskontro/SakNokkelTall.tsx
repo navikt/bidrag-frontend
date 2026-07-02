@@ -1,6 +1,6 @@
 import type { SaksinformasjonBarn } from "@bidrag/api/BidragReskontroApi";
 import { PersonNavnIdent } from "@bidrag/common";
-import { formaterBelop } from "@bidrag/utils/belopUtils";
+import {formaterBelop, sumNullable} from "@bidrag/utils/belopUtils";
 import { Box, Label, Table, VStack } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { hentInnkrevingForSaksnummer } from "~/routes/api/query/reskontro.query";
@@ -12,10 +12,10 @@ interface SakNokkelTallProps {
 }
 
 const gjeld = (barn: SaksinformasjonBarn) => {
-    return barn.restGjeldOffentlig + barn.restGjeldPrivat;
+    return sumNullable(barn.restGjeldOffentlig , barn.restGjeldPrivat) ;
 };
 const tilUtbetaling = (barn: SaksinformasjonBarn) => {
-    return barn.sumForskuddUtbetalt + barn.sumIkkeUtbetalt;
+    return sumNullable(barn.sumForskuddUtbetalt , barn.sumIkkeUtbetalt);
 };
 
 export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
@@ -28,18 +28,18 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
         data?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
     const totalGjeld = barn.reduce((acc, barn) => acc + gjeld(barn), 0);
     const totalPrivatGjeld = barn.reduce(
-        (acc, barn) => acc + barn.restGjeldPrivat,
+        (acc, barn) =>sumNullable(acc , barn.restGjeldPrivat),
         0,
     );
     const totalOffGjeld = barn.reduce(
-        (acc, barn) => acc + barn.restGjeldOffentlig,
+        (acc, barn) => sumNullable(acc , barn.restGjeldOffentlig),
         0,
     );
     const totaltTilUtbetaling = barn.reduce(
         (acc, barn) => acc + tilUtbetaling(barn),
         0,
     );
-    const bmGjeld = data?.bmGjeldRest + data?.bmGjeldFastsettelsesgebyr;
+    const bmGjeld = sumNullable(data?.bmGjeldRest , data?.bmGjeldFastsettelsesgebyr);
 
     return (
         <Box

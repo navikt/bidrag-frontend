@@ -1,14 +1,16 @@
-import { visningsnavnForTransaksjonskode } from "./transaksjonstyper";
+import {visningsnavnForTransaksjonskode} from "./transaksjonstyper";
 
 interface TransaksjonTypeProps {
-    kode: string;
+    kode?: string;
 }
 
 export function TransaksjonType({ kode }: TransaksjonTypeProps) {
-    const visning = visningsnavnForTransaksjonskode(kode);
+    if (!kode) {
+        return null;
+    }
     return (
         <div>
-            <strong>{kode}</strong> {visning}
+            <strong>{kode}</strong> {visningsnavnForTransaksjonskode(kode)}
         </div>
     );
 }
