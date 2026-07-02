@@ -1,6 +1,6 @@
 import { FaroErrorBoundary } from "@grafana/faro-react";
 import { useEffect } from "react";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
 import { userContext } from "~/server/context.ts";
@@ -32,7 +32,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
 
     return (
         <QueryClientWrapper>
-            <FaroErrorBoundary fallback={<ErrorBoundary />}>
+            <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} />}>
                 <AppLayout bruker={navUser}>
                     <ClientOnly fallback={<Loader size="large" />}>
                         <Outlet />
@@ -61,9 +61,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     );
 }
 
-export function ErrorBoundary() {
-    const error = useRouteError();
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+    return <RootErrorBoundary error={error} />;
+}
 
+function RootErrorBoundary({ error }: { error: unknown }) {
     return (
         <QueryClientWrapper>
             <AppLayout>
