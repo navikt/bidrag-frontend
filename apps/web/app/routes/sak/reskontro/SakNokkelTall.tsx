@@ -1,10 +1,9 @@
-import { PersonNavnIdent } from "@navikt/bidrag-ui-common";
+import type { SaksinformasjonBarn } from "@bidrag/api/BidragReskontroApi";
+import { PersonNavnIdent } from "@bidrag/common";
+import { formaterBelop } from "@bidrag/utils/belopUtils";
 import { Box, Label, Table, VStack } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-
-import { SaksinformasjonBarn } from "~/api/BidragReskontroApi";
-import { hentInnkrevingForSaksnummer } from "~/api/query/reskontro.query";
-import { formaterBelop } from "~/utils/belopUtils";
+import { hentInnkrevingForSaksnummer } from "~/routes/api/query/reskontro.query";
 
 import { DUMMY_BARN } from "./konstanter";
 
@@ -25,11 +24,21 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
     // TODO tester?
     /**ELIN returnerer noen ganger et "ekstra" barn med fødselsnr 444444 44441. */
 
-    const barn = data?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
+    const barn =
+        data?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
     const totalGjeld = barn.reduce((acc, barn) => acc + gjeld(barn), 0);
-    const totalPrivatGjeld = barn.reduce((acc, barn) => acc + barn.restGjeldPrivat, 0);
-    const totalOffGjeld = barn.reduce((acc, barn) => acc + barn.restGjeldOffentlig, 0);
-    const totaltTilUtbetaling = barn.reduce((acc, barn) => acc + tilUtbetaling(barn), 0);
+    const totalPrivatGjeld = barn.reduce(
+        (acc, barn) => acc + barn.restGjeldPrivat,
+        0,
+    );
+    const totalOffGjeld = barn.reduce(
+        (acc, barn) => acc + barn.restGjeldOffentlig,
+        0,
+    );
+    const totaltTilUtbetaling = barn.reduce(
+        (acc, barn) => acc + tilUtbetaling(barn),
+        0,
+    );
     const bmGjeld = data?.bmGjeldRest + data?.bmGjeldFastsettelsesgebyr;
 
     return (
@@ -54,25 +63,44 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell>Barn</Table.HeaderCell>
-                                <Table.HeaderCell align={"right"}>Total gjeld</Table.HeaderCell>
-                                <Table.HeaderCell align={"right"}>Privat gjeld</Table.HeaderCell>
-                                <Table.HeaderCell align={"right"}>Offentlig gjeld</Table.HeaderCell>
-                                <Table.HeaderCell align={"right"}>Til utbetaling</Table.HeaderCell>
-                                <Table.HeaderCell align={"center"}>Utbetaling stoppet</Table.HeaderCell>
+                                <Table.HeaderCell align={"right"}>
+                                    Total gjeld
+                                </Table.HeaderCell>
+                                <Table.HeaderCell align={"right"}>
+                                    Privat gjeld
+                                </Table.HeaderCell>
+                                <Table.HeaderCell align={"right"}>
+                                    Offentlig gjeld
+                                </Table.HeaderCell>
+                                <Table.HeaderCell align={"right"}>
+                                    Til utbetaling
+                                </Table.HeaderCell>
+                                <Table.HeaderCell align={"center"}>
+                                    Utbetaling stoppet
+                                </Table.HeaderCell>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
                             {barn.map((b) => (
                                 <Table.Row key={b.personident}>
                                     <Table.DataCell>
-                                        <PersonNavnIdent ident={b.personident} bareFornavn />
+                                        <PersonNavnIdent
+                                            ident={b.personident}
+                                            bareFornavn
+                                        />
                                     </Table.DataCell>
-                                    <Table.DataCell align={"right"}>{formaterBelop(gjeld(b))}</Table.DataCell>
-                                    <Table.DataCell align={"right"}>{formaterBelop(b.restGjeldPrivat)}</Table.DataCell>
+                                    <Table.DataCell align={"right"}>
+                                        {formaterBelop(gjeld(b))}
+                                    </Table.DataCell>
+                                    <Table.DataCell align={"right"}>
+                                        {formaterBelop(b.restGjeldPrivat)}
+                                    </Table.DataCell>
                                     <Table.DataCell align={"right"}>
                                         {formaterBelop(b.restGjeldOffentlig)}
                                     </Table.DataCell>
-                                    <Table.DataCell align={"right"}>{formaterBelop(tilUtbetaling(b))}</Table.DataCell>
+                                    <Table.DataCell align={"right"}>
+                                        {formaterBelop(tilUtbetaling(b))}
+                                    </Table.DataCell>
                                     <Table.DataCell align={"center"}>
                                         {b.erStoppIUtbetaling ? "Ja" : "-"}
                                     </Table.DataCell>
@@ -84,13 +112,19 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                                     <strong>{formaterBelop(totalGjeld)}</strong>
                                 </Table.DataCell>
                                 <Table.DataCell align={"right"}>
-                                    <strong>{formaterBelop(totalPrivatGjeld)}</strong>
+                                    <strong>
+                                        {formaterBelop(totalPrivatGjeld)}
+                                    </strong>
                                 </Table.DataCell>
                                 <Table.DataCell align={"right"}>
-                                    <strong>{formaterBelop(totalOffGjeld)}</strong>
+                                    <strong>
+                                        {formaterBelop(totalOffGjeld)}
+                                    </strong>
                                 </Table.DataCell>
                                 <Table.DataCell align={"right"}>
-                                    <strong>{formaterBelop(totaltTilUtbetaling)}</strong>
+                                    <strong>
+                                        {formaterBelop(totaltTilUtbetaling)}
+                                    </strong>
                                 </Table.DataCell>
                                 <Table.DataCell />
                             </Table.Row>
@@ -112,12 +146,18 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                             <Table.Row>
                                 <Table.DataCell>Gebyr</Table.DataCell>
                                 <Table.DataCell align={"right"}>
-                                    {formaterBelop(data.bmGjeldFastsettelsesgebyr)}
+                                    {formaterBelop(
+                                        data.bmGjeldFastsettelsesgebyr,
+                                    )}
                                 </Table.DataCell>
                             </Table.Row>
                             <Table.Row>
-                                <Table.DataCell>Tilbakekrevingsbeløp</Table.DataCell>
-                                <Table.DataCell align={"right"}>{formaterBelop(data.bmGjeldRest)}</Table.DataCell>
+                                <Table.DataCell>
+                                    Tilbakekrevingsbeløp
+                                </Table.DataCell>
+                                <Table.DataCell align={"right"}>
+                                    {formaterBelop(data.bmGjeldRest)}
+                                </Table.DataCell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.DataCell />

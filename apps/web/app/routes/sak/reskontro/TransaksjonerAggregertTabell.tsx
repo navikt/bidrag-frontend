@@ -1,10 +1,10 @@
-import { PersonNavnIdent } from "@navikt/bidrag-ui-common";
+import { PersonNavnIdent } from "@bidrag/common";
 import { Box, Pagination, SortState, Table, VStack } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
 
-import { Transaksjon } from "~/api/BidragReskontroApi";
-import { formaterBelop } from "~/utils/belopUtils";
-import { formaterDato, sortByDateAsc } from "~/utils/datoUtils";
+import { Transaksjon } from "@bidrag/api/BidragReskontroApi";
+import { formaterBelop } from "@bidrag/utils/belopUtils";
+import { formaterDato, sortByDateAsc } from "@bidrag/utils/datoUtils";
 
 import { FiltrertTransaksjonSummer } from "./FiltrertTransaksjonSummer";
 import { visningsnavnForSøknadstype } from "./søknadstyper";

@@ -1,8 +1,8 @@
 import { Box, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
 import { useMemo } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router";
 
-import { parseDateQueryParam, toQueryParam } from "~/utils/datoUtils";
+import { parseDateQueryParam, toQueryParam } from "@bidrag/utils/datoUtils";
 
 import { IdentQueryParamMapper } from "./IdentQueryParamMapper";
 import { PARAM_BARN, PARAM_FRA, PARAM_KODER, PARAM_MOTTAKERE, PARAM_OPEN_TRANS, PARAM_TIL } from "./konstanter";

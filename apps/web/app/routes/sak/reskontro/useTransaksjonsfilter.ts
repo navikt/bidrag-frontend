@@ -1,8 +1,8 @@
 import { isAfter, isBefore } from "date-fns";
 import { useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
-import { parseDateQueryParam } from "../../utils/datoUtils";
+import { parseDateQueryParam } from "@bidrag/utils/datoUtils";
 import { IdentQueryParamMapper } from "./IdentQueryParamMapper";
 import { PARAM_BARN, PARAM_FRA, PARAM_KODER, PARAM_MOTTAKERE, PARAM_OPEN_TRANS, PARAM_TIL } from "./konstanter";
 import { isTransaksjonGruppe, transaksjonstypeGrupper } from "./transaksjonstyper";

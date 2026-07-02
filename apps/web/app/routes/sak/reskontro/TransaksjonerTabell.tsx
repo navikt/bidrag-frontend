@@ -1,9 +1,9 @@
 import { Pagination, SortState, Table, VStack } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
 
-import { Transaksjon } from "../../api/BidragReskontroApi";
-import { formaterBelop } from "../../utils/belopUtils";
-import { formaterDato, sortByDateAsc } from "../../utils/datoUtils";
+import { Transaksjon } from "@bidrag/api/BidragReskontroApi";
+import { formaterBelop } from "@bidrag/utils/belopUtils";
+import { formaterDato, sortByDateAsc } from "@bidrag/utils/datoUtils";
 
 interface TransaksjonerTabellProps {
     transaksjoner: Transaksjon[];

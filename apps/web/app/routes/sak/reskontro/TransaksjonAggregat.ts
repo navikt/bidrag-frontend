@@ -1,4 +1,4 @@
-import { Transaksjon } from "../../api/BidragReskontroApi";
+import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
 
 export class TransaksjonAggregat {
     readonly dato: string | null;
@@ -19,7 +19,7 @@ export class TransaksjonAggregat {
     }
 
     private shouldNegateSum(): boolean {
-        return ["B10", "D10", "E10", "F10"].includes(this.transaksjonskode);
+        return ["B10", "D10", "E10", "F10"].includes(this.transaksjonskode??"");
     }
 
     add(transaksjon: Transaksjon): void {

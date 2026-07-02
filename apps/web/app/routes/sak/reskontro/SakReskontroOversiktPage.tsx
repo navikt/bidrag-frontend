@@ -1,30 +1,13 @@
 import { Box, Heading, List, LocalAlert, VStack } from "@navikt/ds-react";
-import { QueryErrorWrapper } from "@shared/error/QueryErrorWrapper";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
-import { SakNokkelTall } from "~/features/reskontro/SakNokkelTall";
-import TransaksjonerAggregertTabell from "~/features/reskontro/TransaksjonerAggregertTabell";
-import TransaksjonerFilterPanel from "~/features/reskontro/TransaksjonerFilterPanel";
-import { useTransaksjonsfilter } from "~/features/reskontro/useTransaksjonsfilter";
+import { SakNokkelTall } from "./SakNokkelTall";
+import TransaksjonerAggregertTabell from "./TransaksjonerAggregertTabell";
+import TransaksjonerFilterPanel from "./TransaksjonerFilterPanel";
+import { useTransaksjonsfilter } from "./useTransaksjonsfilter";
 
 export default function SakReskontroOversiktPage() {
-    const { saksnummer } = useParams();
-
-    useEffect(() => {
-        window.setHeaderNavigationContext({ mode: "sak", saksnummer: saksnummer });
-        window.setAppContext({ appName: "sak", moduleName: "sakreskontro" });
-        document.title = `Sakreskontro - ${saksnummer}`;
-    }, [saksnummer]);
-
-    return (
-        <QueryErrorWrapper>
-            <SakReskontroOversiktPageContent />
-        </QueryErrorWrapper>
-    );
-}
-
-function SakReskontroOversiktPageContent() {
     const { saksnummer } = useParams();
     const { filtrertData, totalTransCount } = useTransaksjonsfilter(saksnummer);
     const [showAlert, setShowAlert] = useState(true);
