@@ -35,7 +35,7 @@ export default function PersonNavnIdent({
     stønad18År = false,
     ignoreClickOnIdent = false,
 }: PersonNavnIdentProps) {
-    const ident= nullableIdent ?? undefined
+    const ident= nullableIdent ?? undefined;
     const { useHentPersonData, uthevPerson } = useBidragCommons();
     // const { data: graderingsinfo } = useHentPersonSkjermingInfo(ident);
     const { data: personData } = useHentPersonData(ident);
