@@ -3,7 +3,7 @@ import { PersonNavnIdent } from "@bidrag/common";
 import {formaterBelop, sumNullable} from "@bidrag/utils/belopUtils";
 import { Box, Label, Table, VStack } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { hentInnkrevingForSaksnummer } from "~/routes/api/query/reskontro.query";
+import { hentInnkrevingForSaksnummer } from "~/api/query/reskontro.query";
 
 import { DUMMY_BARN } from "./konstanter";
 

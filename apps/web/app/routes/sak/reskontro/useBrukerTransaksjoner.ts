@@ -1,7 +1,7 @@
 import { unikeVerdier } from "@bidrag/utils/arrayUtils";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { hentReskontroTransaksjonerForBruker } from "~/routes/api/query/reskontro.query";
+import { hentReskontroTransaksjonerForBruker } from "~/api/query/reskontro.query";
 
 import { DUMMY_BARN } from "./konstanter";
 

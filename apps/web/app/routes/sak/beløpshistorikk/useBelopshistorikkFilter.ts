@@ -6,8 +6,8 @@ import { parseDateQueryParam, unikeVerdier } from "@bidrag/utils";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
+import { hentBelopshistorikkQuery } from "~/api/query/belopshistorikk.query.ts";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
-import { hentBelopshistorikkQuery } from "~/routes/api/query/belopshistorikk.query.ts";
 import {
     PARAM_BARN,
     PARAM_FRA,

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
-import { configQuery } from "~/routes/api/query/config.query.ts";
+import { configQuery } from "~/api/query/config.query.ts";
 import { getBisysSessionParams } from "./bisys-params.ts";
 
 const SESSION_BISYS_LINK_TARGET = "bisys.linktarget";

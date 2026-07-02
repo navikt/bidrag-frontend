@@ -38,7 +38,7 @@ import {
     useSuspenseQuery,
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import type { ISamhandlerPersonInfo } from "./types/person";
+import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
 
 // ==================== SAK ====================
 
