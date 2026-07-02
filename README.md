@@ -61,6 +61,27 @@ Deploy skjer automatisk via GitHub Actions:
 | q2 | PR mot main                  | `.nais/q2.yaml` |
 | prod | Merge til main               | `.nais/prod.yaml` |
 
+## Scripts
+
+### migrate-imports
+
+Migrerer import-paths i `apps/web/app` (eller en valgfri delmappe) til monorepo-pakker:
+
+| Fra | Til |
+|-----|-----|
+| `@navikt/bidrag-ui-common` | `@bidrag/common` |
+| `react-router-dom` | `react-router` |
+| `~/api/**`, `(../)+ api/**` | `@bidrag/api/**` (subpath bevares) |
+| `~/utils/**`, `(../)+ utils/**` | `@bidrag/utils/**` (subpath bevares) |
+
+```bash
+# Hele apps/web/app (default)
+pnpm tsx scripts/migrate-imports.ts
+
+# Eller spesifikk mappe
+pnpm tsx scripts/migrate-imports.ts apps/web/app/routes/sak/reskontro
+```
+
 ## Backends
 
 Appen kaller følgende backends via OBO-token-exchange (Azure AD):
