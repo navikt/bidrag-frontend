@@ -98,7 +98,7 @@ function ErrorInfo({ error, stackTrace }: { error?: string; stackTrace?: string 
 
     return (
         <>
-            <BodyLong>
+            <BodyLong as={"div"} >
                 <Heading size="medium" spacing>
                     En teknisk feil har oppstått
                 </Heading>
@@ -112,7 +112,7 @@ function ErrorInfo({ error, stackTrace }: { error?: string; stackTrace?: string 
                 </List>
             </BodyLong>
             {error && (
-                <BodyLong>
+                <BodyLong as={"div"}>
                     <Heading size="small" spacing>
                         Feilmelding:
                     </Heading>
@@ -122,7 +122,7 @@ function ErrorInfo({ error, stackTrace }: { error?: string; stackTrace?: string 
                 </BodyLong>
             )}
             {parsedStackTrace && (
-                <BodyLong>
+                <BodyLong as={"div"}>
                     <details>
                         <summary>Vis feildetaljer</summary>
                         <Box
@@ -206,7 +206,7 @@ function ContactInformation({ exceptionCode }: { exceptionCode: string }) {
             <Heading size="xsmall">Ved kontakt med brukerstøtte oppgi koden under:</Heading>
             <ExceptionCode exceptionCode={exceptionCode} />
             <div style={{ display: "flex", justifyContent: "row" }}>
-                <BodyShort size="small">
+                <BodyShort size="small" >
                     Vennligst lim inn koden over i feltet "Tittel", da du oppretter sak i{" "}
                     <Link
                         href={"https://jira.adeo.no/plugins/servlet/desk/portal/541/create/1861"}
