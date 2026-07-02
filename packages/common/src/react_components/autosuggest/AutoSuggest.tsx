@@ -149,8 +149,10 @@ export default function AutoSuggest(props: AutoSuggestProps) {
             e.stopPropagation();
             if (showOptions) {
                 const userInput = filteredOptions[activeOption];
-                updateInput(userInput);
-                hideOptions();
+                if (userInput !== undefined) {
+                    updateInput(userInput);
+                    hideOptions();
+                }
             }
         } else if (e.code === "ArrowUp") {
             if (activeOption === 0) {

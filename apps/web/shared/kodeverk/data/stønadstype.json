@@ -1,0 +1,20 @@
+{
+    "BIDRAG": {
+        "intern": "Bidrag"
+    },
+    "FORSKUDD": {
+        "intern": "Forskudd"
+    },
+    "BIDRAG18AAR": {
+        "intern": "Bidrag 18 år"
+    },
+    "EKTEFELLEBIDRAG": {
+        "intern": "Ekstefellebidrag"
+    },
+    "MOTREGNING": {
+        "intern": "Motregining"
+    },
+    "OPPFOSTRINGSBIDRAG": {
+        "intern": "Oppfostringsbidrag"
+    }
+}

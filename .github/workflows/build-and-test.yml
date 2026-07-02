@@ -42,14 +42,14 @@ jobs:
         run: pnpm run test
 
       - name: Bygg applikasjon
-        run: pnpm run build:all
+        run: pnpm run build
 
       - name: Bygg Bygg deploybar applikasjon for Docker
         run: pnpm run deploy:docker
 
       - name: Push Docker-image til GAR
         if: ${{ inputs.docker }}
-        uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
+        uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
         id: docker-build-push
         with:
           team: bidrag

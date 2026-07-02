@@ -5,6 +5,7 @@
     "scripts": {
         "build": "react-router build",
         "dev": "react-router dev | pino-pretty --messageKey=message",
+        "test": "vitest run",
         "start": "node ./build/server/index.js",
         "typecheck": "react-router typegen && tsc --noEmit && react-router typegen"
     },
@@ -31,7 +32,8 @@
         "react-router": "catalog:",
         "tailwindcss": "catalog:",
         "@tailwindcss/vite": "catalog:",
-        "source-map": "^0.7.6"
+        "source-map": "^0.7.6",
+        "date-fns": "^4.4.0"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",

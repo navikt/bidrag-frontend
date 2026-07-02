@@ -2,14 +2,14 @@ export function removePlaceholder(stringWithPlaceholders: string, ...args: strin
     return args.reduce((s, v) => s.replace("{}", v), stringWithPlaceholders);
 }
 
-export function capitalizeFirstLetterAndLowercaseRest(str) {
+export function capitalizeFirstLetterAndLowercaseRest(str: string) {
     if (typeof str !== "string" || str.length === 0) {
         return "";
     }
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function capitalizeFirstLetter(str) {
+export function capitalizeFirstLetter(str: string) {
     if (typeof str !== "string" || str.length === 0) {
         return str; // Handle empty strings or non-string inputs
     }

@@ -21,8 +21,6 @@ pnpm-monorepo for bidrag. Frontend for saksbehandlere i NAV som jobber med barne
 apps/web/          # Shell-app — React Router v8, entry point
 packages/api/      # @bidrag/api — HTTP-klienter og proxy mot backends
 packages/common/   # @bidrag/common — felles tjenester, React-komponenter, typer
-packages/types/    # @bidrag/types — delte TypeScript-typer
-packages/ui/       # @bidrag/ui — felles UI-komponenter
 packages/utils/    # @bidrag/utils — formattering og norsk locale
 .nais/             # Nais-manifest og miljøvariabel-filer (q1, q2, prod)
 .github/workflows/ # CI/CD
@@ -49,9 +47,10 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 ```bash
 pnpm install          # Installer avhengigheter
 pnpm dev              # Start dev-server (apps/web)
-pnpm build:all        # Bygg alle pakker
+pnpm build        # Bygg alle pakker
 pnpm typecheck        # Typesjekk alle pakker
 pnpm check            # Lint + format (Biome)
+pnpm test             # Kjør tester i alle workspaces (kun pakker med testscript)
 ```
 
 ## Grenser
