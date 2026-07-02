@@ -10,6 +10,36 @@
     "exports": {
         ".": {
             "import": "./src/index.ts"
+        },
+        "./arrayUtils": {
+            "import": "./src/arrayUtils.ts"
+        },
+        "./belopUtils": {
+            "import": "./src/belopUtils.ts"
+        },
+        "./datoUtils": {
+            "import": "./src/datoUtils.ts"
+        },
+        "./organisasjonUtils": {
+            "import": "./src/organisasjonUtils.ts"
+        },
+        "./pathUtils": {
+            "import": "./src/pathUtils.ts"
+        },
+        "./personUtils": {
+            "import": "./src/personUtils.ts"
+        },
+        "./sakUtils": {
+            "import": "./src/sakUtils.ts"
+        },
+        "./stringUtils": {
+            "import": "./src/stringUtils.ts"
+        },
+        "./validationUtils": {
+            "import": "./src/validationUtils.ts"
+        },
+        "./visningsnavnUtils": {
+            "import": "./src/visningsnavnUtils.ts"
         }
     },
     "devDependencies": {

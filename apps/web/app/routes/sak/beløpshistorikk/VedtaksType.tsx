@@ -1,7 +1,7 @@
 import { Loader } from "@navikt/ds-react";
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
 import { useQuery } from "@tanstack/react-query";
-import {hentVedtakQuery} from "~/routes/api/query/vedtak.query.ts";
+import {hentVedtakQuery} from "~/api/query/vedtak.query.ts";
 
 
 interface VedtaksTypeProps {

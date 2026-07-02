@@ -1,45 +1,65 @@
-import type { Stonadstype } from "@bidrag/api/BelopshistorikkApi";
-import { parseDateQueryParam, toQueryParam } from "@bidrag/utils";
+import { parseDateQueryParam, toQueryParam } from "@bidrag/utils/datoUtils";
 import {
     Box,
     DatePicker,
     HStack,
+    Switch,
     UNSAFE_Combobox,
     useDatepicker,
 } from "@navikt/ds-react";
-import { hentVisningsnavnFraType } from "@shared/kodeverk";
-import { useSearchParams } from "react-router";
-import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper";
+import { useMemo } from "react";
+import { useParams, useSearchParams } from "react-router";
+import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
 import {
     PARAM_BARN,
     PARAM_FRA,
+    PARAM_KODER,
+    PARAM_MOTTAKERE,
+    PARAM_OPEN_TRANS,
     PARAM_TIL,
-    PARAM_TYPE,
-} from "./konstanter.ts";
-import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";
+} from "./konstanter";
+import {
+    transaksjonstypeGrupper,
+    visningsnavnForTransaksjonskode,
+} from "./transaksjonstyper";
+import { useTransaksjoner } from "./useTransaksjoner";
 
-interface PerioderFilterPanelProps {
-    saksnummer: string;
-}
-
-export default function PerioderFilterPanel({
-    saksnummer,
-}: PerioderFilterPanelProps) {
-    const { unikeKravhavere, unikeTyper } = useBeløphistorikkfilter(
-        saksnummer!,
-    );
+export default function TransaksjonerFilterPanel() {
+    const { saksnummer } = useParams();
+    const { unikeMottakere, unikeBarn, unikeTransaksjonskoder } =
+        useTransaksjoner(saksnummer!);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const valgteTyper = searchParams.getAll(PARAM_TYPE);
+    const valgteKoder = searchParams.getAll(PARAM_KODER);
 
-    const barnMapper = new IdentQueryParamMapper(unikeKravhavere);
+    const mottakerMapper = new IdentQueryParamMapper(unikeMottakere);
+    const barnMapper = new IdentQueryParamMapper(unikeBarn);
 
+    const valgteMottakere = mottakerMapper.toIdents(
+        searchParams.getAll(PARAM_MOTTAKERE),
+    );
     const valgteBarn = barnMapper.toIdents(searchParams.getAll(PARAM_BARN));
 
-    const typeOptions = unikeTyper.map((type) => ({
-        label: hentVisningsnavnFraType("stønadstype", type as Stonadstype),
-        value: type,
-    }));
+    const checked = searchParams.get(PARAM_OPEN_TRANS) === "true";
+
+    const kodeOptionsExtended = Object.entries(transaksjonstypeGrupper).map(
+        ([kode, type]) => {
+            return { label: type.visningsnavn, value: kode };
+        },
+    );
+
+    const transKodeOptions = useMemo(
+        () =>
+            unikeTransaksjonskoder.map((kode) => {
+                return {
+                    label: `${kode} - ${visningsnavnForTransaksjonskode(kode) ?? ""}`,
+                    value: kode,
+                };
+            }),
+        [unikeTransaksjonskoder],
+    );
+
+    const kodeOptions = kodeOptionsExtended.concat(transKodeOptions);
 
     const toggleParam = (key: string, option: string, isSelected: boolean) => {
         setSearchParams(
@@ -105,9 +125,32 @@ export default function PerioderFilterPanel({
             onDateChange: handleTilChange,
         });
 
+    const handleOpenTrans = (value: boolean | undefined) => {
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                value
+                    ? next.set(PARAM_OPEN_TRANS, "true")
+                    : next.delete(PARAM_OPEN_TRANS);
+                return next;
+            },
+            { replace: true },
+        );
+    };
+
     return (
         <Box background="neutral-soft" borderRadius="4" padding="space-16">
             <HStack gap="space-8" wrap align={"end"}>
+                <UNSAFE_Combobox
+                    label="Transaksjonstype"
+                    options={kodeOptions}
+                    isMultiSelect
+                    selectedOptions={valgteKoder}
+                    onToggleSelected={(option, isSelected) =>
+                        toggleParam(PARAM_KODER, option, isSelected)
+                    }
+                    size="small"
+                />
                 <UNSAFE_Combobox
                     label="Barn"
                     options={barnMapper.allIdents}
@@ -124,14 +167,19 @@ export default function PerioderFilterPanel({
                     }
                     size="small"
                 />
-
                 <UNSAFE_Combobox
-                    label="Beløpsgruppe"
-                    options={typeOptions}
+                    label="Mottaker"
+                    options={mottakerMapper.allIdents}
+                    readOnly={mottakerMapper.allIdents.length <= 1}
                     isMultiSelect
-                    selectedOptions={valgteTyper}
+                    selectedOptions={valgteMottakere}
                     onToggleSelected={(option, isSelected) =>
-                        toggleParam(PARAM_TYPE, option, isSelected)
+                        toggleIdentParam(
+                            PARAM_MOTTAKERE,
+                            mottakerMapper,
+                            option,
+                            isSelected,
+                        )
                     }
                     size="small"
                 />
@@ -152,6 +200,13 @@ export default function PerioderFilterPanel({
                         />
                     </DatePicker>
                 </HStack>
+                <Switch
+                    size={"small"}
+                    checked={checked}
+                    onChange={(e) => handleOpenTrans(e.target.checked)}
+                >
+                    Vis bare åpne
+                </Switch>
             </HStack>
         </Box>
     );

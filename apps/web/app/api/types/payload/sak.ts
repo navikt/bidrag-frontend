@@ -1,4 +1,4 @@
-import { RolleType } from "../rolleveileder";
+import type { RolleType } from "../rolleveileder.ts";
 
 export interface ICreateSakRoller {
     reellMottager?: string | undefined;

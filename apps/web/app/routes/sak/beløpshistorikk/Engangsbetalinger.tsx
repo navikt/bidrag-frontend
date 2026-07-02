@@ -1,6 +1,6 @@
 import { Engangsbeloptype } from "@bidrag/api/BelopshistorikkApi";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { hentEngangsbetalingerQuery } from "../../api/query/belopshistorikk.query";
+import { hentEngangsbetalingerQuery } from "~/api/query/belopshistorikk.query";
 import EngangsbetalingTabell from "./EngangsbetalingTabell";
 
 interface EngangsbetalingerProps {

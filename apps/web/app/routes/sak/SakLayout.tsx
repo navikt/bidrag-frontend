@@ -7,9 +7,9 @@ import {
 import { Loader, Page, VStack } from "@navikt/ds-react";
 import { Suspense, useEffect } from "react";
 import { Outlet } from "react-router";
+import { useHentSak } from "~/api/useApi.ts";
 import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import type { Route } from "./+types/SakLayout.ts";
-import { useHentSak } from "./useApi";
 
 export default function SakLayout({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;

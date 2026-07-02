@@ -1,6 +1,7 @@
 import {
     index,
     layout,
+    prefix,
     type RouteConfig,
     route,
 } from "@react-router/dev/routes";
@@ -14,13 +15,19 @@ export default [
 
     index("routes/_index.tsx"),
     layout("routes/sak/SakLayout.tsx", [
-        route(
-            "sak/:saksnummer/fogdhistorikk",
-            "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx",
-        ),
-        route(
-            "sak/:saksnummer/belopshistorikk",
-            "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx",
-        ),
+        ...prefix("sak/:saksnummer", [
+            route(
+                "fogdhistorikk",
+                "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx",
+            ),
+            route(
+                "belopshistorikk",
+                "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx",
+            ),
+            route(
+                "reskontro",
+                "routes/sak/reskontro/SakReskontroOversiktPage.tsx",
+            ),
+        ]),
     ]),
 ] satisfies RouteConfig;

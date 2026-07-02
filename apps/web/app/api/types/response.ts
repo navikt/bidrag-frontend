@@ -1,5 +1,9 @@
-import { ICreateSakRoller } from "./payload/sak";
-import { IForelderBarnRelasjon, IMotpartBarnRelasjon, IPerson } from "./person";
+import type { ICreateSakRoller } from "./payload/sak.ts";
+import type {
+    IForelderBarnRelasjon,
+    IMotpartBarnRelasjon,
+    IPerson,
+} from "./person.ts";
 
 export interface IMotpartBarnRelasjonResponse {
     person: IPerson;
