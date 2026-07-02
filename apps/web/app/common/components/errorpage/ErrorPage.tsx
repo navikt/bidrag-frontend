@@ -3,9 +3,9 @@ import { BodyLong, BodyShort, Box, Button, CopyButton, Heading, HStack, Label, L
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
-import "./errorpage.css";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Iskrem } from "./Iskrem";
+import styles from "./errorpage.module.css";
 
 export interface ErrorPageProps {
     error: unknown;
@@ -144,14 +144,14 @@ function ErrorInfo({ error, stackTrace }: { error?: string; stackTrace?: string 
 
 function StackTraceDetails({ headline, frames, extraLines }: { headline?: string; frames: string[]; extraLines: string[] }) {
     return (
-        <div className="stacktrace-container">
-            {headline && <div className="stacktrace-headline">{headline}</div>}
+        <div className={styles["stacktrace-container"]}>
+            {headline && <div className={styles["stacktrace-headline"]}>{headline}</div>}
             {frames.length > 0 && (
-                <div className="stacktrace-section">
-                    <div className="stacktrace-section-title">Stack frames</div>
-                    <ol className="stacktrace-frames">
+                <div className={styles["stacktrace-section"]}>
+                    <div className={styles["stacktrace-section-title"]}>Stack frames</div>
+                    <ol className={styles["stacktrace-frames"]}>
                         {frames.map((frame, index) => (
-                            <li key={`${frame}-${index}`} className="stacktrace-frame">
+                            <li key={`${frame}-${index}`} className={styles["stacktrace-frame"]}>
                                 {frame}
                             </li>
                         ))}
@@ -159,9 +159,9 @@ function StackTraceDetails({ headline, frames, extraLines }: { headline?: string
                 </div>
             )}
             {extraLines.length > 0 && (
-                <div className="stacktrace-section">
-                    <div className="stacktrace-section-title">Tilleggsdetaljer</div>
-                    <div className="stacktrace-extra-lines">{extraLines.join("\n")}</div>
+                <div className={styles["stacktrace-section"]}>
+                    <div className={styles["stacktrace-section-title"]}>Tilleggsdetaljer</div>
+                    <div className={styles["stacktrace-extra-lines"]}>{extraLines.join("\n")}</div>
                 </div>
             )}
         </div>
