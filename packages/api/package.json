@@ -13,6 +13,7 @@
     },
     "scripts": {
         "typecheck": "tsc --noEmit",
+        "test": "vitest run --passWithNoTests",
         "api:person": "swagger-typescript-api -p https://bidrag-person-q2.intern.dev.nav.no/bidrag-person/v3/api-docs --axios -n PersonApi.ts -o src/api",
         "api:sak": "swagger-typescript-api -p https://bidrag-sak-q2.intern.dev.nav.no/v3/api-docs --axios -n SakApi.ts -o src/api",
         "api:tilgangskontroll": "swagger-typescript-api -p https://bidrag-tilgangskontroll.intern.dev.nav.no/v3/api-docs --axios -n TilgangskontrollApi.ts -o src/api",

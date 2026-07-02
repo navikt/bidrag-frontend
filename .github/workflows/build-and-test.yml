@@ -42,7 +42,7 @@ jobs:
         run: pnpm run test
 
       - name: Bygg applikasjon
-        run: pnpm run build:all
+        run: pnpm run build
 
       - name: Bygg Bygg deploybar applikasjon for Docker
         run: pnpm run deploy:docker

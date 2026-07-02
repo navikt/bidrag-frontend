@@ -7,12 +7,10 @@ pnpm-monorepo med React Router v8 i framework mode for bidrag saksbehanding.
 ```
 bidrag-frontend/
 ├── apps/
-│   └── web/              # Shell-app — React Router v7 (SSR + SPA)
+│   └── web/              # Shell-app — React Router v8 (SSR + SPA)
 ├── packages/
 │   ├── api/              # @bidrag/api — HTTP-klienter og proxy mot backends
-│   ├── common/           # @bidrag/common — felles tjenester, React-komponenter, typer og utilities
-│   ├── types/            # @bidrag/types — delte TypeScript-typer
-│   ├── ui/               # @bidrag/ui — felles UI-komponenter
+│   ├── common/           # @bidrag/common — felles tjenester, React-komponenter, typer
 │   └── utils/            # @bidrag/utils — formattering og norsk locale
 ├── .nais/                # Nais-manifest og miljøvariabel-filer per miljø
 └── .github/workflows/    # CI/CD
@@ -30,20 +28,21 @@ pnpm install
 pnpm dev
 
 # Bygg alle pakker
-pnpm build:all
+pnpm build
 
 # Typesjekk alle pakker
 pnpm typecheck
 
 # Lint og format
 pnpm check
+
+# Kjør tester i alle workspaces (kun pakker med testscript)
+pnpm test
 ```
 
 ## Auth lokalt
 
 Wonderwall og Texas kjører i docker-compose. Den benytter https://github.com/navikt/localauth
-
-## Miljøer
 
 ## Miljøer
 
