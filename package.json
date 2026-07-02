@@ -5,7 +5,7 @@
         "build": "pnpm run -r build",
         "build:web": "pnpm --filter web build",
         "dev": "pnpm --filter web dev",
-        "typecheck": "pnpm -r typecheck",
+        "typecheck": "pnpm -r run typecheck",
         "lint": "biome lint .",
         "format": "biome format --write .",
         "check": "biome check --write .",
