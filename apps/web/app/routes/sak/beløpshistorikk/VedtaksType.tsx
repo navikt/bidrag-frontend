@@ -1,4 +1,4 @@
-import { Loader } from "@navikt/ds-react";
+import {Loader, Skeleton} from "@navikt/ds-react";
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
 import { useQuery } from "@tanstack/react-query";
 import {hentVedtakQuery} from "~/api/query/vedtak.query.ts";
@@ -10,7 +10,7 @@ interface VedtaksTypeProps {
 export function VedtaksType({ vedtaksId }: VedtaksTypeProps) {
     const { data, error, isPending } = useQuery(hentVedtakQuery(vedtaksId));
     if (isPending) {
-        return <Loader size="xsmall" />;
+        return <Skeleton variant="text" width="60%"/>;
     }
     if (error) {
         return vedtaksId;

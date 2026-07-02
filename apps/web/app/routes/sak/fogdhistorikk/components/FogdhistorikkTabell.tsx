@@ -1,9 +1,7 @@
-import "./FogdhistorikkTabell.css";
-
 import type { FogdhistorikkDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
 import { Heading, Table, VStack } from "@navikt/ds-react";
-import { useHentEnhetInfomasjon } from "~/api/useApi.ts";
+import {EnhetsNavn} from "~/routes/sak/fogdhistorikk/components/EnhetsNavn.tsx";
 
 export default function FogdhistorikkTabell({
     tittel,
@@ -12,12 +10,7 @@ export default function FogdhistorikkTabell({
     tittel: string;
     historikk: FogdhistorikkDto[];
 }) {
-    const mappedHistorikk = historikk.map((h) => {
-        return {
-            ...h,
-            enhetsnavn: useHentEnhetInfomasjon(h.enhetsnummer).data?.navn,
-        };
-    });
+
     return (
         <VStack gap={"space-16"} className={"fogdhistorikk-tabell"}>
             <Heading size={"medium"} as={"h2"}>
@@ -37,33 +30,24 @@ export default function FogdhistorikkTabell({
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {mappedHistorikk.map(
-                        ({
-                            tilgangId,
-                            enhetsnummer,
-                            enhetsnavn,
-                            arsakBeskrivelse,
-                            opprettetAv,
-                            tilgangFomDato,
-                            tilgangTomDato,
-                        }) => (
-                            <Table.Row key={tilgangId}>
+                    {historikk.map(h => (
+                            <Table.Row key={h.tilgangId}>
                                 <Table.DataCell className={"cell"}>
-                                    {enhetsnummer}
+                                    {h.enhetsnummer}
                                 </Table.DataCell>
-                                <Table.DataCell>{enhetsnavn}</Table.DataCell>
+                                <Table.DataCell><EnhetsNavn enhetsnummer={h.enhetsnummer}/></Table.DataCell>
                                 <Table.DataCell className={"cell"}>
-                                    {arsakBeskrivelse}
+                                    {h.arsakBeskrivelse}
                                 </Table.DataCell>
                                 <Table.DataCell className={"cell"}>
-                                    {opprettetAv}
+                                    {h.opprettetAv}
                                 </Table.DataCell>
                                 <Table.DataCell className={"cell"}>
-                                    {formaterDato(tilgangFomDato)}
+                                    {formaterDato(h.tilgangFomDato)}
                                 </Table.DataCell>
                                 <Table.DataCell className={"cell"}>
-                                    {tilgangTomDato
-                                        ? formaterDato(tilgangTomDato)
+                                    {h.tilgangTomDato
+                                        ? formaterDato(h.tilgangTomDato)
                                         : ""}
                                 </Table.DataCell>
                             </Table.Row>
