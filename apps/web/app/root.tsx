@@ -49,6 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="nb">
             <head>
+                <title>Bidrag</title>
                 <meta charSet="utf-8" />
                 <meta
                     name="viewport"
