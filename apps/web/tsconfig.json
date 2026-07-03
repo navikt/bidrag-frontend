@@ -5,6 +5,7 @@
         ".react-router/types/**/*"
     ],
     "compilerOptions": {
+        "sourceMap": true,
         "rootDirs": [
             ".",
             "./.react-router/types"
