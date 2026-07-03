@@ -61,10 +61,7 @@ export function SakNokkelTall({saksnummer}: SakNokkelTallProps) {
         >
             <VStack gap={"space-16"}>
                 <Label>
-                    BPs gjeld i sak
-                    {bpFnr && <Link as={ObfuscateFnrLink} to={`/bruker/${bpFnr}`}>
-                        reskontro for bruker
-                    </Link>}
+                    BPs gjeld i sak {bpFnr && <Link as={ObfuscateFnrLink} to={`/bruker/${bpFnr}`}>brukerside for BP</Link>}
                 </Label>
                 <Box
                     asChild
