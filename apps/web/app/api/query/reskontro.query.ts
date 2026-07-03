@@ -23,6 +23,7 @@ export function hentReskontroTransaksjonerForBruker(ident: string) {
                     return data;
                 },
                 { ident },
+                { transaksjoner: [] },
             ),
     });
 }
@@ -47,6 +48,7 @@ export function hentReskontroTransaksjonerForSaksnummer(saksnummer: string) {
                     return data;
                 },
                 { saksnummer },
+                { transaksjoner: [] },
             ),
     });
 }
