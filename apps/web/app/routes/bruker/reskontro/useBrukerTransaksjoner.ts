@@ -1,9 +1,9 @@
 import { unikeVerdier } from "@bidrag/utils/arrayUtils";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { hentReskontroTransaksjonerForBruker } from "~/api/query/reskontro.query";
+import { hentReskontroTransaksjonerForBruker } from "~/api/query/reskontro.query.ts";
 
-import { DUMMY_BARN } from "./konstanter";
+import { DUMMY_BARN } from "../../sak/reskontro/konstanter.ts";
 
 export function useBrukerTransaksjoner(ident: string) {
     const { data } = useSuspenseQuery(

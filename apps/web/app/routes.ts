@@ -14,6 +14,11 @@ export default [
     route("proxy/:app/*", "./server/auth/proxy.ts"),
 
     index("routes/_index.tsx"),
+    route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
+            index("./routes/bruker/index.tsx"),
+            // route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
+        ]),
+
     layout("routes/sak/SakLayout.tsx", [
         ...prefix("sak/:saksnummer", [
             route(

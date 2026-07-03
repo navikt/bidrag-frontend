@@ -10,12 +10,12 @@ import {
     PARAM_MOTTAKERE,
     PARAM_OPEN_TRANS,
     PARAM_TIL,
-} from "./konstanter";
+} from "../../sak/reskontro/konstanter.ts";
 import {
     isTransaksjonGruppe,
     transaksjonstypeGrupper,
-} from "./transaksjonstyper";
-import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner";
+} from "../../sak/reskontro/transaksjonstyper.ts";
+import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner.ts";
 
 export function useBrukerTransaksjonsfilter(ident: string) {
     const { alletransaksjoner, unikeMottakere, unikeBarn } =

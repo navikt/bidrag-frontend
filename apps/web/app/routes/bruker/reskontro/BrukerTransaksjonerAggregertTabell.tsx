@@ -5,10 +5,10 @@ import {formaterDato, sortByDateAsc} from "@bidrag/utils/datoUtils";
 import {Box, Pagination, type SortState, Table, VStack,} from "@navikt/ds-react";
 import {useMemo, useState} from "react";
 
-import {FiltrertTransaksjonSummer} from "./FiltrertTransaksjonSummer";
-import {visningsnavnForSøknadstype} from "./søknadstyper";
-import {aggregerTransaksjoner} from "./TransaksjonAggregat";
-import {TransaksjonType} from "./TransaksjonType";
+import {FiltrertTransaksjonSummer} from "../../sak/reskontro/FiltrertTransaksjonSummer.tsx";
+import {visningsnavnForSøknadstype} from "../../sak/reskontro/søknadstyper.ts";
+import {aggregerTransaksjoner} from "../../sak/reskontro/TransaksjonAggregat.ts";
+import {TransaksjonType} from "../../sak/reskontro/TransaksjonType.tsx";
 
 interface TransaksjonerAggregertTabellProps {
     transaksjoner: Transaksjon[];
