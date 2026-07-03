@@ -1,17 +1,25 @@
-// import { context, propagation } from "@opentelemetry/api";
+/** biome-ignore-all lint : biome ødelegger klassen*/
 
-import { CustomError, IErrorContext } from "../types";
-import { ErrorInfo, LogErrorType, LogInfo, LogLevel, LogResponse } from "../types";
+import {
+    CustomError,
+    type ErrorInfo,
+    type IErrorContext,
+    type LogErrorType,
+    type LogInfo,
+    LogLevel,
+    type LogResponse,
+} from "../types";
 import { SecuritySessionUtils } from "../utils";
-import { StringUtils } from "../utils/StringUtils";
-
 export abstract class AbstractLoggerService {
     static info(msg: string): Promise<LogResponse> {
         try {
             return this.mapAndLog(msg, LogLevel.INFO);
         } catch (e) {
             console.log(e);
-            return Promise.resolve({ exceptionCode: "unkown", errorCode: "unkown" });
+            return Promise.resolve({
+                exceptionCode: "unkown",
+                errorCode: "unkown",
+            });
         }
     }
 
@@ -20,39 +28,62 @@ export abstract class AbstractLoggerService {
             return this.mapAndLog(msg, LogLevel.FEEDBACK);
         } catch (e) {
             console.log(e);
-            return Promise.resolve({ exceptionCode: "unkown", errorCode: "unkown" });
+            return Promise.resolve({
+                exceptionCode: "unkown",
+                errorCode: "unkown",
+            });
         }
     }
 
-    static warn(msg: string, error?: LogErrorType | ErrorInfo): Promise<LogResponse> {
+    static warn(
+        msg: string,
+        error?: LogErrorType | ErrorInfo,
+    ): Promise<LogResponse> {
         try {
-            return this.mapAndLog(msg, LogLevel.WARNING, error);
+            return this.mapAndLog(
+                msg,
+                LogLevel.WARNING,
+                error,
+            );
         } catch (e) {
             console.log(e);
-            return Promise.resolve({ exceptionCode: "unkown", errorCode: "unkown" });
+            return Promise.resolve({
+                exceptionCode: "unkown",
+                errorCode: "unkown",
+            });
         }
     }
 
-    static error(msg: string, error: LogErrorType | ErrorInfo | IErrorContext): Promise<LogResponse> {
+    static error(
+        msg: string,
+        error: LogErrorType | ErrorInfo | IErrorContext,
+    ): Promise<LogResponse> {
         try {
             return this.mapAndLog(msg, LogLevel.ERROR, error);
         } catch (e) {
             console.log(e);
-            return Promise.resolve({ exceptionCode: "unkown", errorCode: "unkown" });
+            return Promise.resolve({
+                exceptionCode: "unkown",
+                errorCode: "unkown",
+            });
         }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    protected static log(_logInfo: LogInfo, _headers?: Record<string, string>): Promise<LogResponse> {
+    protected static log(
+        _logInfo: LogInfo,
+        _headers?: Record<string, string>,
+    ): Promise<LogResponse> {
         throw new Error("Not implemented");
     }
 
-    protected static mapAndLog(message: string, level: LogLevel, error?: LogErrorType | ErrorInfo | IErrorContext) {
-        // @ts-ignore
-        // const parentCtx = window.__otelSessionContext || context.active();
+    protected static mapAndLog(
+        message: string,
+        level: LogLevel,
+        error?: LogErrorType | ErrorInfo | IErrorContext,
+    ) {
         const carrier: Record<string, string> = {};
 
-        // propagation.inject(parentCtx, carrier);
         const logInfo: LogInfo = {
             message,
             level,
@@ -62,28 +93,30 @@ export abstract class AbstractLoggerService {
         };
         const errorInfo = this.normalizeErrorInfo(error);
         logInfo.error = errorInfo;
-
-        if (errorInfo) {
-            // Log on console for easy debugging
-            console.error(
-                message,
-                `Det skjedde en feil: ${errorInfo.message}`,
-                `correlationId=${errorInfo.correlationId ?? "unknown"}`,
-                errorInfo.stack_trace
-            );
-        } else {
-            console.log(logInfo.message, logInfo);
-        }
+        //
+        // if (errorInfo) {
+        //     // Log on console for easy debugging
+        //     console.error(
+        //         message,
+        //         `Det skjedde en feil: ${errorInfo.message}`,
+        //         `correlationId=${errorInfo.correlationId ?? "unknown"}`,
+        //         errorInfo.stack_trace,
+        //     );
+        // } else {
+        //     console.log(logInfo.message, logInfo);
+        // }
         return this.log(logInfo, carrier);
     }
 
-    protected static normalizeErrorInfo(error?: LogErrorType | ErrorInfo | IErrorContext): ErrorInfo | undefined {
+    protected static normalizeErrorInfo(
+        error?: LogErrorType | ErrorInfo | IErrorContext,
+    ): ErrorInfo | undefined {
         if (!error) {
             return undefined;
         }
 
         if (error instanceof Error) {
-            return this.mapError(error);
+            return AbstractLoggerService.mapError(error);
         }
 
         const input = error as ErrorInfo &

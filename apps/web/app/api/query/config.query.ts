@@ -1,4 +1,4 @@
-import type { ConfigResponse } from "~/server/configRoute.ts";
+import type { ConfigResponse } from "~/api/types/configResponse.ts";
 
 export const configQuery = {
     queryKey: ["internal/config"],
@@ -7,8 +7,7 @@ export const configQuery = {
         if (!response.ok) {
             throw new Error("Failed to get config");
         }
-      return (await response.json()) as ConfigResponse;
+        return (await response.json()) as ConfigResponse;
     },
     staleTime: Infinity,
-
-}
+};

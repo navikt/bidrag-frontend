@@ -1,9 +1,0 @@
-.fogdhistorikk-tabell {
-    .cell {
-        width: 10rem;
-
-        &:first-of-type {
-            width: 2rem;
-        }
-    }
-}

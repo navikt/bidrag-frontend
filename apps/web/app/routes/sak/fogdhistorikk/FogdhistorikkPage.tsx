@@ -1,12 +1,11 @@
-import {Box, Heading, LocalAlert, VStack} from "@navikt/ds-react";
-
+import { Box, Heading, LocalAlert, VStack } from "@navikt/ds-react";
+import { useHentFogdhistorikk } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
-import {useHentFogdhistorikk} from "../useApi.ts";
+import type { Route } from "./+types/FogdhistorikkPage";
 import FogdhistorikkTabell from "./components/FogdhistorikkTabell";
-import type {Route} from "./+types/FogdhistorikkPage";
 
-export default function FogdhistorikkPage({params}: Route.ComponentProps) {
-    const {saksnummer} = params;
+export default function FogdhistorikkPage({ params }: Route.ComponentProps) {
+    const { saksnummer } = params;
     const tabTitle = "Fogdhistorikk - " + saksnummer;
     const {
         data: fogdhistorikk,
@@ -14,9 +13,8 @@ export default function FogdhistorikkPage({params}: Route.ComponentProps) {
         isLoading: fogdhistorikkLoading,
     } = useHentFogdhistorikk(saksnummer);
 
-
     if (fogdhistorikkLoading) {
-        return <PageLoadingSpinner/>;
+        return <PageLoadingSpinner />;
     }
 
     if (fogdhistorikkError) {
@@ -24,22 +22,29 @@ export default function FogdhistorikkPage({params}: Route.ComponentProps) {
             <Box margin={"space-16"}>
                 <LocalAlert status="error">
                     <LocalAlert.Header>
-                        <LocalAlert.Title>{fogdhistorikkError.message}</LocalAlert.Title>
+                        <LocalAlert.Title>
+                            {fogdhistorikkError.message}
+                        </LocalAlert.Title>
                     </LocalAlert.Header>
                 </LocalAlert>
             </Box>
         );
     }
 
-    const eierenhet = fogdhistorikk?.filter((historikk) => historikk.type === "EIER") ?? [];
-    const midlertidige = fogdhistorikk?.filter((historikk) => historikk.type === "MIDL") ?? [];
+    const eierenhet =
+        fogdhistorikk?.filter((historikk) => historikk.type === "EIER") ?? [];
+    const midlertidige =
+        fogdhistorikk?.filter((historikk) => historikk.type === "MIDL") ?? [];
 
     return (
         <VStack gap={"space-64"}>
             <title>{tabTitle}</title>
             <Heading size={"large"}>Fogdhistorikk</Heading>
-            <FogdhistorikkTabell tittel="Eierenhet" historikk={eierenhet}/>
-            <FogdhistorikkTabell tittel="Midlertidig autorisasjon" historikk={midlertidige}/>
+            <FogdhistorikkTabell tittel="Eierenhet" historikk={eierenhet} />
+            <FogdhistorikkTabell
+                tittel="Midlertidig autorisasjon"
+                historikk={midlertidige}
+            />
         </VStack>
     );
 }

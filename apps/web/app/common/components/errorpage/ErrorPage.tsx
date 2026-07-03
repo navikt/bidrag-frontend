@@ -1,11 +1,11 @@
 import { CustomError, LoggerService } from "@bidrag/common";
+import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Box, Button, CopyButton, Heading, HStack, Label, Link, List, VStack } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
-import { ExternalLinkIcon } from "@navikt/aksel-icons";
-import { Iskrem } from "./Iskrem";
 import styles from "./errorpage.module.css";
+import { Iskrem } from "./Iskrem";
 
 export interface ErrorPageProps {
     error: unknown;
@@ -98,7 +98,7 @@ function ErrorInfo({ error, stackTrace }: { error?: string; stackTrace?: string 
 
     return (
         <>
-            <BodyLong>
+            <BodyLong as={"div"} >
                 <Heading size="medium" spacing>
                     En teknisk feil har oppstått
                 </Heading>
@@ -112,7 +112,7 @@ function ErrorInfo({ error, stackTrace }: { error?: string; stackTrace?: string 
                 </List>
             </BodyLong>
             {error && (
-                <BodyLong>
+                <BodyLong as={"div"}>
                     <Heading size="small" spacing>
                         Feilmelding:
                     </Heading>
@@ -122,7 +122,7 @@ function ErrorInfo({ error, stackTrace }: { error?: string; stackTrace?: string 
                 </BodyLong>
             )}
             {parsedStackTrace && (
-                <BodyLong>
+                <BodyLong as={"div"}>
                     <details>
                         <summary>Vis feildetaljer</summary>
                         <Box
@@ -206,7 +206,7 @@ function ContactInformation({ exceptionCode }: { exceptionCode: string }) {
             <Heading size="xsmall">Ved kontakt med brukerstøtte oppgi koden under:</Heading>
             <ExceptionCode exceptionCode={exceptionCode} />
             <div style={{ display: "flex", justifyContent: "row" }}>
-                <BodyShort size="small">
+                <BodyShort size="small" >
                     Vennligst lim inn koden over i feltet "Tittel", da du oppretter sak i{" "}
                     <Link
                         href={"https://jira.adeo.no/plugins/servlet/desk/portal/541/create/1861"}

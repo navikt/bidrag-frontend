@@ -1,5 +1,5 @@
-import { RelasjonType } from "./personsearch";
-import { RolleType } from "./rolleveileder";
+import type { RelasjonType } from "./personsearch.ts";
+import type { RolleType } from "./rolleveileder.ts";
 
 export interface IFamilierelasjonTableData {
     rolle: RolleType;

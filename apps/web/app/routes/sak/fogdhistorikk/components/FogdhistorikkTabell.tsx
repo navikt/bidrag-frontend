@@ -1,15 +1,16 @@
-import "./FogdhistorikkTabell.css";
-
-import { Heading, Table, VStack } from "@navikt/ds-react";
-
-import { useHentEnhetInfomasjon } from "../../useApi.ts";
+import type { FogdhistorikkDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
-import type {FogdhistorikkDto} from "@bidrag/api/SakApi";
+import { Heading, Table, VStack } from "@navikt/ds-react";
+import {EnhetsNavn} from "~/routes/sak/fogdhistorikk/components/EnhetsNavn.tsx";
 
-export default function FogdhistorikkTabell({ tittel, historikk }: { tittel: string; historikk: FogdhistorikkDto[] }) {
-    const mappedHistorikk = historikk.map((h) => {
-        return { ...h, enhetsnavn: useHentEnhetInfomasjon(h.enhetsnummer).data?.navn };
-    });
+export default function FogdhistorikkTabell({
+    tittel,
+    historikk,
+}: {
+    tittel: string;
+    historikk: FogdhistorikkDto[];
+}) {
+
     return (
         <VStack gap={"space-16"} className={"fogdhistorikk-tabell"}>
             <Heading size={"medium"} as={"h2"}>
@@ -21,33 +22,36 @@ export default function FogdhistorikkTabell({ tittel, historikk }: { tittel: str
                         <Table.HeaderCell scope="col">Enhet</Table.HeaderCell>
                         <Table.HeaderCell scope="col">Navn</Table.HeaderCell>
                         <Table.HeaderCell scope="col">Årsak</Table.HeaderCell>
-                        <Table.HeaderCell scope="col">Opprettet av</Table.HeaderCell>
+                        <Table.HeaderCell scope="col">
+                            Opprettet av
+                        </Table.HeaderCell>
                         <Table.HeaderCell scope="col">FOM</Table.HeaderCell>
                         <Table.HeaderCell scope="col">TOM</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {mappedHistorikk.map(
-                        ({
-                            tilgangId,
-                            enhetsnummer,
-                            enhetsnavn,
-                            arsakBeskrivelse,
-                            opprettetAv,
-                            tilgangFomDato,
-                            tilgangTomDato,
-                        }) => (
-                            <Table.Row key={tilgangId}>
-                                <Table.DataCell className={"cell"}>{enhetsnummer}</Table.DataCell>
-                                <Table.DataCell>{enhetsnavn}</Table.DataCell>
-                                <Table.DataCell className={"cell"}>{arsakBeskrivelse}</Table.DataCell>
-                                <Table.DataCell className={"cell"}>{opprettetAv}</Table.DataCell>
-                                <Table.DataCell className={"cell"}>{formaterDato(tilgangFomDato)}</Table.DataCell>
+                    {historikk.map(h => (
+                            <Table.Row key={h.tilgangId}>
                                 <Table.DataCell className={"cell"}>
-                                    {tilgangTomDato ? formaterDato(tilgangTomDato) : ""}
+                                    {h.enhetsnummer}
+                                </Table.DataCell>
+                                <Table.DataCell><EnhetsNavn enhetsnummer={h.enhetsnummer}/></Table.DataCell>
+                                <Table.DataCell className={"cell"}>
+                                    {h.arsakBeskrivelse}
+                                </Table.DataCell>
+                                <Table.DataCell className={"cell"}>
+                                    {h.opprettetAv}
+                                </Table.DataCell>
+                                <Table.DataCell className={"cell"}>
+                                    {formaterDato(h.tilgangFomDato)}
+                                </Table.DataCell>
+                                <Table.DataCell className={"cell"}>
+                                    {h.tilgangTomDato
+                                        ? formaterDato(h.tilgangTomDato)
+                                        : ""}
                                 </Table.DataCell>
                             </Table.Row>
-                        )
+                        ),
                     )}
                 </Table.Body>
             </Table>

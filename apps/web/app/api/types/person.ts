@@ -1,6 +1,6 @@
-import { PersonDto } from "@bidrag/api/PersonApi";
-import { ForelderrolleType } from "./personsearch";
-import { RolleType } from "./rolleveileder";
+import type { PersonDto } from "@bidrag/api/PersonApi";
+import type { ForelderrolleType } from "./personsearch.ts";
+import type { RolleType } from "./rolleveileder.ts";
 
 export interface IPerson {
     ident: string;

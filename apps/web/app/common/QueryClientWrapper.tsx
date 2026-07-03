@@ -1,7 +1,6 @@
 import { BidragCommonsProvider } from "@bidrag/common";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { PropsWithChildren } from "react";
-import * as React from "react";
+import type { PropsWithChildren } from "react";
 
 const queryClient = new QueryClient({
     defaultOptions: {
