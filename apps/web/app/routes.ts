@@ -1,10 +1,4 @@
-import {
-    index,
-    layout,
-    prefix,
-    type RouteConfig,
-    route,
-} from "@react-router/dev/routes";
+import { index, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
     route("internal/health/liveness", "./server/liveness.ts"),
@@ -15,24 +9,19 @@ export default [
 
     index("routes/_index.tsx"),
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
-            index("./routes/bruker/index.tsx"),
-            // route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
-        ]),
+        index("./routes/bruker/index.tsx"),
+        // route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
+    ]),
 
-    layout("routes/sak/SakLayout.tsx", [
-        ...prefix("sak/:saksnummer", [
-            route(
-                "fogdhistorikk",
-                "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx",
-            ),
-            route(
-                "belopshistorikk",
-                "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx",
-            ),
-            route(
-                "reskontro",
-                "routes/sak/reskontro/SakReskontroOversiktPage.tsx",
-            ),
-        ]),
+    route("sak/:saksnummer", "routes/sak/SakLayout.tsx", [
+        route(
+            "fogdhistorikk",
+            "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx",
+        ),
+        route(
+            "belopshistorikk",
+            "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx",
+        ),
+        route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
     ]),
 ] satisfies RouteConfig;

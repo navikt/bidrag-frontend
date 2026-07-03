@@ -6,7 +6,7 @@ import {useSuspenseQuery} from "@tanstack/react-query";
 
 import {hentInnkrevingForSaksnummer} from "~/api/query/reskontro.query";
 import {useHentSak} from "~/api/useApi.ts";
-import {ObfusicateFnrLink} from "~/common/person/ObfusicateFnrLink.tsx";
+import {ObfuscateFnrLink} from "~/common/person/ObfuscateFnrLink.tsx";
 import {DUMMY_BARN} from "./konstanter";
 
 interface SakNokkelTallProps {
@@ -62,9 +62,9 @@ export function SakNokkelTall({saksnummer}: SakNokkelTallProps) {
             <VStack gap={"space-16"}>
                 <Label>
                     BPs gjeld i sak
-                    <Link as={ObfusicateFnrLink} to={`/bruker/${bpFnr}`}>
+                    {bpFnr && <Link as={ObfuscateFnrLink} to={`/bruker/${bpFnr}`}>
                         reskontro for bruker
-                    </Link>
+                    </Link>}
                 </Label>
                 <Box
                     asChild

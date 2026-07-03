@@ -1,6 +1,6 @@
 import Sqids from "sqids";
 
-export class FnrObfusicator {
+export class FnrObfuscator {
     private sqids: Sqids
     constructor(alphabet?: string){
         this.sqids=new Sqids({

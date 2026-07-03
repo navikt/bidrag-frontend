@@ -1,11 +1,11 @@
 import {Link, type LinkProps} from "react-router";
-import {useObfusicateFnr} from "~/common/person/useObfusicateFnr.ts";
+import {useObfuscateFnr} from "~/common/person/useObfuscateFnr.ts";
 
 interface BrukerLinkProps extends LinkProps {
 }
 
-export const ObfusicateFnrLink = ({children, to, ...linkProps}: BrukerLinkProps) => {
-    const {encodeFnr} = useObfusicateFnr();
+export const ObfuscateFnrLink = ({children, to, ...linkProps}: BrukerLinkProps) => {
+    const {encodeFnr} = useObfuscateFnr();
 
     const modifiedTo =
         typeof to === "string"
@@ -16,6 +16,7 @@ export const ObfusicateFnrLink = ({children, to, ...linkProps}: BrukerLinkProps)
                     encodeFnr(match),
                 ),
             };
+    // TODO Legge til obfuscation på queryparams også?
     return (
         <Link {...linkProps} to={modifiedTo}>
             {children}
