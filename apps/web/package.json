@@ -22,18 +22,18 @@
         "@navikt/pino-logger": "^5.0.0",
         "@react-router/node": "catalog:",
         "@react-router/serve": "catalog:",
+        "@tailwindcss/vite": "catalog:",
         "@tanstack/react-query": "catalog:",
         "axios": "^1.18.0",
+        "date-fns": "^4.4.0",
         "isbot": "^5.1.42",
         "pino": "^10.3.1",
         "pino-socket": "^8.0.0",
         "react": "catalog:",
         "react-dom": "catalog:",
         "react-router": "catalog:",
-        "tailwindcss": "catalog:",
-        "@tailwindcss/vite": "catalog:",
         "source-map": "^0.7.6",
-        "date-fns": "^4.4.0"
+        "tailwindcss": "catalog:"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",

@@ -9,9 +9,9 @@ import "./index.css";
 import { Loader } from "@navikt/ds-react";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
+import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import type { Route } from "./+types/root.ts";
-import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
 
 export const middleware = [authMiddleware];
 export const clientMiddleware = [bisysParamsMiddleware];
@@ -32,7 +32,9 @@ export default function App({ loaderData }: Route.ComponentProps) {
 
     return (
         <QueryClientWrapper>
-            <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} />}>
+            <FaroErrorBoundary
+                fallback={(error) => <RootErrorBoundary error={error} />}
+            >
                 <AppLayout bruker={navUser}>
                     <ClientOnly fallback={<Loader size="large" />}>
                         <Outlet />
@@ -48,7 +50,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <html lang="nb">
             <head>
                 <meta charSet="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1"
+                />
                 <Meta />
                 <Links />
             </head>
