@@ -1,25 +1,28 @@
-import type { SaksinformasjonBarn } from "@bidrag/api/BidragReskontroApi";
-import { PersonNavnIdent } from "@bidrag/common";
+import type {SaksinformasjonBarn} from "@bidrag/api/BidragReskontroApi";
+import {PersonNavnIdent} from "@bidrag/common";
 import {formaterBelop, sumNullable} from "@bidrag/utils/belopUtils";
-import { Box, Label, Table, VStack } from "@navikt/ds-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { hentInnkrevingForSaksnummer } from "~/api/query/reskontro.query";
+import {Box, Label, Link, Table, VStack} from "@navikt/ds-react";
+import {useSuspenseQuery} from "@tanstack/react-query";
 
-import { DUMMY_BARN } from "./konstanter";
+import {hentInnkrevingForSaksnummer} from "~/api/query/reskontro.query";
+import {useHentSak} from "~/api/useApi.ts";
+import {ObfuscateFnrLink} from "~/common/person/ObfuscateFnrLink.tsx";
+import {DUMMY_BARN} from "./konstanter";
 
 interface SakNokkelTallProps {
     saksnummer: string;
 }
 
 const gjeld = (barn: SaksinformasjonBarn) => {
-    return sumNullable(barn.restGjeldOffentlig , barn.restGjeldPrivat) ;
+    return sumNullable(barn.restGjeldOffentlig, barn.restGjeldPrivat);
 };
 const tilUtbetaling = (barn: SaksinformasjonBarn) => {
-    return sumNullable(barn.sumForskuddUtbetalt , barn.sumIkkeUtbetalt);
+    return sumNullable(barn.sumForskuddUtbetalt, barn.sumIkkeUtbetalt);
 };
 
-export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
-    const { data } = useSuspenseQuery(hentInnkrevingForSaksnummer(saksnummer));
+export function SakNokkelTall({saksnummer}: SakNokkelTallProps) {
+    const {data} = useSuspenseQuery(hentInnkrevingForSaksnummer(saksnummer));
+    const {data: sak} = useHentSak(saksnummer);
 
     // TODO tester?
     /**ELIN returnerer noen ganger et "ekstra" barn med fødselsnr 444444 44441. */
@@ -28,18 +31,25 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
         data?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
     const totalGjeld = barn.reduce((acc, barn) => acc + gjeld(barn), 0);
     const totalPrivatGjeld = barn.reduce(
-        (acc, barn) =>sumNullable(acc , barn.restGjeldPrivat),
+        (acc, barn) => sumNullable(acc, barn.restGjeldPrivat),
         0,
     );
     const totalOffGjeld = barn.reduce(
-        (acc, barn) => sumNullable(acc , barn.restGjeldOffentlig),
+        (acc, barn) => sumNullable(acc, barn.restGjeldOffentlig),
         0,
     );
     const totaltTilUtbetaling = barn.reduce(
         (acc, barn) => acc + tilUtbetaling(barn),
         0,
     );
-    const bmGjeld = sumNullable(data?.bmGjeldRest , data?.bmGjeldFastsettelsesgebyr);
+    const bmGjeld = sumNullable(
+        data?.bmGjeldRest,
+        data?.bmGjeldFastsettelsesgebyr,
+    );
+
+    const bpFnr = sak?.roller.find(
+        (rolle) => rolle.type === "BP",
+    )?.fodselsnummer;
 
     return (
         <Box
@@ -50,7 +60,9 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
             borderRadius="4"
         >
             <VStack gap={"space-16"}>
-                <Label>BPs gjeld i sak</Label>
+                <Label>
+                    BPs gjeld i sak {bpFnr && <Link as={ObfuscateFnrLink} to={`/bruker/${bpFnr}`}>brukerside for BP</Link>}
+                </Label>
                 <Box
                     asChild
                     background={"default"}
@@ -107,7 +119,7 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                                 </Table.Row>
                             ))}
                             <Table.Row>
-                                <Table.DataCell />
+                                <Table.DataCell/>
                                 <Table.DataCell align={"right"}>
                                     <strong>{formaterBelop(totalGjeld)}</strong>
                                 </Table.DataCell>
@@ -126,7 +138,7 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                                         {formaterBelop(totaltTilUtbetaling)}
                                     </strong>
                                 </Table.DataCell>
-                                <Table.DataCell />
+                                <Table.DataCell/>
                             </Table.Row>
                         </Table.Body>
                     </Table>
@@ -160,7 +172,7 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                                 </Table.DataCell>
                             </Table.Row>
                             <Table.Row>
-                                <Table.DataCell />
+                                <Table.DataCell/>
                                 <Table.DataCell align={"right"}>
                                     <strong>{formaterBelop(bmGjeld)}</strong>
                                 </Table.DataCell>
