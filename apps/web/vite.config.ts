@@ -11,10 +11,14 @@ export default defineConfig({
         port: 3000,
         host: true, // Lytt på 0.0.0.0 slik at host.docker.internal kan nå serveren
     },
+    // Peker klientbundlene mot CDN i prod, se .github/workflows/build-and-test.yml
+    base: process.env.CDN_BASE_URL,
     build: {
         sourcemap: true,
         rollupOptions: {
-            external: ["./nais.js"],
+            // Absolutt sti slik at nais.js alltid hentes fra samme origin som siden,
+            // uavhengig av CDN_BASE_URL (nais.js genereres og monteres av Nais i poden)
+            external: ["/nais.js"],
         },
     },
     optimizeDeps: {
