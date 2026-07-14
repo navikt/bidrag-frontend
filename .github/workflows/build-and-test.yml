@@ -52,6 +52,7 @@ jobs:
           team: bidrag
           source: apps/web/build/client
           destination: /bidrag-frontend/dist
+          source_keep_parent_name: false
 
       - name: Push Docker-image til GAR
         if: ${{ inputs.docker }}
