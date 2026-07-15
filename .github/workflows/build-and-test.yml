@@ -47,7 +47,7 @@ jobs:
           CDN_BASE_URL: https://cdn.nav.no/bidrag/bidrag-frontend/dist/
 
       - name: Last opp klientbundler til CDN
-        uses: nais/deploy/actions/cdn-upload/v2@master
+        uses: nais/deploy/actions/cdn-upload/v2@9ce59af14f70c3a7093ba1e20d6679af2b1c7be9
         with:
           team: bidrag
           source: apps/web/build/client
