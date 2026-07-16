@@ -232,6 +232,13 @@ importers:
         version: 15.8.1
 
   packages/utils:
+    dependencies:
+      '@bidrag/api':
+        specifier: workspace:*
+        version: link:../api
+      '@bidrag/common':
+        specifier: workspace:*
+        version: link:../common
     devDependencies:
       date-fns:
         specifier: ^4.4.0

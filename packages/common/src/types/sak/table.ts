@@ -13,6 +13,7 @@ export interface IOpprettSakRequest {
     roller: IOpprettSakRolleDto[];
 }
 
+export interface IFamilierelasjonTableData {
     rolle: RolleTypeAbbreviation;
     relasjon: RelasjonType;
     fodselsnummer: string;

@@ -1,6 +1,6 @@
-import { OpprettSakRequest, RolleDto } from "../api/SakApi";
-import { IPersonensReellMottakerRolle } from "../types/person";
-import { RolleType } from "../types/rolleveileder";
+import { IOpprettSakRequest, IOpprettSakRolleDto } from "@bidrag/common";
+import { IPersonensReellMottakerRolle } from "@bidrag/common";
+import { RolleTypeAbbreviation as RolleType } from "@bidrag/common";
 import { getMotpartRolleType } from "./personUtils";
 
 export function createSakPayload(
@@ -9,7 +9,7 @@ export function createSakPayload(
     personensRolle: RolleType,
     selectedBarn: IPersonensReellMottakerRolle[],
     motpartId?: string
-): OpprettSakRequest {
+): IOpprettSakRequest {
     return {
         eierfogd,
         roller: createSakRoller(personensId, personensRolle, selectedBarn, motpartId),
@@ -22,7 +22,7 @@ export function createSakPayloadForBA(
     personensRolle: RolleType,
     foreldre: IPersonensReellMottakerRolle[],
     motpartReellMottaker?: string
-): OpprettSakRequest {
+): IOpprettSakRequest {
     const hovedpersonensRolle = {
         fodselsnummer: personensId,
         type: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
@@ -30,7 +30,7 @@ export function createSakPayloadForBA(
         reellMottager: motpartReellMottaker,
     };
 
-    const roller = [
+    const roller: IOpprettSakRolleDto[] = [
         hovedpersonensRolle,
         ...foreldre.map((selected) => ({
             reellMottager: selected.reellMottaker,
@@ -41,12 +41,12 @@ export function createSakPayloadForBA(
     ];
     if (foreldre.length === 1) {
         const enesteForeldre = foreldre[0];
-        const personensRolle = enesteForeldre.rolle;
-        // @ts-ignore
-        roller.push({
-            rolleType: getMotpartRolleType(personensRolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-            type: getMotpartRolleType(personensRolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-        });
+        if (enesteForeldre) {
+            roller.push({
+                rolleType: getMotpartRolleType(enesteForeldre.rolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+                type: getMotpartRolleType(enesteForeldre.rolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+            });
+        }
     }
 
     return {
@@ -60,7 +60,7 @@ function createSakRoller(
     personensRolle: RolleType,
     selectedBarn: IPersonensReellMottakerRolle[],
     motpartId?: string
-): RolleDto[] {
+): IOpprettSakRolleDto[] {
     const hovedPersonensRolle = {
         fodselsnummer: personensId,
         type: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
