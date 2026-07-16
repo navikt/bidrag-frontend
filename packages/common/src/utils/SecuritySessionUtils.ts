@@ -39,8 +39,7 @@ export class SecuritySessionUtils {
 
     static createRequestTrace(spanName: string): RequestTraceContext {
         // const tracer = trace.getTracer(tracerName);
-        // @ts-ignore
-        const parentContext = window.__otelSessionContext || context.active();
+        const parentContext = window.__otelSessionContext ?? undefined;
         // const span = tracer.startSpan(spanName, undefined, parentContext);
         // const traceContext = trace.setSpan(parentContext, span);
         const headers: Record<string, string> = {};

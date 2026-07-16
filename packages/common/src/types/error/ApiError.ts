@@ -2,7 +2,6 @@ import { CustomError } from "./CustomError";
 
 export class ApiError extends CustomError {
     public override status: number;
-    // @ts-ignore
     public data: any;
     public ok = false;
     public error?: Error;

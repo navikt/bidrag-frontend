@@ -25,5 +25,6 @@ declare global {
     interface Window {
         openPersonsok: () => Window | null;
         waitForPersonSokResult: () => Promise<BroadcastMessage<PersonBroadcastMessage>>;
+        __otelSessionContext?: unknown;
     }
 }

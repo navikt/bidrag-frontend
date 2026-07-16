@@ -15,10 +15,8 @@ export class CustomError extends Error {
         this.cause = cause;
 
         // Maintains proper stack trace for where our error was thrown (only available on V8)
-        // @ts-ignore
-        if (Error.captureStackTrace) {
-            // @ts-ignore
-            Error.captureStackTrace(this);
+        if ((Error as unknown as { captureStackTrace?: unknown }).captureStackTrace) {
+            (Error as unknown as { captureStackTrace: (target: unknown) => void }).captureStackTrace(this);
         }
         this.stack = this.stack + "\r\n\r\n" + stack;
         this.correlationId = correlationId;
