@@ -83,9 +83,10 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                             : -1)
                     );
                 case "tom":
+                    if (!a.periode.til || !b.periode.til) return 0;
                     return (
                         dir *
-                        (new Date(a.periode.til ?? "") <= new Date(b.periode.til ?? "")
+                        (new Date(a.periode.til) <= new Date(b.periode.til)
                             ? 1
                             : -1)
                     );

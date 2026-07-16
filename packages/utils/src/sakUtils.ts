@@ -1,7 +1,10 @@
-import { IOpprettSakRequest, IOpprettSakRolleDto } from "@bidrag/common";
-import { IPersonensReellMottakerRolle } from "@bidrag/common";
-import { RolleTypeAbbreviation as RolleType } from "@bidrag/common";
+import type { Rolletype } from "@bidrag/api/SakApi";
+import type { OpprettSakPayload, OpprettSakRolleRequest, IPersonensReellMottakerRolle, RolleTypeAbbreviation as RolleType } from "@bidrag/common";
 import { getMotpartRolleType } from "./personUtils";
+
+function toRolletype(rolle: RolleType): Rolletype {
+    return rolle as unknown as Rolletype;
+}
 
 export function createSakPayload(
     eierfogd: string,
@@ -9,7 +12,7 @@ export function createSakPayload(
     personensRolle: RolleType,
     selectedBarn: IPersonensReellMottakerRolle[],
     motpartId?: string
-): IOpprettSakRequest {
+): OpprettSakPayload {
     return {
         eierfogd,
         roller: createSakRoller(personensId, personensRolle, selectedBarn, motpartId),
@@ -22,20 +25,20 @@ export function createSakPayloadForBA(
     personensRolle: RolleType,
     foreldre: IPersonensReellMottakerRolle[],
     motpartReellMottaker?: string
-): IOpprettSakRequest {
-    const hovedpersonensRolle = {
+): OpprettSakPayload {
+    const hovedpersonensRolle: OpprettSakRolleRequest = {
         fodselsnummer: personensId,
-        type: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-        rolleType: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+        type: toRolletype(personensRolle),
+        rolleType: toRolletype(personensRolle),
         reellMottager: motpartReellMottaker,
     };
 
-    const roller: IOpprettSakRolleDto[] = [
+    const roller: OpprettSakRolleRequest[] = [
         hovedpersonensRolle,
-        ...foreldre.map((selected) => ({
+        ...foreldre.map((selected): OpprettSakRolleRequest => ({
             reellMottager: selected.reellMottaker,
-            type: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-            rolleType: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+            type: toRolletype(selected.rolle),
+            rolleType: toRolletype(selected.rolle),
             fodselsnummer: selected.ident,
         })),
     ];
@@ -43,8 +46,8 @@ export function createSakPayloadForBA(
         const enesteForeldre = foreldre[0];
         if (enesteForeldre) {
             roller.push({
-                rolleType: getMotpartRolleType(enesteForeldre.rolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-                type: getMotpartRolleType(enesteForeldre.rolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+                rolleType: toRolletype(getMotpartRolleType(enesteForeldre.rolle)),
+                type: toRolletype(getMotpartRolleType(enesteForeldre.rolle)),
             });
         }
     }
@@ -60,23 +63,23 @@ function createSakRoller(
     personensRolle: RolleType,
     selectedBarn: IPersonensReellMottakerRolle[],
     motpartId?: string
-): IOpprettSakRolleDto[] {
-    const hovedPersonensRolle = {
+): OpprettSakRolleRequest[] {
+    const hovedPersonensRolle: OpprettSakRolleRequest = {
         fodselsnummer: personensId,
-        type: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+        type: toRolletype(personensRolle),
     };
-    const motpartsRolle = {
+    const motpartsRolle: OpprettSakRolleRequest = {
         fodselsnummer: motpartId,
-        type: getMotpartRolleType(personensRolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+        type: toRolletype(getMotpartRolleType(personensRolle)),
     };
 
     return [
         hovedPersonensRolle,
         motpartsRolle,
-        ...selectedBarn.map((selected) => ({
+        ...selectedBarn.map((selected): OpprettSakRolleRequest => ({
             reellMottager: selected.reellMottaker,
-            type: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-            rolleType: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+            type: toRolletype(selected.rolle),
+            rolleType: toRolletype(selected.rolle),
             fodselsnummer: selected.ident,
         })),
     ];

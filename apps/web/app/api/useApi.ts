@@ -434,8 +434,10 @@ export const useHentSamhandlerEllerPersonForIdent = (
                         );
                     if (response.status !== 200)
                         throw Error(`Fant ikke samhandler med ident ${ident}`);
+                    if (!response.data.samhandlerId)
+                        throw Error(`Samhandler mangler id for ident ${ident}`);
                     result = {
-                        ident: response.data.samhandlerId ?? "",
+                        ident: response.data.samhandlerId,
                         navn: response.data.navn,
                         visningsnavn: response.data.navn,
                         offentligId: response.data.offentligId,

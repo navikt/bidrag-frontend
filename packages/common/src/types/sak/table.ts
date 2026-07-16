@@ -1,16 +1,22 @@
-import { RelasjonType } from "./personsearch";
-import { RolleTypeAbbreviation } from "../roller/RolleType";
+import type { Rolletype } from "@bidrag/api/SakApi";
+import type { RolleTypeAbbreviation } from "../roller/RolleType";
+import type { RelasjonType } from "./personsearch";
 
-export interface IOpprettSakRolleDto {
+/**
+ * Subset av RolleDto for oppretting av sak.
+ * RolleDto har påkrevde felt (mottagerErVerge, rolleType) med @default-verdiar i API-et,
+ * men TypeScript-generatoren markerer dei som required. Vi sender berre dei felta vi faktisk treng.
+ */
+export interface OpprettSakRolleRequest {
     fodselsnummer?: string;
-    type: RolleTypeAbbreviation | "BA" | "BM" | "BP" | "FR" | "RM";
-    rolleType?: RolleTypeAbbreviation | "BA" | "BM" | "BP" | "FR" | "RM";
+    type: Rolletype;
+    rolleType?: Rolletype;
     reellMottager?: string | null;
 }
 
-export interface IOpprettSakRequest {
+export interface OpprettSakPayload {
     eierfogd: string;
-    roller: IOpprettSakRolleDto[];
+    roller: OpprettSakRolleRequest[];
 }
 
 export interface IFamilierelasjonTableData {

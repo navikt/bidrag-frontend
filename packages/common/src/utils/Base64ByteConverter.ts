@@ -9,7 +9,12 @@ for (let i = 0, len = code.length; i < len; ++i) {
 revLookup["-".charCodeAt(0)] = 62;
 revLookup["_".charCodeAt(0)] = 63;
 export class Base64ByteConverter {
-    static toByteArray(b64: string): ArrayBuffer {
+    private static readonly VALID_BASE64 = /^[A-Za-z0-9+/]*={0,2}$/;
+
+    static toByteArray(b64: string): Uint8Array {
+        if (!Base64ByteConverter.VALID_BASE64.test(b64)) {
+            throw new Error(`Invalid base64 string: contains illegal characters`);
+        }
         let tmp;
         const lens = this.getLens(b64);
         const validLen = lens[0];
@@ -48,8 +53,7 @@ export class Base64ByteConverter {
             arr[curByte++] = tmp & 0xff;
         }
 
-        // Uint8Array is a valid ArrayBuffer view — cast is safe here
-        return arr as unknown as ArrayBuffer;
+        return arr;
     }
 
     static fromByteArray(uint8: Uint8Array) {
