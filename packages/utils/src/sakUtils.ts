@@ -1,18 +1,18 @@
-import type { Rolletype } from "@bidrag/api/SakApi";
-import type { OpprettSakPayload, OpprettSakRolleRequest, IPersonensReellMottakerRolle, RolleTypeAbbreviation as RolleType } from "@bidrag/common";
+import { Rolletype } from "@bidrag/api/SakApi";
+import type * as common from "@bidrag/common";
 import { getMotpartRolleType } from "./personUtils";
 
-function toRolletype(rolle: RolleType): Rolletype {
-    return rolle as unknown as Rolletype;
+function toRolletype(rolle: common.RolleTypeAbbreviation): Rolletype {
+    return Rolletype[rolle as keyof typeof Rolletype];
 }
 
 export function createSakPayload(
     eierfogd: string,
     personensId: string,
-    personensRolle: RolleType,
-    selectedBarn: IPersonensReellMottakerRolle[],
+    personensRolle: common.RolleTypeAbbreviation,
+    selectedBarn: common.IPersonensReellMottakerRolle[],
     motpartId?: string
-): OpprettSakPayload {
+): common.OpprettSakPayload {
     return {
         eierfogd,
         roller: createSakRoller(personensId, personensRolle, selectedBarn, motpartId),
@@ -22,20 +22,20 @@ export function createSakPayload(
 export function createSakPayloadForBA(
     eierfogd: string,
     personensId: string,
-    personensRolle: RolleType,
-    foreldre: IPersonensReellMottakerRolle[],
+    personensRolle: common.RolleTypeAbbreviation,
+    foreldre: common.IPersonensReellMottakerRolle[],
     motpartReellMottaker?: string
-): OpprettSakPayload {
-    const hovedpersonensRolle: OpprettSakRolleRequest = {
+): common.OpprettSakPayload {
+    const hovedpersonensRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: personensId,
         type: toRolletype(personensRolle),
         rolleType: toRolletype(personensRolle),
         reellMottager: motpartReellMottaker,
     };
 
-    const roller: OpprettSakRolleRequest[] = [
+    const roller: common.OpprettSakRolleRequest[] = [
         hovedpersonensRolle,
-        ...foreldre.map((selected): OpprettSakRolleRequest => ({
+        ...foreldre.map((selected): common.OpprettSakRolleRequest => ({
             reellMottager: selected.reellMottaker,
             type: toRolletype(selected.rolle),
             rolleType: toRolletype(selected.rolle),
@@ -60,15 +60,15 @@ export function createSakPayloadForBA(
 
 function createSakRoller(
     personensId: string,
-    personensRolle: RolleType,
-    selectedBarn: IPersonensReellMottakerRolle[],
+    personensRolle: common.RolleTypeAbbreviation,
+    selectedBarn: common.IPersonensReellMottakerRolle[],
     motpartId?: string
-): OpprettSakRolleRequest[] {
-    const hovedPersonensRolle: OpprettSakRolleRequest = {
+): common.OpprettSakRolleRequest[] {
+    const hovedPersonensRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: personensId,
         type: toRolletype(personensRolle),
     };
-    const motpartsRolle: OpprettSakRolleRequest = {
+    const motpartsRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: motpartId,
         type: toRolletype(getMotpartRolleType(personensRolle)),
     };
@@ -76,7 +76,7 @@ function createSakRoller(
     return [
         hovedPersonensRolle,
         motpartsRolle,
-        ...selectedBarn.map((selected): OpprettSakRolleRequest => ({
+        ...selectedBarn.map((selected): common.OpprettSakRolleRequest => ({
             reellMottager: selected.reellMottaker,
             type: toRolletype(selected.rolle),
             rolleType: toRolletype(selected.rolle),
