@@ -39,7 +39,11 @@ export class SecuritySessionUtils {
 
     static createRequestTrace(spanName: string): RequestTraceContext {
         // const tracer = trace.getTracer(tracerName);
-        const parentContext = window.__otelSessionContext ?? undefined;
+
+        // context er fra @opentelemetry/api — aktiveres når OTel-integrasjonen tas i bruk
+        // @ts-expect-error
+        const parentContext = window.__otelSessionContext || context.active();
+        
         // const span = tracer.startSpan(spanName, undefined, parentContext);
         // const traceContext = trace.setSpan(parentContext, span);
         const headers: Record<string, string> = {};
