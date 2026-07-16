@@ -7,7 +7,7 @@ import JournalpostTabell from "./components/journalpost/JournalpostTabell";
 
 export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;
-    const tabTitle = "Sakshistorikk - " + saksnummer;
+    const tabTitle = `Sakshistorikk - ${saksnummer}`;
     const {
         data: journalposter,
         error: journalposterError,

@@ -34,9 +34,9 @@ export function BrevLink({
         ...(hendelse.vedtakType && { vedtakType: hendelse.vedtakType }),
     });
 
-    hendelse.barnObjektNumre?.forEach((objNr) =>
-        params.append("barn_obj_nr", objNr),
-    );
+    hendelse.barnObjektNumre?.forEach((objNr) => {
+        params.append("barn_obj_nr", objNr);
+    });
 
     return (
         <Link href={`/sak/${saksnummer}/forsendelse/?${params}`} title="Brev">

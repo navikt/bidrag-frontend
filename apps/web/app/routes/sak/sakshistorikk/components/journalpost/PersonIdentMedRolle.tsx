@@ -17,7 +17,7 @@ export default function PersonIdentMedRolle({
 
     return (
         <HStack gap="space-2" align="center" wrap={false}>
-            {rolle && rolle.type}
+            {rolle?.type}
             <PersonNavnIdent variant="ident" ident={gjelderAktor.ident} />
         </HStack>
     );
