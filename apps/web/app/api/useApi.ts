@@ -74,7 +74,7 @@ export function useKanOppretteSakUtenBm() {
             } catch (e) {
                 SecureLoggerService.error(
                     "Kunne ikke hente informasjon om saksbehandler kan opprette sak uten BM",
-                    e as Error,
+                    e instanceof Error ? e : new Error(String(e)),
                 );
                 return { data: false };
             }
@@ -113,7 +113,7 @@ export function useSjekkTilgangOpprettSakUtenBm(enabled: boolean = true) {
                 } else {
                     await SecureLoggerService.warn(
                         "Feil ved tilgangssjekk sak uten BM - antar ingen tilgang",
-                        e as Error,
+                        e instanceof Error ? e : new Error(String(e)),
                     );
                 }
 
@@ -162,7 +162,7 @@ export function useOpprettSak() {
                 }
                 await SecureLoggerService.error(
                     `Kunne ikke opprette sak for request ${JSON.stringify(request)}`,
-                    e as Error,
+                    e instanceof Error ? e : new Error(String(e)),
                 );
                 throw e;
             }
@@ -211,7 +211,7 @@ export function useHentSakForPerson(ident: string, enabled: boolean = true) {
                 }
                 await SecureLoggerService.error(
                     `Kunne ikke hente sak for person ${ident}`,
-                    e as Error,
+                    e instanceof Error ? e : new Error(String(e)),
                 );
                 throw e;
             }
@@ -463,7 +463,7 @@ export const useHentSamhandlerEllerPersonForIdent = (
             } catch (e) {
                 await SecureLoggerService.warn(
                     `Feil ved henting av samhandler eller person for ident ${ident} - antar ugyldig ident`,
-                    e as Error,
+                    e instanceof Error ? e : new Error(String(e)),
                 );
                 const axiosError = e as AxiosError;
                 const status = axiosError?.response?.status;
@@ -993,7 +993,7 @@ export function useHentFogdhistorikk(
                 }
                 await SecureLoggerService.error(
                     `Kunne ikke hente fogdhistorikk for saksnummer ${saksnummer}`,
-                    e as Error,
+                    e instanceof Error ? e : new Error(String(e)),
                 );
                 throw e;
             }
