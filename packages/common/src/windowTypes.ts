@@ -1,3 +1,5 @@
+import { BroadcastMessage, PersonBroadcastMessage } from "./types/broadcast";
+
 export type HeaderNavigationMode = "default" | "sak" | "sakshistorikk" | "sakforside";
 
 export interface IHeaderNavigationContext {
@@ -17,4 +19,11 @@ export interface IWindowLogToServer {
     warning: (message: string) => void;
     debug: (message: string) => void;
     error: (message: string, err: Error) => void;
+}
+
+declare global {
+    interface Window {
+        openPersonsok: () => Window | null;
+        waitForPersonSokResult: () => Promise<BroadcastMessage<PersonBroadcastMessage>>;
+    }
 }

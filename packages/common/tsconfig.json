@@ -1,1 +1,5 @@
-{ "extends": "../../tsconfig.packages.json", "include": ["src"] }
+{
+    "extends": "../../tsconfig.packages.json",
+    "include": ["src"],
+    "compilerOptions": { "types": ["node"] }
+}
