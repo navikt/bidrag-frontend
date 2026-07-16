@@ -22,6 +22,10 @@ export default [
             "belopshistorikk",
             "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx",
         ),
+        route(
+            "sakshistorikk",
+            "routes/sak/sakshistorikk/SakshistorikkPage.tsx",
+        ),
         route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
     ]),
 ] satisfies RouteConfig;

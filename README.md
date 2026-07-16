@@ -96,3 +96,4 @@ Appen kaller følgende backends via OBO-token-exchange (Azure AD):
 | bidrag-samhandler | `BIDRAG_SAMHANDLER_URL` / `BIDRAG_SAMHANDLER_AUDIENCE` |
 | bidrag-belopshistorikk | `BIDRAG_BELOPSHISTORIKK_URL` / `BIDRAG_BELOPSHISTORIKK_AUDIENCE` |
 | bidrag-reskontro | `BIDRAG_RESKONTRO_URL` / `BIDRAG_RESKONTRO_AUDIENCE` |
+| bidrag-dokument | `BIDRAG_DOKUMENT_URL` / `BIDRAG_DOKUMENT_AUDIENCE` |

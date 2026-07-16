@@ -44,6 +44,11 @@ env:
   - name: BIDRAG_RESKONTRO_AUDIENCE
     value: api://prod-gcp.bidrag.bidrag-reskontro/.default
 
+  - name: BIDRAG_DOKUMENT_URL
+    value: https://bidrag-dokument.prod-fss-pub.nais.io/bidrag-dokument
+  - name: BIDRAG_DOKUMENT_AUDIENCE
+    value: api://prod-fss.bidrag.bidrag-dokument/.default
+
   - name: BISYS_URL
     value: https://wasapp.adeo.no/rtv-bidrag/
 
@@ -59,3 +64,4 @@ outbound:
     - bidrag-sak.prod-fss-pub.nais.io
     - bidrag-organisasjon.prod-fss-pub.nais.io
     - bidrag-person.prod-fss-pub.nais.io
+    - bidrag-dokument.prod-fss-pub.nais.io

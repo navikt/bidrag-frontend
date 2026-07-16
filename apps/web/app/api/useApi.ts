@@ -1,6 +1,7 @@
 /* eslint-disable preserve-caught-error */
 
 import {
+    BIDRAG_DOKUMENT_API,
     BIDRAG_ORGANISASJON_API,
     BIDRAG_PERSON_API,
     BIDRAG_SAK_API,
@@ -8,6 +9,7 @@ import {
     BIDRAG_TILGANGSKONTROLL_API,
     TilgangsFeilError,
 } from "@bidrag/api";
+import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { EnhetDto, HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
 import type {
     ForelderBarnRelasjonDto,
@@ -21,6 +23,7 @@ import type {
     OppdaterRollerISakRequest,
     OppdaterSakResponse,
     OpprettSakRequest,
+    SakshendelseDto,
 } from "@bidrag/api/SakApi";
 import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
 import {
@@ -1002,6 +1005,167 @@ export function useHentFogdhistorikk(
             if ((error as AxiosError)?.response?.status === 404) {
                 return false;
             }
+            if (error instanceof TilgangsFeilError) {
+                return false;
+            }
+            return failureCount < 3;
+        },
+    });
+}
+
+export function useHentJournalposter(
+    saksnummer: string,
+    enabled: boolean = true,
+) {
+    return useQuery<JournalpostDto[], AxiosError | TilgangsFeilError>({
+        queryKey: ["hent_journalposter", saksnummer],
+        queryFn: async () => {
+            try {
+                const response = await BIDRAG_DOKUMENT_API.sak.hentJournal(
+                    saksnummer,
+                    { fagomrade: ["BID", "FAR"] },
+                    {
+                        validateStatus: (status) => {
+                            return status === 200 || status === 404;
+                        },
+                    },
+                );
+
+                if (response.status === 404) {
+                    await SecureLoggerService.info(
+                        `Ingen journalposter funnet for saksnummer ${saksnummer}`,
+                    );
+                    return [];
+                }
+
+                await SecureLoggerService.info(
+                    `Hentet journalposter for saksnummer ${saksnummer}`,
+                );
+                return response.data;
+            } catch (e) {
+                const axiosError = e as AxiosError;
+                const status = axiosError?.response?.status;
+
+                if (status === 403 || status === 401) {
+                    await SecureLoggerService.warn(
+                        `Ingen tilgang til journalposter for saksnummer ${saksnummer}`,
+                    );
+                    throw new TilgangsFeilError(
+                        `Du har ikke tilgang til journalposter for dette saksnummeret (${saksnummer})`,
+                    );
+                }
+                await SecureLoggerService.error(
+                    `Kunne ikke hente journalposter for saksnummer ${saksnummer}`,
+                    axiosError,
+                );
+                throw e;
+            }
+        },
+        enabled: enabled && !!saksnummer,
+        retry: (failureCount, error) => {
+            if ((error as AxiosError)?.response?.status === 404) {
+                return false;
+            }
+            if (error instanceof TilgangsFeilError) {
+                return false;
+            }
+            return failureCount < 3;
+        },
+    });
+}
+
+export function useFinnHendelserForSak(
+    saksnummer: string,
+    enabled: boolean = true,
+) {
+    return useQuery<SakshendelseDto[], AxiosError | TilgangsFeilError>({
+        queryKey: ["finn_hendelser_for_sak", saksnummer],
+        queryFn: async () => {
+            try {
+                const response = await BIDRAG_SAK_API.sak.finnHendelserForSak(
+                    saksnummer,
+                    {
+                        validateStatus: (status) => {
+                            return status === 200 || status === 404;
+                        },
+                    },
+                );
+
+                if (response.status === 404) {
+                    await SecureLoggerService.info(
+                        `Ingen hendelser funnet for saksnummer ${saksnummer}`,
+                    );
+                    return [];
+                }
+
+                await SecureLoggerService.info(
+                    `Hentet hendelser for saksnummer ${saksnummer}`,
+                );
+                return response.data;
+            } catch (e) {
+                const axiosError = e as AxiosError;
+                const status = axiosError?.response?.status;
+
+                if (status === 403 || status === 401) {
+                    await SecureLoggerService.warn(
+                        `Ingen tilgang til hendelser for saksnummer ${saksnummer}`,
+                    );
+                    throw new TilgangsFeilError(
+                        `Du har ikke tilgang til hendelser for dette saksnummeret (${saksnummer})`,
+                    );
+                }
+                await SecureLoggerService.error(
+                    `Kunne ikke hente hendelser for saksnummer ${saksnummer}`,
+                    axiosError,
+                );
+                throw e;
+            }
+        },
+        enabled: enabled && !!saksnummer,
+        retry: (failureCount, error) => {
+            if ((error as AxiosError)?.response?.status === 404) {
+                return false;
+            }
+            if (error instanceof TilgangsFeilError) {
+                return false;
+            }
+            return failureCount < 3;
+        },
+    });
+}
+
+export function useHarSkrivetilgang(saksnummer: string, enhet: string | null) {
+    return useQuery<boolean, AxiosError>({
+        queryKey: ["har_skrivetilgang", saksnummer, enhet],
+        queryFn: async () => {
+            try {
+                const response = await BIDRAG_SAK_API.sak.harSkrivetilgang(
+                    saksnummer,
+                    { enhet: enhet ?? "" },
+                );
+                return response.data;
+            } catch (e) {
+                const axiosError = e as AxiosError;
+                const status = axiosError?.response?.status;
+
+                if (status === 403 || status === 401) {
+                    await SecureLoggerService.warn(
+                        `Ingen tilgang til skrivetilgang for saksnummer ${saksnummer}`,
+                    );
+                    throw new TilgangsFeilError(
+                        `Du har ikke tilgang til å sjekke skrivetilgang for dette saksnummeret (${saksnummer})`,
+                    );
+                }
+                await SecureLoggerService.error(
+                    `Kunne ikke sjekke skrivetilgang for saksnummer ${saksnummer}`,
+                    axiosError,
+                );
+                throw e;
+            }
+        },
+        enabled: !!saksnummer && !!enhet,
+        staleTime: 5 * 60 * 1000,
+        retry: (failureCount, error) => {
             if (error instanceof TilgangsFeilError) {
                 return false;
             }
