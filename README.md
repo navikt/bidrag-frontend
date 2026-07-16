@@ -104,16 +104,8 @@ grep -rn "@ts-ignore" apps/ packages/ --include="*.ts" --include="*.tsx"
 3. Er det en `as`-cast som er trygg og selvforklarende? → Bruk `as` i stedet for suppressering
 4. Ingen av de over → `@ts-expect-error` med kommentar som forklarer hvorfor
 
-```ts
-// ❌ ingen kommentar
-// @ts-expect-error
-doSomething(value);
-
-// ✅ forklarer hvorfor suppressering er nødvendig
-// Tredjeparts-SDK har feil type — returnerer string, men er typet som number (SDK-bug #1234)
-// @ts-expect-error
-const id: string = legacySdk.getId();
-```
+Under migreringen ble samtlige `@ts-expect-error`/`@ts-ignore` fjernet ved å rette rotårsaken —
+ingen ble beholdt. Se mønstrene nedenfor for konkrete eksempler på hvordan.
 
 #### `catch (e)` sendt til logger
 
