@@ -74,7 +74,7 @@ export function useKanOppretteSakUtenBm() {
             } catch (e) {
                 SecureLoggerService.error(
                     "Kunne ikke hente informasjon om saksbehandler kan opprette sak uten BM",
-                    e,
+                    e as Error,
                 );
                 return { data: false };
             }
@@ -113,7 +113,7 @@ export function useSjekkTilgangOpprettSakUtenBm(enabled: boolean = true) {
                 } else {
                     await SecureLoggerService.warn(
                         "Feil ved tilgangssjekk sak uten BM - antar ingen tilgang",
-                        e,
+                        e as Error,
                     );
                 }
 
@@ -162,7 +162,7 @@ export function useOpprettSak() {
                 }
                 await SecureLoggerService.error(
                     `Kunne ikke opprette sak for request ${JSON.stringify(request)}`,
-                    e,
+                    e as Error,
                 );
                 throw e;
             }
@@ -211,7 +211,7 @@ export function useHentSakForPerson(ident: string, enabled: boolean = true) {
                 }
                 await SecureLoggerService.error(
                     `Kunne ikke hente sak for person ${ident}`,
-                    e,
+                    e as Error,
                 );
                 throw e;
             }
@@ -424,7 +424,7 @@ export const useHentSamhandlerEllerPersonForIdent = (
             }
 
             // Fetch from API
-            let result: PersonDto | ISamhandlerPersonInfo;
+            let result: ISamhandlerPersonInfo;
 
             try {
                 if (IdentUtils.isSamhandlerId(ident) && sjekkSamhandler) {
@@ -435,7 +435,7 @@ export const useHentSamhandlerEllerPersonForIdent = (
                     if (response.status !== 200)
                         throw Error(`Fant ikke samhandler med ident ${ident}`);
                     result = {
-                        ident: response.data.samhandlerId,
+                        ident: response.data.samhandlerId ?? "",
                         navn: response.data.navn,
                         visningsnavn: response.data.navn,
                         offentligId: response.data.offentligId,
@@ -463,7 +463,7 @@ export const useHentSamhandlerEllerPersonForIdent = (
             } catch (e) {
                 await SecureLoggerService.warn(
                     `Feil ved henting av samhandler eller person for ident ${ident} - antar ugyldig ident`,
-                    e,
+                    e as Error,
                 );
                 const axiosError = e as AxiosError;
                 const status = axiosError?.response?.status;
@@ -666,7 +666,7 @@ function hentPersonMotpartBarnRelasjonQueryOptions(
             enabled,
         ],
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
-            if (!request || enabled === false) return null;
+            if (!request || enabled === false) return undefined;
             try {
                 const { data } =
                     await BIDRAG_PERSON_API.motpartbarnrelasjon.getPersonensMotpartBarnRelasjon(
@@ -705,7 +705,7 @@ export function useHentPersonMotpartBarnRelasjon(
     request: PersonRequest | null,
     enabled: boolean = true,
 ) {
-    return useQuery<MotpartBarnRelasjonDto, AxiosError | TilgangsFeilError>({
+    return useQuery<MotpartBarnRelasjonDto | undefined, AxiosError | TilgangsFeilError>({
         ...hentPersonMotpartBarnRelasjonQueryOptions(request),
         enabled: enabled && !!request?.ident,
     });
@@ -716,7 +716,7 @@ export function useHentPersonMotpartBarnRelasjonSuspense(
     enabled: boolean = true,
 ) {
     return useSuspenseQuery<
-        MotpartBarnRelasjonDto,
+        MotpartBarnRelasjonDto | undefined,
         AxiosError | TilgangsFeilError
     >({
         ...hentPersonMotpartBarnRelasjonQueryOptions(request, enabled),
@@ -727,10 +727,10 @@ export function useHentForelderBarnRelasjon(
     request: PersonRequest | null,
     enabled: boolean = true,
 ) {
-    return useQuery<ForelderBarnRelasjonDto, AxiosError | TilgangsFeilError>({
+    return useQuery<ForelderBarnRelasjonDto | undefined, AxiosError | TilgangsFeilError>({
         queryKey: ["hent_forelder_barn_relasjon", request?.ident],
         queryFn: async (): Promise<ForelderBarnRelasjonDto | undefined> => {
-            if (!request || enabled === false) return null;
+            if (!request || enabled === false) return undefined;
             try {
                 const { data } =
                     await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(
@@ -777,7 +777,7 @@ function hentForeldreinformasjonForBarnQueryOptions(
             enabled,
         ],
         queryFn: async () => {
-            if (!request?.ident || enabled === false) return null;
+            if (!request?.ident || enabled === false) return [];
 
             try {
                 const { data } =
@@ -787,7 +787,8 @@ function hentForeldreinformasjonForBarnQueryOptions(
 
                 const foreldreIdenter = data.forelderBarnRelasjon
                     .filter((relasjon) => relasjon.minRolleForPerson === "BARN")
-                    .map((relasjon) => relasjon.relatertPersonsIdent);
+                    .map((relasjon) => relasjon.relatertPersonsIdent)
+                    .filter((ident): ident is string => ident !== undefined);
 
                 if (foreldreIdenter.length === 0) {
                     return [];
@@ -992,7 +993,7 @@ export function useHentFogdhistorikk(
                 }
                 await SecureLoggerService.error(
                     `Kunne ikke hente fogdhistorikk for saksnummer ${saksnummer}`,
-                    e,
+                    e as Error,
                 );
                 throw e;
             }

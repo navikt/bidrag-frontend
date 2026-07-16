@@ -85,12 +85,14 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                 case "tom":
                     return (
                         dir *
-                        (new Date(a.periode.til) <= new Date(b.periode.til)
+                        (new Date(a.periode.til ?? "") <= new Date(b.periode.til ?? "")
                             ? 1
                             : -1)
                     );
                 case "belop":
-                    return dir * (a.beløp - b.beløp);
+                    return dir * ((a.beløp ?? 0) - (b.beløp ?? 0));
+                default:
+                    return 0;
             }
         });
     }, [flateRader, sort]);
@@ -177,7 +179,7 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                                 {formaterDato(rad.periode.fom)}
                             </Table.DataCell>
                             <Table.DataCell>
-                                {sisteDagFramTilDato(rad.periode.til) ?? ""}
+                                {rad.periode.til ? sisteDagFramTilDato(rad.periode.til) ?? "" : ""}
                             </Table.DataCell>
                             <Table.DataCell align={"right"}>
                                 {rad.beløp ?? ""}
