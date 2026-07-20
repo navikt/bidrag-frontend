@@ -32,6 +32,7 @@ Bruk denne når en funksjon/side skal flyttes fra `bidrag-ui` til `bidrag-fronte
 
 4. **Koble API-kontrakter**
    - Regenerer API-klienter i `packages/api/src/api`
+   - Kjør `pnpm --filter @bidrag/api run generate:api` for å generere alle klienter
    - Koble klient i `packages/api/src/api.ts`
    - Unngå manuell redigering av genererte filer
 

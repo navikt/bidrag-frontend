@@ -116,6 +116,9 @@ Bruk denne rekkefølgen for å unngå breaking changes:
 1. Flytt route + komponenter til `apps/web/app/routes/**`.
 2. Port hooks/query til `apps/web/app/api/useApi.ts`.
 3. Regenerer nødvendige API-klienter i `packages/api/src/api` og koble dem i `packages/api/src/api.ts`.
+   ```bash
+   pnpm --filter @bidrag/api run generate:api
+   ```
 4. Oppdater env + NAIS:
    - `apps/web/app/env.server.ts`
    - `apps/web/app/api.env.ts`
