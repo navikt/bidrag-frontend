@@ -1,15 +1,18 @@
-import { OpprettSakRequest, RolleDto } from "../api/SakApi";
-import { IPersonensReellMottakerRolle } from "../types/person";
-import { RolleType } from "../types/rolleveileder";
+import { Rolletype } from "@bidrag/api/SakApi";
+import type * as common from "@bidrag/common";
 import { getMotpartRolleType } from "./personUtils";
+
+function toRolletype(rolle: common.RolleTypeAbbreviation): Rolletype {
+    return Rolletype[rolle as keyof typeof Rolletype];
+}
 
 export function createSakPayload(
     eierfogd: string,
     personensId: string,
-    personensRolle: RolleType,
-    selectedBarn: IPersonensReellMottakerRolle[],
+    personensRolle: common.RolleTypeAbbreviation,
+    selectedBarn: common.IPersonensReellMottakerRolle[],
     motpartId?: string
-): OpprettSakRequest {
+): common.OpprettSakPayload {
     return {
         eierfogd,
         roller: createSakRoller(personensId, personensRolle, selectedBarn, motpartId),
@@ -19,34 +22,34 @@ export function createSakPayload(
 export function createSakPayloadForBA(
     eierfogd: string,
     personensId: string,
-    personensRolle: RolleType,
-    foreldre: IPersonensReellMottakerRolle[],
+    personensRolle: common.RolleTypeAbbreviation,
+    foreldre: common.IPersonensReellMottakerRolle[],
     motpartReellMottaker?: string
-): OpprettSakRequest {
-    const hovedpersonensRolle = {
+): common.OpprettSakPayload {
+    const hovedpersonensRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: personensId,
-        type: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-        rolleType: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+        type: toRolletype(personensRolle),
+        rolleType: toRolletype(personensRolle),
         reellMottager: motpartReellMottaker,
     };
 
-    const roller = [
+    const roller: common.OpprettSakRolleRequest[] = [
         hovedpersonensRolle,
-        ...foreldre.map((selected) => ({
+        ...foreldre.map((selected): common.OpprettSakRolleRequest => ({
             reellMottager: selected.reellMottaker,
-            type: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-            rolleType: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+            type: toRolletype(selected.rolle),
+            rolleType: toRolletype(selected.rolle),
             fodselsnummer: selected.ident,
         })),
     ];
     if (foreldre.length === 1) {
         const enesteForeldre = foreldre[0];
-        const personensRolle = enesteForeldre.rolle;
-        // @ts-ignore
-        roller.push({
-            rolleType: getMotpartRolleType(personensRolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-            type: getMotpartRolleType(personensRolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-        });
+        if (enesteForeldre) {
+            roller.push({
+                rolleType: toRolletype(getMotpartRolleType(enesteForeldre.rolle)),
+                type: toRolletype(getMotpartRolleType(enesteForeldre.rolle)),
+            });
+        }
     }
 
     return {
@@ -57,26 +60,26 @@ export function createSakPayloadForBA(
 
 function createSakRoller(
     personensId: string,
-    personensRolle: RolleType,
-    selectedBarn: IPersonensReellMottakerRolle[],
+    personensRolle: common.RolleTypeAbbreviation,
+    selectedBarn: common.IPersonensReellMottakerRolle[],
     motpartId?: string
-): RolleDto[] {
-    const hovedPersonensRolle = {
+): common.OpprettSakRolleRequest[] {
+    const hovedPersonensRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: personensId,
-        type: personensRolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+        type: toRolletype(personensRolle),
     };
-    const motpartsRolle = {
+    const motpartsRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: motpartId,
-        type: getMotpartRolleType(personensRolle) as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+        type: toRolletype(getMotpartRolleType(personensRolle)),
     };
 
     return [
         hovedPersonensRolle,
         motpartsRolle,
-        ...selectedBarn.map((selected) => ({
+        ...selectedBarn.map((selected): common.OpprettSakRolleRequest => ({
             reellMottager: selected.reellMottaker,
-            type: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
-            rolleType: selected.rolle as unknown as "BA" | "BM" | "BP" | "FR" | "RM",
+            type: toRolletype(selected.rolle),
+            rolleType: toRolletype(selected.rolle),
             fodselsnummer: selected.ident,
         })),
     ];

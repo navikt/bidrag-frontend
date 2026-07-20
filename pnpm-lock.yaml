@@ -221,6 +221,9 @@ importers:
         specifier: ^14
         version: 14.0.0
     devDependencies:
+      '@opentelemetry/api':
+        specifier: ^1.9.1
+        version: 1.9.1
       '@types/lodash':
         specifier: ^4.14.202
         version: 4.17.24
@@ -238,6 +241,13 @@ importers:
         version: 15.8.1
 
   packages/utils:
+    dependencies:
+      '@bidrag/api':
+        specifier: workspace:*
+        version: link:../api
+      '@bidrag/common':
+        specifier: workspace:*
+        version: link:../common
     devDependencies:
       date-fns:
         specifier: ^4.4.0

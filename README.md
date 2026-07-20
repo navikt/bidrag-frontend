@@ -82,6 +82,85 @@ pnpm tsx scripts/migrate-imports.ts
 pnpm tsx scripts/migrate-imports.ts apps/web/app/routes/sak/reskontro
 ```
 
+### Fikse TypeScript-feil etter migrering
+
+Når nye filer migreres inn i monorepoet vil `pnpm typecheck` avdekke feil. Vanlige mønstre:
+
+#### `@ts-ignore` → `@ts-expect-error`
+
+Migreringsscriptet kan introdusere `@ts-ignore`. Første steg er å bytte til `@ts-expect-error`
+— det gir kompileringsfeil hvis suppresseringen ikke lenger er nødvendig, og avdekker dermed
+"falske" suppresseringer:
+
+```bash
+# Finn alle gjenværende @ts-ignore
+grep -rn "@ts-ignore" apps/ packages/ --include="*.ts" --include="*.tsx"
+```
+
+**`@ts-expect-error` er siste utvei** — undersøk alltid rotårsaken først:
+
+1. Kan typen endres til å stemme? → Fiks typen
+2. Kan koden skrives om (f.eks. `Object.entries`, type guard, standardverdi)? → Gjør det
+3. Er det en `as`-cast som er trygg og selvforklarende? → Bruk `as` i stedet for suppressering
+4. Ingen av de over → `@ts-expect-error` med kommentar som forklarer hvorfor
+
+Under migreringen ble samtlige `@ts-expect-error`/`@ts-ignore` fjernet ved å rette rotårsaken —
+ingen ble beholdt. Se mønstrene nedenfor for konkrete eksempler på hvordan.
+
+#### `catch (e)` sendt til logger
+
+`e` i catch-blokker er `unknown`. Bruk type guard — ikke `as`-cast:
+
+```ts
+// ❌ usikker cast
+SecureLoggerService.error("Feil", e as Error);
+
+// ✅ type guard
+SecureLoggerService.error("Feil", e instanceof Error ? e : new Error(String(e)));
+```
+
+#### `null` vs `undefined` fra API
+
+Genererte API-typer returnerer `null` der interne interfaces forventer `undefined`:
+
+```ts
+// ❌ return null i queryFn med returntype T | undefined
+if (!request) return null;
+
+// ✅
+if (!request) return undefined;
+```
+
+#### `useRef` med timeout
+
+```ts
+// ❌ null er ikke kompatibelt med clearTimeout
+const ref = useRef<NodeJS.Timeout>(null);
+
+// ✅
+const ref = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+```
+
+#### `Object.keys` med indeksering
+
+```ts
+// ❌ noUncheckedIndexedAccess blokkerer obj[key]
+Object.keys(obj).map((key) => obj[key]);
+
+// ✅
+Object.entries(obj).map(([key, value]) => value);
+```
+
+#### Array-destructuring fra regex match
+
+```ts
+// ❌ regex-grupper er string | undefined
+const [, prefix, scriptUrl] = match;
+
+// ✅ default-verdier i destructuring
+const [, prefix = "", scriptUrl = ""] = match;
+```
+
 ## Backends
 
 Appen kaller følgende backends via OBO-token-exchange (Azure AD):

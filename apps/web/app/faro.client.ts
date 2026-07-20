@@ -1,10 +1,10 @@
 import { initializeFaro, getWebInstrumentations } from "@grafana/faro-web-sdk";
 import { ReactIntegration } from "@grafana/faro-react";
-import nais from "./nais.js";
+import type { NaisConfig } from "~/nais.ts";
 
 let faroInstance: ReturnType<typeof initializeFaro> | null = null;
 
-export function initFaro() {
+export function initFaro(nais: NaisConfig) {
     if (faroInstance) {
         return faroInstance;
     }

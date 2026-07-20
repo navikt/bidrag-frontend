@@ -33,7 +33,7 @@ export default function AutoSuggest(props: AutoSuggestProps) {
     const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const [userInput, setUserInput] = useState<string | undefined>(props.defaultValue);
-    const onBlurTimeoutRef = useRef<NodeJS.Timeout>(null);
+    const onBlurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const avoidBlurRef = useRef<boolean>(false);
     const [cursor, setCursor] = useState<number | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -93,7 +93,6 @@ export default function AutoSuggest(props: AutoSuggestProps) {
 
     function avoidBlur() {
         avoidBlurRef.current = true;
-        // @ts-ignore
         clearTimeout(onBlurTimeoutRef.current);
     }
 
@@ -178,7 +177,6 @@ export default function AutoSuggest(props: AutoSuggestProps) {
                     label={props.label}
                     type="text"
                     ref={(ref) => {
-                        //@ts-ignore
                         inputRef.current = ref;
                     }}
                     description={props.description}
