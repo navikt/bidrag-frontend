@@ -48,7 +48,7 @@ export default function PersonNavnIdent({
         personData.diskresjonskode === "P19";
     // const skjermet = false; //ident ? graderingsinfo.identerTilSkjerming[ident] : false;
     const navnFraData = bareFornavn
-        ? personData.fornavn
+        ? personData.fornavn ?? undefined
         : personData.visningsnavn;
     const personnavn = navn ?? navnFraData;
     const highlightClassName = highlight
@@ -81,7 +81,7 @@ export default function PersonNavnIdent({
     };
 
     const Ident = ({ visAlder = false }: { visAlder?: boolean }) => {
-        const birthdate = dateOrNull(fødselsdato ?? personData.fødselsdato);
+        const birthdate = dateOrNull(fødselsdato ?? personData.fødselsdato ?? undefined);
         const calculateAge = (born: Date): number => {
             const today = new Date();
             let age = today.getFullYear() - born.getFullYear();

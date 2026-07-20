@@ -459,7 +459,7 @@ export const useHentSamhandlerEllerPersonForIdent = (
                         navn: response.data.visningsnavn,
                         visningsnavn: response.data.visningsnavn,
                         ident: response.data.ident,
-                        offentligId: response.data.aktørId,
+                        offentligId: response.data.aktørId ?? undefined,
                         isValid: true,
                     };
                 } else {
