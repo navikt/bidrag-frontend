@@ -5,7 +5,10 @@ const { subtle } = webcrypto;
 const INSTANCE_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const INSTANCE_CODE_LENGTH = 5;
 
-export default async function exceptionToErrorCode(stack_trace: string, _appName: string): Promise<ErrorCode> {
+export default async function exceptionToErrorCode(
+    stack_trace: string,
+    _appName: string,
+): Promise<ErrorCode> {
     const errorCode = await exceptionToExceptionCode(stack_trace);
     const exceptionCode = exceptionToInstanceCode(errorCode);
 
@@ -27,7 +30,12 @@ function exceptionToInstanceCode(errorCode: string) {
 
 function createReadableUniqueCode(): string {
     const code = Array.from(randomBytes(INSTANCE_CODE_LENGTH))
-        .map((randomValue) => INSTANCE_CODE_ALPHABET[randomValue % INSTANCE_CODE_ALPHABET.length])
+        .map(
+            (randomValue) =>
+                INSTANCE_CODE_ALPHABET[
+                    randomValue % INSTANCE_CODE_ALPHABET.length
+                ],
+        )
         .join("");
 
     return code;
@@ -44,5 +52,5 @@ async function sha256(message: string): Promise<string> {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
 
     // convert bytes to hex string
-    return hashArray.map((b) => ("00" + b.toString(16)).slice(-2)).join("");
+    return hashArray.map((b) => `00${b.toString(16)}`.slice(-2)).join("");
 }
