@@ -6,14 +6,12 @@ type BuildEnvContext = {
     mode: string;
 };
 
-const CdnBaseUrlSchema = z.string().min(1);
-
 const ProdBuildSchema = z.object({
-    CDN_BASE_URL: CdnBaseUrlSchema,
+    CDN_BASE_URL: z.url(),
 });
 
 const DevTestSchema = z.object({
-    CDN_BASE_URL: CdnBaseUrlSchema.optional(),
+    CDN_BASE_URL: z.url().optional(),
 });
 
 export function readBuildEnv({ command, mode }: BuildEnvContext) {
