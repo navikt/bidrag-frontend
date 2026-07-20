@@ -215,6 +215,9 @@ importers:
         specifier: ^14
         version: 14.0.0
     devDependencies:
+      '@opentelemetry/api':
+        specifier: ^1.9.1
+        version: 1.9.1
       '@types/lodash':
         specifier: ^4.14.202
         version: 4.17.24

@@ -1,4 +1,5 @@
 // import { context, propagation, Span, trace } from "@opentelemetry/api";
+import { context } from "@opentelemetry/api";
 import { v4 as uuidV4 } from "uuid";
 
 import { SessionStorage } from "./Storage";
@@ -41,7 +42,6 @@ export class SecuritySessionUtils {
         // const tracer = trace.getTracer(tracerName);
 
         // context er fra @opentelemetry/api — aktiveres når OTel-integrasjonen tas i bruk
-        // @ts-expect-error
         const parentContext = window.__otelSessionContext || context.active();
         
         // const span = tracer.startSpan(spanName, undefined, parentContext);
