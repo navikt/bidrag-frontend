@@ -1,20 +1,20 @@
 {
-  "description": "Migrering av funksjonalitet fra bidrag-ui til bidrag-frontend med sjekkliste for routes, API, env, NAIS og fallback/legacy-lenker",
-  "domain": "frontend",
-  "tags": ["migration", "react-router", "api", "nais", "bidrag"],
-  "references": [],
-  "examples": [
-    {
-      "prompt": "Migrer sakshistorikk fra bidrag-ui til bidrag-frontend",
-      "scenario": "Full flytting av route, komponenter og datahenting"
-    },
-    {
-      "prompt": "Hvilke filer må flyttes når vi migrerer en ny sak-side?",
-      "scenario": "Kartlegging av avhengigheter og scope"
-    },
-    {
-      "prompt": "Vi får 403 mot bidrag-dokument etter migrering, hva mangler?",
-      "scenario": "Sjekk av env, audience og inbound/outbound NAIS-regler"
-    }
-  ]
+    "description": "Migrering av funksjonalitet fra bidrag-ui til bidrag-frontend med sjekkliste for routes, API, env, NAIS og fallback/legacy-lenker",
+    "domain": "frontend",
+    "tags": ["migration", "react-router", "api", "nais", "bidrag"],
+    "references": [],
+    "examples": [
+        {
+            "prompt": "Migrer sakshistorikk fra bidrag-ui til bidrag-frontend",
+            "scenario": "Full flytting av route, komponenter og datahenting"
+        },
+        {
+            "prompt": "Hvilke filer må flyttes når vi migrerer en ny sak-side?",
+            "scenario": "Kartlegging av avhengigheter og scope"
+        },
+        {
+            "prompt": "Vi får 403 mot bidrag-dokument etter migrering, hva mangler?",
+            "scenario": "Sjekk av env, audience og inbound/outbound NAIS-regler"
+        }
+    ]
 }
