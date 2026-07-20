@@ -1,5 +1,6 @@
 import { type LogInfo, LogLevel, type LogResponse } from "@bidrag/common";
 import type pino from "pino";
+import { env } from "~/env.server.ts";
 import { userContext } from "~/server/auth/auth.context";
 import exceptionToErrorCode from "~/server/logger/utils/ExceptionHasher";
 import { symbolicateStackTrace } from "~/server/logger/utils/SymbolicateStackTrace";
@@ -67,7 +68,7 @@ async function doLog(
             component_stack: componentStack,
             stack_trace_symbolicated: didSymbolicate,
             stack_trace_symbolication_debug:
-                process.env.NODE_ENV === "development" ? debug : undefined,
+                env.NODE_ENV === "development" ? debug : undefined,
             errorType,
             status: error.status ?? 500,
             cause: error.cause ?? "unknown",
@@ -84,7 +85,7 @@ async function doLog(
             loggerInstance.warn(metadata, message);
             break;
         case LogLevel.DEBUG: {
-            if (process.env.NODE_ENV === "development") {
+            if (env.NODE_ENV === "development") {
                 loggerInstance.debug(metadata, message);
             }
             break;

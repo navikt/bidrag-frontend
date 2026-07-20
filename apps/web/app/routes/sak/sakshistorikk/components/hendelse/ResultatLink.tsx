@@ -5,13 +5,11 @@ import { useFlag } from "@unleash/proxy-client-react";
 export function ResultatLink({
     saksnummer,
     hendelse,
-    bisysUrl,
     enhet,
     sessionState,
 }: {
     saksnummer: string;
     hendelse: SakshendelseDto;
-    bisysUrl: string;
     enhet: string | null;
     sessionState: string | null;
 }) {
@@ -33,7 +31,6 @@ export function ResultatLink({
         saksnummer,
         enhet,
         sessionState,
-        bisysUrl,
     );
 
     if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført) {
@@ -67,7 +64,6 @@ function generateBisysResultatUrl(
     saksnummer: string,
     enhet: string | null,
     sessionState: string | null,
-    bisysUrl: string,
 ) {
     const bisysResultatUrlParams = new URLSearchParams({
         executeResultat: "1",
@@ -78,7 +74,7 @@ function generateBisysResultatUrl(
         ...(sessionState && { sessionState }),
     });
 
-    return `${bisysUrl}Sakshistorikk.do?${bisysResultatUrlParams}`;
+    return `/bisys/sakHistorikk?${bisysResultatUrlParams}`;
 }
 
 function generateResultatUrl(

@@ -9,10 +9,8 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
-import { configQuery } from "~/api/query/config.query.ts";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
@@ -35,8 +33,6 @@ export default function HendelseTabell({
     const [searchParams] = useSearchParams();
     const enhet = searchParams.get("enhet");
     const sessionState = searchParams.get("sessionState");
-    const { data: config } = useQuery(configQuery);
-    const bisysUrl = config?.bisysBaseUrl ?? "";
     const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);
 
     const onRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -111,7 +107,6 @@ export default function HendelseTabell({
                             <BehandleLink
                                 saksnummer={saksnummer}
                                 hendelse={h}
-                                bisysUrl={bisysUrl}
                                 enhet={enhet}
                                 sessionState={sessionState}
                                 kanSkrive={kanSkrive}
@@ -182,7 +177,6 @@ export default function HendelseTabell({
                             <ResultatLink
                                 saksnummer={saksnummer}
                                 hendelse={h}
-                                bisysUrl={bisysUrl}
                                 enhet={enhet}
                                 sessionState={sessionState}
                             />

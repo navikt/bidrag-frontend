@@ -1,11 +1,15 @@
-import { RawSourceMap, SourceMapConsumer } from "source-map";
+import { type RawSourceMap, SourceMapConsumer } from "source-map";
+import { env } from "~/env.server.ts";
 
 const STACK_FRAME_REGEX = /^(\s*at\s+(?:.*?\()?)(.+):(\d+):(\d+)(\)?)$/;
 const SOURCE_MAP_URL_REGEX = /^[\s\S]*[#@]\s*sourceMappingURL=(\S+)\s*$/m;
 const FETCH_TIMEOUT_MS = 3000;
 const MAX_CACHE_SIZE = 200;
 
-const sourceMapConsumerCache = new Map<string, Promise<SourceMapConsumer | null>>();
+const sourceMapConsumerCache = new Map<
+    string,
+    Promise<SourceMapConsumer | null>
+>();
 
 interface ISymbolicationResult {
     symbolicatedStackTrace: string;
@@ -41,10 +45,13 @@ interface IParseStackFrameResult {
 }
 
 function hasAllowedHost(url: URL): boolean {
-    const allowedHosts = process.env.STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS;
+    const allowedHosts = env.STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS;
 
     // Keep local development working even with host restrictions.
-    if (process.env.NODE_ENV === "development" && ["localhost", "127.0.0.1"].includes(url.hostname)) {
+    if (
+        env.NODE_ENV === "development" &&
+        ["localhost", "127.0.0.1"].includes(url.hostname)
+    ) {
         return true;
     }
 
@@ -57,7 +64,10 @@ function hasAllowedHost(url: URL): boolean {
         .split(",")
         .map((value) => value.trim().toLowerCase())
         .filter(Boolean)
-        .some((allowedHost) => host === allowedHost || host.endsWith(`.${allowedHost}`));
+        .some(
+            (allowedHost) =>
+                host === allowedHost || host.endsWith(`.${allowedHost}`),
+        );
 }
 
 function withTimeout(): AbortSignal {
@@ -99,7 +109,9 @@ function getSourceMapReference(scriptContent: string): string | null {
     return sourceMapReference;
 }
 
-function decodeInlineSourceMap(sourceMapReference: string): RawSourceMap | null {
+function decodeInlineSourceMap(
+    sourceMapReference: string,
+): RawSourceMap | null {
     if (!sourceMapReference.startsWith("data:")) {
         return null;
     }
@@ -122,7 +134,10 @@ function decodeInlineSourceMap(sourceMapReference: string): RawSourceMap | null 
     }
 }
 
-function resolveSourceMapUrl(scriptUrl: string, sourceMapReference: string): string | null {
+function resolveSourceMapUrl(
+    scriptUrl: string,
+    sourceMapReference: string,
+): string | null {
     if (!sourceMapReference) {
         return null;
     }
@@ -147,7 +162,10 @@ function isSymbolicFrameUrl(scriptUrl: string): boolean {
     );
 }
 
-function createEmptyFailureCounters(): Record<SymbolicationFailureReason, number> {
+function createEmptyFailureCounters(): Record<
+    SymbolicationFailureReason,
+    number
+> {
     return {
         frame_not_matched: 0,
         unsupported_frame_url: 0,
@@ -158,7 +176,7 @@ function createEmptyFailureCounters(): Record<SymbolicationFailureReason, number
 
 function registerFailure(
     failures: Record<SymbolicationFailureReason, number>,
-    failureReason?: SymbolicationFailureReason
+    failureReason?: SymbolicationFailureReason,
 ): void {
     if (!failureReason) {
         return;
@@ -195,7 +213,9 @@ function parseStackFrame(stackLine: string): IParseStackFrameResult {
     };
 }
 
-async function createSourceMapConsumer(scriptUrl: string): Promise<SourceMapConsumer | null> {
+async function createSourceMapConsumer(
+    scriptUrl: string,
+): Promise<SourceMapConsumer | null> {
     if (!scriptUrl.startsWith("http://") && !scriptUrl.startsWith("https://")) {
         return null;
     }
@@ -237,7 +257,9 @@ async function createSourceMapConsumer(scriptUrl: string): Promise<SourceMapCons
     }
 }
 
-function getSourceMapConsumer(scriptUrl: string): Promise<SourceMapConsumer | null> {
+function getSourceMapConsumer(
+    scriptUrl: string,
+): Promise<SourceMapConsumer | null> {
     const cachedConsumer = sourceMapConsumerCache.get(scriptUrl);
     if (cachedConsumer) {
         return cachedConsumer;
@@ -249,7 +271,9 @@ function getSourceMapConsumer(scriptUrl: string): Promise<SourceMapConsumer | nu
     if (sourceMapConsumerCache.size > MAX_CACHE_SIZE) {
         const oldestKey = sourceMapConsumerCache.keys().next().value;
         if (oldestKey) {
-            void sourceMapConsumerCache.get(oldestKey)?.then((consumer) => consumer?.destroy());
+            void sourceMapConsumerCache
+                .get(oldestKey)
+                ?.then((consumer) => consumer?.destroy());
             sourceMapConsumerCache.delete(oldestKey);
         }
     }
@@ -262,14 +286,21 @@ function cleanSourcePath(source: string): string {
     return source.replace(/^webpack:\/\/[^/]*\//, "");
 }
 
-function mapToOriginalFrame(frame: IStackFrame, consumer: SourceMapConsumer): string {
+function mapToOriginalFrame(
+    frame: IStackFrame,
+    consumer: SourceMapConsumer,
+): string {
     const originalPosition = consumer.originalPositionFor({
         line: frame.line,
         column: Math.max(frame.column - 1, 0),
         bias: SourceMapConsumer.GREATEST_LOWER_BOUND,
     });
 
-    if (!originalPosition.source || !originalPosition.line || originalPosition.column == null) {
+    if (
+        !originalPosition.source ||
+        !originalPosition.line ||
+        originalPosition.column == null
+    ) {
         return frame.rawLine;
     }
 
@@ -294,7 +325,9 @@ function deduplicateStackLines(stackTrace: string): string {
         .join("\n");
 }
 
-export async function symbolicateStackTrace(stackTrace?: string): Promise<ISymbolicationResult> {
+export async function symbolicateStackTrace(
+    stackTrace?: string,
+): Promise<ISymbolicationResult> {
     const emptyDebug: ISymbolicationDebug = {
         totalLines: 0,
         frameLines: 0,
@@ -339,7 +372,7 @@ export async function symbolicateStackTrace(stackTrace?: string): Promise<ISymbo
                 registerFailure(failures, "original_position_not_found");
             }
             return mappedFrame;
-        })
+        }),
     );
 
     return {

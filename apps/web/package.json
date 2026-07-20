@@ -36,7 +36,8 @@
         "source-map": "^0.7.6",
         "tailwindcss": "catalog:",
         "sqids": "^0.3.0",
-        "unleash-proxy-client": "^3.7.8"
+        "unleash-proxy-client": "^3.7.8",
+        "zod": "^4.1.12"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",

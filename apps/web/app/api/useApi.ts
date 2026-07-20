@@ -84,7 +84,7 @@ export function useKanOppretteSakUtenBm() {
         },
         select: (data) => data.data,
         initialData:
-            process.env.NODE_ENV == "TEST"
+            import.meta.env.MODE === "test"
                 ? () => ({
                       data: false,
                   })
@@ -710,7 +710,10 @@ export function useHentPersonMotpartBarnRelasjon(
     request: PersonRequest | null,
     enabled: boolean = true,
 ) {
-    return useQuery<MotpartBarnRelasjonDto | undefined, AxiosError | TilgangsFeilError>({
+    return useQuery<
+        MotpartBarnRelasjonDto | undefined,
+        AxiosError | TilgangsFeilError
+    >({
         ...hentPersonMotpartBarnRelasjonQueryOptions(request),
         enabled: enabled && !!request?.ident,
     });
@@ -732,10 +735,13 @@ export function useHentForelderBarnRelasjon(
     request: PersonRequest | null,
     enabled: boolean = true,
 ) {
-    return useQuery<ForelderBarnRelasjonDto | undefined, AxiosError | TilgangsFeilError>({
+    return useQuery<
+        ForelderBarnRelasjonDto | undefined,
+        AxiosError | TilgangsFeilError
+    >({
         queryKey: ["hent_forelder_barn_relasjon", request?.ident],
         queryFn: async (): Promise<ForelderBarnRelasjonDto | undefined> => {
-            if (!request || enabled === false) return undefined;
+            if (!request || !enabled) return undefined;
             try {
                 const { data } =
                     await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(
