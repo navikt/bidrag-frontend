@@ -20,7 +20,7 @@
             "~/*": [
                 "./app/*"
             ],
-            "nais.js": [
+            "/nais.js": [
                 "./app/nais.d.ts"
             ],
             "@shared/*": [
