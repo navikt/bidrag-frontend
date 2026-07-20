@@ -1,4 +1,4 @@
-import { randomBytes, webcrypto } from "node:crypto";
+import { randomInt, webcrypto } from "node:crypto";
 import type { ErrorCode } from "@bidrag/common";
 
 const { subtle } = webcrypto;
@@ -29,11 +29,11 @@ function exceptionToInstanceCode(errorCode: string) {
 }
 
 function createReadableUniqueCode(): string {
-    const code = Array.from(randomBytes(INSTANCE_CODE_LENGTH))
+    const code = Array.from({ length: INSTANCE_CODE_LENGTH })
         .map(
-            (randomValue) =>
+            () =>
                 INSTANCE_CODE_ALPHABET[
-                    randomValue % INSTANCE_CODE_ALPHABET.length
+                    randomInt(INSTANCE_CODE_ALPHABET.length)
                 ],
         )
         .join("");

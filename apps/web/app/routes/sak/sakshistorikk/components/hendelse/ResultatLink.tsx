@@ -17,7 +17,7 @@ export function ResultatLink({
     const visIBegge = useFlag("bisys.vedtak_lesemodus_lenke_begge");
 
     if (!hendelse.link || !hendelse.resultat) {
-        return undefined;
+        return null;
     }
 
     const resultatUrl = generateResultatUrl(
