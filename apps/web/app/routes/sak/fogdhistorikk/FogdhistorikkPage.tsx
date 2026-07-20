@@ -6,7 +6,7 @@ import FogdhistorikkTabell from "./components/FogdhistorikkTabell";
 
 export default function FogdhistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;
-    const tabTitle = "Fogdhistorikk - " + saksnummer;
+    const tabTitle = `Fogdhistorikk - ${saksnummer}`;
     const {
         data: fogdhistorikk,
         error: fogdhistorikkError,

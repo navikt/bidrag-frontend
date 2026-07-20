@@ -49,7 +49,7 @@ async function doLog(
         await symbolicateStackTrace(rawStackTrace);
     const resolvedStackTrace = symbolicatedStackTrace || rawStackTrace;
 
-    let metadata: any =
+    let metadata: Record<string, unknown> =
         level === LogLevel.FEEDBACK
             ? {
                   module: `${appName}/${moduleName}`,

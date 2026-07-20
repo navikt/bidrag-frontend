@@ -55,7 +55,7 @@ function hasAllowedHost(url: URL): boolean {
         return true;
     }
 
-    if (!allowedHosts || !allowedHosts.trim()) {
+    if (!allowedHosts?.trim()) {
         return true;
     }
 

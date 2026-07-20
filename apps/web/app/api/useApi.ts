@@ -159,7 +159,7 @@ export function useOpprettSak() {
                 }
                 if (e instanceof AxiosError) {
                     throw new Error(
-                        e.response?.headers["warning"] ||
+                        e.response?.headers.warning ||
                             "Feil ved opprettelse av sak",
                     );
                 }

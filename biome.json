@@ -1,4 +1,7 @@
 {
+    "files": {
+        "includes": ["**", "!!**/packages/api/src/api"]
+    },
     "vcs": {
         "enabled": true,
         "clientKind": "git"

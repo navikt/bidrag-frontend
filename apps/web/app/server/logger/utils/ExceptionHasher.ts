@@ -1,7 +1,7 @@
-import {ErrorCode} from "@bidrag/common";
-import {randomBytes, webcrypto} from "crypto";
+import { randomBytes, webcrypto } from "node:crypto";
+import type { ErrorCode } from "@bidrag/common";
 
-const {subtle} = webcrypto;
+const { subtle } = webcrypto;
 const INSTANCE_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const INSTANCE_CODE_LENGTH = 5;
 
