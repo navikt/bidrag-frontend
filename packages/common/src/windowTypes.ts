@@ -1,4 +1,4 @@
-import { BroadcastMessage, PersonBroadcastMessage } from "./types/broadcast";
+import type { BroadcastMessage, PersonBroadcastMessage } from "./types/broadcast";
 
 export type HeaderNavigationMode = "default" | "sak" | "sakshistorikk" | "sakforside";
 

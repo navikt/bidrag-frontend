@@ -9,7 +9,7 @@ for (let i = 0, len = code.length; i < len; ++i) {
 revLookup["-".charCodeAt(0)] = 62;
 revLookup["_".charCodeAt(0)] = 63;
 export class Base64ByteConverter {
-    private static readonly VALID_BASE64 = /^[A-Za-z0-9+/]*={0,2}$/;
+    private static readonly VALID_BASE64 = /^[A-Za-z0-9+/\-_]*={0,2}$/;
 
     static toByteArray(b64: string): Uint8Array {
         if (!Base64ByteConverter.VALID_BASE64.test(b64)) {
