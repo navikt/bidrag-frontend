@@ -10,7 +10,7 @@ export default [
     index("routes/_index.tsx"),
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),
-        // route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
+        route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
     ]),
 
     route("sak/:saksnummer", "routes/sak/SakLayout.tsx", [
