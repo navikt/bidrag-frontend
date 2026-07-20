@@ -23,9 +23,12 @@ import {
     visningsnavnForTransaksjonskode,
 } from "../../sak/reskontro/transaksjonstyper.ts";
 import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner.ts";
+import {useObfuscateFnr} from "~/common/person/useObfuscateFnr.ts";
 
 export default function BrukerTransaksjonerFilterPanel() {
-    const { ident } = useParams();
+    const {decodeFnr} = useObfuscateFnr();
+    const { brukerid } = useParams();
+    const ident = decodeFnr(brukerid || "")
     const { unikeMottakere, unikeBarn, unikeTransaksjonskoder } =
         useBrukerTransaksjoner(ident!);
     const [searchParams, setSearchParams] = useSearchParams();
