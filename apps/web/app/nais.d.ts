@@ -1,4 +1,4 @@
-declare const nais: {
+export type NaisConfig = {
     telemetryCollectorURL: string;
     app: {
         name: string;
@@ -6,4 +6,6 @@ declare const nais: {
         version: string;
     };
 };
+
+declare const nais: NaisConfig;
 export default nais;
