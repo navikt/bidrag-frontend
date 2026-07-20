@@ -81,7 +81,7 @@ export abstract class AbstractLoggerService {
         message: string,
         level: LogLevel,
         error?: LogErrorType | ErrorInfo | IErrorContext,
-    ) {
+    ): Promise<LogResponse> {
         const carrier: Record<string, string> = {};
 
         const logInfo: LogInfo = {

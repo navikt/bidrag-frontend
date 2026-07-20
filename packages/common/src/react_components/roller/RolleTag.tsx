@@ -17,14 +17,13 @@ const RolleTag = ({
 }) => {
     const { useHentRevurderingsbarn } = useBidragCommons();
 
-    //@ts-ignore
     const renderRolletype = ROLE_FORKORTELSER[rolleType] ?? rolleType;
     const erRevurdering = useHentRevurderingsbarn && ident ? useHentRevurderingsbarn(ident, stønad18År) : false;
+    const variant = erRevurdering ? ROLE_TAGS_REVURDERING[rolleType] : ROLE_TAGS[rolleType];
     return (
-        // @ts-ignore
         <Tag
             title={erRevurdering ? "Revurderingsbarn" : ""}
-            variant={erRevurdering ? ROLE_TAGS_REVURDERING[rolleType] : ROLE_TAGS[rolleType]}
+            variant={variant}
             size="small"
             className={`w-8 mr-2 rounded select-none rolleTag ${rolleType} ${className}`}
         >

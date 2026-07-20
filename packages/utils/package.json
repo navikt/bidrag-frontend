@@ -44,6 +44,9 @@
     },
     "devDependencies": {
         "date-fns": "^4.4.0"
-
+    },
+    "dependencies": {
+        "@bidrag/api": "workspace:*",
+        "@bidrag/common": "workspace:*"
     }
 }

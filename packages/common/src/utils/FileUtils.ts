@@ -1,4 +1,4 @@
-import { FileData } from "../types";
+import type { FileData } from "../types";
 import { Base64ByteConverter } from "./Base64ByteConverter";
 
 export class FileUtils {
@@ -30,7 +30,7 @@ export class FileUtils {
         return Base64ByteConverter.fromByteArray(data);
     }
 
-    static _base64ToArrayBuffer(data: string): ArrayBuffer {
+    static _base64ToArrayBuffer(data: string): Uint8Array {
         return Base64ByteConverter.toByteArray(data);
     }
 }

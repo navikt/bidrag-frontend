@@ -1,6 +1,6 @@
-import { FamileenhetDto } from "../types/personsearch";
-import { RolleType, Rolleveileder } from "../types/rolleveileder";
-import { IFamilierelasjonTableData } from "../types/table";
+import { FamileenhetDto, Rolleveileder } from "@bidrag/common";
+import { RolleTypeAbbreviation as RolleType } from "@bidrag/common";
+import { IFamilierelasjonTableData } from "@bidrag/common";
 
 export function getFamilierelasjonByRolle(
     personList: IFamilierelasjonTableData[],
@@ -12,7 +12,7 @@ export function getFamilierelasjonByRolle(
 export function getFamileenhetByMotpartFodselsnummer(
     personList: FamileenhetDto[],
     fodselsnummer: string
-): FamileenhetDto {
+): FamileenhetDto | undefined {
     return personList.find((person) => {
         if (person.motpart === undefined || person.motpart === null) {
             return person;

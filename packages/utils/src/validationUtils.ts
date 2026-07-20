@@ -1,13 +1,15 @@
-import PersonSearchService from "../service/PersonSearchService";
+export interface PersonLookupService {
+    hentPersonInformasjon(fnr: string): Promise<unknown>;
+}
 
 export class PersonValidator {
-    static async validatePerson(ident: string[]): Promise<string[]> {
+    static async validatePerson(ident: string[], service: PersonLookupService): Promise<string[]> {
         const list = ident.filter((i) => i !== undefined);
-        let invalidNumber = [];
+        const invalidNumber: string[] = [];
         for (const fnr of list) {
-            const response = await new PersonSearchService().hentPersonInformasjon(fnr);
+            const response = await service.hentPersonInformasjon(fnr);
             if (response === null) {
-                invalidNumber = [...invalidNumber, fnr];
+                invalidNumber.push(fnr);
             }
         }
         return invalidNumber;

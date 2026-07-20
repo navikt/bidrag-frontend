@@ -27,6 +27,7 @@
         "@bidrag/api": "workspace:"
     },
     "devDependencies": {
+        "@opentelemetry/api": "^1.9.1",
         "@types/lodash": "^4.14.202",
         "@types/node": "^25",
         "@types/react-modal": "3.16.3",
