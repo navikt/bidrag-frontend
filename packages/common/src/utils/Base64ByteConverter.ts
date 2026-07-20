@@ -9,7 +9,12 @@ for (let i = 0, len = code.length; i < len; ++i) {
 revLookup["-".charCodeAt(0)] = 62;
 revLookup["_".charCodeAt(0)] = 63;
 export class Base64ByteConverter {
-    static toByteArray(b64: string): ArrayBuffer {
+    private static readonly VALID_BASE64 = /^[A-Za-z0-9+/\-_]*={0,2}$/;
+
+    static toByteArray(b64: string): Uint8Array {
+        if (!Base64ByteConverter.VALID_BASE64.test(b64)) {
+            throw new Error(`Invalid base64 string: contains illegal characters`);
+        }
         let tmp;
         const lens = this.getLens(b64);
         const validLen = lens[0];
@@ -25,30 +30,29 @@ export class Base64ByteConverter {
         let i;
         for (i = 0; i < len; i += 4) {
             tmp =
-                (revLookup[b64.charCodeAt(i)] << 18) |
-                (revLookup[b64.charCodeAt(i + 1)] << 12) |
-                (revLookup[b64.charCodeAt(i + 2)] << 6) |
-                revLookup[b64.charCodeAt(i + 3)];
+                (revLookup[b64.charCodeAt(i)]! << 18) |
+                (revLookup[b64.charCodeAt(i + 1)]! << 12) |
+                (revLookup[b64.charCodeAt(i + 2)]! << 6) |
+                revLookup[b64.charCodeAt(i + 3)]!;
             arr[curByte++] = (tmp >> 16) & 0xff;
             arr[curByte++] = (tmp >> 8) & 0xff;
             arr[curByte++] = tmp & 0xff;
         }
 
         if (placeHoldersLen === 2) {
-            tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4);
+            tmp = (revLookup[b64.charCodeAt(i)]! << 2) | (revLookup[b64.charCodeAt(i + 1)]! >> 4);
             arr[curByte++] = tmp & 0xff;
         }
 
         if (placeHoldersLen === 1) {
             tmp =
-                (revLookup[b64.charCodeAt(i)] << 10) |
-                (revLookup[b64.charCodeAt(i + 1)] << 4) |
-                (revLookup[b64.charCodeAt(i + 2)] >> 2);
+                (revLookup[b64.charCodeAt(i)]! << 10) |
+                (revLookup[b64.charCodeAt(i + 1)]! << 4) |
+                (revLookup[b64.charCodeAt(i + 2)]! >> 2);
             arr[curByte++] = (tmp >> 8) & 0xff;
             arr[curByte++] = tmp & 0xff;
         }
 
-        //@ts-ignore
         return arr;
     }
 
@@ -66,17 +70,17 @@ export class Base64ByteConverter {
 
         // pad the end with zeros, but make sure to not forget the extra bytes
         if (extraBytes === 1) {
-            tmp = uint8[len - 1];
-            parts.push(lookup[tmp >> 2] + lookup[(tmp << 4) & 0x3f] + "==");
+            tmp = uint8[len - 1]!;
+            parts.push(lookup[tmp >> 2]! + lookup[(tmp << 4) & 0x3f]! + "==");
         } else if (extraBytes === 2) {
-            tmp = (uint8[len - 2] << 8) + uint8[len - 1];
-            parts.push(lookup[tmp >> 10] + lookup[(tmp >> 4) & 0x3f] + lookup[(tmp << 2) & 0x3f] + "=");
+            tmp = (uint8[len - 2]! << 8) + uint8[len - 1]!;
+            parts.push(lookup[tmp >> 10]! + lookup[(tmp >> 4) & 0x3f]! + lookup[(tmp << 2) & 0x3f]! + "=");
         }
 
         return parts.join("");
     }
 
-    private static getLens(b64: string) {
+    private static getLens(b64: string): [number, number] {
         const len = b64.length;
 
         if (len % 4 > 0) {
@@ -104,14 +108,14 @@ export class Base64ByteConverter {
     }
 
     private static tripletToBase64(num: number) {
-        return lookup[(num >> 18) & 0x3f] + lookup[(num >> 12) & 0x3f] + lookup[(num >> 6) & 0x3f] + lookup[num & 0x3f];
+        return lookup[(num >> 18) & 0x3f]! + lookup[(num >> 12) & 0x3f]! + lookup[(num >> 6) & 0x3f]! + lookup[num & 0x3f]!;
     }
 
     private static encodeChunk(uint8: Uint8Array, start: number, end: number) {
         let tmp;
         const output = [];
         for (let i = start; i < end; i += 3) {
-            tmp = ((uint8[i] << 16) & 0xff0000) + ((uint8[i + 1] << 8) & 0xff00) + (uint8[i + 2] & 0xff);
+            tmp = ((uint8[i]! << 16) & 0xff0000) + ((uint8[i + 1]! << 8) & 0xff00) + (uint8[i + 2]! & 0xff);
             output.push(this.tripletToBase64(tmp));
         }
         return output.join("");

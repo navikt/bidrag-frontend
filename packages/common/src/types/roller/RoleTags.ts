@@ -1,5 +1,10 @@
+import type { Tag } from "@navikt/ds-react";
+import type { ComponentProps } from "react";
 import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "./RolleType";
-export const ROLE_TAGS_REVURDERING = {
+
+type TagVariant = ComponentProps<typeof Tag>["variant"];
+
+export const ROLE_TAGS_REVURDERING: Record<string, TagVariant> = {
     [RolleTypeAbbreviation.BM]: "success-filled",
     [RolleTypeAbbreviation.BP]: "warning",
     [RolleTypeAbbreviation.BA]: "alt1-filled",
@@ -15,8 +20,8 @@ export const ROLE_TAGS_REVURDERING = {
     [RolleTypeDeprecated.BIDRAGS_MOTTAKER]: "success-filled",
     [RolleTypeDeprecated.BIDRAGS_PLIKTIG]: "warning",
     [RolleTypeDeprecated.REELL_MOTTAKER]: "alt3",
-} as const;
-export const ROLE_TAGS = {
+};
+export const ROLE_TAGS: Record<string, TagVariant> = {
     [RolleTypeAbbreviation.BM]: "success",
     [RolleTypeAbbreviation.BP]: "warning",
     [RolleTypeAbbreviation.BA]: "alt1",
@@ -32,8 +37,8 @@ export const ROLE_TAGS = {
     [RolleTypeDeprecated.BIDRAGS_MOTTAKER]: "success",
     [RolleTypeDeprecated.BIDRAGS_PLIKTIG]: "warning",
     [RolleTypeDeprecated.REELL_MOTTAKER]: "alt3",
-} as const;
-export const ROLE_FORKORTELSER = {
+};
+export const ROLE_FORKORTELSER: Record<string, string> = {
     [RolleTypeFullName.BIDRAGSMOTTAKER]: "BM",
     [RolleTypeFullName.BIDRAGSPLIKTIG]: "BP",
     [RolleTypeFullName.BARN]: "BA",

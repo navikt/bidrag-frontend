@@ -5,16 +5,13 @@ import { ErrorInfo } from "../logging";
 
 export class AxiosErrorHandler {
     static getStackFromErrorBody(errorParsed: object | string): string {
-        if (errorParsed && typeof errorParsed == "string") {
+        if (errorParsed && typeof errorParsed === "string") {
             return errorParsed;
         }
-        if (errorParsed && typeof errorParsed == "object") {
-            return (
-                Object.keys(errorParsed)
-                    // @ts-ignore
-                    .map((key) => `key=${errorParsed[key]}`)
-                    .join("-")
-            );
+        if (errorParsed && typeof errorParsed === "object") {
+            return Object.entries(errorParsed as Record<string, unknown>)
+                .map(([key, value]) => `key=${String(value)}`)
+                .join("-");
         }
 
         return `Feil fra respons: ${errorParsed}`;

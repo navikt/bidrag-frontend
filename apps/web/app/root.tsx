@@ -4,7 +4,8 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
 import { userContext } from "~/server/context.ts";
-import { getFaro } from "./faro.client";
+import { getNaisConfig } from "~/server/naisConfig.server.ts";
+import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
 import { Loader } from "@navikt/ds-react";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
@@ -18,11 +19,16 @@ export const clientMiddleware = [bisysParamsMiddleware];
 
 export async function loader({ context }: Route.LoaderArgs) {
     const navUser = context.get(userContext);
-    return { navUser };
+    const naisConfig = await getNaisConfig();
+    return { navUser, naisConfig };
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {
-    const { navUser } = loaderData;
+    const { navUser, naisConfig } = loaderData;
+
+    useEffect(() => {
+        initFaro(naisConfig);
+    }, [naisConfig]);
 
     useEffect(() => {
         if (navUser?.NAVident) {

@@ -175,7 +175,7 @@ function parseStackFrame(stackLine: string): IParseStackFrameResult {
         };
     }
 
-    const [, prefix, scriptUrl, line, column, suffix] = match;
+    const [, prefix = "", scriptUrl = "", line, column, suffix = ""] = match;
     if (!isSymbolicFrameUrl(scriptUrl)) {
         return {
             frame: null,

@@ -1,4 +1,4 @@
-import { Sakskategori } from "../features/saksrolleroversikt/saksrolleroversiktContext";
+import { Sakskategori } from "@bidrag/common";
 
 const SAKSKATEGORI_ENUM_MAP: Record<string, string> = {
     Nasjonal: "N",
