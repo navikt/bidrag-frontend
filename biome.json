@@ -9,6 +9,7 @@
 
     "formatter": {
         "enabled": true,
+        "lineWidth": 120,
         "useEditorconfig": true
     },
 

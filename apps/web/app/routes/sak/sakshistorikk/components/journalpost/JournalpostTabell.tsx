@@ -1,25 +1,9 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
-import {
-    DokumentStatusDto as DokumentStatus,
-    JournalpostStatus,
-} from "@bidrag/api/BidragDokumentApi";
+import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
-import {
-    ArrowCirclepathIcon,
-    PaperclipIcon,
-    TasklistSendIcon,
-} from "@navikt/aksel-icons";
-import {
-    Button,
-    Checkbox,
-    CheckboxGroup,
-    Heading,
-    HStack,
-    Link,
-    List,
-    VStack,
-} from "@navikt/ds-react";
+import { ArrowCirclepathIcon, PaperclipIcon, TasklistSendIcon } from "@navikt/aksel-icons";
+import { Button, Checkbox, CheckboxGroup, Heading, HStack, Link, List, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
@@ -37,14 +21,10 @@ function DokumentListe({ jp }: { jp: JournalpostDto }) {
         <List size="small">
             {dokumenter.map((dok, i) => (
                 <List.Item key={dok.dokumentreferanse ?? i}>
-                    {dok.status === DokumentStatus.FERDIGSTILT &&
-                    dok.dokumentreferanse &&
-                    jp.journalpostId ? (
+                    {dok.status === DokumentStatus.FERDIGSTILT && dok.dokumentreferanse && jp.journalpostId ? (
                         <HStack gap="space-6" align="center">
                             <PaperclipIcon aria-hidden />
-                            <Link
-                                href={`/aapnedokument/${jp.journalpostId}/${dok.dokumentreferanse}`}
-                            >
+                            <Link href={`/aapnedokument/${jp.journalpostId}/${dok.dokumentreferanse}`}>
                                 {dok.tittel ?? dok.dokumentreferanse}
                             </Link>
                         </HStack>
@@ -67,14 +47,8 @@ export default function JournalpostTabell({
     const { sort, handleSort, sortData, setSort } = useSort<JournalpostDto>({
         defaultUnsorted: standardSort,
         customComparators: {
-            status: (a, b) =>
-                journalstatusDisplayVerdi(a).localeCompare(
-                    journalstatusDisplayVerdi(b),
-                ),
-            gjelderAktor: (a, b) =>
-                (a.gjelderAktor?.ident ?? "").localeCompare(
-                    b.gjelderAktor?.ident ?? "",
-                ),
+            status: (a, b) => journalstatusDisplayVerdi(a).localeCompare(journalstatusDisplayVerdi(b)),
+            gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
         },
     });
 
@@ -88,31 +62,25 @@ export default function JournalpostTabell({
     const [kunVedtak, setKunVedtak] = useState(false);
 
     const filtrerteJournalposter = journalposter.filter((jp) => {
-        if (kunVedtak && !jp.innhold?.toLowerCase().includes("vedtak"))
-            return false;
+        if (kunVedtak && !jp.innhold?.toLowerCase().includes("vedtak")) return false;
         if (!visFarskapUtelukket && jp.fagomrade === "FAR") return false;
         if (!visFeilregistrerte && jp.feilfort) return false;
         return true;
     });
 
     const harBlandingFarBid =
-        journalposter.some((jp) => jp.fagomrade === "FAR") &&
-        journalposter.some((jp) => jp.fagomrade === "BID");
+        journalposter.some((jp) => jp.fagomrade === "FAR") && journalposter.some((jp) => jp.fagomrade === "BID");
 
     const sorterteJournalposter = sortData(filtrerteJournalposter);
 
-    const dataGridSort: import("@navikt/ds-react/PREVIEW/DataGrid").DataGrid.Table.SortEntry[] =
-        sort
-            ? [
-                  {
-                      columnId: sort.orderBy,
-                      direction:
-                          sort.direction === "ascending"
-                              ? ("asc" as const)
-                              : ("desc" as const),
-                  },
-              ]
-            : [];
+    const dataGridSort: import("@navikt/ds-react/PREVIEW/DataGrid").DataGrid.Table.SortEntry[] = sort
+        ? [
+              {
+                  columnId: sort.orderBy,
+                  direction: sort.direction === "ascending" ? ("asc" as const) : ("desc" as const),
+              },
+          ]
+        : [];
 
     const jpParams = () =>
         new URLSearchParams({
@@ -127,17 +95,12 @@ export default function JournalpostTabell({
         if (harFlereDokumenter) {
             const dokParams = (jp.dokumenter ?? [])
                 .filter((d) => d.dokumentreferanse)
-                .map(
-                    (d) =>
-                        `dokument=${jp.journalpostId}:${d.dokumentreferanse}`,
-                )
+                .map((d) => `dokument=${jp.journalpostId}:${d.dokumentreferanse}`)
                 .join("&");
             return `/aapnedokument/?${dokParams}`;
         }
         const hoveddokRef = jp.dokumenter?.[0]?.dokumentreferanse;
-        return hoveddokRef
-            ? `/aapnedokument/${jp.journalpostId}/${hoveddokRef}`
-            : undefined;
+        return hoveddokRef ? `/aapnedokument/${jp.journalpostId}/${hoveddokRef}` : undefined;
     };
 
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
@@ -149,10 +112,7 @@ export default function JournalpostTabell({
             width: { defaultValue: scaledPx(48) },
             bodyCell: (jp: JournalpostDto) =>
                 jp.journalpostId ? (
-                    <Link
-                        href={`/sak/${saksnummer}/journal/${jp.journalpostId}?${jpParams()}`}
-                        title="Vis journalpost"
-                    >
+                    <Link href={`/sak/${saksnummer}/journal/${jp.journalpostId}?${jpParams()}`} title="Vis journalpost">
                         <TasklistSendIcon aria-hidden />
                     </Link>
                 ) : null,
@@ -182,16 +142,14 @@ export default function JournalpostTabell({
             header: "Dok.dato",
             width: { defaultValue: scaledPx(110) },
             isSortable: true,
-            bodyCell: (jp: JournalpostDto) =>
-                jp.dokumentDato ? formaterDato(jp.dokumentDato) : "",
+            bodyCell: (jp: JournalpostDto) => (jp.dokumentDato ? formaterDato(jp.dokumentDato) : ""),
         },
         {
             id: "journalfortDato",
             header: "Jour.dato",
             width: { defaultValue: scaledPx(110) },
             isSortable: true,
-            bodyCell: (jp: JournalpostDto) =>
-                jp.journalfortDato ? formaterDato(jp.journalfortDato) : "",
+            bodyCell: (jp: JournalpostDto) => (jp.journalfortDato ? formaterDato(jp.journalfortDato) : ""),
         },
         {
             id: "journalforendeEnhet",
@@ -206,10 +164,7 @@ export default function JournalpostTabell({
             width: { defaultValue: scaledPx(150) },
             isSortable: true,
             bodyCell: (jp: JournalpostDto) => (
-                <PersonIdentMedRolle
-                    gjelderAktor={jp.gjelderAktor}
-                    sakRoller={sakRoller}
-                />
+                <PersonIdentMedRolle gjelderAktor={jp.gjelderAktor} sakRoller={sakRoller} />
             ),
         },
         {
@@ -230,10 +185,7 @@ export default function JournalpostTabell({
             width: { defaultValue: scaledPx(374) },
             bodyCell: (jp: JournalpostDto) => {
                 const antall = jp.dokumenter?.length ?? 0;
-                const tekst =
-                    antall > 1
-                        ? `(${antall}) ${jp.innhold ?? ""}`
-                        : (jp.innhold ?? "");
+                const tekst = antall > 1 ? `(${antall}) ${jp.innhold ?? ""}` : (jp.innhold ?? "");
                 return <span title={tekst}>{tekst}</span>;
             },
         },
@@ -247,11 +199,7 @@ export default function JournalpostTabell({
     };
 
     const columnDefinitions = harBlandingFarBid
-        ? [
-              ...basisKolonner.slice(0, 7),
-              fagomradeKolonne,
-              ...basisKolonner.slice(7),
-          ]
+        ? [...basisKolonner.slice(0, 7), fagomradeKolonne, ...basisKolonner.slice(7)]
         : basisKolonner;
 
     return (
@@ -259,11 +207,7 @@ export default function JournalpostTabell({
             <HStack justify={"space-between"}>
                 <Heading size="medium">Journal</Heading>
                 <HStack gap="space-32">
-                    <Checkbox
-                        checked={kunVedtak}
-                        onChange={(e) => setKunVedtak(e.target.checked)}
-                        size="small"
-                    >
+                    <Checkbox checked={kunVedtak} onChange={(e) => setKunVedtak(e.target.checked)} size="small">
                         Kun vedtak
                     </Checkbox>
                     <CheckboxGroup legend="Filtrer" hideLegend size="small">
@@ -272,9 +216,7 @@ export default function JournalpostTabell({
                                 <Checkbox
                                     disabled={kunVedtak}
                                     checked={!kunVedtak && visFarskapUtelukket}
-                                    onChange={(e) =>
-                                        setVisFarskapUtelukket(e.target.checked)
-                                    }
+                                    onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
                                 >
                                     Vis farskapsutelukket
                                 </Checkbox>
@@ -282,9 +224,7 @@ export default function JournalpostTabell({
                             <Checkbox
                                 disabled={kunVedtak}
                                 checked={!kunVedtak && visFeilregistrerte}
-                                onChange={(e) =>
-                                    setVisFeilregistrerte(e.target.checked)
-                                }
+                                onChange={(e) => setVisFeilregistrerte(e.target.checked)}
                             >
                                 Vis feilregistrerte
                             </Checkbox>
@@ -316,17 +256,11 @@ export default function JournalpostTabell({
                     sorting={{
                         sortOrder: dataGridSort,
                         onSortOrderChange: (_, detail) =>
-                            handleSort(
-                                detail.columnId as Extract<
-                                    keyof JournalpostDto,
-                                    string
-                                >,
-                            ),
+                            handleSort(detail.columnId as Extract<keyof JournalpostDto, string>),
                     }}
                     detailsPanel={{
                         getContent: (jp) => <DokumentListe jp={jp} />,
-                        isRowExpandable: (jp) =>
-                            (jp.dokumenter?.length ?? 0) > 1,
+                        isRowExpandable: (jp) => (jp.dokumenter?.length ?? 0) > 1,
                         showExpandAll: true,
                     }}
                 />

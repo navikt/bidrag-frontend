@@ -10,13 +10,7 @@ type Props = {
     kanSkrive: boolean;
 };
 
-export function BrevLink({
-    saksnummer,
-    hendelse,
-    enhet,
-    sessionState,
-    kanSkrive,
-}: Props) {
+export function BrevLink({ saksnummer, hendelse, enhet, sessionState, kanSkrive }: Props) {
     if (!kanSkrive || !hendelse.søknadsid) return null;
 
     const params = new URLSearchParams({

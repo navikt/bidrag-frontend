@@ -9,13 +9,7 @@ type Props = {
     kanSkrive: boolean;
 };
 
-export function BehandleLink({
-    saksnummer,
-    hendelse,
-    enhet,
-    sessionState,
-    kanSkrive,
-}: Props) {
+export function BehandleLink({ saksnummer, hendelse, enhet, sessionState, kanSkrive }: Props) {
     if (!kanSkrive) return null;
 
     const params = new URLSearchParams({

@@ -20,18 +20,8 @@ export function ResultatLink({
         return null;
     }
 
-    const resultatUrl = generateResultatUrl(
-        hendelse,
-        enhet,
-        sessionState,
-        saksnummer,
-    );
-    const bisysResultatUrl = generateBisysResultatUrl(
-        hendelse,
-        saksnummer,
-        enhet,
-        sessionState,
-    );
+    const resultatUrl = generateResultatUrl(hendelse, enhet, sessionState, saksnummer);
+    const bisysResultatUrl = generateBisysResultatUrl(hendelse, saksnummer, enhet, sessionState);
 
     if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført) {
         return (

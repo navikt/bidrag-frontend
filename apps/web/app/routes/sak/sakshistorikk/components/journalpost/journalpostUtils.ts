@@ -1,12 +1,5 @@
-import type {
-    JournalpostDto,
-    JournalpostStatus,
-    Kanal,
-} from "@bidrag/api/BidragDokumentApi";
-import {
-    JournalpostStatus as JournalpostStatusEnum,
-    Kanal as KanalEnum,
-} from "@bidrag/api/BidragDokumentApi";
+import type { JournalpostDto, JournalpostStatus, Kanal } from "@bidrag/api/BidragDokumentApi";
+import { JournalpostStatus as JournalpostStatusEnum, Kanal as KanalEnum } from "@bidrag/api/BidragDokumentApi";
 
 export const DIGITALE_KANALER: Kanal[] = [
     KanalEnum.SDP,
@@ -28,10 +21,8 @@ export function journalstatusDisplayVerdi(jp: JournalpostDto): string {
     const erNotat = jp.dokumentType === "X";
 
     if (status === JournalpostStatusEnum.RETUR) return "Retur";
-    if (status === JournalpostStatusEnum.FEILREGISTRERT)
-        return "Feilregistrert";
-    if (kanal === KanalEnum.INGEN_DISTRIBUSJON && !erNotat)
-        return "Ingen distribusjon";
+    if (status === JournalpostStatusEnum.FEILREGISTRERT) return "Feilregistrert";
+    if (kanal === KanalEnum.INGEN_DISTRIBUSJON && !erNotat) return "Ingen distribusjon";
 
     if (status && EKSPEDERT_STATUSER.includes(status) && kanal) {
         if (kanal === KanalEnum.SENTRAL_UTSKRIFT) return "Sendt sentralt";
@@ -39,17 +30,13 @@ export function journalstatusDisplayVerdi(jp: JournalpostDto): string {
         if (DIGITALE_KANALER.includes(kanal)) return "Sendt digitalt";
     }
 
-    if (status === JournalpostStatusEnum.UNDER_PRODUKSJON)
-        return "Under produksjon";
-    if (status === JournalpostStatusEnum.UNDER_OPPRETTELSE)
-        return "Under opprettelse";
+    if (status === JournalpostStatusEnum.UNDER_PRODUKSJON) return "Under produksjon";
+    if (status === JournalpostStatusEnum.UNDER_OPPRETTELSE) return "Under opprettelse";
     if (status === JournalpostStatusEnum.RESERVERT) return "Reservert";
-    if (status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON)
-        return "Klar for distribusjon";
+    if (status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON) return "Klar for distribusjon";
     if (status === JournalpostStatusEnum.JOURNALFORT) return "Journalført";
     if (status === JournalpostStatusEnum.MOTTATT) return "Mottatt";
-    if (status === JournalpostStatusEnum.MOTTAKSREGISTRERT)
-        return "Mottaksregistrert";
+    if (status === JournalpostStatusEnum.MOTTAKSREGISTRERT) return "Mottaksregistrert";
     if (status === JournalpostStatusEnum.FERDIGSTILT) return "Ferdigstilt";
     if (status === JournalpostStatusEnum.AVBRUTT) return "Avbrutt";
 
@@ -57,13 +44,10 @@ export function journalstatusDisplayVerdi(jp: JournalpostDto): string {
 }
 
 export function standardSort(a: JournalpostDto, b: JournalpostDto): number {
-    const klarTilPrint = (jp: JournalpostDto) =>
-        jp.status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON;
-    const underOpprettelse = (jp: JournalpostDto) =>
-        jp.status === JournalpostStatusEnum.UNDER_OPPRETTELSE;
+    const klarTilPrint = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON;
+    const underOpprettelse = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.UNDER_OPPRETTELSE;
     const erForsendelse = (jp: JournalpostDto) =>
-        jp.status === JournalpostStatusEnum.UNDER_PRODUKSJON ||
-        (jp.journalpostId?.startsWith("BID-") ?? false);
+        jp.status === JournalpostStatusEnum.UNDER_PRODUKSJON || (jp.journalpostId?.startsWith("BID-") ?? false);
 
     return (
         Number(klarTilPrint(b)) - Number(klarTilPrint(a)) ||

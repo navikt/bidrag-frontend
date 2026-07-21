@@ -13,11 +13,7 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
         error: journalposterError,
         isLoading: journalposterLoading,
     } = useHentJournalposter(saksnummer);
-    const {
-        data: hendelser,
-        error: hendelserError,
-        isLoading: hendelserLoading,
-    } = useFinnHendelserForSak(saksnummer);
+    const { data: hendelser, error: hendelserError, isLoading: hendelserLoading } = useFinnHendelserForSak(saksnummer);
 
     if (journalposterLoading || hendelserLoading) {
         return <PageLoadingSpinner />;
@@ -35,14 +31,8 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
         <VStack gap={"space-24"}>
             <title>{tabTitle}</title>
             <Heading size={"large"}>Sakshistorikk</Heading>
-            <HendelseTabell
-                saksnummer={saksnummer}
-                hendelser={hendelser ?? []}
-            />
-            <JournalpostTabell
-                saksnummer={saksnummer}
-                journalposter={journalposter ?? []}
-            />
+            <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
+            <JournalpostTabell saksnummer={saksnummer} journalposter={journalposter ?? []} />
         </VStack>
     );
 }

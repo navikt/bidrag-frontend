@@ -10,25 +10,13 @@ export default [
     index("routes/_index.tsx"),
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),
-        route(
-            "reskontro",
-            "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx",
-        ),
+        route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
     ]),
 
     route("sak/:saksnummer", "routes/sak/SakLayout.tsx", [
-        route(
-            "fogdhistorikk",
-            "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx",
-        ),
-        route(
-            "belopshistorikk",
-            "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx",
-        ),
-        route(
-            "sakshistorikk",
-            "routes/sak/sakshistorikk/SakshistorikkPage.tsx",
-        ),
+        route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
+        route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
+        route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),
         route("journal/:journalpostId", "routes/sak/legacy/JournalRedirect.ts"),
         route("notat", "routes/sak/legacy/NotatRedirect.ts"),
         route("forsendelse", "routes/sak/legacy/ForsendelseRedirect.ts"),

@@ -8,10 +8,7 @@ interface Props {
     sakRoller: RolleDto[];
 }
 
-export default function PersonIdentMedRolle({
-    gjelderAktor,
-    sakRoller,
-}: Props) {
+export default function PersonIdentMedRolle({ gjelderAktor, sakRoller }: Props) {
     if (!gjelderAktor) return null;
     const rolle = sakRoller.find((r) => r.fodselsnummer === gjelderAktor.ident);
 

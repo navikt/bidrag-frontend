@@ -24,29 +24,20 @@ export interface UseSortOptions<TData, TKey extends string> {
     customComparators?: Partial<Record<TKey, (a: TData, b: TData) => number>>;
 }
 
-export function useSort<
-    TData,
-    TKey extends string = Extract<keyof TData, string>,
->(options?: UseSortOptions<TData, TKey>) {
-    const [sort, setSort] = useState<SortState<TKey> | undefined>(
-        options?.initialSort,
-    );
+export function useSort<TData, TKey extends string = Extract<keyof TData, string>>(
+    options?: UseSortOptions<TData, TKey>,
+) {
+    const [sort, setSort] = useState<SortState<TKey> | undefined>(options?.initialSort);
 
     const handleSort = (sortKey: TKey) => {
         setSort((prevSort) => {
-            if (
-                prevSort &&
-                sortKey === prevSort.orderBy &&
-                prevSort.direction === "descending"
-            ) {
+            if (prevSort && sortKey === prevSort.orderBy && prevSort.direction === "descending") {
                 return undefined;
             }
             return {
                 orderBy: sortKey,
                 direction:
-                    prevSort &&
-                    sortKey === prevSort.orderBy &&
-                    prevSort.direction === "ascending"
+                    prevSort && sortKey === prevSort.orderBy && prevSort.direction === "ascending"
                         ? "descending"
                         : "ascending",
             };
@@ -55,9 +46,7 @@ export function useSort<
 
     const sortData = (data: TData[]): TData[] => {
         if (!sort) {
-            return options?.defaultUnsorted
-                ? [...data].sort(options.defaultUnsorted)
-                : data;
+            return options?.defaultUnsorted ? [...data].sort(options.defaultUnsorted) : data;
         }
 
         return [...data].sort((a, b) => {
@@ -65,11 +54,7 @@ export function useSort<
 
             const result = customComp
                 ? customComp(a, b)
-                : defaultComparator(
-                      a,
-                      b,
-                      sort.orderBy as unknown as keyof TData,
-                  );
+                : defaultComparator(a, b, sort.orderBy as unknown as keyof TData);
 
             return sort.direction === "ascending" ? result : -result;
         });

@@ -1,13 +1,6 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
-import {
-    Heading,
-    HStack,
-    Label,
-    Pagination,
-    Select,
-    VStack,
-} from "@navikt/ds-react";
+import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
@@ -44,18 +37,12 @@ export default function HendelseTabell({
         ? [
               {
                   columnId: sort.orderBy,
-                  direction:
-                      sort.direction === "ascending"
-                          ? ("asc" as const)
-                          : ("desc" as const),
+                  direction: sort.direction === "ascending" ? ("asc" as const) : ("desc" as const),
               },
           ]
         : [];
 
-    const sortedData = sortData(hendelser).slice(
-        (page - 1) * rowsPerPage,
-        page * rowsPerPage,
-    );
+    const sortedData = sortData(hendelser).slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
     return (
         <VStack gap={"space-16"}>
@@ -89,9 +76,7 @@ export default function HendelseTabell({
             </HStack>
             <DataGrid
                 data={sortedData}
-                getRowId={(h) =>
-                    h.hendelseId ?? `${h.opprettetTidspunkt}-${h.type}`
-                }
+                getRowId={(h) => h.hendelseId ?? `${h.opprettetTidspunkt}-${h.type}`}
                 settings={{
                     zebraStripes: true,
                     rowDensity: "tight",
@@ -189,12 +174,7 @@ export default function HendelseTabell({
                     sorting={{
                         sortOrder: sortOrder,
                         onSortOrderChange: (_, detail) => {
-                            handleSort(
-                                detail.columnId as Extract<
-                                    keyof SakshendelseDto,
-                                    string
-                                >,
-                            );
+                            handleSort(detail.columnId as Extract<keyof SakshendelseDto, string>);
                             setPage(1);
                         },
                     }}

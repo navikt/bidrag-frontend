@@ -9,11 +9,8 @@ type BisysParamName = "saksnr";
 
 export function useBisysLink() {
     const [searchParams] = useSearchParams();
-    const bisysLinkTarget = sessionStorage.getItem(
-        SESSION_BISYS_LINK_TARGET,
-    ) as BisysLinkTarget;
-    const bisysLinkParams =
-        sessionStorage.getItem(SESSION_BISYS_LINK_PARAMS) ?? "";
+    const bisysLinkTarget = sessionStorage.getItem(SESSION_BISYS_LINK_TARGET) as BisysLinkTarget;
+    const bisysLinkParams = sessionStorage.getItem(SESSION_BISYS_LINK_PARAMS) ?? "";
     const bisysSessionParams = getBisysSessionParams(searchParams);
     const bisysQueryParams = new URLSearchParams(bisysLinkParams);
     if (bisysSessionParams.sessionState) {
@@ -28,17 +25,12 @@ export function useBisysLink() {
             return null;
         }
         const params = bisysQueryParams.toString();
-        return params
-            ? `/bisys/${bisysLinkTarget}?${params}`
-            : `/bisys/${bisysLinkTarget}`;
+        return params ? `/bisys/${bisysLinkTarget}?${params}` : `/bisys/${bisysLinkTarget}`;
     }
 
     const bisysUrl = getBisysUrl();
 
-    function setBisysLinkTarget(
-        target: BisysLinkTarget,
-        params: Partial<Record<BisysParamName, string>> = {},
-    ) {
+    function setBisysLinkTarget(target: BisysLinkTarget, params: Partial<Record<BisysParamName, string>> = {}) {
         sessionStorage.setItem(SESSION_BISYS_LINK_TARGET, target);
         const urlString = new URLSearchParams(params).toString();
         sessionStorage.setItem(SESSION_BISYS_LINK_PARAMS, urlString);

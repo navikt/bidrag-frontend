@@ -10,13 +10,7 @@ type Props = {
     kanSkrive: boolean;
 };
 
-export function NotatLink({
-    saksnummer,
-    hendelse,
-    enhet,
-    sessionState,
-    kanSkrive,
-}: Props) {
+export function NotatLink({ saksnummer, hendelse, enhet, sessionState, kanSkrive }: Props) {
     if (!kanSkrive || !hendelse.søknadsid) return null;
 
     const params = new URLSearchParams({

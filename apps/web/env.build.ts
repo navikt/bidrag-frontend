@@ -16,11 +16,8 @@ const DevTestSchema = z.object({
 
 export function readBuildEnv({ command, mode }: BuildEnvContext) {
     const isReactRouterBuildRequest = process.env.IS_RR_BUILD_REQUEST === "yes";
-    const isTypegenInvocation = process.argv.some((arg) =>
-        arg.includes("typegen"),
-    );
-    const isCiBuild =
-        process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
+    const isTypegenInvocation = process.argv.some((arg) => arg.includes("typegen"));
+    const isCiBuild = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
     if (
         command === "build" &&
         mode === "production" &&

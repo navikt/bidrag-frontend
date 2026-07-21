@@ -14,13 +14,7 @@ function isBisysTarget(value: string): value is BisysTarget {
     return value in BISYS_PATHS;
 }
 
-export async function loader({
-    params,
-    request,
-}: {
-    params: { target: string };
-    request: Request;
-}) {
+export async function loader({ params, request }: { params: { target: string }; request: Request }) {
     const target = params.target;
     if (!isBisysTarget(target)) {
         throw new Response("Ukjent bisys-target", { status: 400 });
