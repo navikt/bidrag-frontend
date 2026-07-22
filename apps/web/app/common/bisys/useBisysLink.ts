@@ -1,30 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
-import { configQuery } from "~/api/query/config.query.ts";
 import { getBisysSessionParams } from "./bisys-params.ts";
 
 const SESSION_BISYS_LINK_TARGET = "bisys.linktarget";
 const SESSION_BISYS_LINK_PARAMS = "bisys.linkParams";
+const BISYS_LINK_TARGETS = ["sak", "sakForside", "sakHistorikk", "oppgaveliste"] as const;
 
-type BisysLinkTarget = "sak" | "sakForside" | "sakHistorikk" | "oppgaveliste";
+type BisysLinkTarget = (typeof BISYS_LINK_TARGETS)[number];
 type BisysParamName = "saksnr";
 
-const bisysPaths: Record<BisysLinkTarget, string> = {
-    sak: "Sak.do",
-    sakForside: "Sak.do",
-    sakHistorikk: "Sakshistorikk.do",
-    oppgaveliste: "Oppgaveliste.do",
-};
+function isBisysLinkTarget(value: string | null): value is BisysLinkTarget {
+    return value !== null && BISYS_LINK_TARGETS.includes(value as BisysLinkTarget);
+}
 
 export function useBisysLink() {
-    const {data: config} = useQuery(configQuery);
-    const bisysBaseUrl = config?.bisysBaseUrl;
     const [searchParams] = useSearchParams();
-    const bisysLinkTarget = sessionStorage.getItem(
-        SESSION_BISYS_LINK_TARGET,
-    ) as BisysLinkTarget;
-    const bisysLinkParams =
-        sessionStorage.getItem(SESSION_BISYS_LINK_PARAMS) ?? "";
+    const storage = typeof window !== "undefined" ? window.sessionStorage : null;
+    const storedTarget = storage?.getItem(SESSION_BISYS_LINK_TARGET) ?? null;
+    const bisysLinkTarget = isBisysLinkTarget(storedTarget) ? storedTarget : null;
+    const bisysLinkParams = storage?.getItem(SESSION_BISYS_LINK_PARAMS) ?? "";
     const bisysSessionParams = getBisysSessionParams(searchParams);
     const bisysQueryParams = new URLSearchParams(bisysLinkParams);
     if (bisysSessionParams.sessionState) {
@@ -34,26 +27,24 @@ export function useBisysLink() {
         bisysQueryParams.set("enhet", bisysSessionParams.enhet);
     }
 
-    function getBisysUrl(baseUrl?: string) {
-        if (!bisysBaseUrl || !bisysLinkTarget) {
-
+    function getBisysUrl() {
+        if (!bisysLinkTarget) {
             return null;
         }
-        const path = bisysPaths[bisysLinkTarget];
-        const url = new URL(path, baseUrl);
-        url.search = bisysQueryParams.toString();
-        return url.toString();
+        const params = bisysQueryParams.toString();
+        return params ? `/bisys/${bisysLinkTarget}?${params}` : `/bisys/${bisysLinkTarget}`;
     }
 
-    const bisysUrl = getBisysUrl(bisysBaseUrl);
+    const bisysUrl = getBisysUrl();
 
-    function setBisysLinkTarget(
-        target: BisysLinkTarget,
-        params: Partial<Record<BisysParamName, string>> = {},
-    ) {
-        sessionStorage.setItem(SESSION_BISYS_LINK_TARGET, target);
+    function setBisysLinkTarget(target: BisysLinkTarget, params: Partial<Record<BisysParamName, string>> = {}) {
+        if (!storage) {
+            return;
+        }
+
+        storage.setItem(SESSION_BISYS_LINK_TARGET, target);
         const urlString = new URLSearchParams(params).toString();
-        sessionStorage.setItem(SESSION_BISYS_LINK_PARAMS, urlString);
+        storage.setItem(SESSION_BISYS_LINK_PARAMS, urlString);
     }
 
     return {

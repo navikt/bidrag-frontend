@@ -6,7 +6,7 @@ import FogdhistorikkTabell from "./components/FogdhistorikkTabell";
 
 export default function FogdhistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;
-    const tabTitle = "Fogdhistorikk - " + saksnummer;
+    const tabTitle = `Fogdhistorikk - ${saksnummer}`;
     const {
         data: fogdhistorikk,
         error: fogdhistorikkError,
@@ -22,29 +22,22 @@ export default function FogdhistorikkPage({ params }: Route.ComponentProps) {
             <Box margin={"space-16"}>
                 <LocalAlert status="error">
                     <LocalAlert.Header>
-                        <LocalAlert.Title>
-                            {fogdhistorikkError.message}
-                        </LocalAlert.Title>
+                        <LocalAlert.Title>{fogdhistorikkError.message}</LocalAlert.Title>
                     </LocalAlert.Header>
                 </LocalAlert>
             </Box>
         );
     }
 
-    const eierenhet =
-        fogdhistorikk?.filter((historikk) => historikk.type === "EIER") ?? [];
-    const midlertidige =
-        fogdhistorikk?.filter((historikk) => historikk.type === "MIDL") ?? [];
+    const eierenhet = fogdhistorikk?.filter((historikk) => historikk.type === "EIER") ?? [];
+    const midlertidige = fogdhistorikk?.filter((historikk) => historikk.type === "MIDL") ?? [];
 
     return (
         <VStack gap={"space-64"}>
             <title>{tabTitle}</title>
             <Heading size={"large"}>Fogdhistorikk</Heading>
             <FogdhistorikkTabell tittel="Eierenhet" historikk={eierenhet} />
-            <FogdhistorikkTabell
-                tittel="Midlertidig autorisasjon"
-                historikk={midlertidige}
-            />
+            <FogdhistorikkTabell tittel="Midlertidig autorisasjon" historikk={midlertidige} />
         </VStack>
     );
 }

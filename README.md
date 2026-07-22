@@ -20,6 +20,16 @@ bidrag-frontend/
 
 **Krav:** Node.js 24+, pnpm 11+
 
+For å installere private `@navikt`-pakker fra GitHub Packages må du ha token-oppsett i `~/.npmrc`.
+Se: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry
+
+Eksempel:
+
+```ini
+@navikt:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=<TOKEN_GITHUB_PAT_MED_PACKAGES_READ>
+```
+
 ```bash
 # Installer avhengigheter
 pnpm install
@@ -42,7 +52,24 @@ pnpm test
 
 ## Auth lokalt
 
-Wonderwall og Texas kjører i docker-compose. Den benytter https://github.com/navikt/localauth
+Lokal innlogging går via Wonderwall + Texas + localauth.
+Frontend nås via Wonderwall på `http://localhost:4000`.
+
+```bash
+# 1. Start Wonderwall/Texas/Redis
+docker compose up -d
+
+# 2. Start frontend lokalt
+pnpm dev
+```
+
+Åpne deretter:
+
+```text
+http://localhost:4000
+```
+
+Direkte åpning av app-porten (f.eks. `localhost:3000`) bypasser Wonderwall og gir ikke riktig auth-flyt.
 
 ## Miljøer
 
@@ -81,6 +108,27 @@ pnpm tsx scripts/migrate-imports.ts
 # Eller spesifikk mappe
 pnpm tsx scripts/migrate-imports.ts apps/web/app/routes/sak/reskontro
 ```
+
+### Migreringsoppskrift: bidrag-ui -> bidrag-frontend
+
+Bruk denne rekkefølgen for å unngå breaking changes:
+
+1. Flytt route + komponenter til `apps/web/app/routes/**`.
+2. Port hooks/query til `apps/web/app/api/useApi.ts`.
+3. Regenerer nødvendige API-klienter i `packages/api/src/api` og koble dem i `packages/api/src/api.ts`.
+   ```bash
+   pnpm --filter @bidrag/api run generate:api
+   ```
+4. Oppdater env + NAIS:
+   - `apps/web/app/env.server.ts`
+   - `apps/web/app/api.env.ts`
+   - `.nais/q1.yaml`, `.nais/q2.yaml`, `.nais/prod.yaml`
+5. Verifiser alltid både outbound i `bidrag-frontend` **og** inbound i målbackend (f.eks. `bidrag-dokument`).
+6. Oppdater `apps/web/.env.development` når nye required variabler innføres, ellers feiler `pnpm dev` med Zod-validering.
+
+For `bidrag-dokument` i dev:
+- q1: `bidrag-dokument-feature.dev-fss-pub.nais.io` + audience `...bidrag-dokument-feature...`
+- q2: `bidrag-dokument.dev-fss-pub.nais.io` + audience `...bidrag-dokument...`
 
 ### Fikse TypeScript-feil etter migrering
 
@@ -175,3 +223,6 @@ Appen kaller følgende backends via OBO-token-exchange (Azure AD):
 | bidrag-samhandler | `BIDRAG_SAMHANDLER_URL` / `BIDRAG_SAMHANDLER_AUDIENCE` |
 | bidrag-belopshistorikk | `BIDRAG_BELOPSHISTORIKK_URL` / `BIDRAG_BELOPSHISTORIKK_AUDIENCE` |
 | bidrag-reskontro | `BIDRAG_RESKONTRO_URL` / `BIDRAG_RESKONTRO_AUDIENCE` |
+| bidrag-dokument | `BIDRAG_DOKUMENT_URL` / `BIDRAG_DOKUMENT_AUDIENCE` |
+| bisys | `BISYS_URL` |
+| bidrag-ui | `BIDRAG_UI_BASE_URL` |

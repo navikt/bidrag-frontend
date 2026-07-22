@@ -116,6 +116,9 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.101.0(react@19.2.7)
+      '@unleash/proxy-client-react':
+        specifier: ^5.0.1
+        version: 5.1.0(unleash-proxy-client@3.8.0)
       axios:
         specifier: ^1.18.0
         version: 1.18.0
@@ -149,6 +152,12 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.1
+      unleash-proxy-client:
+        specifier: ^3.7.8
+        version: 3.8.0
+      zod:
+        specifier: ^4.1.12
+        version: 4.4.3
     devDependencies:
       '@react-router/dev':
         specifier: 'catalog:'
@@ -1193,6 +1202,12 @@ packages:
 
   '@types/swagger-schema-official@2.0.25':
     resolution: {integrity: sha512-T92Xav+Gf/Ik1uPW581nA+JftmjWPgskw/WBf4TJzxRG/SJ+DfNnNE+WuZ4mrXuzflQMqMkm1LSYjzYW7MB1Cg==}
+
+  '@unleash/proxy-client-react@5.1.0':
+    resolution: {integrity: sha512-S0RSU3PppwovY0kK0wN1QyL+6JKeNXXiZSYVELILZb9yY1VMfDsE/UnzGk+Oq8BTDnm/54boZHc4MaPztfGxEA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      unleash-proxy-client: ^3.8.0
 
   '@vitest/expect@4.1.9':
     resolution: {integrity: sha512-vl/rYsUKcBr3SnQn166+XR5ZQcgMx3DQhFWdfli/cWpLnLUmbxZvyrJZotLFUryib+LtArYMSTJ5RbQ57ZqrlA==}
@@ -2767,6 +2782,9 @@ packages:
     resolution: {integrity: sha512-wFH7+SEAcKfJpfLPkrgMPvvwnEtj8W4IurvEyrKsDleXnKLCDw71w8jltvfLa8Rm4qQxxT4jmDBYbJG/z7qoww==}
     engines: {node: '>=0.12'}
 
+  tiny-emitter@2.1.0:
+    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
+
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
 
@@ -2840,6 +2858,9 @@ packages:
 
   undici-types@7.24.6:
     resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
+
+  unleash-proxy-client@3.8.0:
+    resolution: {integrity: sha512-7+IMDM/t8sUojbYmOMoRW0SjD7+ShOrpI+vR1QWSv1Fnf7IxXLKp1dVhWnWyh9p4iyqFw4RXG9Iw5LHuBMV4aA==}
 
   unpipe@1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
@@ -3027,6 +3048,9 @@ packages:
   yargs@17.7.2:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
+
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
   zrender@6.1.0:
     resolution: {integrity: sha512-oEGMDB6pOP2S6OwRR4PdVv610zrjnA3Bh+JnSG12fYJlBKjtNAoEb5fSUoCOOINlH96I2fU38/A2UpRKs67xYQ==}
@@ -3932,6 +3956,10 @@ snapshots:
       csstype: 3.2.3
 
   '@types/swagger-schema-official@2.0.25': {}
+
+  '@unleash/proxy-client-react@5.1.0(unleash-proxy-client@3.8.0)':
+    dependencies:
+      unleash-proxy-client: 3.8.0
 
   '@vitest/expect@4.1.9':
     dependencies:
@@ -5572,6 +5600,8 @@ snapshots:
       es5-ext: 0.10.64
       next-tick: 1.1.0
 
+  tiny-emitter@2.1.0: {}
+
   tinybench@2.9.0: {}
 
   tinyexec@1.2.4: {}
@@ -5627,6 +5657,10 @@ snapshots:
   underscore@1.13.6: {}
 
   undici-types@7.24.6: {}
+
+  unleash-proxy-client@3.8.0:
+    dependencies:
+      tiny-emitter: 2.1.0
 
   unpipe@1.0.0: {}
 
@@ -5770,6 +5804,8 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
+
+  zod@4.4.3: {}
 
   zrender@6.1.0:
     dependencies:
