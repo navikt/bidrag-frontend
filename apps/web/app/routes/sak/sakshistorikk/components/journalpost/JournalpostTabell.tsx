@@ -90,17 +90,20 @@ export default function JournalpostTabell({
 
     const åpneDokumentHref = (jp: JournalpostDto): string | undefined => {
         if (!jp.journalpostId) return undefined;
+        const journalpostId = jp.journalpostId;
         if (jp.status === JournalpostStatus.UNDER_PRODUKSJON) return undefined;
         const harFlereDokumenter = (jp.dokumenter?.length ?? 0) > 1;
         if (harFlereDokumenter) {
-            const dokParams = (jp.dokumenter ?? [])
-                .filter((d) => d.dokumentreferanse)
-                .map((d) => `dokument=${jp.journalpostId}:${d.dokumentreferanse}`)
-                .join("&");
-            return `/aapnedokument/?${dokParams}`;
+            const params = new URLSearchParams();
+            for (const dokument of jp.dokumenter ?? []) {
+                if (dokument.dokumentreferanse) {
+                    params.append("dokument", `${journalpostId}:${dokument.dokumentreferanse}`);
+                }
+            }
+            return `/aapnedokument/?${params.toString()}`;
         }
         const hoveddokRef = jp.dokumenter?.[0]?.dokumentreferanse;
-        return hoveddokRef ? `/aapnedokument/${jp.journalpostId}/${hoveddokRef}` : undefined;
+        return hoveddokRef ? `/aapnedokument/${journalpostId}/${hoveddokRef}` : undefined;
     };
 
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
@@ -242,7 +245,10 @@ export default function JournalpostTabell({
             </HStack>
             <DataGrid
                 data={sorterteJournalposter}
-                getRowId={(jp) => jp.journalpostId ?? ""}
+                getRowId={(jp) =>
+                    jp.journalpostId ??
+                    `missing-${jp.dokumenter?.[0]?.dokumentreferanse ?? jp.journalfortDato ?? jp.dokumentDato ?? "0"}`
+                }
                 settings={{
                     zebraStripes: true,
                     rowDensity: "tight",

@@ -893,7 +893,7 @@ export function useFinnHendelserForSak(saksnummer: string, enabled: boolean = tr
 }
 
 export function useHarSkrivetilgang(saksnummer: string, enhet: string | null) {
-    return useQuery<boolean, AxiosError>({
+    return useQuery<boolean, AxiosError | TilgangsFeilError>({
         queryKey: ["har_skrivetilgang", saksnummer, enhet],
         queryFn: async () => {
             try {

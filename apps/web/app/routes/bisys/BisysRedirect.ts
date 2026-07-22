@@ -11,7 +11,7 @@ const BISYS_PATHS = {
 type BisysTarget = keyof typeof BISYS_PATHS;
 
 function isBisysTarget(value: string): value is BisysTarget {
-    return value in BISYS_PATHS;
+    return Object.hasOwn(BISYS_PATHS, value);
 }
 
 export async function loader({ params, request }: { params: { target: string }; request: Request }) {
