@@ -405,9 +405,9 @@ export interface ConflictException {
   statusText?: string;
   responseHeaders?: HttpHeaders;
   responseBodyAsString?: string;
+  bodyConvertFunction?: any;
   /** @format byte */
   responseBodyAsByteArray?: string;
-  bodyConvertFunction?: any;
   rootCause?: {
     cause?: {
       stackTrace?: {
@@ -595,13 +595,13 @@ export interface HttpHeaders {
   date?: number;
   /** @format int64 */
   contentLength?: number;
-  bearerAuth?: string;
+  cacheControl?: string;
   range?: HttpRange[];
   connection?: string[];
   origin?: string;
-  cacheControl?: string;
   /** @uniqueItems true */
   allow?: HttpMethod[];
+  bearerAuth?: string;
   contentLanguage?: string;
   etag?: string;
   accessControlAllowOrigin?: string;
