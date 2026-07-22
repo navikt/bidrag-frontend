@@ -115,7 +115,10 @@ export default function JournalpostTabell({
             width: { defaultValue: scaledPx(48) },
             bodyCell: (jp: JournalpostDto) =>
                 jp.journalpostId ? (
-                    <Link href={`/sak/${saksnummer}/journal/${jp.journalpostId}?${jpParams()}`} title="Vis journalpost">
+                    <Link
+                        href={`/sak/${saksnummer}/journal/${jp.journalpostId}?${jpParams()}`}
+                        aria-label="Vis journalpost"
+                    >
                         <TasklistSendIcon aria-hidden />
                     </Link>
                 ) : null,
@@ -127,7 +130,7 @@ export default function JournalpostTabell({
             bodyCell: (jp: JournalpostDto) => {
                 const href = åpneDokumentHref(jp);
                 return href ? (
-                    <Link href={href} title="Åpne dokument">
+                    <Link href={href} title="Åpne dokument" aria-label="Åpne dokument">
                         <PaperclipIcon aria-hidden />
                     </Link>
                 ) : null;

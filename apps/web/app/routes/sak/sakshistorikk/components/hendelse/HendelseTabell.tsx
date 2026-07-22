@@ -2,7 +2,7 @@ import type { SakshendelseDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
 import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
 import { useSort } from "../useSort";
@@ -28,7 +28,7 @@ export default function HendelseTabell({
     const sessionState = searchParams.get("sessionState");
     const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);
 
-    const onRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const onRowsPerPageChange = (e: ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     };
@@ -48,12 +48,14 @@ export default function HendelseTabell({
         <VStack gap={"space-16"}>
             <HStack justify={"space-between"} align={"center"}>
                 <Heading size="medium">Sakslogg</Heading>
-                <Pagination
-                    page={page}
-                    onPageChange={setPage}
-                    count={Math.ceil(hendelser.length / rowsPerPage)}
-                    size="xsmall"
-                />
+                {hendelser.length > rowsPerPage && (
+                    <Pagination
+                        page={page}
+                        onPageChange={setPage}
+                        count={Math.ceil(hendelser.length / rowsPerPage)}
+                        size="xsmall"
+                    />
+                )}
                 <HStack align="center" gap={"space-8"}>
                     <Label size="small" htmlFor="antall-rader">
                         Antall rader

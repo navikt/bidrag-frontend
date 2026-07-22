@@ -23,7 +23,7 @@ export function ResultatLink({
     const resultatUrl = generateResultatUrl(hendelse, enhet, sessionState, saksnummer);
     const bisysResultatUrl = generateBisysResultatUrl(hendelse, saksnummer, enhet, sessionState);
 
-    if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført) {
+    if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
         return (
             <HStack gap={"space-12"}>
                 <Link href={bisysResultatUrl}>{hendelse.resultat}*</Link>
@@ -34,11 +34,11 @@ export function ResultatLink({
         );
     }
 
-    if (visINyLosning && hendelse.erBisysVedtakOgErOverført) {
+    if (visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
         return <Link href={resultatUrl}>{hendelse.resultat}</Link>;
     }
 
-    if (hendelse.behandlingsid != null && hendelse.vedtaksid != null) {
+    if (hendelse.behandlingsid != null && hendelse.vedtaksid != null && resultatUrl) {
         return <Link href={resultatUrl}>{hendelse.resultat}</Link>;
     }
 
@@ -73,6 +73,10 @@ function generateResultatUrl(
     sessionState: string | null,
     saksnummer: string,
 ) {
+    if (hendelse.vedtaksid == null) {
+        return null;
+    }
+
     const resultatUrlParams = new URLSearchParams({
         steg: "vedtak",
         ...(hendelse.søknadsid && { soknadId: hendelse.søknadsid }),

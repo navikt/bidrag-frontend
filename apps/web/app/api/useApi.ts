@@ -750,7 +750,6 @@ export function useHentFogdhistorikk(saksnummer: string, enabled: boolean = true
         queryKey: ["hent_fogdhistorikk", saksnummer],
         queryFn: async () => {
             try {
-                console.log("Hent fogdhistorikk", saksnummer);
                 const response = await BIDRAG_SAK_API.bidragSak.finnFogdhistorikk(saksnummer, {
                     validateStatus: (status) => {
                         return status === 200 || status === 404;
