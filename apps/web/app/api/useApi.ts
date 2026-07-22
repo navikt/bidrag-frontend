@@ -9,7 +9,7 @@ import {
     BIDRAG_TILGANGSKONTROLL_API,
     TilgangsFeilError,
 } from "@bidrag/api";
-import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
+import type { DokumentMetadata, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { EnhetDto, HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
 import type { ForelderBarnRelasjonDto, MotpartBarnRelasjonDto, PersonDto, PersonRequest } from "@bidrag/api/PersonApi";
 import type {
@@ -842,6 +842,183 @@ export function useHentJournalposter(saksnummer: string, enabled: boolean = true
                 return false;
             }
             return failureCount < 3;
+        },
+    });
+}
+
+interface HentDokumentRequest {
+    journalpostId: string;
+    dokumentreferanse?: string;
+    resizeToA4?: boolean;
+    optimizeForPrint?: boolean;
+}
+
+interface HentDokumenterRequest {
+    dokumenter: string[];
+    resizeToA4?: boolean;
+    optimizeForPrint?: boolean;
+}
+
+interface HentDokumentUrlRequest {
+    journalpostId: string;
+    dokumentreferanse: string;
+}
+
+export function useHentDokumentMetadata(journalpostId: string, dokumentreferanse?: string, enabled: boolean = true) {
+    return useQuery<DokumentMetadata[], AxiosError | TilgangsFeilError>({
+        queryKey: ["hent_dokument_metadata", journalpostId, dokumentreferanse],
+        queryFn: async () => {
+            try {
+                const response = dokumentreferanse
+                    ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata1(journalpostId, dokumentreferanse, {
+                          validateStatus: (status) => status === 200 || status === 204 || status === 404,
+                      })
+                    : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata(journalpostId, {
+                          validateStatus: (status) => status === 200 || status === 204 || status === 404,
+                      });
+
+                if (response.status === 404 || response.status === 204) {
+                    await SecureLoggerService.info(
+                        `Ingen dokumentmetadata funnet for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
+                    );
+                    return [];
+                }
+
+                return response.data;
+            } catch (e) {
+                const axiosError = e as AxiosError;
+                const status = axiosError?.response?.status;
+
+                if (status === 403 || status === 401) {
+                    await SecureLoggerService.warn(
+                        `Ingen tilgang til dokumentmetadata for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
+                    );
+                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokumentmetadata");
+                }
+
+                await SecureLoggerService.error(
+                    `Kunne ikke hente dokumentmetadata for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
+                    axiosError,
+                );
+                throw e;
+            }
+        },
+        enabled: enabled && !!journalpostId,
+        retry: (failureCount, error) => {
+            if ((error as AxiosError)?.response?.status === 404) {
+                return false;
+            }
+            if (error instanceof TilgangsFeilError) {
+                return false;
+            }
+            return failureCount < 3;
+        },
+    });
+}
+
+export function useHentDokument() {
+    return useMutation<ArrayBuffer, AxiosError | TilgangsFeilError, HentDokumentRequest>({
+        mutationKey: ["hent_dokument"],
+        mutationFn: async ({ journalpostId, dokumentreferanse, resizeToA4, optimizeForPrint }) => {
+            try {
+                const queryParams = new URLSearchParams();
+                queryParams.set("resizeToA4", String(Boolean(resizeToA4)));
+                queryParams.set("optimizeForPrint", String(optimizeForPrint ?? true));
+                const path = dokumentreferanse
+                    ? `/dokument/${journalpostId}/${dokumentreferanse}`
+                    : `/dokument/${journalpostId}`;
+                const response = await BIDRAG_DOKUMENT_API.request<ArrayBuffer, unknown>({
+                    path: `${path}?${queryParams.toString()}`,
+                    method: "GET",
+                    secure: true,
+                    format: "arraybuffer",
+                });
+
+                return response.data;
+            } catch (e) {
+                const axiosError = e as AxiosError;
+                const status = axiosError?.response?.status;
+
+                if (status === 403 || status === 401) {
+                    await SecureLoggerService.warn(
+                        `Ingen tilgang til dokument for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
+                    );
+                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokument");
+                }
+
+                await SecureLoggerService.error(
+                    `Kunne ikke hente dokument for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
+                    axiosError,
+                );
+                throw e;
+            }
+        },
+    });
+}
+
+export function useHentDokumenter() {
+    return useMutation<ArrayBuffer, AxiosError | TilgangsFeilError, HentDokumenterRequest>({
+        mutationKey: ["hent_dokumenter"],
+        mutationFn: async ({ dokumenter, resizeToA4, optimizeForPrint }) => {
+            try {
+                const queryParams = new URLSearchParams();
+                dokumenter.forEach((dokument) => {
+                    queryParams.append("dokument", dokument);
+                });
+                queryParams.set("resizeToA4", String(Boolean(resizeToA4)));
+                queryParams.set("optimizeForPrint", String(optimizeForPrint ?? true));
+
+                const response = await BIDRAG_DOKUMENT_API.request<ArrayBuffer, unknown>({
+                    path: `/dokument?${queryParams.toString()}`,
+                    method: "GET",
+                    secure: true,
+                    format: "arraybuffer",
+                });
+
+                return response.data;
+            } catch (e) {
+                const axiosError = e as AxiosError;
+                const status = axiosError?.response?.status;
+
+                if (status === 403 || status === 401) {
+                    await SecureLoggerService.warn(`Ingen tilgang til å hente dokumenter`);
+                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokumentene");
+                }
+
+                await SecureLoggerService.error("Kunne ikke hente dokumenter", axiosError);
+                throw e;
+            }
+        },
+    });
+}
+
+export function useHentDokumentUrl() {
+    return useMutation<string, AxiosError | TilgangsFeilError, HentDokumentUrlRequest>({
+        mutationKey: ["hent_dokument_url"],
+        mutationFn: async ({ journalpostId, dokumentreferanse }) => {
+            try {
+                const response = await BIDRAG_DOKUMENT_API.tilgang.giTilgangTilDokument(
+                    journalpostId,
+                    dokumentreferanse,
+                );
+                return response.data.dokumentUrl;
+            } catch (e) {
+                const axiosError = e as AxiosError;
+                const status = axiosError?.response?.status;
+
+                if (status === 403 || status === 401) {
+                    await SecureLoggerService.warn(
+                        `Ingen tilgang til dokument-url for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse}`,
+                    );
+                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokument-url");
+                }
+
+                await SecureLoggerService.error(
+                    `Kunne ikke hente dokument-url for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse}`,
+                    axiosError,
+                );
+                throw e;
+            }
         },
     });
 }

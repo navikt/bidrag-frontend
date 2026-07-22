@@ -24,8 +24,16 @@ const EnvSchema = z.object({
     BIDRAG_DOKUMENT_AUDIENCE: NonEmpty,
     BISYS_URL: z.url(),
     BIDRAG_UI_BASE_URL: z.url(),
+    UNLEASH_PROXY_URL: z.url().optional(),
+    UNLEASH_PROXY_CLIENT_KEY: NonEmpty.optional(),
     NODE_ENV: z.enum(["development", "test", "production"]),
     STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS: z.string().optional(),
+    OVERRIDE_BRUK_DOKUMENTVISNING_POC: z.enum(["true", "false"]).optional().transform((value) => {
+        if (value === undefined) {
+            return undefined;
+        }
+        return value === "true";
+    }),
 });
 
 export const env = EnvSchema.parse(process.env);
