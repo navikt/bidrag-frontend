@@ -1,8 +1,8 @@
 import { FaroErrorBoundary } from "@grafana/faro-react";
 import { FlagProvider } from "@unleash/proxy-client-react";
-import { UnleashClient } from "unleash-proxy-client";
 import { useEffect, useMemo } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import { UnleashClient } from "unleash-proxy-client";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import { env } from "~/env.server.ts";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
@@ -74,9 +74,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
 
     return (
         <QueryClientWrapper>
-            <FaroErrorBoundary
-                fallback={(error) => <RootErrorBoundary error={error} />}
-            >
+            <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} />}>
                 <FlagProvider unleashClient={unleashClient} startClient={false}>
                     <AppLayout bruker={navUser}>
                         <ClientOnly fallback={<Loader size="large" />}>
@@ -95,10 +93,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <head>
                 <title>Bidrag</title>
                 <meta charSet="utf-8" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1"
-                />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <Meta />
                 <Links />
             </head>
