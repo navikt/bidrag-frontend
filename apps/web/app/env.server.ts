@@ -28,12 +28,15 @@ const EnvSchema = z.object({
     UNLEASH_PROXY_CLIENT_KEY: NonEmpty.optional(),
     NODE_ENV: z.enum(["development", "test", "production"]),
     STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS: z.string().optional(),
-    OVERRIDE_BRUK_DOKUMENTVISNING_POC: z.enum(["true", "false"]).optional().transform((value) => {
-        if (value === undefined) {
-            return undefined;
-        }
-        return value === "true";
-    }),
+    OVERRIDE_BRUK_DOKUMENTVISNING_POC: z
+        .enum(["true", "false"])
+        .optional()
+        .transform((value) => {
+            if (value === undefined) {
+                return undefined;
+            }
+            return value === "true";
+        }),
 });
 
 export const env = EnvSchema.parse(process.env);

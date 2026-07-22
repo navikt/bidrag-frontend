@@ -15,7 +15,7 @@ export async function getNaisConfig(): Promise<NaisConfig> {
     // https://docs.nais.io/observability/frontend/how-to/setup-faro/
     const mountedPath = path.resolve(process.cwd(), "build/client/nais.js");
     try {
-        const mod = (await import(pathToFileURL(mountedPath).href)) as {
+        const mod = (await import(/* @vite-ignore */ pathToFileURL(mountedPath).href)) as {
             default: NaisConfig;
         };
         cached = mod.default;

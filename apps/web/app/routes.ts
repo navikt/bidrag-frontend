@@ -1,4 +1,4 @@
-import { index, type RouteConfig, route } from "@react-router/dev/routes";
+import { index, layout, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
     route("internal/health/liveness", "./server/liveness.ts"),
@@ -19,14 +19,19 @@ export default [
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
     ]),
 
-    route("sak/:saksnummer", "routes/sak/SakLayout.tsx", [
-        route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
-        route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
-        route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),
+    route("sak/:saksnummer", "routes/sak/SakBaseLayout.tsx", [
+        route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),
+
+        layout("routes/sak/SakStandardLayout.tsx", [
+            route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
+            route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
+            route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),
+            route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
+        ]),
+
         route("journal/:journalpostId", "routes/dokument-ui/JournalRedirect.ts"),
         route("notat", "routes/forsendelse-ui/NotatRedirect.ts"),
         route("forsendelse", "routes/forsendelse-ui/ForsendelseRedirect.ts"),
         route("vedtak/:vedtaksid", "routes/behandling-ui/VedtakRedirect.ts"),
-        route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
     ]),
 ] satisfies RouteConfig;

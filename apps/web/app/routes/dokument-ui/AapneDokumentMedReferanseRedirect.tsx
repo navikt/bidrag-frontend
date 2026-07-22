@@ -52,8 +52,8 @@ export default function AapneDokumentMedReferanseRedirect({ params, loaderData }
         error: metadataError,
         refetch,
     } = useHentDokumentMetadata(journalpostId, dokumentreferanse);
-    const hentDokument = useHentDokument();
-    const hentDokumentUrl = useHentDokumentUrl();
+    const { mutateAsync: hentDokumentAsync } = useHentDokument();
+    const { mutateAsync: hentDokumentUrlAsync } = useHentDokumentUrl();
 
     useEffect(() => {
         if (hasOpenedRef.current || metadataLoading) {
@@ -66,7 +66,7 @@ export default function AapneDokumentMedReferanseRedirect({ params, loaderData }
         }
 
         const openPdf = async (jpId: string, dokRef: string) => {
-            const dokument = await hentDokument.mutateAsync({
+            const dokument = await hentDokumentAsync({
                 journalpostId: jpId,
                 dokumentreferanse: dokRef,
                 resizeToA4,
@@ -119,7 +119,7 @@ export default function AapneDokumentMedReferanseRedirect({ params, loaderData }
             }
 
             if (dokumentMetadata.format === DokumentFormatDto.MBDOK) {
-                const dokumentUrl = await hentDokumentUrl.mutateAsync({
+                const dokumentUrl = await hentDokumentUrlAsync({
                     journalpostId: dokumentJournalpostId,
                     dokumentreferanse: metadataDokumentreferanse,
                 });
@@ -145,8 +145,8 @@ export default function AapneDokumentMedReferanseRedirect({ params, loaderData }
         });
     }, [
         dokumentreferanse,
-        hentDokument,
-        hentDokumentUrl,
+        hentDokumentAsync,
+        hentDokumentUrlAsync,
         journalpostId,
         metadata,
         metadataError,

@@ -1,4 +1,5 @@
 import type { DokumentMetadata } from "@bidrag/api/BidragDokumentApi";
+import { DokumentStatusDto } from "@bidrag/api/BidragDokumentApi";
 import { Alert, BodyShort, Button, Detail, Heading, Label, List, Loader } from "@navikt/ds-react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -25,6 +26,7 @@ interface DokumentMetadataView {
     tittel?: string | null;
     journalpostId?: string | null;
     dokumentreferanse: string;
+    status?: DokumentStatusDto | null;
 }
 
 function getDocumentTitle(dokument: DokumentMetadataView): string {
@@ -104,6 +106,7 @@ function toViewMetadata(metadataList: DokumentMetadata[]): DokumentMetadataView[
             tittel: metadata.tittel,
             journalpostId: metadata.journalpostId,
             dokumentreferanse: metadata.dokumentreferanse,
+            status: metadata.status,
         }));
 }
 
@@ -129,7 +132,7 @@ export default function PdfTabsViewer({
         isLoading: isLoadingMetadata,
         error: metadataError,
     } = useHentDokumentMetadata(journalpostId, undefined);
-    const hentDokument = useHentDokument();
+    const { mutateAsync: hentDokumentAsync } = useHentDokument();
     const dokumenter = useMemo(() => {
         const metadataDokumenter = toViewMetadata(metadata);
         if (metadataDokumenter.length > 0) {
@@ -144,6 +147,7 @@ export default function PdfTabsViewer({
             dokumentreferanse: referanse,
             journalpostId,
             tittel: referanse,
+            status: undefined,
         }));
     }, [dokumentreferanse, fallbackDokumentreferanser, journalpostId, metadata]);
     const selectedDocument = useMemo(
@@ -232,19 +236,22 @@ export default function PdfTabsViewer({
             return;
         }
 
+        if (selectedDocument.status === DokumentStatusDto.UNDER_PRODUKSJON) {
+            return;
+        }
+
         inFlightDocumentsRef.current.add(dokumentreferanseValue);
         setLoadedDocuments((current) => ({
             ...current,
             [dokumentreferanseValue]: { loading: true },
         }));
 
-        hentDokument
-            .mutateAsync({
-                journalpostId: selectedDocument.journalpostId || journalpostId,
-                dokumentreferanse: selectedDocument.dokumentreferanse,
-                resizeToA4,
-                optimizeForPrint,
-            })
+        hentDokumentAsync({
+            journalpostId: selectedDocument.journalpostId || journalpostId,
+            dokumentreferanse: selectedDocument.dokumentreferanse,
+            resizeToA4,
+            optimizeForPrint,
+        })
             .then((response: unknown) => {
                 const { src, pageBuffer, isBlobUrl } = toPdfSource(response);
                 if (!src) {
@@ -265,6 +272,7 @@ export default function PdfTabsViewer({
                 const pageCount = pageBuffer ? estimatePageCountFromArrayBuffer(pageBuffer) : undefined;
                 setLoadedDocuments((current) => ({
                     ...current,
+
                     [dokumentreferanseValue]: { loading: false, src, pageCount },
                 }));
             })
@@ -280,7 +288,7 @@ export default function PdfTabsViewer({
             .finally(() => {
                 inFlightDocumentsRef.current.delete(dokumentreferanseValue);
             });
-    }, [selectedDocument, loadedDocuments, journalpostId, resizeToA4, optimizeForPrint, hentDokument]);
+    }, [selectedDocument, loadedDocuments, journalpostId, resizeToA4, optimizeForPrint, hentDokumentAsync]);
 
     useEffect(() => {
         if (dokumenter.length === 0) {
@@ -289,15 +297,26 @@ export default function PdfTabsViewer({
         }
 
         const valgtDokumentreferanse =
-            dokumentreferanse && dokumenter.some((dokument) => dokument.dokumentreferanse === dokumentreferanse)
+            dokumentreferanse &&
+            dokumenter.some(
+                (dokument) =>
+                    dokument.dokumentreferanse === dokumentreferanse &&
+                    dokument.status !== DokumentStatusDto.UNDER_PRODUKSJON,
+            )
                 ? dokumentreferanse
-                : dokumenter[0]?.dokumentreferanse;
+                : dokumenter.find((dokument) => dokument.status !== DokumentStatusDto.UNDER_PRODUKSJON)
+                      ?.dokumentreferanse;
 
-        setSelectedValue((current) =>
-            current && dokumenter.some((dokument) => dokument.dokumentreferanse === current)
-                ? current
-                : valgtDokumentreferanse,
-        );
+        setSelectedValue((current) => {
+            const currentIsValid =
+                current &&
+                dokumenter.some(
+                    (dokument) =>
+                        dokument.dokumentreferanse === current &&
+                        dokument.status !== DokumentStatusDto.UNDER_PRODUKSJON,
+                );
+            return currentIsValid ? current : valgtDokumentreferanse;
+        });
     }, [dokumenter, dokumentreferanse]);
 
     useEffect(() => {
@@ -406,6 +425,7 @@ export default function PdfTabsViewer({
                         {dokumenter.map((dokument, index) => {
                             const state = loadedDocuments[dokument.dokumentreferanse];
                             const isSelected = selectedValue === dokument.dokumentreferanse;
+                            const erUnderProduksjon = dokument.status === DokumentStatusDto.UNDER_PRODUKSJON;
 
                             return (
                                 <List.Item
@@ -418,7 +438,10 @@ export default function PdfTabsViewer({
                                         type="button"
                                         variant="tertiary"
                                         size="small"
-                                        onClick={() => setSelectedValue(dokument.dokumentreferanse)}
+                                        onClick={() =>
+                                            !erUnderProduksjon && setSelectedValue(dokument.dokumentreferanse)
+                                        }
+                                        disabled={erUnderProduksjon}
                                         tabIndex={isSelected ? 0 : -1}
                                         data-dokumentreferanse={dokument.dokumentreferanse}
                                         aria-current={isSelected ? "true" : "false"}
@@ -443,20 +466,25 @@ export default function PdfTabsViewer({
                                             style={{
                                                 fontWeight: isSelected ? 600 : 400,
                                                 wordBreak: "break-word",
-                                                color: "var(--a-text-default)",
+                                                color: erUnderProduksjon
+                                                    ? "var(--a-text-subtle)"
+                                                    : "var(--a-text-default)",
                                             }}
                                         >
                                             {formatSidebarLabel(dokument, index)}
                                         </Label>
-                                        {state?.pageCount && (
+                                        {erUnderProduksjon && (
+                                            <Detail style={{ color: "var(--a-text-subtle)" }}>Under produksjon</Detail>
+                                        )}
+                                        {!erUnderProduksjon && state?.pageCount && (
                                             <Detail style={{ color: "var(--a-text-subtle)" }}>
                                                 {state.pageCount} sider
                                             </Detail>
                                         )}
-                                        {state?.loading && (
+                                        {!erUnderProduksjon && state?.loading && (
                                             <Detail style={{ color: "var(--a-text-subtle)" }}>Laster...</Detail>
                                         )}
-                                        {state?.error && (
+                                        {!erUnderProduksjon && state?.error && (
                                             <Detail style={{ color: "var(--a-text-danger)" }}>Feil ved lasting</Detail>
                                         )}
                                     </Button>
