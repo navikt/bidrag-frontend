@@ -100,7 +100,7 @@ export default function JournalpostTabell({
                     params.append("dokument", `${journalpostId}:${dokument.dokumentreferanse}`);
                 }
             }
-            return `/aapnedokument/?${params.toString()}`;
+            return `/aapnedokument?${params.toString()}`;
         }
         const hoveddokRef = jp.dokumenter?.[0]?.dokumentreferanse;
         return hoveddokRef ? `/aapnedokument/${journalpostId}/${hoveddokRef}` : undefined;
