@@ -72,8 +72,4 @@ outbound:
     - bidrag-sak.prod-fss-pub.nais.io
     - bidrag-organisasjon.prod-fss-pub.nais.io
     - bidrag-person.prod-fss-pub.nais.io
-<<<<<<< Updated upstream
     - bidrag-dokument.prod-fss-pub.nais.io
-=======
-
->>>>>>> Stashed changes
