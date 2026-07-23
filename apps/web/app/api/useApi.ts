@@ -379,7 +379,9 @@ export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = 
 
                 if (status === 403 || status === 401) {
                     await SecureLoggerService.warn(`Ingen tilgang til person ${ident}`);
-                    throw new Error(`Du har ikke tilgang til informasjon om denne personen ${ident}. Dette kan skyldes diskresjonskode eller manglende rettigheter.`);
+                    throw new Error(
+                        `Du har ikke tilgang til informasjon om denne personen ${ident}. Dette kan skyldes diskresjonskode eller manglende rettigheter.`,
+                    );
                 }
                 throw e;
             }
