@@ -56,7 +56,7 @@ jobs:
   deploy_q1:
     needs: build-and-push
     # Kjører hvis kalt fra main.yml ELLER hvis valgt manuelt
-    if: github.event_name == 'workflow_call' || github.event.inputs.miljo == 'q1' || github.event.inputs.miljo == 'q1_og_q2'
+    if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.miljo == 'q1' || github.event.inputs.miljo == 'q1_og_q2' }}
     name: "Deploy til q1"
     runs-on: ubuntu-latest
     permissions:
@@ -76,7 +76,7 @@ jobs:
 
   deploy_q2:
     needs: build-and-push
-    if: github.event_name == 'workflow_call' || github.event.inputs.miljo == 'q2' || github.event.inputs.miljo == 'q1_og_q2'
+    if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.miljo == 'q2' || github.event.inputs.miljo == 'q1_og_q2' }}
     name: "Deploy til q2"
     runs-on: ubuntu-latest
     permissions:
@@ -97,7 +97,7 @@ jobs:
   deploy_prod:
     needs: build-and-push
     # Låst til KUN å kjøre når workflowen kalles automatisk (fra main.yml)
-    if: github.event_name == 'workflow_call'
+    if: ${{ (github.event_name == 'push' && github.ref_name == 'main') }}
     name: "Deploy til prod"
     runs-on: ubuntu-latest
     permissions:
