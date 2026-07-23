@@ -68,7 +68,7 @@ outbound:
     - application: bidrag-belopshistorikk-q2
     - application: bidrag-vedtak-q2
     - application: bidrag-reskontro-q2
-    - application: bidrag-admin-dev
+    - application: bidrag-admin
   external:
     - bidrag-sak-q2.dev-fss-pub.nais.io
     - bidrag-organisasjon.dev-fss-pub.nais.io
