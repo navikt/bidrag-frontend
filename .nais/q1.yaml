@@ -52,7 +52,7 @@ env:
   - name: BISYS_URL
     value: https://wasapp-q1.adeo.no/rtv-bidrag/
   - name: BIDRAG_UI_BASE_URL
-    value: https://bidrag-ui-feature.intern.dev.nav.no
+    value: https://bidrag-ui-feature.dev.adeo.no
 
 outbound:
   rules:
