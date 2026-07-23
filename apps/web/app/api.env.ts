@@ -7,8 +7,8 @@ type ApiConfig = {
 
 const APIS: Record<string, ApiConfig> = {
   "bidrag-admin": {
-    url: process.env.BIDRAG_ADMIN_URL || "",
-    audience: process.env.BIDRAG_ADMIN_AUDIENCE || ""
+    url: env.BIDRAG_ADMIN_URL,
+    audience: env.BIDRAG_ADMIN_AUDIENCE,
   },
   "bidrag-sak": {
     url: env.BIDRAG_SAK_URL,
@@ -42,10 +42,10 @@ const APIS: Record<string, ApiConfig> = {
     url: env.BIDRAG_RESKONTRO_URL,
     audience: env.BIDRAG_RESKONTRO_AUDIENCE,
   },
-    "bidrag-dokument": {
-        url: env.BIDRAG_DOKUMENT_URL,
-        audience: env.BIDRAG_DOKUMENT_AUDIENCE,
-    },
+  "bidrag-dokument": {
+    url: env.BIDRAG_DOKUMENT_URL,
+    audience: env.BIDRAG_DOKUMENT_AUDIENCE,
+  },
 };
 
 export type ApiAppName = keyof typeof APIS | string;

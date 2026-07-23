@@ -4,6 +4,8 @@ import { z } from "zod";
 const NonEmpty = z.string().min(1);
 
 const EnvSchema = z.object({
+    BIDRAG_ADMIN_URL: z.url(),
+    BIDRAG_ADMIN_AUDIENCE: NonEmpty,
     BIDRAG_SAK_URL: z.url(),
     BIDRAG_SAK_AUDIENCE: NonEmpty,
     BIDRAG_ORGANISASJON_URL: z.url(),
