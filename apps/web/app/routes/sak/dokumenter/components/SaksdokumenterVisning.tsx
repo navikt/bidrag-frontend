@@ -3,14 +3,13 @@ import type { RolleDto } from "@bidrag/api/SakApi";
 import { HStack, VStack } from "@navikt/ds-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useHentDokument, useHentDokumentMetadata, useHentDokumentUrl, useHentSak } from "~/api/useApi.ts";
+import { estimatePageCountFromArrayBuffer, toPdfSource } from "~/common/components/utils/pdfUtils";
 import type { PdfState } from "../types";
 import {
     byggDokumenter,
-    estimatePageCountFromArrayBuffer,
     filtrerJournalposter,
     hentJournalpostIderMedFlereDokumenter,
     sjekkOmBlandingAvFarOgBidrag,
-    toPdfSource,
     utvidSettMedNyVerdi,
 } from "../utils/saksdokumenterUtils";
 import { PdfVisning } from "./PdfVisning";

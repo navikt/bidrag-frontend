@@ -15,7 +15,7 @@ interface JPHeaderInfoProps {
     isVisited?: boolean;
 }
 
-export function JournalpostHaderInfo({
+export function JournalpostHeaderInfo({
     jp,
     sakRoller,
     visFagomrade,

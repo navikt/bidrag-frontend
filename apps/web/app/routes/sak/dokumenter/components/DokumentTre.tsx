@@ -6,7 +6,7 @@ import { standardSort } from "../../sakshistorikk/components/journalpost/journal
 import type { SaksDokument } from "../types";
 import { finnDokumenterForJournalpost } from "../utils/saksdokumenterUtils";
 import { DokumentKnapp } from "./DokumentKnapp";
-import { JournalpostHaderInfo } from "./JournalpostHaderInfo";
+import { JournalpostHeaderInfo } from "./JournalpostHeaderInfo";
 
 export interface DokumentTreProps {
     journalposter: JournalpostDto[];
@@ -54,7 +54,7 @@ export function DokumentTre({
                         if (doksForJp.length === 0) {
                             return (
                                 <div key={jpId} style={{ padding: "0.25rem 0.5rem" }}>
-                                    <JournalpostHaderInfo
+                                    <JournalpostHeaderInfo
                                         jp={jp}
                                         sakRoller={sakRoller}
                                         visFagomrade={harBlandingFarBid}
@@ -96,7 +96,7 @@ export function DokumentTre({
                                         boxSizing: "border-box",
                                     }}
                                 >
-                                    <JournalpostHaderInfo
+                                    <JournalpostHeaderInfo
                                         jp={jp}
                                         sakRoller={sakRoller}
                                         visFagomrade={harBlandingFarBid}
@@ -127,7 +127,7 @@ export function DokumentTre({
                             <Accordion key={jpId}>
                                 <Accordion.Item open={isExpanded} onOpenChange={handterAccordionEndring}>
                                     <Accordion.Header className="[&>button]:py-2 [&>button]:px-2 hover:[&>button]:bg-gray-100">
-                                        <JournalpostHaderInfo
+                                        <JournalpostHeaderInfo
                                             jp={jp}
                                             sakRoller={sakRoller}
                                             visFagomrade={harBlandingFarBid}

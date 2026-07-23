@@ -3,7 +3,6 @@ import { env } from "~/env.server.ts";
 
 const DOCUMENT_VIEWER_FLAG = "dokumentvisning.ny_losning";
 
-let cachedEnabled: boolean | undefined;
 let clientPromise: Promise<UnleashClient | null> | null = null;
 
 async function getUnleashClient(): Promise<UnleashClient | null> {
@@ -39,15 +38,10 @@ export async function isDocumentViewerEnabled(): Promise<boolean> {
         return env.OVERRIDE_BRUK_DOKUMENTVISNING_POC;
     }
 
-    if (cachedEnabled !== undefined) {
-        return cachedEnabled;
-    }
-
-    const client = await getUnleashClient();
-    if (!client) {
+    const unleashClient = await getUnleashClient();
+    if (!unleashClient) {
         return false;
     }
 
-    cachedEnabled = client.isEnabled(DOCUMENT_VIEWER_FLAG);
-    return cachedEnabled;
+    return unleashClient.isEnabled(DOCUMENT_VIEWER_FLAG);
 }

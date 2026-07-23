@@ -55,63 +55,6 @@ export function utvidSettMedNyVerdi(prevSett: Set<string>, nyVerdi: string): Set
     return nyttSett;
 }
 
-export function estimatePageCountFromArrayBuffer(file: ArrayBuffer): number | undefined {
-    try {
-        const decodedString = new TextDecoder("latin1").decode(file);
-        const matchResultat = decodedString.match(/\/Type\s*\/Page\b/g);
-        return matchResultat?.length;
-    } catch {
-        return undefined;
-    }
-}
-
-export function isLikelyBase64(value: string): boolean {
-    const normalized = value.replace(/\s/g, "");
-    if (normalized.length < 16 || normalized.length % 4 !== 0) {
-        return false;
-    }
-    return /^[A-Za-z0-9+/=]+$/.test(normalized);
-}
-
-export function toPdfSource(response: unknown): { src?: string; pageBuffer?: ArrayBuffer; isBlobUrl: boolean } {
-    if (response instanceof ArrayBuffer) {
-        const kilde = URL.createObjectURL(new Blob([response], { type: "application/pdf" }));
-        return { src: kilde, pageBuffer: response, isBlobUrl: true };
-    }
-    if (response instanceof Uint8Array) {
-        const pageBuffer = response.buffer instanceof ArrayBuffer ? response.buffer : undefined;
-        // Castes til BlobPart for å fortelle TypeScript at Uint8Array-en er trygg å sende til Blob
-        const kilde = URL.createObjectURL(new Blob([response as unknown as BlobPart], { type: "application/pdf" }));
-        return { src: kilde, pageBuffer, isBlobUrl: true };
-    }
-    if (response instanceof Blob) {
-        const kilde = URL.createObjectURL(response);
-        return { src: kilde, isBlobUrl: true };
-    }
-    if (typeof response === "string") {
-        const verdi = response.trim();
-        if (!verdi) {
-            return { isBlobUrl: false };
-        }
-
-        const erStandardUrlEllerDataUrl =
-            verdi.startsWith("data:application/pdf") ||
-            verdi.startsWith("blob:") ||
-            verdi.startsWith("http") ||
-            verdi.startsWith("https");
-        if (erStandardUrlEllerDataUrl) {
-            return { src: verdi, isBlobUrl: false };
-        }
-
-        const erRaaBase64 = verdi.startsWith("JVBER") || isLikelyBase64(verdi);
-        if (erRaaBase64) {
-            const formatertBase64 = `data:application/pdf;base64,${verdi.replace(/\s/g, "")}`;
-            return { src: formatertBase64, isBlobUrl: false };
-        }
-    }
-    return { isBlobUrl: false };
-}
-
 export function journalpostStatusForkortelse(status?: JournalpostStatus | null): string {
     switch (status) {
         case JournalpostStatus.FERDIGSTILT:

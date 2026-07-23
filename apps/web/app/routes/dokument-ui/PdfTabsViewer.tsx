@@ -4,6 +4,7 @@ import { Alert, BodyShort, Button, Detail, Heading, Label, List, Loader } from "
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useHentDokument, useHentDokumentMetadata } from "~/api/useApi.ts";
+import { estimatePageCountFromArrayBuffer, toPdfSource } from "~/common/components/utils/pdfUtils";
 
 interface PdfTabsViewerProps {
     journalpostId: string;
@@ -33,68 +34,8 @@ function getDocumentTitle(dokument: DokumentMetadataView): string {
     return dokument.tittel?.trim() || dokument.dokumentreferanse;
 }
 
-function estimatePageCountFromArrayBuffer(file: ArrayBuffer): number | undefined {
-    try {
-        const decoded = new TextDecoder("latin1").decode(file);
-        const matches = decoded.match(/\/Type\s*\/Page\b/g);
-        return matches?.length;
-    } catch {
-        return undefined;
-    }
-}
-
 function formatSidebarLabel(dokument: DokumentMetadataView, index: number): string {
     return `${index + 1}. ${getDocumentTitle(dokument)}`;
-}
-
-function isLikelyBase64(value: string): boolean {
-    const normalized = value.replace(/\s/g, "");
-    if (normalized.length < 16 || normalized.length % 4 !== 0) {
-        return false;
-    }
-
-    return /^[A-Za-z0-9+/=]+$/.test(normalized);
-}
-
-function toPdfSource(response: unknown): { src?: string; pageBuffer?: ArrayBuffer; isBlobUrl: boolean } {
-    if (response instanceof ArrayBuffer) {
-        const src = URL.createObjectURL(new Blob([response], { type: "application/pdf" }));
-        return { src, pageBuffer: response, isBlobUrl: true };
-    }
-
-    if (response instanceof Uint8Array) {
-        const buffer = Uint8Array.from(response).buffer;
-        const src = URL.createObjectURL(new Blob([buffer], { type: "application/pdf" }));
-        return { src, pageBuffer: buffer, isBlobUrl: true };
-    }
-
-    if (response instanceof Blob) {
-        const src = URL.createObjectURL(response);
-        return { src, isBlobUrl: true };
-    }
-
-    if (typeof response === "string") {
-        const value = response.trim();
-        if (!value) {
-            return { isBlobUrl: false };
-        }
-
-        if (
-            value.startsWith("data:application/pdf") ||
-            value.startsWith("blob:") ||
-            value.startsWith("http://") ||
-            value.startsWith("https://")
-        ) {
-            return { src: value, isBlobUrl: false };
-        }
-
-        if (value.startsWith("JVBER") || isLikelyBase64(value)) {
-            const normalized = value.replace(/\s/g, "");
-            return { src: `data:application/pdf;base64,${normalized}`, isBlobUrl: false };
-        }
-    }
-
-    return { isBlobUrl: false };
 }
 
 function toViewMetadata(metadataList: DokumentMetadata[]): DokumentMetadataView[] {

@@ -31,12 +31,7 @@ const EnvSchema = z.object({
     OVERRIDE_BRUK_DOKUMENTVISNING_POC: z
         .enum(["true", "false"])
         .optional()
-        .transform((value) => {
-            if (value === undefined) {
-                return undefined;
-            }
-            return value === "true";
-        }),
+        .transform((value) => value === "true"),
 });
 
 export const env = EnvSchema.parse(process.env);

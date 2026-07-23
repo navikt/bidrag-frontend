@@ -40,6 +40,7 @@ export const QueryKeys = {
     hentSak: (saksnummer: string) => ["hent_sak", saksnummer],
     hentPersoninfo: (ident: string) => ["hent_personinfo", ident],
 };
+
 export const useHentPersonData = (ident?: string) => {
     return useQuery({
         queryKey: QueryKeys.hentPersoninfo(ident ?? ""),
@@ -53,6 +54,7 @@ export const useHentPersonData = (ident?: string) => {
         throwOnError: false,
     });
 };
+
 export function useKanOppretteSakUtenBm() {
     return useSuspenseQuery({
         queryKey: QueryKeys.kanOppretteSak,
@@ -156,7 +158,6 @@ export function useHentSakForPerson(ident: string, enabled: boolean = true) {
                     },
                 });
 
-                // Hvis 404, returner tom array
                 if (response.status === 404) {
                     await SecureLoggerService.info(`Ingen saker funnet for person ${ident}`);
                     return [];
@@ -322,6 +323,7 @@ export function useHentSamhandler(ident: string, enabled: boolean = true) {
         throwOnError: false,
     });
 }
+
 export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = true) => {
     const queryClient = useQueryClient();
 
@@ -331,13 +333,11 @@ export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = 
 
             const queryKey = ["hent_samhandler_eller_person", ident];
 
-            // Check cache first
             const cachedData = queryClient.getQueryData<ISamhandlerPersonInfo>(queryKey);
             if (cachedData) {
                 return cachedData;
             }
 
-            // Fetch from API
             let result: ISamhandlerPersonInfo;
 
             try {
@@ -379,14 +379,12 @@ export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = 
 
                 if (status === 403 || status === 401) {
                     await SecureLoggerService.warn(`Ingen tilgang til person ${ident}`);
-                    throw new Error(`Du har ikke tilgang til informasjon om denne personen ${ident}. Dette kan skyldes diskresjonskode eller
-                    manglende rettigheter.`);
+                    throw new Error(`Du har ikke tilgang til informasjon om denne personen ${ident}. Dette kan skyldes diskresjonskode eller manglende rettigheter.`);
                 }
                 throw e;
             }
-            // Save to cache
-            queryClient.setQueryData(queryKey, result);
 
+            queryClient.setQueryData(queryKey, result);
             return result;
         },
         throwOnError: false,
@@ -484,7 +482,7 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
                 }
                 return failureCount < 1;
             },
-            throwOnError: true, // Enable throwing for suspense
+            throwOnError: true,
         })),
     });
 }
@@ -756,7 +754,6 @@ export function useHentFogdhistorikk(saksnummer: string, enabled: boolean = true
                     },
                 });
 
-                // Hvis 404, returner tom array
                 if (response.status === 404) {
                     await SecureLoggerService.info(`Ingen fogdhistorikk funnet for saksnummer ${saksnummer}`);
                     return [];
@@ -794,6 +791,8 @@ export function useHentFogdhistorikk(saksnummer: string, enabled: boolean = true
     });
 }
 
+// ==================== DOKUMENT ====================
+
 export function useHentJournalposter(saksnummer: string, enabled: boolean = true) {
     return useQuery<JournalpostDto[], AxiosError | TilgangsFeilError>({
         queryKey: ["hent_journalposter", saksnummer],
@@ -817,20 +816,7 @@ export function useHentJournalposter(saksnummer: string, enabled: boolean = true
                 await SecureLoggerService.info(`Hentet journalposter for saksnummer ${saksnummer}`);
                 return response.data;
             } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til journalposter for saksnummer ${saksnummer}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til journalposter for dette saksnummeret (${saksnummer})`,
-                    );
-                }
-                await SecureLoggerService.error(
-                    `Kunne ikke hente journalposter for saksnummer ${saksnummer}`,
-                    axiosError,
-                );
-                throw e;
+                return handleApiError(e, `hente journalposter for saksnummer ${saksnummer}`);
             }
         },
         enabled: enabled && !!saksnummer,
@@ -886,29 +872,15 @@ export function useHentDokumentMetadata(journalpostId: string, dokumentreferanse
 
                 return response.data;
             } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(
-                        `Ingen tilgang til dokumentmetadata for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
-                    );
-                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokumentmetadata");
-                }
-
-                await SecureLoggerService.error(
-                    `Kunne ikke hente dokumentmetadata for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
-                    axiosError,
+                return handleApiError(
+                    e,
+                    `hente dokumentmetadata for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
                 );
-                throw e;
             }
         },
         enabled: enabled && !!journalpostId,
         retry: (failureCount, error) => {
-            if ((error as AxiosError)?.response?.status === 404) {
-                return false;
-            }
-            if (error instanceof TilgangsFeilError) {
+            if ((error as AxiosError)?.response?.status === 404 || error instanceof TilgangsFeilError) {
                 return false;
             }
             return failureCount < 3;
@@ -936,21 +908,10 @@ export function useHentDokument() {
 
                 return response.data;
             } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(
-                        `Ingen tilgang til dokument for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
-                    );
-                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokument");
-                }
-
-                await SecureLoggerService.error(
-                    `Kunne ikke hente dokument for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
-                    axiosError,
+                return handleApiError(
+                    e,
+                    `hente dokument for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
                 );
-                throw e;
             }
         },
     });
@@ -977,16 +938,7 @@ export function useHentDokumenter() {
 
                 return response.data;
             } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til å hente dokumenter`);
-                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokumentene");
-                }
-
-                await SecureLoggerService.error("Kunne ikke hente dokumenter", axiosError);
-                throw e;
+                return handleApiError(e, "hente dokumentene");
             }
         },
     });
@@ -1003,21 +955,10 @@ export function useHentDokumentUrl() {
                 );
                 return response.data.dokumentUrl;
             } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(
-                        `Ingen tilgang til dokument-url for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse}`,
-                    );
-                    throw new TilgangsFeilError("Du har ikke tilgang til å hente dokument-url");
-                }
-
-                await SecureLoggerService.error(
-                    `Kunne ikke hente dokument-url for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse}`,
-                    axiosError,
+                return handleApiError(
+                    e,
+                    `hente dokument-URL for journalpost ${journalpostId} og referanse ${dokumentreferanse}`,
                 );
-                throw e;
             }
         },
     });
@@ -1029,9 +970,7 @@ export function useFinnHendelserForSak(saksnummer: string, enabled: boolean = tr
         queryFn: async () => {
             try {
                 const response = await BIDRAG_SAK_API.sak.finnHendelserForSak(saksnummer, {
-                    validateStatus: (status) => {
-                        return status === 200 || status === 404;
-                    },
+                    validateStatus: (status) => status === 200 || status === 404,
                 });
 
                 if (response.status === 404) {
@@ -1042,25 +981,12 @@ export function useFinnHendelserForSak(saksnummer: string, enabled: boolean = tr
                 await SecureLoggerService.info(`Hentet hendelser for saksnummer ${saksnummer}`);
                 return response.data;
             } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til hendelser for saksnummer ${saksnummer}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til hendelser for dette saksnummeret (${saksnummer})`,
-                    );
-                }
-                await SecureLoggerService.error(`Kunne ikke hente hendelser for saksnummer ${saksnummer}`, axiosError);
-                throw e;
+                return handleApiError(e, `hente hendelser for saksnummer ${saksnummer}`);
             }
         },
         enabled: enabled && !!saksnummer,
         retry: (failureCount, error) => {
-            if ((error as AxiosError)?.response?.status === 404) {
-                return false;
-            }
-            if (error instanceof TilgangsFeilError) {
+            if ((error as AxiosError)?.response?.status === 404 || error instanceof TilgangsFeilError) {
                 return false;
             }
             return failureCount < 3;
@@ -1076,20 +1002,7 @@ export function useHarSkrivetilgang(saksnummer: string, enhet: string | null) {
                 const response = await BIDRAG_SAK_API.sak.harSkrivetilgang(saksnummer, { enhet: enhet ?? "" });
                 return response.data;
             } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til skrivetilgang for saksnummer ${saksnummer}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til å sjekke skrivetilgang for dette saksnummeret (${saksnummer})`,
-                    );
-                }
-                await SecureLoggerService.error(
-                    `Kunne ikke sjekke skrivetilgang for saksnummer ${saksnummer}`,
-                    axiosError,
-                );
-                throw e;
+                return handleApiError(e, `sjekke skrivetilgang for saksnummer ${saksnummer} og enhet ${enhet}`);
             }
         },
         enabled: !!saksnummer && !!enhet,
@@ -1101,4 +1014,24 @@ export function useHarSkrivetilgang(saksnummer: string, enhet: string | null) {
             return failureCount < 3;
         },
     });
+}
+
+// ==================== HELPER ====================
+
+async function handleApiError(e: unknown, handling: string): Promise<never> {
+    const axiosError = e as AxiosError;
+    const status = axiosError?.response?.status;
+
+    if (status === 401) {
+        await SecureLoggerService.warn(`Sesjon utløpt eller manglende autentisering ved å ${handling}`);
+        throw new Error("Sesjonen din har utløpt. Vennligst last siden på nytt.");
+    }
+
+    if (status === 403) {
+        await SecureLoggerService.warn(`Ingen tilgang til å ${handling}`);
+        throw new TilgangsFeilError(`Du har ikke tilgang til å ${handling}`);
+    }
+
+    await SecureLoggerService.error(`Kunne ikke ${handling}`, axiosError);
+    throw e;
 }
