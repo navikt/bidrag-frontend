@@ -1,0 +1,116 @@
+name: "Deploy"
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      miljo:
+        description: 'Hvilket miljø vil du deploye til?'
+        required: true
+        default: 'q1'
+        type: choice
+        options:
+          - q1
+          - q2
+          - q1_og_q2
+
+jobs:
+  build-and-push:
+    name: "Bygg og push Docker-image"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+      telemetry: ${{ steps.docker-build-push.outputs.telemetry }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          node-auth-token: ${{ secrets.READER_TOKEN }}
+
+      - name: Bygg deploybar applikasjon for Docker
+        run: pnpm run deploy:docker
+        env:
+          CDN_BASE_URL: https://cdn.nav.no/bidrag/bidrag-frontend/dist/
+
+      - name: Last opp klientbundler til CDN
+        uses: nais/deploy/actions/cdn-upload/v2@9ce59af14f70c3a7093ba1e20d6679af2b1c7be9
+        with:
+          team: bidrag
+          source: apps/web/build/client
+          destination: /bidrag-frontend/dist
+          source_keep_parent_name: false
+
+      - name: Push Docker-image til GAR
+        uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
+        id: docker-build-push
+        with:
+          team: bidrag
+
+  deploy_q1:
+    needs: build-and-push
+    # Kjører hvis kalt fra main.yml ELLER hvis valgt manuelt
+    if: github.event_name == 'workflow_call' || github.event.inputs.miljo == 'q1' || github.event.inputs.miljo == 'q1_og_q2'
+    name: "Deploy til q1"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Deploy til dev-gcp q1
+        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/nais.yaml
+          VARS: .nais/q1.yaml
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.build-and-push.outputs.telemetry }}
+
+  deploy_q2:
+    needs: build-and-push
+    if: github.event_name == 'workflow_call' || github.event.inputs.miljo == 'q2' || github.event.inputs.miljo == 'q1_og_q2'
+    name: "Deploy til q2"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Deploy til dev-gcp q2
+        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/nais.yaml
+          VARS: .nais/q2.yaml
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.build-and-push.outputs.telemetry }}
+
+  deploy_prod:
+    needs: build-and-push
+    # Låst til KUN å kjøre når workflowen kalles automatisk (fra main.yml)
+    if: github.event_name == 'workflow_call'
+    name: "Deploy til prod"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Deploy til prod-gcp
+        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/nais.yaml
+          VARS: .nais/prod.yaml
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.build-and-push.outputs.telemetry }}
