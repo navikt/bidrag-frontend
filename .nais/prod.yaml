@@ -7,7 +7,7 @@ env:
   - name: BIDRAG_ADMIN_URL
     value: https://bidrag-admin.intern.nav.no
   - name: BIDRAG_ADMIN_AUDIENCE
-    value: api://bidrag-admin.intern.nav.no/.default
+    value: api://prod-gcp.bidrag.bidrag-admin/.default
 
   - name: BIDRAG_SAK_URL
     value: https://bidrag-sak.prod-fss-pub.nais.io
