@@ -11,8 +11,8 @@ export interface SaksDokument {
     dokumentType?: string;
     dokumentDato?: string;
     tittel: string;
-    kanAapnes: boolean;
-    aapenForklaring?: string;
+    kanÅpnes: boolean;
+    åpenForklaring?: string;
     gjelderAktor?: JournalpostDto["gjelderAktor"];
 }
 

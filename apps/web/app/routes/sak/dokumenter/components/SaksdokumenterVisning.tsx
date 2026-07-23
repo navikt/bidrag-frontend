@@ -1,6 +1,6 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { Heading, HStack, VStack } from "@navikt/ds-react";
+import { Heading, VStack } from "@navikt/ds-react";
 import { useHentDokumentMetadata, useHentSak } from "~/api/useApi.ts";
 import { useDokumentState } from "./hooks/useDokumentState";
 import { useOppdaterPdfFremviser } from "./hooks/useOppdaterPdfFremviser";
@@ -19,7 +19,7 @@ export function SaksdokumenterVisning({
 
     const { data, filterState, menyState } = useDokumentState(journalposter);
 
-    const gjelderMetadata = Boolean(data.selectedDocument?.kanAapnes && data.selectedDocument?.dokumentreferanse);
+    const gjelderMetadata = Boolean(data.selectedDocument?.kanÅpnes && data.selectedDocument?.dokumentreferanse);
     const {
         data: metadata = [],
         isLoading: isMetadataLoading,
@@ -35,7 +35,7 @@ export function SaksdokumenterVisning({
     const viewerState = useOppdaterPdfFremviser(data.selectedDocument, metadata, gjelderMetadata, isMetadataLoading);
 
     return (
-       <>
+        <>
             <VStack>
                 <Heading size="medium">Dokumenter for sak {saksnummer}</Heading>
                 <VenstreMeny sakRoller={sakRoller} data={data} filterState={filterState} menyState={menyState} />
@@ -45,6 +45,6 @@ export function SaksdokumenterVisning({
                 viewerState={viewerState}
                 isMetadataLoading={isMetadataLoading}
             />
-       </>
+        </>
     );
 }

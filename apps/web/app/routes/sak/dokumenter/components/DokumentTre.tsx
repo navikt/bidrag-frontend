@@ -16,6 +16,25 @@ export interface DokumentTreProps {
     sakRoller: RolleDto[];
 }
 
+interface DokumentJournalpostProps {
+    jp: JournalpostDto;
+    doksForJp: SaksDokument[];
+    sakRoller: RolleDto[];
+    visFagomrade: boolean;
+    isExpanded: boolean;
+    onToggle: (isOpen: boolean) => void;
+    selectedId?: string;
+    visitedIds: Set<string>;
+    onSelectDocument: (id: string) => void;
+}
+
+function hentIdentFraRolle(rolle: RolleDto): string | undefined {
+    if ("fodselsnummer" in rolle && typeof rolle.fodselsnummer === "string") return rolle.fodselsnummer;
+    if ("aktorId" in rolle && typeof rolle.aktorId === "string") return rolle.aktorId;
+    if ("ident" in rolle && typeof rolle.ident === "string") return rolle.ident;
+    return undefined;
+}
+
 export function DokumentTre({ data, menyState, sakRoller }: DokumentTreProps) {
     const { journalposter, dokumenter, harBlandingFarBid } = data;
     const { selectedId, handleSelectDocument, visitedIds, expandedIds, setExpandedIds } = menyState;
@@ -29,14 +48,13 @@ export function DokumentTre({ data, menyState, sakRoller }: DokumentTreProps) {
     }
 
     return (
-        <VStack gap="0" className="divide-y divide-neutral-subtle">
+        <VStack>
             {journalposter
                 .slice()
                 .sort(standardSort)
                 .map((jp: JournalpostDto) => {
                     const jpId = jp.journalpostId ?? `${jp.journalfortDato ?? ""}-${jp.dokumentDato ?? ""}`;
                     const doksForJp = finnDokumenterForJournalpost(jp, dokumenter);
-
                     const handterAccordionEndring = (isOpen: boolean) => {
                         setExpandedIds((prev) => {
                             const next = new Set(prev);
@@ -64,18 +82,6 @@ export function DokumentTre({ data, menyState, sakRoller }: DokumentTreProps) {
     );
 }
 
-interface DokumentJournalpostProps {
-    jp: JournalpostDto;
-    doksForJp: SaksDokument[];
-    sakRoller: RolleDto[];
-    visFagomrade: boolean;
-    isExpanded: boolean;
-    onToggle: (isOpen: boolean) => void;
-    selectedId?: string;
-    visitedIds: Set<string>;
-    onSelectDocument: (id: string) => void;
-}
-
 function DokumentJournalpost({
     jp,
     doksForJp,
@@ -88,38 +94,55 @@ function DokumentJournalpost({
     onSelectDocument,
 }: DokumentJournalpostProps) {
     const harDokumenter = doksForJp.length > 0;
-    const harSettAlle = harDokumenter && doksForJp.every((dok) => visitedIds.has(dok.id));
+    const antallDokumenter = doksForJp.length;
 
-    // Hvis det ikke finnes dokumenter, rendrer vi bare en grået-ut header
-    if (!harDokumenter) {
-        return (
-            <Box paddingBlock="space-3" paddingInline="space-4" className="bg-neutral-soft">
-                <JournalpostHeaderInfo jp={jp} harDokumenter={false} />
-            </Box>
-        );
-    }
+    const åpnebareDoks = doksForJp.filter((dok: SaksDokument) => dok.kanÅpnes);
+    const harÅpnebareDokumenter = åpnebareDoks.length > 0;
+
+    const harSettMinstEn = harÅpnebareDokumenter && åpnebareDoks.some((dok: SaksDokument) => visitedIds.has(dok.id));
+
+    const jpAktorIdent = jp.gjelderAktor?.ident;
+
+    // Finner rollen basert på riktig ident!
+    const gjelderRolle = sakRoller.find((r) => hentIdentFraRolle(r) === jpAktorIdent);
 
     return (
-        <Accordion className="[&.navds-accordion]:!border-none [&_.navds-accordion__item]:!border-none">
+        <Accordion
+            className={`[&.navds-accordion]:!border-none [&_.navds-accordion__item]:!border-none ${
+                !harÅpnebareDokumenter ? "opacity-50" : ""
+            }`}
+        >
             <Accordion.Item open={isExpanded} onOpenChange={onToggle}>
-                <Accordion.Header>
-                    <JournalpostHeaderInfo jp={jp} isVisited={harSettAlle} harDokumenter={true} />
+                <Accordion.Header className={isExpanded ? "!pb-0" : ""}>
+                    <JournalpostHeaderInfo
+                        jp={jp}
+                        isVisited={harSettMinstEn}
+                        harDokumenter={harÅpnebareDokumenter}
+                        antallDokumenter={antallDokumenter}
+                        gjelderRolle={gjelderRolle}
+                        isExpanded={isExpanded}
+                    />
                 </Accordion.Header>
-                {/* Vi fjerner default padding fra Aksel med !p-0 for å ha full kontroll selv */}
                 <Accordion.Content className="!p-0">
                     <VStack>
                         <JournalpostMetadata jp={jp} sakRoller={sakRoller} visFagomrade={visFagomrade} />
-                        <VStack gap="0" className="divide-y divide-neutral-subtle">
-                            {doksForJp.map((dok) => (
-                                <DokumentKnapp
-                                    key={dok.id}
-                                    dokument={dok}
-                                    isSelected={selectedId === dok.id}
-                                    isVisited={visitedIds.has(dok.id)}
-                                    onClick={() => onSelectDocument(dok.id)}
-                                />
-                            ))}
-                        </VStack>
+
+                        {harDokumenter && (
+                            <VStack
+                                gap="space-0"
+                                className="divide-y divide-neutral-subtle border-t border-neutral-subtle"
+                            >
+                                {doksForJp.map((dok: SaksDokument) => (
+                                    <DokumentKnapp
+                                        key={dok.id}
+                                        dokument={dok}
+                                        isSelected={selectedId === dok.id}
+                                        isVisited={visitedIds.has(dok.id)}
+                                        onClick={() => onSelectDocument(dok.id)}
+                                    />
+                                ))}
+                            </VStack>
+                        )}
                     </VStack>
                 </Accordion.Content>
             </Accordion.Item>
@@ -127,7 +150,6 @@ function DokumentJournalpost({
     );
 }
 
-// All metadata som tidligere lå i headeren er nå her inne!
 function JournalpostMetadata({
     jp,
     sakRoller,
@@ -149,8 +171,9 @@ function JournalpostMetadata({
         <VStack
             gap="space-1"
             paddingInline="space-4"
-            paddingBlock="space-2 space-4"
-            className="bg-neutral-soft border-b border-neutral-subtle"
+            // Setter top-padding til space-0 slik at den ligger helt klistret til tittelen!
+            paddingBlock="space-0 space-4"
+            className="bg-neutral-soft"
         >
             <HStack gap="space-4" align="center" wrap className="text-xs">
                 {dokumentType && <Detail textColor="subtle">{dokumentType}</Detail>}

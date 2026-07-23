@@ -23,20 +23,14 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
     } = filterState;
 
     return (
-        <Box
-            paddingBlock="space-2"
-            paddingInline="space-32"
-            background="default"
-            borderWidth="0 0 1 0"
-            borderColor="neutral-subtle"
-        >
+        <Box paddingBlock="space-2" paddingInline="space-4">
             <CheckboxGroup legend="Filtrer" hideLegend size="small">
                 <HStack gap="space-12" wrap>
-                    <Checkbox checked={kunVedtak} onChange={(e) => setKunVedtak(e.target.checked)}>
-                        Kun vedtak
-                    </Checkbox>
                     <Checkbox checked={kunFerdigstilte} onChange={(e) => setKunFerdigstilte(e.target.checked)}>
                         Kun ferdigstilte
+                    </Checkbox>
+                    <Checkbox checked={kunVedtak} onChange={(e) => setKunVedtak(e.target.checked)}>
+                        Kun vedtak
                     </Checkbox>
                     {harBlandingFarBid && (
                         <Checkbox

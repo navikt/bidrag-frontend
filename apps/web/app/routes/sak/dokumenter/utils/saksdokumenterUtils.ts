@@ -135,8 +135,8 @@ export function byggDokumenter(journalposter: JournalpostDto[]): SaksDokument[] 
             return journalpostDokumenter.map((dokument, index) => {
                 const formatertId = genererSaksDokumentId(jp.journalpostId, dokument.dokumentreferanse, index);
                 const tittel = utledDokumentTittel(dokument.tittel, dokument.dokumentreferanse, index);
-                const kanAapnes = kanAapneDokument(jp, dokument.status, dokument.dokumentreferanse);
-                const aapenForklaring = kanAapnes
+                const kanÅpnes = kanAapneDokument(jp, dokument.status, dokument.dokumentreferanse);
+                const åpenForklaring = kanÅpnes
                     ? undefined
                     : utledAarsakTilLukketDokument(dokument.status, dokument.dokumentreferanse);
 
@@ -151,8 +151,8 @@ export function byggDokumenter(journalposter: JournalpostDto[]): SaksDokument[] 
                     dokumentType: jp.dokumentType ?? undefined,
                     dokumentDato: jp.dokumentDato ?? undefined,
                     tittel,
-                    kanAapnes,
-                    aapenForklaring,
+                    kanÅpnes,
+                    åpenForklaring,
                     gjelderAktor: jp.gjelderAktor,
                 };
             });

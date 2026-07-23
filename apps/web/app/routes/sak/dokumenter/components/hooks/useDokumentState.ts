@@ -26,12 +26,12 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
 
     const filtrerteJournalposter = useMemo(
         () => filtrerJournalposter(journalposter, kunVedtak, visFarskapUtelukket, visFeilregistrerte, kunFerdigstilte),
-        [journalposter, kunVedtak, visFarskapUtelukket, visFeilregistrerte, kunFerdigstilte]
+        [journalposter, kunVedtak, visFarskapUtelukket, visFeilregistrerte, kunFerdigstilte],
     );
 
     const alleJpMedFlereDokumenter = useMemo(
         () => hentJournalpostIderMedFlereDokumenter(filtrerteJournalposter),
-        [filtrerteJournalposter]
+        [filtrerteJournalposter],
     );
 
     const dokumenter = useMemo(() => byggDokumenter(filtrerteJournalposter), [filtrerteJournalposter]);
@@ -61,10 +61,14 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
             selectedDocument,
         },
         filterState: {
-            kunVedtak, setKunVedtak,
-            visFarskapUtelukket, setVisFarskapUtelukket,
-            visFeilregistrerte, setVisFeilregistrerte,
-            kunFerdigstilte, setKunFerdigstilte,
+            kunVedtak,
+            setKunVedtak,
+            visFarskapUtelukket,
+            setVisFarskapUtelukket,
+            visFeilregistrerte,
+            setVisFeilregistrerte,
+            kunFerdigstilte,
+            setKunFerdigstilte,
         },
         menyState: {
             selectedId,
@@ -74,6 +78,6 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
             setExpandedIds,
             handterAapneAlle,
             handterLukkAlle,
-        }
+        },
     };
 }

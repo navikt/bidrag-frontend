@@ -1,8 +1,7 @@
 import { Tag } from "@navikt/ds-react";
 
 import { useBidragCommons } from "../../api/BidragCommonsContext";
-import { ROLE_FORKORTELSER, ROLE_TAGS, ROLE_TAGS_REVURDERING } from "../../types/roller/RoleTags";
-import { RolleType } from "../../types/roller/RolleType";
+import { type RolleType, ROLE_FORKORTELSER, ROLE_TAGS, ROLE_TAGS_REVURDERING } from "../../types";
 
 const RolleTag = ({
     rolleType,

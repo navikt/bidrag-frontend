@@ -14,9 +14,7 @@ export function PdfVisning({ selectedDocument, viewerState, isMetadataLoading }:
 
     return (
         <section className="flex-1 min-w-0 sticky top-4 h-[calc(100vh-4em)] flex flex-col">
-            <Box
-                className="flex-1 overflow-hidden flex items-center justify-center"
-            >
+            <Box className="flex-1 overflow-hidden flex items-center justify-center">
                 {isLoading ? (
                     <Loader size="xlarge" title="Laster dokument" />
                 ) : hasError ? (

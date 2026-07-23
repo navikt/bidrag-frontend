@@ -11,7 +11,7 @@ export function useOppdaterPdfFremviser(
     gjelderMetadata: boolean,
     isMetadataLoading: boolean,
 ): PdfState {
-    const klarForHenting = Boolean(selectedDocument?.kanAapnes) && (!gjelderMetadata || !isMetadataLoading);
+    const klarForHenting = Boolean(selectedDocument?.kanÅpnes) && (!gjelderMetadata || !isMetadataLoading);
     const dokumentFormat = metadata.length === 1 ? metadata[0]?.format : undefined;
 
     const {
@@ -54,8 +54,8 @@ export function useOppdaterPdfFremviser(
     }, [cachedResponse]);
 
     if (!selectedDocument) return { loading: false };
-    if (!selectedDocument.kanAapnes)
-        return { loading: false, error: selectedDocument.aapenForklaring ?? "Kan ikke åpnes" };
+    if (!selectedDocument.kanÅpnes)
+        return { loading: false, error: selectedDocument.åpenForklaring ?? "Kan ikke åpnes" };
     if (errorMessage) return { loading: false, error: errorMessage };
 
     return {
