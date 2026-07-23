@@ -7,6 +7,8 @@ ingresses:
 env:
   - name: BIDRAG_ADMIN_URL
     value: https://bidrag-admin.intern.dev.nav.no
+  - name: BIDRAG_ADMIN_AUDIENCE
+    value: api://bidrag-admin.intern.dev.nav.no/.default
 
   - name: BIDRAG_SAK_URL
     value: https://bidrag-sak-q2.dev-fss-pub.nais.io
@@ -66,6 +68,7 @@ outbound:
     - application: bidrag-belopshistorikk-q2
     - application: bidrag-vedtak-q2
     - application: bidrag-reskontro-q2
+    - application: bidrag-admin-dev
   external:
     - bidrag-sak-q2.dev-fss-pub.nais.io
     - bidrag-organisasjon.dev-fss-pub.nais.io
