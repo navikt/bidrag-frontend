@@ -14,15 +14,17 @@
     "scripts": {
         "typecheck": "tsc --noEmit",
         "test": "vitest run --passWithNoTests",
+        "api:all": "pnpm run api:person && pnpm run api:sak && pnpm run api:tilgangskontroll && pnpm run api:samhandler && pnpm run api:organisasjon && pnpm run api:belopshistorikk && pnpm run api:bidragDokument && pnpm run api:bidragVedtak && pnpm run api:reskontro",
+        "generate:api": "pnpm run api:all",
         "api:person": "swagger-typescript-api -p https://bidrag-person-q2.intern.dev.nav.no/bidrag-person/v3/api-docs --axios -n PersonApi.ts -o src/api",
         "api:sak": "swagger-typescript-api -p https://bidrag-sak-q2.intern.dev.nav.no/v3/api-docs --axios -n SakApi.ts -o src/api",
         "api:tilgangskontroll": "swagger-typescript-api -p https://bidrag-tilgangskontroll.intern.dev.nav.no/v3/api-docs --axios -n TilgangskontrollApi.ts -o src/api",
         "api:samhandler": "swagger-typescript-api -p https://bidrag-samhandler-q2.intern.dev.nav.no/v3/api-docs --axios -n SamhandlerApi.ts -o src/api",
         "api:organisasjon": "swagger-typescript-api -p https://bidrag-organisasjon-feature.intern.dev.nav.no/bidrag-organisasjon/v3/api-docs --axios -n OrganisasjonApi.ts -o src/api",
         "api:belopshistorikk": "swagger-typescript-api -p https://bidrag-belopshistorikk-q2.intern.dev.nav.no/v3/api-docs --axios -n BelopshistorikkApi.ts -o src/api",
+        "api:bidragDokument": "swagger-typescript-api -p https://bidrag-dokument.intern.dev.nav.no/bidrag-dokument/v3/api-docs --extract-enums --enum-names-as-values --axios -n BidragDokumentApi.ts -o src/api",
         "api:bidragVedtak": "swagger-typescript-api -p https://bidrag-vedtak-q2.intern.dev.nav.no/v3/api-docs --axios -n BidragVedtakApi.ts -o src/api",
         "api:reskontro": "swagger-typescript-api -p https://bidrag-reskontro-q2.intern.dev.nav.no/v3/api-docs --axios -n BidragReskontroApi.ts -o src/api"
-
     },
     "dependencies": {
         "axios": "^1.18.0",

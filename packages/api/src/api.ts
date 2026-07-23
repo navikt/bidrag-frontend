@@ -1,20 +1,18 @@
 import {Api as BidragAdminApi} from "./api/BidragAdminApi";
-import {Api as BidragBelopshistorikk} from "./api/BelopshistorikkApi";
-import {Api as BidragReskontro} from "./api/BidragReskontroApi";
-import {Api as BidragVedtak} from "./api/BidragVedtakApi";
-import {Api as BidragOrganisasjon} from "./api/OrganisasjonApi";
-import {Api as BidragPersonApi} from "./api/PersonApi";
-import {Api as BidragSakApi} from "./api/SakApi";
-import {Api as BidragSamhandler} from "./api/SamhandlerApi";
-import {Api as BidragTilgangskontroll} from "./api/TilgangskontrollApi";
-import {proxy} from "./proxyApi";
+import { Api as BidragBelopshistorikk } from "./api/BelopshistorikkApi";
+import { Api as BidragDokumentApi } from "./api/BidragDokumentApi";
+import { Api as BidragReskontro } from "./api/BidragReskontroApi";
+import { Api as BidragVedtak } from "./api/BidragVedtakApi";
+import { Api as BidragOrganisasjon } from "./api/OrganisasjonApi";
+import { Api as BidragPersonApi } from "./api/PersonApi";
+import { Api as BidragSakApi } from "./api/SakApi";
+import { Api as BidragSamhandler } from "./api/SamhandlerApi";
+import { Api as BidragTilgangskontroll } from "./api/TilgangskontrollApi";
+import { proxy } from "./proxyApi";
 
-export const BIDRAG_TILGANGSKONTROLL_API = proxy(
-    new BidragTilgangskontroll(),
-    {
-        app: "bidrag-tilgangskontroll",
-    }
-);
+export const BIDRAG_TILGANGSKONTROLL_API = proxy(new BidragTilgangskontroll(), {
+    app: "bidrag-tilgangskontroll",
+});
 
 export const BIDRAG_PERSON_API = proxy(new BidragPersonApi(), {
     app: "bidrag-person",
@@ -36,18 +34,18 @@ export const BIDRAG_ORGANISASJON_API = proxy(new BidragOrganisasjon(), {
     app: "bidrag-organisasjon",
 });
 
-export const BIDRAG_BELOPSHISTORIKK_API = proxy(
-    new BidragBelopshistorikk(),
-    {
-        app: "bidrag-belopshistorikk",
-    }
-);
+export const BIDRAG_BELOPSHISTORIKK_API = proxy(new BidragBelopshistorikk(), {
+    app: "bidrag-belopshistorikk",
+});
 
 export const BIDRAG_VEDTAK_API = proxy(new BidragVedtak(), {
-    app: "bidrag-vedtak"
+    app: "bidrag-vedtak",
+});
+
+export const BIDRAG_DOKUMENT_API = proxy(new BidragDokumentApi(), {
+    app: "bidrag-dokument",
 });
 
 export const BIDRAG_RESKONTRO_API = proxy(new BidragReskontro(), {
     app: "bidrag-reskontro",
 });
-

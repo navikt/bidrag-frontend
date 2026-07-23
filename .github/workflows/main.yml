@@ -1,10 +1,11 @@
-name: "Deploy til prod"
+name: "Pipeline for main"
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  test:
+    name: "Test og valider"
     uses: ./.github/workflows/build-and-test.yml
     secrets: inherit
     permissions:
@@ -12,44 +13,12 @@ jobs:
       contents: read
       id-token: write
 
-  deploy_q1:
-    needs:
-      - build
-    name: "Deploy til q1"
-    runs-on: ubuntu-latest
+  deploy:
+    needs: test
+    name: "Start utrulling"
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
     permissions:
-      packages: read
+      packages: write
       contents: read
       id-token: write
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Deploy til dev-gcp q1
-        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
-        env:
-          CLUSTER: dev-gcp
-          RESOURCE: .nais/nais.yaml
-          VARS: .nais/q1.yaml
-          IMAGE: ${{ needs.build.outputs.image }}
-          TELEMETRY: ${{ needs.build.outputs.telemetry }}
-
-  deploy_prod:
-    needs:
-      - build
-      - deploy_q1
-    name: "Deploy til prod"
-    runs-on: ubuntu-latest
-    permissions:
-      packages: read
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v7
-      - name: Deploy til prod-gcp
-        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
-        env:
-          CLUSTER: prod-gcp
-          RESOURCE: .nais/nais.yaml
-          VARS: .nais/prod.yaml
-          IMAGE: ${{ needs.build.outputs.image }}
-          TELEMETRY: ${{ needs.build.outputs.telemetry }}

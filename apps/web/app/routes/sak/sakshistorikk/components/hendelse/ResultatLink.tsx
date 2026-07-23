@@ -1,0 +1,88 @@
+import type { SakshendelseDto } from "@bidrag/api/SakApi";
+import { HStack, Link } from "@navikt/ds-react";
+import { useFlag } from "@unleash/proxy-client-react";
+
+export function ResultatLink({
+    saksnummer,
+    hendelse,
+    enhet,
+    sessionState,
+}: {
+    saksnummer: string;
+    hendelse: SakshendelseDto;
+    enhet: string | null;
+    sessionState: string | null;
+}) {
+    const visINyLosning = useFlag("bisys.vedtak_lesemodus_ny_losning");
+    const visIBegge = useFlag("bisys.vedtak_lesemodus_lenke_begge");
+
+    if (!hendelse.link || !hendelse.resultat) {
+        return null;
+    }
+
+    const resultatUrl = generateResultatUrl(hendelse, enhet, sessionState, saksnummer);
+    const bisysResultatUrl = generateBisysResultatUrl(hendelse, saksnummer, enhet, sessionState);
+
+    if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
+        return (
+            <HStack gap={"space-12"}>
+                <Link href={bisysResultatUrl}>{hendelse.resultat}*</Link>
+                <Link href={resultatUrl} aria-label="Vis i ny løsning">
+                    🦄
+                </Link>
+            </HStack>
+        );
+    }
+
+    if (visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
+        return <Link href={resultatUrl}>{hendelse.resultat}</Link>;
+    }
+
+    if (hendelse.behandlingsid != null && hendelse.vedtaksid != null && resultatUrl) {
+        return <Link href={resultatUrl}>{hendelse.resultat}</Link>;
+    }
+
+    if (hendelse.resultatIBisys) {
+        return <Link href={bisysResultatUrl}>{hendelse.resultat}*</Link>;
+    }
+
+    return null;
+}
+
+function generateBisysResultatUrl(
+    hendelse: SakshendelseDto,
+    saksnummer: string,
+    enhet: string | null,
+    sessionState: string | null,
+) {
+    const bisysResultatUrlParams = new URLSearchParams({
+        executeResultat: "1",
+        linkTil: hendelse.link ?? "",
+        saksnr: saksnummer,
+        ...(hendelse.søknadsid && { soknadId: hendelse.søknadsid }),
+        ...(enhet && { enhet }),
+        ...(sessionState && { sessionState }),
+    });
+
+    return `/bisys/sakHistorikk?${bisysResultatUrlParams}`;
+}
+
+function generateResultatUrl(
+    hendelse: SakshendelseDto,
+    enhet: string | null,
+    sessionState: string | null,
+    saksnummer: string,
+) {
+    if (hendelse.vedtaksid == null) {
+        return null;
+    }
+
+    const resultatUrlParams = new URLSearchParams({
+        steg: "vedtak",
+        ...(hendelse.søknadsid && { soknadId: hendelse.søknadsid }),
+        ...(enhet && { enhet }),
+        ...(sessionState && { sessionState }),
+    });
+
+    return `/sak/${saksnummer}/vedtak/${hendelse.vedtaksid}?${resultatUrlParams}`;
+}
