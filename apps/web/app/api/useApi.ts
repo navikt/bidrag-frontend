@@ -1,6 +1,7 @@
 /* eslint-disable preserve-caught-error */
 
 import {
+    BIDRAG_ADMIN_API,
     BIDRAG_ORGANISASJON_API,
     BIDRAG_PERSON_API,
     BIDRAG_SAK_API,
@@ -8,37 +9,16 @@ import {
     BIDRAG_TILGANGSKONTROLL_API,
     TilgangsFeilError,
 } from "@bidrag/api";
-import type { EnhetDto, HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
-import type {
-    ForelderBarnRelasjonDto,
-    MotpartBarnRelasjonDto,
-    PersonDto,
-    PersonRequest,
-} from "@bidrag/api/PersonApi";
-import type {
-    BidragssakDto,
-    FogdhistorikkDto,
-    OppdaterRollerISakRequest,
-    OppdaterSakResponse,
-    OpprettSakRequest,
-} from "@bidrag/api/SakApi";
-import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
-import {
-    IdentUtils,
-    ObjectUtils,
-    SecureLoggerService,
-    StringUtils,
-} from "@bidrag/common";
-import {
-    useMutation,
-    useQueries,
-    useQuery,
-    useQueryClient,
-    useSuspenseQueries,
-    useSuspenseQuery,
-} from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
+import type {EnhetDto, HentEnhetRequest} from "@bidrag/api/OrganisasjonApi";
+import type {ForelderBarnRelasjonDto, MotpartBarnRelasjonDto, PersonDto, PersonRequest,} from "@bidrag/api/PersonApi";
+import type {BidragssakDto, FogdhistorikkDto, OppdaterRollerISakRequest, OppdaterSakResponse, OpprettSakRequest,} from "@bidrag/api/SakApi";
+import type {SamhandlerDto} from "@bidrag/api/SamhandlerApi";
+import {IdentUtils, LoggerService, ObjectUtils, SecureLoggerService, StringUtils,} from "@bidrag/common";
+import {useMutation, useQueries, useQuery, useQueryClient, useSuspenseQueries, useSuspenseQuery,} from "@tanstack/react-query";
+import {AxiosError} from "axios";
+import type {ISamhandlerPersonInfo} from "~/api/types/person.ts";
+import {EndringsLoggDto, OppdaterEndringsloggRequest, OpprettEndringsloggRequest} from "~/api/types/admin.ts";
+
 
 // ==================== SAK ====================
 
@@ -52,9 +32,9 @@ export const useHentPersonData = (ident?: string) => {
         queryKey: QueryKeys.hentPersoninfo(ident ?? ""),
         queryFn: async (): Promise<PersonDto> => {
             if (!ident || StringUtils.isEmpty(ident))
-                return { ident: "", visningsnavn: "Ukjent" };
-            const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost(
-                { ident: ident },
+                return {ident: "", visningsnavn: "Ukjent"};
+            const {data} = await BIDRAG_PERSON_API.informasjon.hentPersonPost(
+                {ident: ident},
             );
             return data;
         },
@@ -63,6 +43,7 @@ export const useHentPersonData = (ident?: string) => {
         throwOnError: false,
     });
 };
+
 export function useKanOppretteSakUtenBm() {
     return useSuspenseQuery({
         queryKey: QueryKeys.kanOppretteSak,
@@ -70,21 +51,21 @@ export function useKanOppretteSakUtenBm() {
             try {
                 const response =
                     await BIDRAG_TILGANGSKONTROLL_API.v2.sjekkTilgangOpprettSakUtenBm();
-                return { data: response.data.harTilgang };
+                return {data: response.data.harTilgang};
             } catch (e) {
                 SecureLoggerService.error(
                     "Kunne ikke hente informasjon om saksbehandler kan opprette sak uten BM",
                     e instanceof Error ? e : new Error(String(e)),
                 );
-                return { data: false };
+                return {data: false};
             }
         },
         select: (data) => data.data,
         initialData:
             process.env.NODE_ENV == "TEST"
                 ? () => ({
-                      data: false,
-                  })
+                    data: false,
+                })
                 : undefined,
     });
 }
@@ -157,7 +138,7 @@ export function useOpprettSak() {
                 if (e instanceof AxiosError) {
                     throw new Error(
                         e.response?.headers["warning"] ||
-                            "Feil ved opprettelse av sak",
+                        "Feil ved opprettelse av sak",
                     );
                 }
                 await SecureLoggerService.error(
@@ -365,9 +346,9 @@ export function useHentSamhandler(ident: string, enabled: boolean = true) {
         queryFn: async () => {
             try {
                 if (!IdentUtils.isSamhandlerId(ident)) {
-                    return { samhandlerId: ident } as SamhandlerDto;
+                    return {samhandlerId: ident} as SamhandlerDto;
                 }
-                const { data } =
+                const {data} =
                     await BIDRAG_SAMHANDLER_API.samhandler.hentSamhandler(
                         JSON.stringify(ident),
                     );
@@ -400,6 +381,7 @@ export function useHentSamhandler(ident: string, enabled: boolean = true) {
         throwOnError: false,
     });
 }
+
 export const useHentSamhandlerEllerPersonForIdent = (
     sjekkSamhandler: boolean = true,
 ) => {
@@ -407,12 +389,12 @@ export const useHentSamhandlerEllerPersonForIdent = (
 
     return useMutation({
         mutationFn: async ({
-            ident,
-        }: {
+                               ident,
+                           }: {
             ident: string;
         }): Promise<ISamhandlerPersonInfo> => {
             if (ObjectUtils.isEmpty(ident))
-                return { ident, visningsnavn: "", isValid: false };
+                return {ident, visningsnavn: "", isValid: false};
 
             const queryKey = ["hent_samhandler_eller_person", ident];
 
@@ -460,7 +442,7 @@ export const useHentSamhandlerEllerPersonForIdent = (
                         isValid: true,
                     };
                 } else {
-                    result = { ident, visningsnavn: "", isValid: false };
+                    result = {ident, visningsnavn: "", isValid: false};
                 }
             } catch (e) {
                 await SecureLoggerService.warn(
@@ -500,7 +482,7 @@ export function useHentPersoninformasjon(
         queryFn: async () => {
             if (!request) throw new Error("Request is required");
             try {
-                const { data } =
+                const {data} =
                     await BIDRAG_PERSON_API.informasjon.hentPersonPost(request);
                 await SecureLoggerService.info(
                     `Hentet personinformasjon for ident ${request.ident}`,
@@ -540,7 +522,7 @@ export function useHentPersoninformasjonMutation() {
     >({
         mutationFn: async (request) => {
             try {
-                const { data, status } =
+                const {data, status} =
                     await BIDRAG_PERSON_API.informasjon.hentPersonPost(request);
                 await SecureLoggerService.info(
                     `Hentet personinformasjon for ident ${request.ident}`,
@@ -578,7 +560,7 @@ export function useHentFlerePersoninformasjonSuspense(
             queryKey: ["hent_personinformasjon", ident],
             queryFn: async () => {
                 try {
-                    const { data } =
+                    const {data} =
                         await BIDRAG_PERSON_API.informasjon.hentPersonPost({
                             ident,
                         });
@@ -622,7 +604,7 @@ export function useHentFlerePersoninformasjon(
             queryKey: ["hent_personinformasjon", ident],
             queryFn: async () => {
                 try {
-                    const { data } =
+                    const {data} =
                         await BIDRAG_PERSON_API.informasjon.hentPersonPost({
                             ident,
                         });
@@ -670,7 +652,7 @@ function hentPersonMotpartBarnRelasjonQueryOptions(
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
             if (!request || enabled === false) return undefined;
             try {
-                const { data } =
+                const {data} =
                     await BIDRAG_PERSON_API.motpartbarnrelasjon.getPersonensMotpartBarnRelasjon(
                         request,
                     );
@@ -734,7 +716,7 @@ export function useHentForelderBarnRelasjon(
         queryFn: async (): Promise<ForelderBarnRelasjonDto | undefined> => {
             if (!request || enabled === false) return undefined;
             try {
-                const { data } =
+                const {data} =
                     await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(
                         request,
                     );
@@ -782,7 +764,7 @@ function hentForeldreinformasjonForBarnQueryOptions(
             if (!request?.ident || enabled === false) return [];
 
             try {
-                const { data } =
+                const {data} =
                     await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(
                         request,
                     );
@@ -802,7 +784,7 @@ function hentForeldreinformasjonForBarnQueryOptions(
 
                 const foreldreResponses = await Promise.all(
                     foreldreIdenter.map((ident) =>
-                        BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident }),
+                        BIDRAG_PERSON_API.informasjon.hentPersonPost({ident}),
                     ),
                 );
 
@@ -862,7 +844,7 @@ export function hentPersonGeografiskEnhetQueryOptions(
         queryFn: async () => {
             if (!request) throw new Error("Request is required");
             try {
-                const { data } =
+                const {data} =
                     await BIDRAG_ORGANISASJON_API.arbeidsfordeling.hentArbeidsfordelingGeografiskTilknytningEnhet(
                         request,
                     );
@@ -914,7 +896,7 @@ export function useHentEnhetInfomasjon(
         queryFn: async () => {
             if (!enhetnummer) throw new Error("Enhetnummer is required");
             try {
-                const { data } =
+                const {data} =
                     await BIDRAG_ORGANISASJON_API.enhet.hentEnhetInfo(
                         enhetnummer,
                     );
@@ -1012,3 +994,103 @@ export function useHentFogdhistorikk(
         },
     });
 }
+
+// ================= ENDRINGSLOGG ===============
+
+export const useHentEndringslogger = () => {
+    return useSuspenseQuery<EndringsLoggDto[], AxiosError | TilgangsFeilError>({
+        queryKey: ["endringslogger"],
+        queryFn: async (): Promise<EndringsLoggDto[]> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentAlleEndringslogg({bareAktive: false});
+            return data;
+        },
+    });
+};
+
+export const useCreateEndringslogg = () => {
+    return useMutation({
+        mutationKey: ["createUpdateEndringslogg"],
+        mutationFn: async (payload: OpprettEndringsloggRequest): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.opprettEndringslogg(payload);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved oppreting av endringslogg", error);
+        },
+    });
+};
+
+export const useEditEndringslogg = () => {
+    return useMutation({
+        mutationKey: ["createUpdateEndringslogg"],
+        mutationFn: async ({
+                               endringsloggId,
+                               payload,
+                           }: {
+            endringsloggId: number;
+            payload: OppdaterEndringsloggRequest;
+        }): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.oppdaterEndringslogg(endringsloggId, payload);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved oppreting av endringslogg", error);
+        },
+    });
+};
+
+export const useHentEndringslogg = (endringsloggId?: number) => {
+    return useSuspenseQuery({
+        queryKey: ["endringslogg", endringsloggId],
+        queryFn: async (): Promise<EndringsLoggDto> => {
+            if (!endringsloggId) return {} as EndringsLoggDto;
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentEndringslogg(endringsloggId);
+            return data;
+        },
+    });
+};
+
+export const useAktiverEndringslogg = () => {
+    return useMutation({
+        mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.aktiverEndringslogg(endringsloggId);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved aktivering av endringslogg", error);
+        },
+    });
+};
+
+export const useDeaktiverEndringslogg = () => {
+    return useMutation({
+        mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.deaktiverEndringslogg(endringsloggId);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved deaktivering av endringslogg", error);
+        },
+    });
+};
+
+export const useSlettEndringslogg = () => {
+    return useMutation({
+        mutationFn: async (endringsloggId: number): Promise<void> => {
+            await BIDRAG_ADMIN_API.endringslogg.slettEndringslogg(endringsloggId);
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved sletting av endringslogg", error);
+        },
+    });
+};

@@ -1,0 +1,81 @@
+.ql-top-container {
+    min-width: 100%;
+    min-height: 5rem;
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: var(--ax-border-neutral);
+}
+.resizable .ql-editor {
+    height: inherit;
+    resize: both;
+    overflow: auto;
+    border-end-end-radius: 0;
+}
+
+.error {
+    border: 1px solid;
+    border-radius: 4px;
+    border-color: var(--ax-border-danger);
+    box-shadow: 0 0 0 1px var(--ax-border-danger);
+}
+
+.ql-editor {
+    min-width: 100%;
+    height: min-content;
+    border: 0;
+    font-size: 16px;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+}
+.ql-container {
+    height: inherit;
+    width: auto;
+}
+.ql-toolbar {
+    width: auto;
+}
+
+.ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid var(--ax-border-neutral);
+}
+
+.ql-container.ql-snow {
+    border: none;
+}
+
+.readonly > .ql-container {
+    background-color: var(--ax-bg-neutral-soft);
+    border-color: var(--ax-border-neutral-subtle);
+    cursor: default;
+}
+
+.ql-snow .ql-formats button[aria-label="header: 3"]:before {
+    content: "Undertittel";
+    width: max-content;
+    font-size: 16px;
+}
+.ql-snow .ql-formats button[aria-label="header: 3"].ql-active {
+    font-weight: bold;
+}
+.ql-snow .ql-formats button[aria-label="header: 3"] svg {
+    display: none;
+    width: max-content;
+}
+.ql-snow .ql-tooltip[data-mode="link"]::before {
+    content: "Skriv inn URL:";
+}
+.ql-snow .ql-tooltip[data-mode="link"] a.ql-action::after {
+    content: "Lagre";
+}
+.ql-snow .ql-tooltip:not([data-mode="link"])::before {
+    content: "Lenke:";
+}
+.ql-snow .ql-tooltip:not([data-mode="link"]) a.ql-action::after {
+    content: "Endre";
+}
+.ql-snow .ql-tooltip a.ql-remove::before {
+    content: "Fjern lenke";
+}
