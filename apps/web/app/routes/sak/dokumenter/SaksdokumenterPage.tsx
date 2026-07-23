@@ -17,7 +17,7 @@ export default function SaksdokumenterPage({ params }: Route.ComponentProps) {
     }
 
     return (
-       <HStack gap="space-4" align="start">
+        <HStack gap="space-4" align="start">
             <SaksdokumenterVisning saksnummer={saksnummer} journalposter={journalposter ?? []} />
         </HStack>
     );

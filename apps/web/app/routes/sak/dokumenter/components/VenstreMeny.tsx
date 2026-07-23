@@ -13,11 +13,7 @@ export interface VenstreMenyProps {
 
 export function VenstreMeny({ sakRoller, data, filterState, menyState }: VenstreMenyProps) {
     return (
-        <Box 
-            as="nav" 
-            aria-label="Dokumentliste"
-            width="21em"
-        >
+        <Box as="nav" aria-label="Dokumentliste" width="21em">
             <FilterBoks data={data} filterState={filterState} menyState={menyState} />
             <DokumentTre data={data} menyState={menyState} sakRoller={sakRoller} />
         </Box>

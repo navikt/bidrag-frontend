@@ -44,7 +44,7 @@ export function JournalpostHeaderInfo({
     };
 
     const rolleType = gjelderRolle?.type;
-    const rolleIdent = typeof jp.gjelderAktor === "string" ? jp.gjelderAktor : (jp.gjelderAktor)?.ident;
+    const rolleIdent = typeof jp.gjelderAktor === "string" ? jp.gjelderAktor : jp.gjelderAktor?.ident;
 
     return (
         <HStack gap="space-4" align={isExpanded ? "start" : "center"} wrap={false}>
@@ -53,26 +53,16 @@ export function JournalpostHeaderInfo({
             </Tag>
 
             {rolleType && (
-                <RolleTag 
-                    rolleType={rolleType as string as RolleType} 
-                    ident={rolleIdent}
-                    className="!mr-0" 
-                />
+                <RolleTag rolleType={rolleType as string as RolleType} ident={rolleIdent} className="!mr-0" />
             )}
 
             {/* Antall */}
-            <Detail textColor="subtle">
-                ({antallDokumenter})
-            </Detail>
+            <Detail textColor="subtle">({antallDokumenter})</Detail>
 
-            <Detail 
-                weight="semibold" 
-                textColor={harDokumenter ? "default" : "subtle"} 
-                className={`flex-1 min-w-0 ${
-                    isExpanded 
-                        ? "break-words whitespace-normal block" 
-                        : "truncate block"
-                }`}
+            <Detail
+                weight="semibold"
+                textColor={harDokumenter ? "default" : "subtle"}
+                className={`flex-1 min-w-0 ${isExpanded ? "break-words whitespace-normal block" : "truncate block"}`}
             >
                 {innhold}
             </Detail>
