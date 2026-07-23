@@ -1,157 +1,188 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { Accordion, Alert, VStack } from "@navikt/ds-react";
-import type React from "react";
+import { formaterDato } from "@bidrag/utils";
+import { Accordion, Box, Detail, HStack, VStack } from "@navikt/ds-react";
 import { standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
+import PersonIdentMedRolle from "../../sakshistorikk/components/journalpost/PersonIdentMedRolle";
 import type { SaksDokument } from "../types";
 import { finnDokumenterForJournalpost } from "../utils/saksdokumenterUtils";
 import { DokumentKnapp } from "./DokumentKnapp";
+import type { DokumentData, MenyState } from "./hooks/useDokumentState";
 import { JournalpostHeaderInfo } from "./JournalpostHeaderInfo";
 
 export interface DokumentTreProps {
-    journalposter: JournalpostDto[];
-    dokumenter: SaksDokument[];
+    data: DokumentData;
+    menyState: MenyState;
     sakRoller: RolleDto[];
-    harBlandingFarBid: boolean;
-    selectedId?: string;
-    setSelectedId: (id: string) => void;
-    visitedIds: Set<string>;
-    expandedIds: Set<string>;
-    setExpandedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-export function DokumentTre({
-    journalposter,
-    dokumenter,
-    sakRoller,
-    harBlandingFarBid,
-    selectedId,
-    setSelectedId,
-    visitedIds,
-    expandedIds,
-    setExpandedIds,
-}: DokumentTreProps) {
+export function DokumentTre({ data, menyState, sakRoller }: DokumentTreProps) {
+    const { journalposter, dokumenter, harBlandingFarBid } = data;
+    const { selectedId, handleSelectDocument, visitedIds, expandedIds, setExpandedIds } = menyState;
+
     if (dokumenter.length === 0) {
         return (
-            <div style={{ padding: "0.5rem" }}>
-                <Alert variant="info" size="small">
-                    Ingen dokumenter
-                </Alert>
-            </div>
+            <Box padding="space-2">
+                <Detail>Ingen dokumenter funnet for filteret</Detail>
+            </Box>
         );
     }
 
     return (
-        <div style={{ flex: "1 1 auto", minHeight: 0, overflowY: "auto", padding: "0.25rem" }}>
-            <VStack gap="space-4">
-                {journalposter
-                    .slice()
-                    .sort(standardSort)
-                    .map((jp: JournalpostDto) => {
-                        const jpId = jp.journalpostId ?? `${jp.journalfortDato ?? ""}-${jp.dokumentDato ?? ""}`;
-                        const doksForJp = finnDokumenterForJournalpost(jp, dokumenter);
+        <VStack gap="0" className="divide-y divide-neutral-subtle">
+            {journalposter
+                .slice()
+                .sort(standardSort)
+                .map((jp: JournalpostDto) => {
+                    const jpId = jp.journalpostId ?? `${jp.journalfortDato ?? ""}-${jp.dokumentDato ?? ""}`;
+                    const doksForJp = finnDokumenterForJournalpost(jp, dokumenter);
 
-                        if (doksForJp.length === 0) {
-                            return (
-                                <div key={jpId} style={{ padding: "0.25rem 0.5rem" }}>
-                                    <JournalpostHeaderInfo
-                                        jp={jp}
-                                        sakRoller={sakRoller}
-                                        visFagomrade={harBlandingFarBid}
-                                        kanAapnes={false}
-                                    />
-                                </div>
-                            );
-                        }
+                    const handterAccordionEndring = (isOpen: boolean) => {
+                        setExpandedIds((prev) => {
+                            const next = new Set(prev);
+                            isOpen ? next.add(jpId) : next.delete(jpId);
+                            return next;
+                        });
+                    };
 
-                        if (doksForJp.length === 1) {
-                            const dok = doksForJp[0] as SaksDokument;
-                            const isSelected = selectedId === dok.id;
-                            const isVisited = visitedIds.has(dok.id);
+                    return (
+                        <DokumentJournalpost
+                            key={jpId}
+                            jp={jp}
+                            doksForJp={doksForJp}
+                            sakRoller={sakRoller}
+                            visFagomrade={harBlandingFarBid}
+                            isExpanded={expandedIds.has(jpId)}
+                            onToggle={handterAccordionEndring}
+                            selectedId={selectedId}
+                            visitedIds={visitedIds}
+                            onSelectDocument={handleSelectDocument}
+                        />
+                    );
+                })}
+        </VStack>
+    );
+}
 
-                            const backgroundStyle = isSelected
-                                ? "var(--a-surface-action-subtle, #cce1ff)"
-                                : "transparent";
-                            const borderStyle = isSelected
-                                ? "4px solid var(--a-border-action, #0056b4)"
-                                : "4px solid transparent";
+interface DokumentJournalpostProps {
+    jp: JournalpostDto;
+    doksForJp: SaksDokument[];
+    sakRoller: RolleDto[];
+    visFagomrade: boolean;
+    isExpanded: boolean;
+    onToggle: (isOpen: boolean) => void;
+    selectedId?: string;
+    visitedIds: Set<string>;
+    onSelectDocument: (id: string) => void;
+}
 
-                            return (
-                                <button
-                                    key={jpId}
-                                    type="button"
-                                    onClick={() => dok.kanAapnes && setSelectedId(dok.id)}
-                                    aria-current={isSelected ? "true" : "false"}
-                                    style={{
-                                        width: "100%",
-                                        padding: "0.375rem 0.5rem",
-                                        textAlign: "left",
-                                        background: backgroundStyle,
-                                        border: "none",
-                                        borderLeft: borderStyle,
-                                        borderRadius: "0 0.25rem 0.25rem 0",
-                                        cursor: dok.kanAapnes ? "pointer" : "not-allowed",
-                                        display: "block",
-                                        transition: "background-color 0.15s ease",
-                                        boxSizing: "border-box",
-                                    }}
-                                >
-                                    <JournalpostHeaderInfo
-                                        jp={jp}
-                                        sakRoller={sakRoller}
-                                        visFagomrade={harBlandingFarBid}
-                                        kanAapnes={dok.kanAapnes}
-                                        isSelected={isSelected}
-                                        isVisited={isVisited}
-                                    />
-                                </button>
-                            );
-                        }
+function DokumentJournalpost({
+    jp,
+    doksForJp,
+    sakRoller,
+    visFagomrade,
+    isExpanded,
+    onToggle,
+    selectedId,
+    visitedIds,
+    onSelectDocument,
+}: DokumentJournalpostProps) {
+    const harDokumenter = doksForJp.length > 0;
+    const harSettAlle = harDokumenter && doksForJp.every((dok) => visitedIds.has(dok.id));
 
-                        const isExpanded = expandedIds.has(jpId);
-                        const harSettAlle = doksForJp.length > 0 && doksForJp.every((dok) => visitedIds.has(dok.id));
+    // Hvis det ikke finnes dokumenter, rendrer vi bare en grået-ut header
+    if (!harDokumenter) {
+        return (
+            <Box paddingBlock="space-3" paddingInline="space-4" className="bg-neutral-soft">
+                <JournalpostHeaderInfo jp={jp} harDokumenter={false} />
+            </Box>
+        );
+    }
 
-                        const handterAccordionEndring = (isOpen: boolean) => {
-                            setExpandedIds((prev) => {
-                                const next = new Set(prev);
-                                if (isOpen) {
-                                    next.add(jpId);
-                                } else {
-                                    next.delete(jpId);
-                                }
-                                return next;
-                            });
-                        };
+    return (
+        <Accordion className="[&.navds-accordion]:!border-none [&_.navds-accordion__item]:!border-none">
+            <Accordion.Item open={isExpanded} onOpenChange={onToggle}>
+                <Accordion.Header>
+                    <JournalpostHeaderInfo jp={jp} isVisited={harSettAlle} harDokumenter={true} />
+                </Accordion.Header>
+                {/* Vi fjerner default padding fra Aksel med !p-0 for å ha full kontroll selv */}
+                <Accordion.Content className="!p-0">
+                    <VStack>
+                        <JournalpostMetadata jp={jp} sakRoller={sakRoller} visFagomrade={visFagomrade} />
+                        <VStack gap="0" className="divide-y divide-neutral-subtle">
+                            {doksForJp.map((dok) => (
+                                <DokumentKnapp
+                                    key={dok.id}
+                                    dokument={dok}
+                                    isSelected={selectedId === dok.id}
+                                    isVisited={visitedIds.has(dok.id)}
+                                    onClick={() => onSelectDocument(dok.id)}
+                                />
+                            ))}
+                        </VStack>
+                    </VStack>
+                </Accordion.Content>
+            </Accordion.Item>
+        </Accordion>
+    );
+}
 
-                        return (
-                            <Accordion key={jpId}>
-                                <Accordion.Item open={isExpanded} onOpenChange={handterAccordionEndring}>
-                                    <Accordion.Header className="[&>button]:py-2 [&>button]:px-2 hover:[&>button]:bg-gray-100">
-                                        <JournalpostHeaderInfo
-                                            jp={jp}
-                                            sakRoller={sakRoller}
-                                            visFagomrade={harBlandingFarBid}
-                                            isVisited={harSettAlle}
-                                        />
-                                    </Accordion.Header>
-                                    <Accordion.Content style={{ padding: "0 0.25rem 0.25rem 1rem" }}>
-                                        <VStack gap="space-0">
-                                            {doksForJp.map((dok) => (
-                                                <DokumentKnapp
-                                                    key={dok.id}
-                                                    dokument={dok}
-                                                    isSelected={selectedId === dok.id}
-                                                    isVisited={visitedIds.has(dok.id)}
-                                                    onClick={() => setSelectedId(dok.id)}
-                                                />
-                                            ))}
-                                        </VStack>
-                                    </Accordion.Content>
-                                </Accordion.Item>
-                            </Accordion>
-                        );
-                    })}
-            </VStack>
-        </div>
+// All metadata som tidligere lå i headeren er nå her inne!
+function JournalpostMetadata({
+    jp,
+    sakRoller,
+    visFagomrade,
+}: {
+    jp: JournalpostDto;
+    sakRoller: RolleDto[];
+    visFagomrade: boolean;
+}) {
+    const dokDato = jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
+    const jourDato = jp.journalfortDato ? formaterDato(jp.journalfortDato) : "";
+    const gjelderAktor = jp.gjelderAktor;
+    const journalforendeEnhet = jp.journalforendeEnhet;
+    const dokumentType = jp.dokumentType;
+    const fagomrade = jp.fagomrade;
+    const skalViseGjelderLinje = Boolean(gjelderAktor || journalforendeEnhet);
+
+    return (
+        <VStack
+            gap="space-1"
+            paddingInline="space-4"
+            paddingBlock="space-2 space-4"
+            className="bg-neutral-soft border-b border-neutral-subtle"
+        >
+            <HStack gap="space-4" align="center" wrap className="text-xs">
+                {dokumentType && <Detail textColor="subtle">{dokumentType}</Detail>}
+                {visFagomrade && fagomrade && <Detail textColor="subtle">· {fagomrade}</Detail>}
+                {dokDato && <Detail textColor="subtle">· Dok: {dokDato}</Detail>}
+                {jourDato && <Detail textColor="subtle">· Jour: {jourDato}</Detail>}
+            </HStack>
+
+            {skalViseGjelderLinje && (
+                <HStack align="center" gap="space-4" wrap={false} className="text-xs overflow-hidden">
+                    {gjelderAktor && (
+                        <>
+                            <Detail textColor="subtle" className="shrink-0">
+                                Gjelder:
+                            </Detail>
+                            <div className="truncate min-w-0">
+                                <PersonIdentMedRolle gjelderAktor={gjelderAktor} sakRoller={sakRoller} />
+                            </div>
+                        </>
+                    )}
+                    {gjelderAktor && journalforendeEnhet && (
+                        <Detail textColor="subtle" className="shrink-0">
+                            ·
+                        </Detail>
+                    )}
+                    {journalforendeEnhet && (
+                        <Detail textColor="subtle" className="shrink-0 whitespace-nowrap">
+                            Enhet: {journalforendeEnhet}
+                        </Detail>
+                    )}
+                </HStack>
+            )}
+        </VStack>
     );
 }

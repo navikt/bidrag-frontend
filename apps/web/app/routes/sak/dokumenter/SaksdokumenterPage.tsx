@@ -1,3 +1,4 @@
+import { HStack } from "@navikt/ds-react";
 import { useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import type { Route } from "./+types/SaksdokumenterPage";
@@ -16,9 +17,8 @@ export default function SaksdokumenterPage({ params }: Route.ComponentProps) {
     }
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 120px)", overflow: "hidden" }}>
-            <title>Dokumenter - {saksnummer}</title>
+        <HStack gap="space-32" align="start">
             <SaksdokumenterVisning saksnummer={saksnummer} journalposter={journalposter ?? []} />
-        </div>
+        </HStack>
     );
 }

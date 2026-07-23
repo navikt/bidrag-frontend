@@ -9,7 +9,7 @@ import {
     BIDRAG_TILGANGSKONTROLL_API,
     TilgangsFeilError,
 } from "@bidrag/api";
-import type { DokumentMetadata, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
+import { DokumentFormatDto, type DokumentMetadata, type JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { EnhetDto, HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
 import type { ForelderBarnRelasjonDto, MotpartBarnRelasjonDto, PersonDto, PersonRequest } from "@bidrag/api/PersonApi";
 import type {
@@ -890,35 +890,60 @@ export function useHentDokumentMetadata(journalpostId: string, dokumentreferanse
     });
 }
 
+export async function hentDokumentApi({
+    journalpostId,
+    dokumentreferanse,
+    resizeToA4,
+    optimizeForPrint,
+}: HentDokumentRequest): Promise<ArrayBuffer> {
+    try {
+        const queryParams = new URLSearchParams();
+        queryParams.set("resizeToA4", String(Boolean(resizeToA4)));
+        queryParams.set("optimizeForPrint", String(optimizeForPrint ?? true));
+        const path = dokumentreferanse
+            ? `/dokument/${journalpostId}/${dokumentreferanse}`
+            : `/dokument/${journalpostId}`;
+        const response = await BIDRAG_DOKUMENT_API.request<ArrayBuffer, unknown>({
+            path: `${path}?${queryParams.toString()}`,
+            method: "GET",
+            secure: true,
+            format: "arraybuffer",
+        });
+
+        return response.data;
+    } catch (e) {
+        return handleApiError(
+            e,
+            `hente dokument for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
+        );
+    }
+}
+
+export async function hentDokumentUrlApi({
+    journalpostId,
+    dokumentreferanse,
+}: HentDokumentUrlRequest): Promise<string> {
+    try {
+        const response = await BIDRAG_DOKUMENT_API.tilgang.giTilgangTilDokument(journalpostId, dokumentreferanse);
+        return response.data.dokumentUrl;
+    } catch (e) {
+        return handleApiError(
+            e,
+            `hente dokument-URL for journalpost ${journalpostId} og referanse ${dokumentreferanse}`,
+        );
+    }
+}
+
+// ==================== REACT QUERY HOOKS ====================
+
 export function useHentDokument() {
     return useMutation<ArrayBuffer, AxiosError | TilgangsFeilError, HentDokumentRequest>({
         mutationKey: ["hent_dokument"],
-        mutationFn: async ({ journalpostId, dokumentreferanse, resizeToA4, optimizeForPrint }) => {
-            try {
-                const queryParams = new URLSearchParams();
-                queryParams.set("resizeToA4", String(Boolean(resizeToA4)));
-                queryParams.set("optimizeForPrint", String(optimizeForPrint ?? true));
-                const path = dokumentreferanse
-                    ? `/dokument/${journalpostId}/${dokumentreferanse}`
-                    : `/dokument/${journalpostId}`;
-                const response = await BIDRAG_DOKUMENT_API.request<ArrayBuffer, unknown>({
-                    path: `${path}?${queryParams.toString()}`,
-                    method: "GET",
-                    secure: true,
-                    format: "arraybuffer",
-                });
-
-                return response.data;
-            } catch (e) {
-                return handleApiError(
-                    e,
-                    `hente dokument for journalpost ${journalpostId} og dokumentreferanse ${dokumentreferanse ?? "N/A"}`,
-                );
-            }
-        },
+        mutationFn: hentDokumentApi,
     });
 }
 
+// Her brukes HentDokumenterRequest akkurat som før!
 export function useHentDokumenter() {
     return useMutation<ArrayBuffer, AxiosError | TilgangsFeilError, HentDokumenterRequest>({
         mutationKey: ["hent_dokumenter"],
@@ -949,19 +974,42 @@ export function useHentDokumenter() {
 export function useHentDokumentUrl() {
     return useMutation<string, AxiosError | TilgangsFeilError, HentDokumentUrlRequest>({
         mutationKey: ["hent_dokument_url"],
-        mutationFn: async ({ journalpostId, dokumentreferanse }) => {
-            try {
-                const response = await BIDRAG_DOKUMENT_API.tilgang.giTilgangTilDokument(
-                    journalpostId,
-                    dokumentreferanse,
-                );
-                return response.data.dokumentUrl;
-            } catch (e) {
-                return handleApiError(
-                    e,
-                    `hente dokument-URL for journalpost ${journalpostId} og referanse ${dokumentreferanse}`,
-                );
+        mutationFn: hentDokumentUrlApi,
+    });
+}
+
+export function useHentSaksdokumentPdf(
+    journalpostId?: string,
+    dokumentreferanse?: string,
+    format?: DokumentFormatDto | string,
+    enabled: boolean = true,
+) {
+    return useQuery({
+        queryKey: ["pdf-dokument", journalpostId, dokumentreferanse],
+        enabled: enabled && !!journalpostId,
+        staleTime: 1000 * 60 * 5,
+
+        queryFn: async () => {
+            if (!journalpostId) {
+                throw new Error("Mangler journalpostId for å hente dokument");
             }
+
+            const erMBDok = format === DokumentFormatDto.MBDOK;
+
+            if (erMBDok) {
+                const url = await hentDokumentUrlApi({
+                    journalpostId: journalpostId,
+                    dokumentreferanse: dokumentreferanse ?? "",
+                });
+                return { type: "URL", payload: url };
+            }
+
+            const arrayBuffer = await hentDokumentApi({
+                journalpostId: journalpostId,
+                dokumentreferanse: dokumentreferanse,
+            });
+
+            return { type: "RAW", payload: arrayBuffer };
         },
     });
 }

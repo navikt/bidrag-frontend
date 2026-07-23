@@ -1,4 +1,4 @@
-import { Alert, Loader } from "@navikt/ds-react";
+import { Alert, Box, Loader } from "@navikt/ds-react";
 import type { PdfState, SaksDokument } from "../types";
 
 export interface PdfVisningProps {
@@ -13,36 +13,28 @@ export function PdfVisning({ selectedDocument, viewerState, isMetadataLoading }:
     const hasSource = Boolean(viewerState.src);
 
     return (
-        <section style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", minWidth: 0 }}>
-            <div
-                style={{
-                    flex: 1,
-                    border: "1px solid var(--a-border-default)",
-                    borderRadius: "0.5rem",
-                    overflow: "hidden",
-                    background: "var(--a-surface-default)",
-                }}
+        <section className="flex-1 min-w-0 sticky top-4 h-[calc(100vh-4em)] flex flex-col">
+            <Box
+                className="flex-1 overflow-hidden flex items-center justify-center"
             >
                 {isLoading ? (
-                    <div style={{ padding: "2rem" }}>
-                        <Loader size="xlarge" title="Laster dokument" />
-                    </div>
+                    <Loader size="xlarge" title="Laster dokument" />
                 ) : hasError ? (
-                    <div style={{ padding: "1rem" }}>
+                    <Box padding="space-16">
                         <Alert variant="error">{viewerState.error}</Alert>
-                    </div>
+                    </Box>
                 ) : hasSource ? (
                     <iframe
                         title={selectedDocument?.tittel ?? "Dokument"}
-                        src={viewerState.src}
-                        style={{ width: "100%", height: "100%", border: 0, display: "block" }}
+                        src={`${viewerState.src}#view=FitH`}
+                        className="w-full h-full border-0 block"
                     />
                 ) : (
-                    <div style={{ padding: "1rem" }}>
+                    <Box padding="space-16">
                         <Alert variant="info">Velg et dokument som kan åpnes for å se innholdet</Alert>
-                    </div>
+                    </Box>
                 )}
-            </div>
+            </Box>
         </section>
     );
 }

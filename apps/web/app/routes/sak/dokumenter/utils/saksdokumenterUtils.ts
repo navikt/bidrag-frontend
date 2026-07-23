@@ -3,10 +3,19 @@ import { standardSort } from "../../sakshistorikk/components/journalpost/journal
 import type { SaksDokument } from "../types";
 
 export function sjekkOmBlandingAvFarOgBidrag(journalposter: JournalpostDto[]): boolean {
-    const harFar = journalposter.some((jp) => jp.fagomrade === "FAR");
-    const harBid = journalposter.some((jp) => jp.fagomrade === "BID");
-    return harFar && harBid;
+    const harFarskap = journalposter.some((jp) => jp.fagomrade === "FAR");
+    const harBidrag = journalposter.some((jp) => jp.fagomrade === "BID");
+
+    return harFarskap && harBidrag;
 }
+
+const erVedtak = (jp: JournalpostDto): boolean => {
+    return jp.innhold?.toLowerCase().includes("vedtak") ?? false;
+};
+
+const harFerdigstiltDokument = (jp: JournalpostDto): boolean => {
+    return (jp.dokumenter ?? []).some((dok) => dok.status === DokumentStatusDto.FERDIGSTILT);
+};
 
 export function filtrerJournalposter(
     journalposter: JournalpostDto[],
@@ -16,43 +25,49 @@ export function filtrerJournalposter(
     kunFerdigstilte: boolean,
 ): JournalpostDto[] {
     return journalposter.filter((jp) => {
-        const tekstinnhold = jp.innhold?.toLowerCase() ?? "";
-        const erIkkeVedtak = kunVedtak && !tekstinnhold.includes("vedtak");
-        const erSkjultFarskap = !visFarskapUtelukket && jp.fagomrade === "FAR";
-        const erSkjultFeilregistrert = !visFeilregistrerte && jp.feilfort;
+        const oppfyllerVedtakKrav = !kunVedtak || erVedtak(jp);
+        const oppfyllerFarskapKrav = visFarskapUtelukket || jp.fagomrade !== "FAR";
+        const oppfyllerFeilregistrertKrav = visFeilregistrerte || !jp.feilfort;
+        const oppfyllerFerdigstiltKrav = !kunFerdigstilte || harFerdigstiltDokument(jp);
 
-        const harFerdigstiltDokument = (jp.dokumenter ?? []).some(
-            (dok) => dok.status === DokumentStatusDto.FERDIGSTILT,
-        );
-        const erSkjultIkkeFerdigstilt = kunFerdigstilte && !harFerdigstiltDokument;
-
-        return !(erIkkeVedtak || erSkjultFarskap || erSkjultFeilregistrert || erSkjultIkkeFerdigstilt);
+        return oppfyllerVedtakKrav && oppfyllerFarskapKrav && oppfyllerFeilregistrertKrav && oppfyllerFerdigstiltKrav;
     });
 }
 
+const genererJournalpostFallbackId = (jp: JournalpostDto): string => {
+    return `${jp.journalfortDato ?? ""}-${jp.dokumentDato ?? ""}`;
+};
+
 export function hentJournalpostIderMedFlereDokumenter(journalposter: JournalpostDto[]): string[] {
     return journalposter
-        .filter((jp) => (jp.dokumenter?.length ?? 0) > 1)
-        .map((jp) => jp.journalpostId ?? `${jp.journalfortDato ?? ""}-${jp.dokumentDato ?? ""}`);
+        .filter((jp) => (jp.dokumenter?.length ?? 0) > 0)
+        .map((jp) => jp.journalpostId ?? genererJournalpostFallbackId(jp));
 }
 
-export function finnDokumenterForJournalpost(jp: JournalpostDto, dokumenter: SaksDokument[]): SaksDokument[] {
+const genererSaksDokumentId = (
+    journalpostId?: string | null,
+    dokumentreferanse?: string | null,
+    index?: number,
+): string => {
+    return `${journalpostId ?? "ukjent"}:${dokumentreferanse ?? index}`;
+};
+
+export function finnDokumenterForJournalpost(jp: JournalpostDto, alleDokumenter: SaksDokument[]): SaksDokument[] {
     const journalpostDokumenter = jp.dokumenter ?? [];
+
     return journalpostDokumenter
         .map((dok, index) => {
-            const idForSok = `${jp.journalpostId ?? "ukjent"}:${dok.dokumentreferanse ?? index}`;
-            return dokumenter.find((d) => d.id === idForSok);
+            const sokbarId = genererSaksDokumentId(jp.journalpostId, dok.dokumentreferanse, index);
+            return alleDokumenter.find((d) => d.id === sokbarId);
         })
         .filter((d): d is SaksDokument => Boolean(d));
 }
 
-export function utvidSettMedNyVerdi(prevSett: Set<string>, nyVerdi: string): Set<string> {
-    if (prevSett.has(nyVerdi)) {
-        return prevSett;
+export function utvidSettMedNyVerdi(eksisterendeSett: Set<string>, nyVerdi: string): Set<string> {
+    if (eksisterendeSett.has(nyVerdi)) {
+        return eksisterendeSett;
     }
-    const nyttSett = new Set(prevSett);
-    nyttSett.add(nyVerdi);
-    return nyttSett;
+    return new Set(eksisterendeSett).add(nyVerdi);
 }
 
 export function journalpostStatusForkortelse(status?: JournalpostStatus | null): string {
@@ -77,36 +92,53 @@ export function journalpostStatusForkortelse(status?: JournalpostStatus | null):
 export function kanAapneDokument(
     jp: JournalpostDto,
     dokumentStatus?: DokumentStatusDto | null,
-    dokumentreferanse?: string,
+    dokumentreferanse?: string | null,
 ): boolean {
-    const harJournalpost = Boolean(jp.journalpostId);
+    const harJournalpostId = Boolean(jp.journalpostId);
     const erFerdigstilt = dokumentStatus === DokumentStatusDto.FERDIGSTILT;
-    const harReferanseEllerKunEttDokument = Boolean(dokumentreferanse || (jp.dokumenter?.length ?? 0) === 1);
+    const harGyldigReferanse = Boolean(dokumentreferanse || (jp.dokumenter?.length ?? 0) === 1);
 
-    return harJournalpost && erFerdigstilt && harReferanseEllerKunEttDokument;
+    return harJournalpostId && erFerdigstilt && harGyldigReferanse;
 }
+
+const utledAarsakTilLukketDokument = (
+    status?: DokumentStatusDto | null,
+    dokumentreferanse?: string | null,
+): string | undefined => {
+    if (status === DokumentStatusDto.UNDER_PRODUKSJON) {
+        return "Under produksjon";
+    }
+    if (!dokumentreferanse) {
+        return "Mangler referanse";
+    }
+    return undefined;
+};
+
+const utledDokumentTittel = (tittel?: string | null, dokumentreferanse?: string | null, index?: number): string => {
+    const rensetTittel = tittel?.trim();
+    if (rensetTittel) {
+        return rensetTittel;
+    }
+    if (dokumentreferanse) {
+        return dokumentreferanse;
+    }
+    return `Dokument ${index !== undefined ? index + 1 : ""}`.trim();
+};
 
 export function byggDokumenter(journalposter: JournalpostDto[]): SaksDokument[] {
     return journalposter
         .slice()
         .sort(standardSort)
         .flatMap((jp) => {
-            const innhold = jp.dokumenter ?? [];
-            return innhold.map((dokument, index) => {
-                const dokumentRef = dokument.dokumentreferanse ?? undefined;
-                const kanAapnes = kanAapneDokument(jp, dokument.status, dokumentRef);
+            const journalpostDokumenter = jp.dokumenter ?? [];
 
-                const erUnderProduksjon = dokument.status === DokumentStatusDto.UNDER_PRODUKSJON;
-                const manglerReferanse = !dokument.dokumentreferanse;
-                const fallbackForklaring = erUnderProduksjon
-                    ? "Under produksjon"
-                    : manglerReferanse
-                      ? "Mangler referanse"
-                      : undefined;
-
-                const standardTittel = `Dokument ${index + 1}`;
-                const formatertTittel = dokument.tittel?.trim() || dokument.dokumentreferanse || standardTittel;
-                const formatertId = `${jp.journalpostId ?? "ukjent"}:${dokumentRef ?? index}`;
+            return journalpostDokumenter.map((dokument, index) => {
+                const formatertId = genererSaksDokumentId(jp.journalpostId, dokument.dokumentreferanse, index);
+                const tittel = utledDokumentTittel(dokument.tittel, dokument.dokumentreferanse, index);
+                const kanAapnes = kanAapneDokument(jp, dokument.status, dokument.dokumentreferanse);
+                const aapenForklaring = kanAapnes
+                    ? undefined
+                    : utledAarsakTilLukketDokument(dokument.status, dokument.dokumentreferanse);
 
                 return {
                     id: formatertId,
@@ -114,13 +146,13 @@ export function byggDokumenter(journalposter: JournalpostDto[]): SaksDokument[] 
                     journalpostStatus: jp.status ?? undefined,
                     journalpostTittel: jp.innhold ?? undefined,
                     journalfortDato: jp.journalfortDato ?? undefined,
-                    dokumentreferanse: dokumentRef,
+                    dokumentreferanse: dokument.dokumentreferanse ?? undefined,
                     dokumentStatus: dokument.status ?? undefined,
                     dokumentType: jp.dokumentType ?? undefined,
                     dokumentDato: jp.dokumentDato ?? undefined,
-                    tittel: formatertTittel,
+                    tittel,
                     kanAapnes,
-                    aapenForklaring: kanAapnes ? undefined : fallbackForklaring,
+                    aapenForklaring,
                     gjelderAktor: jp.gjelderAktor,
                 };
             });

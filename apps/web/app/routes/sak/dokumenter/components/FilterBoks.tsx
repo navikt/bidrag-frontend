@@ -1,47 +1,37 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@navikt/aksel-icons";
-import { Button, Checkbox, CheckboxGroup, HStack } from "@navikt/ds-react";
-import type React from "react";
+import { Box, Button, Checkbox, CheckboxGroup, HStack } from "@navikt/ds-react";
+import type { DokumentData, FilterState, MenyState } from "./hooks/useDokumentState";
 
 export interface FilterBoksProps {
-    kunVedtak: boolean;
-    setKunVedtak: (val: boolean) => void;
-    visFarskapUtelukket: boolean;
-    setVisFarskapUtelukket: (val: boolean) => void;
-    visFeilregistrerte: boolean;
-    setVisFeilregistrerte: (val: boolean) => void;
-    kunFerdigstilte: boolean;
-    setKunFerdigstilte: (val: boolean) => void;
-    harBlandingFarBid: boolean;
-    setExpandedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
-    alleJpMedFlereDokumenter: string[];
+    data: DokumentData;
+    filterState: FilterState;
+    menyState: MenyState;
 }
 
-export function FilterBoks({
-    kunVedtak,
-    setKunVedtak,
-    visFarskapUtelukket,
-    setVisFarskapUtelukket,
-    visFeilregistrerte,
-    setVisFeilregistrerte,
-    kunFerdigstilte,
-    setKunFerdigstilte,
-    harBlandingFarBid,
-    setExpandedIds,
-    alleJpMedFlereDokumenter,
-}: FilterBoksProps) {
-    const handterAapneAlle = () => setExpandedIds(new Set(alleJpMedFlereDokumenter));
-    const handterLukkAlle = () => setExpandedIds(new Set());
+export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
+    const { harBlandingFarBid } = data;
+    const { handterAapneAlle, handterLukkAlle } = menyState;
+    const {
+        kunVedtak,
+        setKunVedtak,
+        kunFerdigstilte,
+        setKunFerdigstilte,
+        visFarskapUtelukket,
+        setVisFarskapUtelukket,
+        visFeilregistrerte,
+        setVisFeilregistrerte,
+    } = filterState;
 
     return (
-        <div
-            style={{
-                padding: "0.5rem 0.75rem",
-                borderBottom: "1px solid var(--a-border-default)",
-                background: "var(--a-surface-default)",
-            }}
+        <Box
+            paddingBlock="space-2"
+            paddingInline="space-32"
+            background="default"
+            borderWidth="0 0 1 0"
+            borderColor="neutral-subtle"
         >
             <CheckboxGroup legend="Filtrer" hideLegend size="small">
-                <HStack gap="space-12" wrap={true}>
+                <HStack gap="space-12" wrap>
                     <Checkbox checked={kunVedtak} onChange={(e) => setKunVedtak(e.target.checked)}>
                         Kun vedtak
                     </Checkbox>
@@ -66,7 +56,7 @@ export function FilterBoks({
                     </Checkbox>
                 </HStack>
             </CheckboxGroup>
-            <HStack gap="space-8" style={{ marginTop: "0.75rem" }}>
+            <HStack gap="space-8" marginBlock="space-8 space-0">
                 <Button
                     variant="tertiary"
                     size="xsmall"
@@ -79,6 +69,6 @@ export function FilterBoks({
                     Lukk alle
                 </Button>
             </HStack>
-        </div>
+        </Box>
     );
 }
