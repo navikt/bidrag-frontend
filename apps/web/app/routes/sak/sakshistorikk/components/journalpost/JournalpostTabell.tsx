@@ -92,18 +92,8 @@ export default function JournalpostTabell({
         if (!jp.journalpostId) return undefined;
         const journalpostId = jp.journalpostId;
         if (jp.status === JournalpostStatus.UNDER_PRODUKSJON) return undefined;
-        const harFlereDokumenter = (jp.dokumenter?.length ?? 0) > 1;
-        if (harFlereDokumenter) {
-            const params = new URLSearchParams();
-            for (const dokument of jp.dokumenter ?? []) {
-                if (dokument.dokumentreferanse) {
-                    params.append("dokument", `${journalpostId}:${dokument.dokumentreferanse}`);
-                }
-            }
-            return `/aapnedokument?${params.toString()}`;
-        }
         const hoveddokRef = jp.dokumenter?.[0]?.dokumentreferanse;
-        return hoveddokRef ? `/aapnedokument/${journalpostId}/${hoveddokRef}` : undefined;
+        return hoveddokRef ? `/dokument/${journalpostId}/${hoveddokRef}` : undefined;
     };
 
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
