@@ -8,7 +8,7 @@ export default [
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
-    route("dokument/:journalpostId/:dokumentreferanse", "./routes/dokument/journalpost/JournalpostPage.tsx"),
+    route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),
 
     index("routes/_index.tsx"),
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [

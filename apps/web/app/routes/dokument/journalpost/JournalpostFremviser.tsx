@@ -3,7 +3,7 @@ import { DokumentStatusDto } from "@bidrag/api/BidragDokumentApi";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Detail, HStack, Label, Link, Loader, VStack } from "@navikt/ds-react";
 import { useEffect, useMemo, useState } from "react";
-import { useHentJournalpost } from "~/api/useApi.ts";
+import { hentDokumentApi, useHentJournalpost } from "~/api/useApi.ts";
 import { DomCachedPdfFremviser } from "~/common/dokument/DomCachedPdfFremviser";
 import type { PdfDokument } from "~/common/dokument/PdfVisning";
 import { JournalpostDetaljer } from "./JournalpostDetaljer";
@@ -16,12 +16,12 @@ interface JournalpostFremviserProps {
     fallbackDokumentreferanser?: string[];
 }
 
-function getDocumentTitle(tittel?: string | null): string {
+function utledDokumentTittel(tittel?: string | null): string {
     if (tittel?.trim()) return tittel;
     return "Dokument uten tittel";
 }
 
-function formatSidebarLabel(tittel: string, index: number): string {
+function formaterSidelinjeTittel(tittel: string, index: number): string {
     return `${index + 1}. ${tittel}`;
 }
 
@@ -32,7 +32,7 @@ function mapDokumenterToView(dokumenter: DokumentDto[] = [], fallbackJournalpost
         const kanÅpnes = dok.status !== DokumentStatusDto.UNDER_PRODUKSJON;
 
         return {
-            tittel: getDocumentTitle(dok.tittel),
+            tittel: utledDokumentTittel(dok.tittel),
             journalpostId: dok.journalpostId ?? fallbackJournalpostId,
             dokumentreferanse: dok.dokumentreferanse as string,
             kanÅpnes,
@@ -41,7 +41,7 @@ function mapDokumenterToView(dokumenter: DokumentDto[] = [], fallbackJournalpost
     });
 }
 
-function generateFallbackDocuments(
+function genererFallbackDokumenter(
     journalpostId: string,
     dokumentreferanse?: string,
     fallbackReferanser: string[] = [],
@@ -53,26 +53,26 @@ function generateFallbackDocuments(
     return unikeReferanser.map((referanse) => ({
         dokumentreferanse: referanse,
         journalpostId,
-        tittel: getDocumentTitle(null),
+        tittel: utledDokumentTittel(null),
         kanÅpnes: true,
     }));
 }
 
-function utledInitialValgtDokument(
+function utledStartValgtDokument(
     dokumenter: PdfDokument[],
     dokumentreferanse?: string,
-    currentSelected?: string,
+    noevaerendeValgt?: string,
 ): string | undefined {
-    const currentDoc = dokumenter.find((d) => d.dokumentreferanse === currentSelected);
-    if (currentDoc?.kanÅpnes) return currentSelected;
+    const finnesINåværende = dokumenter.find((d) => d.dokumentreferanse === noevaerendeValgt);
+    if (finnesINåværende?.kanÅpnes) return noevaerendeValgt;
 
-    const requestedDoc = dokumenter.find((d) => d.dokumentreferanse === dokumentreferanse);
-    if (requestedDoc?.kanÅpnes) return dokumentreferanse;
+    const finnesIOppgitt = dokumenter.find((d) => d.dokumentreferanse === dokumentreferanse);
+    if (finnesIOppgitt?.kanÅpnes) return dokumentreferanse;
 
     return dokumenter.find((dok) => dok.kanÅpnes)?.dokumentreferanse;
 }
 
-function _utledBakgrunnsfarge(isSelected: boolean): string {
+function utledBakgrunnsfarge(isSelected: boolean): string {
     if (isSelected) return "var(--a-surface-action-subtle)";
     return "transparent";
 }
@@ -81,7 +81,6 @@ export default function JournalpostFremviser({
     journalpostId,
     dokumentreferanse,
     hidden,
-    openInNewTab,
     fallbackDokumentreferanser = [],
 }: JournalpostFremviserProps) {
     const [selectedValue, setSelectedValue] = useState<string>();
@@ -97,7 +96,7 @@ export default function JournalpostFremviser({
         const apiDokumenter = mapDokumenterToView(journalpostResponse?.journalpost?.dokumenter, journalpostId);
         if (apiDokumenter.length > 0) return apiDokumenter;
 
-        return generateFallbackDocuments(journalpostId, dokumentreferanse, fallbackDokumentreferanser);
+        return genererFallbackDokumenter(journalpostId, dokumentreferanse, fallbackDokumentreferanser);
     }, [dokumentreferanse, fallbackDokumentreferanser, journalpostId, journalpostResponse]);
 
     useEffect(() => {
@@ -110,7 +109,7 @@ export default function JournalpostFremviser({
             setSelectedValue(undefined);
             return;
         }
-        setSelectedValue(utledInitialValgtDokument(dokumenter, dokumentreferanse, selectedValue));
+        setSelectedValue(utledStartValgtDokument(dokumenter, dokumentreferanse, selectedValue));
     }, [dokumenter, dokumentreferanse, selectedValue]);
 
     if (hidden) return null;
@@ -126,14 +125,23 @@ export default function JournalpostFremviser({
     if (journalpostError) throw journalpostError;
     if (dokumenter.length === 0) throw new Error(`Fant ingen dokumenter for journalpost ${journalpostId}`);
 
-    const handleOpenMergedDocument = () => {
-        const url = new URL(`/aapnedokument/${journalpostId}/${dokumentreferanse ?? ""}`, window.location.origin);
-        if (openInNewTab) {
-            window.open(url.toString(), "_blank");
-            return;
+    async function opneSammenslattPdf(journalpostId: string) {
+        const nyFane = window.open("", "_blank");
+        if (!nyFane) return;
+
+        try {
+            const arrayBuffer = await hentDokumentApi({ journalpostId });
+            const pdfBlob = new Blob([arrayBuffer], { type: "application/pdf" });
+            nyFane.location.href = URL.createObjectURL(pdfBlob);
+        } catch {
+            nyFane.close();
         }
-        window.location.assign(url.toString());
-    };
+    }
+
+    // I komponenten:
+    <Button variant="secondary" size="xsmall" onClick={() => opneSammenslattPdf(journalpostId)}>
+        Åpne sammenslått
+    </Button>;
 
     const velgDokument = (e: React.MouseEvent, referanse?: string) => {
         e.preventDefault();
@@ -154,7 +162,7 @@ export default function JournalpostFremviser({
                     )}
 
                     {dokumenter.length > 1 && (
-                        <Button variant="secondary" size="xsmall" onClick={handleOpenMergedDocument}>
+                        <Button variant="secondary" size="xsmall" onClick={() => opneSammenslattPdf(journalpostId)}>
                             Åpne sammenslått
                         </Button>
                     )}
@@ -162,6 +170,7 @@ export default function JournalpostFremviser({
 
                 <VStack gap="space-2" padding="space-2" style={{ overflowY: "auto", flex: 1 }}>
                     {dokumenter.map((dokument, index) => {
+                        const isSelected = selectedValue === dokument.dokumentreferanse;
                         const isVisited = dokument.dokumentreferanse
                             ? visitedIds.has(dokument.dokumentreferanse)
                             : false;
@@ -179,7 +188,7 @@ export default function JournalpostFremviser({
                                         textColor={!dokument.kanÅpnes ? "subtle" : "default"}
                                         style={{ wordBreak: "break-word" }}
                                     >
-                                        {formatSidebarLabel(dokument.tittel, index)}
+                                        {formaterSidelinjeTittel(dokument.tittel, index)}
                                     </Label>
                                     {!dokument.kanÅpnes && (
                                         <Detail textColor="subtle">{dokument.åpenForklaring}</Detail>
@@ -200,6 +209,13 @@ export default function JournalpostFremviser({
                                 key={dokument.dokumentreferanse}
                                 href="#"
                                 onClick={(e) => velgDokument(e, dokument.dokumentreferanse)}
+                                style={{
+                                    textDecoration: "none",
+                                    color: "inherit",
+                                    backgroundColor: utledBakgrunnsfarge(isSelected),
+                                    borderRadius: "var(--a-border-radius-medium)",
+                                    padding: "0 var(--a-spacing-2)",
+                                }}
                             >
                                 {innhold}
                             </Link>
