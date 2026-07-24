@@ -4,12 +4,13 @@ import { Detail, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 
 function getStatusVariant(status?: JournalpostStatus | null) {
     if (!status) return "neutral";
-    
+
     if ([JournalpostStatus.FERDIGSTILT, JournalpostStatus.EKSPEDERT].includes(status)) return "success";
-    if ([JournalpostStatus.FEILREGISTRERT, JournalpostStatus.RETUR, JournalpostStatus.AVBRUTT].includes(status)) return "error";
+    if ([JournalpostStatus.FEILREGISTRERT, JournalpostStatus.RETUR, JournalpostStatus.AVBRUTT].includes(status))
+        return "error";
     if (status === JournalpostStatus.UNDER_PRODUKSJON) return "warning";
     if ([JournalpostStatus.UNDER_OPPRETTELSE, JournalpostStatus.KLAR_FOR_DISTRIBUSJON].includes(status)) return "info";
-    
+
     return "neutral";
 }
 
@@ -40,10 +41,10 @@ export function JournalpostDetaljer({ journalpost }: { journalpost?: Journalpost
                 {dato && <Detail textColor="subtle">{dato}</Detail>}
             </HStack>
             {gjelderIdent && (
-                 <HStack gap="space-2" align="center">
-                     <Detail textColor="subtle">Gjelder:</Detail>
-                     <Detail>{gjelderIdent}</Detail>
-                 </HStack>
+                <HStack gap="space-2" align="center">
+                    <Detail textColor="subtle">Gjelder:</Detail>
+                    <Detail>{gjelderIdent}</Detail>
+                </HStack>
             )}
         </VStack>
     );

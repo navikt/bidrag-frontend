@@ -2,9 +2,8 @@ import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { Heading, HStack, VStack } from "@navikt/ds-react";
 import { useHentDokumentMetadata, useHentSak } from "~/api/useApi.ts";
-import { PdfVisning } from "~/common/dokument/PdfVisning";
+import { DomCachedPdfFremviser } from "~/common/dokument/DomCachedPdfFremviser";
 import { useDokumentState } from "./hooks/useDokumentState";
-import { useOppdaterPdfFremviser } from "./hooks/useOppdaterPdfFremviser";
 import { VenstreMeny } from "./VenstreMeny";
 
 export function SaksdokumenterVisning({
@@ -18,21 +17,17 @@ export function SaksdokumenterVisning({
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
 
     const { data, filterState, menyState } = useDokumentState(journalposter);
+    const valgtDokument = data.selectedDocument;
 
-    const gjelderMetadata = Boolean(data.selectedDocument?.kanÅpnes && data.selectedDocument?.dokumentreferanse);
-    const {
-        data: metadata = [],
-        isLoading: isMetadataLoading,
-        error: metadataError,
-    } = useHentDokumentMetadata(
-        data.selectedDocument?.journalpostId ?? "",
-        data.selectedDocument?.dokumentreferanse,
-        gjelderMetadata,
+    const skalHenteMetadata = Boolean(valgtDokument?.kanÅpnes && valgtDokument?.dokumentreferanse);
+
+    const { error: metadataError } = useHentDokumentMetadata(
+        valgtDokument?.journalpostId ?? "",
+        valgtDokument?.dokumentreferanse,
+        skalHenteMetadata,
     );
 
     if (metadataError) throw metadataError;
-
-    const viewerState = useOppdaterPdfFremviser(data.selectedDocument, metadata, gjelderMetadata, isMetadataLoading);
 
     return (
         <HStack gap="space-4" align="start">
@@ -40,12 +35,9 @@ export function SaksdokumenterVisning({
                 <Heading size="medium">Dokumenter for sak {saksnummer}</Heading>
                 <VenstreMeny sakRoller={sakRoller} data={data} filterState={filterState} menyState={menyState} />
             </VStack>
-            <PdfVisning
-                title={
-                    data.selectedDocument?.tittel ??
-                    `${data.selectedDocument?.journalpostTittel ?? `Journapost id ${data.selectedDocument?.journalpostId}`}`
-                }
-                viewerState={viewerState}
+            <DomCachedPdfFremviser
+                dokumenter={data.dokumenter}
+                valgtDokumentreferanse={valgtDokument?.dokumentreferanse}
             />
         </HStack>
     );
