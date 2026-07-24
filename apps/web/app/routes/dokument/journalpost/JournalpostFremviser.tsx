@@ -72,7 +72,7 @@ function utledInitialValgtDokument(
     return dokumenter.find((dok) => dok.kanÅpnes)?.dokumentreferanse;
 }
 
-function utledBakgrunnsfarge(isSelected: boolean): string {
+function _utledBakgrunnsfarge(isSelected: boolean): string {
     if (isSelected) return "var(--a-surface-action-subtle)";
     return "transparent";
 }
@@ -127,12 +127,18 @@ export default function JournalpostFremviser({
     if (dokumenter.length === 0) throw new Error(`Fant ingen dokumenter for journalpost ${journalpostId}`);
 
     const handleOpenMergedDocument = () => {
-        const url = new URL(`/dokument/${journalpostId}/${dokumentreferanse ?? ""}`, window.location.origin);
+        const url = new URL(`/aapnedokument/${journalpostId}/${dokumentreferanse ?? ""}`, window.location.origin);
         if (openInNewTab) {
             window.open(url.toString(), "_blank");
             return;
         }
         window.location.assign(url.toString());
+    };
+
+    const velgDokument = (e: React.MouseEvent, referanse?: string) => {
+        e.preventDefault();
+        if (!referanse) return;
+        setSelectedValue(referanse);
     };
 
     return (
@@ -156,7 +162,6 @@ export default function JournalpostFremviser({
 
                 <VStack gap="space-2" padding="space-2" style={{ overflowY: "auto", flex: 1 }}>
                     {dokumenter.map((dokument, index) => {
-                        const isSelected = selectedValue === dokument.dokumentreferanse;
                         const isVisited = dokument.dokumentreferanse
                             ? visitedIds.has(dokument.dokumentreferanse)
                             : false;
@@ -194,17 +199,7 @@ export default function JournalpostFremviser({
                             <Link
                                 key={dokument.dokumentreferanse}
                                 href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    dokument.dokumentreferanse && setSelectedValue(dokument.dokumentreferanse);
-                                }}
-                                style={{
-                                    textDecoration: "none",
-                                    color: "inherit",
-                                    backgroundColor: utledBakgrunnsfarge(isSelected),
-                                    borderRadius: "var(--a-border-radius-medium)",
-                                    padding: "0 var(--a-spacing-2)",
-                                }}
+                                onClick={(e) => velgDokument(e, dokument.dokumentreferanse)}
                             >
                                 {innhold}
                             </Link>

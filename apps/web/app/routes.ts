@@ -6,6 +6,8 @@ export default [
     route("log/:type?", "./server/logger/logRoute.ts"),
     route("proxy/:app/*", "./server/auth/proxy.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
+    route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
+    route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
     route("dokument/:journalpostId/:dokumentreferanse", "./routes/dokument/journalpost/JournalpostPage.tsx"),
 
     index("routes/_index.tsx"),
