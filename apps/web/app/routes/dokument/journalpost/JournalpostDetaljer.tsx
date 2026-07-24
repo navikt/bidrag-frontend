@@ -1,6 +1,6 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
-import { Detail, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
+import { Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 
 function getStatusVariant(status?: JournalpostStatus | null) {
     if (!status) return "neutral";
@@ -14,17 +14,27 @@ function getStatusVariant(status?: JournalpostStatus | null) {
     return "neutral";
 }
 
-function formaterDato(datoString?: string | null) {
-    if (!datoString) return null;
-    return new Date(datoString).toLocaleDateString("no-NO");
-}
+const getTagVariant = (jp: JournalpostDto) => {
+    switch (jp.status) {
+        case JournalpostStatus.UNDER_OPPRETTELSE:
+        case JournalpostStatus.KLAR_FOR_DISTRIBUSJON:
+            return "info";
+        case JournalpostStatus.UNDER_PRODUKSJON:
+            return "warning";
+        case JournalpostStatus.FERDIGSTILT:
+            return "success";
+        case JournalpostStatus.FEILREGISTRERT:
+        case JournalpostStatus.RETUR:
+            return "error";
+        default:
+            return "neutral";
+    }
+};
 
-export function JournalpostDetaljer({ journalpost }: { journalpost?: JournalpostDto | null }) {
+export function JournalpostDetaljer({ journalpost }: { journalpost: JournalpostDto }) {
     if (!journalpost) return null;
 
     const tittel = journalpost.innhold || `Journalpost ${journalpost.journalpostId}`;
-    const dato = formaterDato(journalpost.journalfortDato) || formaterDato(journalpost.dokumentDato);
-    const gjelderIdent = journalpost.gjelderAktor?.ident || journalpost.gjelderIdent;
 
     return (
         <VStack gap="space-2">
@@ -37,15 +47,11 @@ export function JournalpostDetaljer({ journalpost }: { journalpost?: Journalpost
                         {journalpost.status}
                     </Tag>
                 )}
-                {journalpost.dokumentType && <Detail textColor="subtle">{journalpost.dokumentType}</Detail>}
-                {dato && <Detail textColor="subtle">{dato}</Detail>}
+
+                <Tag size="small" variant={getTagVariant(journalpost)} className="shrink-0">
+                    {journalpost.dokumentType ?? "?"}
+                </Tag>
             </HStack>
-            {gjelderIdent && (
-                <HStack gap="space-2" align="center">
-                    <Detail textColor="subtle">Gjelder:</Detail>
-                    <Detail>{gjelderIdent}</Detail>
-                </HStack>
-            )}
         </VStack>
     );
 }

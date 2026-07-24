@@ -4,13 +4,12 @@ import type { RolleDto } from "@bidrag/api/SakApi";
 import { RolleTag, type RolleType } from "@bidrag/common";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { Detail, HStack, Tag } from "@navikt/ds-react";
-import { journalpostStatusForkortelse } from "../utils/saksdokumenterUtils";
 
 interface JPHeaderInfoProps {
     jp: JournalpostDto;
     harDokumenter: boolean;
     antallDokumenter: number;
-    antallLeste: number; // Ny prop!
+    antallLeste: number;
     gjelderRolle?: RolleDto;
     isExpanded?: boolean;
 }
@@ -23,7 +22,6 @@ export function JournalpostHeaderInfo({
     gjelderRolle,
     isExpanded = false,
 }: JPHeaderInfoProps) {
-    const forkortelse = journalpostStatusForkortelse(jp.status);
     const innhold = jp.innhold || jp.journalpostId || "Ukjent tittel";
 
     const getTagVariant = () => {
@@ -54,7 +52,7 @@ export function JournalpostHeaderInfo({
     return (
         <HStack gap="space-4" align={isExpanded ? "start" : "center"} wrap={false} className="w-full min-w-0">
             <Tag size="small" variant={getTagVariant()} className="shrink-0">
-                {forkortelse}
+                {jp.dokumentType ?? "?"}
             </Tag>
 
             {rolleType && (

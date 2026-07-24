@@ -1,4 +1,4 @@
-import { DokumentStatusDto, type JournalpostDto, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
+import { DokumentStatusDto, type JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
 import type { SaksDokument } from "../types";
 
@@ -68,25 +68,6 @@ export function utvidSettMedNyVerdi(eksisterendeSett: Set<string>, nyVerdi: stri
         return eksisterendeSett;
     }
     return new Set(eksisterendeSett).add(nyVerdi);
-}
-
-export function journalpostStatusForkortelse(status?: JournalpostStatus | null): string {
-    switch (status) {
-        case JournalpostStatus.FERDIGSTILT:
-            return "F";
-        case JournalpostStatus.UNDER_PRODUKSJON:
-            return "P";
-        case JournalpostStatus.UNDER_OPPRETTELSE:
-            return "U";
-        case JournalpostStatus.KLAR_FOR_DISTRIBUSJON:
-            return "K";
-        case JournalpostStatus.FEILREGISTRERT:
-            return "X";
-        case JournalpostStatus.RETUR:
-            return "R";
-        default:
-            return status ? status.charAt(0).toUpperCase() : "-";
-    }
 }
 
 export function kanAapneDokument(

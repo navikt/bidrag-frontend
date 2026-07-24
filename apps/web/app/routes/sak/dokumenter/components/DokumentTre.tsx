@@ -1,14 +1,13 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { formaterDato } from "@bidrag/utils";
-import { Accordion, Box, Detail, HStack, VStack } from "@navikt/ds-react";
+import { Accordion, Box, Detail, VStack } from "@navikt/ds-react";
+import { JournalpostHeaderInfo } from "../../../../common/dokument/JournalpostHeaderInfo";
+import { JournalpostMetadata } from "../../../../common/dokument/JournalpostMetadata";
 import { standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
-import PersonIdentMedRolle from "../../sakshistorikk/components/journalpost/PersonIdentMedRolle";
 import type { SaksDokument } from "../types";
 import { finnDokumenterForJournalpost } from "../utils/saksdokumenterUtils";
 import { DokumentKnapp } from "./DokumentKnapp";
 import type { DokumentData, MenyState } from "./hooks/useDokumentState";
-import { JournalpostHeaderInfo } from "./JournalpostHeaderInfo";
 
 export interface DokumentTreProps {
     data: DokumentData;
@@ -122,7 +121,7 @@ function DokumentJournalpost({
                 </Accordion.Header>
                 <Accordion.Content className="!p-0">
                     <VStack>
-                        <JournalpostMetadata jp={jp} sakRoller={sakRoller} visFagomrade={visFagomrade} />
+                        <JournalpostMetadata jp={jp} visFagomrade={visFagomrade} />
 
                         {antallDokumenter > 0 && (
                             <VStack
@@ -144,65 +143,5 @@ function DokumentJournalpost({
                 </Accordion.Content>
             </Accordion.Item>
         </Accordion>
-    );
-}
-
-function JournalpostMetadata({
-    jp,
-    sakRoller,
-    visFagomrade,
-}: {
-    jp: JournalpostDto;
-    sakRoller: RolleDto[];
-    visFagomrade: boolean;
-}) {
-    const dokDato = jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
-    const jourDato = jp.journalfortDato ? formaterDato(jp.journalfortDato) : "";
-    const gjelderAktor = jp.gjelderAktor;
-    const journalforendeEnhet = jp.journalforendeEnhet;
-    const dokumentType = jp.dokumentType;
-    const fagomrade = jp.fagomrade;
-    const skalViseGjelderLinje = Boolean(gjelderAktor || journalforendeEnhet);
-
-    return (
-        <VStack
-            gap="space-1"
-            paddingInline="space-4"
-            // Setter top-padding til space-0 slik at den ligger helt klistret til tittelen!
-            paddingBlock="space-0 space-4"
-            className="bg-neutral-soft"
-        >
-            <HStack gap="space-4" align="center" wrap className="text-xs">
-                {dokumentType && <Detail textColor="subtle">{dokumentType}</Detail>}
-                {visFagomrade && fagomrade && <Detail textColor="subtle">· {fagomrade}</Detail>}
-                {dokDato && <Detail textColor="subtle">· Dok: {dokDato}</Detail>}
-                {jourDato && <Detail textColor="subtle">· Jour: {jourDato}</Detail>}
-            </HStack>
-
-            {skalViseGjelderLinje && (
-                <HStack align="center" gap="space-4" wrap={false} className="text-xs overflow-hidden">
-                    {gjelderAktor && (
-                        <>
-                            <Detail textColor="subtle" className="shrink-0">
-                                Gjelder:
-                            </Detail>
-                            <div className="truncate min-w-0">
-                                <PersonIdentMedRolle gjelderAktor={gjelderAktor} sakRoller={sakRoller} />
-                            </div>
-                        </>
-                    )}
-                    {gjelderAktor && journalforendeEnhet && (
-                        <Detail textColor="subtle" className="shrink-0">
-                            ·
-                        </Detail>
-                    )}
-                    {journalforendeEnhet && (
-                        <Detail textColor="subtle" className="shrink-0 whitespace-nowrap">
-                            Enhet: {journalforendeEnhet}
-                        </Detail>
-                    )}
-                </HStack>
-            )}
-        </VStack>
     );
 }

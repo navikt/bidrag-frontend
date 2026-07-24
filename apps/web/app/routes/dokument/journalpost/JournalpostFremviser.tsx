@@ -5,6 +5,7 @@ import { BodyShort, Button, Detail, HStack, Label, Link, Loader, VStack } from "
 import { useEffect, useMemo, useState } from "react";
 import { hentDokumentApi, useHentJournalpost } from "~/api/useApi.ts";
 import { DomCachedPdfFremviser } from "~/common/dokument/DomCachedPdfFremviser";
+import { JournalpostMetadata } from "~/common/dokument/JournalpostMetadata";
 import type { PdfDokument } from "~/common/dokument/PdfVisning";
 import { JournalpostDetaljer } from "./JournalpostDetaljer";
 
@@ -72,11 +73,6 @@ function utledStartValgtDokument(
     return dokumenter.find((dok) => dok.kanÅpnes)?.dokumentreferanse;
 }
 
-function utledBakgrunnsfarge(isSelected: boolean): string {
-    if (isSelected) return "var(--a-surface-action-subtle)";
-    return "transparent";
-}
-
 export default function JournalpostFremviser({
     journalpostId,
     dokumentreferanse,
@@ -86,18 +82,14 @@ export default function JournalpostFremviser({
     const [selectedValue, setSelectedValue] = useState<string>();
     const [visitedIds, setVisitedIds] = useState<Set<string>>(new Set());
 
-    const {
-        data: journalpostResponse,
-        isLoading: isLoadingJournalpost,
-        error: journalpostError,
-    } = useHentJournalpost(journalpostId);
+    const { data, isLoading: isLoadingJournalpost, error: journalpostError } = useHentJournalpost(journalpostId);
 
     const dokumenter = useMemo(() => {
-        const apiDokumenter = mapDokumenterToView(journalpostResponse?.journalpost?.dokumenter, journalpostId);
+        const apiDokumenter = mapDokumenterToView(data?.journalpost?.dokumenter, journalpostId);
         if (apiDokumenter.length > 0) return apiDokumenter;
 
         return genererFallbackDokumenter(journalpostId, dokumentreferanse, fallbackDokumentreferanser);
-    }, [dokumentreferanse, fallbackDokumentreferanser, journalpostId, journalpostResponse]);
+    }, [dokumentreferanse, fallbackDokumentreferanser, journalpostId, data]);
 
     useEffect(() => {
         if (!selectedValue) return;
@@ -112,8 +104,6 @@ export default function JournalpostFremviser({
         setSelectedValue(utledStartValgtDokument(dokumenter, dokumentreferanse, selectedValue));
     }, [dokumenter, dokumentreferanse, selectedValue]);
 
-    if (hidden) return null;
-
     if (isLoadingJournalpost) {
         return (
             <VStack align="center" justify="center" style={{ height: "100vh" }}>
@@ -123,7 +113,18 @@ export default function JournalpostFremviser({
     }
 
     if (journalpostError) throw journalpostError;
-    if (dokumenter.length === 0) throw new Error(`Fant ingen dokumenter for journalpost ${journalpostId}`);
+
+    if (!data?.journalpost) {
+        return null;
+    }
+
+    const journalpost = data.journalpost;
+
+    if (dokumenter.length === 0) {
+        throw new Error(`Fant ingen dokumenter for journalpost ${journalpostId}`);
+    }
+
+    if (hidden) return null;
 
     async function opneSammenslattPdf(journalpostId: string) {
         const nyFane = window.open("", "_blank");
@@ -138,7 +139,6 @@ export default function JournalpostFremviser({
         }
     }
 
-    // I komponenten:
     <Button variant="secondary" size="xsmall" onClick={() => opneSammenslattPdf(journalpostId)}>
         Åpne sammenslått
     </Button>;
@@ -153,24 +153,22 @@ export default function JournalpostFremviser({
         <HStack wrap={false} style={{ height: "100vh", overflow: "hidden" }}>
             <VStack as="nav" style={{ width: "21rem", minWidth: "16rem", maxWidth: "30em", overflow: "hidden" }}>
                 <VStack gap="space-4" padding="space-4">
-                    <JournalpostDetaljer journalpost={journalpostResponse?.journalpost} />
-
-                    {dokumenter.length > 1 && (
-                        <BodyShort size="small" textColor="subtle">
-                            {dokumenter.length} dokumenter
-                        </BodyShort>
-                    )}
-
+                    <JournalpostDetaljer journalpost={journalpost} />
+                    <JournalpostMetadata jp={journalpost} visFagomrade={false} />
                     {dokumenter.length > 1 && (
                         <Button variant="secondary" size="xsmall" onClick={() => opneSammenslattPdf(journalpostId)}>
                             Åpne sammenslått
                         </Button>
                     )}
+                    {dokumenter.length > 1 && (
+                        <BodyShort size="small" textColor="subtle">
+                            {dokumenter.length} dokumenter
+                        </BodyShort>
+                    )}
                 </VStack>
 
-                <VStack gap="space-2" padding="space-2" style={{ overflowY: "auto", flex: 1 }}>
+                <VStack gap="space-12" padding="space-2" style={{ overflowY: "auto", flex: 1 }}>
                     {dokumenter.map((dokument, index) => {
-                        const isSelected = selectedValue === dokument.dokumentreferanse;
                         const isVisited = dokument.dokumentreferanse
                             ? visitedIds.has(dokument.dokumentreferanse)
                             : false;
@@ -209,13 +207,6 @@ export default function JournalpostFremviser({
                                 key={dokument.dokumentreferanse}
                                 href="#"
                                 onClick={(e) => velgDokument(e, dokument.dokumentreferanse)}
-                                style={{
-                                    textDecoration: "none",
-                                    color: "inherit",
-                                    backgroundColor: utledBakgrunnsfarge(isSelected),
-                                    borderRadius: "var(--a-border-radius-medium)",
-                                    padding: "0 var(--a-spacing-2)",
-                                }}
                             >
                                 {innhold}
                             </Link>
