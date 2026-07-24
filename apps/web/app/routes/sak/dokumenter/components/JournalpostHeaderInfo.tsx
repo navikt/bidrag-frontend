@@ -8,18 +8,18 @@ import { journalpostStatusForkortelse } from "../utils/saksdokumenterUtils";
 
 interface JPHeaderInfoProps {
     jp: JournalpostDto;
-    isVisited: boolean;
     harDokumenter: boolean;
     antallDokumenter: number;
+    antallLeste: number; // Ny prop!
     gjelderRolle?: RolleDto;
     isExpanded?: boolean;
 }
 
 export function JournalpostHeaderInfo({
     jp,
-    isVisited,
     harDokumenter = true,
     antallDokumenter,
+    antallLeste,
     gjelderRolle,
     isExpanded = false,
 }: JPHeaderInfoProps) {
@@ -44,20 +44,29 @@ export function JournalpostHeaderInfo({
     };
 
     const rolleType = gjelderRolle?.type;
-    const rolleIdent = typeof jp.gjelderAktor === "string" ? jp.gjelderAktor : jp.gjelderAktor?.ident;
+    const rolleIdent = jp.gjelderAktor?.ident;
+
+    const harLestMinstEtt = antallLeste > 0;
+
+    const antallTekst =
+        antallDokumenter > 1 && harLestMinstEtt ? `(${antallLeste}/${antallDokumenter})` : `(${antallDokumenter})`;
 
     return (
-        <HStack gap="space-4" align={isExpanded ? "start" : "center"} wrap={false}>
-            <Tag size="small" variant={getTagVariant()}>
+        <HStack gap="space-4" align={isExpanded ? "start" : "center"} wrap={false} className="w-full min-w-0">
+            <Tag size="small" variant={getTagVariant()} className="shrink-0">
                 {forkortelse}
             </Tag>
 
             {rolleType && (
-                <RolleTag rolleType={rolleType as string as RolleType} ident={rolleIdent} className="!mr-0" />
+                <RolleTag rolleType={rolleType as string as RolleType} ident={rolleIdent} className="shrink-0 !mr-0" />
             )}
 
-            {/* Antall */}
-            <Detail textColor="subtle">({antallDokumenter})</Detail>
+            <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">
+                {harDokumenter && harLestMinstEtt && <EyeIcon title="Sett" aria-label="Sett" className="text-base" />}
+                <Detail textColor="subtle" className="font-normal">
+                    {antallTekst}
+                </Detail>
+            </HStack>
 
             <Detail
                 weight="semibold"
@@ -66,10 +75,6 @@ export function JournalpostHeaderInfo({
             >
                 {innhold}
             </Detail>
-
-            {harDokumenter && isVisited && (
-                <EyeIcon title="Sett" aria-label="Sett" className="text-gray-500 shrink-0 text-base ml-1 mt-0.5" />
-            )}
         </HStack>
     );
 }

@@ -15,10 +15,3 @@ export interface SaksDokument {
     åpenForklaring?: string;
     gjelderAktor?: JournalpostDto["gjelderAktor"];
 }
-
-export interface PdfState {
-    loading: boolean;
-    src?: string;
-    error?: string;
-    pageCount?: number;
-}

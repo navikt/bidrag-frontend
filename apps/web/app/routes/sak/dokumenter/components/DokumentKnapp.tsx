@@ -24,20 +24,28 @@ export function DokumentKnapp({ dokument, isSelected, isVisited, onClick }: Doku
             type="button"
             onClick={() => kanÅpnes && onClick()}
             aria-current={isSelected ? "true" : "false"}
-            className={`w-full py-1.5 px-2 text-left transition-colors rounded-r block ${backgroundClass} ${borderClass} ${
+            className={`relative w-full py-1.5 pr-3 pl-7 text-left transition-colors rounded-r block ${backgroundClass} ${borderClass} ${
                 kanÅpnes ? "cursor-pointer" : "cursor-not-allowed"
             }`}
         >
-            <HStack align="center" gap="space-4" wrap={false}>
+            {isVisited && (
+                <EyeIcon
+                    title="Sett"
+                    aria-label="Sett"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm shrink-0"
+                />
+            )}
+
+            <HStack gap="space-1" align="center" wrap={false} className="w-full min-w-0">
+                <Detail className="text-gray-500 shrink-0 font-normal">↳</Detail>
                 <Detail
                     weight={isSelected ? "semibold" : "regular"}
                     className={`truncate flex-1 min-w-0 ${tittelFargeClass} ${
                         kanÅpnes && !isSelected ? "underline" : ""
                     }`}
                 >
-                    ↳ {dokument.tittel}
+                    {dokument.tittel}
                 </Detail>
-                {isVisited && <EyeIcon title="Sett" aria-label="Sett" className="text-gray-500 shrink-0 text-xs" />}
             </HStack>
         </button>
     );

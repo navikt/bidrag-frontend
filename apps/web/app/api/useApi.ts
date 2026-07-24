@@ -9,7 +9,12 @@ import {
     BIDRAG_TILGANGSKONTROLL_API,
     TilgangsFeilError,
 } from "@bidrag/api";
-import { DokumentFormatDto, type DokumentMetadata, type JournalpostDto } from "@bidrag/api/BidragDokumentApi";
+import {
+    DokumentFormatDto,
+    type DokumentMetadata,
+    type JournalpostDto,
+    type JournalpostResponse,
+} from "@bidrag/api/BidragDokumentApi";
 import type { EnhetDto, HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
 import type { ForelderBarnRelasjonDto, MotpartBarnRelasjonDto, PersonDto, PersonRequest } from "@bidrag/api/PersonApi";
 import type {
@@ -1041,6 +1046,21 @@ export function useFinnHendelserForSak(saksnummer: string, enabled: boolean = tr
             }
             return failureCount < 3;
         },
+    });
+}
+
+export function useHentJournalpost(journalpostId: string, enabled: boolean = true) {
+    return useQuery<JournalpostResponse, AxiosError | TilgangsFeilError>({
+        queryKey: ["hent_journalpost", journalpostId],
+        queryFn: async () => {
+            try {
+                const response = await BIDRAG_DOKUMENT_API.journal.hentJournalpost(journalpostId);
+                return response.data;
+            } catch (error) {
+                return handleApiError(error, `hente journalpost ${journalpostId}`);
+            }
+        },
+        enabled: enabled && Boolean(journalpostId),
     });
 }
 

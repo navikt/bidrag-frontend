@@ -1,7 +1,5 @@
-import { InMemoryStorageProvider, UnleashClient } from "unleash-proxy-client";
+import { InMemoryStorageProvider, type IVariant, UnleashClient } from "unleash-proxy-client";
 import { env } from "~/env.server.ts";
-
-const DOCUMENT_VIEWER_FLAG = "dokumentvisning.ny_losning";
 
 let clientPromise: Promise<UnleashClient | null> | null = null;
 
@@ -33,15 +31,18 @@ async function getUnleashClient(): Promise<UnleashClient | null> {
     return clientPromise;
 }
 
-export async function isDocumentViewerEnabled(): Promise<boolean> {
-    if (env.OVERRIDE_BRUK_DOKUMENTVISNING_POC !== undefined) {
-        return env.OVERRIDE_BRUK_DOKUMENTVISNING_POC;
-    }
-
+export async function flaggIsEnabled(flag: string): Promise<boolean> {
     const unleashClient = await getUnleashClient();
     if (!unleashClient) {
         return false;
     }
+    return unleashClient.isEnabled(flag);
+}
 
-    return unleashClient.isEnabled(DOCUMENT_VIEWER_FLAG);
+export async function flaggGetVariant(flag: string): Promise<IVariant | undefined> {
+    const unleashClient = await getUnleashClient();
+    if (!unleashClient) {
+        return undefined;
+    }
+    return unleashClient.getVariant(flag);
 }

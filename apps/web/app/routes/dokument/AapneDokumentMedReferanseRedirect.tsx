@@ -4,16 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { redirect } from "react-router";
 import { useHentDokument, useHentDokumentMetadata, useHentDokumentUrl } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
-import { isDocumentViewerEnabled } from "~/server/documentViewerFeatureFlag.server.ts";
-import { redirectToBidragUi } from "../shared/redirectToBidragUi.ts";
 import type { Route } from "./+types/AapneDokumentMedReferanseRedirect";
-import { getDocumentOpenOptions } from "./documentRouteParams";
+import { getDocumentOpenOptions } from "./utils/documentRouteParamsUtils.ts";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-    if (!(await isDocumentViewerEnabled())) {
-        return redirectToBidragUi(request);
-    }
-
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.searchParams);
     const visningstype = searchParams.get("visningstype");

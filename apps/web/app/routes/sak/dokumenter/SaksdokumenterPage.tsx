@@ -1,4 +1,3 @@
-import { HStack } from "@navikt/ds-react";
 import { useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import type { Route } from "./+types/SaksdokumenterPage";
@@ -16,9 +15,5 @@ export default function SaksdokumenterPage({ params }: Route.ComponentProps) {
         throw error;
     }
 
-    return (
-        <HStack gap="space-4" align="start">
-            <SaksdokumenterVisning saksnummer={saksnummer} journalposter={journalposter ?? []} />
-        </HStack>
-    );
+    return <SaksdokumenterVisning saksnummer={saksnummer} journalposter={journalposter ?? []} />;
 }

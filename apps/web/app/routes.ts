@@ -6,12 +6,9 @@ export default [
     route("log/:type?", "./server/logger/logRoute.ts"),
     route("proxy/:app/*", "./server/auth/proxy.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
-    route("aapnedokument", "./routes/dokument-ui/AapneDokumentRedirect.tsx"),
-    route("aapnedokument-tabs/:journalpostId/:dokumentreferanse", "./routes/dokument-ui/AapneDokumentTabs.tsx"),
-    route(
-        "aapnedokument/:journalpostId/:dokumentreferanse",
-        "./routes/dokument-ui/AapneDokumentMedReferanseRedirect.tsx",
-    ),
+    route("aapnedokument", "./routes/dokument/AapneDokumentRedirect.tsx"),
+    route("dokument/:journalpostId/:dokumentreferanse", "./routes/dokument/journalpost/JournalpostPage.tsx"),
+    route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/AapneDokumentMedReferanseRedirect.tsx"),
 
     index("routes/_index.tsx"),
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
@@ -29,9 +26,9 @@ export default [
             route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
         ]),
 
-        route("journal/:journalpostId", "routes/dokument-ui/JournalRedirect.ts"),
-        route("notat", "routes/forsendelse-ui/NotatRedirect.ts"),
-        route("forsendelse", "routes/forsendelse-ui/ForsendelseRedirect.ts"),
-        route("vedtak/:vedtaksid", "routes/behandling-ui/VedtakRedirect.ts"),
+        route("journal/:journalpostId", "routes/dokument/JournalRedirect.ts"),
+        route("notat", "routes/forsendelse/NotatRedirect.ts"),
+        route("forsendelse", "routes/forsendelse/ForsendelseRedirect.ts"),
+        route("vedtak/:vedtaksid", "routes/behandling/VedtakRedirect.ts"),
     ]),
 ] satisfies RouteConfig;

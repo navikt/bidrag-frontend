@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useHentSaksdokumentPdf } from "~/api/useApi.ts";
 import { estimatePageCountFromArrayBuffer, toPdfSource } from "~/common/components/utils/pdfUtils";
 
-import type { PdfState, SaksDokument } from "../../types";
+import type { PdfState } from "~/common/dokument/PdfVisning";
+import type { SaksDokument } from "../../types";
 
 export function useOppdaterPdfFremviser(
     selectedDocument: SaksDokument | undefined,

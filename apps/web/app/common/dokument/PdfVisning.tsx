@@ -1,14 +1,19 @@
 import { Alert, Box, Loader } from "@navikt/ds-react";
-import type { PdfState, SaksDokument } from "../types";
 
-export interface PdfVisningProps {
-    selectedDocument?: SaksDokument;
-    viewerState: PdfState;
-    isMetadataLoading: boolean;
+export interface PdfState {
+    loading: boolean;
+    src?: string;
+    error?: string;
+    pageCount?: number;
 }
 
-export function PdfVisning({ selectedDocument, viewerState, isMetadataLoading }: PdfVisningProps) {
-    const isLoading = isMetadataLoading || viewerState.loading;
+export interface PdfVisningProps {
+    title: string;
+    viewerState: PdfState;
+}
+
+export function PdfVisning({ title, viewerState }: PdfVisningProps) {
+    const isLoading = viewerState.loading;
     const hasError = Boolean(viewerState.error);
     const hasSource = Boolean(viewerState.src);
 
@@ -23,7 +28,7 @@ export function PdfVisning({ selectedDocument, viewerState, isMetadataLoading }:
                     </Box>
                 ) : hasSource ? (
                     <iframe
-                        title={selectedDocument?.tittel ?? "Dokument"}
+                        title={title}
                         src={`${viewerState.src}#view=FitH`}
                         className="w-full h-full border-0 block"
                     />
