@@ -102,7 +102,7 @@ export function PdfVisning({ dokument, lasterMetadata = false }: PdfVisningProps
         >
             <iframe
                 title={dokument.tittel}
-                src={`${pdfSource.src}#view=FitH`}
+                src={`${pdfSource.src}#view=FitH&toolbar=0`}
                 style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
         </section>

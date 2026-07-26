@@ -10,7 +10,16 @@ export interface FilterBoksProps {
 
 export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
     const { harBlandingFarBid } = data;
-    const { handterAapneAlle, handterLukkAlle } = menyState;
+    const {
+        visning,
+        handterAapneAlle,
+        handterLukkAlle,
+        handterAapneAlleTabellRader,
+        handterLukkAlleTabellRader,
+        valgteDokumentreferanser,
+        visKunValgte,
+        setVisKunValgte,
+    } = menyState;
     const {
         kunVedtak,
         setKunVedtak,
@@ -21,6 +30,10 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
         visFeilregistrerte,
         setVisFeilregistrerte,
     } = filterState;
+
+    const erTabell = visning === "tabell";
+    const handterAapneAlleForVisning = erTabell ? handterAapneAlleTabellRader : handterAapneAlle;
+    const handterLukkAlleForVisning = erTabell ? handterLukkAlleTabellRader : handterLukkAlle;
 
     return (
         <Box paddingBlock="space-2" paddingInline="space-4">
@@ -48,18 +61,30 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
                     >
                         Vis feilreg.
                     </Checkbox>
+                    <Checkbox
+                        disabled={valgteDokumentreferanser.size === 0}
+                        checked={visKunValgte}
+                        onChange={(e) => setVisKunValgte(e.target.checked)}
+                    >
+                        Vis kun valgte
+                    </Checkbox>
                 </HStack>
             </CheckboxGroup>
             <HStack gap="space-8" marginBlock="space-8 space-0">
                 <Button
                     variant="tertiary"
                     size="xsmall"
-                    onClick={handterAapneAlle}
+                    onClick={handterAapneAlleForVisning}
                     icon={<ArrowDownIcon aria-hidden />}
                 >
                     Åpne alle
                 </Button>
-                <Button variant="tertiary" size="xsmall" onClick={handterLukkAlle} icon={<ArrowUpIcon aria-hidden />}>
+                <Button
+                    variant="tertiary"
+                    size="xsmall"
+                    onClick={handterLukkAlleForVisning}
+                    icon={<ArrowUpIcon aria-hidden />}
+                >
                     Lukk alle
                 </Button>
             </HStack>
