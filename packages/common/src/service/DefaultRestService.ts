@@ -3,7 +3,7 @@ import { v4 as uuidV4 } from "uuid";
 import { LoggerService } from "../logging/LoggerService";
 import { SecureLoggerService } from "../logging/SecureLoggerService";
 import { ApiError, SimpleError } from "../types";
-import { ApiResponse } from "../types";
+import type { ApiResponse } from "../types";
 import { SecuritySessionUtils } from "../utils";
 
 export interface FetchConfig {
@@ -156,7 +156,7 @@ export class DefaultRestService {
         const resolvedCorrelationId =
             error.headers?.get("traceparent") ?? error.headers?.get("x-correlation-id") ?? correlationId;
         const warningMessage = error?.headers?.get("Warning");
-        const stackTrace = this.getStackFromErrorBody(errorParsed);
+        const stackTrace = DefaultRestService.getStackFromErrorBody(errorParsed);
         const errorMessageFromResponse = `${warningMessage ?? "ukjent feil"} - status=${error.statusText}(${
             error.status
         })`;

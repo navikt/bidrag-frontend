@@ -1,5 +1,5 @@
 import {Bleed, BodyShort, CopyButton} from "@navikt/ds-react";
-import {PersonDto} from "@bidrag/api/PersonApi";
+import type {PersonDto} from "@bidrag/api/PersonApi";
 
 interface ISkjermbildeDetaljer {
     navn: string;

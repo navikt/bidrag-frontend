@@ -1,6 +1,6 @@
-import { BroadcastMessage, PersonBroadcastMessage } from "./types";
-import { LogErrorType } from "./types";
-import { IHeaderNavigationContext, IWindowAppContext, IWindowLogToServer } from "./windowTypes";
+import type { BroadcastMessage, PersonBroadcastMessage } from "./types";
+import type { LogErrorType } from "./types";
+import type { IHeaderNavigationContext, IWindowAppContext, IWindowLogToServer } from "./windowTypes";
 
 declare global {
     interface Window {

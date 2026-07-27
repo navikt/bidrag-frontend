@@ -1,4 +1,4 @@
-import { MutationStatus, QueryClient, useQueryClient } from "@tanstack/react-query";
+import { type MutationStatus, type QueryClient, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 export type MutationKey = any[];

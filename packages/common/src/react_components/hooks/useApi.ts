@@ -1,4 +1,4 @@
-import {AxiosInstance} from "axios";
+import type {AxiosInstance} from "axios";
 import {proxy} from "@bidrag/api"
 
 interface AxiosClient {

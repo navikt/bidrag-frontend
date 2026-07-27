@@ -1,7 +1,7 @@
 import {Box, CopyButton, HStack} from "@navikt/ds-react";
 
 import {useBidragCommons} from "../../api/BidragCommonsContext";
-import {IRolleDetaljer} from "../../types/roller/IRolleDetaljer";
+import type {IRolleDetaljer} from "../../types/roller/IRolleDetaljer";
 import PersonNavnIdent from "../person/PersonNavnIdent";
 import RolleTag from "./RolleTag";
 

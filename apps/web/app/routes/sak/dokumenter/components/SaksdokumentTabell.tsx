@@ -4,6 +4,7 @@ import { formaterDato } from "@bidrag/utils";
 import { PaperclipIcon } from "@navikt/aksel-icons";
 import { HStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
+import JournalpostStatusTag from "~/routes/sak/sakshistorikk/components/journalpost/JournalpostStatusTag.tsx";
 import { standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
 import PersonIdentMedRolle from "../../sakshistorikk/components/journalpost/PersonIdentMedRolle";
 import { useSort } from "../../sakshistorikk/components/useSort";
@@ -11,7 +12,6 @@ import type { SaksDokument } from "../types";
 import { DokumentKategoriTag } from "../utils/dokumentKategori";
 import { finnDokumenterForJournalpost } from "../utils/saksdokumenterUtils";
 import type { MenyState } from "./hooks/useDokumentState";
-import JournalpostStatusTag from "~/routes/sak/sakshistorikk/components/journalpost/JournalpostStatusTag.tsx";
 
 const scaledPx = (value: number) => `${value}px`;
 
@@ -199,7 +199,6 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
     return (
         <DataGrid
             data={rader}
-
             getRowId={(rad) => rad.id}
             selection={{
                 mode: "multiple",
@@ -218,7 +217,6 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
             <DataGrid.Table<DokumentRad>
                 layout="auto"
                 selectionTrigger="control"
-                
                 sorting={{
                     sortOrder: dataGridSort,
                     onSortOrderChange: (_, detail) =>

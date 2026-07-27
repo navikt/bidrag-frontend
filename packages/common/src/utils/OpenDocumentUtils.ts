@@ -1,5 +1,5 @@
 import { LoggerService } from "../logging";
-import { EditDocumentBroadcastMessage, EditDocumentConfig, EditorConfigStorage } from "../types";
+import { type EditDocumentBroadcastMessage, type EditDocumentConfig, EditorConfigStorage } from "../types";
 
 export class OpenDocumentUtils {
     static åpneDokument(

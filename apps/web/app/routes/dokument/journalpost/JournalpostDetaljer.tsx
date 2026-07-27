@@ -1,7 +1,7 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import { Heading, HStack, Tag, VStack } from "@navikt/ds-react";
-import {journalstatusDisplayVerdi} from "~/routes/sak/sakshistorikk/components/journalpost/journalpostUtils.ts";
+import { journalstatusDisplayVerdi } from "~/routes/sak/sakshistorikk/components/journalpost/journalpostUtils.ts";
 
 function getStatusVariant(status?: JournalpostStatus | null) {
     if (!status) return "neutral";

@@ -1,5 +1,5 @@
 import {Link} from "@navikt/ds-react";
-import React, {ReactElement} from "react";
+import React, {type ReactElement} from "react";
 
 interface BisysLinkProps {
     bisysUrl: string;

@@ -12,7 +12,7 @@ import {
 import type { ComposeOption, ECharts, SetOptionOpts } from "echarts/core";
 import { getInstanceByDom, init, use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { CSSProperties, ReactElement, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactElement, useEffect, useRef, useState } from "react";
 
 use([
     LegendComponent,

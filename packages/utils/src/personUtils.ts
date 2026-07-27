@@ -1,6 +1,6 @@
-import { FamileenhetDto, Rolleveileder } from "@bidrag/common";
+import type { FamileenhetDto, Rolleveileder } from "@bidrag/common";
 import { RolleTypeAbbreviation as RolleType } from "@bidrag/common";
-import { IFamilierelasjonTableData } from "@bidrag/common";
+import type { IFamilierelasjonTableData } from "@bidrag/common";
 
 export function getFamilierelasjonByRolle(
     personList: IFamilierelasjonTableData[],

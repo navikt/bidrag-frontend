@@ -1,7 +1,8 @@
 import { TextField } from "@navikt/ds-react";
-import React, { ChangeEvent, useRef, useState } from "react";
+import type React from "react";
+import { type ChangeEvent, useRef, useState } from "react"
 import { useEffect } from "react";
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import { removeNonPrintableCharachters } from "../../utils/StringUtils";
 
