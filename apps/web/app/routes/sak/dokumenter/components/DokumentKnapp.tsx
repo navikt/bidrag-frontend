@@ -45,7 +45,7 @@ export function DokumentKnapp({
             type="button"
             onClick={() => kanÅpnes && onClick()}
             aria-current={isSelected ? "true" : "false"}
-            className={`relative w-full py-1.5 pr-3 pl-7 text-left transition-colors rounded-r block ${backgroundClass} ${borderClass} ${
+            className={`relative w-full min-w-0 py-1.5 pr-3 pl-7 text-left transition-colors rounded-r block ${backgroundClass} ${borderClass} ${
                 kanÅpnes ? "cursor-pointer" : "cursor-not-allowed"
             }`}
         >
@@ -66,7 +66,7 @@ export function DokumentKnapp({
                     } ${kanÅpnes && !isSelected && !tittelDupliserer ? "hover:underline" : ""}`}
                     title={dokument.tittel}
                 >
-                    {visningsTittel}
+                    { dokument.tittel}
                 </Detail>
             </HStack>
         </button>

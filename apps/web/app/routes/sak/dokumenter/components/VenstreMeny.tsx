@@ -21,7 +21,7 @@ export interface VenstreMenyProps {
 
 const BREDDE_PER_VISNING: Record<MenyVisning, string> = {
     liste: "21em",
-    tabell: "56em",
+    tabell: "59em",
 };
 
 export function VenstreMeny({
@@ -49,7 +49,7 @@ export function VenstreMeny({
             borderColor="neutral-subtle"
             borderRadius="4"
             padding="space-4"
-            className="overflow-hidden transition-[width] duration-300 ease-in-out"
+            className="overflow-hidden transition-[width] duration-100 ease-in-out"
             height="100%"
             minHeight="0"
             style={{ display: "flex", flexDirection: "column" }}

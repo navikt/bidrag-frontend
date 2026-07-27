@@ -7,7 +7,7 @@ import TransaksjonerAggregertTabell from "./TransaksjonerAggregertTabell";
 import TransaksjonerFilterPanel from "./TransaksjonerFilterPanel";
 import { useTransaksjonsfilter } from "./useTransaksjonsfilter";
 
-export const handle: SakSideTittelHandle = { sakSideTittel: "Reskontro" };
+export const handle: SakSideTittelHandle = { sakSideTittel: "Saksreskontro" };
 
 export default function SakReskontroOversiktPage({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;

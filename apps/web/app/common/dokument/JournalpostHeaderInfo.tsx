@@ -13,6 +13,12 @@ interface JPHeaderInfoProps {
     antallLeste: number;
     gjelderRolle?: RolleDto;
     isExpanded?: boolean;
+    /**
+     * True når hoveddokumentet i denne journalposten er dokumentet som vises i PDF-fremviseren
+     * akkurat nå. Vises som en tydelig, fargeuavhengig "Åpent"-merking (ikke bare bakgrunnsfarge),
+     * slik at den ikke kan forveksles med hover/fokus-tilstander på andre journalposter.
+     */
+    erAktivtDokument?: boolean;
 }
 
 export function JournalpostHeaderInfo({
@@ -22,6 +28,7 @@ export function JournalpostHeaderInfo({
     antallLeste,
     gjelderRolle,
     isExpanded = false,
+    erAktivtDokument = false,
 }: JPHeaderInfoProps) {
     const innhold = jp.innhold || jp.journalpostId || "Ukjent tittel";
 
@@ -65,6 +72,8 @@ export function JournalpostHeaderInfo({
             {rolleType && (
                 <RolleTag rolleType={rolleType as string as RolleType} ident={rolleIdent} className="shrink-0 !mr-0" />
             )}
+
+
 
             {(visAntall || (harDokumenter && harLestMinstEtt)) && (
                 <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">

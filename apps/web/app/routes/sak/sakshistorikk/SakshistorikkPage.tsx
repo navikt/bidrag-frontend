@@ -33,7 +33,6 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     return (
         <VStack gap={"space-24"}>
             <title>{tabTitle}</title>
-            <Heading size={"large"}>Sakshistorikk</Heading>
             <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
             <JournalpostTabell saksnummer={saksnummer} journalposter={journalposter ?? []} />
         </VStack>

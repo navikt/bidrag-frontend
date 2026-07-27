@@ -2,6 +2,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import { Bleed, Box, CopyButton } from "@navikt/ds-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useHentFodselsdatoer } from "../../api/useApiData";
 import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
 import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
 import RolleCard from "../roller/RolleCard";
@@ -145,17 +146,48 @@ function beregnAlderFraIdent(ident: string): number | null {
 }
 
 /**
+ * Beregner alder basert på en fødselsdato (ISO-streng) hentet fra BIDRAG_PERSON/PDL.
+ * Brukes når vi har den ekte fødselsdatoen tilgjengelig, i stedet for å gjette ut fra fnr.
+ */
+function beregnAlderFraFødselsdato(fødselsdato: string): number | null {
+    const dato = new Date(fødselsdato);
+    if (Number.isNaN(dato.getTime())) return null;
+
+    const nå = new Date();
+    let alder = nå.getFullYear() - dato.getFullYear();
+    if (nå.getMonth() < dato.getMonth() || (nå.getMonth() === dato.getMonth() && nå.getDate() < dato.getDate())) {
+        alder--;
+    }
+    return alder;
+}
+
+/**
+ * Henter alder for en ident. Bruker fødselsdato fra BIDRAG_PERSON når den er tilgjengelig
+ * (håndterer også aktørId/NPID, som ikke kan tolkes fra selve identen), og faller ellers
+ * tilbake til å parse fødselsnummeret direkte slik at sorteringen fungerer mens dataene
+ * fra BIDRAG_PERSON lastes (eller dersom kallet feiler).
+ */
+function hentAlder(ident: string, fødselsdatoPerIdent?: Record<string, string>): number | null {
+    const fødselsdato = fødselsdatoPerIdent?.[ident];
+    if (fødselsdato) {
+        const alder = beregnAlderFraFødselsdato(fødselsdato);
+        if (alder !== null) return alder;
+    }
+    return beregnAlderFraIdent(ident);
+}
+
+/**
  * Sorterer roller innad i en sak: BM først, deretter BP, så barn (BA) sortert etter alder
  * (eldst først). Roller uten kjent sorteringsvekt havner sist, i opprinnelig rekkefølge.
  */
-function sammenlignRoller(a: HeaderRolle, b: HeaderRolle): number {
+function sammenlignRoller(a: HeaderRolle, b: HeaderRolle, fødselsdatoPerIdent?: Record<string, string>): number {
     const vektA = ROLLE_SORTERINGSVEKT[a.rolleType] ?? Number.MAX_SAFE_INTEGER;
     const vektB = ROLLE_SORTERINGSVEKT[b.rolleType] ?? Number.MAX_SAFE_INTEGER;
     if (vektA !== vektB) return vektA - vektB;
 
     if (BARN_ROLLETYPER.has(a.rolleType) && BARN_ROLLETYPER.has(b.rolleType)) {
-        const alderA = beregnAlderFraIdent(a.ident);
-        const alderB = beregnAlderFraIdent(b.ident);
+        const alderA = hentAlder(a.ident, fødselsdatoPerIdent);
+        const alderB = hentAlder(b.ident, fødselsdatoPerIdent);
         if (alderA !== null && alderB !== null) return alderB - alderA; // eldst først
         if (alderA !== null) return -1;
         if (alderB !== null) return 1;
@@ -164,13 +196,18 @@ function sammenlignRoller(a: HeaderRolle, b: HeaderRolle): number {
     return 0;
 }
 
-const mapSaksnummerRoller = (roller: HeaderRolle[]): SaksnummerRoller[] => {
+const mapSaksnummerRoller = (
+    roller: HeaderRolle[],
+    fødselsdatoPerIdent?: Record<string, string>,
+): SaksnummerRoller[] => {
     const saksnummerOrder = Array.from(new Set(roller.map((rolle) => rolle.saksnummer)));
 
     return saksnummerOrder
         .filter((s): s is string => s !== undefined)
         .map((saksnummer) => {
-            const rollerISak = roller.filter((rolle) => rolle.saksnummer === saksnummer).sort(sammenlignRoller);
+            const rollerISak = roller
+                .filter((rolle) => rolle.saksnummer === saksnummer)
+                .sort((a, b) => sammenlignRoller(a, b, fødselsdatoPerIdent));
             return {
                 saksnummer,
                 roller: rollerISak,
@@ -391,8 +428,28 @@ function HeaderRenderer({
     setSelectedRoller,
     HeaderTittel,
 }: HeaderRendererProps) {
+    // Henter fødselsdatoer for barnerollene fra BIDRAG_PERSON, slik at sorteringen under kan
+    // bruke reell alder i stedet for å parse fødselsnummeret. Faller tilbake til ident-parsing
+    // (se `hentAlder`) mens kallet laster eller dersom det feiler, så sorteringen aldri stopper opp.
+    const barnIdenter = useMemo(
+        () =>
+            Array.from(
+                new Set(
+                    rollerMedPersonNavn
+                        .filter((rolle) => BARN_ROLLETYPER.has(rolle.rolleType))
+                        .map((rolle) => rolle.ident)
+                        .filter((ident): ident is string => Boolean(ident)),
+                ),
+            ),
+        [rollerMedPersonNavn],
+    );
+    const { data: fodselsdatoer } = useHentFodselsdatoer(barnIdenter);
+
     // Calculate grouped saksnummer
-    const saksnummerRoller = useMemo(() => mapSaksnummerRoller(rollerMedPersonNavn), [rollerMedPersonNavn]);
+    const saksnummerRoller = useMemo(
+        () => mapSaksnummerRoller(rollerMedPersonNavn, fodselsdatoer?.identerTilDatoer),
+        [rollerMedPersonNavn, fodselsdatoer],
+    );
     const harFlereSaksnummer = saksnummerRoller.length > 1;
 
     // Determine active saksnummer based on availability and selection

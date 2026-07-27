@@ -10,7 +10,7 @@ function journalstatusColor(jp: JournalpostDto): ComponentProps<typeof Tag>["dat
     if (status === JournalpostStatus.UNDER_OPPRETTELSE) return "warning";
     if (status === JournalpostStatus.UNDER_PRODUKSJON) return "info";
     if (status === JournalpostStatus.FEILREGISTRERT || status === JournalpostStatus.RETUR) return "danger";
-    if (status === JournalpostStatus.KLAR_FOR_DISTRIBUSJON) return undefined;
+    if (status === JournalpostStatus.KLAR_FOR_DISTRIBUSJON) return "meta-purple";
     if (status && EKSPEDERT_STATUSER.includes(status)) return undefined;
 
     return undefined;
@@ -18,6 +18,7 @@ function journalstatusColor(jp: JournalpostDto): ComponentProps<typeof Tag>["dat
 
 export default function JournalpostStatusTag({ jp }: { jp: JournalpostDto }) {
     const color = journalstatusColor(jp);
+    console.log(jp, status)
     if (color) {
         return (
             <Tag variant="moderate" data-color={color} size="small">

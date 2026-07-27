@@ -86,7 +86,9 @@ export function DokumentTre({ data, menyState, sakRoller, flatListe = false }: D
                         isOpen ? next.add(jpId) : next.delete(jpId);
                         return next;
                     });
-                    if (dokumentForHeader) handleSelectDocument(dokumentForHeader.id);
+                    // handleSelectDocument legger selv journalposten tilbake i expandedIds, så den skal
+                    // kun kalles ved åpning – ellers vil lukking bli motvirket umiddelbart.
+                    if (isOpen && dokumentForHeader) handleSelectDocument(dokumentForHeader.id);
                 };
 
                 return (
@@ -140,14 +142,24 @@ function DokumentJournalpost({
         <Accordion
             className={`[&.navds-accordion]:!border-none [&_.navds-accordion__item]:!border-none border-l-4 ${
                 !harÅpnebareDokumenter ? "opacity-50" : ""
-            } ${
-                hoveddokumentErValgt
-                    ? "border-[var(--a-border-action,#0056b4)] bg-[var(--a-surface-action-subtle,#cce1ff)]"
-                    : "border-transparent"
-            }`}
+            } `}
         >
             <Accordion.Item open={isExpanded} onOpenChange={onToggle}>
-                <Accordion.Header className={isExpanded ? "!pb-0" : ""}>
+                <Accordion.Header
+                    // Aksel sin Accordion.Header pakker innholdet i en <Heading as="span">, som er
+                    // display:inline og derfor ikke krymper i header-radens flex-layout. Uten dette
+                    // vokser headingen til full tekstbredde og lange journalposttitler "blør" ut over
+                    // komponenten i stedet for å trunkeres med ellipsis.
+                    className={`[&>.aksel-heading]:min-w-0 [&>.aksel-heading]:flex-1 [&>.aksel-heading]:block [&>.aksel-heading]:overflow-hidden ${
+                        isExpanded
+                            ? `!pb-2 ${
+                                  hoveddokumentErValgt
+                                      ? "border-[var(--a-border-action,#0056b4)] bg-[var(--a-surface-action-subtle,#cce1ff)]"
+                                      : "border-transparent"
+                              }`
+                            : ""
+                    }`}
+                >
                     <JournalpostHeaderInfo
                         jp={jp}
                         harDokumenter={harÅpnebareDokumenter}
@@ -157,14 +169,20 @@ function DokumentJournalpost({
                         isExpanded={isExpanded}
                     />
                 </Accordion.Header>
-                <Accordion.Content className="!p-0">
-                    <VStack>
+                <Accordion.Content
+                    // Aksel sin Accordion.Content pakker barna i .aksel-accordion__content-inner, som er
+                    // et CSS grid-element uten satt bredde. Grid-elementer har min-width:auto som default,
+                    // så uten dette krymper ikke innholdet – lange dokumenttitler tvinger raden bredere enn
+                    // sidepanelet og "blør" ut under det mørke panelet i stedet for å trunkeres.
+                    className="!p-0 [&_.aksel-accordion__content-inner]:min-w-0"
+                >
+                    <VStack className="min-w-0">
                         <JournalpostMetadata jp={jp} visFagomrade={visFagomrade} />
 
                         {vedlegg.length > 0 && (
                             <VStack
                                 gap="space-0"
-                                className="divide-y divide-neutral-subtle border-t border-neutral-subtle"
+                                className="divide-y divide-neutral-subtle border-t border-neutral-subtle min-w-0"
                             >
                                 {vedlegg.map((dok: SaksDokument) => (
                                     <DokumentKnapp
