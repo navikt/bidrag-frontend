@@ -28,7 +28,6 @@ export function JournalpostHeaderInfo({
     antallLeste,
     gjelderRolle,
     isExpanded = false,
-    erAktivtDokument = false,
 }: JPHeaderInfoProps) {
     const innhold = jp.innhold || jp.journalpostId || "Ukjent tittel";
 
@@ -72,8 +71,6 @@ export function JournalpostHeaderInfo({
             {rolleType && (
                 <RolleTag rolleType={rolleType as string as RolleType} ident={rolleIdent} className="shrink-0 !mr-0" />
             )}
-
-
 
             {(visAntall || (harDokumenter && harLestMinstEtt)) && (
                 <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">

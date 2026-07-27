@@ -15,8 +15,8 @@ import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
-import faviconUrl from "./assets/bisys_favicon.ico";
 import type { Route } from "./+types/root.ts";
+import faviconUrl from "./assets/bisys_favicon.ico";
 
 export const middleware = [authMiddleware];
 export const clientMiddleware = [bisysParamsMiddleware];

@@ -31,7 +31,6 @@ export function DokumentKnapp({
         erHoveddokument &&
         Boolean(dokument.journalpostTittel?.trim()) &&
         dokument.journalpostTittel?.trim() === dokument.tittel.trim();
-    const visningsTittel = tittelDupliserer ? "Hoveddokument" : dokument.tittel;
 
     const tittelFargeClass = isSelected ? "text-gray-900" : kanÅpnes ? "text-[var(--a-text-action)]" : "text-gray-500";
 
@@ -66,7 +65,7 @@ export function DokumentKnapp({
                     } ${kanÅpnes && !isSelected && !tittelDupliserer ? "hover:underline" : ""}`}
                     title={dokument.tittel}
                 >
-                    { dokument.tittel}
+                    {dokument.tittel}
                 </Detail>
             </HStack>
         </button>
