@@ -2,7 +2,8 @@
     "extends": "../../tsconfig.base.json",
     "include": [
         "app",
-        ".react-router/types/**/*"
+        ".react-router/types/**/*",
+        "global.d.ts"
     ],
     "compilerOptions": {
         "sourceMap": true,

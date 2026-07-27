@@ -1,12 +1,16 @@
 import {MagnifyingGlassIcon, PencilIcon, TrashIcon} from "@navikt/aksel-icons";
-import {BodyLong, Button, Heading, Modal, Pagination, Switch, Table, Tag, VStack} from "@navikt/ds-react";
+import {BodyLong, Button, Heading, Loader, Modal, Pagination, Switch, Table, Tag, VStack} from "@navikt/ds-react";
 import {useQueryClient} from "@tanstack/react-query";
 import React, {useRef, useState} from "react";
 import {Link as ReactRouterLink} from "react-router";
 import {ConfirmationModal} from "./components/ConfirmationModal.tsx";
 import {EndringsLoggDto, Endringstype} from "~/api/types/admin.ts";
-import {useAktiverEndringslogg, useDeaktiverEndringslogg, useHentEndringslogger, useSlettEndringslogg} from "~/api/useApi.ts";
-
+import {
+    useAktiverEndringslogg,
+    useDeaktiverEndringslogg,
+    useHentEndringslogger,
+    useSlettEndringslogg
+} from "~/api/useApi.ts";
 
 export enum EndringsloggTilhorerSkjermbilde {
     BEHANDLING_BIDRAG = "BEHANDLING_BIDRAG",
@@ -64,7 +68,7 @@ export const EndringsModal = ({
     closeOnBackdropClick?: boolean;
 }) => {
     const [pageState, setPageState] = useState(1);
-
+    const selectedEndringer = selectedEndringslogg.endringer[pageState - 1];
     return (
         <Modal
             open={open}
@@ -73,45 +77,46 @@ export const EndringsModal = ({
             closeOnBackdropClick={closeOnBackdropClick}
             className="max-w-[1500px]"
         >
-            <>
-                <Modal.Body className="grid gap-4">
-                    <Heading size="xsmall" className="flex gap-2">
-                        {selectedEndringslogg.endringer[pageState - 1].tittel}
-                        <Tag
-                            variant={
-                                EndringstypeToTagMapper[selectedEndringslogg.endringer[pageState - 1].endringstype].tag
-                            }
-                            size="xsmall"
-                        >
-                            {EndringstypeToTagMapper[selectedEndringslogg.endringer[pageState - 1].endringstype].tekst}
-                        </Tag>
-                    </Heading>
+            {selectedEndringer === undefined ? <Loader>LOADING</Loader> :
+                <>
+                    <Modal.Body className="grid gap-4">
+                        <Heading size="xsmall" className="flex gap-2">
+                            {selectedEndringer.tittel}
+                            <Tag
+                                variant={
+                                    EndringstypeToTagMapper[selectedEndringer.endringstype].tag
+                                }
+                                size="xsmall"
+                            >
+                                {EndringstypeToTagMapper[selectedEndringer.endringstype].tekst}
+                            </Tag>
+                        </Heading>
 
-                    <BodyLong as="div" size="small">
-                        <div
-                            style={{
-                                overflowWrap: "break-word",
-                                maxWidth: "70rem",
-                                minWidth: "38rem",
-                                maxHeight: "40rem",
-                            }}
-                            dangerouslySetInnerHTML={{__html: selectedEndringslogg.endringer[pageState - 1].innhold}}
-                        />
-                    </BodyLong>
-                </Modal.Body>
-                <Modal.Footer style={{height: "4rem", justifyContent: "center"}}>
-                    {selectedEndringslogg.endringer.length > 1 && (
-                        <Pagination
-                            page={pageState}
-                            onPageChange={(page: number) => setPageState(page)}
-                            count={selectedEndringslogg.endringer.length}
-                            boundaryCount={1}
-                            siblingCount={1}
-                            size="xsmall"
-                        />
-                    )}
-                </Modal.Footer>
-            </>
+                        <BodyLong as="div" size="small">
+                            <div
+                                style={{
+                                    overflowWrap: "break-word",
+                                    maxWidth: "70rem",
+                                    minWidth: "38rem",
+                                    maxHeight: "40rem",
+                                }}
+                                dangerouslySetInnerHTML={{__html: selectedEndringer.innhold}}
+                            />
+                        </BodyLong>
+                    </Modal.Body>
+                    <Modal.Footer style={{height: "4rem", justifyContent: "center"}}>
+                        {selectedEndringslogg.endringer.length > 1 && (
+                            <Pagination
+                                page={pageState}
+                                onPageChange={(page: number) => setPageState(page)}
+                                count={selectedEndringslogg.endringer.length}
+                                boundaryCount={1}
+                                siblingCount={1}
+                                size="xsmall"
+                            />
+                        )}
+                    </Modal.Footer>
+                </>}
         </Modal>
     );
 };
@@ -223,12 +228,12 @@ export default function EndringsloggIndexPage() {
                             <Table.HeaderCell scope="col">Gjelder</Table.HeaderCell>
                             <Table.HeaderCell scope="col">Dato</Table.HeaderCell>
                             <Table.HeaderCell scope="col">Endringstyper</Table.HeaderCell>
-                            <Table.HeaderCell scope="col" className="w-[72px]" align="center">
+                            <Table.HeaderCell scope="col" className="w-18" align="center">
                                 Aktiver
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" className="w-[48px]" align="center"></Table.HeaderCell>
-                            <Table.HeaderCell scope="col" className="w-[48px]" align="center"></Table.HeaderCell>
-                            <Table.HeaderCell scope="col" className="w-[48px]" align="center"></Table.HeaderCell>
+                            <Table.HeaderCell scope="col" className="w-12" align="center"></Table.HeaderCell>
+                            <Table.HeaderCell scope="col" className="w-12" align="center"></Table.HeaderCell>
+                            <Table.HeaderCell scope="col" className="w-12" align="center"></Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>

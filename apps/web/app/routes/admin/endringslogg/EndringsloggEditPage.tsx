@@ -1,7 +1,7 @@
 import {useQueryClient} from "@tanstack/react-query";
 import React from "react";
 
-import type {Route} from "../../../../.react-router/types/app/routes/bruker/+types/BrukerLayout.ts";
+import type {Route} from "../../../../.react-router/types/app/routes/admin/endringslogg/+types/EndringsloggEditPage.ts";
 import {
     EndringsLoggDto,
     EndringsloggTilhorerSkjermbilde,
@@ -9,7 +9,7 @@ import {
     OppdaterEndringsloggRequest
 } from "~/api/types/admin.ts";
 import {useEditEndringslogg, useHentEndringslogg} from "~/api/useApi.ts";
-import {EndringsloggFormValues} from "~/routes/admin/endringslogg/components/EndringsloggForm.tsx";
+import EndringsloggForm, {EndringsloggFormValues} from "~/routes/admin/endringslogg/components/EndringsloggForm.tsx";
 
 const createPayload = (formValues: EndringsloggFormValues) => {
     const payload: OppdaterEndringsloggRequest = {
@@ -24,12 +24,11 @@ const createPayload = (formValues: EndringsloggFormValues) => {
     return payload;
 };
 
-export const EndringsloggEditPage = ({params}: Route.ComponentProps) => {
+export default function EndringsloggEditPage({params}: Route.ComponentProps) {
     const id = params.id;
     const queryClient = useQueryClient();
     const endringslogg = useHentEndringslogg(Number(id));
     const mutation = useEditEndringslogg();
-
     const onSave = (formValues: EndringsloggFormValues, onSuccess: (id: number) => void) => {
         const payload = createPayload(formValues);
         mutation.mutate(
@@ -53,6 +52,5 @@ export const EndringsloggEditPage = ({params}: Route.ComponentProps) => {
             }
         );
     };
-    return <div>YO</div>
-    //return <EndringsloggForm onSave={onSave} mutationError={mutation.error} endringslogg={endringslogg.data}/>;
+    return <EndringsloggForm onSave={onSave} mutationError={mutation.error} endringslogg={endringslogg.data}/>;
 };

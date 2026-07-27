@@ -1,12 +1,39 @@
-import {CheckmarkCircleIcon, ChevronDownIcon, ChevronLeftIcon, ChevronUpIcon, MagnifyingGlassIcon, TrashIcon,} from "@navikt/aksel-icons";
-import {Box, Button, ErrorMessage, HStack, Label, Modal, Select, Switch, Textarea, TextField, VStack,} from "@navikt/ds-react";
+import {
+    CheckmarkCircleIcon,
+    ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronUpIcon,
+    MagnifyingGlassIcon,
+    TrashIcon,
+} from "@navikt/aksel-icons";
+import {
+    Box,
+    Button,
+    ErrorMessage,
+    HStack,
+    Label,
+    Modal,
+    Select,
+    Switch,
+    Textarea,
+    TextField,
+    VStack,
+} from "@navikt/ds-react";
 import {useMutationState} from "@tanstack/react-query";
 import React, {useEffect, useRef, useState} from "react";
-import {Controller, FormProvider, useFieldArray, UseFieldArrayReturn, useForm, useFormContext, useWatch,} from "react-hook-form";
+import {
+    Controller,
+    FormProvider,
+    useFieldArray,
+    UseFieldArrayReturn,
+    useForm,
+    useFormContext,
+    useWatch,
+} from "react-hook-form";
 
 import {EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype} from "~/api/types/admin.ts";
-import {CustomQuillEditor} from "~/routes/admin/endringslogg/components/customEditor/CustomQuillEditor.tsx";
 import {EndringsModal} from "~/routes/admin/endringslogg";
+import {useNavigate} from "react-router";
 
 type Endring = {
     innhold: string;
@@ -171,7 +198,7 @@ const EndringsBox = ({
                                     </Select>
                                 )}
                             />
-
+                            {/*
                             <Controller
                                 name="endring.innhold"
                                 defaultValue=""
@@ -187,6 +214,7 @@ const EndringsBox = ({
                                     />
                                 )}
                             />
+                            */}
                         </VStack>
                     </Box>
                 </Modal.Body>
@@ -287,7 +315,7 @@ const EndringsFormBox = ({
                             </Select>
                         )}
                     />
-
+                    {/*
                     <Controller
                         name={`endringer.${index}.innhold`}
                         control={control}
@@ -308,6 +336,7 @@ const EndringsFormBox = ({
                             />
                         )}
                     />
+                    */}
                 </VStack>
             </Box>
         </>
@@ -321,7 +350,7 @@ export default function EndringsloggForm({
                                          }: {
     onSave: (formValues: EndringsloggFormValues, onSuccess: (id: number) => void) => void;
     endringslogg?: EndringsLoggDto;
-    mutationError: Error;
+    mutationError: Error | null;
 }) {
     const [previewed, setPreviewed] = useState<EndringsLoggDto | null>(null);
     const variables = useMutationState({
