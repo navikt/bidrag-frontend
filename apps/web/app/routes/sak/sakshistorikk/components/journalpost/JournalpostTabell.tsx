@@ -31,7 +31,7 @@ function byggRad(jp: JournalpostDto): JournalpostRad {
 
     const vedlegg: JournalpostRad[] =
         dokumenter.length > 1
-            ? dokumenter.map((dok, i) => ({
+            ? dokumenter.slice(1).map((dok, i) => ({
                   id: `${jpId}:${dok.dokumentreferanse ?? i}`,
                   jp,
                   dok,
@@ -120,12 +120,13 @@ export default function JournalpostTabell({
             );
 
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(340), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(474), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     {kanÅpnes ? (
                         <Link
                             className="min-w-0 truncate"
                             target="_blank"
+                            title={dok.tittel ?? dok.dokumentreferanse ?? ""}
                             href={`/aapnedokument/${rad.jp.journalpostId}/${dok.dokumentreferanse}`}
                         >
                             {dok.tittel ?? dok.dokumentreferanse}
@@ -143,13 +144,13 @@ export default function JournalpostTabell({
 
         if (href) {
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(340), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(474), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <Link
                         className="min-w-0 truncate"
                         target="_blank"
                         href={href}
-                        title="Åpne dokument"
+                        title={tekst}
                         aria-label="Åpne dokument"
                     >
                         {tekst}
