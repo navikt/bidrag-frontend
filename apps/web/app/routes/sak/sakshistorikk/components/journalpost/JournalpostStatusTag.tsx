@@ -18,7 +18,6 @@ function journalstatusColor(jp: JournalpostDto): ComponentProps<typeof Tag>["dat
 
 export default function JournalpostStatusTag({ jp }: { jp: JournalpostDto }) {
     const color = journalstatusColor(jp);
-    console.log(jp, status)
     if (color) {
         return (
             <Tag variant="moderate" data-color={color} size="small">
