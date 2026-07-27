@@ -2,7 +2,7 @@ import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
 import { PaperclipIcon } from "@navikt/aksel-icons";
-import { HStack } from "@navikt/ds-react";
+import { HStack, Tag } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import JournalpostStatusTag from "~/routes/sak/sakshistorikk/components/journalpost/JournalpostStatusTag.tsx";
 import { standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
@@ -112,6 +112,20 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
     const tittelCelle = (rad: DokumentRad) => {
         const erValgt = rad.dok.id === selectedId;
 
+        // Aksel sin DataGrid støtter ikke en "indeterminate"-checkbox på hoveddokumentraden når kun
+        // noen av vedleggene er valgt (checkboxen er hardkodet til `indeterminate: false` internt, og
+        // gir ingen mulighet til å overstyre dette per rad). Vi viser derfor et eget "delvis valgt"-merke
+        // i stedet, med samme antall-mønster som brukes for lest/utvidet i `DokumentTre`.
+        const antallVedlegg = rad.vedlegg.length;
+        const antallValgteVedlegg = rad.vedlegg.filter(
+            (v) => v.dok.dokumentreferanse && valgteDokumentreferanser.has(v.dok.dokumentreferanse),
+        ).length;
+        const erHoveddokumentValgt = Boolean(
+            rad.dok.dokumentreferanse && valgteDokumentreferanser.has(rad.dok.dokumentreferanse),
+        );
+        const erDelvisValgt =
+            !rad.erVedlegg && !erHoveddokumentValgt && antallValgteVedlegg > 0 && antallValgteVedlegg < antallVedlegg;
+
         return (
             <HStack gap="space-1" align="center" wrap={false} style={{ maxWidth: scaledPx(300), minWidth: 0 }}>
                 {rad.erVedlegg && <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />}
@@ -123,7 +137,7 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
                             e.stopPropagation();
                             handleSelectDocument(rad.dok.id);
                         }}
-                        className={`min-w-0 cursor-pointer truncate text-left ${
+                        className={`min-w-0 flex-1 cursor-pointer truncate text-left ${
                             erValgt ? "font-semibold" : "text-text-action hover:text-text-action-on-hover underline"
                         }`}
                     >
@@ -132,10 +146,20 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
                 ) : (
                     <span
                         title={rad.dok.tittel}
-                        className={`min-w-0 truncate ${erValgt ? "font-semibold" : "text-gray-600"}`}
+                        className={`min-w-0 flex-1 truncate ${erValgt ? "font-semibold" : "text-gray-600"}`}
                     >
                         {rad.dok.tittel}
                     </span>
+                )}
+                {erDelvisValgt && (
+                    <Tag
+                        size="small"
+                        variant="info"
+                        className="shrink-0"
+                        title={`${antallValgteVedlegg} av ${antallVedlegg} vedlegg valgt`}
+                    >
+                        {antallValgteVedlegg}/{antallVedlegg}
+                    </Tag>
                 )}
             </HStack>
         );
