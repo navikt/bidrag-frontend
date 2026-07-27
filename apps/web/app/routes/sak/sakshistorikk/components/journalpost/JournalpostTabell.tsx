@@ -107,7 +107,9 @@ export default function JournalpostTabell({
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
 
     const toggleExpandedRad = (id: string) => {
-        setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((expandedId) => expandedId !== id) : [...prev, id]));
+        setExpandedRowIds((prev) =>
+            prev.includes(id) ? prev.filter((expandedId) => expandedId !== id) : [...prev, id],
+        );
     };
 
     const beskrivelseCelle = (rad: JournalpostRad) => {
@@ -143,7 +145,13 @@ export default function JournalpostTabell({
             return (
                 <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(340), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
-                    <Link className="min-w-0 truncate" target="_blank" href={href} title="Åpne dokument" aria-label="Åpne dokument">
+                    <Link
+                        className="min-w-0 truncate"
+                        target="_blank"
+                        href={href}
+                        title="Åpne dokument"
+                        aria-label="Åpne dokument"
+                    >
                         {tekst}
                     </Link>
                 </HStack>
@@ -157,42 +165,12 @@ export default function JournalpostTabell({
         );
     };
 
-    const expandCelle = (rad: JournalpostRad) => {
-        if (rad.erVedlegg || rad.vedlegg.length === 0) return null;
-
-        const erUtvidet = expandedRowIds.includes(rad.id);
-
-        // Egendefinert "disclosure"-knapp: oppfører seg semantisk som en <summary>-markør
-        // (aria-expanded + rotasjon), men uten Aksel-knappens kant/bakgrunn.
-        return (
-            <button
-                type="button"
-                aria-expanded={erUtvidet}
-                aria-label={erUtvidet ? "Skjul underdokumenter" : "Vis underdokumenter"}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    toggleExpandedRad(rad.id);
-                }}
-                className="flex h-6 w-6 items-center justify-center rounded text-gray-600 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--a-border-focus,#0067c5)"
-            >
-                <span
-                    aria-hidden
-                    className={`inline-block text-xs transition-transform duration-150 ${
-                        erUtvidet ? "rotate-90" : "rotate-0"
-                    }`}
-                >
-                    ▶
-                </span>
-            </button>
-        );
-    };
-
     const basisKolonner = [
         {
             id: "expand",
             header: "",
             width: { defaultValue: scaledPx(48) },
-            bodyCell: ()=>null,
+            bodyCell: () => null,
         },
         {
             id: "journalpostId",
@@ -266,7 +244,7 @@ export default function JournalpostTabell({
             isSortable: true,
             width: { defaultValue: scaledPx(474) },
             bodyCell: beskrivelseCelle,
-        }
+        },
     ];
 
     const fagomradeKolonne = {
@@ -344,7 +322,7 @@ export default function JournalpostTabell({
             >
                 <DataGrid.Table<JournalpostRad>
                     layout="fixed"
-                    onRowAction={rad => {
+                    onRowAction={(rad) => {
                         if (rad.row.erVedlegg || rad.row.vedlegg.length === 0) return null;
                         toggleExpandedRad(rad.id);
                     }}

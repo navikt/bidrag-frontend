@@ -1,5 +1,5 @@
-import {Bleed, BodyShort, CopyButton} from "@navikt/ds-react";
-import type {PersonDto} from "@bidrag/api/PersonApi";
+import type { PersonDto } from "@bidrag/api/PersonApi";
+import { Bleed, BodyShort, CopyButton } from "@navikt/ds-react";
 
 interface ISkjermbildeDetaljer {
     navn: string;
@@ -11,26 +11,26 @@ interface ISakHeaderProps {
     skjermbilde?: ISkjermbildeDetaljer;
 }
 
-export default function BrukerHeader({bruker, skjermbilde}: ISakHeaderProps) {
+export default function BrukerHeader({ bruker, skjermbilde }: ISakHeaderProps) {
     return (
         <Bleed marginInline="full">
             <div className="bg-(--ax-neutral-100) border-(--ax-border-neutral-subtle) border-solid border-b w-full border-0">
                 <div className="px-6 py-1 flex items-center border-(--ax-border-neutral-subtle) border-solid border-b border-0">
-                    <SkjermbildeDetaljer bruker={bruker} skjermbilde={skjermbilde}/>
+                    <SkjermbildeDetaljer bruker={bruker} skjermbilde={skjermbilde} />
                 </div>
             </div>
         </Bleed>
     );
 }
 
-function SkjermbildeDetaljer({bruker, skjermbilde}: { bruker: PersonDto; skjermbilde?: ISkjermbildeDetaljer }) {
+function SkjermbildeDetaljer({ bruker, skjermbilde }: { bruker: PersonDto; skjermbilde?: ISkjermbildeDetaljer }) {
     return (
         <div className="flex flex-row">
             <span className="text-base flex items-center font-normal">
                 <BodyShort size={"small"} className="saksnr">
                     Bruker. {bruker.visningsnavn}: {bruker.ident}
                 </BodyShort>
-                <CopyButton size="small" copyText={bruker.ident} activeText="Kopierte ident"/>
+                <CopyButton size="small" copyText={bruker.ident} activeText="Kopierte ident" />
             </span>
             {skjermbilde && (
                 <>
@@ -39,7 +39,7 @@ function SkjermbildeDetaljer({bruker, skjermbilde}: { bruker: PersonDto; skjermb
                         <BodyShort size={"small"}>
                             {skjermbilde.navn} {skjermbilde.referanse}
                         </BodyShort>
-                        <CopyButton size="small" copyText={skjermbilde.referanse?.toString()} activeText="Kopiert"/>
+                        <CopyButton size="small" copyText={skjermbilde.referanse?.toString()} activeText="Kopiert" />
                     </span>
                 </>
             )}
