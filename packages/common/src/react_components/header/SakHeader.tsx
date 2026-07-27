@@ -3,6 +3,7 @@ import { Bleed, Box, CopyButton } from "@navikt/ds-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
+import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
 import RolleCard from "../roller/RolleCard";
 
 type TypeBehandling = string;
@@ -76,13 +77,100 @@ const ROLE_CARD_CONTAINER_STYLE: React.CSSProperties = {
 };
 
 // Helpers
+
+// Sorteringsvekt per rolletype: BM først, deretter BP, så barn (BA), øvrige roller sist.
+// Dekker alle tre RolleType-variantene (forkortelse/fullt navn/deprecated) – samme mønster
+// som brukes i `RoleTags.ts` – slik at sorteringen fungerer uansett hvilken variant API-et sender.
+const ROLLE_SORTERINGSVEKT: Record<string, number> = {
+    [RolleTypeAbbreviation.BM]: 0,
+    [RolleTypeAbbreviation.BP]: 1,
+    [RolleTypeAbbreviation.BA]: 2,
+    [RolleTypeAbbreviation.RM]: 3,
+    [RolleTypeAbbreviation.FR]: 4,
+
+    [RolleTypeFullName.BIDRAGSMOTTAKER]: 0,
+    [RolleTypeFullName.BIDRAGSPLIKTIG]: 1,
+    [RolleTypeFullName.BARN]: 2,
+    [RolleTypeFullName.REELMOTTAKER]: 3,
+    [RolleTypeFullName.FEILREGISTRERT]: 4,
+
+    [RolleTypeDeprecated.BIDRAGS_MOTTAKER]: 0,
+    [RolleTypeDeprecated.BIDRAGS_PLIKTIG]: 1,
+    [RolleTypeDeprecated.REELL_MOTTAKER]: 3,
+};
+
+const BARN_ROLLETYPER = new Set<string>([RolleTypeAbbreviation.BA, RolleTypeFullName.BARN]);
+
+/**
+ * Beregner alder basert på norsk fødselsnummer/d-nummer (11 siffer).
+ * Returnerer `null` for identer som ikke er gyldige fødselsnumre (f.eks. aktørId),
+ * slik at disse sorteres sist blant barna i stedet for å feile.
+ *
+ * NB: Duplisert (forenklet) versjon av `beregnAlderFraFnr` i `@bidrag/utils`. Kan ikke
+ * importeres herfra siden `@bidrag/utils` avhenger av `@bidrag/common` (ville gitt sirkulær avhengighet).
+ */
+function beregnAlderFraIdent(ident: string): number | null {
+    if (!/^\d{11}$/.test(ident)) return null;
+
+    const dag = Number.parseInt(ident.substring(0, 2), 10);
+    const måned = Number.parseInt(ident.substring(2, 4), 10);
+    const år = Number.parseInt(ident.substring(4, 6), 10);
+    const individnummer = Number.parseInt(ident.substring(6, 9), 10);
+
+    const reellDag = dag > 40 ? dag - 40 : dag;
+
+    let fødselsår: number;
+    if (individnummer <= 499) {
+        fødselsår = 1900 + år;
+    } else if (individnummer <= 749 && år >= 54) {
+        fødselsår = 1800 + år;
+    } else if (individnummer <= 999 && år <= 39) {
+        fødselsår = 2000 + år;
+    } else {
+        fødselsår = 1900 + år;
+    }
+
+    const fødselsdato = new Date(fødselsår, måned - 1, reellDag);
+    if (Number.isNaN(fødselsdato.getTime())) return null;
+
+    const nå = new Date();
+    let alder = nå.getFullYear() - fødselsår;
+    if (
+        nå.getMonth() < fødselsdato.getMonth() ||
+        (nå.getMonth() === fødselsdato.getMonth() && nå.getDate() < fødselsdato.getDate())
+    ) {
+        alder--;
+    }
+    return alder;
+}
+
+/**
+ * Sorterer roller innad i en sak: BM først, deretter BP, så barn (BA) sortert etter alder
+ * (eldst først). Roller uten kjent sorteringsvekt havner sist, i opprinnelig rekkefølge.
+ */
+function sammenlignRoller(a: HeaderRolle, b: HeaderRolle): number {
+    const vektA = ROLLE_SORTERINGSVEKT[a.rolleType] ?? Number.MAX_SAFE_INTEGER;
+    const vektB = ROLLE_SORTERINGSVEKT[b.rolleType] ?? Number.MAX_SAFE_INTEGER;
+    if (vektA !== vektB) return vektA - vektB;
+
+    if (BARN_ROLLETYPER.has(a.rolleType) && BARN_ROLLETYPER.has(b.rolleType)) {
+        const alderA = beregnAlderFraIdent(a.ident);
+        const alderB = beregnAlderFraIdent(b.ident);
+        if (alderA !== null && alderB !== null) return alderB - alderA; // eldst først
+        if (alderA !== null) return -1;
+        if (alderB !== null) return 1;
+    }
+
+    return 0;
+}
+
 const mapSaksnummerRoller = (roller: HeaderRolle[]): SaksnummerRoller[] => {
     const saksnummerOrder = Array.from(new Set(roller.map((rolle) => rolle.saksnummer)));
 
     return saksnummerOrder
         .filter((s): s is string => s !== undefined)
         .map((saksnummer) => {
-            const rollerISak = roller.filter((rolle) => rolle.saksnummer === saksnummer);
+            const rollerISak = roller.filter((rolle) => rolle.saksnummer === saksnummer).sort(sammenlignRoller);
             return {
                 saksnummer,
                 roller: rollerISak,
@@ -182,7 +270,7 @@ const useFlashAnimation = (aktivtSaksnummer: string | undefined) => {
     const [flashingSaksnummer, setFlashingSaksnummer] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        if (prevSaksnummerRef.current !== aktivtSaksnummer && aktivtSaksnummer) {
+        if (prevSaksnummerRef.current !== undefined && prevSaksnummerRef.current !== aktivtSaksnummer && aktivtSaksnummer) {
             setFlashingSaksnummer(aktivtSaksnummer);
             const timer = setTimeout(() => setFlashingSaksnummer(undefined), FLASH_ANIMATION_DURATION);
             prevSaksnummerRef.current = aktivtSaksnummer;

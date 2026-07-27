@@ -1,10 +1,13 @@
 import {Box, Heading, List, LocalAlert, VStack} from "@navikt/ds-react";
 import {useState} from "react";
+import type {SakSideTittelHandle} from "~/routes/sak/sakSideTittel";
 import type {Route} from "./+types/SakReskontroOversiktPage.ts";
 import {SakNokkelTall} from "./SakNokkelTall";
 import TransaksjonerAggregertTabell from "./TransaksjonerAggregertTabell";
 import TransaksjonerFilterPanel from "./TransaksjonerFilterPanel";
 import {useTransaksjonsfilter} from "./useTransaksjonsfilter";
+
+export const handle: SakSideTittelHandle = {sakSideTittel: "Reskontro"};
 
 export default function SakReskontroOversiktPage({
                                                      params,

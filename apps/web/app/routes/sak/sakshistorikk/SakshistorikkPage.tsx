@@ -1,9 +1,12 @@
 import { Heading, VStack } from "@navikt/ds-react";
 import { useFinnHendelserForSak, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
+import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SakshistorikkPage";
 import HendelseTabell from "./components/hendelse/HendelseTabell";
 import JournalpostTabell from "./components/journalpost/JournalpostTabell";
+
+export const handle: SakSideTittelHandle = { sakSideTittel: "Sakshistorikk" };
 
 export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;

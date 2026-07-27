@@ -1,8 +1,11 @@
 import { Box, Heading, LocalAlert, VStack } from "@navikt/ds-react";
 import { useHentFogdhistorikk } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
+import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/FogdhistorikkPage";
 import FogdhistorikkTabell from "./components/FogdhistorikkTabell";
+
+export const handle: SakSideTittelHandle = { sakSideTittel: "Fogdhistorikk" };
 
 export default function FogdhistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;
