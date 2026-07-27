@@ -270,7 +270,11 @@ const useFlashAnimation = (aktivtSaksnummer: string | undefined) => {
     const [flashingSaksnummer, setFlashingSaksnummer] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        if (prevSaksnummerRef.current !== undefined && prevSaksnummerRef.current !== aktivtSaksnummer && aktivtSaksnummer) {
+        if (
+            prevSaksnummerRef.current !== undefined &&
+            prevSaksnummerRef.current !== aktivtSaksnummer &&
+            aktivtSaksnummer
+        ) {
             setFlashingSaksnummer(aktivtSaksnummer);
             const timer = setTimeout(() => setFlashingSaksnummer(undefined), FLASH_ANIMATION_DURATION);
             prevSaksnummerRef.current = aktivtSaksnummer;
