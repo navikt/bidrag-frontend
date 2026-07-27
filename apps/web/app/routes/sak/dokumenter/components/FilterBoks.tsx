@@ -1,6 +1,8 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@navikt/aksel-icons";
-import { Box, Button, Checkbox, CheckboxGroup, HStack } from "@navikt/ds-react";
-import type { DokumentData, FilterState, MenyState } from "./hooks/useDokumentState";
+import { Box, Button, HStack } from "@navikt/ds-react";
+import { type DokumentFilterItem, DokumentFilterMeny } from "~/common/dokument/DokumentFilterMeny";
+import { type DokumentSorterItem, DokumentSorterMeny } from "~/common/dokument/DokumentSorterMeny";
+import type { DokumentData, DokumentSortKey, FilterState, MenyState } from "./hooks/useDokumentState";
 
 export interface FilterBoksProps {
     data: DokumentData;
@@ -12,10 +14,14 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
     const { harBlandingFarBid } = data;
     const {
         visning,
+        expandedIds,
+        tableExpandedIds,
         handterAapneAlle,
         handterLukkAlle,
         handterAapneAlleTabellRader,
         handterLukkAlleTabellRader,
+        listeSort,
+        handleListeSort,
         valgteDokumentreferanser,
         visKunValgte,
         setVisKunValgte,
@@ -35,58 +41,67 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
     const handterAapneAlleForVisning = erTabell ? handterAapneAlleTabellRader : handterAapneAlle;
     const handterLukkAlleForVisning = erTabell ? handterLukkAlleTabellRader : handterLukkAlle;
 
+    // Én toggle i stedet for to knapper: viser "Lukk alle" så snart noe er utvidet.
+    const noeErUtvidet = (erTabell ? tableExpandedIds : expandedIds).size > 0;
+
+    const sorterValg: DokumentSorterItem<DokumentSortKey>[] = [
+        { key: "dokumentDato", label: "Dok.dato" },
+        { key: "journalfortDato", label: "Journal.dato" },
+        { key: "gjelderAktor", label: "Gjelder" },
+    ];
+
+    const filtere: DokumentFilterItem[] = [
+        {
+            id: "kunFerdigstilte",
+            label: "Kun ferdigstilte",
+            checked: kunFerdigstilte,
+            onChange: setKunFerdigstilte,
+        },
+        {
+            id: "kunVedtak",
+            label: "Kun vedtak",
+            checked: kunVedtak,
+            onChange: setKunVedtak,
+        },
+        ...(harBlandingFarBid
+            ? [
+                  {
+                      id: "visFarskapUtelukket",
+                      label: "Vis farskap",
+                      checked: !kunVedtak && visFarskapUtelukket,
+                      onChange: setVisFarskapUtelukket,
+                      disabled: kunVedtak,
+                  },
+              ]
+            : []),
+        {
+            id: "visFeilregistrerte",
+            label: "Vis feilreg.",
+            checked: !kunVedtak && visFeilregistrerte,
+            onChange: setVisFeilregistrerte,
+            disabled: kunVedtak,
+        },
+    ];
+
     return (
         <Box paddingBlock="space-2" paddingInline="space-4">
-            <CheckboxGroup legend="Filtrer" hideLegend size="small">
-                <HStack gap="space-12" wrap>
-                    <Checkbox checked={kunFerdigstilte} onChange={(e) => setKunFerdigstilte(e.target.checked)}>
-                        Kun ferdigstilte
-                    </Checkbox>
-                    <Checkbox checked={kunVedtak} onChange={(e) => setKunVedtak(e.target.checked)}>
-                        Kun vedtak
-                    </Checkbox>
-                    {harBlandingFarBid && (
-                        <Checkbox
-                            disabled={kunVedtak}
-                            checked={!kunVedtak && visFarskapUtelukket}
-                            onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
-                        >
-                            Vis farskap
-                        </Checkbox>
-                    )}
-                    <Checkbox
-                        disabled={kunVedtak}
-                        checked={!kunVedtak && visFeilregistrerte}
-                        onChange={(e) => setVisFeilregistrerte(e.target.checked)}
-                    >
-                        Vis feilreg.
-                    </Checkbox>
-                    <Checkbox
-                        disabled={valgteDokumentreferanser.size === 0}
-                        checked={visKunValgte}
-                        onChange={(e) => setVisKunValgte(e.target.checked)}
-                    >
-                        Vis kun valgte
-                    </Checkbox>
-                </HStack>
-            </CheckboxGroup>
-            <HStack gap="space-8" marginBlock="space-8 space-0">
+            <HStack gap="space-2" align="center" wrap={false}>
+                <DokumentFilterMeny
+                    filtere={filtere}
+                    visKunValgte={visKunValgte}
+                    onVisKunValgteChange={setVisKunValgte}
+                    visKunValgteDisabled={valgteDokumentreferanser.size === 0}
+                />
+                {!erTabell && <DokumentSorterMeny valg={sorterValg} sort={listeSort} onSort={handleListeSort} />}
                 <Button
                     variant="tertiary"
                     size="xsmall"
-                    onClick={handterAapneAlleForVisning}
-                    icon={<ArrowDownIcon aria-hidden />}
-                >
-                    Åpne alle
-                </Button>
-                <Button
-                    variant="tertiary"
-                    size="xsmall"
-                    onClick={handterLukkAlleForVisning}
-                    icon={<ArrowUpIcon aria-hidden />}
-                >
-                    Lukk alle
-                </Button>
+                    className="ml-auto shrink-0"
+                    onClick={noeErUtvidet ? handterLukkAlleForVisning : handterAapneAlleForVisning}
+                    icon={noeErUtvidet ? <ArrowUpIcon aria-hidden /> : <ArrowDownIcon aria-hidden />}
+                    title={noeErUtvidet ? "Lukk alle" : "Åpne alle"}
+                    aria-label={noeErUtvidet ? "Lukk alle" : "Åpne alle"}
+                />
             </HStack>
         </Box>
     );

@@ -14,4 +14,10 @@ export interface SaksDokument {
     kanÅpnes: boolean;
     åpenForklaring?: string;
     gjelderAktor?: JournalpostDto["gjelderAktor"];
+    /**
+     * Om dokumentet er hoveddokumentet (index 0) i journalposten. Beregnes ut fra den ufiltrerte
+     * dokumentlisten, slik at det ikke endrer seg selv om et filter (f.eks. "Vis kun valgte")
+     * skjuler selve hoveddokumentet.
+     */
+    erHoveddokument: boolean;
 }

@@ -93,16 +93,15 @@ export function PdfVisning({ dokument, lasterMetadata = false }: PdfVisningProps
             style={{
                 flex: 1,
                 minWidth: 0,
-                position: "sticky",
-                top: "1rem",
-                height: "calc(100vh - 4rem)",
+                minHeight: 0,
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
             }}
         >
             <iframe
                 title={dokument.tittel}
-                src={`${pdfSource.src}#view=FitH&toolbar=0`}
+                src={`${pdfSource.src}#view=FitW&toolbar=1&navpanes=0`}
                 style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
         </section>

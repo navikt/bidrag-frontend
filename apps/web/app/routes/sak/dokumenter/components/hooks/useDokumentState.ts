@@ -1,6 +1,8 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import { standardSort } from "../../../sakshistorikk/components/journalpost/journalpostUtils";
+import { useSort } from "../../../sakshistorikk/components/useSort";
 import {
     byggDokumenter,
     filtrerJournalposter,
@@ -8,6 +10,12 @@ import {
     sjekkOmBlandingAvFarOgBidrag,
     utvidSettMedNyVerdi,
 } from "../../utils/saksdokumenterUtils";
+
+/**
+ * Sorteringsnøkler tilgjengelig i tre-/listevisningen (`DokumentTre`). Tabellvisningen har sin
+ * egen kolonnebaserte sortering (`useSort` direkte i `SaksdokumentTabell`).
+ */
+export type DokumentSortKey = "dokumentDato" | "journalfortDato" | "gjelderAktor";
 
 export type FilterState = ReturnType<typeof useDokumentState>["filterState"];
 export type MenyState = ReturnType<typeof useDokumentState>["menyState"];
@@ -31,7 +39,24 @@ function parseValgteRefs(verdi: string | null): Set<string> {
     return new Set(verdi.split(",").filter(Boolean));
 }
 
-export function useDokumentState(journalposter: JournalpostDto[]) {
+export interface UseDokumentStateOptions {
+    /**
+     * Standardverdi for "kun ferdigstilte"-filteret. Sak-visningen ønsker `true` (skjul journalposter
+     * uten ferdigstilte dokumenter), mens en enkelt journalpost (f.eks. `JournalpostFremviser`) alltid
+     * skal vises uavhengig av status – der brukes `false`.
+     */
+    standardKunFerdigstilte?: boolean;
+    /**
+     * Dokumentreferanse som skal være forhåndsvalgt dersom URL-et ikke allerede spesifiserer `?dok=`.
+     */
+    initialDokumentreferanse?: string;
+    /**
+     * Velg første tilgjengelige dokument automatisk når dokumentlisten har lastet.
+     */
+    autoSelectFirstDocument?: boolean;
+}
+
+export function useDokumentState(journalposter: JournalpostDto[], options?: UseDokumentStateOptions) {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const harBlandingFarBid = useMemo(() => sjekkOmBlandingAvFarOgBidrag(journalposter), [journalposter]);
@@ -39,7 +64,7 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
     const [visFarskapUtelukket, setVisFarskapUtelukket] = useState(false);
     const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
     const [kunVedtak, setKunVedtak] = useState(false);
-    const [kunFerdigstilte, setKunFerdigstilte] = useState(true);
+    const [kunFerdigstilte, setKunFerdigstilte] = useState(options?.standardKunFerdigstilte ?? true);
 
     const [visning, setVisning] = useState<MenyVisning>(() => parseVisning(searchParams.get("visning")));
 
@@ -79,6 +104,21 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
         );
     }, [filtrerteJournalposter, visKunValgte, valgteDokumentreferanser]);
 
+    // Sortering for tre-/listevisningen (`DokumentTre`). Tabellvisningen sorterer uavhengig via
+    // egne kolonneheadere i `SaksdokumentTabell`.
+    const {
+        sort: listeSort,
+        handleSort: handleListeSort,
+        sortData: sortListeData,
+    } = useSort<JournalpostDto, DokumentSortKey>({
+        defaultUnsorted: standardSort,
+        customComparators: {
+            gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
+        },
+    });
+
+    const sorterteJournalposter = sortListeData(synligeJournalposter);
+
     const alleJpMedFlereDokumenter = useMemo(
         () =>
             synligeJournalposter
@@ -88,23 +128,34 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
     );
 
     // Rad-id-ene (SaksDokument.id) til hoveddokumentene som har vedlegg – brukes for "åpne alle rader" i tabellen.
+    // Kun relevant når hoveddokumentet faktisk er synlig (ellers vises vedleggene som egne, uavhengige rader).
     const alleTabellForeldreIder = useMemo(
         () =>
             synligeJournalposter
                 .map((jp) => finnDokumenterForJournalpost(jp, dokumenter))
-                .filter((docs) => docs.length > 1)
-                .map((docs) => docs[0]?.id)
+                .filter((docs) => docs.length > 1 && docs.some((d) => d.erHoveddokument))
+                .map((docs) => docs.find((d) => d.erHoveddokument)?.id)
                 .filter((id): id is string => Boolean(id)),
         [synligeJournalposter, dokumenter],
     );
 
     const [selectedId, setSelectedId] = useState<string | undefined>(() => {
-        const dokRef = searchParams.get("dok");
+        const dokRef = searchParams.get("dok") ?? options?.initialDokumentreferanse;
         if (!dokRef) return undefined;
         return alleDokumenter.find((d) => d.dokumentreferanse === dokRef)?.id;
     });
 
     const selectedDocument = useMemo(() => dokumenter.find((d) => d.id === selectedId), [dokumenter, selectedId]);
+
+    useEffect(() => {
+        if (!options?.autoSelectFirstDocument) return;
+        if (selectedId !== undefined) return;
+        if (alleDokumenter.length === 0) return;
+
+        const dokRef = searchParams.get("dok") ?? options?.initialDokumentreferanse;
+        const onsketDokument = dokRef ? alleDokumenter.find((d) => d.dokumentreferanse === dokRef) : undefined;
+        setSelectedId(onsketDokument?.id ?? alleDokumenter[0]?.id);
+    }, [alleDokumenter, options?.autoSelectFirstDocument, options?.initialDokumentreferanse, searchParams, selectedId]);
 
     const handleSelectDocument = (id?: string) => {
         setSelectedId(id);
@@ -186,7 +237,7 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
 
     return {
         data: {
-            journalposter: synligeJournalposter,
+            journalposter: sorterteJournalposter,
             dokumenter,
             alleDokumenter,
             harBlandingFarBid,
@@ -216,6 +267,8 @@ export function useDokumentState(journalposter: JournalpostDto[]) {
             setTableExpandedIds,
             handterAapneAlleTabellRader,
             handterLukkAlleTabellRader,
+            listeSort,
+            handleListeSort,
             valgteDokumentreferanser,
             handleSettValgteRefs,
             handleVelgAlle,

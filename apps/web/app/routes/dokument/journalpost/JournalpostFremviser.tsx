@@ -1,12 +1,11 @@
-import type { DokumentDto } from "@bidrag/api/BidragDokumentApi";
+import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { DokumentStatusDto } from "@bidrag/api/BidragDokumentApi";
-import { EyeIcon } from "@navikt/aksel-icons";
-import { BodyShort, Button, Detail, HStack, Label, Link, Loader, VStack } from "@navikt/ds-react";
-import { useEffect, useMemo, useState } from "react";
+import { Button, Loader, VStack } from "@navikt/ds-react";
+import { useMemo } from "react";
 import { hentDokumentApi, useHentJournalpost } from "~/api/useApi.ts";
-import { DomCachedPdfFremviser } from "~/common/dokument/DomCachedPdfFremviser";
 import { JournalpostMetadata } from "~/common/dokument/JournalpostMetadata";
-import type { PdfDokument } from "~/common/dokument/PdfVisning";
+import { DokumentVisning } from "../../sak/dokumenter/components/DokumentVisning";
+import { useDokumentState } from "../../sak/dokumenter/components/hooks/useDokumentState";
 import { JournalpostDetaljer } from "./JournalpostDetaljer";
 
 interface JournalpostFremviserProps {
@@ -17,60 +16,20 @@ interface JournalpostFremviserProps {
     fallbackDokumentreferanser?: string[];
 }
 
-function utledDokumentTittel(tittel?: string | null): string {
-    if (tittel?.trim()) return tittel;
-    return "Dokument uten tittel";
-}
-
-function formaterSidelinjeTittel(tittel: string, index: number): string {
-    return `${index + 1}. ${tittel}`;
-}
-
-function mapDokumenterToView(dokumenter: DokumentDto[] = [], fallbackJournalpostId: string): PdfDokument[] {
-    const medReferanse = dokumenter.filter((dok) => Boolean(dok.dokumentreferanse));
-
-    return medReferanse.map((dok) => {
-        const kanÅpnes = dok.status !== DokumentStatusDto.UNDER_PRODUKSJON;
-
-        return {
-            tittel: utledDokumentTittel(dok.tittel),
-            journalpostId: dok.journalpostId ?? fallbackJournalpostId,
-            dokumentreferanse: dok.dokumentreferanse as string,
-            kanÅpnes,
-            åpenForklaring: kanÅpnes ? undefined : "Under produksjon",
-        };
-    });
-}
-
-function genererFallbackDokumenter(
-    journalpostId: string,
-    dokumentreferanse?: string,
-    fallbackReferanser: string[] = [],
-): PdfDokument[] {
+/**
+ * Genererer syntetiske dokumenter når journalposten (ennå) ikke har dokumentmetadata fra API-et,
+ * f.eks. rett etter journalføring. Markeres som ferdigstilt slik at de kan åpnes i PDF-fremviseren.
+ */
+function genererFallbackDokumenter(dokumentreferanse?: string, fallbackReferanser: string[] = []) {
     const unikeReferanser = Array.from(
         new Set([...(dokumentreferanse ? [dokumentreferanse] : []), ...fallbackReferanser]),
     );
 
     return unikeReferanser.map((referanse) => ({
         dokumentreferanse: referanse,
-        journalpostId,
-        tittel: utledDokumentTittel(null),
-        kanÅpnes: true,
+        status: DokumentStatusDto.FERDIGSTILT,
+        metadata: {},
     }));
-}
-
-function utledStartValgtDokument(
-    dokumenter: PdfDokument[],
-    dokumentreferanse?: string,
-    noevaerendeValgt?: string,
-): string | undefined {
-    const finnesINåværende = dokumenter.find((d) => d.dokumentreferanse === noevaerendeValgt);
-    if (finnesINåværende?.kanÅpnes) return noevaerendeValgt;
-
-    const finnesIOppgitt = dokumenter.find((d) => d.dokumentreferanse === dokumentreferanse);
-    if (finnesIOppgitt?.kanÅpnes) return dokumentreferanse;
-
-    return dokumenter.find((dok) => dok.kanÅpnes)?.dokumentreferanse;
 }
 
 export default function JournalpostFremviser({
@@ -79,30 +38,37 @@ export default function JournalpostFremviser({
     hidden,
     fallbackDokumentreferanser = [],
 }: JournalpostFremviserProps) {
-    const [selectedValue, setSelectedValue] = useState<string>();
-    const [visitedIds, setVisitedIds] = useState<Set<string>>(new Set());
-
     const { data, isLoading: isLoadingJournalpost, error: journalpostError } = useHentJournalpost(journalpostId);
 
-    const dokumenter = useMemo(() => {
-        const apiDokumenter = mapDokumenterToView(data?.journalpost?.dokumenter, journalpostId);
-        if (apiDokumenter.length > 0) return apiDokumenter;
+    const journalpost: JournalpostDto | undefined = data?.journalpost ?? undefined;
 
-        return genererFallbackDokumenter(journalpostId, dokumentreferanse, fallbackDokumentreferanser);
-    }, [dokumentreferanse, fallbackDokumentreferanser, journalpostId, data]);
+    // Journalposten slik den skal vises: samme struktur som resten av sakens dokumentvisning,
+    // men begrenset til denne ene journalposten. Faller tilbake til syntetiske dokumenter
+    // dersom API-et ennå ikke har returnert dokumentmetadata.
+    const journalposterForVisning = useMemo<JournalpostDto[]>(() => {
+        if (!journalpost) return [];
 
-    useEffect(() => {
-        if (!selectedValue) return;
-        setVisitedIds((prev) => new Set(prev).add(selectedValue));
-    }, [selectedValue]);
+        const harDokumenter = (journalpost.dokumenter?.length ?? 0) > 0;
+        if (harDokumenter) return [journalpost];
 
-    useEffect(() => {
-        if (dokumenter.length === 0) {
-            setSelectedValue(undefined);
-            return;
-        }
-        setSelectedValue(utledStartValgtDokument(dokumenter, dokumentreferanse, selectedValue));
-    }, [dokumenter, dokumentreferanse, selectedValue]);
+        return [
+            {
+                ...journalpost,
+                dokumenter: genererFallbackDokumenter(dokumentreferanse, fallbackDokumentreferanser),
+            },
+        ];
+    }, [journalpost, dokumentreferanse, fallbackDokumentreferanser]);
+
+    const {
+        data: dokumentData,
+        filterState,
+        menyState,
+    } = useDokumentState(journalposterForVisning, {
+        // Alltid vis journalposten uavhengig av ferdigstilt-status – det er den eneste vi har.
+        standardKunFerdigstilte: false,
+        initialDokumentreferanse: dokumentreferanse,
+        autoSelectFirstDocument: true,
+    });
 
     if (isLoadingJournalpost) {
         return (
@@ -114,13 +80,9 @@ export default function JournalpostFremviser({
 
     if (journalpostError) throw journalpostError;
 
-    if (!data?.journalpost) {
-        return null;
-    }
+    if (!journalpost) return null;
 
-    const journalpost = data.journalpost;
-
-    if (dokumenter.length === 0) {
+    if (dokumentData.alleDokumenter.length === 0) {
         throw new Error(`Fant ingen dokumenter for journalpost ${journalpostId}`);
     }
 
@@ -139,83 +101,26 @@ export default function JournalpostFremviser({
         }
     }
 
-    <Button variant="secondary" size="xsmall" onClick={() => opneSammenslattPdf(journalpostId)}>
-        Åpne sammenslått
-    </Button>;
-
-    const velgDokument = (e: React.MouseEvent, referanse?: string) => {
-        e.preventDefault();
-        if (!referanse) return;
-        setSelectedValue(referanse);
-    };
+    const header = (
+        <VStack gap="space-2">
+            <JournalpostDetaljer journalpost={journalpost} />
+            <JournalpostMetadata jp={journalpost} visFagomrade={false} />
+            {dokumentData.alleDokumenter.length > 1 && (
+                <Button variant="secondary" size="xsmall" onClick={() => opneSammenslattPdf(journalpostId)}>
+                    Åpne sammenslått
+                </Button>
+            )}
+        </VStack>
+    );
 
     return (
-        <HStack wrap={false} style={{ height: "100vh", overflow: "hidden" }}>
-            <VStack as="nav" style={{ width: "21rem", minWidth: "16rem", maxWidth: "30em", overflow: "hidden" }}>
-                <VStack gap="space-4" padding="space-4">
-                    <JournalpostDetaljer journalpost={journalpost} />
-                    <JournalpostMetadata jp={journalpost} visFagomrade={false} />
-                    {dokumenter.length > 1 && (
-                        <Button variant="secondary" size="xsmall" onClick={() => opneSammenslattPdf(journalpostId)}>
-                            Åpne sammenslått
-                        </Button>
-                    )}
-                    {dokumenter.length > 1 && (
-                        <BodyShort size="small" textColor="subtle">
-                            {dokumenter.length} dokumenter
-                        </BodyShort>
-                    )}
-                </VStack>
-
-                <VStack gap="space-12" padding="space-2" style={{ overflowY: "auto", flex: 1 }}>
-                    {dokumenter.map((dokument, index) => {
-                        const isVisited = dokument.dokumentreferanse
-                            ? visitedIds.has(dokument.dokumentreferanse)
-                            : false;
-
-                        const innhold = (
-                            <HStack
-                                align="center"
-                                gap="space-4"
-                                justify="space-between"
-                                style={{ width: "100%", padding: "var(--a-spacing-2) 0" }}
-                            >
-                                <VStack style={{ overflow: "hidden", flex: 1 }}>
-                                    <Label
-                                        size="small"
-                                        textColor={!dokument.kanÅpnes ? "subtle" : "default"}
-                                        style={{ wordBreak: "break-word" }}
-                                    >
-                                        {formaterSidelinjeTittel(dokument.tittel, index)}
-                                    </Label>
-                                    {!dokument.kanÅpnes && (
-                                        <Detail textColor="subtle">{dokument.åpenForklaring}</Detail>
-                                    )}
-                                </VStack>
-                                {dokumenter.length > 1 && isVisited && (
-                                    <EyeIcon title="Sett" style={{ flexShrink: 0, color: "var(--a-icon-subtle)" }} />
-                                )}
-                            </HStack>
-                        );
-
-                        if (!dokument.kanÅpnes) {
-                            return <div key={dokument.dokumentreferanse}>{innhold}</div>;
-                        }
-
-                        return (
-                            <Link
-                                key={dokument.dokumentreferanse}
-                                href="#"
-                                onClick={(e) => velgDokument(e, dokument.dokumentreferanse)}
-                            >
-                                {innhold}
-                            </Link>
-                        );
-                    })}
-                </VStack>
-            </VStack>
-
-            <DomCachedPdfFremviser dokumenter={dokumenter} valgtDokumentreferanse={selectedValue} />
-        </HStack>
+        <DokumentVisning
+            data={dokumentData}
+            filterState={filterState}
+            menyState={menyState}
+            skjulKontroller
+            flatDokumentliste
+            venstreMenyHeader={header}
+        />
     );
 }

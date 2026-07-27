@@ -4,6 +4,7 @@ import type { RolleDto } from "@bidrag/api/SakApi";
 import { RolleTag, type RolleType } from "@bidrag/common";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { Detail, HStack, Tag } from "@navikt/ds-react";
+import { dokumentKategoriBeskrivelse } from "~/routes/sak/dokumenter/utils/dokumentKategori";
 
 interface JPHeaderInfoProps {
     jp: JournalpostDto;
@@ -46,12 +47,18 @@ export function JournalpostHeaderInfo({
 
     const harLestMinstEtt = antallLeste > 0;
 
-    const antallTekst =
-        antallDokumenter > 1 && harLestMinstEtt ? `(${antallLeste}/${antallDokumenter})` : `(${antallDokumenter})`;
+    // "(1)" gir ingen informasjon – antall vises kun når journalposten har flere dokumenter.
+    const visAntall = antallDokumenter > 1;
+    const antallTekst = harLestMinstEtt ? `(${antallLeste}/${antallDokumenter})` : `(${antallDokumenter})`;
 
     return (
         <HStack gap="space-4" align={isExpanded ? "start" : "center"} wrap={false} className="w-full min-w-0">
-            <Tag size="small" variant={getTagVariant()} className="shrink-0">
+            <Tag
+                size="small"
+                variant={getTagVariant()}
+                className="shrink-0"
+                title={dokumentKategoriBeskrivelse(jp.dokumentType)}
+            >
                 {jp.dokumentType ?? "?"}
             </Tag>
 
@@ -59,12 +66,18 @@ export function JournalpostHeaderInfo({
                 <RolleTag rolleType={rolleType as string as RolleType} ident={rolleIdent} className="shrink-0 !mr-0" />
             )}
 
-            <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">
-                {harDokumenter && harLestMinstEtt && <EyeIcon title="Sett" aria-label="Sett" className="text-base" />}
-                <Detail textColor="subtle" className="font-normal">
-                    {antallTekst}
-                </Detail>
-            </HStack>
+            {(visAntall || (harDokumenter && harLestMinstEtt)) && (
+                <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">
+                    {harDokumenter && harLestMinstEtt && (
+                        <EyeIcon title="Sett" aria-label="Sett" className="text-base" />
+                    )}
+                    {visAntall && (
+                        <Detail textColor="subtle" className="font-normal">
+                            {antallTekst}
+                        </Detail>
+                    )}
+                </HStack>
+            )}
 
             <Detail
                 weight="semibold"

@@ -135,6 +135,7 @@ export function byggDokumenter(journalposter: JournalpostDto[]): SaksDokument[] 
                     kanÅpnes,
                     åpenForklaring,
                     gjelderAktor: jp.gjelderAktor,
+                    erHoveddokument: index === 0,
                 };
             });
         });

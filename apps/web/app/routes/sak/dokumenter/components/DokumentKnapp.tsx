@@ -7,10 +7,31 @@ interface DokumentKnappProps {
     isSelected: boolean;
     isVisited: boolean;
     onClick: () => void;
+    /**
+     * Når true skilles hoveddokument og vedlegg visuelt fra hverandre i stedet for at alle
+     * dokumenter får en generisk «↳»-pil. Brukes i flat liste der journalposten ikke er en egen node.
+     */
+    visDokumentRolle?: boolean;
 }
 
-export function DokumentKnapp({ dokument, isSelected, isVisited, onClick }: DokumentKnappProps) {
+export function DokumentKnapp({
+    dokument,
+    isSelected,
+    isVisited,
+    onClick,
+    visDokumentRolle = false,
+}: DokumentKnappProps) {
     const kanÅpnes = dokument.kanÅpnes;
+    const erHoveddokument = visDokumentRolle && dokument.erHoveddokument;
+
+    // Hoveddokumentet har ofte nøyaktig samme tittel som journalposten det ligger under. Å gjenta
+    // den teksten får listen til å se ut som den har ett dokument for mye, så raden merkes i stedet
+    // med rollen sin. Selve tittelen er uansett synlig i journalpost-headeren rett over.
+    const tittelDupliserer =
+        erHoveddokument &&
+        Boolean(dokument.journalpostTittel?.trim()) &&
+        dokument.journalpostTittel?.trim() === dokument.tittel.trim();
+    const visningsTittel = tittelDupliserer ? "Hoveddokument" : dokument.tittel;
 
     const tittelFargeClass = isSelected ? "text-gray-900" : kanÅpnes ? "text-[var(--a-text-action)]" : "text-gray-500";
 
@@ -37,14 +58,15 @@ export function DokumentKnapp({ dokument, isSelected, isVisited, onClick }: Doku
             )}
 
             <HStack gap="space-1" align="center" wrap={false} className="w-full min-w-0">
-                <Detail className="text-gray-500 shrink-0 font-normal">↳</Detail>
+                {!erHoveddokument && <Detail className="text-gray-500 shrink-0 font-normal">↳</Detail>}
                 <Detail
-                    weight={isSelected ? "semibold" : "regular"}
-                    className={`truncate flex-1 min-w-0 ${tittelFargeClass} ${
-                        kanÅpnes && !isSelected ? "underline" : ""
-                    }`}
+                    weight={isSelected || erHoveddokument ? "semibold" : "regular"}
+                    className={`truncate flex-1 min-w-0 ${
+                        tittelDupliserer ? "text-gray-600" : tittelFargeClass
+                    } ${kanÅpnes && !isSelected && !tittelDupliserer ? "hover:underline" : ""}`}
+                    title={dokument.tittel}
                 >
-                    {dokument.tittel}
+                    {visningsTittel}
                 </Detail>
             </HStack>
         </button>
