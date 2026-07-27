@@ -15,6 +15,7 @@ import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
+import faviconUrl from "./assets/bisys_favicon.ico";
 import type { Route } from "./+types/root.ts";
 
 export const middleware = [authMiddleware];
@@ -94,6 +95,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <title>Bidrag</title>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="icon" href={faviconUrl} type="image/x-icon" />
                 <Meta />
                 <Links />
             </head>
