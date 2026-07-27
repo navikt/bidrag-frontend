@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { Broadcast, BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
+import { Broadcast, BroadcastNames, SamhandlerBroadcastMessage } from "../../types";
 
 type SamhandlerSokPopupProps = {
     windowId: string;

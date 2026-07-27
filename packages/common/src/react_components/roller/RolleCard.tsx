@@ -1,7 +1,7 @@
 import { CopyButton } from "@navikt/ds-react";
 
 import { useBidragCommons } from "../../api/BidragCommonsContext";
-import type { IRolleDetaljer, RolleTypeAbbreviation } from "../../types";
+import { IRolleDetaljer, RolleTypeAbbreviation } from "../../types";
 import PersonNavnIdent from "../person/PersonNavnIdent";
 import RolleTag from "./RolleTag";
 

@@ -13,10 +13,10 @@ export default function useStartTracing() {
     //     const sessionContext = trace.setSpan(ROOT_CONTEXT, sessionSpan);
     //
     //     // Optionally store in window/global for access in hooks
-    //     // @ts-expect-error
+    //     // @ts-ignore
     //     window.__otelSessionContext = sessionContext;
     //
-    //     // @ts-expect-error
+    //     // @ts-ignore
     //     window.__otelSessionSpan = sessionSpan;
     //
     //     // End span on unload

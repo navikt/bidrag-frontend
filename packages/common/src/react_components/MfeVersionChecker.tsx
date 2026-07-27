@@ -1,7 +1,7 @@
 import { Alert, BodyShort, Button } from "@navikt/ds-react";
 import React, { useEffect, useMemo } from "react";
 
-import { buildMfeRemoteEntryUrl, type MFERemoteTarget, useMfeVersions } from "./hooks/useMfeVersions";
+import { buildMfeRemoteEntryUrl, MFERemoteTarget, useMfeVersions } from "./hooks/useMfeVersions";
 
 interface MfeVersionCheckerProps {
     /** List of MFE federation names to check */

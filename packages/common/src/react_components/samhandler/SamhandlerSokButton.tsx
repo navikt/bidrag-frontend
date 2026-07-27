@@ -1,7 +1,7 @@
-import { Button, type ButtonProps, Modal } from "@navikt/ds-react";
-import { type ReactNode, useRef } from "react";
+import { Button, ButtonProps, Modal } from "@navikt/ds-react";
+import { ReactNode, useRef } from "react";
 
-import { Broadcast, BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
+import { Broadcast, BroadcastNames, SamhandlerBroadcastMessage } from "../../types";
 
 type SamhandlerSokProps = {
     onResult: (data: SamhandlerBroadcastMessage | null) => void;

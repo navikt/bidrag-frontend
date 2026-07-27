@@ -1,4 +1,4 @@
-import type { EditDocumentConfig } from "../dokument";
+import { EditDocumentConfig } from "../dokument";
 
 export interface EditDocumentBroadcastMessage {
     documentFile?: string;

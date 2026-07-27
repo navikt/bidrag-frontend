@@ -30,12 +30,12 @@ const individsifferAsString = (num: number): string => {
 
 export default class IdentUtils {
     static isFnr(value: string) {
-        return IdentUtils.validateFnr(value);
+        return this.validateFnr(value);
     }
 
     static isSamhandlerId(value: string | number) {
         if (ObjectUtils.isEmpty(value)) return false;
-        const samhandlerIdentRegex = /^[89]\d{10}$/;
+        const samhandlerIdentRegex = new RegExp("^[89]\\d{10}$");
         return samhandlerIdentRegex.test(value.toString());
     }
 
@@ -44,7 +44,7 @@ export default class IdentUtils {
     }
 
     static validateFnr(value: string) {
-        const elevenDigits = /^\d{11}$/;
+        const elevenDigits = new RegExp("^\\d{11}$");
         return elevenDigits.test(value) && parseInt(value.substring(0, 1)) !== 8;
     }
 

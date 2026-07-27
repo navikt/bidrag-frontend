@@ -1,7 +1,7 @@
-import { Button, type ButtonProps, Modal } from "@navikt/ds-react";
-import { type ReactNode, useRef } from "react";
+import { Button, ButtonProps, Modal } from "@navikt/ds-react";
+import { ReactNode, useRef } from "react";
 
-import type { BroadcastError, PersonBroadcastMessage } from "../../types/broadcast";
+import { BroadcastError, PersonBroadcastMessage } from "../../types/broadcast";
 
 type PersonSokProps = {
     onResult: (data: PersonBroadcastMessage | null) => void;

@@ -1,4 +1,4 @@
-import type { CustomError, SimpleError } from "../error";
+import { CustomError, SimpleError } from "../error";
 
 export enum LogLevel {
     INFO = "INFO",

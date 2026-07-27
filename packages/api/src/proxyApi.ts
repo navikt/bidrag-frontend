@@ -1,4 +1,4 @@
-import type {AxiosInstance} from "axios";
+import {AxiosInstance} from "axios";
 
 interface AxiosClient {
     instance: AxiosInstance;

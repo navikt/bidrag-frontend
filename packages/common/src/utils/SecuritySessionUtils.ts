@@ -35,7 +35,7 @@ export class SecuritySessionUtils {
     }
 
     static getCorrelationId(): string {
-        return SessionStorage.getOrDefault("traceparent", `${SecuritySessionUtils.getAppName()}/${uuidV4()}`);
+        return SessionStorage.getOrDefault("traceparent", `${this.getAppName()}/${uuidV4()}`);
     }
 
     static createRequestTrace(spanName: string): RequestTraceContext {
@@ -51,7 +51,7 @@ export class SecuritySessionUtils {
         // propagation.inject(traceContext, headers);
 
         return {
-            correlationId: headers.traceparent ?? SecuritySessionUtils.getCorrelationId(),
+            correlationId: headers.traceparent ?? this.getCorrelationId(),
             headers,
             // span,
         };
@@ -71,7 +71,7 @@ export class SecuritySessionUtils {
     static async getSession(): Promise<SessionResponse> {
         return {
             user_id: "",
-            correlation_id: SecuritySessionUtils.getCorrelationId(),
+            correlation_id: this.getCorrelationId(),
         };
     }
 

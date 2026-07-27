@@ -106,7 +106,7 @@ export default function PerioderFilterPanel({
         });
 
     return (
-        <Box background="neutral-soft" borderRadius="4" padding="space-16">
+        <Box background={"neutral-soft"} borderRadius="4" padding="space-16">
             <HStack gap="space-8" wrap align={"end"}>
                 <UNSAFE_Combobox
                     label="Barn"

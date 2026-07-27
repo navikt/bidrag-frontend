@@ -1,4 +1,4 @@
-import type { RolleTypeAbbreviation } from "../roller/RolleType";
+import { RolleTypeAbbreviation } from "../roller/RolleType";
 
 export interface IPerson {
     ident: string;

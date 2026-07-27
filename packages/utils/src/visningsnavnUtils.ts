@@ -1,4 +1,4 @@
-import type { Sakskategori } from "@bidrag/common";
+import { Sakskategori } from "@bidrag/common";
 
 const SAKSKATEGORI_ENUM_MAP: Record<string, string> = {
     Nasjonal: "N",
