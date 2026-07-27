@@ -44,6 +44,7 @@ export function DokumentKnapp({
             type="button"
             onClick={() => kanÅpnes && onClick()}
             aria-current={isSelected ? "true" : "false"}
+            title={dokument.tittel}
             className={`relative w-full min-w-0 py-1.5 pr-3 pl-7 text-left transition-colors rounded-r block ${backgroundClass} ${borderClass} ${
                 kanÅpnes ? "cursor-pointer" : "cursor-not-allowed"
             }`}

@@ -88,6 +88,7 @@ export function JournalpostHeaderInfo({
             <Detail
                 weight="semibold"
                 textColor={harDokumenter ? "default" : "subtle"}
+                title={innhold}
                 className={`flex-1 min-w-0 ${isExpanded ? "break-words whitespace-normal block" : "truncate block"}`}
             >
                 {innhold}

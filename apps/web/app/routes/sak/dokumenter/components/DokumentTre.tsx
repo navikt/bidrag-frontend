@@ -6,6 +6,7 @@ import { JournalpostMetadata } from "../../../../common/dokument/JournalpostMeta
 import type { SaksDokument } from "../types";
 import { finnDokumenterForJournalpost } from "../utils/saksdokumenterUtils";
 import { DokumentKnapp } from "./DokumentKnapp";
+import styles from "./DokumentTre.module.css";
 import type { DokumentData, MenyState } from "./hooks/useDokumentState";
 
 export interface DokumentTreProps {
@@ -140,7 +141,7 @@ function DokumentJournalpost({
 
     return (
         <Accordion
-            className={`[&.navds-accordion]:!border-none [&_.navds-accordion__item]:!border-none border-l-4 ${
+            className={`${styles.accordion} [&.navds-accordion]:!border-none border-l-4 ${
                 !harÅpnebareDokumenter ? "opacity-50" : ""
             } `}
         >
@@ -174,7 +175,7 @@ function DokumentJournalpost({
                     // et CSS grid-element uten satt bredde. Grid-elementer har min-width:auto som default,
                     // så uten dette krymper ikke innholdet – lange dokumenttitler tvinger raden bredere enn
                     // sidepanelet og "blør" ut under det mørke panelet i stedet for å trunkeres.
-                    className="!p-0 [&_.aksel-accordion__content-inner]:min-w-0"
+                    className={`!p-0 ${styles.accordionContent}`}
                 >
                     <VStack className="min-w-0">
                         <JournalpostMetadata jp={jp} visFagomrade={visFagomrade} />

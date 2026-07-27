@@ -166,6 +166,18 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
         const doc = alleDokumenter.find((d) => d.id === id);
         if (doc?.journalpostId) {
             setExpandedIds((prev) => utvidSettMedNyVerdi(prev, doc.journalpostId));
+
+            // I tabellvisningen ligger vedlegg skjult under hoveddokument-raden til den er utvidet.
+            // Naviger (f.eks. med piltast) til et vedlegg skal derfor automatisk utvide raden, slik
+            // at brukeren alltid ser hvilket dokument som faktisk vises i PDF-fremviseren.
+            if (!doc.erHoveddokument) {
+                const hoveddokument = alleDokumenter.find(
+                    (d) => d.journalpostId === doc.journalpostId && d.erHoveddokument,
+                );
+                if (hoveddokument) {
+                    setTableExpandedIds((prev) => utvidSettMedNyVerdi(prev, hoveddokument.id));
+                }
+            }
         }
     };
 
