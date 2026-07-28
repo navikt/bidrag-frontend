@@ -44,8 +44,7 @@ export function AppSwitcher({ bisysUrl }: { bisysUrl?: string }) {
                         <ActionMenu.Divider />
                     </>
                 )}
-                <ActionMenu.Group label="Oppgaver">
-                    {/* TODO: bytt ut placeholder-lenkene når faktiske URL-er er avklart. */}
+                <ActionMenu.Group label="Oppgave">
                     <ActionMenu.Item as="a" href={`${bisysUrl}Oppgaveliste.do`}>
                         Oppgaveliste
                     </ActionMenu.Item>
