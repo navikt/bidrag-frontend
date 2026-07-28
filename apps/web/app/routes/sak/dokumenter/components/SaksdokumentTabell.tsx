@@ -56,6 +56,22 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
           ]
         : [];
 
+    const utvidRad = (radId: string) => {
+        setTableExpandedIds((prev) => {
+            if (prev.has(radId)) return prev;
+            const neste = new Set(prev);
+            neste.add(radId);
+            return neste;
+        });
+    };
+
+    const velgOgUtvidRad = (rad: DokumentRad) => {
+        if (rad.dok.kanÅpnes) handleSelectDocument(rad.dok.id);
+        // Klikk på rad/tittel skal alltid utvide (aldri kollapse) – kollaps skjer kun via
+        // ekspander/kollaps-knappen som DataGrid rendrer i sub-rows-kolonnen.
+        if (rad.vedlegg.length > 0) utvidRad(rad.id);
+    };
+
     const tilRad = (
         jp: JournalpostDto,
         dok: SaksDokument,
@@ -135,7 +151,7 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
                         title={rad.dok.tittel}
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleSelectDocument(rad.dok.id);
+                            velgOgUtvidRad(rad);
                         }}
                         className={`min-w-0 flex-1 cursor-pointer truncate text-left ${
                             erValgt ? "font-semibold" : "text-text-action hover:text-text-action-on-hover underline"
@@ -168,7 +184,7 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
     const columns = [
         {
             id: "tittel",
-            header: "Dokument",
+            header: "Beskrivelse",
             isSortable: true,
             width: { defaultValue: scaledPx(300) },
             bodyCell: tittelCelle,
@@ -246,7 +262,7 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
                     onSortOrderChange: (_, detail) =>
                         handleSort(detail.columnId as Extract<keyof JournalpostDto, string>),
                 }}
-                onRowAction={({ row }) => row.dok.kanÅpnes && handleSelectDocument(row.dok.id)}
+                onRowAction={({ row }) => velgOgUtvidRad(row)}
                 subRows={{
                     getRows: (rad) => rad.vedlegg,
                     isRowExpandable: (rad) => rad.vedlegg.length > 0,
