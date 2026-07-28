@@ -130,7 +130,7 @@ export default function HendelseTabell({
                     {
                         id: "resultat",
                         header: "Resultat",
-                        width: { defaultValue: scaledPx(250) },
+                        width: { defaultValue: scaledPx(350) },
                         bodyCell: (h) => (
                             <ResultatLink
                                 saksnummer={saksnummer}
