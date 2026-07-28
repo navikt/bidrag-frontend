@@ -1,4 +1,4 @@
-import { Heading, VStack } from "@navikt/ds-react";
+import { VStack } from "@navikt/ds-react";
 import { useFinnHendelserForSak, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
