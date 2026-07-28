@@ -297,7 +297,7 @@ export default function JournalpostTabell({
             id: "status",
             header: "Status",
             isSortable: true,
-            width: { defaultValue: scaledPx(140) },
+            width: { defaultValue: scaledPx(175) },
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? (
                     ""
@@ -311,7 +311,7 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { defaultValue: scaledPx(514) },
+            width: { defaultValue: scaledPx(484) },
             bodyCell: beskrivelseCelle,
         },
     ];
