@@ -55,7 +55,7 @@ env:
   - name: BIDRAG_UI_BASE_URL
     value: https://bidrag-ui.dev.adeo.no
 
-  - name: BIDRAG_DOKUMENT_FORSENDELSE
+  - name: BIDRAG_DOKUMENT_FORSENDELSE_URL
     value: http://bidrag-dokument-forsendelse
   - name: BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-dokument-forsendelse/.default
