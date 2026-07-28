@@ -54,6 +54,12 @@ env:
   - name: BIDRAG_UI_BASE_URL
     value: https://bidrag-ui-feature.dev.adeo.no
 
+
+  - name: BIDRAG_DOKUMENT_FORSENDELSE
+    value: http://bidrag-dokument-forsendelse-feature
+  - name: BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-dokument-forsendelse-feature/.default
+
 outbound:
   rules:
     - application: bidrag-tilgangskontroll-feature
@@ -61,6 +67,7 @@ outbound:
     - application: bidrag-belopshistorikk-q1
     - application: bidrag-vedtak-q1
     - application: bidrag-reskontro-q1
+    - application: bidrag-dokument-forsendelse-feature
   external:
     - bidrag-sak-q1.dev-fss-pub.nais.io
     - bidrag-organisasjon-feature.dev-fss-pub.nais.io

@@ -7,6 +7,7 @@ import { Api as BidragPersonApi } from "./api/PersonApi";
 import { Api as BidragSakApi } from "./api/SakApi";
 import { Api as BidragSamhandler } from "./api/SamhandlerApi";
 import { Api as BidragTilgangskontroll } from "./api/TilgangskontrollApi";
+import { Api as BidragForsendelseApi } from "./api/BidragForsendelseApi";
 import { proxy } from "./proxyApi";
 
 export const BIDRAG_TILGANGSKONTROLL_API = proxy(new BidragTilgangskontroll(), {
@@ -44,3 +45,8 @@ export const BIDRAG_DOKUMENT_API = proxy(new BidragDokumentApi(), {
 export const BIDRAG_RESKONTRO_API = proxy(new BidragReskontro(), {
     app: "bidrag-reskontro",
 });
+
+export const BIDRAG_FORSENDELSE_API = proxy(new BidragForsendelseApi(), {
+    app: "bidrag-dokument-forsendelse",
+});
+

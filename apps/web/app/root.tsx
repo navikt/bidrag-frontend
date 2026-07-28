@@ -34,11 +34,12 @@ export async function loader({ context }: Route.LoaderArgs) {
                       clientKey: env.UNLEASH_PROXY_CLIENT_KEY,
                   }
                 : null,
+        bisysUrl: env.BISYS_URL,
     };
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {
-    const { navUser, naisConfig, unleashConfig } = loaderData;
+    const { navUser, naisConfig, unleashConfig, bisysUrl } = loaderData;
     const unleashClient = useMemo(
         () =>
             new UnleashClient({
@@ -77,7 +78,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
         <QueryClientWrapper>
             <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} />}>
                 <FlagProvider unleashClient={unleashClient} startClient={false}>
-                    <AppLayout bruker={navUser}>
+                    <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
                         <ClientOnly fallback={<Loader size="large" />}>
                             <Outlet />
                         </ClientOnly>

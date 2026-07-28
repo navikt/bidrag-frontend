@@ -2,11 +2,13 @@ import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi"
 import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
-import { ArrowCirclepathIcon, FilesIcon, PaperclipIcon, TasklistSendIcon } from "@navikt/aksel-icons";
-import { Button, Checkbox, CheckboxGroup, Heading, HStack, Link, VStack } from "@navikt/ds-react";
+import { ArrowCirclepathIcon, FilesIcon, PaperclipIcon, TasklistSendIcon, TrashIcon } from "@navikt/aksel-icons";
+import { BodyShort, Button, Checkbox, CheckboxGroup, Heading, HStack, Link, Modal, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
@@ -62,6 +64,33 @@ export default function JournalpostTabell({
     const enhet = searchParams.get("enhet");
     const sessionState = searchParams.get("sessionState");
     const { data: sak } = useHentSak(saksnummer);
+    const queryClient = useQueryClient();
+
+    const { mutate: slettForsendelse, isPending: sletterForsendelse } = useMutation<unknown, Error, string>({
+        mutationKey: ["utførSlettForsendelse"],
+        mutationFn: (forsendelseId) => utførSlettForsendelseMutationFn(forsendelseId),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: ["hent_journalposter", saksnummer] });
+            lukkSlettBekreftelse();
+        },
+    });
+
+    const slettModalRef = useRef<HTMLDialogElement>(null);
+    const [journalpostIdTilSletting, setJournalpostIdTilSletting] = useState<string | null>(null);
+
+    const åpneSlettBekreftelse = (journalpostId: string) => {
+        setJournalpostIdTilSletting(journalpostId);
+        slettModalRef.current?.showModal();
+    };
+
+    const lukkSlettBekreftelse = () => {
+        slettModalRef.current?.close();
+        setJournalpostIdTilSletting(null);
+    };
+
+    const bekreftSletting = () => {
+        if (journalpostIdTilSletting) slettForsendelse(journalpostIdTilSletting);
+    };
 
     const [visFarskapUtelukket, setVisFarskapUtelukket] = useState(false);
     const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
@@ -127,7 +156,7 @@ export default function JournalpostTabell({
                             className="min-w-0 truncate"
                             target="_blank"
                             title={dok.tittel ?? dok.dokumentreferanse ?? ""}
-                            href={`/aapnedokument/${rad.jp.journalpostId}/${dok.dokumentreferanse}`}
+                            href={`/dokument/${rad.jp.journalpostId}/${dok.dokumentreferanse}?dok=${dok.dokumentreferanse}`}
                         >
                             {dok.tittel ?? dok.dokumentreferanse}
                         </Link>
@@ -172,6 +201,22 @@ export default function JournalpostTabell({
             header: "",
             width: { defaultValue: scaledPx(48) },
             bodyCell: () => null,
+        },
+        {
+            id: "slett",
+            header: "",
+            width: { defaultValue: scaledPx(56) },
+            bodyCell: (rad: JournalpostRad) =>
+                !rad.erVedlegg && rad.jp.status === JournalpostStatus.UNDER_OPPRETTELSE && rad.jp.journalpostId ? (
+                    <Button
+                        variant="tertiary"
+                        size="xsmall"
+                        icon={<TrashIcon aria-hidden />}
+                        aria-label="Slett forsendelse"
+                        title="Slett forsendelse"
+                        onClick={() => åpneSlettBekreftelse(rad.jp.journalpostId as string)}
+                    />
+                ) : null,
         },
         {
             id: "journalpostId",
@@ -340,6 +385,30 @@ export default function JournalpostTabell({
                     }}
                 />
             </DataGrid>
+            <Modal
+                ref={slettModalRef}
+                header={{ heading: "Slett forsendelse", closeButton: false }}
+                onClose={lukkSlettBekreftelse}
+                onCancel={(e) => e.preventDefault()}
+                closeOnBackdropClick={false}
+            >
+                <Modal.Body>
+                    <BodyShort>Er du sikker på at du vil slette denne forsendelsen?</BodyShort>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" size="small" loading={sletterForsendelse} onClick={bekreftSletting}>
+                        Slett
+                    </Button>
+                    <Button
+                        variant="tertiary"
+                        size="small"
+                        disabled={sletterForsendelse}
+                        onClick={lukkSlettBekreftelse}
+                    >
+                        Avbryt
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </VStack>
     );
 }

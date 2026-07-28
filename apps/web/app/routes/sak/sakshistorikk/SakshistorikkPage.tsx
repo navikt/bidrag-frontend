@@ -31,7 +31,7 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     }
 
     return (
-        <VStack gap={"space-24"}>
+        <VStack gap={"space-48"}>
             <title>{tabTitle}</title>
             <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
             <JournalpostTabell saksnummer={saksnummer} journalposter={journalposter ?? []} />
