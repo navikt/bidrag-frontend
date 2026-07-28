@@ -2,8 +2,27 @@ import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi"
 import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
-import { ArrowCirclepathIcon, FilesIcon, PaperclipIcon, TasklistSendIcon, TrashIcon } from "@navikt/aksel-icons";
-import { BodyShort, Button, Checkbox, CheckboxGroup, Heading, HStack, Link, Modal, VStack } from "@navikt/ds-react";
+import {
+    ArrowCirclepathIcon,
+    FilePdfIcon,
+    FilterIcon,
+    PaperclipIcon,
+    TasklistSendIcon,
+    TrashIcon,
+} from "@navikt/aksel-icons";
+import {
+    BodyShort,
+    Button,
+    Checkbox,
+    CheckboxGroup,
+    Heading,
+    HStack,
+    Link,
+    Modal,
+    Popover,
+    Tag,
+    VStack,
+} from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -96,6 +115,8 @@ export default function JournalpostTabell({
     const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
     const [kunVedtak, setKunVedtak] = useState(false);
     const [expandedRowIds, setExpandedRowIds] = useState<string[]>([]);
+    const [filterÅpen, setFilterÅpen] = useState(false);
+    const filterKnappRef = useRef<HTMLButtonElement>(null);
 
     const filtrerteJournalposter = journalposter.filter((jp) => {
         if (kunVedtak && !jp.innhold?.toLowerCase().includes("vedtak")) return false;
@@ -106,6 +127,8 @@ export default function JournalpostTabell({
 
     const harBlandingFarBid =
         journalposter.some((jp) => jp.fagomrade === "FAR") && journalposter.some((jp) => jp.fagomrade === "BID");
+
+    const antallAktiveFiltre = (harBlandingFarBid && visFarskapUtelukket ? 1 : 0) + (visFeilregistrerte ? 1 : 0);
 
     const sorterteJournalposter = sortData(filtrerteJournalposter);
     const rader: JournalpostRad[] = sorterteJournalposter.map(byggRad);
@@ -199,13 +222,13 @@ export default function JournalpostTabell({
         {
             id: "expand",
             header: "",
-            width: { defaultValue: scaledPx(48) },
+            width: { defaultValue: scaledPx(38) },
             bodyCell: () => null,
         },
         {
             id: "slett",
             header: "",
-            width: { defaultValue: scaledPx(56) },
+            width: { defaultValue: scaledPx(46) },
             bodyCell: (rad: JournalpostRad) =>
                 !rad.erVedlegg && rad.jp.status === JournalpostStatus.UNDER_OPPRETTELSE && rad.jp.journalpostId ? (
                     <Button
@@ -274,7 +297,7 @@ export default function JournalpostTabell({
             id: "status",
             header: "Status",
             isSortable: true,
-            width: { defaultValue: scaledPx(170) },
+            width: { defaultValue: scaledPx(140) },
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? (
                     ""
@@ -288,7 +311,7 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { defaultValue: scaledPx(474) },
+            width: { defaultValue: scaledPx(514) },
             bodyCell: beskrivelseCelle,
         },
     ];
@@ -308,83 +331,110 @@ export default function JournalpostTabell({
 
     return (
         <VStack gap={"space-16"}>
-            <HStack justify={"space-between"}>
-                <Heading size="medium">Journal</Heading>
-                <HStack gap="space-32">
+            <HStack justify="space-between" align="center">
+                <HStack gap="space-16" align="center">
+                    <Heading size="medium">Journal</Heading>
+                    <Button
+                        ref={filterKnappRef}
+                        variant="tertiary"
+                        size="small"
+                        icon={<FilterIcon aria-hidden />}
+                        onClick={() => setFilterÅpen((forrige) => !forrige)}
+                    >
+                        Filter
+                        {antallAktiveFiltre > 0 && (
+                            <Tag variant="info" size="small" className="ml-1">
+                                {antallAktiveFiltre}
+                            </Tag>
+                        )}
+                    </Button>
+                    <Popover
+                        open={filterÅpen}
+                        onClose={() => setFilterÅpen(false)}
+                        anchorEl={filterKnappRef.current}
+                        placement="bottom-start"
+                    >
+                        <Popover.Content>
+                            <CheckboxGroup legend="Filtrer" hideLegend size="small">
+                                <VStack gap={"space-8"}>
+                                    {harBlandingFarBid && (
+                                        <Checkbox
+                                            disabled={kunVedtak}
+                                            checked={!kunVedtak && visFarskapUtelukket}
+                                            onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
+                                        >
+                                            Vis farskapsutelukket
+                                        </Checkbox>
+                                    )}
+                                    <Checkbox
+                                        disabled={kunVedtak}
+                                        checked={!kunVedtak && visFeilregistrerte}
+                                        onChange={(e) => setVisFeilregistrerte(e.target.checked)}
+                                    >
+                                        Vis feilregistrerte
+                                    </Checkbox>
+                                </VStack>
+                            </CheckboxGroup>
+                        </Popover.Content>
+                    </Popover>
                     <Checkbox checked={kunVedtak} onChange={(e) => setKunVedtak(e.target.checked)} size="small">
                         Kun vedtak
                     </Checkbox>
-                    <CheckboxGroup legend="Filtrer" hideLegend size="small">
-                        <HStack gap={"space-8"}>
-                            {harBlandingFarBid && (
-                                <Checkbox
-                                    disabled={kunVedtak}
-                                    checked={!kunVedtak && visFarskapUtelukket}
-                                    onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
-                                >
-                                    Vis farskapsutelukket
-                                </Checkbox>
-                            )}
-                            <Checkbox
-                                disabled={kunVedtak}
-                                checked={!kunVedtak && visFeilregistrerte}
-                                onChange={(e) => setVisFeilregistrerte(e.target.checked)}
-                            >
-                                Vis feilregistrerte
-                            </Checkbox>
-                        </HStack>
-                    </CheckboxGroup>
+                    <Button
+                        variant="tertiary"
+                        size="xsmall"
+                        icon={<ArrowCirclepathIcon aria-hidden />}
+                        onClick={() => setSort(undefined)}
+                    >
+                        Tilbakestill sortering
+                    </Button>
                 </HStack>
                 <HStack gap="space-4">
                     <Button
                         as="a"
                         href={`/sak/${saksnummer}/dokumenter`}
+                        target="_blank"
                         variant="tertiary"
-                        size="small"
-                        icon={<FilesIcon aria-hidden />}
+                        size="xsmall"
+                        icon={<FilePdfIcon aria-hidden />}
                     >
-                        Åpne dokumentvisning
-                    </Button>
-                    <Button
-                        variant="tertiary"
-                        size="small"
-                        icon={<ArrowCirclepathIcon aria-hidden />}
-                        onClick={() => setSort(undefined)}
-                    >
-                        Tilbakestill
+                        Dokumentvisning (åpnes i egen vindu)
                     </Button>
                 </HStack>
             </HStack>
-            <DataGrid
-                data={rader}
-                getRowId={(rad) => rad.id}
-                settings={{
-                    zebraStripes: true,
-                    rowDensity: "tight",
-                    textSize: "small",
-                    truncateContent: true,
-                }}
-                columns={columnDefinitions}
-            >
-                <DataGrid.Table<JournalpostRad>
-                    layout="fixed"
-                    onRowAction={(rad) => {
-                        if (rad.row.erVedlegg || rad.row.vedlegg.length === 0) return null;
-                        toggleExpandedRad(rad.id);
+            <VStack maxHeight="60vh" overflowY="auto">
+                <DataGrid
+                    data={rader}
+                    getRowId={(rad) => rad.id}
+                    settings={{
+                        zebraStripes: true,
+                        rowDensity: "tight",
+                        textSize: "small",
+                        truncateContent: true,
                     }}
-                    sorting={{
-                        sortOrder: dataGridSort,
-                        onSortOrderChange: (_, detail) =>
-                            handleSort(detail.columnId as Extract<keyof JournalpostDto, string>),
-                    }}
-                    subRows={{
-                        getRows: (rad) => rad.vedlegg,
-                        isRowExpandable: (rad) => rad.vedlegg.length > 0,
-                        expandedRowIds,
-                        onExpandedRowIdsChange: setExpandedRowIds,
-                    }}
-                />
-            </DataGrid>
+                    columns={columnDefinitions}
+                >
+                    <DataGrid.Table<JournalpostRad>
+                        layout="fixed"
+                        stickyHeader
+                        onRowAction={(rad) => {
+                            if (rad.row.erVedlegg || rad.row.vedlegg.length === 0) return null;
+                            toggleExpandedRad(rad.id);
+                        }}
+                        sorting={{
+                            sortOrder: dataGridSort,
+                            onSortOrderChange: (_, detail) =>
+                                handleSort(detail.columnId as Extract<keyof JournalpostDto, string>),
+                        }}
+                        subRows={{
+                            getRows: (rad) => rad.vedlegg,
+                            isRowExpandable: (rad) => rad.vedlegg.length > 0,
+                            expandedRowIds,
+                            onExpandedRowIdsChange: setExpandedRowIds,
+                        }}
+                    />
+                </DataGrid>
+            </VStack>
             <Modal
                 ref={slettModalRef}
                 header={{ heading: "Slett forsendelse", closeButton: false }}
