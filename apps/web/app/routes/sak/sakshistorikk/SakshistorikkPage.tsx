@@ -1,9 +1,12 @@
-import { Heading, VStack } from "@navikt/ds-react";
+import { VStack } from "@navikt/ds-react";
 import { useFinnHendelserForSak, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
+import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SakshistorikkPage";
 import HendelseTabell from "./components/hendelse/HendelseTabell";
 import JournalpostTabell from "./components/journalpost/JournalpostTabell";
+
+export const handle: SakSideTittelHandle = { sakSideTittel: "Sakshistorikk" };
 
 export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;
@@ -28,9 +31,8 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     }
 
     return (
-        <VStack gap={"space-24"}>
+        <VStack gap={"space-48"}>
             <title>{tabTitle}</title>
-            <Heading size={"large"}>Sakshistorikk</Heading>
             <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
             <JournalpostTabell saksnummer={saksnummer} journalposter={journalposter ?? []} />
         </VStack>

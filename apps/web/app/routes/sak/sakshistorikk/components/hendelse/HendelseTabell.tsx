@@ -46,36 +46,7 @@ export default function HendelseTabell({
 
     return (
         <VStack gap={"space-16"}>
-            <HStack justify={"space-between"} align={"center"}>
-                <Heading size="medium">Sakslogg</Heading>
-                {hendelser.length > rowsPerPage && (
-                    <Pagination
-                        page={page}
-                        onPageChange={setPage}
-                        count={Math.ceil(hendelser.length / rowsPerPage)}
-                        size="xsmall"
-                    />
-                )}
-                <HStack align="center" gap={"space-8"}>
-                    <Label size="small" htmlFor="antall-rader">
-                        Antall rader
-                    </Label>
-                    <Select
-                        id="antall-rader"
-                        label="Antall rader"
-                        hideLabel
-                        size="small"
-                        value={rowsPerPage}
-                        onChange={onRowsPerPageChange}
-                    >
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                    </Select>
-                </HStack>
-            </HStack>
+            <Heading size="medium">Sakslogg</Heading>
             <DataGrid
                 data={sortedData}
                 getRowId={(h) => h.hendelseId ?? `${h.opprettetTidspunkt}-${h.type}`}
@@ -159,7 +130,7 @@ export default function HendelseTabell({
                     {
                         id: "resultat",
                         header: "Resultat",
-                        width: { defaultValue: scaledPx(250) },
+                        width: { defaultValue: scaledPx(350) },
                         bodyCell: (h) => (
                             <ResultatLink
                                 saksnummer={saksnummer}
@@ -182,6 +153,36 @@ export default function HendelseTabell({
                     }}
                 />
             </DataGrid>
+            <HStack justify={"space-between"} align={"center"}>
+                <div></div>
+                {hendelser.length > rowsPerPage && (
+                    <Pagination
+                        page={page}
+                        onPageChange={setPage}
+                        count={Math.ceil(hendelser.length / rowsPerPage)}
+                        size="xsmall"
+                    />
+                )}
+                <HStack align="center" gap={"space-8"}>
+                    <Label size="small" htmlFor="antall-rader">
+                        Antall rader
+                    </Label>
+                    <Select
+                        id="antall-rader"
+                        label="Antall rader"
+                        hideLabel
+                        size="small"
+                        value={rowsPerPage}
+                        onChange={onRowsPerPageChange}
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </Select>
+                </HStack>
+            </HStack>
         </VStack>
     );
 }

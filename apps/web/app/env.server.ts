@@ -21,11 +21,19 @@ const EnvSchema = z.object({
     BIDRAG_RESKONTRO_URL: z.url(),
     BIDRAG_RESKONTRO_AUDIENCE: NonEmpty,
     BIDRAG_DOKUMENT_URL: z.url(),
+    BIDRAG_DOKUMENT_FORSENDELSE_URL: z.url(),
     BIDRAG_DOKUMENT_AUDIENCE: NonEmpty,
+    BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE: NonEmpty,
     BISYS_URL: z.url(),
     BIDRAG_UI_BASE_URL: z.url(),
+    UNLEASH_PROXY_URL: z.url().optional(),
+    UNLEASH_PROXY_CLIENT_KEY: NonEmpty.optional(),
     NODE_ENV: z.enum(["development", "test", "production"]),
     STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS: z.string().optional(),
+    OVERRIDE_BRUK_DOKUMENTVISNING_POC: z
+        .enum(["true", "false"])
+        .optional()
+        .transform((value) => value === "true"),
 });
 
 export const env = EnvSchema.parse(process.env);
