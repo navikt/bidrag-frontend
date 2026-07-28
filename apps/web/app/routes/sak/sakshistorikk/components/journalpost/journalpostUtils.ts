@@ -46,7 +46,7 @@ export function journalstatusDisplayVerdi(jp: JournalpostDto): string {
 export function standardSort(a: JournalpostDto, b: JournalpostDto): number {
     const klarTilPrint = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON;
     const underOpprettelse = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.UNDER_OPPRETTELSE;
-    const erForsendelse = (jp: JournalpostDto) => jp.journalpostId?.startsWith("BIF")
+    const erForsendelse = (jp: JournalpostDto) => jp.journalpostId?.startsWith("BIF");
 
     return (
         Number(klarTilPrint(b)) - Number(klarTilPrint(a)) ||
