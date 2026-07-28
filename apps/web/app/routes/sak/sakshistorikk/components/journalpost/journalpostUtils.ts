@@ -46,12 +46,12 @@ export function journalstatusDisplayVerdi(jp: JournalpostDto): string {
 export function standardSort(a: JournalpostDto, b: JournalpostDto): number {
     const klarTilPrint = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON;
     const underOpprettelse = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.UNDER_OPPRETTELSE;
-    const erForsendelseUnderProduksjon = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.UNDER_PRODUKSJON;
+    const erForsendelse = (jp: JournalpostDto) => jp.journalpostId?.startsWith("BIF")
 
     return (
         Number(klarTilPrint(b)) - Number(klarTilPrint(a)) ||
         Number(underOpprettelse(b)) - Number(underOpprettelse(a)) ||
-        Number(erForsendelseUnderProduksjon(b)) - Number(erForsendelseUnderProduksjon(a)) ||
+        Number(erForsendelse(b)) - Number(erForsendelse(a)) ||
         (b.dokumentDato ?? "").localeCompare(a.dokumentDato ?? "") ||
         (b.journalpostId ?? "").localeCompare(a.journalpostId ?? "")
     );
