@@ -30,8 +30,8 @@ export type MenyVisning = "liste" | "tabell";
 
 const GYLDIGE_VISNINGER: MenyVisning[] = ["liste", "tabell"];
 
-function parseVisning(verdi: string | null): MenyVisning {
-    return GYLDIGE_VISNINGER.includes(verdi as MenyVisning) ? (verdi as MenyVisning) : "liste";
+function parseVisning(verdi: string | null): MenyVisning | undefined {
+    return GYLDIGE_VISNINGER.includes(verdi as MenyVisning) ? (verdi as MenyVisning) : undefined;
 }
 
 function parseValgteRefs(verdi: string | null): Set<string> {
@@ -66,7 +66,17 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
     const [kunVedtak, setKunVedtak] = useState(false);
     const [kunFerdigstilte, setKunFerdigstilte] = useState(options?.standardKunFerdigstilte ?? true);
 
-    const [visning, setVisning] = useState<MenyVisning>(() => parseVisning(searchParams.get("visning")));
+    const [visning, setVisning] = useState<MenyVisning>(() => {
+        const visningParam = parseVisning(searchParams.get("visning"));
+        if (visningParam) return visningParam;
+
+        // Ingen dokument forhåndsvalgt (verken via `?dok=` eller `initialDokumentreferanse`) betyr at
+        // brukeren åpner oversikten uten en spesifikk journalpost i fokus – da er tabellvisningen mest
+        // nyttig som standard. Er et dokument allerede valgt (f.eks. `JournalpostFremviser`), behold
+        // den kompakte listevisningen slik at dokumentfremviseren får mest plass.
+        const dokRef = searchParams.get("dok") ?? options?.initialDokumentreferanse;
+        return dokRef ? "liste" : "tabell";
+    });
 
     const [visitedIds, setVisitedIds] = useState<Set<string>>(new Set());
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
