@@ -131,6 +131,10 @@ export default function JournalpostTabell({
     const harDokumenterUnderOpprettelse = journalposter.some((jp) => jp.status === JournalpostStatus.UNDER_OPPRETTELSE);
     const antallAktiveFiltre = (harBlandingFarBid && visFarskapUtelukket ? 1 : 0) + (visFeilregistrerte ? 1 : 0);
 
+    const antallJournalposterTotalt = journalposter.length;
+    const antallJournalposterFiltrert = filtrerteJournalposter.length;
+    const erFiltrert = antallJournalposterFiltrert !== antallJournalposterTotalt;
+
     const sorterteJournalposter = sortData(filtrerteJournalposter);
     const rader: JournalpostRad[] = sorterteJournalposter.map(byggRad);
 
@@ -339,6 +343,11 @@ export default function JournalpostTabell({
             <HStack justify="space-between" align="center">
                 <HStack gap="space-16" align="center">
                     <Heading size="medium">Journal</Heading>
+                    <Tag variant="info-moderate" size="small">
+                        {erFiltrert
+                            ? `${antallJournalposterFiltrert} av ${antallJournalposterTotalt} journalposter`
+                            : `${antallJournalposterTotalt} journalposter`}
+                    </Tag>
                     <Button
                         ref={filterKnappRef}
                         variant="tertiary"
@@ -397,7 +406,7 @@ export default function JournalpostTabell({
                 <HStack gap="space-4">
                     <Button
                         as="a"
-                        href={`/sak/${saksnummer}/dokumenter`}
+                        href={`/sak/${saksnummer}/dokumenter?from=sakshistorikk&${jpParams()}`}
                         target="_blank"
                         variant="tertiary"
                         size="xsmall"
@@ -410,7 +419,8 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
-                    // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0"}
+                    // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
+                    //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
                     settings={{
                         zebraStripes: true,
