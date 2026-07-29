@@ -46,10 +46,7 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
 /** Gir tabellene en tydelig flate som skiller dem fra sidebakgrunnen. */
 function TabellKort({ children }: { children: React.ReactNode }) {
     return (
-        <Box
-            background="neutral-soft"
-            padding="space-16"
-        >
+        <Box background="neutral-soft" padding="space-16">
             {children}
         </Box>
     );
