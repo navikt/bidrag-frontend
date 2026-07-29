@@ -22,13 +22,14 @@ export type MenyState = ReturnType<typeof useDokumentState>["menyState"];
 export type DokumentData = ReturnType<typeof useDokumentState>["data"];
 
 /**
- * To tilstander for venstremenyen:
+ * Tre tilstander for venstremenyen:
+ * - skjult: helt minimert til en smal kolonne, slik at dokumentet får all plassen
  * - liste: minimert tre-visning med journalposter og dokumenter
  * - tabell: utvidet tabellvisning med utvalgte kolonner og radvalg via checkbox
  */
-export type MenyVisning = "liste" | "tabell";
+export type MenyVisning = "skjult" | "liste" | "tabell";
 
-const GYLDIGE_VISNINGER: MenyVisning[] = ["liste", "tabell"];
+const GYLDIGE_VISNINGER: MenyVisning[] = ["skjult", "liste", "tabell"];
 
 function parseVisning(verdi: string | null): MenyVisning | undefined {
     return GYLDIGE_VISNINGER.includes(verdi as MenyVisning) ? (verdi as MenyVisning) : undefined;

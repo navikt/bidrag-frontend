@@ -1,4 +1,4 @@
-import { VStack } from "@navikt/ds-react";
+import { Box, VStack } from "@navikt/ds-react";
 import { useFinnHendelserForSak, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
@@ -31,10 +31,30 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     }
 
     return (
-        <VStack gap={"space-48"}>
+        <VStack gap={"space-32"}>
             <title>{tabTitle}</title>
-            <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
-            <JournalpostTabell saksnummer={saksnummer} journalposter={journalposter ?? []} />
+            <TabellKort>
+                <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
+            </TabellKort>
+            <TabellKort>
+                <JournalpostTabell saksnummer={saksnummer} journalposter={journalposter ?? []} />
+            </TabellKort>
         </VStack>
+    );
+}
+
+/** Gir tabellene en tydelig flate som skiller dem fra sidebakgrunnen. */
+function TabellKort({ children }: { children: React.ReactNode }) {
+    return (
+        <Box
+            background="raised"
+            borderColor="neutral-subtle"
+            borderWidth="1"
+            borderRadius="4"
+            padding="space-16"
+            shadow="dialog"
+        >
+            {children}
+        </Box>
     );
 }
