@@ -47,12 +47,8 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
 function TabellKort({ children }: { children: React.ReactNode }) {
     return (
         <Box
-            background="raised"
-            borderColor="neutral-subtle"
-            borderWidth="1"
-            borderRadius="4"
+            background="neutral-soft"
             padding="space-16"
-            shadow="dialog"
         >
             {children}
         </Box>
