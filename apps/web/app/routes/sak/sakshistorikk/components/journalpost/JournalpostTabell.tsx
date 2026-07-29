@@ -407,7 +407,7 @@ export default function JournalpostTabell({
                     </Button>
                 </HStack>
             </HStack>
-            <VStack maxHeight="60vh" overflowY="auto" >
+            <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0"}
