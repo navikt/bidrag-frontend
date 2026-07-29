@@ -316,7 +316,7 @@ export default function JournalpostTabell({
             id: "status",
             header: "Status",
             isSortable: true,
-            width: { resizable: false, value: scaledPx(175) },
+            width: { resizable: false, value: scaledPx(178) },
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? (
                     ""
