@@ -14,7 +14,9 @@ const erVedtak = (jp: JournalpostDto): boolean => {
 };
 
 const harFerdigstiltDokument = (jp: JournalpostDto): boolean => {
-    return (jp.dokumenter ?? []).some((dok) => dok.status === DokumentStatusDto.FERDIGSTILT);
+    return (jp.dokumenter ?? []).some(
+        (dok) => !jp.journalpostId?.startsWith("BIF-") || dok.status === DokumentStatusDto.FERDIGSTILT,
+    );
 };
 
 export function filtrerJournalposter(
@@ -76,7 +78,7 @@ export function kanAapneDokument(
     dokumentreferanse?: string | null,
 ): boolean {
     const harJournalpostId = Boolean(jp.journalpostId);
-    const erFerdigstilt = dokumentStatus === DokumentStatusDto.FERDIGSTILT;
+    const erFerdigstilt = !jp.journalpostId?.startsWith("BIF-") || dokumentStatus === DokumentStatusDto.FERDIGSTILT;
     const harGyldigReferanse = Boolean(dokumentreferanse || (jp.dokumenter?.length ?? 0) === 1);
 
     return harJournalpostId && erFerdigstilt && harGyldigReferanse;

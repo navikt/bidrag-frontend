@@ -153,17 +153,19 @@ export default function HendelseTabell({
                     }}
                 />
             </DataGrid>
-            <HStack justify={"space-between"} align={"center"}>
-                <div></div>
-                {hendelser.length > rowsPerPage && (
-                    <Pagination
-                        page={page}
-                        onPageChange={setPage}
-                        count={Math.ceil(hendelser.length / rowsPerPage)}
-                        size="xsmall"
-                    />
-                )}
-                <HStack align="center" gap={"space-8"}>
+            <HStack align={"center"}>
+                <HStack flexGrow="1" flexBasis="0" />
+                <HStack flexGrow="1" flexBasis="0" justify="center">
+                    {hendelser.length > rowsPerPage && (
+                        <Pagination
+                            page={page}
+                            onPageChange={setPage}
+                            count={Math.ceil(hendelser.length / rowsPerPage)}
+                            size="xsmall"
+                        />
+                    )}
+                </HStack>
+                <HStack align="center" gap={"space-8"} flexGrow="1" flexBasis="0" justify="end">
                     <Label size="small" htmlFor="antall-rader">
                         Antall rader
                     </Label>

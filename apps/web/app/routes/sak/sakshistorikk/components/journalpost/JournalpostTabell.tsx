@@ -2,14 +2,34 @@ import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi"
 import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { formaterDato } from "@bidrag/utils";
-import { ArrowCirclepathIcon, FilesIcon, PaperclipIcon, TasklistSendIcon, TrashIcon } from "@navikt/aksel-icons";
-import { BodyShort, Button, Checkbox, CheckboxGroup, Heading, HStack, Link, Modal, VStack } from "@navikt/ds-react";
+import {
+    ArrowCirclepathIcon,
+    FilePdfIcon,
+    FilterIcon,
+    PaperclipIcon,
+    TasklistSendIcon,
+    TrashIcon,
+} from "@navikt/aksel-icons";
+import {
+    BodyShort,
+    Button,
+    Checkbox,
+    CheckboxGroup,
+    Heading,
+    HStack,
+    Link,
+    Modal,
+    Popover,
+    Tag,
+    VStack,
+} from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
+import { medReturMål } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
 import { journalstatusDisplayVerdi, standardSort } from "./journalpostUtils";
@@ -96,6 +116,8 @@ export default function JournalpostTabell({
     const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
     const [kunVedtak, setKunVedtak] = useState(false);
     const [expandedRowIds, setExpandedRowIds] = useState<string[]>([]);
+    const [filterÅpen, setFilterÅpen] = useState(false);
+    const filterKnappRef = useRef<HTMLButtonElement>(null);
 
     const filtrerteJournalposter = journalposter.filter((jp) => {
         if (kunVedtak && !jp.innhold?.toLowerCase().includes("vedtak")) return false;
@@ -106,6 +128,13 @@ export default function JournalpostTabell({
 
     const harBlandingFarBid =
         journalposter.some((jp) => jp.fagomrade === "FAR") && journalposter.some((jp) => jp.fagomrade === "BID");
+
+    const harDokumenterUnderOpprettelse = journalposter.some((jp) => jp.status === JournalpostStatus.UNDER_OPPRETTELSE);
+    const antallAktiveFiltre = (harBlandingFarBid && visFarskapUtelukket ? 1 : 0) + (visFeilregistrerte ? 1 : 0);
+
+    const antallJournalposterTotalt = journalposter.length;
+    const antallJournalposterFiltrert = filtrerteJournalposter.length;
+    const erFiltrert = antallJournalposterFiltrert !== antallJournalposterTotalt;
 
     const sorterteJournalposter = sortData(filtrerteJournalposter);
     const rader: JournalpostRad[] = sorterteJournalposter.map(byggRad);
@@ -149,7 +178,7 @@ export default function JournalpostTabell({
             );
 
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(474), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     {kanÅpnes ? (
                         <Link
@@ -173,7 +202,7 @@ export default function JournalpostTabell({
 
         if (href) {
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(474), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <Link
                         className="min-w-0 truncate"
@@ -189,7 +218,7 @@ export default function JournalpostTabell({
         }
 
         return (
-            <span className="truncate" title={tekst}>
+            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(720), display: "inline-block" }}>
                 {tekst}
             </span>
         );
@@ -199,13 +228,13 @@ export default function JournalpostTabell({
         {
             id: "expand",
             header: "",
-            width: { defaultValue: scaledPx(48) },
+            width: { resizable: false, value: scaledPx(54) },
             bodyCell: () => null,
         },
-        {
+        harDokumenterUnderOpprettelse && {
             id: "slett",
             header: "",
-            width: { defaultValue: scaledPx(56) },
+            width: { resizable: false, autoResizeOnce: true },
             bodyCell: (rad: JournalpostRad) =>
                 !rad.erVedlegg && rad.jp.status === JournalpostStatus.UNDER_OPPRETTELSE && rad.jp.journalpostId ? (
                     <Button
@@ -214,6 +243,7 @@ export default function JournalpostTabell({
                         icon={<TrashIcon aria-hidden />}
                         aria-label="Slett forsendelse"
                         title="Slett forsendelse"
+                        iconPosition={"left"}
                         onClick={() => åpneSlettBekreftelse(rad.jp.journalpostId as string)}
                     />
                 ) : null,
@@ -221,7 +251,7 @@ export default function JournalpostTabell({
         {
             id: "journalpostId",
             header: "",
-            width: { defaultValue: scaledPx(48) },
+            width: { resizable: false, value: scaledPx(52) },
             bodyCell: (rad: JournalpostRad) =>
                 !rad.erVedlegg && rad.jp.journalpostId ? (
                     <Link
@@ -235,14 +265,14 @@ export default function JournalpostTabell({
         {
             id: "dokumentType",
             header: "K",
-            width: { defaultValue: scaledPx(48) },
+            width: { resizable: false, value: scaledPx(32) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : rad.jp.dokumentType),
         },
         {
             id: "dokumentDato",
             header: "Dok.dato",
-            width: { defaultValue: scaledPx(110) },
+            width: { resizable: false, value: scaledPx(108) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : rad.jp.dokumentDato ? formaterDato(rad.jp.dokumentDato) : "",
@@ -250,7 +280,7 @@ export default function JournalpostTabell({
         {
             id: "journalfortDato",
             header: "Jour.dato",
-            width: { defaultValue: scaledPx(110) },
+            width: { resizable: false, value: scaledPx(108) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : rad.jp.journalfortDato ? formaterDato(rad.jp.journalfortDato) : "",
@@ -258,14 +288,14 @@ export default function JournalpostTabell({
         {
             id: "journalforendeEnhet",
             header: "Enhet",
-            width: { defaultValue: scaledPx(75) },
+            width: { resizable: false, value: scaledPx(74) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.journalforendeEnhet ?? "-")),
         },
         {
             id: "gjelderAktor",
             header: "Gjelder",
-            width: { defaultValue: scaledPx(150) },
+            width: { resizable: false, value: scaledPx(150) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : <PersonIdentMedRolle gjelderAktor={rad.jp.gjelderAktor} sakRoller={sakRoller} />,
@@ -274,7 +304,7 @@ export default function JournalpostTabell({
             id: "status",
             header: "Status",
             isSortable: true,
-            width: { defaultValue: scaledPx(170) },
+            width: { resizable: false, value: scaledPx(175) },
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? (
                     ""
@@ -288,7 +318,7 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { defaultValue: scaledPx(474) },
+            width: { resizable: false, autoResizeOnce: true, value: scaledPx(500) },
             bodyCell: beskrivelseCelle,
         },
     ];
@@ -297,94 +327,130 @@ export default function JournalpostTabell({
         id: "fagomrade",
         header: "Fag",
         isSortable: true,
-        width: { defaultValue: scaledPx(60) },
+        width: { resizable: false, value: scaledPx(60) },
         bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.fagomrade ?? "-")),
     };
 
     // "fagomrade" settes inn mellom "gjelderAktor" og "status" når saken har blanding av far/bidrag.
+    const synligeBasisKolonner = basisKolonner.filter(
+        (kolonne): kolonne is Exclude<typeof kolonne, false> => kolonne !== false,
+    );
     const columnDefinitions = harBlandingFarBid
-        ? [...basisKolonner.slice(0, 6), fagomradeKolonne, ...basisKolonner.slice(6)]
-        : basisKolonner;
+        ? [...synligeBasisKolonner.slice(0, 6), fagomradeKolonne, ...synligeBasisKolonner.slice(6)]
+        : synligeBasisKolonner;
 
     return (
         <VStack gap={"space-16"}>
-            <HStack justify={"space-between"}>
-                <Heading size="medium">Journal</Heading>
-                <HStack gap="space-32">
+            <HStack justify="space-between" align="center">
+                <HStack gap="space-16" align="center">
+                    <Heading size="medium">Journal</Heading>
+                    <Tag variant="info-moderate" size="small">
+                        {erFiltrert
+                            ? `${antallJournalposterFiltrert} av ${antallJournalposterTotalt} journalposter`
+                            : `${antallJournalposterTotalt} journalposter`}
+                    </Tag>
+                    <Button
+                        ref={filterKnappRef}
+                        variant="tertiary"
+                        size="small"
+                        icon={<FilterIcon aria-hidden />}
+                        onClick={() => setFilterÅpen((forrige) => !forrige)}
+                    >
+                        Filter
+                        {antallAktiveFiltre > 0 && (
+                            <Tag variant="info" size="small" className="ml-1">
+                                {antallAktiveFiltre}
+                            </Tag>
+                        )}
+                    </Button>
+                    <Popover
+                        open={filterÅpen}
+                        onClose={() => setFilterÅpen(false)}
+                        anchorEl={filterKnappRef.current}
+                        placement="bottom-start"
+                    >
+                        <Popover.Content>
+                            <CheckboxGroup legend="Filtrer" hideLegend size="small">
+                                <VStack gap={"space-8"}>
+                                    {harBlandingFarBid && (
+                                        <Checkbox
+                                            disabled={kunVedtak}
+                                            checked={!kunVedtak && visFarskapUtelukket}
+                                            onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
+                                        >
+                                            Vis farskapsutelukket
+                                        </Checkbox>
+                                    )}
+                                    <Checkbox
+                                        disabled={kunVedtak}
+                                        checked={!kunVedtak && visFeilregistrerte}
+                                        onChange={(e) => setVisFeilregistrerte(e.target.checked)}
+                                    >
+                                        Vis feilregistrerte
+                                    </Checkbox>
+                                </VStack>
+                            </CheckboxGroup>
+                        </Popover.Content>
+                    </Popover>
                     <Checkbox checked={kunVedtak} onChange={(e) => setKunVedtak(e.target.checked)} size="small">
                         Kun vedtak
                     </Checkbox>
-                    <CheckboxGroup legend="Filtrer" hideLegend size="small">
-                        <HStack gap={"space-8"}>
-                            {harBlandingFarBid && (
-                                <Checkbox
-                                    disabled={kunVedtak}
-                                    checked={!kunVedtak && visFarskapUtelukket}
-                                    onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
-                                >
-                                    Vis farskapsutelukket
-                                </Checkbox>
-                            )}
-                            <Checkbox
-                                disabled={kunVedtak}
-                                checked={!kunVedtak && visFeilregistrerte}
-                                onChange={(e) => setVisFeilregistrerte(e.target.checked)}
-                            >
-                                Vis feilregistrerte
-                            </Checkbox>
-                        </HStack>
-                    </CheckboxGroup>
+                    <Button
+                        variant="tertiary"
+                        size="xsmall"
+                        icon={<ArrowCirclepathIcon aria-hidden />}
+                        onClick={() => setSort(undefined)}
+                    >
+                        Tilbakestill sortering
+                    </Button>
                 </HStack>
                 <HStack gap="space-4">
                     <Button
                         as="a"
-                        href={`/sak/${saksnummer}/dokumenter`}
+                        href={medReturMål(`/sak/${saksnummer}/dokumenter`, "sakshistorikk", jpParams())}
                         variant="tertiary"
-                        size="small"
-                        icon={<FilesIcon aria-hidden />}
+                        size="xsmall"
+                        icon={<FilePdfIcon aria-hidden />}
                     >
-                        Åpne dokumentvisning
-                    </Button>
-                    <Button
-                        variant="tertiary"
-                        size="small"
-                        icon={<ArrowCirclepathIcon aria-hidden />}
-                        onClick={() => setSort(undefined)}
-                    >
-                        Tilbakestill
+                        Dokumentvisning
                     </Button>
                 </HStack>
             </HStack>
-            <DataGrid
-                data={rader}
-                getRowId={(rad) => rad.id}
-                settings={{
-                    zebraStripes: true,
-                    rowDensity: "tight",
-                    textSize: "small",
-                    truncateContent: true,
-                }}
-                columns={columnDefinitions}
-            >
-                <DataGrid.Table<JournalpostRad>
-                    layout="fixed"
-                    onRowAction={(rad) => {
-                        if (rad.row.erVedlegg || rad.row.vedlegg.length === 0) return null;
-                        toggleExpandedRad(rad.id);
+            <VStack maxHeight="60vh" overflowY="auto">
+                <DataGrid
+                    data={rader}
+                    // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
+                    //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
+                    getRowId={(rad) => rad.id}
+                    settings={{
+                        zebraStripes: true,
+                        rowDensity: "tight",
+                        textSize: "small",
+                        truncateContent: true,
                     }}
-                    sorting={{
-                        sortOrder: dataGridSort,
-                        onSortOrderChange: (_, detail) =>
-                            handleSort(detail.columnId as Extract<keyof JournalpostDto, string>),
-                    }}
-                    subRows={{
-                        getRows: (rad) => rad.vedlegg,
-                        isRowExpandable: (rad) => rad.vedlegg.length > 0,
-                        expandedRowIds,
-                        onExpandedRowIdsChange: setExpandedRowIds,
-                    }}
-                />
-            </DataGrid>
+                    columns={columnDefinitions}
+                >
+                    <DataGrid.Table<JournalpostRad>
+                        layout="fixed"
+                        stickyHeader
+                        onRowAction={(rad) => {
+                            if (rad.row.erVedlegg || rad.row.vedlegg.length === 0) return null;
+                            toggleExpandedRad(rad.id);
+                        }}
+                        sorting={{
+                            sortOrder: dataGridSort,
+                            onSortOrderChange: (_, detail) =>
+                                handleSort(detail.columnId as Extract<keyof JournalpostDto, string>),
+                        }}
+                        subRows={{
+                            getRows: (rad) => rad.vedlegg,
+                            isRowExpandable: (rad) => rad.vedlegg.length > 0,
+                            expandedRowIds,
+                            onExpandedRowIdsChange: setExpandedRowIds,
+                        }}
+                    />
+                </DataGrid>
+            </VStack>
             <Modal
                 ref={slettModalRef}
                 header={{ heading: "Slett forsendelse", closeButton: false }}
