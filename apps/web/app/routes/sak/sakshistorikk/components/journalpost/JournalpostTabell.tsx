@@ -408,12 +408,11 @@ export default function JournalpostTabell({
                     <Button
                         as="a"
                         href={medReturMål(`/sak/${saksnummer}/dokumenter`, "sakshistorikk", jpParams())}
-                        target="_blank"
                         variant="tertiary"
                         size="xsmall"
                         icon={<FilePdfIcon aria-hidden />}
                     >
-                        Dokumentvisning (åpnes i egen vindu)
+                        Dokumentvisning
                     </Button>
                 </HStack>
             </HStack>
