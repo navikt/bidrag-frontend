@@ -52,7 +52,7 @@ env:
   - name: BISYS_URL
     value: https://wasapp.adeo.no/rtv-bidrag/
   - name: BIDRAG_UI_BASE_URL
-    value: https://bidrag.nais.adeo.no
+    value: https://bidrag-ui.nais.adeo.no
 
   - name: BIDRAG_DOKUMENT_FORSENDELSE_URL
     value: http://bidrag-dokument-forsendelse
