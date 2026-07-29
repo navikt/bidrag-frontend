@@ -36,6 +36,7 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
         handleSelectDocument,
         valgteDokumentreferanser,
         handleSettValgteRefs,
+        velgDokumenterAktiv,
         tableExpandedIds,
         setTableExpandedIds,
     } = menyState;
@@ -140,7 +141,11 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
             rad.dok.dokumentreferanse && valgteDokumentreferanser.has(rad.dok.dokumentreferanse),
         );
         const erDelvisValgt =
-            !rad.erVedlegg && !erHoveddokumentValgt && antallValgteVedlegg > 0 && antallValgteVedlegg < antallVedlegg;
+            velgDokumenterAktiv &&
+            !rad.erVedlegg &&
+            !erHoveddokumentValgt &&
+            antallValgteVedlegg > 0 &&
+            antallValgteVedlegg < antallVedlegg;
 
         return (
             <HStack gap="space-1" align="center" wrap={false} style={{ maxWidth: scaledPx(300), minWidth: 0 }}>
@@ -240,12 +245,18 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
         <DataGrid
             data={rader}
             getRowId={(rad) => rad.id}
-            selection={{
-                mode: "multiple",
-                selectedRowIds: valgteRadIder,
-                onSelectedRowIdsChange: oppdaterValg,
-                enableRowSelection: ({ row }) => Boolean(row.dok.dokumentreferanse),
-            }}
+            // Avkrysningskolonnen finnes kun for å filtrere dokumentlisten, og vises derfor først når
+            // brukeren har slått på "Filtrer dokumenter".
+            selection={
+                velgDokumenterAktiv
+                    ? {
+                          mode: "multiple",
+                          selectedRowIds: valgteRadIder,
+                          onSelectedRowIdsChange: oppdaterValg,
+                          enableRowSelection: ({ row }) => Boolean(row.dok.dokumentreferanse),
+                      }
+                    : undefined
+            }
             settings={{
                 zebraStripes: true,
                 rowDensity: "tight",

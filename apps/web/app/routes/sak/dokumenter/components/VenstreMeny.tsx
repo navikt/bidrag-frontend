@@ -170,7 +170,7 @@ export function VenstreMeny({
     flatDokumentliste = false,
     header,
 }: VenstreMenyProps) {
-    const { visning, setVisning, valgteDokumentreferanser, handleVelgAlle, handleFjernAlle } = menyState;
+    const { visning, setVisning } = menyState;
 
     const steg = skjulKontroller ? VISNING_STEG_UTEN_KONTROLLER : VISNING_STEG;
     const aktivVisning = steg.includes(visning) ? visning : "liste";
@@ -245,9 +245,6 @@ export function VenstreMeny({
                     <HStack justify="space-between" align="center" wrap={false}>
                         <HStack gap="space-2" align="center" wrap={false}>
                             <Heading size="small">Dokumenter</Heading>
-                            {!skjulKontroller && valgteDokumentreferanser.size > 0 && (
-                                <Detail className="text-gray-600">{valgteDokumentreferanser.size} valgt</Detail>
-                            )}
                         </HStack>
                         <HStack gap="space-1" align="center" wrap={false}>
                             {!skjulKontroller && <SnarveierKnapp />}
@@ -272,18 +269,6 @@ export function VenstreMeny({
                             )}
                         </HStack>
                     </HStack>
-
-                    {erTabell && (
-                        <HStack justify="start" align="center" wrap={false} marginBlock="space-4 space-2">
-                            <Button
-                                variant="tertiary"
-                                size="xsmall"
-                                onClick={valgteDokumentreferanser.size > 0 ? handleFjernAlle : handleVelgAlle}
-                            >
-                                {valgteDokumentreferanser.size > 0 ? "Fjern valg" : "Velg alle"}
-                            </Button>
-                        </HStack>
-                    )}
 
                     <VStack gap="space-2" marginBlock="space-2 space-0" flexGrow="1" minHeight="0" overflow="hidden">
                         {!skjulKontroller && <FilterBoks data={data} filterState={filterState} menyState={menyState} />}
