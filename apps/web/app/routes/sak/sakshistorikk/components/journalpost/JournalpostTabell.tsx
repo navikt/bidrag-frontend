@@ -29,6 +29,7 @@ import { useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
+import { medReturMål } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
 import { journalstatusDisplayVerdi, standardSort } from "./journalpostUtils";
@@ -406,7 +407,7 @@ export default function JournalpostTabell({
                 <HStack gap="space-4">
                     <Button
                         as="a"
-                        href={`/sak/${saksnummer}/dokumenter?from=sakshistorikk&${jpParams()}`}
+                        href={medReturMål(`/sak/${saksnummer}/dokumenter`, "sakshistorikk", jpParams())}
                         target="_blank"
                         variant="tertiary"
                         size="xsmall"
