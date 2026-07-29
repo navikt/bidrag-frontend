@@ -128,6 +128,7 @@ export default function JournalpostTabell({
     const harBlandingFarBid =
         journalposter.some((jp) => jp.fagomrade === "FAR") && journalposter.some((jp) => jp.fagomrade === "BID");
 
+    const harDokumenterUnderOpprettelse = journalposter.some((jp) => jp.status === JournalpostStatus.UNDER_OPPRETTELSE);
     const antallAktiveFiltre = (harBlandingFarBid && visFarskapUtelukket ? 1 : 0) + (visFeilregistrerte ? 1 : 0);
 
     const sorterteJournalposter = sortData(filtrerteJournalposter);
@@ -172,7 +173,7 @@ export default function JournalpostTabell({
             );
 
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(474), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     {kanÅpnes ? (
                         <Link
@@ -196,7 +197,7 @@ export default function JournalpostTabell({
 
         if (href) {
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(474), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <Link
                         className="min-w-0 truncate"
@@ -212,7 +213,7 @@ export default function JournalpostTabell({
         }
 
         return (
-            <span className="truncate" title={tekst}>
+            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(720), display: "inline-block" }}>
                 {tekst}
             </span>
         );
@@ -222,13 +223,13 @@ export default function JournalpostTabell({
         {
             id: "expand",
             header: "",
-            width: { defaultValue: scaledPx(38) },
+            width: { resizable: false, value: scaledPx(54) },
             bodyCell: () => null,
         },
-        {
+        harDokumenterUnderOpprettelse && {
             id: "slett",
             header: "",
-            width: { defaultValue: scaledPx(46) },
+            width: { resizable: false, autoResizeOnce: true },
             bodyCell: (rad: JournalpostRad) =>
                 !rad.erVedlegg && rad.jp.status === JournalpostStatus.UNDER_OPPRETTELSE && rad.jp.journalpostId ? (
                     <Button
@@ -237,6 +238,7 @@ export default function JournalpostTabell({
                         icon={<TrashIcon aria-hidden />}
                         aria-label="Slett forsendelse"
                         title="Slett forsendelse"
+                        iconPosition={"left"}
                         onClick={() => åpneSlettBekreftelse(rad.jp.journalpostId as string)}
                     />
                 ) : null,
@@ -244,7 +246,7 @@ export default function JournalpostTabell({
         {
             id: "journalpostId",
             header: "",
-            width: { defaultValue: scaledPx(48) },
+            width: { resizable: false, value: scaledPx(52) },
             bodyCell: (rad: JournalpostRad) =>
                 !rad.erVedlegg && rad.jp.journalpostId ? (
                     <Link
@@ -258,14 +260,14 @@ export default function JournalpostTabell({
         {
             id: "dokumentType",
             header: "K",
-            width: { defaultValue: scaledPx(48) },
+            width: { resizable: false, value: scaledPx(32) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : rad.jp.dokumentType),
         },
         {
             id: "dokumentDato",
             header: "Dok.dato",
-            width: { defaultValue: scaledPx(110) },
+            width: { resizable: false, value: scaledPx(108) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : rad.jp.dokumentDato ? formaterDato(rad.jp.dokumentDato) : "",
@@ -273,7 +275,7 @@ export default function JournalpostTabell({
         {
             id: "journalfortDato",
             header: "Jour.dato",
-            width: { defaultValue: scaledPx(110) },
+            width: { resizable: false, value: scaledPx(108) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : rad.jp.journalfortDato ? formaterDato(rad.jp.journalfortDato) : "",
@@ -281,14 +283,14 @@ export default function JournalpostTabell({
         {
             id: "journalforendeEnhet",
             header: "Enhet",
-            width: { defaultValue: scaledPx(75) },
+            width: { resizable: false, value: scaledPx(74) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.journalforendeEnhet ?? "-")),
         },
         {
             id: "gjelderAktor",
             header: "Gjelder",
-            width: { defaultValue: scaledPx(150) },
+            width: { resizable: false, value: scaledPx(150) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : <PersonIdentMedRolle gjelderAktor={rad.jp.gjelderAktor} sakRoller={sakRoller} />,
@@ -297,7 +299,7 @@ export default function JournalpostTabell({
             id: "status",
             header: "Status",
             isSortable: true,
-            width: { defaultValue: scaledPx(175) },
+            width: { resizable: false, value: scaledPx(175) },
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? (
                     ""
@@ -311,7 +313,7 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { defaultValue: scaledPx(484) },
+            width: { resizable: false, autoResizeOnce: true },
             bodyCell: beskrivelseCelle,
         },
     ];
@@ -320,14 +322,17 @@ export default function JournalpostTabell({
         id: "fagomrade",
         header: "Fag",
         isSortable: true,
-        width: { defaultValue: scaledPx(60) },
+        width: { resizable: false, value: scaledPx(60) },
         bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.fagomrade ?? "-")),
     };
 
     // "fagomrade" settes inn mellom "gjelderAktor" og "status" når saken har blanding av far/bidrag.
+    const synligeBasisKolonner = basisKolonner.filter(
+        (kolonne): kolonne is Exclude<typeof kolonne, false> => kolonne !== false,
+    );
     const columnDefinitions = harBlandingFarBid
-        ? [...basisKolonner.slice(0, 6), fagomradeKolonne, ...basisKolonner.slice(6)]
-        : basisKolonner;
+        ? [...synligeBasisKolonner.slice(0, 6), fagomradeKolonne, ...synligeBasisKolonner.slice(6)]
+        : synligeBasisKolonner;
 
     return (
         <VStack gap={"space-16"}>
@@ -402,9 +407,10 @@ export default function JournalpostTabell({
                     </Button>
                 </HStack>
             </HStack>
-            <VStack maxHeight="60vh" overflowY="auto">
+            <VStack maxHeight="60vh" overflowY="auto" >
                 <DataGrid
                     data={rader}
+                    // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0"}
                     getRowId={(rad) => rad.id}
                     settings={{
                         zebraStripes: true,
