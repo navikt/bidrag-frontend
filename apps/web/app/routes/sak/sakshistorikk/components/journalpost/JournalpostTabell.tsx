@@ -318,7 +318,7 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { resizable: false, autoResizeOnce: true },
+            width: { resizable: false, autoResizeOnce: true, value: scaledPx(500) },
             bodyCell: beskrivelseCelle,
         },
     ];
