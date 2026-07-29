@@ -1,5 +1,5 @@
 import { FilterIcon } from "@navikt/aksel-icons";
-import { ActionMenu, Button, Checkbox, HStack } from "@navikt/ds-react";
+import { ActionMenu, Button } from "@navikt/ds-react";
 
 export interface DokumentFilterItem {
     id: string;
@@ -12,71 +12,45 @@ export interface DokumentFilterItem {
 export interface DokumentFilterMenyProps {
     /**
      * Filtervalg som vises i action-menyen. Utelates `filtere` (eller sendes tom liste)
-     * skjules menyknappen – nyttig i visninger uten egne filtervalg (f.eks. `JournalpostFremviser`).
+     * rendres ingenting – nyttig i visninger uten egne filtervalg.
      */
     filtere?: DokumentFilterItem[];
-    /**
-     * "Vis kun valgte" holdes utenfor action-menyen som egen avkrysningsboks,
-     * siden det er det filtervalget brukere endrer aller oftest.
-     */
-    visKunValgte: boolean;
-    onVisKunValgteChange: (checked: boolean) => void;
-    visKunValgteLabel?: string;
-    visKunValgteDisabled?: boolean;
 }
 
 /**
- * Felles filterkontroll for dokumentlister: en action-meny med sjeldnere brukte filtervalg,
- * og en frittstående "Vis kun valgte"-avkrysningsboks ved siden av.
+ * Felles filterkontroll for dokumentlister: en action-meny med filtervalg som gjelder hele listen.
  *
- * Brukes både i sakens dokumentvisning (`VenstreMeny`/`FilterBoks`) og i `JournalpostFremviser`,
- * der sistnevnte som standard er i kompakt visning (kun valgte dokument(er) vises).
+ * "Vis kun valgte" hører derimot sammen med dokumentutvalget i tabellen, og bor derfor sammen med
+ * "Filtrer dokumenter" i `VenstreMeny` i stedet for her.
  */
-export function DokumentFilterMeny({
-    filtere = [],
-    visKunValgte,
-    onVisKunValgteChange,
-    visKunValgteLabel = "Vis kun valgte",
-    visKunValgteDisabled,
-}: DokumentFilterMenyProps) {
+export function DokumentFilterMeny({ filtere = [] }: DokumentFilterMenyProps) {
+    if (filtere.length === 0) return null;
+
     return (
-        <HStack gap="space-2" align="center" wrap={false}>
-            {filtere.length > 0 && (
-                <ActionMenu>
-                    <ActionMenu.Trigger>
-                        <Button
-                            variant="tertiary"
-                            size="xsmall"
-                            icon={<FilterIcon aria-hidden />}
-                            className="shrink-0 whitespace-nowrap"
-                        >
-                            Filter
-                        </Button>
-                    </ActionMenu.Trigger>
-                    <ActionMenu.Content>
-                        <ActionMenu.Label>Filtrer</ActionMenu.Label>
-                        {filtere.map((filter) => (
-                            <ActionMenu.CheckboxItem
-                                key={filter.id}
-                                checked={filter.checked}
-                                disabled={filter.disabled}
-                                onCheckedChange={filter.onChange}
-                            >
-                                {filter.label}
-                            </ActionMenu.CheckboxItem>
-                        ))}
-                    </ActionMenu.Content>
-                </ActionMenu>
-            )}
-            <Checkbox
-                size="small"
-                checked={visKunValgte}
-                disabled={visKunValgteDisabled}
-                onChange={(e) => onVisKunValgteChange(e.target.checked)}
-                className="shrink-0 whitespace-nowrap"
-            >
-                {visKunValgteLabel}
-            </Checkbox>
-        </HStack>
+        <ActionMenu>
+            <ActionMenu.Trigger>
+                <Button
+                    variant="tertiary"
+                    size="xsmall"
+                    icon={<FilterIcon aria-hidden />}
+                    className="shrink-0 whitespace-nowrap"
+                >
+                    Filter
+                </Button>
+            </ActionMenu.Trigger>
+            <ActionMenu.Content>
+                <ActionMenu.Label>Filtrer</ActionMenu.Label>
+                {filtere.map((filter) => (
+                    <ActionMenu.CheckboxItem
+                        key={filter.id}
+                        checked={filter.checked}
+                        disabled={filter.disabled}
+                        onCheckedChange={filter.onChange}
+                    >
+                        {filter.label}
+                    </ActionMenu.CheckboxItem>
+                ))}
+            </ActionMenu.Content>
+        </ActionMenu>
     );
 }

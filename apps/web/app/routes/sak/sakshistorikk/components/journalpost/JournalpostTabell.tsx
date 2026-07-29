@@ -252,15 +252,27 @@ export default function JournalpostTabell({
             id: "journalpostId",
             header: "",
             width: { resizable: false, value: scaledPx(52) },
-            bodyCell: (rad: JournalpostRad) =>
-                !rad.erVedlegg && rad.jp.journalpostId ? (
+            bodyCell: (rad: JournalpostRad) => {
+                if (rad.erVedlegg) return null;
+                if (rad.jp.journalpostId?.startsWith("BIF")) {
+                    return (
+                        <Link
+                            href={`/sak/${saksnummer}/forsendelse/${rad.jp.journalpostId}?${jpParams()}`}
+                            aria-label="Vis journalpost"
+                        >
+                            <TasklistSendIcon aria-hidden />
+                        </Link>
+                    );
+                }
+                return (
                     <Link
                         href={`/sak/${saksnummer}/journal/${rad.jp.journalpostId}?${jpParams()}`}
                         aria-label="Vis journalpost"
                     >
                         <TasklistSendIcon aria-hidden />
                     </Link>
-                ) : null,
+                );
+            },
         },
         {
             id: "dokumentType",
@@ -304,7 +316,7 @@ export default function JournalpostTabell({
             id: "status",
             header: "Status",
             isSortable: true,
-            width: { resizable: false, value: scaledPx(175) },
+            width: { resizable: false, value: scaledPx(178) },
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? (
                     ""

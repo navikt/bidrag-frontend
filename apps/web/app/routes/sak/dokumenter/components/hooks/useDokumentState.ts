@@ -22,13 +22,14 @@ export type MenyState = ReturnType<typeof useDokumentState>["menyState"];
 export type DokumentData = ReturnType<typeof useDokumentState>["data"];
 
 /**
- * To tilstander for venstremenyen:
+ * Tre tilstander for venstremenyen:
+ * - skjult: helt minimert til en smal kolonne, slik at dokumentet får all plassen
  * - liste: minimert tre-visning med journalposter og dokumenter
  * - tabell: utvidet tabellvisning med utvalgte kolonner og radvalg via checkbox
  */
-export type MenyVisning = "liste" | "tabell";
+export type MenyVisning = "skjult" | "liste" | "tabell";
 
-const GYLDIGE_VISNINGER: MenyVisning[] = ["liste", "tabell"];
+const GYLDIGE_VISNINGER: MenyVisning[] = ["skjult", "liste", "tabell"];
 
 function parseVisning(verdi: string | null): MenyVisning | undefined {
     return GYLDIGE_VISNINGER.includes(verdi as MenyVisning) ? (verdi as MenyVisning) : undefined;
@@ -87,6 +88,13 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
         parseValgteRefs(searchParams.get("valgte")),
     );
     const [visKunValgte, setVisKunValgte] = useState<boolean>(
+        () => parseValgteRefs(searchParams.get("valgte")).size > 0,
+    );
+
+    // Avkrysningsboksene i tabellen finnes kun for å filtrere ned dokumentlisten, og er forvirrende
+    // når de alltid vises. De slås derfor på eksplisitt via "Filtrer dokumenter". Et delt URL-et med
+    // `valgte` starter i modusen, slik at mottakeren ser hva avsenderen filtrerte på.
+    const [velgDokumenterAktiv, setVelgDokumenterAktiv] = useState<boolean>(
         () => parseValgteRefs(searchParams.get("valgte")).size > 0,
     );
 
@@ -205,7 +213,26 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
         setValgteDokumentreferanser(
             new Set(alleDokumenter.map((dok) => dok.dokumentreferanse).filter((ref): ref is string => Boolean(ref))),
         );
-    const handleFjernAlle = () => setValgteDokumentreferanser(new Set());
+    // Når utvalget tømmes forsvinner også "Vis kun valgte"-avkrysningsboksen, så tilstanden nullstilles
+    // for å unngå at den er huket av neste gang brukeren velger et dokument.
+    const handleFjernAlle = () => {
+        setValgteDokumentreferanser(new Set());
+        setVisKunValgte(false);
+    };
+
+    /**
+     * Slår dokumentfiltreringen av eller på. Når den slås av nullstilles utvalget, slik at tabellen
+     * går tilbake til å vise alle dokumenter i stedet for å etterlate et usynlig aktivt filter.
+     */
+    const handterToggleVelgDokumenter = () => {
+        setVelgDokumenterAktiv((forrige) => {
+            if (forrige) {
+                setValgteDokumentreferanser(new Set());
+                setVisKunValgte(false);
+            }
+            return !forrige;
+        });
+    };
     // Synkroniser visningstilstand mot søkeparametre slik at siden kan åpnes/deles med ønsket visning.
     useEffect(() => {
         setSearchParams(
@@ -295,6 +322,8 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
             handleSettValgteRefs,
             handleVelgAlle,
             handleFjernAlle,
+            velgDokumenterAktiv,
+            handterToggleVelgDokumenter,
             visKunValgte,
             setVisKunValgte,
         },
