@@ -6,6 +6,7 @@ import type { SaksDokument } from "../types";
 import { DokumentTre } from "./DokumentTre";
 import { FilterBoks } from "./FilterBoks";
 import type { DokumentData, FilterState, MenyState, MenyVisning } from "./hooks/useDokumentState";
+import { useMaksMenyVisning } from "./hooks/useMaksMenyVisning";
 import { SaksdokumentTabell } from "./SaksdokumentTabell";
 
 export interface VenstreMenyProps {
@@ -20,10 +21,14 @@ export interface VenstreMenyProps {
     header?: ReactNode;
 }
 
+/**
+ * Bredden på venstremenyen per visning. Tabellvisningen får aldri ta mer plass enn at
+ * dokumentfremviseren beholder ~30em, slik at PDF-en ikke forsvinner når vinduet minimeres.
+ */
 const BREDDE_PER_VISNING: Record<MenyVisning, string> = {
     skjult: "3.25em",
     liste: "21em",
-    tabell: "59em",
+    tabell: "min(66em, max(21em, calc(100vw - 30em)))",
 };
 
 /** Visningene sortert fra minst til mest plass. Minimer/utvid flytter brukeren ett steg om gangen. */
@@ -172,18 +177,24 @@ export function VenstreMeny({
 }: VenstreMenyProps) {
     const { visning, setVisning } = menyState;
 
+    // Vinduet kan være for smalt til brukerens valgte visning. Da klemmes visningen midlertidig ned,
+    // slik at dokumentfremviseren beholder plassen sin – og gjenopprettes når vinduet blir bredt igjen.
+    const maksVisning = useMaksMenyVisning();
+
     const steg = skjulKontroller ? VISNING_STEG_UTEN_KONTROLLER : VISNING_STEG;
-    const aktivVisning = steg.includes(visning) ? visning : "liste";
-    const stegIndeks = steg.indexOf(aktivVisning);
+    const maksStegIndeks = Math.min(VISNING_STEG.indexOf(maksVisning), steg.length - 1);
+    const ønsketVisning = steg.includes(visning) ? visning : "liste";
+    const stegIndeks = Math.min(steg.indexOf(ønsketVisning), maksStegIndeks);
+    const aktivVisning = steg[stegIndeks] ?? "skjult";
 
     const erSkjult = aktivVisning === "skjult";
     const erTabell = aktivVisning === "tabell";
-    const kanUtvide = stegIndeks < steg.length - 1;
+    const kanUtvide = stegIndeks < maksStegIndeks;
 
     const minimer = useCallback(() => setVisning(steg[stegIndeks - 1] ?? "skjult"), [setVisning, steg, stegIndeks]);
     const utvid = useCallback(
-        () => setVisning(steg[stegIndeks + 1] ?? aktivVisning),
-        [setVisning, steg, stegIndeks, aktivVisning],
+        () => setVisning(kanUtvide ? (steg[stegIndeks + 1] ?? aktivVisning) : aktivVisning),
+        [setVisning, steg, stegIndeks, aktivVisning, kanUtvide],
     );
 
     // Piltast venstre/høyre flytter menyen ett steg, som et raskt alternativ til minimer/utvid-knappene.
@@ -263,7 +274,11 @@ export function VenstreMeny({
                                     icon={<ChevronRightIcon aria-hidden />}
                                     onClick={utvid}
                                     disabled={!kanUtvide}
-                                    title="Utvid dokumentliste (→)"
+                                    title={
+                                        kanUtvide
+                                            ? "Utvid dokumentliste (→)"
+                                            : "Vinduet er for smalt til en bredere dokumentliste"
+                                    }
                                     aria-label="Utvid dokumentliste"
                                 />
                             )}
@@ -271,7 +286,14 @@ export function VenstreMeny({
                     </HStack>
 
                     <VStack gap="space-2" marginBlock="space-2 space-0" flexGrow="1" minHeight="0" overflow="hidden">
-                        {!skjulKontroller && <FilterBoks data={data} filterState={filterState} menyState={menyState} />}
+                        {!skjulKontroller && (
+                            <FilterBoks
+                                data={data}
+                                filterState={filterState}
+                                menyState={menyState}
+                                aktivVisning={aktivVisning}
+                            />
+                        )}
 
                         <div style={{ flexGrow: 1, minHeight: 0, overflowY: "auto" }}>
                             {erTabell ? (
@@ -280,6 +302,7 @@ export function VenstreMeny({
                                     dokumenter={data.dokumenter}
                                     sakRoller={sakRoller}
                                     menyState={menyState}
+                                    harBlandingFarBid={data.harBlandingFarBid}
                                 />
                             ) : (
                                 <DokumentTre

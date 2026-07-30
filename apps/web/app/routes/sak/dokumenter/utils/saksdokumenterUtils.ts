@@ -22,17 +22,15 @@ const harFerdigstiltDokument = (jp: JournalpostDto): boolean => {
 export function filtrerJournalposter(
     journalposter: JournalpostDto[],
     kunVedtak: boolean,
-    visFarskapUtelukket: boolean,
     visFeilregistrerte: boolean,
     kunFerdigstilte: boolean,
 ): JournalpostDto[] {
     return journalposter.filter((jp) => {
         const oppfyllerVedtakKrav = !kunVedtak || erVedtak(jp);
-        const oppfyllerFarskapKrav = visFarskapUtelukket || jp.fagomrade !== "FAR";
         const oppfyllerFeilregistrertKrav = visFeilregistrerte || !jp.feilfort;
         const oppfyllerFerdigstiltKrav = !kunFerdigstilte || harFerdigstiltDokument(jp);
 
-        return oppfyllerVedtakKrav && oppfyllerFarskapKrav && oppfyllerFeilregistrertKrav && oppfyllerFerdigstiltKrav;
+        return oppfyllerVedtakKrav && oppfyllerFeilregistrertKrav && oppfyllerFerdigstiltKrav;
     });
 }
 

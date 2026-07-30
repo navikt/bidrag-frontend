@@ -55,17 +55,38 @@ export interface UseDokumentStateOptions {
      * Velg første tilgjengelige dokument automatisk når dokumentlisten har lastet.
      */
     autoSelectFirstDocument?: boolean;
+    /**
+     * Journalposter hentet med `bareFarskapUtelukket=true`. Backend returnerer enten alle
+     * journalposter *unntatt* de farskapsutelukkede (standard) eller *kun* de farskapsutelukkede,
+     * så utvalgene byttes ut i sin helhet når filteret slås på.
+     */
+    farskapUtelukkedeJournalposter?: JournalpostDto[];
 }
 
 export function useDokumentState(journalposter: JournalpostDto[], options?: UseDokumentStateOptions) {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const harBlandingFarBid = useMemo(() => sjekkOmBlandingAvFarOgBidrag(journalposter), [journalposter]);
-
     const [visFarskapUtelukket, setVisFarskapUtelukket] = useState(false);
     const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
     const [kunVedtak, setKunVedtak] = useState(false);
     const [kunFerdigstilte, setKunFerdigstilte] = useState(options?.standardKunFerdigstilte ?? true);
+
+    const farskapUtelukkedeJournalposter = options?.farskapUtelukkedeJournalposter ?? [];
+    const harFarskapUtelukkede = farskapUtelukkedeJournalposter.length > 0;
+
+    // "Kun farskap utelukket" er skjult/deaktivert i UI-et når "Kun vedtak" er aktivt, men rå-state
+    // beholdes uendret mens den er deaktivert. Filtreringen (og hvilket journalpost-utvalg som
+    // hentes) må derfor bruke den avledede verdien, ellers kan et "usynlig" aktivt filter påvirke
+    // resultatet uten at det vises i UI-et. "Vis feilregistrerte" kan derimot kombineres fritt med
+    // "Kun vedtak", og bruker derfor rå-state direkte.
+    const visKunFarskapUtelukket = !kunVedtak && visFarskapUtelukket;
+
+    // Backend skiller utvalgene med `bareFarskapUtelukket`: standardutvalget inneholder ingen
+    // farskapsutelukkede journalposter, og filteret bytter til utvalget som kun inneholder disse.
+    // Journalposter med tema FAR som ikke er farskapsutelukket vises derfor alltid.
+    const kildeJournalposter = visKunFarskapUtelukket ? farskapUtelukkedeJournalposter : journalposter;
+
+    const harBlandingFarBid = useMemo(() => sjekkOmBlandingAvFarOgBidrag(kildeJournalposter), [kildeJournalposter]);
 
     const [visning, setVisning] = useState<MenyVisning>(() => {
         const visningParam = parseVisning(searchParams.get("visning"));
@@ -99,11 +120,18 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
     );
 
     const filtrerteJournalposter = useMemo(
-        () => filtrerJournalposter(journalposter, kunVedtak, visFarskapUtelukket, visFeilregistrerte, kunFerdigstilte),
-        [journalposter, kunVedtak, visFarskapUtelukket, visFeilregistrerte, kunFerdigstilte],
+        () => filtrerJournalposter(kildeJournalposter, kunVedtak, visFeilregistrerte, kunFerdigstilte),
+        [kildeJournalposter, kunVedtak, visFeilregistrerte, kunFerdigstilte],
     );
 
     const alleDokumenter = useMemo(() => byggDokumenter(filtrerteJournalposter), [filtrerteJournalposter]);
+
+    // Totalt antall journalposter/dokumenter i gjeldende utvalg før filtrering – brukes til tellerne.
+    const antallJournalposterTotalt = kildeJournalposter.length;
+    const antallDokumenterTotalt = useMemo(
+        () => kildeJournalposter.reduce((sum, jp) => sum + (jp.dokumenter?.length ?? 0), 0),
+        [kildeJournalposter],
+    );
 
     const dokumenter = useMemo(() => {
         if (!visKunValgte || valgteDokumentreferanser.size === 0) return alleDokumenter;
@@ -123,7 +151,20 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
     }, [filtrerteJournalposter, visKunValgte, valgteDokumentreferanser]);
 
     // Sortering for tre-/listevisningen (`DokumentTre`). Tabellvisningen sorterer uavhengig via
-    // egne kolonneheadere i `SaksdokumentTabell`.
+    // egne kolonneheadere i `SaksdokumentTabell`, men tilstanden ligger her slik at
+    // "Tilbakestill sortering" kan bo sammen med de øvrige kontrollene i `FilterBoks`.
+    const {
+        sort: tabellSort,
+        handleSort: handleTabellSort,
+        sortData: sortTabellData,
+        setSort: setTabellSort,
+    } = useSort<JournalpostDto>({
+        defaultUnsorted: standardSort,
+        customComparators: {
+            gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
+        },
+    });
+
     const {
         sort: listeSort,
         handleSort: handleListeSort,
@@ -289,7 +330,10 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
             journalposter: sorterteJournalposter,
             dokumenter,
             alleDokumenter,
+            antallDokumenterTotalt,
+            antallJournalposterTotalt,
             harBlandingFarBid,
+            harFarskapUtelukkede,
             selectedDocument,
         },
         filterState: {
@@ -297,6 +341,7 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
             setKunVedtak,
             visFarskapUtelukket,
             setVisFarskapUtelukket,
+            visKunFarskapUtelukket,
             visFeilregistrerte,
             setVisFeilregistrerte,
             kunFerdigstilte,
@@ -318,6 +363,10 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
             handterLukkAlleTabellRader,
             listeSort,
             handleListeSort,
+            tabellSort,
+            handleTabellSort,
+            sortTabellData,
+            tilbakestillTabellSortering: () => setTabellSort(undefined),
             valgteDokumentreferanser,
             handleSettValgteRefs,
             handleVelgAlle,

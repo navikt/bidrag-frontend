@@ -800,14 +800,21 @@ export function useHentFogdhistorikk(saksnummer: string, enabled: boolean = true
 
 // ==================== DOKUMENT ====================
 
-export function useHentJournalposter(saksnummer: string, enabled: boolean = true) {
+/**
+ * Journalposter for en sak. `bareFarskapUtelukket` er et enten/eller-filter i bidrag-dokument:
+ * `false` (standard) gir alle journalposter *unntatt* de farskapsutelukkede, mens `true` gir
+ * *kun* de farskapsutelukkede. De to utvalgene hentes derfor som hver sin query.
+ */
+function useHentJournalpostQuery(saksnummer: string, bareFarskapUtelukket: boolean, enabled: boolean) {
+    const beskrivelse = bareFarskapUtelukket ? "farskapsutelukkede journalposter" : "journalposter";
+
     return useQuery<JournalpostDto[], AxiosError | TilgangsFeilError>({
-        queryKey: ["hent_journalposter", saksnummer],
+        queryKey: ["hent_journalposter", saksnummer, { bareFarskapUtelukket }],
         queryFn: async () => {
             try {
                 const response = await BIDRAG_DOKUMENT_API.sak.hentJournal(
                     saksnummer,
-                    { fagomrade: ["BID", "FAR"] },
+                    { fagomrade: ["BID", "FAR"], bareFarskapUtelukket },
                     {
                         validateStatus: (status) => {
                             return status === 200 || status === 404;
@@ -816,14 +823,14 @@ export function useHentJournalposter(saksnummer: string, enabled: boolean = true
                 );
 
                 if (response.status === 404) {
-                    await SecureLoggerService.info(`Ingen journalposter funnet for saksnummer ${saksnummer}`);
+                    await SecureLoggerService.info(`Ingen ${beskrivelse} funnet for saksnummer ${saksnummer}`);
                     return [];
                 }
 
-                await SecureLoggerService.info(`Hentet journalposter for saksnummer ${saksnummer}`);
+                await SecureLoggerService.info(`Hentet ${beskrivelse} for saksnummer ${saksnummer}`);
                 return response.data;
             } catch (e) {
-                return handleApiError(e, `hente journalposter for saksnummer ${saksnummer}`);
+                return handleApiError(e, `hente ${beskrivelse} for saksnummer ${saksnummer}`);
             }
         },
         enabled: enabled && !!saksnummer,
@@ -837,6 +844,15 @@ export function useHentJournalposter(saksnummer: string, enabled: boolean = true
             return failureCount < 3;
         },
     });
+}
+
+export function useHentJournalposter(saksnummer: string, enabled: boolean = true) {
+    return useHentJournalpostQuery(saksnummer, false, enabled);
+}
+
+/** Kun journalposter der farskap er utelukket – vises bare når brukeren velger det eksplisitt. */
+export function useHentFarskapUtelukkedeJournalposter(saksnummer: string, enabled: boolean = true) {
+    return useHentJournalpostQuery(saksnummer, true, enabled);
 }
 
 interface HentDokumentRequest {
