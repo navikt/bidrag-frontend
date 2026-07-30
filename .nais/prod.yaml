@@ -54,8 +54,14 @@ env:
   - name: BIDRAG_DOKUMENT_AUDIENCE
     value: api://prod-fss.bidrag.bidrag-dokument/.default
 
+  - name: BIDRAG_BEHANDLING_URL
+    value: http://bidrag-behandling
+  - name: BIDRAG_BEHANDLING_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-behandling/.default
+
   - name: BISYS_URL
     value: https://wasapp.adeo.no/rtv-bidrag/
+
   - name: BIDRAG_UI_BASE_URL
     value: https://bidrag-ui.nais.adeo.no
 

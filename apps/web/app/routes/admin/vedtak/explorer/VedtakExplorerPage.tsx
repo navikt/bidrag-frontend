@@ -15,7 +15,7 @@ import {mapVedtakToTree} from "./VedtakToGraphMapper";
 import {lastVisningsnavn} from "./VisningsnavnMapper";
 import {Grunnlagstype, VedtakDto} from "@bidrag/api/BidragVedtakApi";
 import {useSearchParams} from "react-router";
-import {BEHANDLING_API_V1, BIDRAG_VEDTAK_API} from "@bidrag/api";
+import {BIDRAG_BEHANDLING_API, BIDRAG_VEDTAK_API} from "@bidrag/api";
 
 mermaid.initialize({
     startOnLoad: true,
@@ -265,7 +265,7 @@ async function hentVedtakDto(behandlingId?: string, vedtakId?: string) {
     if (behandlingId != null) {
         // TODO ADMIN Usikker på om dette vil funke riktig
         console.log("TODO ADMIN: vi er i en løype som ikke er sikker")
-        return BEHANDLING_API_V1.api.behandlingTilVedtak(Number(behandlingId));
+        return BIDRAG_BEHANDLING_API.api.behandlingTilVedtak(Number(behandlingId));
     }
     return BIDRAG_VEDTAK_API.vedtak.hentVedtak(Number(vedtakId));
 }

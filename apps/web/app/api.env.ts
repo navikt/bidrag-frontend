@@ -50,6 +50,10 @@ const APIS: Record<string, ApiConfig> = {
         url: env.BIDRAG_ADMIN_URL,
         audience: env.BIDRAG_ADMIN_AUDIENCE
     },
+    "bidrag-behandling": {
+        url: env.BIDRAG_BEHANDLING_URL,
+        audience: env.BIDRAG_BEHANDLING_AUDIENCE,
+    },
 };
 
 export type ApiAppName = keyof typeof APIS | string;
