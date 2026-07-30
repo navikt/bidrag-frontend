@@ -74,10 +74,17 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
     const farskapUtelukkedeJournalposter = options?.farskapUtelukkedeJournalposter ?? [];
     const harFarskapUtelukkede = farskapUtelukkedeJournalposter.length > 0;
 
+    // "Kun farskap utelukket" er skjult/deaktivert i UI-et når "Kun vedtak" er aktivt, men rå-state
+    // beholdes uendret mens den er deaktivert. Filtreringen (og hvilket journalpost-utvalg som
+    // hentes) må derfor bruke den avledede verdien, ellers kan et "usynlig" aktivt filter påvirke
+    // resultatet uten at det vises i UI-et. "Vis feilregistrerte" kan derimot kombineres fritt med
+    // "Kun vedtak", og bruker derfor rå-state direkte.
+    const visKunFarskapUtelukket = !kunVedtak && visFarskapUtelukket;
+
     // Backend skiller utvalgene med `bareFarskapUtelukket`: standardutvalget inneholder ingen
     // farskapsutelukkede journalposter, og filteret bytter til utvalget som kun inneholder disse.
     // Journalposter med tema FAR som ikke er farskapsutelukket vises derfor alltid.
-    const kildeJournalposter = visFarskapUtelukket ? farskapUtelukkedeJournalposter : journalposter;
+    const kildeJournalposter = visKunFarskapUtelukket ? farskapUtelukkedeJournalposter : journalposter;
 
     const harBlandingFarBid = useMemo(() => sjekkOmBlandingAvFarOgBidrag(kildeJournalposter), [kildeJournalposter]);
 
@@ -334,6 +341,7 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
             setKunVedtak,
             visFarskapUtelukket,
             setVisFarskapUtelukket,
+            visKunFarskapUtelukket,
             visFeilregistrerte,
             setVisFeilregistrerte,
             kunFerdigstilte,

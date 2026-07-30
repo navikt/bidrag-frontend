@@ -125,8 +125,8 @@ export function FilterBoks({ data, filterState, menyState, aktivVisning }: Filte
         setKunVedtak,
         kunFerdigstilte,
         setKunFerdigstilte,
-        visFarskapUtelukket,
         setVisFarskapUtelukket,
+        visKunFarskapUtelukket,
         visFeilregistrerte,
         setVisFeilregistrerte,
     } = filterState;
@@ -173,17 +173,17 @@ export function FilterBoks({ data, filterState, menyState, aktivVisning }: Filte
                   {
                       id: "visFarskapUtelukket",
                       label: "Kun farskap utelukket",
-                      checked: visFarskapUtelukket,
+                      checked: visKunFarskapUtelukket,
                       onChange: setVisFarskapUtelukket,
+                      disabled: kunVedtak,
                   },
               ]
             : []),
         {
             id: "visFeilregistrerte",
             label: "Vis feilreg.",
-            checked: !kunVedtak && visFeilregistrerte,
+            checked: visFeilregistrerte,
             onChange: setVisFeilregistrerte,
-            disabled: kunVedtak,
         },
     ];
 

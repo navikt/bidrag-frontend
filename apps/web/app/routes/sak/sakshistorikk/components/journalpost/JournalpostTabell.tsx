@@ -401,15 +401,14 @@ export default function JournalpostTabell({
                                     {harFarskapUtelukkede && (
                                         <Checkbox
                                             disabled={kunVedtak}
-                                            checked={!kunVedtak && visFarskapUtelukket}
+                                            checked={visKunFarskapUtelukket}
                                             onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
                                         >
                                             Vis kun farskapsutelukket
                                         </Checkbox>
                                     )}
                                     <Checkbox
-                                        disabled={kunVedtak}
-                                        checked={!kunVedtak && visFeilregistrerte}
+                                        checked={visFeilregistrerte}
                                         onChange={(e) => setVisFeilregistrerte(e.target.checked)}
                                     >
                                         Vis feilregistrerte
