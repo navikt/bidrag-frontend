@@ -1,0 +1,21 @@
+.mermaid svg {
+        height: inherit;
+}
+
+dt:before {
+        content: "";
+        display: block;
+}
+
+dt,
+dd {
+        display: inline;
+}
+
+dt {
+        font-weight: bold;
+}
+
+dt:after {
+        content: ": ";
+}
