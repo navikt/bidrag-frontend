@@ -1,6 +1,7 @@
 /* eslint-disable preserve-caught-error */
 
 import {
+    BIDRAG_ADMIN_API,
     BIDRAG_DOKUMENT_API,
     BIDRAG_ORGANISASJON_API,
     BIDRAG_PERSON_API,
@@ -26,7 +27,7 @@ import type {
     SakshendelseDto,
 } from "@bidrag/api/SakApi";
 import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
-import { IdentUtils, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
+import { IdentUtils, ObjectUtils, SecureLoggerService, StringUtils, LoggerService } from "@bidrag/common";
 import {
     useMutation,
     useQueries,
@@ -37,6 +38,7 @@ import {
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
+import { EndringsLoggDto, OppdaterEndringsloggRequest, OpprettEndringsloggRequest } from "~/api/types/admin.ts";
 
 // ==================== SAK ====================
 
@@ -797,6 +799,106 @@ export function useHentFogdhistorikk(saksnummer: string, enabled: boolean = true
         },
     });
 }
+
+// ================= ENDRINGSLOGG ===============
+
+export const useHentEndringslogger = () => {
+    return useSuspenseQuery<EndringsLoggDto[], AxiosError | TilgangsFeilError>({
+        queryKey: ["endringslogger"],
+        queryFn: async (): Promise<EndringsLoggDto[]> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentAlleEndringslogg({bareAktive: false});
+            return data;
+        },
+    });
+};
+
+export const useCreateEndringslogg = () => {
+    return useMutation({
+        mutationKey: ["createUpdateEndringslogg"],
+        mutationFn: async (payload: OpprettEndringsloggRequest): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.opprettEndringslogg(payload);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved oppreting av endringslogg", error);
+        },
+    });
+};
+
+export const useEditEndringslogg = () => {
+    return useMutation({
+        mutationKey: ["createUpdateEndringslogg"],
+        mutationFn: async ({
+                               endringsloggId,
+                               payload,
+                           }: {
+            endringsloggId: number;
+            payload: OppdaterEndringsloggRequest;
+        }): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.oppdaterEndringslogg(endringsloggId, payload);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved oppreting av endringslogg", error);
+        },
+    });
+};
+
+export const useHentEndringslogg = (endringsloggId?: number) => {
+    return useSuspenseQuery({
+        queryKey: ["endringslogg", endringsloggId],
+        queryFn: async (): Promise<EndringsLoggDto> => {
+            if (!endringsloggId) return {} as EndringsLoggDto;
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentEndringslogg(endringsloggId);
+            return data;
+        },
+    });
+};
+
+export const useAktiverEndringslogg = () => {
+    return useMutation({
+        mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.aktiverEndringslogg(endringsloggId);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved aktivering av endringslogg", error);
+        },
+    });
+};
+
+export const useDeaktiverEndringslogg = () => {
+    return useMutation({
+        mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.deaktiverEndringslogg(endringsloggId);
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved deaktivering av endringslogg", error);
+        },
+    });
+};
+
+export const useSlettEndringslogg = () => {
+    return useMutation({
+        mutationFn: async (endringsloggId: number): Promise<void> => {
+            await BIDRAG_ADMIN_API.endringslogg.slettEndringslogg(endringsloggId);
+        },
+        networkMode: "always",
+        onError: (error) => {
+            console.log("onError", error);
+            LoggerService.error("Feil ved sletting av endringslogg", error);
+        },
+    });
+};
 
 // ==================== DOKUMENT ====================
 

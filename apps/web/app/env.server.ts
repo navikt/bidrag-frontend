@@ -1,5 +1,5 @@
 import * as process from "node:process";
-import { z } from "zod";
+import {z} from "zod";
 
 const NonEmpty = z.string().min(1);
 
@@ -24,6 +24,8 @@ const EnvSchema = z.object({
     BIDRAG_DOKUMENT_FORSENDELSE_URL: z.url(),
     BIDRAG_DOKUMENT_AUDIENCE: NonEmpty,
     BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE: NonEmpty,
+    BIDRAG_ADMIN_URL: z.url(),
+    BIDRAG_ADMIN_AUDIENCE: NonEmpty,
     BISYS_URL: z.url(),
     BIDRAG_UI_BASE_URL: z.url(),
     UNLEASH_PROXY_URL: z.url().optional(),

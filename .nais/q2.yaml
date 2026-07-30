@@ -5,6 +5,9 @@ ingresses:
   - https://bidrag-q2.intern.dev.nav.no
 
 env:
+  - name: BIDRAG_ADMIN_URL
+    value: https://bidrag-admin.intern.dev.nav.no
+
   - name: BIDRAG_SAK_URL
     value: https://bidrag-sak-q2.dev-fss-pub.nais.io
   - name: BIDRAG_SAK_AUDIENCE
