@@ -1,13 +1,15 @@
-import { ArrowDownIcon, ArrowUpIcon, TasklistIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Box, Button, Checkbox, Detail, HStack } from "@navikt/ds-react";
+import { ArrowCirclepathIcon, ArrowDownIcon, ArrowUpIcon, TasklistIcon, XMarkIcon } from "@navikt/aksel-icons";
+import { Box, Button, Checkbox, Detail, HStack, Tag } from "@navikt/ds-react";
 import { type DokumentFilterItem, DokumentFilterMeny } from "~/common/dokument/DokumentFilterMeny";
 import { type DokumentSorterItem, DokumentSorterMeny } from "~/common/dokument/DokumentSorterMeny";
-import type { DokumentData, DokumentSortKey, FilterState, MenyState } from "./hooks/useDokumentState";
+import type { DokumentData, DokumentSortKey, FilterState, MenyState, MenyVisning } from "./hooks/useDokumentState";
 
 export interface FilterBoksProps {
     data: DokumentData;
     filterState: FilterState;
     menyState: MenyState;
+    /** Visningen som faktisk rendres – kan være minimert i forhold til brukerens valg på smale skjermer. */
+    aktivVisning: MenyVisning;
 }
 
 interface DokumentutvalgKontrollProps {
@@ -45,7 +47,7 @@ function DokumentutvalgKontroll({
                 title="Huk av dokumenter i tabellen for å filtrere listen"
                 className="shrink-0 whitespace-nowrap"
             >
-                Velg dokumenter
+                Filtrer dokumenter
             </Button>
         );
     }
@@ -97,10 +99,9 @@ function DokumentutvalgKontroll({
     );
 }
 
-export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
-    const { harBlandingFarBid } = data;
+export function FilterBoks({ data, filterState, menyState, aktivVisning }: FilterBoksProps) {
+    const { harFarskapUtelukkede, antallDokumenterTotalt, antallJournalposterTotalt, dokumenter, journalposter } = data;
     const {
-        visning,
         expandedIds,
         tableExpandedIds,
         handterAapneAlle,
@@ -116,6 +117,8 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
         handleFjernAlle,
         visKunValgte,
         setVisKunValgte,
+        tabellSort,
+        tilbakestillTabellSortering,
     } = menyState;
     const {
         kunVedtak,
@@ -128,7 +131,7 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
         setVisFeilregistrerte,
     } = filterState;
 
-    const erTabell = visning === "tabell";
+    const erTabell = aktivVisning === "tabell";
     const handterAapneAlleForVisning = erTabell ? handterAapneAlleTabellRader : handterAapneAlle;
     const handterLukkAlleForVisning = erTabell ? handterLukkAlleTabellRader : handterLukkAlle;
 
@@ -136,6 +139,15 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
     const noeErUtvidet = (erTabell ? tableExpandedIds : expandedIds).size > 0;
 
     const antallValgt = valgteDokumentreferanser.size;
+
+    const antallDokumenterVist = dokumenter.length;
+    const antallJournalposterVist = journalposter.length;
+
+    // Kort form i listevisningen, der raden er for smal til hele teksten.
+    const tellerTekst = erTabell
+        ? `${antallJournalposterVist} av ${antallJournalposterTotalt} journalposter · ${antallDokumenterVist} av ${antallDokumenterTotalt} dokumenter`
+        : `${antallJournalposterVist}/${antallJournalposterTotalt} jp · ${antallDokumenterVist}/${antallDokumenterTotalt} dok`;
+    const tellerBeskrivelse = `Viser ${antallJournalposterVist} av ${antallJournalposterTotalt} journalposter og ${antallDokumenterVist} av ${antallDokumenterTotalt} dokumenter`;
 
     const sorterValg: DokumentSorterItem<DokumentSortKey>[] = [
         { key: "dokumentDato", label: "Dok.dato" },
@@ -156,14 +168,13 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
             checked: kunVedtak,
             onChange: setKunVedtak,
         },
-        ...(harBlandingFarBid
+        ...(harFarskapUtelukkede
             ? [
                   {
                       id: "visFarskapUtelukket",
-                      label: "Vis farskap",
-                      checked: !kunVedtak && visFarskapUtelukket,
+                      label: "Kun farskap utelukket",
+                      checked: visFarskapUtelukket,
                       onChange: setVisFarskapUtelukket,
-                      disabled: kunVedtak,
                   },
               ]
             : []),
@@ -192,10 +203,30 @@ export function FilterBoks({ data, filterState, menyState }: FilterBoksProps) {
                     />
                 )}
                 {!erTabell && <DokumentSorterMeny valg={sorterValg} sort={listeSort} onSort={handleListeSort} />}
+                <Tag
+                    variant="neutral-moderate"
+                    size="small"
+                    className="ml-auto shrink-0 whitespace-nowrap"
+                    title={tellerBeskrivelse}
+                >
+                    {tellerTekst}
+                </Tag>
+                {erTabell && (
+                    <Button
+                        variant="tertiary"
+                        size="xsmall"
+                        className="shrink-0"
+                        onClick={tilbakestillTabellSortering}
+                        disabled={!tabellSort}
+                        icon={<ArrowCirclepathIcon aria-hidden />}
+                        title="Tilbakestill sortering"
+                        aria-label="Tilbakestill sortering"
+                    />
+                )}
                 <Button
                     variant="tertiary"
                     size="xsmall"
-                    className="ml-auto shrink-0"
+                    className="shrink-0"
                     onClick={noeErUtvidet ? handterLukkAlleForVisning : handterAapneAlleForVisning}
                     icon={noeErUtvidet ? <ArrowUpIcon aria-hidden /> : <ArrowDownIcon aria-hidden />}
                     title={noeErUtvidet ? "Lukk alle" : "Åpne alle"}

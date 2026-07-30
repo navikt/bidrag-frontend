@@ -68,9 +68,12 @@ function byggRad(jp: JournalpostDto): JournalpostRad {
 export default function JournalpostTabell({
     saksnummer,
     journalposter,
+    farskapUtelukkedeJournalposter = [],
 }: {
     saksnummer: string;
     journalposter: JournalpostDto[];
+    /** Journalposter hentet med `bareFarskapUtelukket=true` – vises kun når filteret er aktivt. */
+    farskapUtelukkedeJournalposter?: JournalpostDto[];
 }) {
     const { sort, handleSort, sortData, setSort } = useSort<JournalpostDto>({
         defaultUnsorted: standardSort,
@@ -119,20 +122,31 @@ export default function JournalpostTabell({
     const [filterÅpen, setFilterÅpen] = useState(false);
     const filterKnappRef = useRef<HTMLButtonElement>(null);
 
-    const filtrerteJournalposter = journalposter.filter((jp) => {
+    const visKunFarskapUtelukket = !kunVedtak && visFarskapUtelukket;
+
+    // `bareFarskapUtelukket` er et enten/eller-filter i backend: standardutvalget inneholder ingen
+    // farskapsutelukkede journalposter, og velges filteret vises kun disse. Journalposter med
+    // tema FAR som ikke er farskapsutelukket vises alltid.
+    const kildeJournalposter = visKunFarskapUtelukket ? farskapUtelukkedeJournalposter : journalposter;
+
+    const filtrerteJournalposter = kildeJournalposter.filter((jp) => {
         if (kunVedtak && !jp.innhold?.toLowerCase().includes("vedtak")) return false;
-        if (!visFarskapUtelukket && jp.fagomrade === "FAR") return false;
         if (!visFeilregistrerte && jp.feilfort) return false;
         return true;
     });
 
     const harBlandingFarBid =
-        journalposter.some((jp) => jp.fagomrade === "FAR") && journalposter.some((jp) => jp.fagomrade === "BID");
+        kildeJournalposter.some((jp) => jp.fagomrade === "FAR") &&
+        kildeJournalposter.some((jp) => jp.fagomrade === "BID");
 
-    const harDokumenterUnderOpprettelse = journalposter.some((jp) => jp.status === JournalpostStatus.UNDER_OPPRETTELSE);
-    const antallAktiveFiltre = (harBlandingFarBid && visFarskapUtelukket ? 1 : 0) + (visFeilregistrerte ? 1 : 0);
+    const harFarskapUtelukkede = farskapUtelukkedeJournalposter.length > 0;
 
-    const antallJournalposterTotalt = journalposter.length;
+    const harDokumenterUnderOpprettelse = kildeJournalposter.some(
+        (jp) => jp.status === JournalpostStatus.UNDER_OPPRETTELSE,
+    );
+    const antallAktiveFiltre = (visKunFarskapUtelukket ? 1 : 0) + (visFeilregistrerte ? 1 : 0);
+
+    const antallJournalposterTotalt = kildeJournalposter.length;
     const antallJournalposterFiltrert = filtrerteJournalposter.length;
     const erFiltrert = antallJournalposterFiltrert !== antallJournalposterTotalt;
 
@@ -384,13 +398,13 @@ export default function JournalpostTabell({
                         <Popover.Content>
                             <CheckboxGroup legend="Filtrer" hideLegend size="small">
                                 <VStack gap={"space-8"}>
-                                    {harBlandingFarBid && (
+                                    {harFarskapUtelukkede && (
                                         <Checkbox
                                             disabled={kunVedtak}
                                             checked={!kunVedtak && visFarskapUtelukket}
                                             onChange={(e) => setVisFarskapUtelukket(e.target.checked)}
                                         >
-                                            Vis farskapsutelukket
+                                            Vis kun farskapsutelukket
                                         </Checkbox>
                                     )}
                                     <Checkbox
@@ -411,6 +425,7 @@ export default function JournalpostTabell({
                         variant="tertiary"
                         size="xsmall"
                         icon={<ArrowCirclepathIcon aria-hidden />}
+                        disabled={!sort}
                         onClick={() => setSort(undefined)}
                     >
                         Tilbakestill sortering

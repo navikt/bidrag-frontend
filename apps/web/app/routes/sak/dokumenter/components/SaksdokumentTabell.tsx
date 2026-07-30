@@ -5,9 +5,7 @@ import { PaperclipIcon } from "@navikt/aksel-icons";
 import { HStack, Tag } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import JournalpostStatusTag from "~/routes/sak/sakshistorikk/components/journalpost/JournalpostStatusTag.tsx";
-import { standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
 import PersonIdentMedRolle from "../../sakshistorikk/components/journalpost/PersonIdentMedRolle";
-import { useSort } from "../../sakshistorikk/components/useSort";
 import type { SaksDokument } from "../types";
 import { DokumentKategoriTag } from "../utils/dokumentKategori";
 import { finnDokumenterForJournalpost } from "../utils/saksdokumenterUtils";
@@ -28,9 +26,17 @@ export interface SaksdokumentTabellProps {
     dokumenter: SaksDokument[];
     sakRoller: RolleDto[];
     menyState: MenyState;
+    /** Saken har både farskaps- og bidragsjournalposter – da vises tema-kolonnen. */
+    harBlandingFarBid?: boolean;
 }
 
-export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyState }: SaksdokumentTabellProps) {
+export function SaksdokumentTabell({
+    journalposter,
+    dokumenter,
+    sakRoller,
+    menyState,
+    harBlandingFarBid = false,
+}: SaksdokumentTabellProps) {
     const {
         selectedId,
         handleSelectDocument,
@@ -39,14 +45,10 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
         velgDokumenterAktiv,
         tableExpandedIds,
         setTableExpandedIds,
+        tabellSort: sort,
+        handleTabellSort: handleSort,
+        sortTabellData: sortData,
     } = menyState;
-
-    const { sort, handleSort, sortData } = useSort<JournalpostDto>({
-        defaultUnsorted: standardSort,
-        customComparators: {
-            gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
-        },
-    });
 
     const dataGridSort: DataGrid.Table.SortEntry[] = sort
         ? [
@@ -239,6 +241,25 @@ export function SaksdokumentTabell({ journalposter, dokumenter, sakRoller, menyS
                 </span>
             ),
         },
+        {
+            id: "journalforendeEnhet",
+            header: "Enhet",
+            isSortable: true,
+            width: { defaultValue: scaledPx(74) },
+            bodyCell: (rad: DokumentRad) => (rad.erVedlegg ? "" : (rad.jp.journalforendeEnhet ?? "-")),
+        },
+
+        ...(harBlandingFarBid
+            ? [
+                  {
+                      id: "fagomrade",
+                      header: "Tema",
+                      isSortable: true,
+                      width: { defaultValue: scaledPx(60) },
+                      bodyCell: (rad: DokumentRad) => (rad.erVedlegg ? "" : (rad.jp.fagomrade ?? "-")),
+                  },
+              ]
+            : []),
     ];
 
     return (

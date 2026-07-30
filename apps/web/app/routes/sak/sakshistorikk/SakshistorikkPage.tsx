@@ -1,5 +1,5 @@
 import { Box, VStack } from "@navikt/ds-react";
-import { useFinnHendelserForSak, useHentJournalposter } from "~/api/useApi.ts";
+import { useFinnHendelserForSak, useHentFarskapUtelukkedeJournalposter, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SakshistorikkPage";
@@ -16,6 +16,7 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
         error: journalposterError,
         isLoading: journalposterLoading,
     } = useHentJournalposter(saksnummer);
+    const { data: farskapUtelukkedeJournalposter } = useHentFarskapUtelukkedeJournalposter(saksnummer);
     const { data: hendelser, error: hendelserError, isLoading: hendelserLoading } = useFinnHendelserForSak(saksnummer);
 
     if (journalposterLoading || hendelserLoading) {
@@ -37,7 +38,11 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
                 <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
             </TabellKort>
             <TabellKort>
-                <JournalpostTabell saksnummer={saksnummer} journalposter={journalposter ?? []} />
+                <JournalpostTabell
+                    saksnummer={saksnummer}
+                    journalposter={journalposter ?? []}
+                    farskapUtelukkedeJournalposter={farskapUtelukkedeJournalposter ?? []}
+                />
             </TabellKort>
         </VStack>
     );
