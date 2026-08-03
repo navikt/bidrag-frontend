@@ -1,7 +1,13 @@
-import {EngangsbelopDto, GrunnlagDto, Grunnlagstype} from "@bidrag/api/BidragBehandlingApiV1";
-import {StonadsendringDto, VedtakDto, VedtakPeriodeDto} from "@bidrag/api/BidragVedtakApi";
-import {TreeChild, TreeChildType, TreeEngangsbeløp, TreePeriode, TreeStønad, TreeVedtak} from "./types";
+import {
+    EngangsbelopDto,
+    GrunnlagDto,
+    Grunnlagstype,
+    StonadsendringDto,
+    VedtakDto,
+    VedtakPeriodeDto
+} from "@bidrag/api/BidragVedtakApi";
 import {hentVisningsnavn} from "./VisningsnavnMapper";
+import {TreeChild, TreeChildType, TreeEngangsbeløp, TreePeriode, TreeStønad, TreeVedtak} from "@bidrag/api";
 
 export function mapVedtakToTree(vedtak: VedtakDto) {
     const vedtakParent: TreeChild = {
@@ -183,7 +189,7 @@ function grunnlagstypeTilVisningsnavn(grunnlag: GrunnlagDto, grunnlagsListe: Gru
             if (grunnlag.type.startsWith("PERSON_")) {
                 return `${grunnlag.type}(${toCompactString(grunnlag.innhold.fødselsdato)})`;
             } else if (grunnlag.type.startsWith("INNHENTET_")) {
-                const gjelderGrunnlag = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse, grunnlagsListe);
+                const gjelderGrunnlag = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse || '', grunnlagsListe);
                 const rolleVisningsnavn = tilRolleVisningsnavn(gjelderGrunnlag?.type);
                 const type = innhentetTilVisningsnavn(grunnlag.type);
                 return `Innhentet ${type}(${rolleVisningsnavn})`;
@@ -242,7 +248,7 @@ function hentFørsteBasertPåReferanse(referanse: string, grunnlagsliste: Grunnl
     if (grunnlag.length == 0) {
         return null;
     }
-    return grunnlag[0];
+    return grunnlag[0] || null;
 }
 
 function filtrerBasertPåReferanse(referanse: string, grunnlagsliste: GrunnlagDto[]): GrunnlagDto[] {
@@ -261,10 +267,10 @@ export function stønadsendringPeriodeToTreeDto(
 ): TreePeriode {
     return {
         nodeId: nodeIdVedtakPeriode(periode, stønadsendring),
-        beløp: periode.beløp,
-        valutakode: periode.valutakode,
+        beløp: periode.beløp || null,
+        valutakode: periode.valutakode || null,
         resultatkode: periode.resultatkode,
-        delytelseId: periode.delytelseId,
+        delytelseId: periode.delytelseId || null,
     };
 }
 
@@ -273,18 +279,18 @@ export function engangsbeløpToTreeDto(engangsbeløp: EngangsbelopDto): TreeEnga
         nodeId: nodeIdEngangsbeløp(engangsbeløp),
         type: engangsbeløp.type,
         sak: engangsbeløp.sak,
-        beløp: engangsbeløp.beløp,
+        beløp: engangsbeløp.beløp || null,
         referanse: engangsbeløp.referanse,
-        valutakode: engangsbeløp.valutakode,
-        resultatKode: engangsbeløp.resultatkode,
-        beløpBetalt: engangsbeløp.betaltBeløp,
+        valutakode: engangsbeløp.valutakode || null,
+        resultatkode: engangsbeløp.resultatkode || null,
+        beløpBetalt: engangsbeløp.betaltBeløp || null,
         skyldner: engangsbeløp.skyldner,
         kravhaver: engangsbeløp.kravhaver,
         mottaker: engangsbeløp.mottaker,
         innkreving: engangsbeløp.innkreving,
         beslutning: engangsbeløp.beslutning,
-        omgjørVedtakId: engangsbeløp.omgjørVedtakId,
-        eksternReferanse: engangsbeløp.eksternReferanse,
+        omgjørVedtakId: engangsbeløp.omgjørVedtakId || null,
+        eksternReferanse: engangsbeløp.eksternReferanse || null,
     };
 }
 
@@ -296,11 +302,11 @@ export function stønadsendringToTreeDto(stonad: StonadsendringDto): TreeStønad
         skyldner: stonad.skyldner,
         kravhaver: stonad.kravhaver,
         mottaker: stonad.mottaker,
-        førsteIndeksreguleringsår: stonad.førsteIndeksreguleringsår,
+        førsteIndeksreguleringsår: stonad.førsteIndeksreguleringsår || null,
         innkreving: stonad.innkreving,
         beslutning: stonad.beslutning,
-        omgjørVedtakId: stonad.omgjørVedtakId,
-        eksternReferanse: stonad.eksternReferanse,
+        omgjørVedtakId: stonad.omgjørVedtakId || null,
+        eksternReferanse: stonad.eksternReferanse || null,
     };
 }
 
@@ -310,12 +316,12 @@ export function vedtakToTreeDto(vedtak: VedtakDto): TreeVedtak {
         kilde: vedtak.kilde,
         type: vedtak.type,
         opprettetAv: vedtak.opprettetAv,
-        opprettetAvNavn: vedtak.opprettetAvNavn,
+        opprettetAvNavn: vedtak.opprettetAvNavn || null,
         kildeapplikasjon: vedtak.kildeapplikasjon,
-        vedtakstidspunkt: vedtak.vedtakstidspunkt,
-        enhetsnummer: vedtak.enhetsnummer,
-        innkrevingUtsattTilDato: vedtak.innkrevingUtsattTilDato,
-        fastsattILand: vedtak.fastsattILand,
+        vedtakstidspunkt: vedtak.vedtakstidspunkt || '',
+        enhetsnummer: vedtak.enhetsnummer || null,
+        innkrevingUtsattTilDato: vedtak.innkrevingUtsattTilDato || undefined,
+        fastsattILand: vedtak.fastsattILand || null,
         opprettetTidspunkt: vedtak.opprettetTidspunkt,
     };
 }

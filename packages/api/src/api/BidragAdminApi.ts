@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -9,6 +10,7 @@
  * ---------------------------------------------------------------
  */
 
+/** @default null */
 export enum EndringsloggTilhorerSkjermbilde {
     BEHANDLING_BIDRAG = "BEHANDLING_BIDRAG",
     BEHANDLING_FORSKUDD = "BEHANDLING_FORSKUDD",
@@ -20,6 +22,7 @@ export enum EndringsloggTilhorerSkjermbilde {
     ALLE = "ALLE",
 }
 
+/** @default null */
 export enum Endringstype {
     NYHET = "NYHET",
     ENDRING = "ENDRING",
@@ -29,25 +32,26 @@ export enum Endringstype {
 export interface OppdaterEndringsloggEndring {
     /** @format int64 */
     id: number;
-    tittel?: string;
-    innhold?: string;
-    endringstype?: Endringstype;
+    tittel?: string | null;
+    innhold?: string | null;
+    endringstype?: Endringstype | null;
 }
 
 export interface OppdaterEndringsloggRequest {
-    tittel?: string;
-    tilhørerSkjermbilde?: EndringsloggTilhorerSkjermbilde;
-    sammendrag?: string;
-    innhold?: string;
-    erPåkrevd?: boolean;
+    tittel?: string | null;
+    tilhørerSkjermbilde?: EndringsloggTilhorerSkjermbilde | null;
+    sammendrag?: string | null;
+    innhold?: string | null;
+    erPåkrevd?: boolean | null;
     /** @format date */
-    aktivFraTidspunkt?: string;
+    aktivFraTidspunkt?: string | null;
     /** @format date */
-    aktivTilTidspunkt?: string;
-    endringer?: OppdaterEndringsloggEndring[];
-    endringstyper?: Endringstype[];
+    aktivTilTidspunkt?: string | null;
+    endringer?: any[] | null;
+    endringstyper?: any[] | null;
 }
 
+/** @default null */
 export enum AktivForMiljo {
     PROD = "PROD",
     DEV = "DEV",
@@ -58,35 +62,61 @@ export interface EndringsLoggDto {
     id: number;
     /**
      * Dato når endringsloggen ble publisert
-     * @format date
+     * @format date-time
+     * @default ""
      */
     dato: string;
-    /** @format date */
+    /** @format date-time */
+    opprettetTidspunkt: string;
     aktiv: boolean;
-    /** @format date */
+    /** @format date-time */
     aktivFra?: string;
-    /** @format date */
+    /** @format date-time */
     aktivTil?: string;
-    /** Hvilken system/skjermbilde endringsloggen gjelder for */
+    /**
+     * Hvilken system/skjermbilde endringsloggen gjelder for
+     * @default ""
+     */
     gjelder: EndringsloggTilhorerSkjermbilde;
     aktiveMiljøer: AktivForMiljo[];
-    /** Tittel på endringsloggen */
+    /**
+     * Tittel på endringsloggen
+     * @default ""
+     */
     tittel: string;
     endringstyper: Endringstype[];
-    /** Sammendrag av endringsloggen I HTML */
+    /**
+     * Sammendrag av endringsloggen I HTML
+     * @default ""
+     */
     sammendrag: string;
-    /** Om det er påkrevd å lese endringsloggen. Dette skal føre til at det vises en modal første gang bruker åpner bidrag løsningen */
+    /**
+     * Om det er påkrevd å lese endringsloggen. Dette skal føre til at det vises en modal første gang bruker åpner bidrag løsningen
+     * @default false
+     */
     erPåkrevd: boolean;
-    /** Om endringsloggen er lest av bruker. Dette vil være sann hvis bruker har lest alle endringene i endringsloggen */
+    /**
+     * Om endringsloggen er lest av bruker. Dette vil være sann hvis bruker har lest alle endringene i endringsloggen
+     * @default false
+     */
     erLestAvBruker: boolean;
-    /** Om endringsloggen er sett av bruker. Dette vil være sann hvis bruker har sett endringsloggen men ikke har sett alle endringene i endringsloggen */
+    /**
+     * Om endringsloggen er sett av bruker. Dette vil være sann hvis bruker har sett endringsloggen men ikke har sett alle endringene i endringsloggen
+     * @default false
+     */
     erSettAvBruker: boolean;
-    /** Liste over endringer i endringsloggen.  */
+    /**
+     * Liste over endringer i endringsloggen.
+     * @default ""
+     */
     endringer: EndringsLoggEndringDto[];
 }
 
 export interface EndringsLoggEndringDto {
-    /** Innhold i endringen I HTML */
+    /**
+     * Innhold i endringen I HTML
+     * @default ""
+     */
     innhold: string;
     tittel: string;
     endringstype: Endringstype;
@@ -96,11 +126,11 @@ export interface EndringsLoggEndringDto {
 }
 
 export interface OppdaterDriftsmeldingRequest {
-    tittel?: string;
+    tittel?: string | null;
     /** @format date-time */
-    aktivFraTidspunkt?: string;
+    aktivFraTidspunkt?: string | null;
     /** @format date-time */
-    aktivTilTidspunkt?: string;
+    aktivTilTidspunkt?: string | null;
 }
 
 export interface DriftsmeldingDto {
@@ -123,11 +153,11 @@ export interface DriftsmeldingHistorikkDto {
 }
 
 export interface OppdaterDriftsmeldingHistorikkRequest {
-    innhold?: string;
+    innhold?: string | null;
     /** @format date-time */
-    aktivFraTidspunkt?: string;
+    aktivFraTidspunkt?: string | null;
     /** @format date-time */
-    aktivTilTidspunkt?: string;
+    aktivTilTidspunkt?: string | null;
     status?: "KRITISK" | "VARSEL" | "INFO" | "AVSLUTTET";
 }
 
@@ -141,22 +171,28 @@ export interface OpprettEndringsloggRequest {
     tittel: string;
     tilhørerSkjermbilde: EndringsloggTilhorerSkjermbilde;
     sammendrag: string;
-    innhold?: string;
+    innhold?: string | null;
     erPåkrevd: boolean;
     /** @format date */
-    aktivFraTidspunkt?: string;
+    aktivFraTidspunkt?: string | null;
     /** @format date */
-    aktivTilTidspunkt?: string;
+    aktivTilTidspunkt?: string | null;
     endringstyper: Endringstype[];
-    endringer?: LeggTilEndringsloggEndring[];
+    endringer?: any[] | null;
+}
+
+export interface LestAvBrukerRequest {
+    /** @format int64 */
+    lesetidVarighetMs: number;
+    enhet?: string | null;
 }
 
 export interface OpprettDriftsmeldingRequest {
     tittel: string;
     /** @format date-time */
-    aktivFraTidspunkt?: string;
+    aktivFraTidspunkt?: string | null;
     /** @format date-time */
-    aktivTilTidspunkt?: string;
+    aktivTilTidspunkt?: string | null;
     innhold: string;
     status: "KRITISK" | "VARSEL" | "INFO" | "AVSLUTTET";
 }
@@ -164,13 +200,13 @@ export interface OpprettDriftsmeldingRequest {
 export interface LeggTilDriftsmeldingHistorikkRequest {
     innhold: string;
     /** @format date-time */
-    aktivFraTidspunkt?: string;
+    aktivFraTidspunkt?: string | null;
     /** @format date-time */
-    aktivTilTidspunkt?: string;
+    aktivTilTidspunkt?: string | null;
     status: "KRITISK" | "VARSEL" | "INFO" | "AVSLUTTET";
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
@@ -194,7 +230,7 @@ export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" 
 
 export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
     securityWorker?: (
-        securityData: SecurityDataType | null
+        securityData: SecurityDataType | null,
     ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
     secure?: boolean;
     format?: ResponseType;
@@ -214,7 +250,7 @@ export class HttpClient<SecurityDataType = unknown> {
     private secure?: boolean;
     private format?: ResponseType;
 
-    constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
+    constructor({securityWorker, secure, format, ...axiosConfig}: ApiConfig<SecurityDataType> = {}) {
         this.instance = axios.create({
             ...axiosConfig,
             baseURL: axiosConfig.baseURL || "https://bidrag-admin.intern.dev.nav.no",
@@ -229,14 +265,14 @@ export class HttpClient<SecurityDataType = unknown> {
     };
 
     public request = async <T = any, _E = any>({
-        secure,
-        path,
-        type,
-        query,
-        format,
-        body,
-        ...params
-    }: FullRequestParams): Promise<AxiosResponse<T>> => {
+                                                   secure,
+                                                   path,
+                                                   type,
+                                                   query,
+                                                   format,
+                                                   body,
+                                                   ...params
+                                               }: FullRequestParams): Promise<AxiosResponse<T>> => {
         const secureParams =
             ((typeof secure === "boolean" ? secure : this.secure) &&
                 this.securityWorker &&
@@ -257,7 +293,7 @@ export class HttpClient<SecurityDataType = unknown> {
             ...requestParams,
             headers: {
                 ...(requestParams.headers || {}),
-                ...(type ? { "Content-Type": type } : {}),
+                ...(type ? {"Content-Type": type} : {}),
             },
             params: query,
             responseType: responseFormat,
@@ -381,7 +417,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 skjermbilde?: EndringsloggTilhorerSkjermbilde;
                 bareAktive?: boolean;
             },
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<EndringsLoggDto[], any>({
                 path: `/endringslogg`,
@@ -419,11 +455,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request POST:/endringslogg/{endringsloggId}/lest
          * @secure
          */
-        oppdaterLestAvBrukerEndringslogg: (endringsloggId: number, params: RequestParams = {}) =>
+        oppdaterLestAvBrukerEndringslogg: (endringsloggId: number, data: LestAvBrukerRequest, params: RequestParams = {}) =>
             this.request<EndringsLoggDto, any>({
                 path: `/endringslogg/${endringsloggId}/lest`,
                 method: "POST",
+                body: data,
                 secure: true,
+                type: ContentType.Json,
                 ...params,
             }),
 
@@ -436,11 +474,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request POST:/endringslogg/{endringsloggId}/lest/{endringId}
          * @secure
          */
-        oppdaterLestAvBrukerEndring: (endringsloggId: number, endringId: number, params: RequestParams = {}) =>
+        oppdaterLestAvBrukerEndring: (
+            endringsloggId: number,
+            endringId: number,
+            data: LestAvBrukerRequest,
+            params: RequestParams = {},
+        ) =>
             this.request<EndringsLoggDto, any>({
                 path: `/endringslogg/${endringsloggId}/lest/${endringId}`,
                 method: "POST",
+                body: data,
                 secure: true,
+                type: ContentType.Json,
                 ...params,
             }),
 
@@ -541,11 +586,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request PUT:/driftsmelding/{driftsmeldingId}
          * @secure
          */
-        oppdaterDriftsmelding: (
-            driftsmeldingId: number,
-            data: OppdaterDriftsmeldingRequest,
-            params: RequestParams = {}
-        ) =>
+        oppdaterDriftsmelding: (driftsmeldingId: number, data: OppdaterDriftsmeldingRequest, params: RequestParams = {}) =>
             this.request<DriftsmeldingDto, any>({
                 path: `/driftsmelding/${driftsmeldingId}`,
                 method: "PUT",
@@ -568,7 +609,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             driftsmeldingId: number,
             driftsmeldingHistorikkId: number,
             data: OppdaterDriftsmeldingHistorikkRequest,
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<DriftsmeldingDto, any>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk/${driftsmeldingHistorikkId}`,
@@ -591,7 +632,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         slettDriftsmeldingHistorikk: (
             driftsmeldingId: number,
             driftsmeldingHistorikkId: number,
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<DriftsmeldingDto, any>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk/${driftsmeldingHistorikkId}`,
@@ -665,7 +706,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         opprettDriftsmeldingHistorikk: (
             driftsmeldingId: number,
             data: LeggTilDriftsmeldingHistorikkRequest,
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<DriftsmeldingDto, any>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk`,

@@ -64,11 +64,11 @@ const fallbackToEmptyString = <T extends string | EndringsloggTilhorerSkjermbild
 
 const createDefaultValues = (endringslogg?: EndringsLoggDto): EndringsloggFormValues => {
     const defaultValues: EndringsloggFormValues = {
-        id: !endringslogg?.id ? null : endringslogg.id,
+        id: !endringslogg?.id ? undefined : endringslogg.id,
         tittel: fallbackToEmptyString(endringslogg?.tittel),
         tilhørerSkjermbilde: fallbackToEmptyString(endringslogg?.gjelder),
         sammendrag: fallbackToEmptyString(endringslogg?.sammendrag),
-        erPåkrevd: endringslogg?.erPåkrevd,
+        erPåkrevd: !!endringslogg?.erPåkrevd,
         endring: {
             tittel: "",
             innhold: "",
@@ -78,8 +78,8 @@ const createDefaultValues = (endringslogg?: EndringsLoggDto): EndringsloggFormVa
             innhold: endring?.innhold,
             tittel: endring?.tittel,
             endringstype: endring?.endringstype,
-            id: endring?.id ? endring?.id : null,
-        })),
+            id: endring?.id ? endring?.id : undefined,
+        })) || [],
     };
 
     return defaultValues;
@@ -554,7 +554,7 @@ export default function EndringsloggForm({
                                             {Object.keys(EndringsloggTilhorerSkjermbildeToVisningsnavn).map(
                                                 (gjelder) => (
                                                     <option key={gjelder} value={gjelder}>
-                                                        {EndringsloggTilhorerSkjermbildeToVisningsnavn[gjelder]}
+                                                        {EndringsloggTilhorerSkjermbildeToVisningsnavn[gjelder as EndringsloggTilhorerSkjermbilde]}
                                                     </option>
                                                 )
                                             )}

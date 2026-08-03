@@ -1,7 +1,7 @@
 import {useSuspenseQuery} from "@tanstack/react-query";
 
 import {Inntektsrapportering} from "@bidrag/api/BidragBehandlingApiV1";
-import {BIDRAG_BEHANDLING_API} from "@bidrag/api";
+import {BEHANDLING_API_V1} from "@bidrag/api";
 
 export function lastVisningsnavn() {
     return useSuspenseQuery({
@@ -11,7 +11,7 @@ export function lastVisningsnavn() {
 }
 
 export async function lagreVisningsnavn() {
-    return BIDRAG_BEHANDLING_API.api.hentVisningsnavn().then((response) => {
+    return BEHANDLING_API_V1.api.hentVisningsnavn().then((response) => {
         console.log(response);
         window.localStorage.setItem("visningsnavn", JSON.stringify(response.data));
         return response.data;

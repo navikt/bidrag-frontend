@@ -16,7 +16,7 @@ export default [
         index("./routes/admin/index.tsx"),
         route("endringslogg", "./routes/admin/endringslogg/EndringsloggLayout.tsx", [
             index("./routes/admin/endringslogg/index.tsx"),
-            route("ny", "./routes/admin/endringslogg/NyEndringsloggPage.tsx"),
+            route("ny", "./routes/admin/endringslogg/EndringsloggCreatePage.tsx"),
             route(":id", "./routes/admin/endringslogg/EndringsloggEditPage.tsx"),
         ]),
         route("dokumentasjon", "./routes/admin/dokumentasjon/DokumentasjonPage.tsx"),

@@ -1,11 +1,12 @@
-import {GrunnlagDto, Grunnlagstype, VedtakDto} from "@bidrag/api/BidragBehandlingApiV1";
-import {MermaidResponse, MermaidSubgraph, TreeChild, TreeChildType} from "./types";
+import {MermaidResponse, MermaidSubgraph, TreeChild, TreeChildType} from "@bidrag/api";
 import {
     mapVedtakToTree,
     stønadsendringPeriodeToTreeDto,
     stønadsendringToTreeDto,
     vedtakToTreeDto,
 } from "./VedtakToGraphMapper";
+import {Grunnlagstype, VedtakDto} from "@bidrag/api/BidragVedtakApi";
+import {GrunnlagDto} from "@bidrag/api/BidragBehandlingApiV1";
 
 const grunnlagstyperNotIncludedInFlow = [
     Grunnlagstype.SJABLON,
@@ -133,7 +134,7 @@ function mapGrunnlagToMermaid(
     } else if (grunnlagstype == Grunnlagstype.SLUTTBEREGNING_FORSKUDD) {
         addToMap(
             mermaidSubgraphMap,
-            tilSubgraph(tree),
+            tilSubgraph(tree) || "",
             `${parent.id}["${parent.name}"] --> ${tree.id}{"${tree.name}"}`
         );
     } else if (
@@ -142,25 +143,25 @@ function mapGrunnlagToMermaid(
     ) {
         addToMap(
             mermaidSubgraphMap,
-            tilSubgraph(parent),
+            tilSubgraph(parent) || "",
             `${parent.id}["${parent.name}"] --> |"${tree.name}"| ${tree.id}[["${tree.name}"]]`
         );
     } else if (grunnlagstypeDelberegning.includes(grunnlagstype)) {
         addToMap(
             mermaidSubgraphMap,
-            tilSubgraph(parent),
+            tilSubgraph(parent) || "",
             `${parent.id}[["${parent.name}"]] --> ${tree.id}["${tree.name}"]`
         );
     } else if (parent.type == TreeChildType.FRITTSTÅENDE) {
         addToMap(
             mermaidSubgraphMap,
-            tilSubgraph(parent),
+            tilSubgraph(parent) || "",
             `${parent.id}[["${parent.name}"]] -.- ${tree.id}["${tree.name}"]`
         );
     } else {
         addToMap(
             mermaidSubgraphMap,
-            tilSubgraph(parent),
+            tilSubgraph(parent) || "",
             `${parent.id}["${parent.name}"] --> ${tree.id}["${tree.name}"]`
         );
     }
@@ -200,6 +201,6 @@ function tilSubgraph(tree: TreeChild) {
     }
 }
 
-function treeChildInnholdIsOfTypeGrunnlagDto(obj: TreeChild): obj is TreeChild<GrunnlagDto> {
-    return (obj as TreeChild).innhold !== undefined;
+function treeChildInnholdIsOfTypeGrunnlagDto<T>(obj: TreeChild<T>): obj is TreeChild<GrunnlagDto> {
+    return (obj as TreeChild<T>).innhold !== undefined;
 }

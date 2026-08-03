@@ -3,10 +3,11 @@ import "quill/dist/quill.core.css";
 import "./CustomQuillEditor.css";
 import "quill-paste-smart";
 
-import { ErrorMessage } from "@navikt/ds-react";
+import {ErrorMessage} from "@navikt/ds-react";
 import Quill from "quill";
 import QuillResize from "quill-resize-module";
-import { useEffect, useRef, useState } from "react";
+import {Ref, useEffect, useRef, useState} from "react";
+
 const Clipboard = Quill.import("modules/clipboard");
 
 //@ts-ignore
@@ -22,12 +23,13 @@ class CustomClipboard extends Clipboard {
         const html = this.quill.getSemanticHTML(range);
         const styledHtml = this.tilpassFormatteringForLegacyBidragMaler(html);
 
-        e.clipboardData.setData("text/plain", text);
-        e.clipboardData.setData("text/html", styledHtml);
+        e.clipboardData?.setData("text/plain", text);
+        e.clipboardData?.setData("text/html", styledHtml);
         // console.log(text);
         // console.log(styledHtml);
         e.preventDefault();
     }
+
     tilpassFormatteringForLegacyBidragMaler(html: string): string {
         // Create a container and fill it with the copied HTML.
         const container = document.createElement("div");
@@ -66,18 +68,20 @@ type EditorProps = {
     onTextChange: (html: string) => void;
     resize?: boolean;
     error?: string;
-    ref;
+    ref: Ref<HTMLDivElement>;
 };
-export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, resize, error }: EditorProps) => {
+export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, resize, error}: EditorProps) => {
     const containerRef = useRef(null);
-    const [quill, setQuill] = useState(null);
+    const [quill, setQuill] = useState<Quill | null>(null);
 
     useEffect(() => {
         const textChangeHandler = () => {
-            if (quill.getLength() <= 1) {
-                onTextChange("");
-            } else {
-                onTextChange(quill.getSemanticHTML().replaceAll("<p></p>", "<p><br/></p>"));
+            if (quill !== null) {
+                if (quill.getLength() <= 1) {
+                    onTextChange("");
+                } else {
+                    onTextChange(quill.getSemanticHTML().replaceAll("<p></p>", "<p><br/></p>"));
+                }
             }
         };
 
@@ -102,8 +106,8 @@ export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, r
 
                 toolbar: {
                     container: [
-                        [{ color: [] }, { background: [] }],
-                        ["bold", "italic", "underline", "image", "link", { header: 3 }],
+                        [{color: []}, {background: []}],
+                        ["bold", "italic", "underline", "image", "link", {header: 3}],
                         // [{ 'color': "red" }, { 'background': "yellow" }]
                     ],
                 },
@@ -130,7 +134,7 @@ export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, r
             const currentHTML = quill.getSemanticHTML().replaceAll("<p></p>", "<p><br/></p>");
 
             if (defaultValue !== currentHTML) {
-                const updatedDelta = quill.clipboard.convert({ html: defaultValue });
+                const updatedDelta = quill.clipboard.convert({html: defaultValue});
                 quill.setContents(updatedDelta, "silent");
             }
         }

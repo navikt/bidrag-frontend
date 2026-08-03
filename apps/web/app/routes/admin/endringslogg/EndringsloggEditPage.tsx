@@ -37,7 +37,7 @@ export default function EndringsloggEditPage({params}: Route.ComponentProps) {
                 onSuccess: (response) => {
                     queryClient.setQueryData<EndringsLoggDto[]>(
                         ["endringslogger"],
-                        (currentData: EndringsLoggDto[]) => {
+                        (currentData: NoInfer<EndringsLoggDto[]> | undefined) => {
                             return currentData?.map((endring) => {
                                 if (endring.id === response.id) {
                                     return response;
