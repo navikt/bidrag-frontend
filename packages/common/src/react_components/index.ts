@@ -13,6 +13,6 @@ export {default as PersonSokButton} from "./person/PersonSokButton";
 export {default as RolleCard} from "./roller/RolleCard";
 export {default as RolleDetaljer} from "./roller/RolleDetaljer";
 export {default as RolleTag} from "./roller/RolleTag";
-// export { default as SamhandlerSokButton } from "./samhandler/SamhandlerSokButton";
-// export { default as SamhandlerSokPopup } from "./samhandler/SamhandlerSokPopup";
+export {default as SamhandlerSokButton} from "./samhandler/SamhandlerSokButton";
+export {default as SamhandlerSokPopup} from "./samhandler/SamhandlerSokPopup";
 export {default as SaveStatusIndicator} from "./SaveStatusIndicator";

@@ -24,6 +24,7 @@
         "@react-router/serve": "catalog:",
         "@tailwindcss/vite": "catalog:",
         "@tanstack/react-query": "catalog:",
+        "@hookform/resolvers": "^5.2.2",
         "axios": "^1.18.0",
         "date-fns": "^4.4.0",
         "isbot": "^5.1.42",
@@ -31,10 +32,12 @@
         "pino-socket": "^8.0.0",
         "react": "catalog:",
         "react-dom": "catalog:",
+        "react-hook-form": "^7.71.1",
         "react-router": "catalog:",
         "source-map": "^0.7.6",
         "tailwindcss": "catalog:",
-        "sqids": "^0.3.0"
+        "sqids": "^0.3.0",
+        "zod": "^4.1.11"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",
