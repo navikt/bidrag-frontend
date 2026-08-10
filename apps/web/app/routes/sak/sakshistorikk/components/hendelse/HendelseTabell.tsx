@@ -1,5 +1,5 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
-import { formaterDato } from "@bidrag/utils";
+import {formaterDato, sortByDateAsc} from "@bidrag/utils";
 import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { type ChangeEvent, useState } from "react";
@@ -22,7 +22,7 @@ export default function HendelseTabell({
 }) {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const { sort, handleSort, sortData } = useSort<SakshendelseDto>();
+    const { sort, handleSort, sortData } = useSort<SakshendelseDto>({defaultUnsorted: (a, b) => sortByDateAsc(b.opprettetTidspunkt, a.opprettetTidspunkt)});
     const [searchParams] = useSearchParams();
     const enhet = searchParams.get("enhet");
     const sessionState = searchParams.get("sessionState");
