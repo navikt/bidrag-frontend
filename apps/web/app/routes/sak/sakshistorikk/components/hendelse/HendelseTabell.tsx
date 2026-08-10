@@ -1,32 +1,34 @@
-import type { SakshendelseDto } from "@bidrag/api/SakApi";
+import type {SakshendelseDto} from "@bidrag/api/SakApi";
 import {formaterDato, sortByDateAsc} from "@bidrag/utils";
-import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-react";
-import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
-import { type ChangeEvent, useState } from "react";
-import { useSearchParams } from "react-router";
-import { useHarSkrivetilgang } from "~/api/useApi.ts";
-import { useSort } from "../useSort";
-import { BehandleLink } from "./BehandleLink";
-import { BrevLink } from "./BrevLink";
-import { NotatLink } from "./NotatLink";
-import { ResultatLink } from "./ResultatLink";
-
-const scaledPx = (value: number) => `${value}px`;
+import {Heading, HStack, Label, Pagination, Select, VStack} from "@navikt/ds-react";
+import {DataGrid} from "@navikt/ds-react/PREVIEW/DataGrid";
+import {type ChangeEvent, useState} from "react";
+import {useSearchParams} from "react-router";
+import {useHarSkrivetilgang} from "~/api/useApi.ts";
+import {useSort} from "../useSort";
+import {BehandleLink} from "./BehandleLink";
+import {BrevLink} from "./BrevLink";
+import {NotatLink} from "./NotatLink";
+import {ResultatLink} from "./ResultatLink";
 
 export default function HendelseTabell({
-    saksnummer,
-    hendelser,
-}: {
+                                           saksnummer,
+                                           hendelser,
+                                       }: {
     saksnummer: string;
     hendelser: SakshendelseDto[];
 }) {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const { sort, handleSort, sortData } = useSort<SakshendelseDto>({defaultUnsorted: (a, b) => sortByDateAsc(b.opprettetTidspunkt, a.opprettetTidspunkt)});
+    const {
+        sort,
+        handleSort,
+        sortData
+    } = useSort<SakshendelseDto>({defaultUnsorted: (a, b) => sortByDateAsc(b.opprettetTidspunkt, a.opprettetTidspunkt)});
     const [searchParams] = useSearchParams();
     const enhet = searchParams.get("enhet");
     const sessionState = searchParams.get("sessionState");
-    const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);
+    const {data: kanSkrive = false} = useHarSkrivetilgang(saksnummer, enhet);
 
     const onRowsPerPageChange = (e: ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(e.target.value));
@@ -35,11 +37,11 @@ export default function HendelseTabell({
 
     const sortOrder: DataGrid.Table.SortEntry[] = sort
         ? [
-              {
-                  columnId: sort.orderBy,
-                  direction: sort.direction === "ascending" ? ("asc" as const) : ("desc" as const),
-              },
-          ]
+            {
+                columnId: sort.orderBy,
+                direction: sort.direction === "ascending" ? ("asc" as const) : ("desc" as const),
+            },
+        ]
         : [];
 
     const sortedData = sortData(hendelser).slice((page - 1) * rowsPerPage, page * rowsPerPage);
@@ -60,77 +62,62 @@ export default function HendelseTabell({
                     {
                         id: "behandle",
                         header: "Behandle",
-                        width: { defaultValue: scaledPx(100) },
                         bodyCell: (h) => (
-                            <BehandleLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                                kanSkrive={kanSkrive}
-                            />
-                        ),
-                    },
-                    {
-                        id: "brev",
-                        header: "Brev",
-                        width: { defaultValue: scaledPx(75) },
-                        bodyCell: (h) => (
-                            <BrevLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                                kanSkrive={kanSkrive}
-                            />
-                        ),
-                    },
-                    {
-                        id: "notat",
-                        header: "Notat",
-                        width: { defaultValue: scaledPx(75) },
-                        bodyCell: (h) => (
-                            <NotatLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                                kanSkrive={kanSkrive}
-                            />
+                            <HStack gap={"space-8"} justify={"center"}>
+                                <div style={{minWidth: "8ch"}}>
+                                    <BehandleLink
+                                        saksnummer={saksnummer}
+                                        hendelse={h}
+                                        enhet={enhet}
+                                        sessionState={sessionState}
+                                        kanSkrive={kanSkrive}
+                                    />
+                                </div>
+                                <BrevLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                    kanSkrive={kanSkrive}
+                                />
+                                <NotatLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                    kanSkrive={kanSkrive}
+                                />
+                            </HStack>
+
                         ),
                     },
                     {
                         id: "opprettetTidspunkt",
                         header: "Dato",
                         isSortable: true,
-                        width: { defaultValue: scaledPx(110) },
                         bodyCell: (h) => formaterDato(h.opprettetTidspunkt),
                     },
                     {
                         id: "søknadsgruppeBeskrivelse",
                         header: "Søknadsgrupper",
                         isSortable: true,
-                        width: { defaultValue: scaledPx(249) },
                         bodyCell: (h) => h.søknadsgruppeBeskrivelse,
                     },
                     {
                         id: "typeBeskrivelse",
                         header: "Hendelse",
                         isSortable: true,
-                        width: { defaultValue: scaledPx(249) },
                         bodyCell: (h) => h.typeBeskrivelse,
                     },
                     {
                         id: "enhet",
                         header: "Enhet",
                         isSortable: true,
-                        width: { defaultValue: scaledPx(75) },
                         bodyCell: (h) => h.enhet,
                     },
                     {
                         id: "resultat",
                         header: "Resultat",
-                        width: { defaultValue: scaledPx(350) },
                         bodyCell: (h) => (
                             <ResultatLink
                                 saksnummer={saksnummer}
@@ -143,7 +130,7 @@ export default function HendelseTabell({
                 ]}
             >
                 <DataGrid.Table
-                    layout="fixed"
+                    layout="auto"
                     sorting={{
                         sortOrder: sortOrder,
                         onSortOrderChange: (_, detail) => {
@@ -154,7 +141,7 @@ export default function HendelseTabell({
                 />
             </DataGrid>
             <HStack align={"center"}>
-                <HStack flexGrow="1" flexBasis="0" />
+                <HStack flexGrow="1" flexBasis="0"/>
                 <HStack flexGrow="1" flexBasis="0" justify="center">
                     {hendelser.length > rowsPerPage && (
                         <Pagination
