@@ -59,33 +59,41 @@ export default function HendelseTabell({
                 columns={[
                     {
                         id: "behandle",
-                        header: "Behandle",
+                        header: "",
                         bodyCell: (h) => (
-                            <HStack gap={"space-8"} justify={"center"}>
-                                <div style={{ minWidth: "8ch" }}>
-                                    <BehandleLink
-                                        saksnummer={saksnummer}
-                                        hendelse={h}
-                                        enhet={enhet}
-                                        sessionState={sessionState}
-                                        kanSkrive={kanSkrive}
-                                    />
-                                </div>
-                                <BrevLink
-                                    saksnummer={saksnummer}
-                                    hendelse={h}
-                                    enhet={enhet}
-                                    sessionState={sessionState}
-                                    kanSkrive={kanSkrive}
-                                />
-                                <NotatLink
-                                    saksnummer={saksnummer}
-                                    hendelse={h}
-                                    enhet={enhet}
-                                    sessionState={sessionState}
-                                    kanSkrive={kanSkrive}
-                                />
-                            </HStack>
+                            <BehandleLink
+                                saksnummer={saksnummer}
+                                hendelse={h}
+                                enhet={enhet}
+                                sessionState={sessionState}
+                                kanSkrive={kanSkrive}
+                            />
+                        ),
+                    },
+                    {
+                        id: "forsendelelse",
+                        header: "",
+                        bodyCell: (h) => (
+                            <BrevLink
+                                saksnummer={saksnummer}
+                                hendelse={h}
+                                enhet={enhet}
+                                sessionState={sessionState}
+                                kanSkrive={kanSkrive}
+                            />
+                        ),
+                    },
+                    {
+                        id: "notat",
+                        header: "",
+                        bodyCell: (h) => (
+                            <NotatLink
+                                saksnummer={saksnummer}
+                                hendelse={h}
+                                enhet={enhet}
+                                sessionState={sessionState}
+                                kanSkrive={kanSkrive}
+                            />
                         ),
                     },
                     {
