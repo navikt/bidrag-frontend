@@ -1,34 +1,32 @@
-import type {SakshendelseDto} from "@bidrag/api/SakApi";
-import {formaterDato, sortByDateAsc} from "@bidrag/utils";
-import {Heading, HStack, Label, Pagination, Select, VStack} from "@navikt/ds-react";
-import {DataGrid} from "@navikt/ds-react/PREVIEW/DataGrid";
-import {type ChangeEvent, useState} from "react";
-import {useSearchParams} from "react-router";
-import {useHarSkrivetilgang} from "~/api/useApi.ts";
-import {useSort} from "../useSort";
-import {BehandleLink} from "./BehandleLink";
-import {BrevLink} from "./BrevLink";
-import {NotatLink} from "./NotatLink";
-import {ResultatLink} from "./ResultatLink";
+import type { SakshendelseDto } from "@bidrag/api/SakApi";
+import { formaterDato, sortByDateAsc } from "@bidrag/utils";
+import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-react";
+import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
+import { type ChangeEvent, useState } from "react";
+import { useSearchParams } from "react-router";
+import { useHarSkrivetilgang } from "~/api/useApi.ts";
+import { useSort } from "../useSort";
+import { BehandleLink } from "./BehandleLink";
+import { BrevLink } from "./BrevLink";
+import { NotatLink } from "./NotatLink";
+import { ResultatLink } from "./ResultatLink";
 
 export default function HendelseTabell({
-                                           saksnummer,
-                                           hendelser,
-                                       }: {
+    saksnummer,
+    hendelser,
+}: {
     saksnummer: string;
     hendelser: SakshendelseDto[];
 }) {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const {
-        sort,
-        handleSort,
-        sortData
-    } = useSort<SakshendelseDto>({defaultUnsorted: (a, b) => sortByDateAsc(b.opprettetTidspunkt, a.opprettetTidspunkt)});
+    const { sort, handleSort, sortData } = useSort<SakshendelseDto>({
+        defaultUnsorted: (a, b) => sortByDateAsc(b.opprettetTidspunkt, a.opprettetTidspunkt),
+    });
     const [searchParams] = useSearchParams();
     const enhet = searchParams.get("enhet");
     const sessionState = searchParams.get("sessionState");
-    const {data: kanSkrive = false} = useHarSkrivetilgang(saksnummer, enhet);
+    const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);
 
     const onRowsPerPageChange = (e: ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(e.target.value));
@@ -37,11 +35,11 @@ export default function HendelseTabell({
 
     const sortOrder: DataGrid.Table.SortEntry[] = sort
         ? [
-            {
-                columnId: sort.orderBy,
-                direction: sort.direction === "ascending" ? ("asc" as const) : ("desc" as const),
-            },
-        ]
+              {
+                  columnId: sort.orderBy,
+                  direction: sort.direction === "ascending" ? ("asc" as const) : ("desc" as const),
+              },
+          ]
         : [];
 
     const sortedData = sortData(hendelser).slice((page - 1) * rowsPerPage, page * rowsPerPage);
@@ -64,7 +62,7 @@ export default function HendelseTabell({
                         header: "Behandle",
                         bodyCell: (h) => (
                             <HStack gap={"space-8"} justify={"center"}>
-                                <div style={{minWidth: "8ch"}}>
+                                <div style={{ minWidth: "8ch" }}>
                                     <BehandleLink
                                         saksnummer={saksnummer}
                                         hendelse={h}
@@ -88,7 +86,6 @@ export default function HendelseTabell({
                                     kanSkrive={kanSkrive}
                                 />
                             </HStack>
-
                         ),
                     },
                     {
@@ -141,7 +138,7 @@ export default function HendelseTabell({
                 />
             </DataGrid>
             <HStack align={"center"}>
-                <HStack flexGrow="1" flexBasis="0"/>
+                <HStack flexGrow="1" flexBasis="0" />
                 <HStack flexGrow="1" flexBasis="0" justify="center">
                     {hendelser.length > rowsPerPage && (
                         <Pagination
