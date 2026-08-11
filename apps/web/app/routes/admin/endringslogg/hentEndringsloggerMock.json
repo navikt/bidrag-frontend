@@ -9,9 +9,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Skattesats i barnetillegg",
-        "endringstyper": [
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING"],
         "sammendrag": "Skattesatsen i partenes barnetillegg må legges inn manuelt.",
         "erPåkrevd": true,
         "erLestAvBruker": true,
@@ -36,9 +34,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Beløpstype i tilleggsstønad og barnetillegg",
-        "endringstyper": [
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING"],
         "sammendrag": "Det er nå lagt til støtte for å legge til månedsbeløp i tilleggsstønad i underholdskostnadsbildet.\n\n\nDet er også lagt inn støtte for å legge inn dagsats i barnetilleggstabellen.",
         "erPåkrevd": true,
         "erLestAvBruker": true,
@@ -63,9 +59,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Ny løsning for behandling av søknad for flere barn",
-        "endringstyper": [
-            "NYHET"
-        ],
+        "endringstyper": ["NYHET"],
         "sammendrag": "Det er nå lansert ny løsning for behandling av søknad for flere barn. Se vedlagt introduksjonsvideo for mer informasjon.",
         "erPåkrevd": true,
         "erLestAvBruker": true,
@@ -90,10 +84,7 @@
         "gjelder": "BEHANDLING_ALLE",
         "aktiveMiljøer": [],
         "tittel": "Ny funksjonalitet",
-        "endringstyper": [
-            "ENDRING",
-            "FEILFIKS"
-        ],
+        "endringstyper": ["ENDRING", "FEILFIKS"],
         "sammendrag": "Tekst om ny funksjonalitet",
         "erPåkrevd": true,
         "erLestAvBruker": false,
@@ -125,9 +116,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Spinner på dokument",
-        "endringstyper": [
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING"],
         "sammendrag": "Ny spinner på bindersknappen i Bisys",
         "erPåkrevd": true,
         "erLestAvBruker": true,
@@ -152,9 +141,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Endring under Årsak i bilde Virkningstidspunkt",
-        "endringstyper": [
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING"],
         "sammendrag": "Det er lagt inn flere valg under Årsak i bilde Virkningstidspunkt.",
         "erPåkrevd": true,
         "erLestAvBruker": true,
@@ -179,10 +166,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Ny klageløsning test 2",
-        "endringstyper": [
-            "ENDRING",
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING", "ENDRING"],
         "sammendrag": "Dette er test",
         "erPåkrevd": true,
         "erLestAvBruker": false,
@@ -248,9 +232,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Ny klageløsning",
-        "endringstyper": [
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING"],
         "sammendrag": "Det er nå lansert ny klageløsning for alle saksbehandlere",
         "erPåkrevd": true,
         "erLestAvBruker": false,
@@ -275,9 +257,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Ny klageløsning",
-        "endringstyper": [
-            "NYHET"
-        ],
+        "endringstyper": ["NYHET"],
         "sammendrag": "Ny løsning for klagesaksbehandling er nå lansert. Test",
         "erPåkrevd": true,
         "erLestAvBruker": false,
@@ -302,9 +282,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Test av endringslogg",
-        "endringstyper": [
-            "NYHET"
-        ],
+        "endringstyper": ["NYHET"],
         "sammendrag": "Det er nå lansert en ny funksjon for klage",
         "erPåkrevd": true,
         "erLestAvBruker": false,
@@ -329,10 +307,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Forside etter orkestrert klagevedtak",
-        "endringstyper": [
-            "ENDRING",
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING", "ENDRING"],
         "sammendrag": "Test orkestrert vedtak",
         "erPåkrevd": true,
         "erLestAvBruker": false,
@@ -364,10 +339,7 @@
         "gjelder": "ALLE",
         "aktiveMiljøer": [],
         "tittel": "Ny funksjon",
-        "endringstyper": [
-            "ENDRING",
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING", "ENDRING"],
         "sammendrag": "info om ny funksjon",
         "erPåkrevd": true,
         "erLestAvBruker": false,
@@ -399,10 +371,7 @@
         "gjelder": "BEHANDLING_FORSKUDD",
         "aktiveMiljøer": [],
         "tittel": "test",
-        "endringstyper": [
-            "ENDRING",
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING", "ENDRING"],
         "sammendrag": "test",
         "erPåkrevd": false,
         "erLestAvBruker": false,
@@ -434,9 +403,7 @@
         "gjelder": "INNSYN_DOKUMENT",
         "aktiveMiljøer": [],
         "tittel": "Test",
-        "endringstyper": [
-            "ENDRING"
-        ],
+        "endringstyper": ["ENDRING"],
         "sammendrag": "Test av sammendrag",
         "erPåkrevd": true,
         "erLestAvBruker": false,

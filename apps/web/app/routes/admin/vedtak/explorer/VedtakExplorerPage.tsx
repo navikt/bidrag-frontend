@@ -136,7 +136,6 @@ interface VedtakDetaljer {
 
 function _VedtakMermaidFlowChart({ behandlingId, vedtakId }: VedtakExplorerGraphProps) {
     const {
-        // biome-ignore lint/suspicious/noExplicitAny: TT
         data: { mermaidResponse, vedtak },
     } = useSuspenseQuery({
         queryKey: ["mermaid", behandlingId, vedtakId],
@@ -241,7 +240,6 @@ function _VedtakMermaidFlowChart({ behandlingId, vedtakId }: VedtakExplorerGraph
 
 function VedtakTreeGraph({ behandlingId, vedtakId }: VedtakExplorerGraphProps) {
     const {
-        // biome-ignore lint/suspicious/noExplicitAny: TT
         data: { tree, vedtak },
     } = useSuspenseQuery({
         queryKey: ["graph", behandlingId, vedtakId],

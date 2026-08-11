@@ -1,1 +1,1 @@
-declare module 'quill-resize-module';
+declare module "quill-resize-module";

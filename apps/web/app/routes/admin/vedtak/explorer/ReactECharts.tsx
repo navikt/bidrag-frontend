@@ -1,6 +1,6 @@
-import type {LineSeriesOption, TreemapSeriesOption, TreeSeriesOption} from "echarts/charts";
-import {LineChart, TreeChart} from "echarts/charts";
-import type {GridComponentOption, TitleComponentOption, TooltipComponentOption} from "echarts/components";
+import type { LineSeriesOption, TreemapSeriesOption, TreeSeriesOption } from "echarts/charts";
+import { LineChart, TreeChart } from "echarts/charts";
+import type { GridComponentOption, TitleComponentOption, TooltipComponentOption } from "echarts/components";
 import {
     DataZoomComponent,
     DataZoomInsideComponent,
@@ -11,12 +11,12 @@ import {
     ToolboxComponent,
     TooltipComponent,
 } from "echarts/components";
-import type {ComposeOption, ECharts, SetOptionOpts} from "echarts/core";
-import {getInstanceByDom, init, use} from "echarts/core";
-import {CanvasRenderer} from "echarts/renderers";
-import type {InsideDataZoomOption, SliderDataZoomOption} from "echarts/types/dist/shared";
+import type { ComposeOption, ECharts, SetOptionOpts } from "echarts/core";
+import { getInstanceByDom, init, use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import type { InsideDataZoomOption, SliderDataZoomOption } from "echarts/types/dist/shared";
 import type React from "react";
-import {type CSSProperties, useEffect, useRef, useState} from "react"
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 
 use([
     LegendComponent,
@@ -51,7 +51,7 @@ export interface ReactEChartsProps {
 
 let currentIndex = -1;
 
-export function ReactECharts({option, style, settings}: ReactEChartsProps): React.ReactElement {
+export function ReactECharts({ option, style, settings }: ReactEChartsProps): React.ReactElement {
     const chartRef = useRef<HTMLDivElement>(null);
     const [chartInitialized, setChartInitialized] = useState(false);
 
@@ -96,11 +96,12 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
         const canvas = chartRef.current?.querySelector("canvas");
         const chart = chartRef.current ? getInstanceByDom(chartRef.current) : undefined;
         const seriesData = option.series;
-        const dataLen = Array.isArray(seriesData) && seriesData[0] && 'data' in seriesData[0]
-            ? (seriesData[0].data as unknown[])?.length ?? 0
-            : 0;
+        const dataLen =
+            Array.isArray(seriesData) && seriesData[0] && "data" in seriesData[0]
+                ? ((seriesData[0].data as unknown[])?.length ?? 0)
+                : 0;
         const hideTooltip = () => {
-            chart?.dispatchAction({type: "hideTip"});
+            chart?.dispatchAction({ type: "hideTip" });
             if (currentIndex >= 0) {
                 chart?.dispatchAction({
                     type: "downplay",
@@ -126,8 +127,8 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
                     e.key === "ArrowRight"
                         ? (currentIndex + 1) % dataLen
                         : currentIndex <= 0
-                            ? dataLen - 1
-                            : currentIndex - 1;
+                          ? dataLen - 1
+                          : currentIndex - 1;
                 chart?.dispatchAction({
                     type: "highlight",
                     seriesIndex: 0,
@@ -179,5 +180,5 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
         }
     }, [option, settings]);
 
-    return <div ref={chartRef} style={{width: "100%", height: "250px", ...style}}/>;
+    return <div ref={chartRef} style={{ width: "100%", height: "250px", ...style }} />;
 }

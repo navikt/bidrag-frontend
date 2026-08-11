@@ -114,7 +114,7 @@ function treeToMermaid(mermaidSubgraphMap: Map<string, string[]>, tree: TreeChil
             );
         }
     }
-    // biome-ignore lint/suspicious/useIterableCallbackReturn: <explanation>
+    // biome-ignore lint/suspicious/useIterableCallbackReturn: children is typed as object but contains runtime properties
     tree.children.forEach((child) => treeToMermaid(mermaidSubgraphMap, child, tree));
 }
 
