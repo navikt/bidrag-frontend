@@ -26,7 +26,7 @@ export interface TreeChild {
     id: string;
     type: TreeChildType;
     children: TreeChild[];
-    parent: TreeChild;
+    parent: TreeChild | null;
     innhold?: POJONode;
     /** Grunnlag */
     grunnlag?: GrunnlagDto;
@@ -63,10 +63,12 @@ export interface TreeEngangsbeløp {
     nodeId: string;
     type: string;
     sak: string;
-    resultatkode: string;
+    referanse?: string | null;
+    valutakode?: string | null;
+    resultatkode: string | null;
     skyldner: string;
-    beløp: number;
-    beløpBetalt: number;
+    beløp: number | null;
+    beløpBetalt: number | null;
     kravhaver: string;
     mottaker: string;
     innkreving: string;

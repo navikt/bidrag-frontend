@@ -18,7 +18,7 @@ import {useSearchParams} from "react-router";
 
 mermaid.initialize({
     startOnLoad: true,
-    flowchart: {useMaxWidth: true, useWidth: true, htmlLabels: true, curve: "basis"},
+    flowchart: {useMaxWidth: true, htmlLabels: true, curve: "basis"},
     securityLevel: "loose",
     look: "handDrawn",
     theme: "base",
@@ -40,10 +40,9 @@ export default () => {
 
 const existingSearchParams = () => paramsToObject(new URLSearchParams(window.location.search));
 
-function paramsToObject(entries) {
-    const result = {};
+function paramsToObject(entries: URLSearchParams): Record<string, string> {
+    const result: Record<string, string> = {};
     for (const [key, value] of entries) {
-        // each 'entry' is a [key, value] tupple
         result[key] = value;
     }
     return result;
@@ -51,9 +50,9 @@ function paramsToObject(entries) {
 
 function VedtakExplorer() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [id, setId] = useState<string | undefined>(searchParams.get("id"));
+    const [id, setId] = useState<string | undefined>(searchParams.get("id") ?? undefined);
     const [isBehandlingId, setIsBehandlingId] = useState<boolean>(
-        searchParams.get("erBehandlingId") == "true" ? true : false
+        searchParams.get("erBehandlingId") === "true" ? true : false
     );
 
     const onSearch = (id: string) => {
@@ -62,7 +61,7 @@ function VedtakExplorer() {
     };
 
     return (
-        <div className="p-2">
+        <div className="p-2" style={{width: "98vw", marginLeft: "calc(50% - 49vw)"}}>
             <Heading size="medium">Vedtak explorer</Heading>
             <div className="max-w-96 flex flex-col gap-0.5">
                 <Search
@@ -85,7 +84,7 @@ function VedtakExplorer() {
                     Er behandlingsid
                 </Switch>
             </div>
-            <div className="border-2 border-solid">
+            <div className="border-2 border-solid w-full">
                 <VisualiserVedtakGraph
                     behandlingId={isBehandlingId ? id : undefined}
                     vedtakId={isBehandlingId ? undefined : id}
@@ -100,7 +99,7 @@ function VisualiserVedtakGraph({behandlingId, vedtakId}: VedtakExplorerGraphProp
         return (
             <div>
                 Søk etter vedtaksid som du vil visualisere
-                <img src={missingImg}></img>
+                <img src={missingImg} alt={""}></img>
             </div>
         );
     }
@@ -112,7 +111,7 @@ function VisualiserVedtakGraph({behandlingId, vedtakId}: VedtakExplorerGraphProp
                         <Alert size="small" variant="error">
                             Kunne ikke hente {behandlingId ? "behandling" : "vedtak"} med
                             id {behandlingId ?? vedtakId}:{" "}
-                            {props.error.message}
+                            {(props.error as Error)?.message ?? String(props.error)}
                         </Alert>
                     );
                 }}
@@ -147,8 +146,8 @@ function VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphPro
         queryKey: ["mermaid", behandlingId, vedtakId],
         queryFn: async () => {
             const vedtakDto = await hentVedtakDto(behandlingId, vedtakId);
-            const mermaidResponse = vedtakToMermaidResponse(vedtakDto.data);
-            return {mermaidResponse: mermaidResponse, vedtak: vedtakDto.data};
+            const mermaidResponse = vedtakToMermaidResponse(vedtakDto.data as VedtakDto);
+            return {mermaidResponse: mermaidResponse, vedtak: vedtakDto.data as VedtakDto};
         },
     });
 
@@ -159,49 +158,52 @@ function VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphPro
         // @ts-ignore
         window.callback = (id) => {
             console.log("CALLBACK", id);
-            setShowDetails(getDetailsById(id));
+            setShowDetails(getDetailsById(id) ?? null);
         };
     }, []);
 
-    function getDetailsById(id: string): VedtakDetaljer {
-        const grunnlag = mermaidResponse.grunnlagListe.find((d) => d.referanse == id);
+    function getDetailsById(id: string): VedtakDetaljer | undefined {
+        const grunnlag = mermaidResponse.grunnlagListe.find((d) => d.referanse === id);
         if (grunnlag)
             return {
                 tittel: grunnlag.referanse,
-                innhold: grunnlag.innhold,
+                innhold: grunnlag.innhold as object,
                 gjelderReferanse: grunnlag.gjelderReferanse,
                 gjelderBarnReferanse: grunnlag.gjelderBarnReferanse,
                 type: grunnlag.type,
             };
-        if (mermaidResponse.vedtak.nodeId == id)
+        if (mermaidResponse.vedtak.nodeId === id)
             return {
                 tittel: mermaidResponse.vedtak.nodeId,
                 innhold: mermaidResponse.vedtak,
             };
-        const stønadsendring = mermaidResponse.stønadsendringer.find((d) => d.nodeId == id);
+        const stønadsendring = mermaidResponse.stønadsendringer.find((d) => d.nodeId === id);
         if (stønadsendring)
             return {
                 tittel: stønadsendring.nodeId,
                 innhold: stønadsendring,
             };
 
-        const periode = mermaidResponse.perioder.find((d) => d.nodeId == id);
+        const periode = mermaidResponse.perioder.find((d) => d.nodeId === id);
         if (periode)
             return {
                 tittel: periode.nodeId,
                 innhold: periode,
             };
+        return undefined;
     }
 
     useEffect(() => {
         if (isRendering.current) return;
         isRendering.current = true;
         mermaid
-            .render("mermaidSvg", mermaidResponse.mermaidGraph, divRef.current)
+            .render("mermaidSvg", mermaidResponse.mermaidGraph, divRef.current ?? undefined)
             .then(async (res) => {
+                if (!divRef.current) return;
                 divRef.current.innerHTML = res.svg;
                 if (res.bindFunctions) {
-                    res.bindFunctions(divRef.current.firstElementChild);
+                    const firstEl = divRef.current.firstElementChild;
+                    if (firstEl) res.bindFunctions(firstEl);
                 }
                 const {default: svgPanZoom} = await import("svg-pan-zoom");
                 svgPanZoom("#mermaidSvg");
@@ -249,13 +251,13 @@ function VedtakTreeGraph({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
         queryKey: ["graph", behandlingId, vedtakId],
         queryFn: async () => {
             const vedtakDto = await hentVedtakDto(behandlingId, vedtakId);
-            return {tree: mapVedtakToTree(vedtakDto.data), vedtak: vedtakDto.data};
+            return {tree: mapVedtakToTree(vedtakDto.data as VedtakDto), vedtak: vedtakDto.data as VedtakDto};
         },
     });
     return (
         <>
             <ShowVedtakButton vedtak={vedtak}/>
-            <ReactECharts option={toEchart(tree)} style={{height: "calc(100% - 200px)", margin: "auto"}}/>
+            <ReactECharts option={toEchart(tree)} style={{height: "calc(100vh - 200px)", minHeight: "500px", margin: "auto"}}/>
         </>
     );
 }
@@ -354,7 +356,8 @@ function toEchart(tree: TreeChild): EChartsOption {
     };
 }
 
-function toEchartData(tree: TreeChild) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toEchartData(tree: TreeChild): any {
     const getColor = () => {
         switch (tree.grunnlagstype) {
             case Grunnlagstype.VIRKNINGSTIDSPUNKT:
@@ -401,7 +404,7 @@ function toEchartData(tree: TreeChild) {
         },
 
         tooltip: {
-            formatter: (v) => {
+            formatter: (v: any) => {
                 const jsonContent = v.value.replaceAll("\\n", "\n");
                 const highlightedJson = highlightJson(jsonContent);
                 return `
@@ -441,7 +444,7 @@ function toEchartData(tree: TreeChild) {
                 </div>`;
             },
         },
-        collapsed: tree.type == TreeChildType.GRUNNLAG,
+        collapsed: tree.type === TreeChildType.GRUNNLAG,
         children: tree.children.map(toEchartData),
     };
 }

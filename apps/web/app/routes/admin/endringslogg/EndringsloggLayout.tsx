@@ -1,5 +1,5 @@
 import {Outlet} from "react-router";
-import type {Route} from "../../../../.react-router/types/app/routes/admin/endringslogg/+types";
+import type { Route } from "./+types/EndringsloggLayout";
 
 export default function EndringsloggLayout({params}: Route.ComponentProps) {
     return (

@@ -3,7 +3,7 @@ import React from "react";
 
 import EndringsloggForm, {EndringsloggFormValues} from "./components/EndringsloggForm";
 import {useCreateEndringslogg, useEditEndringslogg} from "~/api/useApi.ts";
-import type {Route} from "../../../../.react-router/types/app/routes/admin/endringslogg/+types/EndringsloggEditPage.ts";
+import type { Route } from "./+types/EndringsloggCreatePage";
 import {
     EndringsLoggDto,
     EndringsloggTilhorerSkjermbilde,

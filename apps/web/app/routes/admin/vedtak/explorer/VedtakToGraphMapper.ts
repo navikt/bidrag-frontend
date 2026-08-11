@@ -41,7 +41,8 @@ export function mapVedtakToTree(vedtak: VedtakDto) {
         };
         vedtakParent.children.push(engangsbeløpNode);
         engangsbeløp.grunnlagReferanseListe.forEach((referanse) => {
-            engangsbeløpNode.children.push(referanseTilTree(referanse, vedtak.grunnlagListe, engangsbeløpNode));
+            const node = referanseTilTree(referanse, vedtak.grunnlagListe, engangsbeløpNode);
+            if (node) engangsbeløpNode.children.push(node);
         });
     });
     vedtak.stønadsendringListe.forEach((stønadsendring, i) => {
@@ -55,7 +56,8 @@ export function mapVedtakToTree(vedtak: VedtakDto) {
         };
         vedtakParent.children.push(stønadsendringNode);
         stønadsendring.grunnlagReferanseListe.forEach((referanse) => {
-            stønadsendringNode.children.push(referanseTilTree(referanse, vedtak.grunnlagListe, stønadsendringNode));
+            const node = referanseTilTree(referanse, vedtak.grunnlagListe, stønadsendringNode);
+            if (node) stønadsendringNode.children.push(node);
         });
         stønadsendring.periodeListe.forEach((periode) => {
             const periodeNode: TreeChild = {
@@ -69,7 +71,8 @@ export function mapVedtakToTree(vedtak: VedtakDto) {
 
             stønadsendringNode.children.push(periodeNode);
             periode.grunnlagReferanseListe.forEach((referanse) => {
-                periodeNode.children.push(referanseTilTree(referanse, vedtak.grunnlagListe, periodeNode));
+                const node = referanseTilTree(referanse, vedtak.grunnlagListe, periodeNode);
+                if (node) periodeNode.children.push(node);
             });
         });
     });
@@ -78,33 +81,35 @@ export function mapVedtakToTree(vedtak: VedtakDto) {
 
 function genererGrunnlagSomIkkeErReferert(vedtak: VedtakDto, parent: TreeChild): TreeChild[] {
     return vedtak.grunnlagListe
-        .filter((grunnlag) => filtrerBasertPåFremmendReferanse(grunnlag.referanse, vedtak.grunnlagListe).length == 0)
+        .filter((grunnlag) => filtrerBasertPåFremmendReferanse(grunnlag.referanse, vedtak.grunnlagListe).length === 0)
         .filter((g) => !stønadsendringerInneholderReferanse(vedtak.stønadsendringListe, g.referanse))
         .filter((g) => !stønadsendringPerioderInneholderReferanse(vedtak.stønadsendringListe, g.referanse))
         .filter((g) => !engangsbeløpInneholderReferanse(vedtak.engangsbeløpListe, g.referanse))
-        .map((g) => referanseTilTree(g.referanse, vedtak.grunnlagListe, parent));
+        .map((g) => referanseTilTree(g.referanse, vedtak.grunnlagListe, parent))
+        .filter((item): item is TreeChild => item !== null);
 }
 
-function referanseTilTree(referanse?: string, grunnlagsliste?: GrunnlagDto[], parent?: TreeChild): TreeChild | null {
+function referanseTilTree(referanse?: string, grunnlagsliste?: GrunnlagDto[], parent?: TreeChild | null): TreeChild | null {
     if (!referanse || !grunnlagsliste) return null;
     const filtrertGrunnlagsliste = filtrerBasertPåReferanse(referanse, grunnlagsliste);
-    if (filtrertGrunnlagsliste.length == 0) {
+    if (filtrertGrunnlagsliste.length === 0) {
         return null;
     }
 
     const grunnlag = filtrertGrunnlagsliste[0];
+    if (!grunnlag) return null;
     const children = [
         ...grunnlag.grunnlagsreferanseListe.map((ref) => referanseTilTree(ref, grunnlagsliste)),
         // referanseTilTree(grunnlag.gjelderReferanse, grunnlagsliste),
-        referanseTilTree(grunnlag.gjelderBarnReferanse, grunnlagsliste),
-    ].filter((item) => item !== null);
+        referanseTilTree(grunnlag.gjelderBarnReferanse ?? undefined, grunnlagsliste),
+    ].filter((item): item is TreeChild => item !== null);
 
     return {
         name: grunnlagstypeTilVisningsnavn(grunnlag, grunnlagsliste) ?? referanse,
         id: referanse,
         innhold: grunnlag,
         type: TreeChildType.GRUNNLAG,
-        parent,
+        parent: parent ?? null,
         children,
     };
 }
@@ -127,45 +132,45 @@ function tilRolleVisningsnavn(type?: Grunnlagstype) {
 }
 
 function grunnlagstypeTilVisningsnavn(grunnlag: GrunnlagDto, grunnlagsListe: GrunnlagDto[]) {
-    const gjelder = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse, grunnlagsListe);
+    // innhold is a JSON string in BidragVedtakApi but treated as a parsed object at runtime
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const innholdObj = grunnlag.innhold as any;
+    const gjelder = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse ?? '', grunnlagsListe);
     const gjelderVisningsnavn = tilRolleVisningsnavn(gjelder?.type);
     switch (grunnlag.type) {
         case Grunnlagstype.SLUTTBEREGNING_FORSKUDD: {
-            return `Sluttberegning(${toCompactString(grunnlag.innhold.periode.fom)})`;
+            return `Sluttberegning(${toCompactString(innholdObj?.periode?.fom)})`;
         }
         case Grunnlagstype.SJABLON_SJABLONTALL: {
-            return `Sjablon(${grunnlag.innhold.sjablon ?? grunnlag.referanse})`;
+            return `Sjablon(${innholdObj?.sjablon ?? grunnlag.referanse})`;
         }
         case Grunnlagstype.DELBEREGNING_SUM_INNTEKT: {
-            return `Delberegning sum inntekt ${gjelderVisningsnavn} (${toCompactString(grunnlag.innhold.periode.fom)})`;
+            return `Delberegning sum inntekt ${gjelderVisningsnavn} (${toCompactString(innholdObj?.periode?.fom)})`;
         }
         case Grunnlagstype.DELBEREGNING_BARN_I_HUSSTAND: {
-            return `Delberegning barn i husstand(${toCompactString(grunnlag.innhold.periode.fom)})`;
+            return `Delberegning barn i husstand(${toCompactString(innholdObj?.periode?.fom)})`;
         }
         case Grunnlagstype.INNTEKT_RAPPORTERING_PERIODE: {
-            const innhold = grunnlag.innhold;
-            const år = new Date(innhold.periode.fom).getFullYear();
-            const visningsnavn = hentVisningsnavn(innhold.inntektsrapportering, år);
-            const manueltRegistrert = innhold.manueltRegistrert ? " (manuelt registrert)" : "";
+            const år = new Date(innholdObj?.periode?.fom).getFullYear();
+            const visningsnavn = hentVisningsnavn(innholdObj?.inntektsrapportering, år);
+            const manueltRegistrert = innholdObj?.manueltRegistrert ? " (manuelt registrert)" : "";
 
             return visningsnavn + manueltRegistrert;
         }
         case Grunnlagstype.SIVILSTAND_PERIODE: {
-            const visningsnavn = hentVisningsnavn(grunnlag.innhold.sivilstand);
-            return `Sivilstand(${visningsnavn}/${toCompactString(grunnlag.innhold.periode.fom)})`;
+            const visningsnavn = hentVisningsnavn(innholdObj?.sivilstand);
+            return `Sivilstand(${visningsnavn}/${toCompactString(innholdObj?.periode?.fom)})`;
         }
         case Grunnlagstype.BOSTATUS_PERIODE: {
-            const visningsnavn = hentVisningsnavn(grunnlag.innhold.bostatus);
-            return `Bosstatus ${gjelderVisningsnavn} (${visningsnavn}/${toCompactString(
-                grunnlag.innhold.periode.fom
-            )}})`;
+            const visningsnavn = hentVisningsnavn(innholdObj?.bostatus);
+            return `Bosstatus ${gjelderVisningsnavn} (${visningsnavn}/${toCompactString(innholdObj?.periode?.fom)}})`;
         }
         case Grunnlagstype.NOTAT:
-            return `Notat(${grunnlag.innhold.type})`;
+            return `Notat(${innholdObj?.type})`;
         case Grunnlagstype.INNHENTET_HUSSTANDSMEDLEM:
-            return `Innhentet husstandsmedlem(${toCompactString(grunnlag.innhold.grunnlag.fødselsdato)})`;
+            return `Innhentet husstandsmedlem(${toCompactString(innholdObj?.grunnlag?.fødselsdato)})`;
         case Grunnlagstype.INNHENTET_INNTEKT_SKATTEGRUNNLAG_PERIODE:
-            return `Innhentet skattegrunnlag(${grunnlag.innhold.år})`;
+            return `Innhentet skattegrunnlag(${innholdObj?.år})`;
         case Grunnlagstype.INNHENTET_SIVILSTAND:
             return "Innhentet sivilstand (Alle)";
         case Grunnlagstype.DELBEREGNING_VOKSNE_I_HUSSTAND:
@@ -187,7 +192,7 @@ function grunnlagstypeTilVisningsnavn(grunnlag: GrunnlagDto, grunnlagsListe: Gru
 
         default:
             if (grunnlag.type.startsWith("PERSON_")) {
-                return `${grunnlag.type}(${toCompactString(grunnlag.innhold.fødselsdato)})`;
+                return `${grunnlag.type}(${toCompactString(innholdObj?.fødselsdato)})`;
             } else if (grunnlag.type.startsWith("INNHENTET_")) {
                 const gjelderGrunnlag = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse || '', grunnlagsListe);
                 const rolleVisningsnavn = tilRolleVisningsnavn(gjelderGrunnlag?.type);
@@ -224,7 +229,7 @@ function engangsbeløpInneholderReferanse(engangsbeløpListe: EngangsbelopDto[],
 }
 
 function inneholderReferanse(referanse: string, grunnlagReferanseListe?: string[]): boolean {
-    if (!grunnlagReferanseListe || grunnlagReferanseListe.length == 0) return false;
+    if (!grunnlagReferanseListe || grunnlagReferanseListe.length === 0) return false;
     return grunnlagReferanseListe.some((gref) => gref === referanse);
 }
 
@@ -245,7 +250,7 @@ export function filtrerBasertPåType(type: Grunnlagstype, grunnlagsliste: Grunnl
 
 function hentFørsteBasertPåReferanse(referanse: string, grunnlagsliste: GrunnlagDto[]): GrunnlagDto | null {
     const grunnlag = filtrerBasertPåReferanse(referanse, grunnlagsliste);
-    if (grunnlag.length == 0) {
+    if (grunnlag.length === 0) {
         return null;
     }
     return grunnlag[0] || null;

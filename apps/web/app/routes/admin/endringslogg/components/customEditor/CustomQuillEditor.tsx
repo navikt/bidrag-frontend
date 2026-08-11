@@ -7,6 +7,7 @@ import {ErrorMessage} from "@navikt/ds-react";
 import Quill from "quill";
 import QuillResize from "quill-resize-module";
 import {Ref, useEffect, useRef, useState} from "react";
+import {RefObject} from "react";
 
 const Clipboard = Quill.import("modules/clipboard");
 
@@ -68,10 +69,10 @@ type EditorProps = {
     onTextChange: (html: string) => void;
     resize?: boolean;
     error?: string;
-    ref: Ref<HTMLDivElement>;
+    ref: RefObject<HTMLDivElement>;
 };
 export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, resize, error}: EditorProps) => {
-    const containerRef = useRef(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [quill, setQuill] = useState<Quill | null>(null);
 
     useEffect(() => {
@@ -96,7 +97,7 @@ export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, re
 
     useEffect(() => {
         const container = containerRef.current;
-        const editorContainer = container.appendChild(container.ownerDocument.createElement("div"));
+        const editorContainer = container!.appendChild(container!.ownerDocument.createElement("div"));
         const quillEditor = new Quill(editorContainer, {
             theme: "snow",
             readOnly,
@@ -121,11 +122,13 @@ export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, re
             },
         });
         setQuill(quillEditor);
+        // @ts-ignore
         ref.current = quillEditor;
 
         return () => {
+            // @ts-ignore
             ref.current = null;
-            container.innerHTML = "";
+            container!.innerHTML = "";
         };
     }, [ref]);
 

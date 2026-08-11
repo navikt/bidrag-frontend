@@ -1,7 +1,6 @@
 import {useQueryClient} from "@tanstack/react-query";
 import React from "react";
 
-import type {Route} from "../../../../.react-router/types/app/routes/admin/endringslogg/+types/EndringsloggEditPage.ts";
 import {
     EndringsLoggDto,
     EndringsloggTilhorerSkjermbilde,
@@ -10,6 +9,7 @@ import {
 } from "~/api/types/admin.ts";
 import {useEditEndringslogg, useHentEndringslogg} from "~/api/useApi.ts";
 import EndringsloggForm, {EndringsloggFormValues} from "~/routes/admin/endringslogg/components/EndringsloggForm.tsx";
+import type { Route } from "./+types/EndringsloggEditPage";
 
 const createPayload = (formValues: EndringsloggFormValues) => {
     const payload: OppdaterEndringsloggRequest = {

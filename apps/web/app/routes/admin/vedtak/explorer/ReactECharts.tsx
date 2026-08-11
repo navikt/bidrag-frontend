@@ -56,9 +56,26 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
 
     useEffect(() => {
         let chart: ECharts | undefined;
-        if (chartRef.current !== null) {
-            chart = init(chartRef.current);
+        let observer: ResizeObserver | undefined;
+
+        const tryInit = () => {
+            const el = chartRef.current;
+            if (!el || chart) return;
+            if (el.clientWidth === 0 || el.clientHeight === 0) return;
+            chart = init(el as HTMLElement);
             setChartInitialized(true);
+        };
+
+        if (chartRef.current) {
+            observer = new ResizeObserver(() => {
+                if (!chart) {
+                    tryInit();
+                } else {
+                    chart.resize();
+                }
+            });
+            observer.observe(chartRef.current);
+            tryInit();
         }
 
         function resizeChart() {
@@ -68,6 +85,7 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
         window.addEventListener("resize", resizeChart);
 
         return () => {
+            observer?.disconnect();
             chart?.dispose();
             window.removeEventListener("resize", resizeChart);
         };
@@ -75,8 +93,11 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
 
     useEffect(() => {
         const canvas = chartRef.current?.querySelector("canvas");
-        const chart = getInstanceByDom(chartRef.current);
-        const dataLen = option.series?.[0]?.data?.length || 0;
+        const chart = chartRef.current ? getInstanceByDom(chartRef.current) : undefined;
+        const seriesData = option.series;
+        const dataLen = Array.isArray(seriesData) && seriesData[0] && 'data' in seriesData[0]
+            ? (seriesData[0].data as unknown[])?.length ?? 0
+            : 0;
         const hideTooltip = () => {
             chart?.dispatchAction({type: "hideTip"});
             if (currentIndex >= 0) {
@@ -95,7 +116,7 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
             }
 
             if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-                chart.dispatchAction({
+                chart?.dispatchAction({
                     type: "downplay",
                     seriesIndex: 0,
                     dataIndex: currentIndex,
@@ -106,12 +127,12 @@ export function ReactECharts({option, style, settings}: ReactEChartsProps): Reac
                         : currentIndex <= 0
                             ? dataLen - 1
                             : currentIndex - 1;
-                chart.dispatchAction({
+                chart?.dispatchAction({
                     type: "highlight",
                     seriesIndex: 0,
                     dataIndex: currentIndex,
                 });
-                chart.dispatchAction({
+                chart?.dispatchAction({
                     type: "showTip",
                     seriesIndex: 0,
                     dataIndex: currentIndex,
