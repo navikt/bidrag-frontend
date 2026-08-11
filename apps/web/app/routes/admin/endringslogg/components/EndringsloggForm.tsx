@@ -592,7 +592,7 @@ export default function EndringsloggForm({
                                     variant="tertiary"
                                     size="small"
                                     icon={<MagnifyingGlassIcon title="Forhåndsvisning" />}
-                                    onClick={() => setPreviewed(formMethods.getValues() as EndringsLoggDto)}
+                                    onClick={() => setPreviewed(formMethods.getValues() as unknown as EndringsLoggDto)}
                                 >
                                     Forhåndsvisning
                                 </Button>
