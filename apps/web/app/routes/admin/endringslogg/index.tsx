@@ -172,14 +172,17 @@ const AktiverSwitch = ({ endringsloggId, aktiv }: { endringsloggId: number; akti
     const deaktiver = useDeaktiverEndringslogg();
 
     const onSuccess = (response: EndringsLoggDto) => {
-        queryClient.setQueryData<EndringsLoggDto[]>(["endringslogger"], (currentData: EndringsLoggDto[] | undefined) => {
-            return currentData?.map((endring) => {
-                if (endring.id === response.id) {
-                    return response;
-                }
-                return endring;
-            });
-        });
+        queryClient.setQueryData<EndringsLoggDto[]>(
+            ["endringslogger"],
+            (currentData: EndringsLoggDto[] | undefined) => {
+                return currentData?.map((endring) => {
+                    if (endring.id === response.id) {
+                        return response;
+                    }
+                    return endring;
+                });
+            },
+        );
         queryClient.setQueryData<EndringsLoggDto>(["endringslogg", endringsloggId], () => response);
     };
 
