@@ -49,6 +49,7 @@ export function useBisysLink() {
 
     return {
         setBisysLinkTarget,
+        bisysSessionParams,
         bisysUrl,
         bisysLinkTarget,
     };

@@ -3,8 +3,8 @@ import { formaterDato, sortByDateAsc } from "@bidrag/utils";
 import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { type ChangeEvent, useState } from "react";
-import { useSearchParams } from "react-router";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
+import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";
@@ -23,9 +23,9 @@ export default function HendelseTabell({
     const { sort, handleSort, sortData } = useSort<SakshendelseDto>({
         defaultUnsorted: (a, b) => sortByDateAsc(b.opprettetTidspunkt, a.opprettetTidspunkt),
     });
-    const [searchParams] = useSearchParams();
-    const enhet = searchParams.get("enhet");
-    const sessionState = searchParams.get("sessionState");
+    const { bisysSessionParams,  } = useBisysLink();
+    const { enhet, sessionState } = bisysSessionParams;
+
     const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);
 
     const onRowsPerPageChange = (e: ChangeEvent<HTMLSelectElement>) => {

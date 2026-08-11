@@ -26,9 +26,9 @@ import {
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { useSearchParams } from "react-router";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
+import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import { medReturMål } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
@@ -83,9 +83,9 @@ export default function JournalpostTabell({
         },
     });
 
-    const [searchParams] = useSearchParams();
-    const enhet = searchParams.get("enhet");
-    const sessionState = searchParams.get("sessionState");
+    const { bisysSessionParams } = useBisysLink();
+    const { enhet, sessionState } = bisysSessionParams;
+
     const { data: sak } = useHentSak(saksnummer);
     const queryClient = useQueryClient();
 
@@ -131,8 +131,7 @@ export default function JournalpostTabell({
 
     const filtrerteJournalposter = kildeJournalposter.filter((jp) => {
         if (kunVedtak && !jp.innhold?.toLowerCase().includes("vedtak")) return false;
-        if (!visFeilregistrerte && jp.feilfort) return false;
-        return true;
+        return !(!visFeilregistrerte && jp.feilfort);
     });
 
     const harBlandingFarBid =
