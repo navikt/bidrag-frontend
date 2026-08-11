@@ -1,10 +1,10 @@
 import {MagnifyingGlassIcon, PencilIcon, TrashIcon} from "@navikt/aksel-icons";
 import {BodyLong, Button, Heading, Loader, Modal, Pagination, Switch, Table, Tag, VStack} from "@navikt/ds-react";
 import {useQueryClient} from "@tanstack/react-query";
-import React, {useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {Link as ReactRouterLink} from "react-router";
 import {ConfirmationModal} from "./components/ConfirmationModal.tsx";
-import {EndringsLoggDto, Endringstype} from "~/api/types/admin.ts";
+import {type EndringsLoggDto, Endringstype} from "~/api/types/admin.ts";
 import {
     useAktiverEndringslogg,
     useDeaktiverEndringslogg,

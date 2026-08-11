@@ -1,10 +1,8 @@
 import {useQueryClient} from "@tanstack/react-query";
-import React from "react";
 
-import EndringsloggForm, {EndringsloggFormValues} from "./components/EndringsloggForm";
+import EndringsloggForm, {type EndringsloggFormValues} from "./components/EndringsloggForm";
 import {useCreateEndringslogg, useEditEndringslogg} from "~/api/useApi.ts";
-import type { Route } from "./+types/EndringsloggCreatePage";
-import {
+import type {
     EndringsLoggDto,
     EndringsloggTilhorerSkjermbilde,
     OppdaterEndringsloggRequest,
@@ -25,7 +23,7 @@ const createPayload = (formValues: EndringsloggFormValues) => {
     return payload;
 };
 
-export default function EndringsloggCreatePage({params}: Route.ComponentProps) {
+export default function EndringsloggCreatePage() {
     const mutation = useCreateEndringslogg();
     const mutationEdit = useEditEndringslogg();
     const queryClient = useQueryClient();

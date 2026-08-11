@@ -3,17 +3,17 @@ import "./VedtakExplorer.css";
 import {Alert, Button, CopyButton, Heading, Loader, Modal, Search, Switch} from "@navikt/ds-react";
 import {useSuspenseQuery} from "@tanstack/react-query";
 import mermaid from "mermaid";
-import React, {Suspense, useEffect, useRef, useState} from "react";
-import {ErrorBoundary, FallbackProps} from "react-error-boundary";
+import {Suspense, useEffect, useRef, useState} from "react";
+import {ErrorBoundary, type FallbackProps} from "react-error-boundary";
 
-import {EChartsOption, ReactECharts} from "./ReactECharts";
+import {type EChartsOption, ReactECharts} from "./ReactECharts";
 import PageWrapper from "../../PageWrapper.tsx";
 import missingImg from "./missing.jpeg";
 import {vedtakToMermaidResponse} from "./TreeToMermaidMapper";
-import {BEHANDLING_API_V1, BIDRAG_VEDTAK_API, TreeChild, TreeChildType} from "@bidrag/api";
+import {BEHANDLING_API_V1, BIDRAG_VEDTAK_API, type TreeChild, TreeChildType} from "@bidrag/api";
 import {mapVedtakToTree} from "./VedtakToGraphMapper";
 import {lastVisningsnavn} from "./VisningsnavnMapper";
-import {Grunnlagstype, VedtakDto} from "@bidrag/api/BidragVedtakApi";
+import {Grunnlagstype, type VedtakDto} from "@bidrag/api/BidragVedtakApi";
 import {useSearchParams} from "react-router";
 
 mermaid.initialize({
@@ -52,7 +52,7 @@ function VedtakExplorer() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [id, setId] = useState<string | undefined>(searchParams.get("id") ?? undefined);
     const [isBehandlingId, setIsBehandlingId] = useState<boolean>(
-        searchParams.get("erBehandlingId") === "true" ? true : false
+        searchParams.get("erBehandlingId")  === "true"
     );
 
     const onSearch = (id: string) => {
@@ -138,9 +138,9 @@ interface VedtakDetaljer {
     gjelderBarnReferanse?: string;
 }
 
-function VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
+function _VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
     const {
-        //@ts-ignore
+        // biome-ignore lint/suspicious/noExplicitAny: TT
         data: {mermaidResponse, vedtak},
     } = useSuspenseQuery({
         queryKey: ["mermaid", behandlingId, vedtakId],
@@ -155,7 +155,7 @@ function VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphPro
     const [showDetails, setShowDetails] = useState<VedtakDetaljer | null>(null);
     const divRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         window.callback = (id) => {
             console.log("CALLBACK", id);
             setShowDetails(getDetailsById(id) ?? null);
@@ -245,7 +245,7 @@ function VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphPro
 
 function VedtakTreeGraph({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
     const {
-        //@ts-ignore
+        // biome-ignore lint/suspicious/noExplicitAny: TT
         data: {tree, vedtak},
     } = useSuspenseQuery({
         queryKey: ["graph", behandlingId, vedtakId],
@@ -300,6 +300,7 @@ function toEchart(tree: TreeChild): EChartsOption {
             confine: true,
             extraCssText:
                 "max-height: 80vh; width: 700px; overflow: auto; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);",
+            // biome-ignore lint/suspicious/noExplicitAny: TT
             position: (point: any, _params: any, _dom: any, _rect: any, size: any) => {
                 // Smart positioning: try right first, fallback to left
                 const contentWidth = size.contentSize[0];
@@ -356,7 +357,7 @@ function toEchart(tree: TreeChild): EChartsOption {
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: TT
 function toEchartData(tree: TreeChild): any {
     const getColor = () => {
         switch (tree.grunnlagstype) {

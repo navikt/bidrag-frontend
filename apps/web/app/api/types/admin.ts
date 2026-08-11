@@ -162,7 +162,7 @@ export interface LeggTilDriftsmeldingHistorikkRequest {
 import type {AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType} from "axios";
 import axios from "axios";
 
-export type QueryParamsType = Record<string | number, any>;
+export type QueryParamsType = Record<string | number, unknown>;
 
 export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
     /** set parameter to `true` for call `securityWorker` for this request */
@@ -184,7 +184,7 @@ export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" 
 export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
     securityWorker?: (
         securityData: SecurityDataType | null
-    ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
+    ) => Promise<AxiosRequestConfig | undefined> | AxiosRequestConfig | undefined;
     secure?: boolean;
     format?: ResponseType;
 }
@@ -217,7 +217,7 @@ export class HttpClient<SecurityDataType = unknown> {
         this.securityData = data;
     };
 
-    public request = async <T = any, _E = any>({
+    public request = async <T = unknown, _E = unknown>({
                                                    secure,
                                                    path,
                                                    type,
@@ -256,7 +256,7 @@ export class HttpClient<SecurityDataType = unknown> {
     };
 
     protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
-        const method = params1.method || (params2 && params2.method);
+        const method = params1.method || (params2?.method);
 
         return {
             ...this.instance.defaults,
@@ -265,7 +265,7 @@ export class HttpClient<SecurityDataType = unknown> {
             headers: {
                 ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
                 ...(params1.headers || {}),
-                ...((params2 && params2.headers) || {}),
+                ...((params2?.headers) || {}),
             },
         };
     }
@@ -284,7 +284,7 @@ export class HttpClient<SecurityDataType = unknown> {
         }
         return Object.keys(input || {}).reduce((formData, key) => {
             const property = input[key];
-            const propertyContent: any[] = property instanceof Array ? property : [property];
+            const propertyContent: any[] = Array.isArray(property) ? property : [property];
 
             for (const formItem of propertyContent) {
                 const isFileType = formItem instanceof Blob || formItem instanceof File;
@@ -301,7 +301,7 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version v1
  * @baseUrl https://bidrag-admin.intern.dev.nav.no
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<SecurityDataType> extends HttpClient<SecurityDataType> {
     endringslogg = {
         /**
          * No description
@@ -313,7 +313,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         hentEndringslogg: (endringsloggId: number, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}`,
                 method: "GET",
                 secure: true,
@@ -330,7 +330,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         oppdaterEndringslogg: (endringsloggId: number, data: OppdaterEndringsloggRequest, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}`,
                 method: "PUT",
                 body: data,
@@ -349,7 +349,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         slettEndringslogg: (endringsloggId: number, params: RequestParams = {}) =>
-            this.request<void, any>({
+            this.request<void, unknown>({
                 path: `/endringslogg/${endringsloggId}`,
                 method: "DELETE",
                 secure: true,
@@ -372,7 +372,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<EndringsLoggDto[], any>({
+            this.request<EndringsLoggDto[], unknown>({
                 path: `/endringslogg`,
                 method: "GET",
                 query: query,
@@ -390,7 +390,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         opprettEndringslogg: (data: OpprettEndringsloggRequest, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg`,
                 method: "POST",
                 body: data,
@@ -409,7 +409,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         oppdaterLestAvBrukerEndringslogg: (endringsloggId: number, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}/lest`,
                 method: "POST",
                 secure: true,
@@ -426,7 +426,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         oppdaterLestAvBrukerEndring: (endringsloggId: number, endringId: number, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}/lest/${endringId}`,
                 method: "POST",
                 secure: true,
@@ -443,7 +443,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         leggTilEndring: (endringsloggId: number, data: LeggTilEndringsloggEndring, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}/endring`,
                 method: "POST",
                 body: data,
@@ -462,7 +462,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         deaktiverEndringslogg: (endringsloggId: number, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}/deaktiver`,
                 method: "PATCH",
                 secure: true,
@@ -479,7 +479,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         aktiverEndringslogg: (endringsloggId: number, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}/aktiver`,
                 method: "PATCH",
                 secure: true,
@@ -496,7 +496,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         slettEndring: (endringsloggId: number, endringId: number, params: RequestParams = {}) =>
-            this.request<EndringsLoggDto, any>({
+            this.request<EndringsLoggDto, unknown>({
                 path: `/endringslogg/${endringsloggId}/endring/${endringId}`,
                 method: "DELETE",
                 secure: true,
@@ -514,7 +514,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         hentDriftsmelding: (driftsmeldingId: number, params: RequestParams = {}) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}`,
                 method: "GET",
                 secure: true,
@@ -535,7 +535,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: OppdaterDriftsmeldingRequest,
             params: RequestParams = {}
         ) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}`,
                 method: "PUT",
                 body: data,
@@ -559,7 +559,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: OppdaterDriftsmeldingHistorikkRequest,
             params: RequestParams = {}
         ) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk/${driftsmeldingHistorikkId}`,
                 method: "PUT",
                 body: data,
@@ -582,7 +582,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             driftsmeldingHistorikkId: number,
             params: RequestParams = {}
         ) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk/${driftsmeldingHistorikkId}`,
                 method: "DELETE",
                 secure: true,
@@ -599,7 +599,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         hentAlleAktiveDriftsmeldinger: (params: RequestParams = {}) =>
-            this.request<DriftsmeldingDto[], any>({
+            this.request<DriftsmeldingDto[], unknown>({
                 path: `/driftsmelding`,
                 method: "GET",
                 secure: true,
@@ -616,7 +616,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         opprettDriftsmelding: (data: OpprettDriftsmeldingRequest, params: RequestParams = {}) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding`,
                 method: "POST",
                 body: data,
@@ -635,7 +635,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         oppdaterLestAvBruker: (driftsmeldingId: number, driftsmeldingHistorikkId: number, params: RequestParams = {}) =>
-            this.request<void, any>({
+            this.request<void, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/${driftsmeldingHistorikkId}/lest`,
                 method: "POST",
                 secure: true,
@@ -656,7 +656,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: LeggTilDriftsmeldingHistorikkRequest,
             params: RequestParams = {}
         ) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk`,
                 method: "POST",
                 body: data,
@@ -675,7 +675,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         deaktiverDriftsmelding: (driftsmeldingId: number, params: RequestParams = {}) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/deaktiver`,
                 method: "PATCH",
                 secure: true,
@@ -692,7 +692,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         aktiverDriftsmelding: (driftsmeldingId: number, params: RequestParams = {}) =>
-            this.request<DriftsmeldingDto, any>({
+            this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/aktiver`,
                 method: "PATCH",
                 secure: true,

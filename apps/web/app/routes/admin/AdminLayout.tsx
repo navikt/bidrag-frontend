@@ -1,8 +1,7 @@
 import {Page, VStack} from "@navikt/ds-react";
 import {Outlet} from "react-router";
-import type {Route} from "./+types/AdminLayout";
 
-export default function AdminLayout({params}: Route.ComponentProps) {
+export default function AdminLayout() {
 
     return (
         <VStack gap={"space-32"}>

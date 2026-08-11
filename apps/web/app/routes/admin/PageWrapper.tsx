@@ -2,7 +2,7 @@ import "./index.css";
 
 import {Loader} from "@navikt/ds-react";
 import {useIsRestoring} from "@tanstack/react-query";
-import React, {PropsWithChildren} from "react";
+import type {PropsWithChildren} from "react";
 
 interface PageWrapperProps {
     name: string;

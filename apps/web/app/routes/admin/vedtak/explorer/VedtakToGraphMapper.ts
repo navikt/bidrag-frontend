@@ -1,13 +1,13 @@
 import {
-    EngangsbelopDto,
-    GrunnlagDto,
+    type EngangsbelopDto,
+    type GrunnlagDto,
     Grunnlagstype,
-    StonadsendringDto,
-    VedtakDto,
-    VedtakPeriodeDto
+    type StonadsendringDto,
+    type VedtakDto,
+    type VedtakPeriodeDto
 } from "@bidrag/api/BidragVedtakApi";
 import {hentVisningsnavn} from "./VisningsnavnMapper";
-import {TreeChild, TreeChildType, TreeEngangsbeløp, TreePeriode, TreeStønad, TreeVedtak} from "@bidrag/api";
+import {type TreeChild, TreeChildType, type TreeEngangsbeløp, type TreePeriode, type TreeStønad, type TreeVedtak} from "@bidrag/api";
 
 export function mapVedtakToTree(vedtak: VedtakDto) {
     const vedtakParent: TreeChild = {

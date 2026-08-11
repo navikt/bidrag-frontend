@@ -6,21 +6,21 @@ import "quill-paste-smart";
 import {ErrorMessage} from "@navikt/ds-react";
 import Quill from "quill";
 import QuillResize from "quill-resize-module";
-import {Ref, useEffect, useRef, useState} from "react";
-import {RefObject} from "react";
+import {useEffect, useRef, useState} from "react";
+import type {RefObject} from "react";
 
 const Clipboard = Quill.import("modules/clipboard");
 
-//@ts-ignore
+//@ts-expect-error
 class CustomClipboard extends Clipboard {
     onCaptureCopy(e: ClipboardEvent) {
-        //@ts-ignore
+        //@ts-expect-error
         const range = this.quill.getSelection();
         if (range == null) return;
 
-        //@ts-ignore
+        //@ts-expect-error
         const text = this.quill.getText(range);
-        //@ts-ignore
+        //@ts-expect-error
         const html = this.quill.getSemanticHTML(range);
         const styledHtml = this.tilpassFormatteringForLegacyBidragMaler(html);
 
@@ -50,7 +50,6 @@ class CustomClipboard extends Clipboard {
                 // strong.style.fontFamily = "'Times New Roman', serif";
                 el.replaceWith(strong);
             } else if (!["H1", "H2", "H4", "H5", "H6"].includes(el.tagName)) {
-                //@ts-ignore
                 // el.style.fontSize = "11pt";
                 // el.style.whiteSpace = "normal";
             }
@@ -97,7 +96,8 @@ export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, re
 
     useEffect(() => {
         const container = containerRef.current;
-        const editorContainer = container!.appendChild(container!.ownerDocument.createElement("div"));
+        const editorContainer = container?.appendChild(container?.ownerDocument.createElement("div"));
+        // @ts-ignore
         const quillEditor = new Quill(editorContainer, {
             theme: "snow",
             readOnly,
@@ -122,12 +122,13 @@ export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, re
             },
         });
         setQuill(quillEditor);
-        // @ts-ignore
+        // @ts-expect-error
         ref.current = quillEditor;
 
         return () => {
-            // @ts-ignore
+            // @ts-expect-error
             ref.current = null;
+            // biome-ignore lint/style/noNonNullAssertion: Ingen risiko
             container!.innerHTML = "";
         };
     }, [ref]);

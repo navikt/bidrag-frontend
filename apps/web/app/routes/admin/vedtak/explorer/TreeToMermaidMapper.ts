@@ -1,3 +1,4 @@
+
 import { type MermaidResponse, MermaidSubgraph, type TreeChild, TreeChildType } from "@bidrag/api";
 import { Grunnlagstype, type VedtakDto } from "@bidrag/api/BidragVedtakApi";
 import {
@@ -95,6 +96,7 @@ function removeDuplicates(arr: string[]): string[] {
 function treeToMermaid(mermaidSubgraphMap: Map<string, string[]>, tree: TreeChild, parent?: TreeChild) {
     // if (tree.type == TreeChildType.FRITTSTÅENDE) return {};
     addToMap(mermaidSubgraphMap, MermaidSubgraph.ACTION, `click ${tree.id} call callback() "${tree.id}"`);
+    // biome-ignore lint/suspicious/noExplicitAny: innhold is typed as object but contains runtime properties
     const innholdType = (tree.innhold as any)?.type as string | undefined;
     if (parent != null && innholdType !== Grunnlagstype.SJABLON_SJABLONTALL) {
         if (parent.type === TreeChildType.PERIODE) {
@@ -118,7 +120,9 @@ function treeToMermaid(mermaidSubgraphMap: Map<string, string[]>, tree: TreeChil
 }
 
 function mapGrunnlagToMermaid(mermaidSubgraphMap: Map<string, string[]>, tree: TreeChild, parent: TreeChild) {
+    // biome-ignore lint/suspicious/noExplicitAny: innhold is typed as object but contains runtime properties
     const innholdType = (tree.innhold as any)?.type as string | undefined;
+    // biome-ignore lint/suspicious/noExplicitAny: innhold is typed as object but contains runtime properties
     const parentInnholdType = (parent?.innhold as any)?.type as string | undefined;
     const grunnlagstype = innholdType as Grunnlagstype | undefined;
     const parentGrunnlagstype = parentInnholdType as Grunnlagstype | undefined;
@@ -177,6 +181,7 @@ function tilSubgraph(tree: TreeChild): string | undefined {
         case TreeChildType.STØNADSENDRING:
             return `Stønadsendring_${tree.name.replaceAll("(", "").replaceAll(")", "")}`;
         case TreeChildType.GRUNNLAG: {
+            // biome-ignore lint/suspicious/noExplicitAny: innhold is typed as object but contains runtime properties
             const innholdType = (tree.innhold as any)?.type as string | undefined;
             if (innholdType !== undefined) {
                 if (innholdType.startsWith("SJABLON_")) return MermaidSubgraph.SJABLON;

@@ -20,18 +20,18 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import {useMutationState} from "@tanstack/react-query";
-import React, {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {
     Controller,
     FormProvider,
     useFieldArray,
-    UseFieldArrayReturn,
+    type UseFieldArrayReturn,
     useForm,
     useFormContext,
     useWatch,
 } from "react-hook-form";
 
-import {EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype} from "~/api/types/admin.ts";
+import {type EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype} from "~/api/types/admin.ts";
 import {EndringsModal} from "~/routes/admin/endringslogg";
 import {useNavigate} from "react-router";
 
@@ -107,7 +107,7 @@ const EndringsBox = ({
                      }: {
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
-    const quillRef = useRef(null);
+    const _quillRef = useRef(null);
     const modalRef = useRef<HTMLDialogElement>(null);
     const {getValues, control, resetField, setError, clearErrors} = useFormContext<EndringsloggFormValues>();
 
@@ -235,12 +235,11 @@ const EndringsFormBox = ({
     index: number;
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
-    const quillRef = useRef(null);
+    const _quillRef = useRef(null);
     const {control} = useFormContext<EndringsloggFormValues>();
 
     return (
-        <>
-            <Box background="default" padding="space-4" borderColor="neutral" borderWidth="1" borderRadius="4">
+        <Box background="default" padding="space-4" borderColor="neutral" borderWidth="1" borderRadius="4">
                 <VStack gap="space-4">
                     <HStack gap="space-4" align="center" justify="space-between">
                         <Label size="small">Endring</Label>
@@ -339,7 +338,6 @@ const EndringsFormBox = ({
                     */}
                 </VStack>
             </Box>
-        </>
     );
 };
 

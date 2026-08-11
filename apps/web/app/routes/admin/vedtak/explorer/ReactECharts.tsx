@@ -14,8 +14,9 @@ import {
 import type {ComposeOption, ECharts, SetOptionOpts} from "echarts/core";
 import {getInstanceByDom, init, use} from "echarts/core";
 import {CanvasRenderer} from "echarts/renderers";
-import {InsideDataZoomOption, SliderDataZoomOption} from "echarts/types/dist/shared";
-import React, {CSSProperties, useEffect, useRef, useState} from "react";
+import type {InsideDataZoomOption, SliderDataZoomOption} from "echarts/types/dist/shared";
+import type React from "react";
+import {type CSSProperties, useEffect, useRef, useState} from "react"
 
 use([
     LegendComponent,
