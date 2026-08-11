@@ -1,24 +1,23 @@
 import "./VedtakExplorer.css";
 
-import {Alert, Button, CopyButton, Heading, Loader, Modal, Search, Switch} from "@navikt/ds-react";
-import {useSuspenseQuery} from "@tanstack/react-query";
+import { BEHANDLING_API_V1, BIDRAG_VEDTAK_API, type TreeChild, TreeChildType } from "@bidrag/api";
+import { Grunnlagstype, type VedtakDto } from "@bidrag/api/BidragVedtakApi";
+import { Alert, Button, CopyButton, Heading, Loader, Modal, Search, Switch } from "@navikt/ds-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import mermaid from "mermaid";
-import {Suspense, useEffect, useRef, useState} from "react";
-import {ErrorBoundary, type FallbackProps} from "react-error-boundary";
-
-import {type EChartsOption, ReactECharts} from "./ReactECharts";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
+import { useSearchParams } from "react-router";
 import PageWrapper from "../../PageWrapper.tsx";
 import missingImg from "./missing.jpeg";
-import {vedtakToMermaidResponse} from "./TreeToMermaidMapper";
-import {BEHANDLING_API_V1, BIDRAG_VEDTAK_API, type TreeChild, TreeChildType} from "@bidrag/api";
-import {mapVedtakToTree} from "./VedtakToGraphMapper";
-import {lastVisningsnavn} from "./VisningsnavnMapper";
-import {Grunnlagstype, type VedtakDto} from "@bidrag/api/BidragVedtakApi";
-import {useSearchParams} from "react-router";
+import { type EChartsOption, ReactECharts } from "./ReactECharts";
+import { vedtakToMermaidResponse } from "./TreeToMermaidMapper";
+import { mapVedtakToTree } from "./VedtakToGraphMapper";
+import { lastVisningsnavn } from "./VisningsnavnMapper";
 
 mermaid.initialize({
     startOnLoad: true,
-    flowchart: {useMaxWidth: true, htmlLabels: true, curve: "basis"},
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
     securityLevel: "loose",
     look: "handDrawn",
     theme: "base",
@@ -33,7 +32,7 @@ export default () => {
     lastVisningsnavn();
     return (
         <PageWrapper name="">
-            <VedtakExplorer/>
+            <VedtakExplorer />
         </PageWrapper>
     );
 };
@@ -51,17 +50,15 @@ function paramsToObject(entries: URLSearchParams): Record<string, string> {
 function VedtakExplorer() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [id, setId] = useState<string | undefined>(searchParams.get("id") ?? undefined);
-    const [isBehandlingId, setIsBehandlingId] = useState<boolean>(
-        searchParams.get("erBehandlingId")  === "true"
-    );
+    const [isBehandlingId, setIsBehandlingId] = useState<boolean>(searchParams.get("erBehandlingId") === "true");
 
     const onSearch = (id: string) => {
-        setSearchParams({...existingSearchParams(), id});
+        setSearchParams({ ...existingSearchParams(), id });
         setId(id);
     };
 
     return (
-        <div className="p-2" style={{width: "98vw", marginLeft: "calc(50% - 49vw)"}}>
+        <div className="p-2" style={{ width: "98vw", marginLeft: "calc(50% - 49vw)" }}>
             <Heading size="medium">Vedtak explorer</Heading>
             <div className="max-w-96 flex flex-col gap-0.5">
                 <Search
@@ -77,7 +74,7 @@ function VedtakExplorer() {
                     size="small"
                     onChange={(e) => {
                         const isChecked = e.target.checked;
-                        setSearchParams({...existingSearchParams(), erBehandlingId: isChecked ? "true" : "false"});
+                        setSearchParams({ ...existingSearchParams(), erBehandlingId: isChecked ? "true" : "false" });
                         setIsBehandlingId(e.target.checked);
                     }}
                 >
@@ -94,7 +91,7 @@ function VedtakExplorer() {
     );
 }
 
-function VisualiserVedtakGraph({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
+function VisualiserVedtakGraph({ behandlingId, vedtakId }: VedtakExplorerGraphProps) {
     if (behandlingId == null && vedtakId == null) {
         return (
             <div>
@@ -109,8 +106,7 @@ function VisualiserVedtakGraph({behandlingId, vedtakId}: VedtakExplorerGraphProp
                 fallbackRender={(props: FallbackProps) => {
                     return (
                         <Alert size="small" variant="error">
-                            Kunne ikke hente {behandlingId ? "behandling" : "vedtak"} med
-                            id {behandlingId ?? vedtakId}:{" "}
+                            Kunne ikke hente {behandlingId ? "behandling" : "vedtak"} med id {behandlingId ?? vedtakId}:{" "}
                             {(props.error as Error)?.message ?? String(props.error)}
                         </Alert>
                     );
@@ -119,11 +115,11 @@ function VisualiserVedtakGraph({behandlingId, vedtakId}: VedtakExplorerGraphProp
                 <Suspense
                     fallback={
                         <div className="flex justify-center">
-                            <Loader size="3xlarge" title="venter..." variant="interaction"/>
+                            <Loader size="3xlarge" title="venter..." variant="interaction" />
                         </div>
                     }
                 >
-                    <VedtakTreeGraph behandlingId={behandlingId} vedtakId={vedtakId}/>
+                    <VedtakTreeGraph behandlingId={behandlingId} vedtakId={vedtakId} />
                 </Suspense>
             </ErrorBoundary>
         </div>
@@ -138,16 +134,16 @@ interface VedtakDetaljer {
     gjelderBarnReferanse?: string;
 }
 
-function _VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
+function _VedtakMermaidFlowChart({ behandlingId, vedtakId }: VedtakExplorerGraphProps) {
     const {
         // biome-ignore lint/suspicious/noExplicitAny: TT
-        data: {mermaidResponse, vedtak},
+        data: { mermaidResponse, vedtak },
     } = useSuspenseQuery({
         queryKey: ["mermaid", behandlingId, vedtakId],
         queryFn: async () => {
             const vedtakDto = await hentVedtakDto(behandlingId, vedtakId);
             const mermaidResponse = vedtakToMermaidResponse(vedtakDto.data as VedtakDto);
-            return {mermaidResponse: mermaidResponse, vedtak: vedtakDto.data as VedtakDto};
+            return { mermaidResponse: mermaidResponse, vedtak: vedtakDto.data as VedtakDto };
         },
     });
 
@@ -205,7 +201,7 @@ function _VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphPr
                     const firstEl = divRef.current.firstElementChild;
                     if (firstEl) res.bindFunctions(firstEl);
                 }
-                const {default: svgPanZoom} = await import("svg-pan-zoom");
+                const { default: svgPanZoom } = await import("svg-pan-zoom");
                 svgPanZoom("#mermaidSvg");
                 isRendering.current = false;
             })
@@ -214,9 +210,9 @@ function _VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphPr
     return (
         <>
             <Modal
-                style={{maxHeight: "1000px", maxWidth: "max-content"}}
+                style={{ maxHeight: "1000px", maxWidth: "max-content" }}
                 open={showDetails != null}
-                header={{heading: showDetails?.tittel || '', size: "medium", closeButton: false}}
+                header={{ heading: showDetails?.tittel || "", size: "medium", closeButton: false }}
                 closeOnBackdropClick
                 onClose={() => setShowDetails(null)}
             >
@@ -229,35 +225,38 @@ function _VedtakMermaidFlowChart({behandlingId, vedtakId}: VedtakExplorerGraphPr
                             <dd>{showDetails?.type}</dd>
                         </dl>
                     )}
-                    <pre style={{maxHeight: "800px", overflow: "auto"}}>
+                    <pre style={{ maxHeight: "800px", overflow: "auto" }}>
                         {JSON.stringify(showDetails?.innhold, null, 2)}
                     </pre>
                 </Modal.Body>
             </Modal>
             <div className="flex flex-row gap-4">
-                <ShowMermaidGraphButton mermaidGraph={mermaidResponse.mermaidGraph}/>
-                <ShowVedtakButton vedtak={vedtak}/>
+                <ShowMermaidGraphButton mermaidGraph={mermaidResponse.mermaidGraph} />
+                <ShowVedtakButton vedtak={vedtak} />
             </div>
-            <div ref={divRef} className="mermaid h-full"/>
+            <div ref={divRef} className="mermaid h-full" />
         </>
     );
 }
 
-function VedtakTreeGraph({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
+function VedtakTreeGraph({ behandlingId, vedtakId }: VedtakExplorerGraphProps) {
     const {
         // biome-ignore lint/suspicious/noExplicitAny: TT
-        data: {tree, vedtak},
+        data: { tree, vedtak },
     } = useSuspenseQuery({
         queryKey: ["graph", behandlingId, vedtakId],
         queryFn: async () => {
             const vedtakDto = await hentVedtakDto(behandlingId, vedtakId);
-            return {tree: mapVedtakToTree(vedtakDto.data as VedtakDto), vedtak: vedtakDto.data as VedtakDto};
+            return { tree: mapVedtakToTree(vedtakDto.data as VedtakDto), vedtak: vedtakDto.data as VedtakDto };
         },
     });
     return (
         <>
-            <ShowVedtakButton vedtak={vedtak}/>
-            <ReactECharts option={toEchart(tree)} style={{height: "calc(100vh - 200px)", minHeight: "500px", margin: "auto"}}/>
+            <ShowVedtakButton vedtak={vedtak} />
+            <ReactECharts
+                option={toEchart(tree)}
+                style={{ height: "calc(100vh - 200px)", minHeight: "500px", margin: "auto" }}
+            />
         </>
     );
 }
@@ -265,7 +264,7 @@ function VedtakTreeGraph({behandlingId, vedtakId}: VedtakExplorerGraphProps) {
 async function hentVedtakDto(behandlingId?: string, vedtakId?: string) {
     if (behandlingId != null) {
         // TODO ADMIN Usikker på om dette vil funke riktig
-        console.log("TODO ADMIN: vi er i en løype som ikke er sikker")
+        console.log("TODO ADMIN: vi er i en løype som ikke er sikker");
         return BEHANDLING_API_V1.api.behandlingTilVedtak(Number(behandlingId));
     }
     return BIDRAG_VEDTAK_API.vedtak.hentVedtak(Number(vedtakId));
@@ -275,17 +274,19 @@ async function hentVedtakDto(behandlingId?: string, vedtakId?: string) {
  * Highlights JSON syntax with colors for better readability in tooltips
  */
 function highlightJson(jsonString: string): string {
-    return (jsonString
-        // Color keys (text before colons)
-        .replace(/("([^"]+)")\s*:/g, '<span style="color: #0066cc; font-weight: bold;">$1</span>:')
-        // Color string values
-        .replace(/:\s*("([^"]*)"|'([^']*)')/g, ': <span style="color: #008000;">$1</span>')
-        // Color numbers
-        .replace(/:\s*([-]?[\d.]+([eE][+-]?[\d]+)?)/g, ': <span style="color: #ff6600;">$1</span>')
-        // Color booleans
-        .replace(/:\s*(true|false)/g, ': <span style="color: #9933cc;">$1</span>')
-        // Color null
-        .replace(/:\s*(null)/g, ': <span style="color: #999999;">$1</span>'));
+    return (
+        jsonString
+            // Color keys (text before colons)
+            .replace(/("([^"]+)")\s*:/g, '<span style="color: #0066cc; font-weight: bold;">$1</span>:')
+            // Color string values
+            .replace(/:\s*("([^"]*)"|'([^']*)')/g, ': <span style="color: #008000;">$1</span>')
+            // Color numbers
+            .replace(/:\s*([-]?[\d.]+([eE][+-]?[\d]+)?)/g, ': <span style="color: #ff6600;">$1</span>')
+            // Color booleans
+            .replace(/:\s*(true|false)/g, ': <span style="color: #9933cc;">$1</span>')
+            // Color null
+            .replace(/:\s*(null)/g, ': <span style="color: #999999;">$1</span>')
+    );
 }
 
 function toEchart(tree: TreeChild): EChartsOption {
@@ -394,8 +395,8 @@ function toEchartData(tree: TreeChild): any {
         value: tree.grunnlag
             ? JSON.stringify(tree?.grunnlag?.innhold, null, 2)
             : tree?.innhold
-                ? JSON.stringify(tree?.innhold, null, 2)
-                : "",
+              ? JSON.stringify(tree?.innhold, null, 2)
+              : "",
         itemStyle: {
             borderType: getBordertype(),
         },
@@ -417,8 +418,8 @@ function toEchartData(tree: TreeChild): any {
                     </div>
                     <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
                     ${
-                    tree.grunnlag
-                        ? `
+                        tree.grunnlag
+                            ? `
                             <div style="font-size: 13px; color: #555; margin-bottom: 8px;">
                                 <dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px;">
                                     <dt style="font-weight: bold;">Gjelder:</dt>
@@ -430,8 +431,8 @@ function toEchartData(tree: TreeChild): any {
                                 </dl>
                             </div>
                             <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">`
-                        : ""
-                }
+                            : ""
+                    }
                     <pre style="
                         margin: 0;
                         font-size: 12px;
@@ -451,7 +452,7 @@ function toEchartData(tree: TreeChild): any {
     };
 }
 
-function ShowMermaidGraphButton({mermaidGraph}: { mermaidGraph: string }) {
+function ShowMermaidGraphButton({ mermaidGraph }: { mermaidGraph: string }) {
     const [showGraph, setShowGraph] = useState(false);
     return (
         <>
@@ -459,22 +460,22 @@ function ShowMermaidGraphButton({mermaidGraph}: { mermaidGraph: string }) {
                 Vis mermaid kode
             </Button>
             <Modal
-                style={{maxHeight: "1000px", maxWidth: "max-content"}}
+                style={{ maxHeight: "1000px", maxWidth: "max-content" }}
                 open={showGraph}
-                header={{heading: "Mermaid kode", size: "medium", closeButton: false}}
+                header={{ heading: "Mermaid kode", size: "medium", closeButton: false }}
                 closeOnBackdropClick
                 onClose={() => setShowGraph(false)}
             >
                 <Modal.Body>
                     <CopyButton size="small" copyText={mermaidGraph} text="Kopier kode til utklippstavle"></CopyButton>
-                    <pre style={{maxHeight: "800px", overflow: "auto"}}>{mermaidGraph}</pre>
+                    <pre style={{ maxHeight: "800px", overflow: "auto" }}>{mermaidGraph}</pre>
                 </Modal.Body>
             </Modal>
         </>
     );
 }
 
-function ShowVedtakButton({vedtak}: { vedtak: VedtakDto }) {
+function ShowVedtakButton({ vedtak }: { vedtak: VedtakDto }) {
     const [showGraph, setShowGraph] = useState(false);
     const vedtakString = JSON.stringify(vedtak, null, 2);
     return (
@@ -483,15 +484,15 @@ function ShowVedtakButton({vedtak}: { vedtak: VedtakDto }) {
                 Vis vedtak JSON
             </Button>
             <Modal
-                style={{maxHeight: "1000px", maxWidth: "max-content"}}
+                style={{ maxHeight: "1000px", maxWidth: "max-content" }}
                 open={showGraph}
-                header={{heading: "Vedtak JSON", size: "medium", closeButton: false}}
+                header={{ heading: "Vedtak JSON", size: "medium", closeButton: false }}
                 closeOnBackdropClick
                 onClose={() => setShowGraph(false)}
             >
                 <Modal.Body>
                     <CopyButton size="small" copyText={vedtakString} text="Kopier til utklippstavle"></CopyButton>
-                    <pre style={{maxHeight: "800px", overflow: "auto"}}>{JSON.stringify(vedtak, null, 2)}</pre>
+                    <pre style={{ maxHeight: "800px", overflow: "auto" }}>{JSON.stringify(vedtak, null, 2)}</pre>
                 </Modal.Body>
             </Modal>
         </>

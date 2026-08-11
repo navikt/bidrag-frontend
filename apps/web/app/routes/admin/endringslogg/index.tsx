@@ -1,16 +1,16 @@
-import {MagnifyingGlassIcon, PencilIcon, TrashIcon} from "@navikt/aksel-icons";
-import {BodyLong, Button, Heading, Loader, Modal, Pagination, Switch, Table, Tag, VStack} from "@navikt/ds-react";
-import {useQueryClient} from "@tanstack/react-query";
-import {useRef, useState} from "react";
-import {Link as ReactRouterLink} from "react-router";
-import {ConfirmationModal} from "./components/ConfirmationModal.tsx";
-import {type EndringsLoggDto, Endringstype} from "~/api/types/admin.ts";
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
+import { BodyLong, Button, Heading, Loader, Modal, Pagination, Switch, Table, Tag, VStack } from "@navikt/ds-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
+import { Link as ReactRouterLink } from "react-router";
+import { type EndringsLoggDto, Endringstype } from "~/api/types/admin.ts";
 import {
     useAktiverEndringslogg,
     useDeaktiverEndringslogg,
     useHentEndringslogger,
-    useSlettEndringslogg
+    useSlettEndringslogg,
 } from "~/api/useApi.ts";
+import { ConfirmationModal } from "./components/ConfirmationModal.tsx";
 
 export enum EndringsloggTilhorerSkjermbilde {
     BEHANDLING_BIDRAG = "BEHANDLING_BIDRAG",
@@ -57,11 +57,11 @@ export const EndringstypeToTagMapper = {
 };
 
 export const EndringsModal = ({
-                                  open,
-                                  onClose,
-                                  selectedEndringslogg,
-                                  closeOnBackdropClick,
-                              }: {
+    open,
+    onClose,
+    selectedEndringslogg,
+    closeOnBackdropClick,
+}: {
     open: boolean;
     onClose: () => void;
     selectedEndringslogg: EndringsLoggDto;
@@ -73,21 +73,18 @@ export const EndringsModal = ({
         <Modal
             open={open}
             onClose={() => onClose()}
-            header={{heading: selectedEndringslogg.tittel}}
+            header={{ heading: selectedEndringslogg.tittel }}
             closeOnBackdropClick={closeOnBackdropClick}
             className="max-w-[1500px]"
         >
-            {selectedEndringer === undefined ? <Loader>LOADING</Loader> :
+            {selectedEndringer === undefined ? (
+                <Loader>LOADING</Loader>
+            ) : (
                 <>
                     <Modal.Body className="grid gap-4">
                         <Heading size="xsmall" className="flex gap-2">
                             {selectedEndringer.tittel}
-                            <Tag
-                                variant={
-                                    EndringstypeToTagMapper[selectedEndringer.endringstype].tag
-                                }
-                                size="xsmall"
-                            >
+                            <Tag variant={EndringstypeToTagMapper[selectedEndringer.endringstype].tag} size="xsmall">
                                 {EndringstypeToTagMapper[selectedEndringer.endringstype].tekst}
                             </Tag>
                         </Heading>
@@ -100,11 +97,11 @@ export const EndringsModal = ({
                                     minWidth: "38rem",
                                     maxHeight: "40rem",
                                 }}
-                                dangerouslySetInnerHTML={{__html: selectedEndringer.innhold}}
+                                dangerouslySetInnerHTML={{ __html: selectedEndringer.innhold }}
                             />
                         </BodyLong>
                     </Modal.Body>
-                    <Modal.Footer style={{height: "4rem", justifyContent: "center"}}>
+                    <Modal.Footer style={{ height: "4rem", justifyContent: "center" }}>
                         {selectedEndringslogg.endringer.length > 1 && (
                             <Pagination
                                 page={pageState}
@@ -116,24 +113,25 @@ export const EndringsModal = ({
                             />
                         )}
                     </Modal.Footer>
-                </>}
+                </>
+            )}
         </Modal>
     );
 };
 
-const DeleteButton = ({endringsloggId}: { endringsloggId: number }) => {
+const DeleteButton = ({ endringsloggId }: { endringsloggId: number }) => {
     const ref = useRef<HTMLDialogElement>(null);
     const queryClient = useQueryClient();
     const slettEndringslogg = useSlettEndringslogg();
     const onSuccess = () => {
         queryClient.setQueryData<EndringsLoggDto[]>(["endringslogger"], (currentData: EndringsLoggDto[]) =>
-            currentData?.filter((endring) => endring.id !== endringsloggId)
+            currentData?.filter((endring) => endring.id !== endringsloggId),
         );
-        queryClient.removeQueries({queryKey: ["endringslogg", endringsloggId]});
+        queryClient.removeQueries({ queryKey: ["endringslogg", endringsloggId] });
     };
 
     const onDelete = () => {
-        slettEndringslogg.mutate(endringsloggId, {onSuccess});
+        slettEndringslogg.mutate(endringsloggId, { onSuccess });
     };
 
     const onConfirm = () => {
@@ -146,7 +144,7 @@ const DeleteButton = ({endringsloggId}: { endringsloggId: number }) => {
             <Button
                 variant="tertiary"
                 size="small"
-                icon={<TrashIcon title="Slett"/>}
+                icon={<TrashIcon title="Slett" />}
                 onClick={() => ref.current?.showModal()}
             />
             <ConfirmationModal
@@ -168,7 +166,7 @@ const DeleteButton = ({endringsloggId}: { endringsloggId: number }) => {
     );
 };
 
-const AktiverSwitch = ({endringsloggId, aktiv}: { endringsloggId: number; aktiv: boolean }) => {
+const AktiverSwitch = ({ endringsloggId, aktiv }: { endringsloggId: number; aktiv: boolean }) => {
     const queryClient = useQueryClient();
     const aktiver = useAktiverEndringslogg();
     const deaktiver = useDeaktiverEndringslogg();
@@ -187,9 +185,9 @@ const AktiverSwitch = ({endringsloggId, aktiv}: { endringsloggId: number; aktiv:
 
     const onAktiverDeaktiver = (checked: boolean) => {
         if (checked) {
-            aktiver.mutate(endringsloggId, {onSuccess});
+            aktiver.mutate(endringsloggId, { onSuccess });
         } else {
-            deaktiver.mutate(endringsloggId, {onSuccess});
+            deaktiver.mutate(endringsloggId, { onSuccess });
         }
     };
 
@@ -271,7 +269,7 @@ export default function EndringsloggIndexPage() {
                                                 <Button
                                                     variant="tertiary"
                                                     size="small"
-                                                    icon={<MagnifyingGlassIcon title="Forhåndsvisning"/>}
+                                                    icon={<MagnifyingGlassIcon title="Forhåndsvisning" />}
                                                     onClick={() => setPreviewed(endringslogg)}
                                                 />
                                             )}
@@ -282,11 +280,11 @@ export default function EndringsloggIndexPage() {
                                                 size="small"
                                                 as={ReactRouterLink}
                                                 to={`/admin/endringslogg/${endringslogg.id}`}
-                                                icon={<PencilIcon title="Rediger"/>}
+                                                icon={<PencilIcon title="Rediger" />}
                                             />
                                         </Table.DataCell>
                                         <Table.DataCell>
-                                            <DeleteButton endringsloggId={endringslogg.id}/>
+                                            <DeleteButton endringsloggId={endringslogg.id} />
                                         </Table.DataCell>
                                     </Table.Row>
                                 );
@@ -304,5 +302,4 @@ export default function EndringsloggIndexPage() {
             )}
         </>
     );
-};
-
+}

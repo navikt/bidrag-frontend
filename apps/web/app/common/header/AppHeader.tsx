@@ -1,36 +1,36 @@
-import {LeaveIcon} from "@navikt/aksel-icons";
-import {ActionMenu, InternalHeader, Spacer} from "@navikt/ds-react";
-import {ClientOnly} from "~/common/ClientOnly.tsx";
-import {AppSwitcher} from "~/common/header/AppSwitcher.tsx";
+import { LeaveIcon } from "@navikt/aksel-icons";
+import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
+import { ClientOnly } from "~/common/ClientOnly.tsx";
+import { AppSwitcher } from "~/common/header/AppSwitcher.tsx";
 import BisysHeaderLink from "~/common/header/BisysHeaderLink.tsx";
 import EndringsloggHeader from "~/common/header/EndringsloggHeader.tsx";
-import type {NavUser} from "~/common/NavUser.ts";
+import type { NavUser } from "~/common/NavUser.ts";
 
 interface AppHeaderProps {
     bruker?: NavUser;
     bisysUrl?: string;
 }
 
-export function AppHeader({bruker, bisysUrl}: AppHeaderProps) {
+export function AppHeader({ bruker, bisysUrl }: AppHeaderProps) {
     return (
         <InternalHeader>
             <InternalHeader.Title href="/">Bidrag</InternalHeader.Title>
-            <Spacer/>
+            <Spacer />
             <ClientOnly>
-                <BisysHeaderLink/>
+                <BisysHeaderLink />
             </ClientOnly>
-            <AppSwitcher bisysUrl={bisysUrl}/>
+            <AppSwitcher bisysUrl={bisysUrl} />
             <ClientOnly>
-                <EndringsloggHeader/>
+                <EndringsloggHeader />
             </ClientOnly>
             <ActionMenu>
                 <ActionMenu.Trigger>
-                    <InternalHeader.UserButton name={bruker?.name ?? "Ukjent bruker"} description={bruker?.NAVident}/>
+                    <InternalHeader.UserButton name={bruker?.name ?? "Ukjent bruker"} description={bruker?.NAVident} />
                 </ActionMenu.Trigger>
                 <ActionMenu.Content align="end">
                     <ActionMenu.Group aria-label="Handlinger">
-                        <ActionMenu.Item as="a" href="/oauth2/logout" style={{cursor: "pointer"}}>
-                            Logg ut <LeaveIcon aria-hidden/>
+                        <ActionMenu.Item as="a" href="/oauth2/logout" style={{ cursor: "pointer" }}>
+                            Logg ut <LeaveIcon aria-hidden />
                         </ActionMenu.Item>
                     </ActionMenu.Group>
                 </ActionMenu.Content>

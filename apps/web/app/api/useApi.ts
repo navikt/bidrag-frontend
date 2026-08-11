@@ -27,7 +27,7 @@ import type {
     SakshendelseDto,
 } from "@bidrag/api/SakApi";
 import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
-import { IdentUtils, ObjectUtils, SecureLoggerService, StringUtils, LoggerService } from "@bidrag/common";
+import { IdentUtils, LoggerService, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
 import {
     useMutation,
     useQueries,
@@ -37,8 +37,13 @@ import {
     useSuspenseQuery,
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import type {
+    EndringsLoggDto,
+    EndringsloggTilhorerSkjermbilde,
+    OppdaterEndringsloggRequest,
+    OpprettEndringsloggRequest,
+} from "~/api/types/admin.ts";
 import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
-import type { EndringsLoggDto, EndringsloggTilhorerSkjermbilde, OppdaterEndringsloggRequest, OpprettEndringsloggRequest } from "~/api/types/admin.ts";
 
 // ==================== SAK ====================
 
@@ -806,7 +811,7 @@ export const useHentEndringslogger = () => {
     return useSuspenseQuery<EndringsLoggDto[], AxiosError | TilgangsFeilError>({
         queryKey: ["endringslogger"],
         queryFn: async (): Promise<EndringsLoggDto[]> => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentAlleEndringslogg({bareAktive: false});
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.hentAlleEndringslogg({ bareAktive: false });
             return data;
         },
     });
@@ -816,7 +821,7 @@ export const useCreateEndringslogg = () => {
     return useMutation({
         mutationKey: ["createUpdateEndringslogg"],
         mutationFn: async (payload: OpprettEndringsloggRequest): Promise<EndringsLoggDto> => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.opprettEndringslogg(payload);
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.opprettEndringslogg(payload);
             return data;
         },
         networkMode: "always",
@@ -831,13 +836,13 @@ export const useEditEndringslogg = () => {
     return useMutation({
         mutationKey: ["createUpdateEndringslogg"],
         mutationFn: async ({
-                               endringsloggId,
-                               payload,
-                           }: {
+            endringsloggId,
+            payload,
+        }: {
             endringsloggId: number;
             payload: OppdaterEndringsloggRequest;
         }): Promise<EndringsLoggDto> => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.oppdaterEndringslogg(endringsloggId, payload);
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.oppdaterEndringslogg(endringsloggId, payload);
             return data;
         },
         networkMode: "always",
@@ -853,7 +858,7 @@ export const useHentEndringslogg = (endringsloggId?: number) => {
         queryKey: ["endringslogg", endringsloggId],
         queryFn: async (): Promise<EndringsLoggDto> => {
             if (!endringsloggId) return {} as EndringsLoggDto;
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentEndringslogg(endringsloggId);
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.hentEndringslogg(endringsloggId);
             return data;
         },
     });
@@ -862,7 +867,7 @@ export const useHentEndringslogg = (endringsloggId?: number) => {
 export const useAktiverEndringslogg = () => {
     return useMutation({
         mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.aktiverEndringslogg(endringsloggId);
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.aktiverEndringslogg(endringsloggId);
             return data;
         },
         networkMode: "always",
@@ -876,7 +881,7 @@ export const useAktiverEndringslogg = () => {
 export const useDeaktiverEndringslogg = () => {
     return useMutation({
         mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.deaktiverEndringslogg(endringsloggId);
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.deaktiverEndringslogg(endringsloggId);
             return data;
         },
         networkMode: "always",
@@ -904,7 +909,7 @@ export const useGetEndringsloggForBruker = (skjermbilde?: EndringsloggTilhorerSk
     return useQuery<EndringsLoggDto[]>({
         queryKey: ["endringslogg_bruker", skjermbilde],
         queryFn: async () => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentAlleEndringslogg({
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.hentAlleEndringslogg({
                 bareAktive: true,
                 skjermbilde,
             });
@@ -918,12 +923,15 @@ export const useLestAvBrukerEndringslogg = (skjermbilde?: EndringsloggTilhorerSk
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.oppdaterLestAvBrukerEndringslogg(endringsloggId, {lesetidVarighetMs: 0});
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.oppdaterLestAvBrukerEndringslogg(endringsloggId, {
+                lesetidVarighetMs: 0,
+            });
             return data;
         },
         onSuccess: (updated) => {
-            queryClient.setQueryData<EndringsLoggDto[]>(["endringslogg_bruker", skjermbilde], (prev) =>
-                prev?.map((e) => (e.id === updated.id ? updated : e)) ?? prev
+            queryClient.setQueryData<EndringsLoggDto[]>(
+                ["endringslogg_bruker", skjermbilde],
+                (prev) => prev?.map((e) => (e.id === updated.id ? updated : e)) ?? prev,
             );
         },
     });
@@ -932,13 +940,24 @@ export const useLestAvBrukerEndringslogg = (skjermbilde?: EndringsloggTilhorerSk
 export const useLestAvBrukerEndring = (endringsloggId: number, skjermbilde?: EndringsloggTilhorerSkjermbilde) => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({endringId, lesetidVarighet}: {endringId: number; lesetidVarighet: number}): Promise<EndringsLoggDto> => {
-            const {data} = await BIDRAG_ADMIN_API.endringslogg.oppdaterLestAvBrukerEndring(endringsloggId, endringId, {lesetidVarighetMs: lesetidVarighet});
+        mutationFn: async ({
+            endringId,
+            lesetidVarighet,
+        }: {
+            endringId: number;
+            lesetidVarighet: number;
+        }): Promise<EndringsLoggDto> => {
+            const { data } = await BIDRAG_ADMIN_API.endringslogg.oppdaterLestAvBrukerEndring(
+                endringsloggId,
+                endringId,
+                { lesetidVarighetMs: lesetidVarighet },
+            );
             return data;
         },
         onSuccess: (updated) => {
-            queryClient.setQueryData<EndringsLoggDto[]>(["endringslogg_bruker", skjermbilde], (prev) =>
-                prev?.map((e) => (e.id === updated.id ? updated : e)) ?? prev
+            queryClient.setQueryData<EndringsLoggDto[]>(
+                ["endringslogg_bruker", skjermbilde],
+                (prev) => prev?.map((e) => (e.id === updated.id ? updated : e)) ?? prev,
             );
         },
     });

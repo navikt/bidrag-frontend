@@ -1,13 +1,15 @@
-import {useQueryClient} from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 import type {
     EndringsLoggDto,
     EndringsloggTilhorerSkjermbilde,
     OppdaterEndringsloggEndring,
-    OppdaterEndringsloggRequest
+    OppdaterEndringsloggRequest,
 } from "~/api/types/admin.ts";
-import {useEditEndringslogg, useHentEndringslogg} from "~/api/useApi.ts";
-import EndringsloggForm, {type EndringsloggFormValues} from "~/routes/admin/endringslogg/components/EndringsloggForm.tsx";
+import { useEditEndringslogg, useHentEndringslogg } from "~/api/useApi.ts";
+import EndringsloggForm, {
+    type EndringsloggFormValues,
+} from "~/routes/admin/endringslogg/components/EndringsloggForm.tsx";
 import type { Route } from "./+types/EndringsloggEditPage";
 
 const createPayload = (formValues: EndringsloggFormValues) => {
@@ -23,7 +25,7 @@ const createPayload = (formValues: EndringsloggFormValues) => {
     return payload;
 };
 
-export default function EndringsloggEditPage({params}: Route.ComponentProps) {
+export default function EndringsloggEditPage({ params }: Route.ComponentProps) {
     const id = params.id;
     const queryClient = useQueryClient();
     const endringslogg = useHentEndringslogg(Number(id));
@@ -31,7 +33,7 @@ export default function EndringsloggEditPage({params}: Route.ComponentProps) {
     const onSave = (formValues: EndringsloggFormValues, onSuccess: (id: number) => void) => {
         const payload = createPayload(formValues);
         mutation.mutate(
-            {endringsloggId: Number(id), payload},
+            { endringsloggId: Number(id), payload },
             {
                 onSuccess: (response) => {
                     queryClient.setQueryData<EndringsLoggDto[]>(
@@ -43,13 +45,13 @@ export default function EndringsloggEditPage({params}: Route.ComponentProps) {
                                 }
                                 return endring;
                             });
-                        }
+                        },
                     );
                     queryClient.setQueryData<EndringsLoggDto>(["endringslogg", Number(id)], () => response);
                     onSuccess(response.id);
                 },
-            }
+            },
         );
     };
-    return <EndringsloggForm onSave={onSave} mutationError={mutation.error} endringslogg={endringslogg.data}/>;
-};
+    return <EndringsloggForm onSave={onSave} mutationError={mutation.error} endringslogg={endringslogg.data} />;
+}

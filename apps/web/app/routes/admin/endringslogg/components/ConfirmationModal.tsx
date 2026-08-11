@@ -1,5 +1,5 @@
-import {BodyLong, Modal} from "@navikt/ds-react";
-import {type ForwardedRef, forwardRef, type ReactNode} from "react";
+import { BodyLong, Modal } from "@navikt/ds-react";
+import { type ForwardedRef, forwardRef, type ReactNode } from "react";
 
 export const ConfirmationModal = forwardRef(
     (
@@ -12,7 +12,7 @@ export const ConfirmationModal = forwardRef(
             description: string;
             footer: ReactNode;
         },
-        ref: ForwardedRef<HTMLDialogElement>
+        ref: ForwardedRef<HTMLDialogElement>,
     ) => {
         return (
             <Modal ref={ref} closeOnBackdropClick aria-labelledby="modal-heading">
@@ -23,5 +23,5 @@ export const ConfirmationModal = forwardRef(
                 <Modal.Footer>{footer}</Modal.Footer>
             </Modal>
         );
-    }
+    },
 );

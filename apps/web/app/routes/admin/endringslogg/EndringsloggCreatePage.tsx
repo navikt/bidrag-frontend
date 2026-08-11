@@ -1,13 +1,12 @@
-import {useQueryClient} from "@tanstack/react-query";
-
-import EndringsloggForm, {type EndringsloggFormValues} from "./components/EndringsloggForm";
-import {useCreateEndringslogg, useEditEndringslogg} from "~/api/useApi.ts";
+import { useQueryClient } from "@tanstack/react-query";
 import type {
     EndringsLoggDto,
     EndringsloggTilhorerSkjermbilde,
     OppdaterEndringsloggRequest,
-    OpprettEndringsloggRequest
+    OpprettEndringsloggRequest,
 } from "~/api/types/admin.ts";
+import { useCreateEndringslogg, useEditEndringslogg } from "~/api/useApi.ts";
+import EndringsloggForm, { type EndringsloggFormValues } from "./components/EndringsloggForm";
 
 const createPayload = (formValues: EndringsloggFormValues) => {
     const payload: OpprettEndringsloggRequest & { id?: number } = {
@@ -32,7 +31,7 @@ export default function EndringsloggCreatePage() {
         if (formValues.id) {
             const payload = createPayload(formValues);
             mutationEdit.mutate(
-                {endringsloggId: formValues.id, payload: payload as OppdaterEndringsloggRequest},
+                { endringsloggId: formValues.id, payload: payload as OppdaterEndringsloggRequest },
                 {
                     onSuccess: (response) => {
                         queryClient.setQueryData<EndringsLoggDto[]>(
@@ -43,24 +42,25 @@ export default function EndringsloggCreatePage() {
                                         return response;
                                     }
                                     return endring;
-                                })
+                                }),
                         );
                         onSuccess(response.id);
                     },
-                }
+                },
             );
             return;
         }
         const payload = createPayload(formValues);
         mutation.mutate(payload, {
             onSuccess: (response) => {
-                queryClient.setQueryData<EndringsLoggDto[]>(["endringslogger"], (currentData: NoInfer<EndringsLoggDto[]> | undefined) =>
-                    [response].concat(currentData || [])
+                queryClient.setQueryData<EndringsLoggDto[]>(
+                    ["endringslogger"],
+                    (currentData: NoInfer<EndringsLoggDto[]> | undefined) => [response].concat(currentData || []),
                 );
                 onSuccess(response.id);
             },
         });
     };
 
-    return <EndringsloggForm onSave={onSave} mutationError={mutation.error}/>;
-};
+    return <EndringsloggForm onSave={onSave} mutationError={mutation.error} />;
+}

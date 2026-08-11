@@ -19,21 +19,20 @@ import {
     TextField,
     VStack,
 } from "@navikt/ds-react";
-import {useMutationState} from "@tanstack/react-query";
-import {useEffect, useRef, useState} from "react";
+import { useMutationState } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import {
     Controller,
     FormProvider,
-    useFieldArray,
     type UseFieldArrayReturn,
+    useFieldArray,
     useForm,
     useFormContext,
     useWatch,
 } from "react-hook-form";
-
-import {type EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype} from "~/api/types/admin.ts";
-import {EndringsModal} from "~/routes/admin/endringslogg";
-import {useNavigate} from "react-router";
+import { useNavigate } from "react-router";
+import { type EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype } from "~/api/types/admin.ts";
+import { EndringsModal } from "~/routes/admin/endringslogg";
 
 type Endring = {
     innhold: string;
@@ -59,7 +58,7 @@ export type EndringsloggFormValues = {
 };
 
 const fallbackToEmptyString = <T extends string | EndringsloggTilhorerSkjermbilde>(
-    value: T | null | undefined
+    value: T | null | undefined,
 ): T | "" => value ?? "";
 
 const createDefaultValues = (endringslogg?: EndringsLoggDto): EndringsloggFormValues => {
@@ -74,12 +73,13 @@ const createDefaultValues = (endringslogg?: EndringsLoggDto): EndringsloggFormVa
             innhold: "",
             endringstype: Endringstype.ENDRING,
         },
-        endringer: endringslogg?.endringer?.map((endring) => ({
-            innhold: endring?.innhold,
-            tittel: endring?.tittel,
-            endringstype: endring?.endringstype,
-            id: endring?.id ? endring?.id : undefined,
-        })) || [],
+        endringer:
+            endringslogg?.endringer?.map((endring) => ({
+                innhold: endring?.innhold,
+                tittel: endring?.tittel,
+                endringstype: endring?.endringstype,
+                id: endring?.id ? endring?.id : undefined,
+            })) || [],
     };
 
     return defaultValues;
@@ -103,13 +103,13 @@ export const EndringstypeToVisningsnavn = {
 };
 
 const EndringsBox = ({
-                         endringerFieldArray,
-                     }: {
+    endringerFieldArray,
+}: {
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
     const _quillRef = useRef(null);
     const modalRef = useRef<HTMLDialogElement>(null);
-    const {getValues, control, resetField, setError, clearErrors} = useFormContext<EndringsloggFormValues>();
+    const { getValues, control, resetField, setError, clearErrors } = useFormContext<EndringsloggFormValues>();
 
     const onAdd = () => {
         const endring = getValues("endring");
@@ -150,14 +150,14 @@ const EndringsBox = ({
                 size="small"
                 className="w-max"
                 onClick={() => {
-                    endringerFieldArray.prepend({tittel: "", innhold: "", endringstype: Endringstype.ENDRING});
+                    endringerFieldArray.prepend({ tittel: "", innhold: "", endringstype: Endringstype.ENDRING });
                 }}
             >
                 + Legg til endring
             </Button>
             <Modal
                 ref={modalRef}
-                header={{heading: "Endring"}}
+                header={{ heading: "Endring" }}
                 closeOnBackdropClick
                 onClose={() => resetField("endring")}
                 aria-labelledby="modal-heading"
@@ -169,7 +169,7 @@ const EndringsBox = ({
                             <Controller
                                 name="endring.tittel"
                                 control={control}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <TextField
                                         {...field}
                                         label="Tittel"
@@ -182,7 +182,7 @@ const EndringsBox = ({
                             <Controller
                                 name="endring.endringstype"
                                 control={control}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <Select
                                         {...field}
                                         error={fieldState.error?.message}
@@ -229,92 +229,92 @@ const EndringsBox = ({
 };
 
 const EndringsFormBox = ({
-                             index,
-                             endringerFieldArray,
-                         }: {
+    index,
+    endringerFieldArray,
+}: {
     index: number;
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
     const _quillRef = useRef(null);
-    const {control} = useFormContext<EndringsloggFormValues>();
+    const { control } = useFormContext<EndringsloggFormValues>();
 
     return (
         <Box background="default" padding="space-4" borderColor="neutral" borderWidth="1" borderRadius="4">
-                <VStack gap="space-4">
-                    <HStack gap="space-4" align="center" justify="space-between">
-                        <Label size="small">Endring</Label>
-                        <HStack gap="space-2">
-                            <Button
-                                type="button"
-                                onClick={() => endringerFieldArray.move(index, index - 1)}
-                                disabled={index === 0}
-                                icon={<ChevronUpIcon aria-hidden/>}
-                                variant="tertiary"
-                                size="small"
-                            />
-                            <Button
-                                type="button"
-                                onClick={() => endringerFieldArray.move(index, index + 1)}
-                                disabled={index === endringerFieldArray.fields.length - 1}
-                                icon={<ChevronDownIcon aria-hidden/>}
-                                variant="tertiary"
-                                size="small"
-                            />
-                            <Button
-                                type="button"
-                                onClick={() => endringerFieldArray.remove(index)}
-                                icon={<TrashIcon aria-hidden/>}
-                                variant="tertiary"
-                                size="small"
-                            />
-                        </HStack>
+            <VStack gap="space-4">
+                <HStack gap="space-4" align="center" justify="space-between">
+                    <Label size="small">Endring</Label>
+                    <HStack gap="space-2">
+                        <Button
+                            type="button"
+                            onClick={() => endringerFieldArray.move(index, index - 1)}
+                            disabled={index === 0}
+                            icon={<ChevronUpIcon aria-hidden />}
+                            variant="tertiary"
+                            size="small"
+                        />
+                        <Button
+                            type="button"
+                            onClick={() => endringerFieldArray.move(index, index + 1)}
+                            disabled={index === endringerFieldArray.fields.length - 1}
+                            icon={<ChevronDownIcon aria-hidden />}
+                            variant="tertiary"
+                            size="small"
+                        />
+                        <Button
+                            type="button"
+                            onClick={() => endringerFieldArray.remove(index)}
+                            icon={<TrashIcon aria-hidden />}
+                            variant="tertiary"
+                            size="small"
+                        />
                     </HStack>
+                </HStack>
 
-                    <Controller
-                        name={`endringer.${index}.tittel`}
-                        control={control}
-                        rules={{
-                            required: {
-                                value: true,
-                                message: "Dette feltet er påkrevd",
-                            },
-                        }}
-                        render={({field, fieldState}) => (
-                            <TextField
-                                {...field}
-                                label="Tittel"
-                                size="small"
-                                error={fieldState.error?.message}
-                                className="h-max"
-                            />
-                        )}
-                    />
-                    <Controller
-                        name={`endringer.${index}.endringstype`}
-                        control={control}
-                        rules={{
-                            required: {
-                                value: true,
-                                message: "Dette feltet er påkrevd",
-                            },
-                        }}
-                        render={({field, fieldState}) => (
-                            <Select
-                                {...field}
-                                error={fieldState.error?.message}
-                                label="Endringstype"
-                                size="small"
-                                className="h-max"
-                            >
-                                {Object.values(Endringstype).map((endringstype) => (
-                                    <option key={endringstype} value={endringstype}>
-                                        {EndringstypeToVisningsnavn[endringstype]}
-                                    </option>
-                                ))}
-                            </Select>
-                        )}
-                    />
-                    {/*
+                <Controller
+                    name={`endringer.${index}.tittel`}
+                    control={control}
+                    rules={{
+                        required: {
+                            value: true,
+                            message: "Dette feltet er påkrevd",
+                        },
+                    }}
+                    render={({ field, fieldState }) => (
+                        <TextField
+                            {...field}
+                            label="Tittel"
+                            size="small"
+                            error={fieldState.error?.message}
+                            className="h-max"
+                        />
+                    )}
+                />
+                <Controller
+                    name={`endringer.${index}.endringstype`}
+                    control={control}
+                    rules={{
+                        required: {
+                            value: true,
+                            message: "Dette feltet er påkrevd",
+                        },
+                    }}
+                    render={({ field, fieldState }) => (
+                        <Select
+                            {...field}
+                            error={fieldState.error?.message}
+                            label="Endringstype"
+                            size="small"
+                            className="h-max"
+                        >
+                            {Object.values(Endringstype).map((endringstype) => (
+                                <option key={endringstype} value={endringstype}>
+                                    {EndringstypeToVisningsnavn[endringstype]}
+                                </option>
+                            ))}
+                        </Select>
+                    )}
+                />
+                {/*
                     <Controller
                         name={`endringer.${index}.innhold`}
                         control={control}
@@ -336,23 +336,23 @@ const EndringsFormBox = ({
                         )}
                     />
                     */}
-                </VStack>
-            </Box>
+            </VStack>
+        </Box>
     );
 };
 
 export default function EndringsloggForm({
-                                             onSave,
-                                             endringslogg,
-                                             mutationError,
-                                         }: {
+    onSave,
+    endringslogg,
+    mutationError,
+}: {
     onSave: (formValues: EndringsloggFormValues, onSuccess: (id: number) => void) => void;
     endringslogg?: EndringsLoggDto;
     mutationError: Error | null;
 }) {
     const [previewed, setPreviewed] = useState<EndringsLoggDto | null>(null);
     const variables = useMutationState({
-        filters: {mutationKey: ["createUpdateEndringslogg"], status: "pending"},
+        filters: { mutationKey: ["createUpdateEndringslogg"], status: "pending" },
         select: (mutation) => mutation.state.variables,
     });
     const [showSaved, setShowSaved] = useState(false);
@@ -370,7 +370,7 @@ export default function EndringsloggForm({
         control: formMethods.control,
         name: "endringer",
     });
-    const watchFieldArray = useWatch({control: formMethods.control, name: "endringer"});
+    const watchFieldArray = useWatch({ control: formMethods.control, name: "endringer" });
     const controlledFields = endringerFieldArray.fields.map((field, index) => {
         return {
             ...field,
@@ -434,7 +434,7 @@ export default function EndringsloggForm({
         }
 
         onSave(formValues, (id) => {
-            const updatedValues = {...formValues, id};
+            const updatedValues = { ...formValues, id };
             formMethods.reset(updatedValues);
             if (saveAndLeave) {
                 setSaveAndLeave(false);
@@ -460,7 +460,7 @@ export default function EndringsloggForm({
                         navigate("/admin/endringslogg");
                     }
                 }}
-                icon={<ChevronLeftIcon title="Tilbake" fontSize="1.5rem"/>}
+                icon={<ChevronLeftIcon title="Tilbake" fontSize="1.5rem" />}
                 className="mb-4"
             >
                 Tilbake
@@ -479,7 +479,7 @@ export default function EndringsloggForm({
                                             message: "Dette feltet er påkrevd",
                                         },
                                     }}
-                                    render={({field, fieldState}) => (
+                                    render={({ field, fieldState }) => (
                                         <TextField
                                             {...field}
                                             label="Tittel"
@@ -498,7 +498,7 @@ export default function EndringsloggForm({
                                             message: "Dette feltet er påkrevd",
                                         },
                                     }}
-                                    render={({field, fieldState}) => (
+                                    render={({ field, fieldState }) => (
                                         <Textarea
                                             {...field}
                                             label="Sammendrag"
@@ -512,7 +512,7 @@ export default function EndringsloggForm({
                                 <Controller
                                     name="erPåkrevd"
                                     control={formMethods.control}
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <Switch
                                             checked={field.value}
                                             onChange={(e) => field.onChange(e.target.checked)}
@@ -528,7 +528,7 @@ export default function EndringsloggForm({
                                         {formMethods.formState.errors.root.message}
                                     </ErrorMessage>
                                 )}
-                                <EndringsBox endringerFieldArray={endringerFieldArray}/>
+                                <EndringsBox endringerFieldArray={endringerFieldArray} />
                             </div>
                             <div>
                                 <Controller
@@ -540,7 +540,7 @@ export default function EndringsloggForm({
                                             message: "Dette feltet er påkrevd",
                                         },
                                     }}
-                                    render={({field, fieldState}) => (
+                                    render={({ field, fieldState }) => (
                                         <Select
                                             {...field}
                                             label="Gjelder skjermbilde"
@@ -552,9 +552,13 @@ export default function EndringsloggForm({
                                             {Object.keys(EndringsloggTilhorerSkjermbildeToVisningsnavn).map(
                                                 (gjelder) => (
                                                     <option key={gjelder} value={gjelder}>
-                                                        {EndringsloggTilhorerSkjermbildeToVisningsnavn[gjelder as EndringsloggTilhorerSkjermbilde]}
+                                                        {
+                                                            EndringsloggTilhorerSkjermbildeToVisningsnavn[
+                                                                gjelder as EndringsloggTilhorerSkjermbilde
+                                                            ]
+                                                        }
                                                     </option>
-                                                )
+                                                ),
                                             )}
                                         </Select>
                                     )}
@@ -577,7 +581,7 @@ export default function EndringsloggForm({
                             <Button
                                 type="submit"
                                 variant="primary"
-                                icon={showSaved ? <CheckmarkCircleIcon/> : undefined}
+                                icon={showSaved ? <CheckmarkCircleIcon /> : undefined}
                                 size="small"
                                 loading={variables.length > 0}
                             >
@@ -587,7 +591,7 @@ export default function EndringsloggForm({
                                 <Button
                                     variant="tertiary"
                                     size="small"
-                                    icon={<MagnifyingGlassIcon title="Forhåndsvisning"/>}
+                                    icon={<MagnifyingGlassIcon title="Forhåndsvisning" />}
                                     onClick={() => setPreviewed(formMethods.getValues() as EndringsLoggDto)}
                                 >
                                     Forhåndsvisning
@@ -610,7 +614,7 @@ export default function EndringsloggForm({
                         <Modal
                             open={showLeaveModal}
                             onClose={() => setShowLeaveModal(false)}
-                            header={{heading: "Ulagrede endringer"}}
+                            header={{ heading: "Ulagrede endringer" }}
                             closeOnBackdropClick={false}
                         >
                             <Modal.Body>

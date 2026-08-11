@@ -1,7 +1,7 @@
-import {useSuspenseQuery} from "@tanstack/react-query";
+import { BEHANDLING_API_V1 } from "@bidrag/api";
 
-import {Inntektsrapportering} from "@bidrag/api/BidragBehandlingApiV1";
-import {BEHANDLING_API_V1} from "@bidrag/api";
+import { Inntektsrapportering } from "@bidrag/api/BidragBehandlingApiV1";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function lastVisningsnavn() {
     return useSuspenseQuery({

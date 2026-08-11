@@ -1,13 +1,20 @@
 import {
+    type TreeChild,
+    TreeChildType,
+    type TreeEngangsbeløp,
+    type TreePeriode,
+    type TreeStønad,
+    type TreeVedtak,
+} from "@bidrag/api";
+import {
     type EngangsbelopDto,
     type GrunnlagDto,
     Grunnlagstype,
     type StonadsendringDto,
     type VedtakDto,
-    type VedtakPeriodeDto
+    type VedtakPeriodeDto,
 } from "@bidrag/api/BidragVedtakApi";
-import {hentVisningsnavn} from "./VisningsnavnMapper";
-import {type TreeChild, TreeChildType, type TreeEngangsbeløp, type TreePeriode, type TreeStønad, type TreeVedtak} from "@bidrag/api";
+import { hentVisningsnavn } from "./VisningsnavnMapper";
 
 export function mapVedtakToTree(vedtak: VedtakDto) {
     const vedtakParent: TreeChild = {
@@ -89,7 +96,11 @@ function genererGrunnlagSomIkkeErReferert(vedtak: VedtakDto, parent: TreeChild):
         .filter((item): item is TreeChild => item !== null);
 }
 
-function referanseTilTree(referanse?: string, grunnlagsliste?: GrunnlagDto[], parent?: TreeChild | null): TreeChild | null {
+function referanseTilTree(
+    referanse?: string,
+    grunnlagsliste?: GrunnlagDto[],
+    parent?: TreeChild | null,
+): TreeChild | null {
     if (!referanse || !grunnlagsliste) return null;
     const filtrertGrunnlagsliste = filtrerBasertPåReferanse(referanse, grunnlagsliste);
     if (filtrertGrunnlagsliste.length === 0) {
@@ -135,7 +146,7 @@ function grunnlagstypeTilVisningsnavn(grunnlag: GrunnlagDto, grunnlagsListe: Gru
     // innhold is a JSON string in BidragVedtakApi but treated as a parsed object at runtime
     // biome-ignore lint/suspicious/noExplicitAny: innhold typed as string in API but is a parsed JSON object at runtime
     const innholdObj = grunnlag.innhold as any;
-    const gjelder = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse ?? '', grunnlagsListe);
+    const gjelder = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse ?? "", grunnlagsListe);
     const gjelderVisningsnavn = tilRolleVisningsnavn(gjelder?.type);
     switch (grunnlag.type) {
         case Grunnlagstype.SLUTTBEREGNING_FORSKUDD: {
@@ -194,7 +205,7 @@ function grunnlagstypeTilVisningsnavn(grunnlag: GrunnlagDto, grunnlagsListe: Gru
             if (grunnlag.type.startsWith("PERSON_")) {
                 return `${grunnlag.type}(${toCompactString(innholdObj?.fødselsdato)})`;
             } else if (grunnlag.type.startsWith("INNHENTET_")) {
-                const gjelderGrunnlag = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse || '', grunnlagsListe);
+                const gjelderGrunnlag = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse || "", grunnlagsListe);
                 const rolleVisningsnavn = tilRolleVisningsnavn(gjelderGrunnlag?.type);
                 const type = innhentetTilVisningsnavn(grunnlag.type);
                 return `Innhentet ${type}(${rolleVisningsnavn})`;
@@ -235,7 +246,7 @@ function inneholderReferanse(referanse: string, grunnlagReferanseListe?: string[
 
 function stønadsendringPerioderInneholderReferanse(
     stønadsendringListe: StonadsendringDto[],
-    referanse: string
+    referanse: string,
 ): boolean {
     return stønadsendringListe.some((s) => s.periodeListe.some((p) => p.grunnlagReferanseListe.includes(referanse)));
 }
@@ -262,13 +273,13 @@ function filtrerBasertPåReferanse(referanse: string, grunnlagsliste: GrunnlagDt
 
 function filtrerBasertPåFremmendReferanse(referanse: string, grunnlagsliste: GrunnlagDto[]): GrunnlagDto[] {
     return grunnlagsliste.filter(
-        (grunnlag) => grunnlag.gjelderReferanse === referanse || grunnlag.grunnlagsreferanseListe.includes(referanse)
+        (grunnlag) => grunnlag.gjelderReferanse === referanse || grunnlag.grunnlagsreferanseListe.includes(referanse),
     );
 }
 
 export function stønadsendringPeriodeToTreeDto(
     periode: VedtakPeriodeDto,
-    stønadsendring: StonadsendringDto
+    stønadsendring: StonadsendringDto,
 ): TreePeriode {
     return {
         nodeId: nodeIdVedtakPeriode(periode, stønadsendring),
@@ -323,7 +334,7 @@ export function vedtakToTreeDto(vedtak: VedtakDto): TreeVedtak {
         opprettetAv: vedtak.opprettetAv,
         opprettetAvNavn: vedtak.opprettetAvNavn || null,
         kildeapplikasjon: vedtak.kildeapplikasjon,
-        vedtakstidspunkt: vedtak.vedtakstidspunkt || '',
+        vedtakstidspunkt: vedtak.vedtakstidspunkt || "",
         enhetsnummer: vedtak.enhetsnummer || null,
         innkrevingUtsattTilDato: vedtak.innkrevingUtsattTilDato || undefined,
         fastsattILand: vedtak.fastsattILand || null,

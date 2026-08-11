@@ -1,9 +1,6 @@
-import type {Route} from "../../../../.react-router/types/app/routes/admin/+types";
+import type { Route } from "../../../../.react-router/types/app/routes/admin/+types";
 
-export default function DokumentasjonPage({params}: Route.ComponentProps) {
+export default function DokumentasjonPage({ params }: Route.ComponentProps) {
     console.log(params);
-    return (
-        <div>DOKUMENTASJON</div>
-
-    );
+    return <div>DOKUMENTASJON</div>;
 }

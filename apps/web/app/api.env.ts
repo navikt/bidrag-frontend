@@ -48,7 +48,7 @@ const APIS: Record<string, ApiConfig> = {
     },
     "bidrag-admin": {
         url: env.BIDRAG_ADMIN_URL,
-        audience: env.BIDRAG_ADMIN_AUDIENCE
+        audience: env.BIDRAG_ADMIN_AUDIENCE,
     },
     "bidrag-behandling": {
         url: env.BIDRAG_BEHANDLING_URL,

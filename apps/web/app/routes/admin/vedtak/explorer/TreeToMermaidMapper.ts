@@ -1,4 +1,3 @@
-
 import { type MermaidResponse, MermaidSubgraph, type TreeChild, TreeChildType } from "@bidrag/api";
 import { Grunnlagstype, type VedtakDto } from "@bidrag/api/BidragVedtakApi";
 import {

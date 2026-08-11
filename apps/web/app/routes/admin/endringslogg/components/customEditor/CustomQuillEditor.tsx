@@ -3,11 +3,11 @@ import "quill/dist/quill.core.css";
 import "./CustomQuillEditor.css";
 import "quill-paste-smart";
 
-import {ErrorMessage} from "@navikt/ds-react";
+import { ErrorMessage } from "@navikt/ds-react";
 import Quill from "quill";
 import QuillResize from "quill-resize-module";
-import {useEffect, useRef, useState} from "react";
-import type {RefObject} from "react";
+import type { RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Clipboard = Quill.import("modules/clipboard");
 
@@ -71,7 +71,7 @@ type EditorProps = {
     error?: string;
     ref: RefObject<HTMLDivElement>;
 };
-export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, resize, error}: EditorProps) => {
+export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, resize, error }: EditorProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [quill, setQuill] = useState<Quill | null>(null);
 
@@ -108,8 +108,8 @@ export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, re
 
                 toolbar: {
                     container: [
-                        [{color: []}, {background: []}],
-                        ["bold", "italic", "underline", "image", "link", {header: 3}],
+                        [{ color: [] }, { background: [] }],
+                        ["bold", "italic", "underline", "image", "link", { header: 3 }],
                         // [{ 'color': "red" }, { 'background': "yellow" }]
                     ],
                 },
@@ -139,7 +139,7 @@ export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, re
             const currentHTML = quill.getSemanticHTML().replaceAll("<p></p>", "<p><br/></p>");
 
             if (defaultValue !== currentHTML) {
-                const updatedDelta = quill.clipboard.convert({html: defaultValue});
+                const updatedDelta = quill.clipboard.convert({ html: defaultValue });
                 quill.setContents(updatedDelta, "silent");
             }
         }

@@ -159,7 +159,7 @@ export interface LeggTilDriftsmeldingHistorikkRequest {
     status: "KRITISK" | "VARSEL" | "INFO" | "AVSLUTTET";
 }
 
-import type {AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType} from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, unknown>;
@@ -183,7 +183,7 @@ export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" 
 
 export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
     securityWorker?: (
-        securityData: SecurityDataType | null
+        securityData: SecurityDataType | null,
     ) => Promise<AxiosRequestConfig | undefined> | AxiosRequestConfig | undefined;
     secure?: boolean;
     format?: ResponseType;
@@ -203,7 +203,7 @@ export class HttpClient<SecurityDataType = unknown> {
     private secure?: boolean;
     private format?: ResponseType;
 
-    constructor({securityWorker, secure, format, ...axiosConfig}: ApiConfig<SecurityDataType> = {}) {
+    constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
         this.instance = axios.create({
             ...axiosConfig,
             baseURL: axiosConfig.baseURL || "https://bidrag-admin.intern.dev.nav.no",
@@ -218,14 +218,14 @@ export class HttpClient<SecurityDataType = unknown> {
     };
 
     public request = async <T = unknown, _E = unknown>({
-                                                   secure,
-                                                   path,
-                                                   type,
-                                                   query,
-                                                   format,
-                                                   body,
-                                                   ...params
-                                               }: FullRequestParams): Promise<AxiosResponse<T>> => {
+        secure,
+        path,
+        type,
+        query,
+        format,
+        body,
+        ...params
+    }: FullRequestParams): Promise<AxiosResponse<T>> => {
         const secureParams =
             ((typeof secure === "boolean" ? secure : this.secure) &&
                 this.securityWorker &&
@@ -246,7 +246,7 @@ export class HttpClient<SecurityDataType = unknown> {
             ...requestParams,
             headers: {
                 ...(requestParams.headers || {}),
-                ...(type ? {"Content-Type": type} : {}),
+                ...(type ? { "Content-Type": type } : {}),
             },
             params: query,
             responseType: responseFormat,
@@ -256,7 +256,7 @@ export class HttpClient<SecurityDataType = unknown> {
     };
 
     protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
-        const method = params1.method || (params2?.method);
+        const method = params1.method || params2?.method;
 
         return {
             ...this.instance.defaults,
@@ -265,7 +265,7 @@ export class HttpClient<SecurityDataType = unknown> {
             headers: {
                 ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
                 ...(params1.headers || {}),
-                ...((params2?.headers) || {}),
+                ...(params2?.headers || {}),
             },
         };
     }
@@ -371,7 +371,7 @@ export class Api<SecurityDataType> extends HttpClient<SecurityDataType> {
                 skjermbilde?: EndringsloggTilhorerSkjermbilde;
                 bareAktive?: boolean;
             },
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<EndringsLoggDto[], unknown>({
                 path: `/endringslogg`,
@@ -534,7 +534,7 @@ export class Api<SecurityDataType> extends HttpClient<SecurityDataType> {
         oppdaterDriftsmelding: (
             driftsmeldingId: number,
             data: OppdaterDriftsmeldingRequest,
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}`,
@@ -558,7 +558,7 @@ export class Api<SecurityDataType> extends HttpClient<SecurityDataType> {
             driftsmeldingId: number,
             driftsmeldingHistorikkId: number,
             data: OppdaterDriftsmeldingHistorikkRequest,
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk/${driftsmeldingHistorikkId}`,
@@ -581,7 +581,7 @@ export class Api<SecurityDataType> extends HttpClient<SecurityDataType> {
         slettDriftsmeldingHistorikk: (
             driftsmeldingId: number,
             driftsmeldingHistorikkId: number,
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk/${driftsmeldingHistorikkId}`,
@@ -655,7 +655,7 @@ export class Api<SecurityDataType> extends HttpClient<SecurityDataType> {
         opprettDriftsmeldingHistorikk: (
             driftsmeldingId: number,
             data: LeggTilDriftsmeldingHistorikkRequest,
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<DriftsmeldingDto, unknown>({
                 path: `/driftsmelding/${driftsmeldingId}/historikk`,
