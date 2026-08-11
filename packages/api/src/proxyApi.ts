@@ -1,4 +1,4 @@
-import type {AxiosInstance} from "axios";
+import type { AxiosInstance } from "axios";
 
 interface AxiosClient {
     instance: AxiosInstance;
@@ -13,7 +13,6 @@ interface UseApiOptions {
 }
 
 export function proxy<T extends AxiosClient>(api: T, options: UseApiOptions): T {
-    api.instance.defaults.baseURL = `/proxy/${options.app}`
-    return api
-
+    api.instance.defaults.baseURL = `/proxy/${options.app}`;
+    return api;
 }
