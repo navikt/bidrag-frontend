@@ -284,6 +284,7 @@ export class HttpClient<SecurityDataType = unknown> {
         }
         return Object.keys(input || {}).reduce((formData, key) => {
             const property = input[key];
+            // biome-ignore lint/suspicious/noExplicitAny: generated API utility for form data encoding
             const propertyContent: any[] = Array.isArray(property) ? property : [property];
 
             for (const formItem of propertyContent) {

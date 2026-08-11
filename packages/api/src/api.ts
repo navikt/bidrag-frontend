@@ -1,9 +1,9 @@
-import { Api as BidragAdminApi } from "./api/BidragAdminApi";
 import { Api as BidragBelopshistorikk } from "./api/BelopshistorikkApi";
+import { Api as BidragAdminApi } from "./api/BidragAdminApi";
+import { Api as BidragBehandlingApi } from "./api/BidragBehandlingApiV1.ts";
 import { Api as BidragDokumentApi } from "./api/BidragDokumentApi";
 import { Api as BidragForsendelseApi } from "./api/BidragForsendelseApi";
 import { Api as BidragReskontro } from "./api/BidragReskontroApi";
-import {Api as BidragBehandlingApi} from "./api/BidragBehandlingApiV1.ts";
 import { Api as BidragVedtak } from "./api/BidragVedtakApi";
 import { Api as BidragOrganisasjon } from "./api/OrganisasjonApi";
 import { Api as BidragPersonApi } from "./api/PersonApi";
