@@ -50,6 +50,8 @@ export interface EndringsLoggDto {
      * @format date
      */
     dato: string;
+    /** @format date-time */
+    opprettetTidspunkt: string;
     /** @format date */
     aktiv: boolean;
     /** @format date */

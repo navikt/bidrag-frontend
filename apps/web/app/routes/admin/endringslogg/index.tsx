@@ -124,7 +124,7 @@ const DeleteButton = ({ endringsloggId }: { endringsloggId: number }) => {
     const queryClient = useQueryClient();
     const slettEndringslogg = useSlettEndringslogg();
     const onSuccess = () => {
-        queryClient.setQueryData<EndringsLoggDto[]>(["endringslogger"], (currentData: EndringsLoggDto[]) =>
+        queryClient.setQueryData<EndringsLoggDto[]>(["endringslogger"], (currentData: EndringsLoggDto[] | undefined) =>
             currentData?.filter((endring) => endring.id !== endringsloggId),
         );
         queryClient.removeQueries({ queryKey: ["endringslogg", endringsloggId] });
@@ -171,8 +171,8 @@ const AktiverSwitch = ({ endringsloggId, aktiv }: { endringsloggId: number; akti
     const aktiver = useAktiverEndringslogg();
     const deaktiver = useDeaktiverEndringslogg();
 
-    const onSuccess = (response) => {
-        queryClient.setQueryData<EndringsLoggDto[]>(["endringslogger"], (currentData: EndringsLoggDto[]) => {
+    const onSuccess = (response: EndringsLoggDto) => {
+        queryClient.setQueryData<EndringsLoggDto[]>(["endringslogger"], (currentData: EndringsLoggDto[] | undefined) => {
             return currentData?.map((endring) => {
                 if (endring.id === response.id) {
                     return response;
