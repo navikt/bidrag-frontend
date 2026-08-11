@@ -83,7 +83,8 @@ export default function JournalpostTabell({
         },
     });
 
-    const { bisysSessionParams } = useBisysLink();
+    const { bisysSessionParams, setBisysLinkTarget } = useBisysLink();
+    setBisysLinkTarget("sak", { saksnr: saksnummer });
     const { enhet, sessionState } = bisysSessionParams;
 
     const { data: sak } = useHentSak(saksnummer);
