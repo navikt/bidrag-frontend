@@ -133,7 +133,7 @@ function tilRolleVisningsnavn(type?: Grunnlagstype) {
 
 function grunnlagstypeTilVisningsnavn(grunnlag: GrunnlagDto, grunnlagsListe: GrunnlagDto[]) {
     // innhold is a JSON string in BidragVedtakApi but treated as a parsed object at runtime
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: innhold typed as string in API but is a parsed JSON object at runtime
     const innholdObj = grunnlag.innhold as any;
     const gjelder = hentFørsteBasertPåReferanse(grunnlag.gjelderReferanse ?? '', grunnlagsListe);
     const gjelderVisningsnavn = tilRolleVisningsnavn(gjelder?.type);

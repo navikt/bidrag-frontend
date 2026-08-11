@@ -405,6 +405,7 @@ function toEchartData(tree: TreeChild): any {
         },
 
         tooltip: {
+            // biome-ignore lint/suspicious/noExplicitAny: ECharts formatter callback is untyped
             formatter: (v: any) => {
                 const jsonContent = v.value.replaceAll("\\n", "\n");
                 const highlightedJson = highlightJson(jsonContent);

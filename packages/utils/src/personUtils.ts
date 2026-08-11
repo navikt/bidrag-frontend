@@ -1,6 +1,6 @@
-import { FamileenhetDto, Rolleveileder } from "@bidrag/common";
+import type { FamileenhetDto, Rolleveileder } from "@bidrag/common";
 import { RolleTypeAbbreviation as RolleType } from "@bidrag/common";
-import { IFamilierelasjonTableData } from "@bidrag/common";
+import type { IFamilierelasjonTableData } from "@bidrag/common";
 
 export function getFamilierelasjonByRolle(
     personList: IFamilierelasjonTableData[],
@@ -70,7 +70,7 @@ export function beregnAlderFraFnr(fnr: string): number | null {
     }
 
     const fødselsdato = new Date(fødselsår, måned - 1, reellDag);
-    if (isNaN(fødselsdato.getTime())) {
+    if (Number.isNaN(fødselsdato.getTime())) {
         return null; // ugyldig dato
     }
 

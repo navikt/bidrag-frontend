@@ -1,4 +1,4 @@
-import {GrunnlagDto, Grunnlagstype} from "./api/BidragBehandlingApiV1.ts";
+import type {GrunnlagDto, Grunnlagstype} from "./api/BidragBehandlingApiV1.ts";
 
 export enum MermaidSubgraph {
     STONADSENDRING = "STONADSENDRING",

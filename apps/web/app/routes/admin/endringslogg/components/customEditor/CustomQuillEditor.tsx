@@ -12,6 +12,7 @@ import type {RefObject} from "react";
 const Clipboard = Quill.import("modules/clipboard");
 
 //@ts-expect-error
+// biome-ignore lint/correctness/noUnusedVariables: reserved for future clipboard customization
 class CustomClipboard extends Clipboard {
     onCaptureCopy(e: ClipboardEvent) {
         //@ts-expect-error
@@ -97,7 +98,7 @@ export const CustomQuillEditor = ({readOnly, defaultValue, onTextChange, ref, re
     useEffect(() => {
         const container = containerRef.current;
         const editorContainer = container?.appendChild(container?.ownerDocument.createElement("div"));
-        // @ts-ignore
+        // @ts-expect-error
         const quillEditor = new Quill(editorContainer, {
             theme: "snow",
             readOnly,
