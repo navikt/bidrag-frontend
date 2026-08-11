@@ -38,7 +38,7 @@ import {
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
-import { EndringsLoggDto, OppdaterEndringsloggRequest, OpprettEndringsloggRequest } from "~/api/types/admin.ts";
+import { EndringsLoggDto, EndringsloggTilhorerSkjermbilde, OppdaterEndringsloggRequest, OpprettEndringsloggRequest } from "~/api/types/admin.ts";
 
 // ==================== SAK ====================
 
@@ -896,6 +896,50 @@ export const useSlettEndringslogg = () => {
         onError: (error) => {
             console.log("onError", error);
             LoggerService.error("Feil ved sletting av endringslogg", error);
+        },
+    });
+};
+
+export const useGetEndringsloggForBruker = (skjermbilde?: EndringsloggTilhorerSkjermbilde) => {
+    return useQuery<EndringsLoggDto[]>({
+        queryKey: ["endringslogg_bruker", skjermbilde],
+        queryFn: async () => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.hentAlleEndringslogg({
+                bareAktive: true,
+                skjermbilde,
+            });
+            return data;
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+};
+
+export const useLestAvBrukerEndringslogg = (skjermbilde?: EndringsloggTilhorerSkjermbilde) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (endringsloggId: number): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.oppdaterLestAvBrukerEndringslogg(endringsloggId, {lesetidVarighetMs: 0});
+            return data;
+        },
+        onSuccess: (updated) => {
+            queryClient.setQueryData<EndringsLoggDto[]>(["endringslogg_bruker", skjermbilde], (prev) =>
+                prev?.map((e) => (e.id === updated.id ? updated : e)) ?? prev
+            );
+        },
+    });
+};
+
+export const useLestAvBrukerEndring = (endringsloggId: number, skjermbilde?: EndringsloggTilhorerSkjermbilde) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({endringId, lesetidVarighet}: {endringId: number; lesetidVarighet: number}): Promise<EndringsLoggDto> => {
+            const {data} = await BIDRAG_ADMIN_API.endringslogg.oppdaterLestAvBrukerEndring(endringsloggId, endringId, {lesetidVarighetMs: lesetidVarighet});
+            return data;
+        },
+        onSuccess: (updated) => {
+            queryClient.setQueryData<EndringsLoggDto[]>(["endringslogg_bruker", skjermbilde], (prev) =>
+                prev?.map((e) => (e.id === updated.id ? updated : e)) ?? prev
+            );
         },
     });
 };
