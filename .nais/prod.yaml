@@ -5,7 +5,7 @@ ingresses:
 
 env:
   - name: BIDRAG_ADMIN_URL
-    value: https://bidrag-admin.intern.nav.no
+    value: http://bidrag-admin
   - name: BIDRAG_ADMIN_AUDIENCE
     value: api://prod-gcp.bidrag.bidrag-admin/.default
 
