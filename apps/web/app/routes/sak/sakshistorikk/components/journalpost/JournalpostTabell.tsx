@@ -274,7 +274,7 @@ export default function JournalpostTabell({
                             href={`/sak/${saksnummer}/forsendelse/${rad.jp.journalpostId}?${jpParams()}`}
                             aria-label="Vis journalpost"
                         >
-                            <TasklistSendIcon aria-hidden />
+                            <TasklistSendIcon aria-hidden  title="Vis journalpost"/>
                         </Link>
                     );
                 }
