@@ -1,5 +1,4 @@
 allowBuilds:
-  '@parcel/watcher': true
   es5-ext: false
   esbuild: true
 #injectWorkspacePackages: true
