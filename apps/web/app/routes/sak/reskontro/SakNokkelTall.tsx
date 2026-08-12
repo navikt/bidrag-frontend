@@ -6,6 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { hentInnkrevingForSaksnummer } from "~/api/query/reskontro.query";
 import { useHentSak } from "~/api/useApi.ts";
+import { medReturMål } from "~/common/navigation/returLink.ts";
 import { ObfuscateFnrLink } from "~/common/person/ObfuscateFnrLink.tsx";
 import { DUMMY_BARN } from "./konstanter";
 
@@ -48,7 +49,10 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                 <Label>
                     BPs gjeld i sak{" "}
                     {bpFnr && (
-                        <Link as={ObfuscateFnrLink} to={`/bruker/${bpFnr}/reskontro`}>
+                        <Link
+                            as={ObfuscateFnrLink}
+                            to={medReturMål(`/bruker/${bpFnr}/reskontro`, "saksreskontro", undefined, { saksnummer })}
+                        >
                             brukerside for BP
                         </Link>
                     )}
