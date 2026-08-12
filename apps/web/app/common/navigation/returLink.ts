@@ -220,11 +220,10 @@ function lesEksplisittReturMål(
  * Bisys-lenken på målsiden fortsatt skal virke.
  */
 function byggHref({ sti, params }: ReturDestinasjon, searchParams: URLSearchParams): string {
-    const { enhet, sessionState } = getBisysSessionParams(searchParams);
+    const { sessionState } = getBisysSessionParams(searchParams);
 
     const queryParams = new URLSearchParams(params);
     if (sessionState) queryParams.set("sessionState", sessionState);
-    // if (enhet) queryParams.set("enhet", enhet);
 
     const query = queryParams.toString();
     return query ? `${sti}?${query}` : sti;
