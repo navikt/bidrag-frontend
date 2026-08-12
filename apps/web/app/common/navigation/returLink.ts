@@ -224,7 +224,7 @@ function byggHref({ sti, params }: ReturDestinasjon, searchParams: URLSearchPara
 
     const queryParams = new URLSearchParams(params);
     if (sessionState) queryParams.set("sessionState", sessionState);
-    if (enhet) queryParams.set("enhet", enhet);
+    // if (enhet) queryParams.set("enhet", enhet);
 
     const query = queryParams.toString();
     return query ? `${sti}?${query}` : sti;
