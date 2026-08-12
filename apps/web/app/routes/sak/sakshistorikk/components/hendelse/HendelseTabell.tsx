@@ -23,7 +23,7 @@ export default function HendelseTabell({
     const { sort, handleSort, sortData } = useSort<SakshendelseDto>({
         defaultUnsorted: (a, b) => sortByDateAsc(b.opprettetTidspunkt, a.opprettetTidspunkt),
     });
-    const { bisysSessionParams,  } = useBisysLink();
+    const { bisysSessionParams } = useBisysLink();
     const { enhet, sessionState } = bisysSessionParams;
 
     const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);

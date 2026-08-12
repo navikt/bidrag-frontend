@@ -1,5 +1,5 @@
 import { Link } from "@navikt/ds-react";
-import {Link as RouterLink} from "react-router";
+import { Link as RouterLink } from "react-router";
 import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import { useReturLink } from "~/common/navigation/returLink.ts";
 
@@ -40,5 +40,9 @@ export default function BisysHeaderLink() {
             linkLabel = "Tilbake til bisys";
     }
 
-    return <Link as={RouterLink} style={LENKE_STYLE} to={bisysUrl}>{linkLabel}</Link>;
+    return (
+        <Link as={RouterLink} style={LENKE_STYLE} to={bisysUrl}>
+            {linkLabel}
+        </Link>
+    );
 }
