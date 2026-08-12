@@ -1,4 +1,4 @@
-import { index, layout, type RouteConfig, route } from "@react-router/dev/routes";
+import {index, layout, route, type RouteConfig} from "@react-router/dev/routes";
 
 export default [
     route("internal/health/liveness", "./server/liveness.ts"),
@@ -27,6 +27,10 @@ export default [
         index("./routes/bruker/index.tsx"),
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
     ]),
+
+    route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),
+    route("samhandler/:samhandlerId", "./routes/samhandler/SamhandlerDetaljer.tsx"),
+
 
     route("sak/:saksnummer", "routes/sak/SakBaseLayout.tsx", [
         route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),

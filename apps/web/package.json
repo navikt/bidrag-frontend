@@ -33,6 +33,7 @@
         "pino-socket": "^8.0.0",
         "react": "catalog:",
         "react-dom": "catalog:",
+        "react-hook-form": "^7.85.0",
         "react-router": "catalog:",
         "source-map": "^0.7.6",
         "sqids": "^0.3.0",
