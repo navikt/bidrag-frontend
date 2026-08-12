@@ -6,6 +6,7 @@ const BISYS_PATHS = {
     sakForside: "Sak.do",
     sakHistorikk: "Sakshistorikk.do",
     oppgaveliste: "Oppgaveliste.do",
+    brukeroversikt: "Brukeroversikt.do",
 } as const;
 
 type BisysTarget = keyof typeof BISYS_PATHS;
