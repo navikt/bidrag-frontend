@@ -79,6 +79,7 @@ outbound:
     - application: bidrag-reskontro
     - application: bidrag-dokument-forsendelse
     - application: bidrag-admin
+    - application: bidrag-behandling
   external:
     - bidrag-sak.prod-fss-pub.nais.io
     - bidrag-organisasjon.prod-fss-pub.nais.io

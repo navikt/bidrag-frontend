@@ -80,6 +80,7 @@ outbound:
     - application: bidrag-reskontro-q1
     - application: bidrag-dokument-forsendelse-feature
     - application: bidrag-admin
+    - application: bidrag-behandling-q1
   external:
     - bidrag-sak-q1.dev-fss-pub.nais.io
     - bidrag-organisasjon-feature.dev-fss-pub.nais.io
