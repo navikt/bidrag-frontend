@@ -2,6 +2,7 @@ name: bidrag-frontend-q1
 
 ingresses:
   - https://bidrag-q1.intern.dev.nav.no
+replicas: 1
 
 env:
   - name: BIDRAG_SAK_URL
