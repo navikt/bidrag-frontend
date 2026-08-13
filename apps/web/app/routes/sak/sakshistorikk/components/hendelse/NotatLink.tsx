@@ -33,7 +33,7 @@ export function NotatLink({ saksnummer, hendelse, enhet, sessionState, kanSkrive
     });
 
     return (
-        <Link href={`/sak/${saksnummer}/notat?${params}`} title="Notat">
+        <Link href={`/sak/${saksnummer}/notat?${params}`} aria-label="Opprett notat" title="Opprett notat">
             <NotePencilIcon aria-hidden />
         </Link>
     );
