@@ -71,6 +71,11 @@ env:
   - name: BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE
     value: api://prod-gcp.bidrag.bidrag-dokument-forsendelse/.default
 
+  - name: KODEVERK_URL
+    value: https://bidrag-kodeverk.intern.nav.no
+  - name: KODEVERK_URL_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-kodeverk/.default
+
 outbound:
   rules:
     - application: bidrag-tilgangskontroll

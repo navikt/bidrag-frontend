@@ -30,6 +30,8 @@ const EnvSchema = z.object({
     BIDRAG_BEHANDLING_AUDIENCE: NonEmpty,
     BISYS_URL: z.url(),
     BIDRAG_UI_BASE_URL: z.url(),
+    KODEVERK_URL: z.url(),
+    KODEVERK_URL_AUDIENCE: NonEmpty,
     UNLEASH_PROXY_URL: z.url().optional(),
     UNLEASH_PROXY_CLIENT_KEY: NonEmpty.optional(),
     NODE_ENV: z.enum(["development", "test", "production"]),
