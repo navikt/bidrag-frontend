@@ -90,14 +90,7 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
 
     const [visning, setVisning] = useState<MenyVisning>(() => {
         const visningParam = parseVisning(searchParams.get("visning"));
-        if (visningParam) return visningParam;
-
-        // Ingen dokument forhåndsvalgt (verken via `?dok=` eller `initialDokumentreferanse`) betyr at
-        // brukeren åpner oversikten uten en spesifikk journalpost i fokus – da er tabellvisningen mest
-        // nyttig som standard. Er et dokument allerede valgt (f.eks. `JournalpostFremviser`), behold
-        // den kompakte listevisningen slik at dokumentfremviseren får mest plass.
-        const dokRef = searchParams.get("dok") ?? options?.initialDokumentreferanse;
-        return dokRef ? "liste" : "tabell";
+        return visningParam ?? "liste";
     });
 
     const [visitedIds, setVisitedIds] = useState<Set<string>>(new Set());
