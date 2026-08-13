@@ -1,4 +1,4 @@
-import { formatISO, lightFormat, parseISO } from "date-fns";
+import { formatISO, parseISO } from "date-fns";
 
 /**
  * Formaterer dato til norsk format
@@ -10,11 +10,6 @@ export function formaterDato(dato?: string | null): string {
         month: "2-digit",
         year: "numeric",
     });
-}
-
-export function formaterDatoMnd(dato?: string | null): string {
-    if (!dato) return "-";
-    return lightFormat(dato, "MM.yyyy");
 }
 
 export function sisteDagiMnd(dato: string): string | null {
