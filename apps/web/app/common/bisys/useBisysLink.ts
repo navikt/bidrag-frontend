@@ -28,10 +28,11 @@ export function useBisysLink() {
     }
 
     function getBisysUrl() {
-        if (!bisysLinkTarget) {
-            return null;
-        }
         const params = bisysQueryParams.toString();
+        if (!bisysLinkTarget) {
+            const defaultTarget="oppgaveliste";
+            params ? `/bisys/${defaultTarget}?${params}` : `/bisys/${defaultTarget}`;
+        }
         return params ? `/bisys/${bisysLinkTarget}?${params}` : `/bisys/${bisysLinkTarget}`;
     }
 
