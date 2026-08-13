@@ -33,7 +33,11 @@ export function BrevLink({ saksnummer, hendelse, enhet, sessionState, kanSkrive 
     });
 
     return (
-        <Link href={`/sak/${saksnummer}/forsendelse?${params}`} title="Brev">
+        <Link
+            href={`/sak/${saksnummer}/forsendelse/?${params}`}
+            aria-label="Opprett forsendelse"
+            title="Opprett forsendelse"
+        >
             <EnvelopeOpenIcon aria-hidden />
         </Link>
     );
