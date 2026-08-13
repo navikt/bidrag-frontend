@@ -1,5 +1,9 @@
 import type { TypeArManedsperiode } from "@bidrag/api/BelopshistorikkApi";
-import { differenceInMonths, format, isBefore, max, min } from "date-fns";
+import { differenceInMonths, format, isBefore, lastDayOfMonth, max, min } from "date-fns";
+
+export function sisteDagIMnd(dato: Date): Date {
+    return lastDayOfMonth(dato);
+}
 
 export function erDatoInnenforPeriode(dato: Date, fom: string, tom?: string | null): boolean {
     const datoManed = format(dato, "yyyy-MM");
@@ -21,9 +25,9 @@ export function erInnenforPeriode(fra: Date | undefined, til: Date | undefined, 
     if (fraManed > tilManed) {
         return false;
     }
-
-    return fraManed <= periodeTom && tilManed >= periodeFom;
+    return fraManed < periodeTom && tilManed >= periodeFom;
 }
+
 
 /**
  * Beregner antall måneder en periode dekker, klemmet mot filtergrensene fra/til.
@@ -47,7 +51,7 @@ export function beregnAntallMåneder(
 
     const months = differenceInMonths(effektivFom, effektivTom);
     /** Ta med en ekstra måned dersom filterTom er før periodeTom, for å inkludere hele siste måned i perioden */
-    if (tom && isBefore(filterTom, periodeTom)){
+    if (tom && isBefore(filterTom, periodeTom)) {
         return Math.abs(months) + 1;
     }
 

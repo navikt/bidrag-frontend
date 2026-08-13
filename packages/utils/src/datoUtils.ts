@@ -1,4 +1,4 @@
-import {formatISO, parseISO} from "date-fns";
+import { formatISO, lightFormat, parseISO } from "date-fns";
 
 /**
  * Formaterer dato til norsk format
@@ -12,6 +12,11 @@ export function formaterDato(dato?: string | null): string {
     });
 }
 
+export function formaterDatoMnd(dato?: string | null): string {
+    if (!dato) return "-";
+    return lightFormat(dato, "MM.yyyy");
+}
+
 export function sisteDagiMnd(dato: string): string | null {
     if (!dato || dato.length === 0) return null;
     const datoObj = new Date(dato);
@@ -20,7 +25,7 @@ export function sisteDagiMnd(dato: string): string | null {
 }
 
 export function toQueryParam(date: Date): string {
-    return formatISO(date, {representation: "date"});
+    return formatISO(date, { representation: "date" });
 }
 
 export function parseDateQueryParam(value: string | null): Date | undefined {

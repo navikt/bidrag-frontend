@@ -1,18 +1,7 @@
 import { PersonNavnIdent } from "@bidrag/common";
 import { formaterBelop, formaterDato, sisteDagFramTilDato } from "@bidrag/utils";
-import { InformationIcon, InformationSquareIcon } from "@navikt/aksel-icons";
-import {
-    BodyShort, CopyButton,
-    Detail,
-    HStack,
-    InfoCard,
-    Label,
-    Pagination,
-    type SortState,
-    Table,
-    Tooltip,
-    VStack,
-} from "@navikt/ds-react";
+import { InformationSquareIcon } from "@navikt/aksel-icons";
+import { Detail, HStack, InfoCard, Pagination, type SortState, Table, VStack } from "@navikt/ds-react";
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
 import { useEffect, useMemo, useState } from "react";
 import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";

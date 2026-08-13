@@ -40,54 +40,74 @@ describe("periodeFilterUtils", () => {
             fom: "2024-01",
             til: "2024-06",
         };
-        it("returnerer true når fra er innenfor periode", () => {
+        it("fra er åpen, til er åpen", () => {
+            expect(erInnenforPeriode(undefined, undefined, periode)).toBe(true);
+        });
+        it("fra er før periode, til er åpen", () => {
+            expect(erInnenforPeriode(new Date("2023-01-01"), undefined, periode)).toBe(true);
+        });
+        it("fra er innefor periode, til er åpen", () => {
             expect(erInnenforPeriode(new Date("2024-03-10"), undefined, periode)).toBe(true);
         });
-
-        it("returnerer true når til er innenfor periode", () => {
-            expect(erInnenforPeriode(undefined, new Date("2024-05-10"), periode)).toBe(true);
+        it("fra er etter periode, til er åpen", () => {
+            expect(erInnenforPeriode(new Date("2025-03-10"), undefined, periode)).toBe(false);
         });
 
-        it("returnerer true når fra er utenfor, men til er innenfor periode", () => {
-            expect(erInnenforPeriode(new Date("2023-12-10"), new Date("2024-05-10"), periode)).toBe(true);
-        });
-
-        it("returnerer false når intervall er helt før periode", () => {
-            expect(erInnenforPeriode(new Date("2023-10-10"), new Date("2023-12-10"), periode)).toBe(false);
-        });
-
-        it("returnerer true når fra er før periode og til er etter periode", () => {
-            expect(erInnenforPeriode(new Date("2023-12-10"), new Date("2024-07-10"), periode)).toBe(true);
-        });
-
-        it("returnerer true når fra er null (fra tidenes morgen) og til overlapper", () => {
-            expect(erInnenforPeriode(undefined, new Date("2024-02-01"), periode)).toBe(true);
-        });
-
-        it("returnerer false når fra er null og til er før periode", () => {
-            expect(erInnenforPeriode(undefined, new Date("2023-12-01"), periode)).toBe(false);
-        });
-
-        it("returnerer true når til er null (nå) og fra overlapper periode", () => {
+        it("fra er siste  i periode, til er åpen", () => {
             expect(erInnenforPeriode(new Date("2024-05-01"), undefined, periode)).toBe(true);
         });
 
-        it("returnerer false når til er null (nå) og fra er etter nå", () => {
-            expect(erInnenforPeriode(new Date("2024-11-01"), undefined, periode)).toBe(false);
+        it("Fra er åpen, til er før periode", () => {
+            expect(erInnenforPeriode(undefined, new Date("2024-05-10"), periode)).toBe(true);
         });
 
-        it("returnerer true når ingen filterdato er satt", () => {
-            expect(erInnenforPeriode(undefined, undefined, periode)).toBe(true);
+        it("Fra er åpen, til er innen periode", () => {
+            expect(erInnenforPeriode(undefined, new Date("2024-05-10"), periode)).toBe(true);
         });
 
-        it("returnerer true når periode.til er null og intervall overlapper", () => {
-            expect(
-                erInnenforPeriode(new Date("2024-08-01"), undefined, {
-                    fom: "2024-01",
-                    til: null,
-                }),
-            ).toBe(true);
+        it("Fra er åpen, til er etter periode", () => {
+            expect(erInnenforPeriode(undefined, new Date("2025-01-01"), periode)).toBe(true);
         });
+
+        it("Fra er åpen, til er siste peride", () => {
+            expect(erInnenforPeriode(undefined, new Date("2024-06-01"), periode)).toBe(true);
+        });
+
+        it("fra er før, til er etter", () => {
+            expect(erInnenforPeriode(new Date("2023-12-10"), new Date("2025-05-10"), periode)).toBe(true);
+        });
+        it("fra er før, til er innen", () => {
+            expect(erInnenforPeriode(new Date("2023-12-10"), new Date("2024-05-01"), periode)).toBe(true);
+        });
+
+        it("intervall er helt før periode", () => {
+            expect(erInnenforPeriode(new Date("2023-10-10"), new Date("2023-12-10"), periode)).toBe(false);
+        });
+        it("intervall er helt etter periode", () => {
+            expect(erInnenforPeriode(new Date("2025-10-10"), new Date("2025-12-10"), periode)).toBe(false);
+        });
+
+        it("intervall en kun en måned på slutten", () => {
+            expect(erInnenforPeriode(new Date("2024-05-01"), new Date("2024-05-30"), periode)).toBe(true);
+        });
+
+
+        it("fra tidenes morgen og til er innen intervall", () => {
+            expect(erInnenforPeriode(undefined, new Date("2024-02-01"), periode)).toBe(true);
+        });
+
+        it("fra tidenes morgen  og til er før periode", () => {
+            expect(erInnenforPeriode(undefined, new Date("2023-12-01"), periode)).toBe(false);
+        });
+
+        it("fra tidenes morgen  og til er etter periode", () => {
+            expect(erInnenforPeriode(undefined, new Date("2025-12-01"), periode)).toBe(true);
+        });
+
+        it("fra tidenes morgen  og til er første måned i perioden", () => {
+            expect(erInnenforPeriode(undefined, new Date("2024-01-01"), periode)).toBe(true);
+        });
+
     });
 
     describe("beregnAntallMåneder", () => {
