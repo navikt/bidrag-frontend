@@ -2,8 +2,9 @@ import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { RolleTag, type RolleType } from "@bidrag/common";
+import { formaterDato } from "@bidrag/utils";
 import { EyeIcon } from "@navikt/aksel-icons";
-import { Detail, HStack, Tag } from "@navikt/ds-react";
+import { Detail, HStack, Tag, VStack } from "@navikt/ds-react";
 import { dokumentKategoriBeskrivelse } from "~/routes/sak/dokumenter/utils/dokumentKategori";
 
 interface JPHeaderInfoProps {
@@ -30,6 +31,7 @@ export function JournalpostHeaderInfo({
     isExpanded = false,
 }: JPHeaderInfoProps) {
     const innhold = jp.innhold || jp.journalpostId || "Ukjent tittel";
+    const dokDato = jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
 
     const getTagVariant = () => {
         switch (jp.status) {
@@ -72,27 +74,31 @@ export function JournalpostHeaderInfo({
                 <RolleTag rolleType={rolleType as string as RolleType} ident={rolleIdent} className="shrink-0 !mr-0" />
             )}
 
-            {(visAntall || (harDokumenter && harLestMinstEtt)) && (
-                <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">
-                    {harDokumenter && harLestMinstEtt && (
-                        <EyeIcon title="Sett" aria-label="Sett" className="text-base" />
-                    )}
-                    {visAntall && (
-                        <Detail textColor="subtle" className="font-normal">
-                            {antallTekst}
-                        </Detail>
+            <VStack gap="space-1">
+                <Detail
+                    weight="semibold"
+                    textColor={harDokumenter ? "default" : "subtle"}
+                    title={innhold}
+                    className={`flex-1 min-w-0 ${isExpanded ? "break-words whitespace-normal block" : "truncate block"}`}
+                >
+                    {innhold}
+                </Detail>
+                <HStack gap={"space-4"} justify={"start"} >
+                    <Detail textColor={"default"}>{dokDato}</Detail>
+                    {(visAntall || (harDokumenter && harLestMinstEtt)) && (
+                        <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">
+                            {harDokumenter && harLestMinstEtt && (
+                                <EyeIcon title="Sett" aria-label="Sett" className="text-base" />
+                            )}
+                            {visAntall && (
+                                <Detail textColor="subtle" className="font-normal">
+                                    {antallTekst}
+                                </Detail>
+                            )}
+                        </HStack>
                     )}
                 </HStack>
-            )}
-
-            <Detail
-                weight="semibold"
-                textColor={harDokumenter ? "default" : "subtle"}
-                title={innhold}
-                className={`flex-1 min-w-0 ${isExpanded ? "break-words whitespace-normal block" : "truncate block"}`}
-            >
-                {innhold}
-            </Detail>
+            </VStack>
         </HStack>
     );
 }
