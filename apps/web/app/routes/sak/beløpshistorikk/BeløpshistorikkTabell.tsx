@@ -1,11 +1,16 @@
 import { PersonNavnIdent } from "@bidrag/common";
-import { formaterDato, sisteDagFramTilDato } from "@bidrag/utils";
-import { InformationSquareIcon } from "@navikt/aksel-icons";
+import { formaterBelop, formaterDato, sisteDagFramTilDato } from "@bidrag/utils";
+import { InformationIcon, InformationSquareIcon } from "@navikt/aksel-icons";
 import {
+    BodyShort, CopyButton,
+    Detail,
+    HStack,
     InfoCard,
+    Label,
     Pagination,
     type SortState,
     Table,
+    Tooltip,
     VStack,
 } from "@navikt/ds-react";
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
@@ -21,8 +26,7 @@ interface BeløpshistorikkProps {
 }
 
 export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
-    const { filtrertData: flateRader, totalCount } =
-        useBeløphistorikkfilter(saksnummer);
+    const { filtrertData: flateRader, totalCount } = useBeløphistorikkfilter(saksnummer);
     const [stønaderPage, setStønaderPage] = useState(1);
     const [sort, setSort] = useState<SortState | undefined>();
 
@@ -33,16 +37,12 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
     const handleSortChange = (sortKey: string) => {
         setStønaderPage(1);
         setSort((prevSort) =>
-            prevSort &&
-            sortKey === prevSort.orderBy &&
-            prevSort.direction === "descending"
+            prevSort && sortKey === prevSort.orderBy && prevSort.direction === "descending"
                 ? undefined
                 : {
                       orderBy: sortKey,
                       direction:
-                          prevSort &&
-                          sortKey === prevSort.orderBy &&
-                          prevSort.direction === "ascending"
+                          prevSort && sortKey === prevSort.orderBy && prevSort.direction === "ascending"
                               ? "descending"
                               : "ascending",
                   },
@@ -61,35 +61,17 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                 case "belopsgruppe":
                     return (
                         dir *
-                        hentVisningsnavnFraType(
-                            "stønadstype",
-                            a.type,
-                        ).localeCompare(
+                        hentVisningsnavnFraType("stønadstype", a.type).localeCompare(
                             hentVisningsnavnFraType("stønadstype", b.type),
                         )
                     );
                 case "vedtaksdato":
-                    return (
-                        dir *
-                        (new Date(a.gyldigFra) <= new Date(b.gyldigFra)
-                            ? 1
-                            : -1)
-                    );
+                    return dir * (new Date(a.gyldigFra) <= new Date(b.gyldigFra) ? 1 : -1);
                 case "fom":
-                    return (
-                        dir *
-                        (new Date(a.periode.fom) <= new Date(b.periode.fom)
-                            ? 1
-                            : -1)
-                    );
+                    return dir * (new Date(a.periode.fom) <= new Date(b.periode.fom) ? 1 : -1);
                 case "tom":
                     if (!a.periode.til || !b.periode.til) return 0;
-                    return (
-                        dir *
-                        (new Date(a.periode.til) <= new Date(b.periode.til)
-                            ? 1
-                            : -1)
-                    );
+                    return dir * (new Date(a.periode.til) <= new Date(b.periode.til) ? 1 : -1);
                 case "belop":
                     return dir * ((a.beløp ?? 0) - (b.beløp ?? 0));
                 default:
@@ -99,20 +81,17 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
     }, [flateRader, sort]);
 
     const paginertStønader = useMemo(
-        () =>
-            sortedData.slice(
-                (stønaderPage - 1) * ROWS_PER_PAGE,
-                stønaderPage * ROWS_PER_PAGE,
-            ),
+        () => sortedData.slice((stønaderPage - 1) * ROWS_PER_PAGE, stønaderPage * ROWS_PER_PAGE),
         [sortedData, stønaderPage, sort],
     );
+
+    const totalSum = useMemo(() => flateRader.reduce((acc, rad) => acc + rad.periodSum, 0), [flateRader]);
 
     if (totalCount === 0) {
         return (
             <InfoCard data-color="info">
                 <InfoCard.Message icon={<InformationSquareIcon aria-hidden />}>
-                    Det finnes ingen bidrag eller forskudd som innkreves i
-                    saken.
+                    Det finnes ingen bidrag eller forskudd som innkreves i saken.
                 </InfoCard.Message>
             </InfoCard>
         );
@@ -120,12 +99,14 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
 
     return (
         <VStack gap={"space-16"}>
-            <Table
-                zebraStripes
-                size={"small"}
-                sort={sort}
-                onSortChange={handleSortChange}
-            >
+            <HStack justify="end" gap="space-16" width={"100%"}>
+                <Detail>
+                    Antall rader {flateRader.length}/{totalCount}
+                </Detail>
+                <Detail>Sum beløp over valgt periode {formaterBelop(totalSum)}</Detail>
+            </HStack>
+
+            <Table zebraStripes size={"small"} sort={sort} onSortChange={handleSortChange}>
                 <Table.Header>
                     <Table.Row>
                         <Table.ColumnHeader sortable sortKey={"navn"}>
@@ -145,49 +126,33 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                         <Table.ColumnHeader sortable sortKey={"tom"}>
                             TOM
                         </Table.ColumnHeader>
-                        <Table.ColumnHeader
-                            sortable
-                            sortKey={"belop"}
-                            align={"right"}
-                        >
+                        <Table.ColumnHeader sortable sortKey={"belop"} align={"right"}>
                             Beløp
                         </Table.ColumnHeader>
                         <Table.HeaderCell>Valuta</Table.HeaderCell>
+                        <Table.ColumnHeader align={"right"}>Perioder</Table.ColumnHeader>
+                        <Table.ColumnHeader align={"right"}>Sum</Table.ColumnHeader>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
                     {paginertStønader.map((rad) => (
                         <Table.Row key={`${rad.stønadsid}-${rad.periodeid}`}>
                             <Table.DataCell>
-                                <PersonNavnIdent
-                                    ident={rad.kravhaver}
-                                    bareFornavn={true}
-                                />
+                                <PersonNavnIdent ident={rad.kravhaver} bareFornavn={true} />
                             </Table.DataCell>
-                            <Table.DataCell>
-                                {hentVisningsnavnFraType(
-                                    "stønadstype",
-                                    rad.type,
-                                )}
-                            </Table.DataCell>
+                            <Table.DataCell>{hentVisningsnavnFraType("stønadstype", rad.type)}</Table.DataCell>
                             <Table.DataCell>
                                 <VedtaksType vedtaksId={rad.vedtaksid} />
                             </Table.DataCell>
+                            <Table.DataCell>{formaterDato(rad.gyldigFra)}</Table.DataCell>
+                            <Table.DataCell>{formaterDato(rad.periode.fom)}</Table.DataCell>
                             <Table.DataCell>
-                                {formaterDato(rad.gyldigFra)}
+                                {rad.periode.til ? (sisteDagFramTilDato(rad.periode.til) ?? "") : ""}
                             </Table.DataCell>
-                            <Table.DataCell>
-                                {formaterDato(rad.periode.fom)}
-                            </Table.DataCell>
-                            <Table.DataCell>
-                                {rad.periode.til ? sisteDagFramTilDato(rad.periode.til) ?? "" : ""}
-                            </Table.DataCell>
-                            <Table.DataCell align={"right"}>
-                                {rad.beløp ?? ""}
-                            </Table.DataCell>
-                            <Table.DataCell>
-                                {rad.valutakode ?? "NOK"}
-                            </Table.DataCell>
+                            <Table.DataCell align={"right"}>{rad.beløp ?? ""}</Table.DataCell>
+                            <Table.DataCell>{rad.valutakode ?? "NOK"}</Table.DataCell>
+                            <Table.DataCell align={"right"}>{rad.antallMåneder}</Table.DataCell>
+                            <Table.DataCell align={"right"}>{formaterBelop(rad.periodSum)}</Table.DataCell>
                         </Table.Row>
                     ))}
                 </Table.Body>
