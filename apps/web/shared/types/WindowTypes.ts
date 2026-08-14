@@ -2,7 +2,7 @@
  * Global type declarations for window properties injected by the shell app (bidragui)
  */
 
-export type HeaderNavigationMode = "default" | "sak" | "sakshistorikk" | "sakforside";
+export type HeaderNavigationMode = "default" | "sak" | "sakshistorikk";
 
 export interface IHeaderNavigationContext {
     mode?: HeaderNavigationMode;
