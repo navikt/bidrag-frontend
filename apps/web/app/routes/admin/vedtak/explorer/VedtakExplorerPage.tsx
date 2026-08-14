@@ -4,24 +4,33 @@ import { BEHANDLING_API_V1, BIDRAG_VEDTAK_API, type TreeChild, TreeChildType } f
 import { Grunnlagstype, type VedtakDto } from "@bidrag/api/BidragVedtakApi";
 import { Alert, Button, CopyButton, Heading, Loader, Modal, Search, Switch } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import mermaid from "mermaid";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import { useSearchParams } from "react-router";
 import PageWrapper from "../../PageWrapper.tsx";
 import missingImg from "./missing.jpeg";
-import { type EChartsOption, ReactECharts } from "./ReactECharts";
+import type { EChartsOption } from "./ReactECharts";
 import { vedtakToMermaidResponse } from "./TreeToMermaidMapper";
 import { mapVedtakToTree } from "./VedtakToGraphMapper";
 import { lastVisningsnavn } from "./VisningsnavnMapper";
 
-mermaid.initialize({
-    startOnLoad: true,
-    flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
-    securityLevel: "loose",
-    look: "handDrawn",
-    theme: "base",
-});
+const ReactECharts = lazy(() => import("./ReactECharts").then((m) => ({ default: m.ReactECharts })));
+
+// Lastes først når grafen faktisk skal tegnes, slik at mermaid holdes ute av rute-chunken
+let mermaidPromise: Promise<typeof import("mermaid").default> | undefined;
+function loadMermaid() {
+    mermaidPromise ??= import("mermaid").then(({ default: mermaid }) => {
+        mermaid.initialize({
+            startOnLoad: true,
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
+            securityLevel: "loose",
+            look: "handDrawn",
+            theme: "base",
+        });
+        return mermaid;
+    });
+    return mermaidPromise;
+}
 
 interface VedtakExplorerGraphProps {
     behandlingId?: string;
@@ -191,21 +200,28 @@ function _VedtakMermaidFlowChart({ behandlingId, vedtakId }: VedtakExplorerGraph
     useEffect(() => {
         if (isRendering.current) return;
         isRendering.current = true;
-        mermaid
-            .render("mermaidSvg", mermaidResponse.mermaidGraph, divRef.current ?? undefined)
+        let cancelled = false;
+        loadMermaid()
+            .then((mermaid) => mermaid.render("mermaidSvg", mermaidResponse.mermaidGraph, divRef.current ?? undefined))
             .then(async (res) => {
-                if (!divRef.current) return;
+                if (cancelled || !divRef.current) return;
                 divRef.current.innerHTML = res.svg;
                 if (res.bindFunctions) {
                     const firstEl = divRef.current.firstElementChild;
                     if (firstEl) res.bindFunctions(firstEl);
                 }
                 const { default: svgPanZoom } = await import("svg-pan-zoom");
+                if (cancelled) return;
                 svgPanZoom("#mermaidSvg");
-                isRendering.current = false;
             })
-            .catch((e) => console.error("HERE", e));
-    }, [mermaid]);
+            .catch((e) => console.error("Klarte ikke å rendre mermaid-graf", e))
+            .finally(() => {
+                isRendering.current = false;
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [mermaidResponse.mermaidGraph]);
     return (
         <>
             <Modal
@@ -251,10 +267,12 @@ function VedtakTreeGraph({ behandlingId, vedtakId }: VedtakExplorerGraphProps) {
     return (
         <>
             <ShowVedtakButton vedtak={vedtak} />
-            <ReactECharts
-                option={toEchart(tree)}
-                style={{ height: "calc(100vh - 200px)", minHeight: "500px", margin: "auto" }}
-            />
+            <Suspense fallback={<Loader size="large" title="Laster graf..." />}>
+                <ReactECharts
+                    option={toEchart(tree)}
+                    style={{ height: "calc(100vh - 200px)", minHeight: "500px", margin: "auto" }}
+                />
+            </Suspense>
         </>
     );
 }
