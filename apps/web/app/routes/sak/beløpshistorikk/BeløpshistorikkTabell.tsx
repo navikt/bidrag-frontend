@@ -15,7 +15,7 @@ interface BeløpshistorikkProps {
 }
 
 export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
-    const { filtrertData: flateRader, totalCount } = useBeløphistorikkfilter(saksnummer);
+    const { filtrertData, totalCount } = useBeløphistorikkfilter(saksnummer);
     const [stønaderPage, setStønaderPage] = useState(1);
     const [sort, setSort] = useState<SortState | undefined>();
 
@@ -40,9 +40,10 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
 
     const sortedData = useMemo(() => {
         if (!sort) {
-            return flateRader;
+           // Default sortering: etter periodeid synkende (eldste først)
+            return filtrertData.sort((a, b) => a.periodeid - b.periodeid);
         }
-        return flateRader.sort((a, b) => {
+        return filtrertData.sort((a, b) => {
             const dir = sort.direction === "ascending" ? 1 : -1;
             switch (sort.orderBy) {
                 case "navn":
@@ -67,14 +68,14 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                     return 0;
             }
         });
-    }, [flateRader, sort]);
+    }, [filtrertData, sort]);
 
     const paginertStønader = useMemo(
         () => sortedData.slice((stønaderPage - 1) * ROWS_PER_PAGE, stønaderPage * ROWS_PER_PAGE),
         [sortedData, stønaderPage, sort],
     );
 
-    const totalSum = useMemo(() => flateRader.reduce((acc, rad) => acc + rad.periodSum, 0), [flateRader]);
+    const totalSum = useMemo(() => filtrertData.reduce((acc, rad) => acc + rad.periodSum, 0), [filtrertData]);
 
     if (totalCount === 0) {
         return (
@@ -90,7 +91,7 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
         <VStack gap={"space-16"}>
             <HStack justify="end" gap="space-16" width={"100%"}>
                 <Detail>
-                    Antall rader {flateRader.length}/{totalCount}
+                    Antall rader {filtrertData.length}/{totalCount}
                 </Detail>
                 <Detail>Sum beløp over valgt periode {formaterBelop(totalSum)}</Detail>
             </HStack>
@@ -146,7 +147,7 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                     ))}
                 </Table.Body>
             </Table>
-            {flateRader.length > ROWS_PER_PAGE && (
+            {filtrertData.length > ROWS_PER_PAGE && (
                 <Pagination
                     page={stønaderPage}
                     onPageChange={setStønaderPage}

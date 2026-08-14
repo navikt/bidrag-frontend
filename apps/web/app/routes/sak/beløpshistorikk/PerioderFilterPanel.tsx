@@ -140,7 +140,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                     variant={"tertiary"}
                     onClick={clearFilter}
                     icon={<EraserIcon title="Fjern filter" />}
-                ></Button>
+                >Fjern filter</Button>
             </HStack>
         </Box>
     );
