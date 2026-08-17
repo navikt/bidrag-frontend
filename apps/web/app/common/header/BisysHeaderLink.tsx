@@ -1,3 +1,5 @@
+import { Link } from "@navikt/ds-react";
+import { Link as RouterLink } from "react-router";
 import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import { useReturLink } from "~/common/navigation/returLink.ts";
 
@@ -10,15 +12,15 @@ const LENKE_STYLE = {
 } as const;
 
 export default function BisysHeaderLink() {
-    const { bisysUrl } = useBisysLink();
+    const { bisysUrl, bisysLinkTarget } = useBisysLink();
     const returLink = useReturLink();
 
     // Når brukeren er rutet hit fra en annen side i appen, peker tilbakelenken dit i stedet for til Bisys.
     if (returLink) {
         return (
-            <a style={LENKE_STYLE} href={returLink.href}>
+            <Link as={RouterLink} style={LENKE_STYLE} to={returLink.href}>
                 Tilbake til {returLink.label}
-            </a>
+            </Link>
         );
     }
 
@@ -26,9 +28,21 @@ export default function BisysHeaderLink() {
         return null;
     }
 
+    let linkLabel: string;
+    switch (bisysLinkTarget) {
+        case "sak":
+            linkLabel = "Tilbake til sak";
+            break;
+        case "oppgaveliste":
+            linkLabel = "Tilbake til oppgaveliste";
+            break;
+        default:
+            linkLabel = "Tilbake til bisys";
+    }
+
     return (
-        <a style={LENKE_STYLE} href={bisysUrl}>
-            Tilbake til bisys
-        </a>
+        <Link as={RouterLink} style={LENKE_STYLE} to={bisysUrl}>
+            {linkLabel}
+        </Link>
     );
 }
