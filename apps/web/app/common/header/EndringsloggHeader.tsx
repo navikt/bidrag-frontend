@@ -1,3 +1,5 @@
+import { useGetEndringsloggForBruker, useLestAvBrukerEndring, useLestAvBrukerEndringslogg } from "@bidrag/admin-app";
+import { type EndringsLoggDto, type EndringsloggTilhorerSkjermbilde, Endringstype } from "@bidrag/api/BidragAdminApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { BellDotFillIcon, BellIcon } from "@navikt/aksel-icons";
 import {
@@ -15,8 +17,6 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import React, { useEffect, useState } from "react";
-import { type EndringsLoggDto, type EndringsloggTilhorerSkjermbilde, Endringstype } from "@bidrag/api/BidragAdminApi";
-import { useGetEndringsloggForBruker, useLestAvBrukerEndring, useLestAvBrukerEndringslogg } from "@bidrag/admin-app";
 
 const EndringstypeToTagMapper = {
     [Endringstype.ENDRING]: { tag: "neutral" as const, tekst: "Endring" },

@@ -26,7 +26,7 @@ import type {
     SakshendelseDto,
 } from "@bidrag/api/SakApi";
 import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
-import { IdentUtils, LoggerService, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
+import { IdentUtils, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
 import {
     useMutation,
     useQueries,

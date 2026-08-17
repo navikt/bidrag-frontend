@@ -1,3 +1,4 @@
+import { type EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype } from "@bidrag/api/BidragAdminApi";
 import {
     CheckmarkCircleIcon,
     ChevronDownIcon,
@@ -31,7 +32,6 @@ import {
     useWatch,
 } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { type EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype } from "@bidrag/api/BidragAdminApi";
 import { EndringsModal } from "../index.tsx";
 
 type Endring = {
