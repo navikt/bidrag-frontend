@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/index.tsx";
+export { default } from "@bidrag/admin-app/AdminIndexPage";

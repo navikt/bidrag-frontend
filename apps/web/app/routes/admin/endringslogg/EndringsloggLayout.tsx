@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/endringslogg/EndringsloggLayout.tsx";
+export { default } from "@bidrag/admin-app/endringslogg/EndringsloggLayout";

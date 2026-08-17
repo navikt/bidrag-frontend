@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/AdminLayout.tsx";
+export { default } from "@bidrag/admin-app/AdminLayout";

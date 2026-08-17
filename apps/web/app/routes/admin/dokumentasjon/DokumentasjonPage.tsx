@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/dokumentasjon/DokumentasjonPage.tsx";
+export { default } from "@bidrag/admin-app/dokumentasjon/DokumentasjonPage";
