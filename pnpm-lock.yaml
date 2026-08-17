@@ -72,7 +72,7 @@ importers:
         specifier: ^4.1.9
         version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@25.9.5)(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass-embedded@1.100.0)(sass@1.100.0)(tsx@4.23.1))
 
-  apps/web:
+  apps/admin-app:
     dependencies:
       '@bidrag/api':
         specifier: workspace:*
@@ -80,9 +80,64 @@ importers:
       '@bidrag/common':
         specifier: workspace:*
         version: link:../../packages/common
-      '@bidrag/route-admin':
+      '@navikt/aksel-icons':
+        specifier: 'catalog:'
+        version: 8.15.0
+      '@navikt/ds-react':
+        specifier: 'catalog:'
+        version: 8.15.0(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.101.4(react@19.2.8)
+      echarts:
+        specifier: ^6.1.0
+        version: 6.1.0
+      mermaid:
+        specifier: ^11.16.0
+        version: 11.16.0
+      quill:
+        specifier: ^2.0.3
+        version: 2.0.3
+      quill-paste-smart:
+        specifier: ^2.0.0
+        version: 2.0.0(quill@2.0.3)
+      quill-resize-module:
+        specifier: 2.0.8
+        version: 2.0.8
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.8(react@19.2.8)
+      react-error-boundary:
+        specifier: ^6.1.2
+        version: 6.1.2(react@19.2.8)
+      react-hook-form:
+        specifier: ^7.82.0
+        version: 7.84.0(react@19.2.8)
+      react-router:
+        specifier: 'catalog:'
+        version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      svg-pan-zoom:
+        specifier: ^3.6.2
+        version: 3.6.2
+    devDependencies:
+      vite:
+        specifier: ^8.0.16
+        version: 8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass-embedded@1.100.0)(sass@1.100.0)(tsx@4.23.1)
+
+  apps/web:
+    dependencies:
+      '@bidrag/admin-app':
         specifier: workspace:*
-        version: link:app/routes/admin
+        version: link:../admin-app
+      '@bidrag/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@bidrag/common':
+        specifier: workspace:*
+        version: link:../../packages/common
       '@bidrag/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -146,9 +201,6 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.8(react@19.2.8)
-      react-error-boundary:
-        specifier: ^6.1.2
-        version: 6.1.2(react@19.2.8)
       react-router:
         specifier: 'catalog:'
         version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -192,57 +244,6 @@ importers:
       vite:
         specifier: ^8.0.16
         version: 8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass-embedded@1.100.0)(sass@1.100.0)(tsx@4.23.1)
-
-  apps/web/app/routes/admin:
-    dependencies:
-      '@bidrag/api':
-        specifier: workspace:*
-        version: link:../../../../../packages/api
-      '@bidrag/common':
-        specifier: workspace:*
-        version: link:../../../../../packages/common
-      '@navikt/aksel-icons':
-        specifier: 'catalog:'
-        version: 8.15.0
-      '@navikt/ds-react':
-        specifier: 'catalog:'
-        version: 8.15.0(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@tanstack/react-query':
-        specifier: 'catalog:'
-        version: 5.101.4(react@19.2.8)
-      echarts:
-        specifier: ^6.1.0
-        version: 6.1.0
-      mermaid:
-        specifier: ^11.16.0
-        version: 11.16.0
-      quill:
-        specifier: ^2.0.3
-        version: 2.0.3
-      quill-paste-smart:
-        specifier: ^2.0.0
-        version: 2.0.0(quill@2.0.3)
-      quill-resize-module:
-        specifier: 2.0.8
-        version: 2.0.8
-      react:
-        specifier: 'catalog:'
-        version: 19.2.8
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.8(react@19.2.8)
-      react-error-boundary:
-        specifier: ^6.1.2
-        version: 6.1.2(react@19.2.8)
-      react-hook-form:
-        specifier: ^7.82.0
-        version: 7.84.0(react@19.2.8)
-      react-router:
-        specifier: 'catalog:'
-        version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      svg-pan-zoom:
-        specifier: ^3.6.2
-        version: 3.6.2
 
   packages/api:
     dependencies:

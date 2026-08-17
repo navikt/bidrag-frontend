@@ -1,9 +1,1 @@
-import { Outlet } from "react-router";
-
-export default function EndringsloggLayout() {
-    return (
-        <div className={"container mx-auto p-6"}>
-            <Outlet />
-        </div>
-    );
-}
+export { default } from "@bidrag/admin-app/endringslogg/EndringsloggLayout.tsx";

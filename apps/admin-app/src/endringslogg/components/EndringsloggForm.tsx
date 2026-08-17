@@ -31,8 +31,8 @@ import {
     useWatch,
 } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { type EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype } from "~/api/types/admin.ts";
-import { EndringsModal } from "~/routes/admin/endringslogg";
+import { type EndringsLoggDto, EndringsloggTilhorerSkjermbilde, Endringstype } from "@bidrag/api/BidragAdminApi";
+import { EndringsModal } from "../index.tsx";
 
 type Endring = {
     innhold: string;

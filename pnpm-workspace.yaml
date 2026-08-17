@@ -9,7 +9,6 @@ allowBuilds:
 packages:
   - "apps/*"
   - "packages/*"
-  - "apps/web/app/routes/*"
 
 catalog:
   react: "^19.2.7"

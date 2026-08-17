@@ -15,8 +15,8 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import React, { useEffect, useState } from "react";
-import { type EndringsLoggDto, type EndringsloggTilhorerSkjermbilde, Endringstype } from "~/api/types/admin.ts";
-import { useGetEndringsloggForBruker, useLestAvBrukerEndring, useLestAvBrukerEndringslogg } from "~/api/useApi.ts";
+import { type EndringsLoggDto, type EndringsloggTilhorerSkjermbilde, Endringstype } from "@bidrag/api/BidragAdminApi";
+import { useGetEndringsloggForBruker, useLestAvBrukerEndring, useLestAvBrukerEndringslogg } from "@bidrag/admin-app";
 
 const EndringstypeToTagMapper = {
     [Endringstype.ENDRING]: { tag: "neutral" as const, tekst: "Endring" },

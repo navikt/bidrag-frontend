@@ -33,14 +33,13 @@
         "pino-socket": "^8.0.0",
         "react": "catalog:",
         "react-dom": "catalog:",
-        "react-error-boundary": "^6.1.2",
         "react-router": "catalog:",
         "source-map": "^0.7.6",
         "sqids": "^0.3.0",
         "tailwindcss": "catalog:",
         "unleash-proxy-client": "^3.7.8",
         "zod": "^4.1.12",
-        "@bidrag/route-admin": "workspace:*"
+        "@bidrag/admin-app": "workspace:*"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",
