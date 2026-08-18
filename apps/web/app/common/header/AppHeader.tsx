@@ -1,4 +1,4 @@
-import {EndringsloggHeader} from "@bidrag/admin-app";
+import { EndringsloggHeader } from "@bidrag/admin-app";
 import { LeaveIcon } from "@navikt/aksel-icons";
 import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
