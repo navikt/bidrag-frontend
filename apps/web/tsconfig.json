@@ -1,6 +1,6 @@
 {
     "extends": "../../tsconfig.base.json",
-    "include": ["app", ".react-router/types/**/*", "global.d.ts"],
+    "include": ["app", ".react-router/types/**/*"],
     "compilerOptions": {
         "sourceMap": true,
         "rootDirs": [".", "./.react-router/types"],

@@ -31,9 +31,7 @@
         "svg-pan-zoom": "^3.6.2",
         "dompurify": "^3.4.13"
     },
-    "devDependencies": {
-        "vite": "^8.0.16"
-    },
+
     "peerDependencies": {
         "@tanstack/react-query": "catalog:",
         "react": "catalog:",
