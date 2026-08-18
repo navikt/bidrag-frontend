@@ -6,8 +6,6 @@ import { hentVisningsnavnFraType } from "@shared/kodeverk";
 import { useEffect, useMemo, useState } from "react";
 import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";
 
-import { VedtaksType } from "./VedtaksType";
-
 const ROWS_PER_PAGE = 20;
 
 interface BeløpshistorikkProps {
@@ -56,7 +54,8 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                         )
                     );
                 case "vedtaksdato":
-                    return dir * (new Date(a.gyldigFra) <= new Date(b.gyldigFra) ? 1 : -1);
+                    if (!a.vedtaksTidspunkt || !b.vedtaksTidspunkt) return 0;
+                    return (dir * (new Date(a.vedtaksTidspunkt) <= new Date(b.vedtaksTidspunkt) ? 1 : -1));
                 case "fom":
                     return dir * (new Date(a.periode.fom) <= new Date(b.periode.fom) ? 1 : -1);
                 case "tom":
@@ -132,9 +131,9 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                             </Table.DataCell>
                             <Table.DataCell>{hentVisningsnavnFraType("stønadstype", rad.type)}</Table.DataCell>
                             <Table.DataCell>
-                                <VedtaksType vedtaksId={rad.vedtaksid} />
+                                {rad.vedtaksType && hentVisningsnavnFraType("vedtakstype", rad.vedtaksType)}
                             </Table.DataCell>
-                            <Table.DataCell>{formaterDato(rad.gyldigFra)}</Table.DataCell>
+                            <Table.DataCell>{formaterDato(rad.vedtaksTidspunkt)}</Table.DataCell>
                             <Table.DataCell>{formaterDato(rad.periode.fom)}</Table.DataCell>
                             <Table.DataCell>
                                 {rad.periode.til ? (sisteDagFramTilDato(rad.periode.til) ?? "") : ""}
