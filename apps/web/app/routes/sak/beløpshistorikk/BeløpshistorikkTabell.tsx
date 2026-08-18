@@ -75,6 +75,14 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
     );
 
     const totalSum = useMemo(() => filtrertData.reduce((acc, rad) => acc + rad.periodSum, 0), [filtrertData]);
+    const sumPerValuta = useMemo(() => {
+        const grupper = filtrertData.reduce<Record<string, number>>((acc, rad) => {
+            const valuta = rad.valutakode ?? "NOK";
+            acc[valuta] = (acc[valuta] ?? 0) + rad.periodSum;
+            return acc;
+        }, {});
+        return Object.entries(grupper).sort(([a], [b]) => a.localeCompare(b));
+    }, [filtrertData]);
 
     if (totalCount === 0) {
         return (
@@ -90,9 +98,16 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
         <VStack gap={"space-16"}>
             <HStack justify="end" gap="space-16" width={"100%"}>
                 <Detail>
-                    Antall rader {filtrertData.length}/{totalCount}
+                    Antall rader <strong>{filtrertData.length}/{totalCount}</strong>
                 </Detail>
-                <Detail>Sum beløp over valgt periode {formaterBelop(totalSum)}</Detail>
+                <HStack gap={"space-4"}>
+                    <Detail> Sum over valgt periode:</Detail>
+                    {sumPerValuta.map(([valuta, sum]) => (
+                        <Detail key={valuta}>
+                            <strong>{formaterBelop(sum)}</strong> {valuta}
+                        </Detail>
+                    ))}
+                </HStack>
             </HStack>
 
             <Table zebraStripes size={"small"} sort={sort} onSortChange={handleSortChange}>
