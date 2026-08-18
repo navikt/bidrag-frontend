@@ -1,3 +1,4 @@
+import { EndringsloggHeader } from "@bidrag/admin-app";
 import { LeaveIcon } from "@navikt/aksel-icons";
 import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
@@ -19,6 +20,9 @@ export function AppHeader({ bruker, bisysUrl }: AppHeaderProps) {
                 <BisysHeaderLink />
             </ClientOnly>
             <AppSwitcher bisysUrl={bisysUrl} />
+            <ClientOnly>
+                <EndringsloggHeader />
+            </ClientOnly>
             <ActionMenu>
                 <ActionMenu.Trigger>
                     <InternalHeader.UserButton name={bruker?.name ?? "Ukjent bruker"} description={bruker?.NAVident} />
