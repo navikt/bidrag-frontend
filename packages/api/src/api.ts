@@ -58,5 +58,4 @@ export const BIDRAG_FORSENDELSE_API = proxy(new BidragForsendelseApi(), {
 
 export const BEHANDLING_API_V1 = proxy(new BidragBehandlingApi(), {
     app: "bidrag-behandling",
-    cluster: "gcp",
 });

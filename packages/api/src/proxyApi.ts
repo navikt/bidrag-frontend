@@ -6,10 +6,6 @@ interface AxiosClient {
 
 interface UseApiOptions {
     app: string;
-    cluster?: string;
-    env?: string;
-    scope?: string;
-    showAlertOnNetworkError?: boolean;
 }
 
 export function proxy<T extends AxiosClient>(api: T, options: UseApiOptions): T {

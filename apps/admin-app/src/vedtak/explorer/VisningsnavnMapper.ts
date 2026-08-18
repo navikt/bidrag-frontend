@@ -12,7 +12,6 @@ export function lastVisningsnavn() {
 
 export async function lagreVisningsnavn() {
     return BEHANDLING_API_V1.api.hentVisningsnavn().then((response) => {
-        console.log(response);
         window.localStorage.setItem("visningsnavn", JSON.stringify(response.data));
         return response.data;
     });

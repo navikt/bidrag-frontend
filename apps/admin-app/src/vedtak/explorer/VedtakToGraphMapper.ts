@@ -28,7 +28,7 @@ export function mapVedtakToTree(vedtak: VedtakDto) {
 
     const grunnlagSomIkkeErReferert: TreeChild = {
         id: "ikke_referert",
-        name: "Frittstående(Ikke refert av grunnlag eller stønadsendring/engangsbeløp)",
+        name: "Frittstående(Ikke referert av grunnlag eller stønadsendring/engangsbeløp)",
         parent: vedtakParent,
         type: TreeChildType.FRITTSTÅENDE,
         children: genererGrunnlagSomIkkeErReferert(vedtak, vedtakParent),
