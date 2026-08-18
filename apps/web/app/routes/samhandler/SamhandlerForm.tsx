@@ -231,7 +231,7 @@ export default function SamhandlerForm({
                 onClose();
             },
             onError: (error) => {
-                if (error?.response && error?.response?.data && typeof error.response.data === "object") {
+                if (error.response?.data && typeof error.response.data === "object") {
                     const errorData = error.response.data as Record<string, unknown>;
                     const { duplikatSamhandler } = errorData;
                     if (

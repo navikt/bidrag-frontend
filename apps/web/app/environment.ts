@@ -1,12 +1,12 @@
-'use server'
-import {env} from "./env.server.ts";
+"use server";
+import { env } from "./env.server.ts";
 
 // @ts-nocheck
 const system = {
     isTest: env.NODE_ENV === "test",
     isDevelopment: env.NODE_ENV === "development",
     isProduction: env.NODE_ENV === "production",
-    environment: "",//env.ENVIRONMENT, //TODO Does not exist. in bidrag-ui it seems to be empty in samhandler.
+    environment: "", //env.ENVIRONMENT, //TODO Does not exist. in bidrag-ui it seems to be empty in samhandler.
 };
 
 const url = {
@@ -15,4 +15,4 @@ const url = {
     bidragSak: env.BIDRAG_SAK_URL,
 };
 
-export default {url, system};
+export default { url, system };

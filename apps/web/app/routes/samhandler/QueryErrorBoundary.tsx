@@ -1,18 +1,18 @@
-import {FaroErrorBoundary} from "@grafana/faro-react";
-import {LoggerService} from "@bidrag/common";
-import {BodyShort, Button, Loader, VStack} from "@navikt/ds-react";
-import {QueryErrorResetBoundary} from "@tanstack/react-query";
-import {ReactNode, Suspense} from "react";
+import { LoggerService } from "@bidrag/common";
+import { FaroErrorBoundary } from "@grafana/faro-react";
+import { BodyShort, Button, Loader, VStack } from "@navikt/ds-react";
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { type ReactNode, Suspense } from "react";
 
-export const QueryErrorWrapper = ({children}: { children: ReactNode }) => {
+export const QueryErrorWrapper = ({ children }: { children: ReactNode }) => {
     return (
         <QueryErrorResetBoundary>
-            {({reset}) => (
+            {({ reset }) => (
                 <FaroErrorBoundary
                     onError={(error) => {
                         LoggerService.error(
                             `Det skjedde en feil i bidrag-behandling skjermbildet ${error.message}`,
-                            error
+                            error,
                         );
                     }}
                     fallback={(_, resetErrorBoundary) => (
@@ -28,7 +28,7 @@ export const QueryErrorWrapper = ({children}: { children: ReactNode }) => {
                     <Suspense
                         fallback={
                             <div className="flex justify-center overflow-hidden">
-                                <Loader size="xsmall" title="Henter.." variant="interaction"/>
+                                <Loader size="xsmall" title="Henter.." variant="interaction" />
                             </div>
                         }
                     >

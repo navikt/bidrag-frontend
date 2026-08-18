@@ -1,8 +1,11 @@
-import {SamhandlerDto} from "@bidrag/api/SamhandlerApi";
-import {PencilIcon, XMarkIcon} from "@navikt/aksel-icons";
-import {Alert, BodyLong, BodyShort, Box, Button, Heading, HGrid, Label, Loader, Tag, VStack} from "@navikt/ds-react";
-import {memo, Suspense, useState} from "react";
-
+import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
+import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
+import { Alert, BodyLong, BodyShort, Box, Button, Heading, HGrid, Label, Loader, Tag, VStack } from "@navikt/ds-react";
+import { memo, Suspense, useState } from "react";
+import type { Route } from "../../../.react-router/types/app/routes/samhandler/+types/SamhandlerDetaljer.ts";
+import { QueryErrorWrapper } from "./QueryErrorBoundary";
+import SamhandlerForm from "./SamhandlerForm";
+import type { Samhandler } from "./SamhandlerSøk";
 import {
     kodeTilVisningsnavn,
     landkodeTilVisningsnavn,
@@ -10,14 +13,10 @@ import {
     useHentVisningsnavn,
     useOppdaterSamhandler,
 } from "./utils/useApiData";
-import {QueryErrorWrapper} from "./QueryErrorBoundary";
-import SamhandlerForm from "./SamhandlerForm";
-import {Samhandler} from "./SamhandlerSøk";
-import type {Route} from "../../../.react-router/types/app/routes/samhandler/+types/SamhandlerDetaljer.ts"
 
 type InfoRowProps = { label: string; value: React.ReactNode };
 
-function InfoRow({label, value}: InfoRowProps) {
+function InfoRow({ label, value }: InfoRowProps) {
     return (
         <div>
             <Label size="small" className="text-ax-neutral-600 uppercase tracking-wide text-xs">
@@ -29,7 +28,7 @@ function InfoRow({label, value}: InfoRowProps) {
 }
 
 const SamhandlerDetaljerContent = memo(
-    ({samhandler}: { samhandler: SamhandlerDto }) => {
+    ({ samhandler }: { samhandler: SamhandlerDto }) => {
         const [isEditing, setIsEditing] = useState(false);
         const [samhandlerData, setSamhandlerData] = useState<SamhandlerDto>(samhandler);
         const oppdaterSamhandler = useOppdaterSamhandler();
@@ -72,7 +71,7 @@ const SamhandlerDetaljerContent = memo(
                                 <Button
                                     size="small"
                                     variant="secondary"
-                                    icon={<PencilIcon aria-hidden/>}
+                                    icon={<PencilIcon aria-hidden />}
                                     onClick={() => setIsEditing(true)}
                                 >
                                     Rediger
@@ -80,7 +79,7 @@ const SamhandlerDetaljerContent = memo(
                             </div>
 
                             <div className="border-t border-ax-neutral-300 mt-4 pt-4">
-                                <HGrid gap="space-4" columns={{xs: 1, sm: 2, md: 3}}>
+                                <HGrid gap="space-4" columns={{ xs: 1, sm: 2, md: 3 }}>
                                     {samhandlerData.områdekode && (
                                         <InfoRow
                                             label="Kreditortype"
@@ -88,7 +87,7 @@ const SamhandlerDetaljerContent = memo(
                                         />
                                     )}
                                     {samhandlerData.offentligId && (
-                                        <InfoRow label="Offentlig ID" value={samhandlerData.offentligId}/>
+                                        <InfoRow label="Offentlig ID" value={samhandlerData.offentligId} />
                                     )}
                                     {samhandlerData.offentligIdType && (
                                         <InfoRow
@@ -97,16 +96,16 @@ const SamhandlerDetaljerContent = memo(
                                         />
                                     )}
                                     {samhandlerData.språk && (
-                                        <InfoRow label="Språk" value={kodeTilVisningsnavn(samhandlerData.språk)}/>
+                                        <InfoRow label="Språk" value={kodeTilVisningsnavn(samhandlerData.språk)} />
                                     )}
                                     {samhandlerData.kontaktperson && (
-                                        <InfoRow label="Kontaktperson" value={samhandlerData.kontaktperson}/>
+                                        <InfoRow label="Kontaktperson" value={samhandlerData.kontaktperson} />
                                     )}
                                     {samhandlerData.kontaktTelefon && (
-                                        <InfoRow label="Telefon" value={samhandlerData.kontaktTelefon}/>
+                                        <InfoRow label="Telefon" value={samhandlerData.kontaktTelefon} />
                                     )}
                                     {samhandlerData.kontaktEpost && (
-                                        <InfoRow label="E-post" value={samhandlerData.kontaktEpost}/>
+                                        <InfoRow label="E-post" value={samhandlerData.kontaktEpost} />
                                     )}
                                 </HGrid>
                             </div>
@@ -160,7 +159,7 @@ const SamhandlerDetaljerContent = memo(
                                 <Heading level="3" size="small" spacing>
                                     Kontoopplysninger
                                 </Heading>
-                                <HGrid gap="space-4" columns={{xs: 1, sm: 2, md: 3}}>
+                                <HGrid gap="space-4" columns={{ xs: 1, sm: 2, md: 3 }}>
                                     {samhandlerData.kontonummer.norskKontonummer && (
                                         <InfoRow
                                             label="Kontonummer"
@@ -168,16 +167,16 @@ const SamhandlerDetaljerContent = memo(
                                         />
                                     )}
                                     {samhandlerData.kontonummer.iban && (
-                                        <InfoRow label="IBAN" value={samhandlerData.kontonummer.iban}/>
+                                        <InfoRow label="IBAN" value={samhandlerData.kontonummer.iban} />
                                     )}
                                     {samhandlerData.kontonummer.swift && (
-                                        <InfoRow label="SWIFT" value={samhandlerData.kontonummer.swift}/>
+                                        <InfoRow label="SWIFT" value={samhandlerData.kontonummer.swift} />
                                     )}
                                     {samhandlerData.kontonummer.banknavn && (
-                                        <InfoRow label="Banknavn" value={samhandlerData.kontonummer.banknavn}/>
+                                        <InfoRow label="Banknavn" value={samhandlerData.kontonummer.banknavn} />
                                     )}
                                     {samhandlerData.kontonummer.bankCode && (
-                                        <InfoRow label="Bankkode" value={samhandlerData.kontonummer.bankCode}/>
+                                        <InfoRow label="Bankkode" value={samhandlerData.kontonummer.bankCode} />
                                     )}
                                     {samhandlerData.kontonummer.landkodeBank && (
                                         <InfoRow
@@ -186,7 +185,7 @@ const SamhandlerDetaljerContent = memo(
                                         />
                                     )}
                                     {samhandlerData.kontonummer.valutakode && (
-                                        <InfoRow label="Valutakode" value={samhandlerData.kontonummer.valutakode}/>
+                                        <InfoRow label="Valutakode" value={samhandlerData.kontonummer.valutakode} />
                                     )}
                                 </HGrid>
                             </Box>
@@ -227,7 +226,7 @@ const SamhandlerDetaljerContent = memo(
                             <Button
                                 size="small"
                                 variant="tertiary-neutral"
-                                icon={<XMarkIcon aria-hidden/>}
+                                icon={<XMarkIcon aria-hidden />}
                                 onClick={() => setIsEditing(false)}
                             >
                                 Lukk
@@ -246,11 +245,11 @@ const SamhandlerDetaljerContent = memo(
             </VStack>
         );
     },
-    (prevProps, nextProps) => prevProps.samhandler.samhandlerId === nextProps.samhandler.samhandlerId
+    (prevProps, nextProps) => prevProps.samhandler.samhandlerId === nextProps.samhandler.samhandlerId,
 );
 
-export default function SamhandlerDetaljer({params}: Route.ComponentProps) {
-    const {samhandlerId: id} = params;
+export default function SamhandlerDetaljer({ params }: Route.ComponentProps) {
+    const { samhandlerId: id } = params;
 
     if (!id) {
         return <Alert variant="error">Samhandler ID mangler</Alert>;
@@ -269,8 +268,8 @@ export default function SamhandlerDetaljer({params}: Route.ComponentProps) {
                         </BodyShort>
                     </div>
                     <QueryErrorWrapper>
-                        <Suspense fallback={<Loader size="medium" title="Laster samhandler..."/>}>
-                            <SamhandlerDetaljerLoader samhandlerId={id}/>
+                        <Suspense fallback={<Loader size="medium" title="Laster samhandler..." />}>
+                            <SamhandlerDetaljerLoader samhandlerId={id} />
                         </Suspense>
                     </QueryErrorWrapper>
                 </VStack>
@@ -279,7 +278,7 @@ export default function SamhandlerDetaljer({params}: Route.ComponentProps) {
     );
 }
 
-function SamhandlerDetaljerLoader({samhandlerId}: { samhandlerId: string }) {
-    const {data: samhandler} = useHentSamhandlerDetaljer(samhandlerId);
-    return <SamhandlerDetaljerContent samhandler={samhandler}/>;
+function SamhandlerDetaljerLoader({ samhandlerId }: { samhandlerId: string }) {
+    const { data: samhandler } = useHentSamhandlerDetaljer(samhandlerId);
+    return <SamhandlerDetaljerContent samhandler={samhandler} />;
 }

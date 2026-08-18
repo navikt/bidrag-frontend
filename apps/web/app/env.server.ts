@@ -1,5 +1,5 @@
 import * as process from "node:process";
-import {z} from "zod";
+import { z } from "zod";
 
 const NonEmpty = z.string().min(1);
 
