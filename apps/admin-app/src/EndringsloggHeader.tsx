@@ -15,6 +15,7 @@ import {
     Tag,
     VStack,
 } from "@navikt/ds-react";
+import DOMPurify from "dompurify";
 import React, { useEffect, useState } from "react";
 import {
     useGetEndringsloggForBruker,
@@ -160,7 +161,7 @@ const MenuItem = ({
                     {item.tittel}
                 </Heading>
                 <BodyLong as="div" size="small">
-                    <div dangerouslySetInnerHTML={{ __html: item.sammendrag }} />
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.sammendrag) }} />
                 </BodyLong>
                 {item.endringer.length > 0 && (
                     <Button
@@ -256,7 +257,7 @@ const EndringsModal = ({
                 <BodyLong as="div" size="small">
                     <div
                         style={{ overflowWrap: "break-word", maxWidth: "70rem", minWidth: "38rem", maxHeight: "40rem" }}
-                        dangerouslySetInnerHTML={{ __html: currentEndring.innhold }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentEndring.innhold) }}
                     />
                 </BodyLong>
             </Modal.Body>
