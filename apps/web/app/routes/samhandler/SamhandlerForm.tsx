@@ -192,7 +192,7 @@ export default function SamhandlerForm({
     const hasKontonummer = checkIfKontoHasAnyNonEmptyValues(defaultValues.kontonummer);
     const [erRM, setRM] = useState(hasKontonummer);
     const [erBekreftet, setBekreftet] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | string[] | null>(null);
     const formMethods = useForm<SamhandlerFormValues>({
         defaultValues,
         mode: "onSubmit",
@@ -233,7 +233,8 @@ export default function SamhandlerForm({
             onError: (error) => {
                 if (error.response?.data && typeof error.response.data === "object") {
                     const errorData = error.response.data as Record<string, unknown>;
-                    const { duplikatSamhandler } = errorData;
+                    const { duplikatSamhandler, ugyldigInput } = errorData;
+                    const ugyldigInputData = ugyldigInput as { feltnavn: string; feilmelding: string }[];
                     if (
                         Array.isArray(duplikatSamhandler) &&
                         duplikatSamhandler.length > 0 &&
@@ -246,6 +247,8 @@ export default function SamhandlerForm({
                         }
                     } else if (typeof errorData?.feilmelding === "string") {
                         setErrorMessage(errorData.feilmelding);
+                    } else if (ugyldigInputData !== undefined) {
+                        setErrorMessage(ugyldigInputData.map((input) => input.feilmelding));
                     }
                 }
                 errorRef.current?.focus();
@@ -282,9 +285,13 @@ export default function SamhandlerForm({
             <div className="grid gap-y-4">
                 {mutation.error && (
                     <ErrorSummary ref={errorRef}>
-                        <ErrorSummary.Item>
-                            {errorMessage ? errorMessage : "Feil ved lagring. Prøv på nytt."}
-                        </ErrorSummary.Item>
+                        {Array.isArray(errorMessage) ? (
+                            errorMessage.map((message) => <ErrorSummary.Item>{message}</ErrorSummary.Item>)
+                        ) : (
+                            <ErrorSummary.Item>
+                                {errorMessage ? errorMessage : "Feil ved lagring. Prøv på nytt."}
+                            </ErrorSummary.Item>
+                        )}
                     </ErrorSummary>
                 )}
                 <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={3} align="start">
