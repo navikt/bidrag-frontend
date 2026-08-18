@@ -119,8 +119,8 @@ const EndringsLista = ({
         onWheel={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
     >
-        {endringslogg.map((item, index) => (
-            <MenuItem key={index} item={item} onSelect={onSelect} skjermbilde={skjermbilde} />
+        {endringslogg.map((item) => (
+            <MenuItem key={item.id} item={item} onSelect={onSelect} skjermbilde={skjermbilde} />
         ))}
     </ActionMenu.Group>
 );
