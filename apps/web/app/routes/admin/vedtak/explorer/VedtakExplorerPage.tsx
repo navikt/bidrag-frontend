@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/vedtak/explorer/VedtakExplorerPage";
+export { VedtakExplorerPage as default } from "@bidrag/admin-app";

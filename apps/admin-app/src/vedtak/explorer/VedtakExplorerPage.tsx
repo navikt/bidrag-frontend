@@ -37,14 +37,14 @@ interface VedtakExplorerGraphProps {
     vedtakId?: string;
 }
 
-export default () => {
+export function VedtakExplorerPage() {
     lastVisningsnavn();
     return (
         <PageWrapper name="">
             <VedtakExplorer />
         </PageWrapper>
     );
-};
+}
 
 const existingSearchParams = () => paramsToObject(new URLSearchParams(window.location.search));
 

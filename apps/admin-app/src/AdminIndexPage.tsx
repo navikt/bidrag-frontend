@@ -1,3 +1,3 @@
-export default function AdminIndex() {
+export function AdminIndexPage() {
     return <div>Hallo admin side</div>;
 }

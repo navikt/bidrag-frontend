@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/endringslogg/index";
+export { EndringsloggIndexPage as default } from "@bidrag/admin-app";

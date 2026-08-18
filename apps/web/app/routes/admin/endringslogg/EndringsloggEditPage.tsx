@@ -1,4 +1,4 @@
-import { default as EndringsloggEditPage } from "@bidrag/admin-app/endringslogg/EndringsloggEditPage";
+import { EndringsloggEditPage } from "@bidrag/admin-app";
 import type { Route } from "./+types/EndringsloggEditPage";
 
 export default function EndringsloggEditPageWrapper({ params }: Route.ComponentProps) {

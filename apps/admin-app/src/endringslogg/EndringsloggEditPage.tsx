@@ -21,7 +21,7 @@ const createPayload = (formValues: EndringsloggFormValues) => {
     return payload;
 };
 
-export default function EndringsloggEditPage(params: { id: string }) {
+export function EndringsloggEditPage(params: { id: string }) {
     const id = params.id;
     const queryClient = useQueryClient();
     const endringslogg = useHentEndringslogg(Number(id));

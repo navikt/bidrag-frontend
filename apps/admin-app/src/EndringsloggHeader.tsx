@@ -1,4 +1,3 @@
-import { useGetEndringsloggForBruker, useLestAvBrukerEndring, useLestAvBrukerEndringslogg } from "@bidrag/admin-app";
 import { type EndringsLoggDto, type EndringsloggTilhorerSkjermbilde, Endringstype } from "@bidrag/api/BidragAdminApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { BellDotFillIcon, BellIcon } from "@navikt/aksel-icons";
@@ -17,6 +16,11 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import React, { useEffect, useState } from "react";
+import {
+    useGetEndringsloggForBruker,
+    useLestAvBrukerEndring,
+    useLestAvBrukerEndringslogg,
+} from "./api/endringsloggApi.ts";
 
 const EndringstypeToTagMapper = {
     [Endringstype.ENDRING]: { tag: "neutral" as const, tekst: "Endring" },
@@ -24,7 +28,7 @@ const EndringstypeToTagMapper = {
     [Endringstype.FEILFIKS]: { tag: "success" as const, tekst: "Feilfiks" },
 };
 
-export default function EndringsloggHeader({ skjermbilde }: { skjermbilde?: EndringsloggTilhorerSkjermbilde }) {
+export function EndringsloggHeader({ skjermbilde }: { skjermbilde?: EndringsloggTilhorerSkjermbilde }) {
     const endringslogg = useGetEndringsloggForBruker(skjermbilde);
     const [selected, setSelected] = useState<EndringsLoggDto | null>(null);
     const [påkrevdUlestEndringer, setPåkrevdUlestEndringer] = useState<EndringsLoggDto[]>([]);

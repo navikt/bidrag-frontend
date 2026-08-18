@@ -1,9 +1,9 @@
+import {EndringsloggHeader} from "@bidrag/admin-app";
 import { LeaveIcon } from "@navikt/aksel-icons";
 import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import { AppSwitcher } from "~/common/header/AppSwitcher.tsx";
 import BisysHeaderLink from "~/common/header/BisysHeaderLink.tsx";
-import EndringsloggHeader from "~/common/header/EndringsloggHeader.tsx";
 import type { NavUser } from "~/common/NavUser.ts";
 
 interface AppHeaderProps {

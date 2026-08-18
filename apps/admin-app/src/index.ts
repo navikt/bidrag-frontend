@@ -1,1 +1,9 @@
-export * from "./api/endringsloggApi";
+export { AdminIndexPage } from "./AdminIndexPage";
+export { AdminLayout } from "./AdminLayout";
+export { DokumentasjonPage } from "./dokumentasjon/DokumentasjonPage";
+export { EndringsloggHeader } from "./EndringsloggHeader";
+export { EndringsloggCreatePage } from "./endringslogg/EndringsloggCreatePage";
+export { EndringsloggEditPage } from "./endringslogg/EndringsloggEditPage";
+export { EndringsloggLayout } from "./endringslogg/EndringsloggLayout";
+export { EndringsloggIndexPage } from "./endringslogg/index";
+export { VedtakExplorerPage } from "./vedtak/explorer/VedtakExplorerPage";

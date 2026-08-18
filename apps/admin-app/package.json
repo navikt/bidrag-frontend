@@ -3,15 +3,7 @@
     "private": true,
     "type": "module",
     "exports": {
-        ".": "./src/index.ts",
-        "./AdminLayout": "./src/AdminLayout.tsx",
-        "./AdminIndexPage": "./src/AdminIndexPage.tsx",
-        "./dokumentasjon/DokumentasjonPage": "./src/dokumentasjon/DokumentasjonPage.tsx",
-        "./endringslogg/EndringsloggLayout": "./src/endringslogg/EndringsloggLayout.tsx",
-        "./endringslogg/index": "./src/endringslogg/index.tsx",
-        "./endringslogg/EndringsloggCreatePage": "./src/endringslogg/EndringsloggCreatePage.tsx",
-        "./endringslogg/EndringsloggEditPage": "./src/endringslogg/EndringsloggEditPage.tsx",
-        "./vedtak/explorer/VedtakExplorerPage": "./src/vedtak/explorer/VedtakExplorerPage.tsx"
+        ".": "./src/index.ts"
     },
     "scripts": {
         "typecheck": "tsc --noEmit"

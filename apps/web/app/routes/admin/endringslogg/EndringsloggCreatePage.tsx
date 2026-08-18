@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/endringslogg/EndringsloggCreatePage";
+export { EndringsloggCreatePage as default } from "@bidrag/admin-app";

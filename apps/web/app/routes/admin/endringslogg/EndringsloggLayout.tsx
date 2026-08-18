@@ -1,1 +1,1 @@
-export { default } from "@bidrag/admin-app/endringslogg/EndringsloggLayout";
+export { EndringsloggLayout as default } from "@bidrag/admin-app";
