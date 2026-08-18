@@ -8,12 +8,12 @@ export default class CustomError extends Error {
         this.message = message;
 
         // Maintains proper stack trace for where our error was thrown (only available on V8)
-        // @ts-ignore
+        // @ts-expect-error
         if (Error.captureStackTrace) {
-            // @ts-ignore
+            // @ts-expect-error
             Error.captureStackTrace(this);
         }
-        this.stack = this.stack + "\n" + stack;
+        this.stack = `${this.stack}\n${stack}`;
         this.correlationId = correlationId;
     }
 }
