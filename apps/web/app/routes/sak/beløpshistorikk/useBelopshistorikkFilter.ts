@@ -1,7 +1,7 @@
 import type { StonadDto, StonadPeriodeDto } from "@bidrag/api/BelopshistorikkApi";
 import type { VedtakDto } from "@bidrag/api/BidragVedtakApi";
 import { parseDateQueryParam, unikeVerdier } from "@bidrag/utils";
-import { useQueries, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { hentBelopshistorikkQuery } from "~/api/query/belopshistorikk.query.ts";
@@ -42,7 +42,7 @@ export function useBeløphistorikkfilter(saksnummer: string) {
             .map((id) => Number(id));
     }, [allestonader]);
 
-    const vedtakResultater = useQueries({
+    const vedtakResultater = useSuspenseQueries({
         queries: unikeVedtaksIder.map((vedtaksId) => hentVedtakQuery(vedtaksId)),
     });
 
