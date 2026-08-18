@@ -8,7 +8,7 @@ import { hentBelopshistorikkQuery } from "~/api/query/belopshistorikk.query.ts";
 import { hentVedtakQuery } from "~/api/query/vedtak.query.ts";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
 import { PARAM_BARN, PARAM_FRA, PARAM_TIL, PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
-import { bererInnenforPeriode, erInnenforPeriode } from "./periode.utils";
+import { beregnAntallMåneder, erInnenforPeriode } from "./periode.utils";
 
 interface StonadMedPeriode
     extends StonadPeriodeDto,
