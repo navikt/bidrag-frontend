@@ -89,6 +89,9 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.101.4(react@19.2.8)
+      dompurify:
+        specifier: ^3.4.13
+        version: 3.4.13
       echarts:
         specifier: ^6.1.0
         version: 6.1.0

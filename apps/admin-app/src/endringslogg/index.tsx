@@ -2,6 +2,7 @@ import { type EndringsLoggDto, Endringstype } from "@bidrag/api/BidragAdminApi";
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { BodyLong, Button, Heading, Loader, Modal, Pagination, Switch, Table, Tag, VStack } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
 import { useRef, useState } from "react";
 import { Link as ReactRouterLink } from "react-router";
 import {
@@ -97,7 +98,7 @@ export const EndringsModal = ({
                                     minWidth: "38rem",
                                     maxHeight: "40rem",
                                 }}
-                                dangerouslySetInnerHTML={{ __html: selectedEndringer.innhold }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEndringer.innhold) }}
                             />
                         </BodyLong>
                     </Modal.Body>

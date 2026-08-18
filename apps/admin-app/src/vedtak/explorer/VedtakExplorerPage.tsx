@@ -49,11 +49,7 @@ export default () => {
 const existingSearchParams = () => paramsToObject(new URLSearchParams(window.location.search));
 
 function paramsToObject(entries: URLSearchParams): Record<string, string> {
-    const result: Record<string, string> = {};
-    for (const [key, value] of entries) {
-        result[key] = value;
-    }
-    return result;
+    return Object.fromEntries(entries);
 }
 
 function VedtakExplorer() {
