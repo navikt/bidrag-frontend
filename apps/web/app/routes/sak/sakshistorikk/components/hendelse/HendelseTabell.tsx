@@ -4,7 +4,7 @@ import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-r
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { type ChangeEvent, useState } from "react";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
-import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
+import { useBisysLink } from "@bidrag/common";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";

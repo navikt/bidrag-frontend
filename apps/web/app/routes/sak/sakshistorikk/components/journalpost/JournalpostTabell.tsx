@@ -28,7 +28,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
-import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
+import { useBisysLink } from "@bidrag/common";
 import { medReturMål } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";

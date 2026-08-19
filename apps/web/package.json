@@ -14,6 +14,7 @@
         "@bidrag/common": "workspace:*",
         "@bidrag/utils": "workspace:*",
         "@bidrag/admin-app": "workspace:*",
+        "@bidrag/samhandler": "workspace:*",
         "@grafana/faro-react": "^2.7.1",
         "@grafana/faro-web-sdk": "^2.7.1",
         "@navikt/aksel-icons": "catalog:",

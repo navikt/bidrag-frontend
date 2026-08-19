@@ -3,7 +3,7 @@ import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Box, Button, CopyButton, Heading, HStack, Label, Link, List, VStack } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
+import { useBisysLink } from "@bidrag/common";
 import styles from "./errorpage.module.css";
 import { Iskrem } from "./Iskrem";
 

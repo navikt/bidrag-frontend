@@ -1,0 +1,27 @@
+{
+    "name": "@bidrag/samhandler",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@bidrag/api": "workspace:*",
+        "@bidrag/common": "workspace:*",
+        "@grafana/faro-react": "^2.7.1",
+        "@navikt/aksel-icons": "catalog:",
+        "@navikt/ds-react": "catalog:",
+        "react-hook-form": "^7.85.0"
+    },
+
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "axios": "^1.18.0",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-router": "catalog:"
+    }
+}

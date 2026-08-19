@@ -1,5 +1,7 @@
 export {default as AutoSuggest} from "./autosuggest/AutoSuggest";
 export {default as BisysLink} from "./bisys/BisysLink";
+export {getBisysSessionParams, persistBisysParams} from "./bisys/bisys-params";
+export {useBisysLink} from "./bisys/useBisysLink";
 export {default as BidragCell} from "./grid/BidragCell";
 export {default as BidragContainer} from "./grid/BidragContainer";
 export {default as BidragGrid} from "./grid/BidragGrid";
