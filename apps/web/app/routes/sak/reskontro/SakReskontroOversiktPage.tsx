@@ -1,5 +1,4 @@
-import { Box, Heading, List, LocalAlert, VStack } from "@navikt/ds-react";
-import { useState } from "react";
+import { Box, Heading, VStack } from "@navikt/ds-react";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SakReskontroOversiktPage.ts";
 import { SakNokkelTall } from "./SakNokkelTall";
@@ -12,7 +11,6 @@ export const handle: SakSideTittelHandle = { sakSideTittel: "Saksreskontro" };
 export default function SakReskontroOversiktPage({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;
     const { filtrertData, totalTransCount } = useTransaksjonsfilter(saksnummer);
-    const [showAlert, setShowAlert] = useState(true);
     const documentTitle = `Sakreskontro - ${saksnummer}`;
 
     return (
