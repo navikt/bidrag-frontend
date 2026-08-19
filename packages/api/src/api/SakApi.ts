@@ -529,9 +529,9 @@ export interface SakshendelseDto {
   søktAv?: SoktAvType | null;
   vedtakType?: Vedtakstype | null;
   barnObjektNumre: string[];
-  typeBeskrivelse: string;
   søknadsgruppeBeskrivelse?: string | null;
   resultatBeskrivelse?: string | null;
+  typeBeskrivelse: string;
 }
 
 /** @default null */

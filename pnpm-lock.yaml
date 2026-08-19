@@ -125,6 +125,45 @@ importers:
       svg-pan-zoom:
         specifier: ^3.6.2
         version: 3.6.2
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
+
+  apps/samhandler:
+    dependencies:
+      '@bidrag/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@bidrag/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@navikt/aksel-icons':
+        specifier: 'catalog:'
+        version: 8.15.0
+      '@navikt/ds-react':
+        specifier: 'catalog:'
+        version: 8.15.0(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.101.4(react@19.2.8)
+      axios:
+        specifier: ^1.18.0
+        version: 1.18.1
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.8(react@19.2.8)
+      react-hook-form:
+        specifier: ^7.85.0
+        version: 7.85.0(react@19.2.8)
+      react-router:
+        specifier: 'catalog:'
+        version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
 
   apps/web:
     dependencies:
@@ -137,6 +176,9 @@ importers:
       '@bidrag/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@bidrag/samhandler':
+        specifier: workspace:*
+        version: link:../samhandler
       '@bidrag/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -197,6 +239,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.8(react@19.2.8)
+      react-hook-form:
+        specifier: ^7.85.0
+        version: 7.85.0(react@19.2.8)
       react-router:
         specifier: 'catalog:'
         version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -277,6 +322,9 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
+      react-router:
+        specifier: 'catalog:'
+        version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       uuid:
         specifier: ^14
         version: 14.0.1
@@ -3125,6 +3173,12 @@ packages:
 
   react-hook-form@7.84.0:
     resolution: {integrity: sha512-+hWvQP6GLco56mDwrbU4XnHix8t1z90ltZsDIrREl+jnQFQxYLX8oAzqe/Xn8nHpmoXTY5M6oEXrAhbP1qevNQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+
+  react-hook-form@7.85.0:
+    resolution: {integrity: sha512-U2MTriFXnclmV4rOE20p2DcRFv5WEg3FIcBFOKcOLFHDVvGIMPvLTkTWefUsonmlaVy23khVDxDWym6uJVGOzw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
@@ -6666,6 +6720,10 @@ snapshots:
       react: 19.2.8
 
   react-hook-form@7.84.0(react@19.2.8):
+    dependencies:
+      react: 19.2.8
+
+  react-hook-form@7.85.0(react@19.2.8):
     dependencies:
       react: 19.2.8
 
