@@ -1,6 +1,6 @@
 import { Api as BidragBelopshistorikk } from "./api/BelopshistorikkApi";
 import { Api as BidragAdminApi } from "./api/BidragAdminApi";
-import { Api as BidragBehandlingApi } from "./api/BidragBehandlingApiV1.ts";
+import { Api as BidragBehandlingApi } from "./api/BidragBehandlingApiV1";
 import { Api as BidragDokumentApi } from "./api/BidragDokumentApi";
 import { Api as BidragForsendelseApi } from "./api/BidragForsendelseApi";
 import { Api as KodeverkApi } from "./api/BidragKodeverkApi.ts";
@@ -57,10 +57,10 @@ export const BIDRAG_FORSENDELSE_API = proxy(new BidragForsendelseApi(), {
     app: "bidrag-dokument-forsendelse",
 });
 
-export const BEHANDLING_API_V1 = proxy(new BidragBehandlingApi(), {
-    app: "bidrag-behandling",
-});
-
 export const KODEVERK_API = proxy(new KodeverkApi(), {
     app: "bidrag-kodeverk",
+});
+
+export const BEHANDLING_API_V1 = proxy(new BidragBehandlingApi(), {
+    app: "bidrag-behandling",
 });
