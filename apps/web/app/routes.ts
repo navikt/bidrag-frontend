@@ -1,4 +1,4 @@
-import { index, layout, type RouteConfig, route } from "@react-router/dev/routes";
+import {index, layout, route, type RouteConfig} from "@react-router/dev/routes";
 
 export default [
     route("internal/health/liveness", "./server/liveness.ts"),
@@ -9,6 +9,10 @@ export default [
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
     route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),
+
+    //route("sak/:saksnummer/journal/:journalpostid", "./routes/dokument/journalpost/VisJournalpostPage.tsx"),
+    //route("journal/:journalpostid", "./routes/dokument/journalpost/VisJournalpostPage.tsx"),
+    route("journalpost/:journalpostid", "./routes/dokument/journalpost/registrereJournalpost/index.tsx"),
 
     index("routes/_index.tsx"),
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
