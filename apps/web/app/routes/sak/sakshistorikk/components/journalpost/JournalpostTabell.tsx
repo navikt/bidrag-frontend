@@ -1,6 +1,7 @@
 import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
+import { useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
 import {
     ArrowCirclepathIcon,
@@ -28,7 +29,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
-import { useBisysLink } from "@bidrag/common";
 import { medReturMål } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";

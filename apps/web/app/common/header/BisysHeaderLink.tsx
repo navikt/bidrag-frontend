@@ -1,6 +1,6 @@
+import { useBisysLink } from "@bidrag/common";
 import { Link } from "@navikt/ds-react";
 import { Link as RouterLink } from "react-router";
-import { useBisysLink } from "@bidrag/common";
 import { useReturLink } from "~/common/navigation/returLink.ts";
 
 const LENKE_STYLE = {

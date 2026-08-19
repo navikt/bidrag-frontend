@@ -19,10 +19,10 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { erGyldigKontonummer, objectHasSomeValue } from "./utils/validator.ts";
 import type { Samhandler } from "./SamhandlerSøk";
 import { sortInAlphabeticOrder } from "./utils/sorting";
 import { useHentLandkoder, useHentVisningsnavn } from "./utils/useApiData";
+import { erGyldigKontonummer, objectHasSomeValue } from "./utils/validator.ts";
 
 /** Definerer hvilket område samhandleren er knyttet til. */
 export enum SamhandlerDtoOmradekodeEnum {

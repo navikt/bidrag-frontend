@@ -20,6 +20,7 @@ export type SamhandlerAxiosError = AxiosError<SamhandlerErrorResponse>;
 export const useHentSamhandler = () => {
     return useMutation({
         mutationFn: async (payload: SamhandlerSok): Promise<SamhandlersokeresultatDto> => {
+            console.info("SamhandlerSok payload", payload);
             const { data } = await BIDRAG_SAMHANDLER_API.samhandlersok.samhandlerSok(payload);
             return data;
         },

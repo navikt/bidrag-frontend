@@ -1,5 +1,5 @@
-import { useLocation, useSearchParams } from "react-router";
 import { getBisysSessionParams } from "@bidrag/common";
+import { useLocation, useSearchParams } from "react-router";
 
 /** Query-parameter som forteller hvilken side brukeren ble rutet fra. */
 export const RETUR_PARAM = "from";

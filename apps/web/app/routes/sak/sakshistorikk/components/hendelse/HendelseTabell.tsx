@@ -1,10 +1,10 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
+import { useBisysLink } from "@bidrag/common";
 import { formaterDato, sortByDateAsc } from "@bidrag/utils";
 import { Heading, HStack, Label, Pagination, Select, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { type ChangeEvent, useState } from "react";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
-import { useBisysLink } from "@bidrag/common";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";

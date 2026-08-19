@@ -125,6 +125,9 @@ importers:
       svg-pan-zoom:
         specifier: ^3.6.2
         version: 3.6.2
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
 
   apps/samhandler:
     dependencies:
@@ -134,9 +137,6 @@ importers:
       '@bidrag/common':
         specifier: workspace:*
         version: link:../../packages/common
-      '@grafana/faro-react':
-        specifier: ^2.7.1
-        version: 2.8.2(react-dom@19.2.8(react@19.2.8))(react-router@8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
       '@navikt/aksel-icons':
         specifier: 'catalog:'
         version: 8.15.0
@@ -161,21 +161,24 @@ importers:
       react-router:
         specifier: 'catalog:'
         version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
 
   apps/web:
     dependencies:
       '@bidrag/admin-app':
         specifier: workspace:*
         version: link:../admin-app
-      '@bidrag/samhandler':
-        specifier: workspace:*
-        version: link:../samhandler
       '@bidrag/api':
         specifier: workspace:*
         version: link:../../packages/api
       '@bidrag/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@bidrag/samhandler':
+        specifier: workspace:*
+        version: link:../samhandler
       '@bidrag/utils':
         specifier: workspace:*
         version: link:../../packages/utils
