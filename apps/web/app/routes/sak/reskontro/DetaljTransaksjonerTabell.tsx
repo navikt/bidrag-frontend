@@ -14,6 +14,14 @@ interface DetaljTransaksjonerTabellProps {
 export function DetaljTransaksjonerTabell({ transaksjoner, skjulMotposter }: DetaljTransaksjonerTabellProps) {
     const [valgtMotpostId, setValgtMotpostId] = useState<number | null>(null);
 
+    const renderValuta = (t: Transaksjon) => {
+        const valutaKode = t.valutakode ?? "NOK";
+        if (valutaKode !== "NOK") {
+            return `${formaterBelop(t.beløpIOpprinneligValuta)} ${valutaKode}`;
+        }
+        return null
+        // return "-";
+    }
     return (
         <>
             <Table size="small" stickyHeader>
@@ -24,7 +32,7 @@ export function DetaljTransaksjonerTabell({ transaksjoner, skjulMotposter }: Det
                         <Table.HeaderCell>Saksnummer</Table.HeaderCell>
                         <Table.HeaderCell>Skyldner</Table.HeaderCell>
                         <Table.HeaderCell>Mottaker</Table.HeaderCell>
-                        <Table.HeaderCell>Valuta</Table.HeaderCell>
+                        <Table.HeaderCell>Orignal valuta</Table.HeaderCell>
                         <Table.HeaderCell align="right">Beløp</Table.HeaderCell>
                         <Table.HeaderCell align="right">Restbeløp</Table.HeaderCell>
                         {!skjulMotposter && <Table.HeaderCell>Motposter</Table.HeaderCell>}
@@ -35,16 +43,16 @@ export function DetaljTransaksjonerTabell({ transaksjoner, skjulMotposter }: Det
                         <Table.Row key={`${t.transaksjonsid}-${t.delytelsesid}`}>
                             <Table.DataCell>{formaterDato(t.periode?.fom)}</Table.DataCell>
                             <Table.DataCell>
-                                {t.barn !== DUMMY_BARN ? <PersonNavnIdent ident={t.barn} bareFornavn /> : "-"}
+                                {t.barn !== DUMMY_BARN ? <PersonNavnIdent ident={t.barn} bareFornavn/> : "-"}
                             </Table.DataCell>
                             <Table.DataCell>{t.saksnummer}</Table.DataCell>
                             <Table.DataCell>
-                                <PersonNavnIdent ident={t.skyldner} variant={"ident"} />
+                                <PersonNavnIdent ident={t.skyldner} variant={"ident"}/>
                             </Table.DataCell>
                             <Table.DataCell>
-                                <PersonNavnIdent ident={t.mottaker} variant={"ident"} />
+                                <PersonNavnIdent ident={t.mottaker} variant={"ident"}/>
                             </Table.DataCell>
-                            <Table.DataCell>{t.valutakode ?? "NOK"}</Table.DataCell>
+                            <Table.DataCell>{renderValuta(t)}</Table.DataCell>
                             <Table.DataCell align="right">{formaterBelop(t.beløp)}</Table.DataCell>
                             <Table.DataCell align="right">{formaterBelop(t.restBeløp)}</Table.DataCell>
                             {!skjulMotposter && (
