@@ -73,7 +73,7 @@ export function hentTransaksjonerPaTransaksjonsid(transaksjonsId: number) {
         queryKey: ["hentTransaksjonerPaTransaksjonsid", transaksjonsId],
         queryFn: () =>
             withQueryErrorHandlingV2(
-                "hentTransaksjoner",
+                "hentTransaksjonerPaTransaksjonsid",
                 async () => {
                     const { data } = await BIDRAG_RESKONTRO_API.transaksjoner.hentTransaksjonerPaTransaksjonsid({
                         transaksjonsid: transaksjonsId,

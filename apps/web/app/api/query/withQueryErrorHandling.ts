@@ -18,7 +18,7 @@ export async function withQueryErrorHandlingV2<T>(
 export async function withQueryErrorHandling<T>(
     queryName: string,
     fn: () => Promise<T>,
-    context: Record<string, string | number | undefined> = {},
+    context?: Record<string, string | number | undefined>,
     notFoundValue?: T,
 ): Promise<T> {
     try {
@@ -28,8 +28,9 @@ export async function withQueryErrorHandling<T>(
 
         const status = axiosError?.response?.status;
         if (status === 403 || status === 401) {
-            await SecureLoggerService.warn(`Ingen tilgang til ${queryName} for ${context}`);
-            throw new TilgangsFeilError(`Du har ikke tilgang til ${queryName} for ${context}`);
+            const contextString = context ? `for ${JSON.stringify(context)}` : "";
+            await SecureLoggerService.warn(`Ingen tilgang til ${queryName} ${contextString}`);
+            throw new TilgangsFeilError(`Du har ikke tilgang til ${queryName} ${contextString}`);
         }
         if (status === 404 && notFoundValue !== undefined) {
             return notFoundValue;
