@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useFormContext, type UseFormReturn } from "react-hook-form";
+import { type UseFormReturn, useFormContext } from "react-hook-form";
 
 import type { SakRedigeringData } from "../sakvisning-schema.ts";
 
@@ -7,7 +7,7 @@ type SamhandlerEllerPersonResultat = {
     samhandlerId?: string;
     ident?: string;
     offentligId?: string;
-    navn?: string;
+    navn?: string | null;
     barnIndex?: number;
 };
 
@@ -26,7 +26,7 @@ export function useSamhandlerReellMottakerHandling() {
 
             const ident = data.samhandlerId ?? data.ident ?? data.offentligId ?? "";
             form.setValue(`roller.${data.barnIndex}.reellMottaker`, ident);
-            form.setValue(`roller.${data.barnIndex}.reellMottakerNavn`, data.navn);
+            form.setValue(`roller.${data.barnIndex}.reellMottakerNavn`, data.navn ?? undefined);
         },
         [form],
     );

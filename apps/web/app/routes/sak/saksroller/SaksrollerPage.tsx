@@ -1,13 +1,14 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { TilgangsFeilError } from "@bidrag/api";
 import type { OppdaterRollerISakRequest } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
-import { TilgangsFeilError } from "@bidrag/api";
 import { dateToDDMMYYYYString } from "@bidrag/common";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, BodyLong, Heading, Loader, Tag, VStack } from "@navikt/ds-react";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { useOppdaterSaksroller } from "~/api/useApi.ts";
+import type { Route } from "./+types/SaksrollerPage.ts";
 import BarnVisning from "./BarnVisning.tsx";
 import SakButtons from "./components/SakButtons.tsx";
 import Endringsoppsummering from "./Endringsoppsummering.tsx";
@@ -19,10 +20,9 @@ import { useUfullstendigRelasjonSjekk } from "./hooks/useUfullstendigRelasjonSje
 import LeggTilBarn from "./LeggTilBarn.tsx";
 import LeggTilForelder from "./LeggTilForelder.tsx";
 import SakErrorBoundary from "./SakErrorBoundary.tsx";
-import { erBarn, SakRedigeringSchema, type BarnRolle, type SakRedigeringData } from "./sakvisning-schema.ts";
+import { type BarnRolle, erBarn, type SakRedigeringData, SakRedigeringSchema } from "./sakvisning-schema.ts";
 import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "./utils.ts";
-import type { Route } from "./+types/SaksrollerPage.ts";
 
 type SakstypeVisning = "Barnebidrag" | "Ektefellebidrag" | "Oppfostringsbidrag" | "Farskap";
 
@@ -82,7 +82,9 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
 
     const muligeBarn =
         bp || bm
-            ? (muligeBarnPerMotpart.get(bp?.fodselsnummer ?? "") ?? muligeBarnPerMotpart.get(bm?.fodselsnummer ?? "") ?? [])
+            ? (muligeBarnPerMotpart.get(bp?.fodselsnummer ?? "") ??
+              muligeBarnPerMotpart.get(bm?.fodselsnummer ?? "") ??
+              [])
             : [];
 
     // Initialiser form med berikede roller når data er lastet eller oppdatert
@@ -148,7 +150,11 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                 roller: data.roller.map((rolle) => {
                     const barnRolle = rolle as BarnRolle;
                     const bidragSakRolle =
-                        rolle.rolleType === "BP" ? Rolletype.BP : rolle.rolleType === "BM" ? Rolletype.BM : Rolletype.BA;
+                        rolle.rolleType === "BP"
+                            ? Rolletype.BP
+                            : rolle.rolleType === "BM"
+                              ? Rolletype.BM
+                              : Rolletype.BA;
                     return {
                         fodselsnummer: rolle.fodselsnummer || "",
                         type: bidragSakRolle,
@@ -268,7 +274,8 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
 
                                 {erEktefellebidrag && (
                                     <Alert variant="info" size="small">
-                                        Dette er en ektefellebidragssak og inneholder ikke barn. Saken kan ikke redigeres.
+                                        Dette er en ektefellebidragssak og inneholder ikke barn. Saken kan ikke
+                                        redigeres.
                                     </Alert>
                                 )}
 
@@ -340,7 +347,9 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                                                     <Heading level="2" size="medium" className="flex-1 min-w-0">
                                                         Barn i saken ({barn.length})
                                                     </Heading>
-                                                    <div className={leggTilBarnVisSøk ? "shrink-0 mt-2 md:mt-0" : "mt-3"}>
+                                                    <div
+                                                        className={leggTilBarnVisSøk ? "shrink-0 mt-2 md:mt-0" : "mt-3"}
+                                                    >
                                                         <LeggTilBarn
                                                             søsken={muligeBarn}
                                                             setVisSøk={setLeggTilBarnVisSøk}

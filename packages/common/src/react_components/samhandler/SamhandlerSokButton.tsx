@@ -1,7 +1,7 @@
-import { Button, ButtonProps, Modal } from "@navikt/ds-react";
-import { ReactNode, useRef } from "react";
+import { Button, type ButtonProps, Modal } from "@navikt/ds-react";
+import { type ReactNode, useRef } from "react";
 
-import { Broadcast, BroadcastNames, SamhandlerBroadcastMessage } from "../../types";
+import { Broadcast, BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
 
 type SamhandlerSokProps = {
     onResult: (data: SamhandlerBroadcastMessage | null) => void;
@@ -33,7 +33,7 @@ export default function SamhandlerSokButton({
         const openedWindow = window.open(
             `/samhandler/søk/?windowId=${windowId}`,
             "_blank",
-            `location=yes,height=${height},width=${width},scrollbars=yes,status=yes`
+            `location=yes,height=${height},width=${width},scrollbars=yes,status=yes`,
         );
 
         Broadcast.waitForBroadcast<SamhandlerBroadcastMessage>(BroadcastNames.SAMHANDLERSOK_RESULT_EVENT, windowId)

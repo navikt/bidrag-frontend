@@ -1,15 +1,12 @@
-import { useMemo } from "react";
+import type { TilgangsFeilError } from "@bidrag/api";
 
 import type { BidragssakDto, RolleDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
-import type { TilgangsFeilError } from "@bidrag/api";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
-import {
-    useHentFlerePersoninformasjonSuspense,
-    useHentSakSuspense,
-} from "~/api/useApi.ts";
-import { MYNDYG_BARN_ALDER } from "../sakvisning-schema.ts";
+import { useMemo } from "react";
+import { useHentFlerePersoninformasjonSuspense, useHentSakSuspense } from "~/api/useApi.ts";
 import type { BarnRolle, Rolle } from "../sakvisning-schema.ts";
+import { MYNDYG_BARN_ALDER } from "../sakvisning-schema.ts";
 
 export interface SakMedPersoninfo {
     sak: BidragssakDto;

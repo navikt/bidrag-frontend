@@ -1,7 +1,6 @@
+import { TilgangsFeilError } from "@bidrag/api";
 import { Alert, BodyLong, Heading } from "@navikt/ds-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
-
-import { TilgangsFeilError } from "@bidrag/api";
 
 interface Props {
     children: ReactNode;

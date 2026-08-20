@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { Broadcast, BroadcastNames, SamhandlerBroadcastMessage } from "../../types";
+import { Broadcast, BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
 
 type SamhandlerSokPopupProps = {
     windowId: string;
@@ -24,7 +24,7 @@ export default function SamhandlerSokPopup({ windowId, onResult, onError }: Samh
         popupRef.current = window.open(
             `/samhandler/søk/?windowId=${windowId}`,
             "_blank",
-            `location=yes,height=${height},width=${width},scrollbars=yes,status=yes`
+            `location=yes,height=${height},width=${width},scrollbars=yes,status=yes`,
         );
 
         checkIntervalRef.current = window.setInterval(() => {

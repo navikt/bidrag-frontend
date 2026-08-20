@@ -1,9 +1,9 @@
-import { FloppydiskIcon } from "@navikt/aksel-icons";
 import { RedirectTo } from "@bidrag/common";
+import { FloppydiskIcon } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
-import { useQuery } from "@tanstack/react-query";
+import { useRouteLoaderData } from "react-router";
 
-import { configQuery } from "~/api/query/config.query.ts";
+import type { loader as rootLoader } from "~/root.tsx";
 
 export default function SakButtons({
     onSubmit,
@@ -12,8 +12,7 @@ export default function SakButtons({
     onSubmit: () => Promise<string>;
     onRefetch: () => Promise<unknown>;
 }) {
-    const { data: config } = useQuery(configQuery);
-    const bisysBaseUrl = config?.bisysBaseUrl ?? "";
+    const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
 
     return (
         <div className="flex justify-end gap-2">
@@ -26,7 +25,7 @@ export default function SakButtons({
                 onClick={async () => {
                     try {
                         const saksnummer = await onSubmit();
-                        RedirectTo.nySoknad(saksnummer, bisysBaseUrl);
+                        RedirectTo.nySoknad(saksnummer, bisysUrl);
                     } catch {
                         return;
                     }
@@ -43,7 +42,7 @@ export default function SakButtons({
                 onClick={async () => {
                     try {
                         const saksnummer = await onSubmit();
-                        RedirectTo.behandleSak(saksnummer, bisysBaseUrl);
+                        RedirectTo.behandleSak(saksnummer, bisysUrl);
                     } catch {
                         return;
                     }

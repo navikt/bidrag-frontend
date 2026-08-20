@@ -1,9 +1,8 @@
+import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PadlockLockedIcon, PencilIcon, PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { BodyLong, Button, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-
-import type { PersonDto } from "@bidrag/api/PersonApi";
 import DiskresjonAlert from "./components/DiskresjonAlert.tsx";
 import PersonInfo from "./components/PersonInfo.tsx";
 import SøkPerson from "./components/SøkPerson.tsx";
@@ -27,9 +26,9 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
             ...rolle,
             fodselsnummer: person.ident,
             foedselsnummer: person.ident,
-            navn: person.visningsnavn,
-            fødselsdato: person.fødselsdato,
-            diskresjonskode: person.diskresjonskode,
+            navn: person.visningsnavn ?? undefined,
+            fødselsdato: person.fødselsdato ?? undefined,
+            diskresjonskode: person.diskresjonskode ?? undefined,
         };
 
         const finnesAllerede = roller.some((r) => r.type === rolle.type);
@@ -79,13 +78,11 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
                             ident={rolle.fodselsnummer}
                             fødselsdato={rolle.fødselsdato}
                             tags={
-                                <>
-                                    {erNyForelder && (
-                                        <Tag variant="alt1" size="xsmall">
-                                            Ny
-                                        </Tag>
-                                    )}
-                                </>
+                                erNyForelder && (
+                                    <Tag variant="alt1" size="xsmall">
+                                        Ny
+                                    </Tag>
+                                )
                             }
                         />
                         {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}

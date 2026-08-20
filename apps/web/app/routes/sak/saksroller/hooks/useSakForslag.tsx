@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 
 import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
-import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { SecureLoggerService } from "@bidrag/common";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
+import { useEffect, useState } from "react";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 
 const MAKS_ALDER_BARN = 24;
@@ -115,13 +115,19 @@ export function useSakForslag({ sak }: { sak: BidragssakDto | undefined }): SakF
             // Filtrer barn etter alder
             const filtrertBarnMap = new Map<string, PersonDto[]>(
                 Array.from(barnMap.entries())
-                    .map(([motpartIdent, liste]): [string, PersonDto[]] => [motpartIdent, liste.filter(erBarnUnderMaksAlder)])
+                    .map(([motpartIdent, liste]): [string, PersonDto[]] => [
+                        motpartIdent,
+                        liste.filter(erBarnUnderMaksAlder),
+                    ])
                     .filter(([, liste]) => liste.length > 0),
             );
 
             setMuligeBarnPerMotpart(filtrertBarnMap);
         } catch (e) {
-            SecureLoggerService.error("Kunne ikke prosessere motpart-barn-relasjon", e instanceof Error ? e : new Error(String(e)));
+            SecureLoggerService.error(
+                "Kunne ikke prosessere motpart-barn-relasjon",
+                e instanceof Error ? e : new Error(String(e)),
+            );
             setFeil("Kunne ikke hente forslag til roller");
         }
     }, [

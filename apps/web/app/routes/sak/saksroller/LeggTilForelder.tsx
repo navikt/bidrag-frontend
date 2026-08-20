@@ -1,9 +1,8 @@
+import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonPlusIcon } from "@navikt/aksel-icons";
 import { BodyLong, Button, Heading } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-
-import type { PersonDto } from "@bidrag/api/PersonApi";
 import PersonInfo from "./components/PersonInfo.tsx";
 import PersonSøkWrapper from "./PersonSøkWrapper.tsx";
 import type { Rolle, SakRedigeringData } from "./sakvisning-schema.ts";
@@ -15,7 +14,12 @@ interface LeggTilForelderProps {
     muligeAndreForeldre?: PersonDto[];
 }
 
-export default function LeggTilForelder({ form, rolleType, rolleNavn, muligeAndreForeldre = [] }: LeggTilForelderProps) {
+export default function LeggTilForelder({
+    form,
+    rolleType,
+    rolleNavn,
+    muligeAndreForeldre = [],
+}: LeggTilForelderProps) {
     const [visSøk, setVisSøk] = useState<boolean>(false);
     const roller = form.watch("roller") || [];
 
@@ -38,9 +42,9 @@ export default function LeggTilForelder({ form, rolleType, rolleNavn, muligeAndr
         const nyForelder: Rolle = {
             fodselsnummer: person.ident,
             foedselsnummer: person.ident,
-            navn: person.visningsnavn,
-            fødselsdato: person?.fødselsdato,
-            diskresjonskode: person.diskresjonskode,
+            navn: person.visningsnavn ?? undefined,
+            fødselsdato: person.fødselsdato ?? undefined,
+            diskresjonskode: person.diskresjonskode ?? undefined,
             type: rolleType,
             rolleType: rolleType,
             objektnummer: "",

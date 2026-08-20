@@ -1,10 +1,9 @@
 import { Alert, BodyShort, Button, Radio, RadioGroup, Stack } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-
-import type { SakRedigeringData } from "./sakvisning-schema.ts";
 import FunnetPersonInfo from "./components/FunnetPersonInfo.tsx";
 import ReellMottakerSøk from "./components/ReellMottakerSøk.tsx";
+import type { SakRedigeringData } from "./sakvisning-schema.ts";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;

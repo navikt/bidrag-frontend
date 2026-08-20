@@ -1,8 +1,7 @@
+import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
 import { Alert, Loader, Search } from "@navikt/ds-react";
 import { useState } from "react";
-
-import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
 
 export default function PersonSamhandlerSok({

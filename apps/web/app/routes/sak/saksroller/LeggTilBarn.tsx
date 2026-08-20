@@ -1,14 +1,13 @@
+import type { PersonDto } from "@bidrag/api/PersonApi";
+import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
 import { PlusIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, Button, Heading } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-
-import type { PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
 import PersonInfo from "./components/PersonInfo.tsx";
 import PersonSøkWrapper from "./PersonSøkWrapper.tsx";
 import ReellMottakerVelger from "./ReellMottakerVelger.tsx";
-import { MYNDYG_BARN_ALDER, type BarnRolle, type SakRedigeringData } from "./sakvisning-schema.ts";
+import { type BarnRolle, MYNDYG_BARN_ALDER, type SakRedigeringData } from "./sakvisning-schema.ts";
 
 const MAKS_ALDER_BARN = 24;
 
@@ -105,9 +104,9 @@ export default function LeggTilBarn({
                       : undefined,
             mottagerErVerge: false,
             samhandlerIdent: reellMottakerType === "samhandler" ? reellMottakerIdent : undefined,
-            navn: person.visningsnavn,
-            fødselsdato: person?.fødselsdato,
-            diskresjonskode: person.diskresjonskode,
+            navn: person.visningsnavn ?? undefined,
+            fødselsdato: person.fødselsdato ?? undefined,
+            diskresjonskode: person.diskresjonskode ?? undefined,
             alder,
             erMyndig: alder >= MYNDYG_BARN_ALDER,
             reellMottakerType: reellMottakerType,
@@ -115,7 +114,7 @@ export default function LeggTilBarn({
                 reellMottakerType === "samhandler"
                     ? reellMottakerNavn
                     : reellMottakerType === "barnet_selv"
-                      ? person.visningsnavn
+                      ? (person.visningsnavn ?? undefined)
                       : undefined,
         };
 
@@ -209,7 +208,9 @@ export default function LeggTilBarn({
         );
     }
 
-    const alder = valgtBarn?.fødselsdato ? beregnAlder(valgtBarn.fødselsdato) : (beregnAlderFraFnr(valgtBarn.ident) ?? 0);
+    const alder = valgtBarn?.fødselsdato
+        ? beregnAlder(valgtBarn.fødselsdato)
+        : (beregnAlderFraFnr(valgtBarn.ident) ?? 0);
     const bm = roller.find((r) => r.type === "BM");
     const erBmUkjent = !bm?.fodselsnummer;
     const rolleIndex = roller.findIndex((r) => r.fodselsnummer === valgtBarn.ident);

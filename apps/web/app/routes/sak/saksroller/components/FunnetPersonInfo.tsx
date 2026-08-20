@@ -1,5 +1,5 @@
-import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { IdentUtils } from "@bidrag/common";
+import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, Button } from "@navikt/ds-react";
 
 import { useHentSamhandler } from "~/api/useApi.ts";
@@ -41,7 +41,9 @@ export default function FunnetPersonInfo({
         >
             <div className="flex gap-3 w-[stretch] justify-between">
                 <div className="flex gap-3">
-                    {simple ? null : <PersonIcon fontSize="1.5rem" aria-hidden className={ikon ?? `text-ax-success-700`} />}
+                    {simple ? null : (
+                        <PersonIcon fontSize="1.5rem" aria-hidden className={ikon ?? `text-ax-success-700`} />
+                    )}
                     <div className="flex flex-col">
                         <BodyLong size="small" className="font-semibold">
                             {label} <PersonInfo ident={ident ?? ""} navn={navn} />

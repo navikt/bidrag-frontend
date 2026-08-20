@@ -200,7 +200,11 @@ function ReellMottakerDetaljer({ endring }: { endring: Extract<Endringsrad, { ty
                                 </BodyShort>
                             </dt>
                             <dd className="ml-0">
-                                {renderReellMottaker(endring.ident, endring.fraReellMottaker, endring.fraReellMottakerNavn)}
+                                {renderReellMottaker(
+                                    endring.ident,
+                                    endring.fraReellMottaker,
+                                    endring.fraReellMottakerNavn,
+                                )}
                             </dd>
                         </div>
                     </dl>
@@ -217,7 +221,11 @@ function ReellMottakerDetaljer({ endring }: { endring: Extract<Endringsrad, { ty
                                 </BodyShort>
                             </dt>
                             <dd className="ml-0">
-                                {renderReellMottaker(endring.ident, endring.tilReellMottaker, endring.tilReellMottakerNavn)}
+                                {renderReellMottaker(
+                                    endring.ident,
+                                    endring.tilReellMottaker,
+                                    endring.tilReellMottakerNavn,
+                                )}
                             </dd>
                         </div>
                     </dl>
@@ -293,7 +301,9 @@ export default function Endringsoppsummering({
                         {grupperteEndringer.length === 0 ? (
                             <EndringsTomTilstand />
                         ) : (
-                            grupperteEndringer.map((gruppe) => <PersonEndringerSvar key={gruppe.personKey} gruppe={gruppe} />)
+                            grupperteEndringer.map((gruppe) => (
+                                <PersonEndringerSvar key={gruppe.personKey} gruppe={gruppe} />
+                            ))
                         )}
                     </FormSummary.Answers>
                 </FormSummary>

@@ -1,9 +1,8 @@
-import { useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-
 import { BIDRAG_PERSON_API } from "@bidrag/api";
 import type { ForelderBarnRelasjonDto } from "@bidrag/api/PersonApi";
 import { SecureLoggerService } from "@bidrag/common";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 /**
  * Sjekker om barn i saken har ufullstendig/manglende relasjon til begge foreldrene.

@@ -1,5 +1,5 @@
-import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { SecureLoggerService } from "@bidrag/common";
+import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { BodyLong, Button, Tag } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";

@@ -1,5 +1,4 @@
-import { IdentUtils, PersonIdent, PersonNavnIdent } from "@bidrag/common";
-import { dateToDDMMYYYYString } from "@bidrag/common";
+import { dateToDDMMYYYYString, IdentUtils, PersonIdent, PersonNavnIdent } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
 import { BodyShort, HStack, Link, Loader, Tag } from "@navikt/ds-react";
 import type { ReactNode } from "react";
