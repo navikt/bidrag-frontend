@@ -72,6 +72,10 @@ env:
   - name: BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-dokument-forsendelse/.default
 
+unleash:
+  host: bidrag-unleash-api.nav.cloud.nais.io
+  environment: development
+
 outbound:
   rules:
     - application: bidrag-tilgangskontroll
