@@ -1,8 +1,10 @@
 import { parseDateQueryParam, toQueryParam } from "@bidrag/utils/datoUtils";
-import { Box, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
+import { EraserIcon } from "@navikt/aksel-icons";
+import { Box, Button, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
+import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
 import {
     PARAM_BARN,
     PARAM_FRA,
@@ -88,12 +90,16 @@ export function BrukerTransaksjonerFilterPanel({ ident }: { ident: string }) {
         );
     };
 
-    const { datepickerProps: fraDatepickerProps, inputProps: fraInputProps } = useDatepicker({
+    const { datepickerProps: fraDatepickerProps, inputProps: fraInputProps , setSelected: setFraSelected} = useDatepicker({
         defaultSelected: parseDateQueryParam(searchParams.get(PARAM_FRA)),
         onDateChange: handleFraChange,
     });
 
-    const { datepickerProps: tilDatepickerProps, inputProps: tilInputProps } = useDatepicker({
+    const {
+        datepickerProps: tilDatepickerProps,
+        inputProps: tilInputProps,
+        setSelected: setTilSelected,
+    } = useDatepicker({
         defaultSelected: parseDateQueryParam(searchParams.get(PARAM_TIL)),
         onDateChange: handleTilChange,
     });
@@ -103,6 +109,24 @@ export function BrukerTransaksjonerFilterPanel({ ident }: { ident: string }) {
             (prev) => {
                 const next = new URLSearchParams(prev);
                 value ? next.set(PARAM_OPEN_TRANS, "true") : next.delete(PARAM_OPEN_TRANS);
+                return next;
+            },
+            { replace: true, preventScrollReset: true },
+        );
+    };
+    const clearFilter = () => {
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete(PARAM_TIL);
+                next.delete(PARAM_FRA);
+                next.delete(PARAM_BARN);
+                next.delete(PARAM_TYPE);
+                next.delete(PARAM_KODER);
+                next.delete(PARAM_MOTTAKERE);
+                next.delete(PARAM_OPEN_TRANS)
+                setFraSelected();
+                setTilSelected();
                 return next;
             },
             { replace: true, preventScrollReset: true },
@@ -154,6 +178,14 @@ export function BrukerTransaksjonerFilterPanel({ ident }: { ident: string }) {
                 <Switch size={"small"} checked={checked} onChange={(e) => handleOpenTrans(e.target.checked)}>
                     Vis bare åpne
                 </Switch>
+                <Button
+                    size={"small"}
+                    variant={"tertiary"}
+                    onClick={clearFilter}
+                    icon={<EraserIcon title="Fjern filter" />}
+                >
+                    Fjern filter
+                </Button>
             </HStack>
         </Box>
     );
