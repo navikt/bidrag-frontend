@@ -30,12 +30,12 @@ const individsifferAsString = (num: number): string => {
 
 export default class IdentUtils {
     static isFnr(value: string) {
-        return this.validateFnr(value);
+        return IdentUtils.validateFnr(value);
     }
 
     static isSamhandlerId(value: string | number) {
         if (ObjectUtils.isEmpty(value)) return false;
-        const samhandlerIdentRegex = new RegExp("^[89]\\d{10}$");
+        const samhandlerIdentRegex = /^[89]\d{10}$/;
         return samhandlerIdentRegex.test(value.toString());
     }
 
@@ -44,7 +44,7 @@ export default class IdentUtils {
     }
 
     static validateFnr(value: string) {
-        const elevenDigits = new RegExp("^\\d{11}$");
+        const elevenDigits = /^\d{11}$/;
         return elevenDigits.test(value) && parseInt(value.substring(0, 1)) !== 8;
     }
 
@@ -65,11 +65,11 @@ export default class IdentUtils {
         const i3 = Number(individsiffer.substring(2, 3));
 
         const k1 = elevenGivesZero(
-            11 - ((3 * d1 + 7 * d2 + 6 * m1 + m2 + 8 * aa1 + 9 * aa2 + 4 * i1 + 5 * i2 + 2 * i3) % 11)
+            11 - ((3 * d1 + 7 * d2 + 6 * m1 + m2 + 8 * aa1 + 9 * aa2 + 4 * i1 + 5 * i2 + 2 * i3) % 11),
         );
 
         const k2 = elevenGivesZero(
-            11 - ((5 * d1 + 4 * d2 + 3 * m1 + 2 * m2 + 7 * aa1 + 6 * aa2 + 5 * i1 + 4 * i2 + 3 * i3 + 2 * k1) % 11)
+            11 - ((5 * d1 + 4 * d2 + 3 * m1 + 2 * m2 + 7 * aa1 + 6 * aa2 + 5 * i1 + 4 * i2 + 3 * i3 + 2 * k1) % 11),
         );
 
         const result = `${d1}${d2}${m1}${m2}${aa1}${aa2}${i1}${i2}${i3}${k1}${k2}`;

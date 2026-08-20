@@ -54,7 +54,7 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                     );
                 case "vedtaksdato":
                     if (!a.vedtaksTidspunkt || !b.vedtaksTidspunkt) return 0;
-                    return (dir * (new Date(a.vedtaksTidspunkt) <= new Date(b.vedtaksTidspunkt) ? 1 : -1));
+                    return dir * (new Date(a.vedtaksTidspunkt) <= new Date(b.vedtaksTidspunkt) ? 1 : -1);
                 case "fom":
                     return dir * (new Date(a.periode.fom) <= new Date(b.periode.fom) ? 1 : -1);
                 case "tom":

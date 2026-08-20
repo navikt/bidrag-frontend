@@ -1,0 +1,18 @@
+.navds-checkbox__label {
+    align-items: center;
+}
+.navds-checkbox__icon {
+    max-height: 0.5rem;
+}
+.navds-form-field--small .navds-date__field-input {
+    width: 120px;
+}
+.navds-form-field--small .navds-date__field-input::placeholder {
+    font-size: var(--ax-font-size-small);
+}
+/* .navds-table--small .navds-table__expanded-row-content {
+    padding: var(--ax-space-8) 92px;
+} */
+/* .navds-table--small .navds-table__header-cell, .navds-table--small .navds-table__data-cell {
+    padding: var(--ax-space-8) var(--ax-space-8);
+} */

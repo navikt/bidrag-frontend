@@ -1,7 +1,7 @@
-import { AxiosError, AxiosResponse } from "axios";
+import type { AxiosError, AxiosResponse } from "axios";
 
 import { SecuritySessionUtils } from "../../utils";
-import { ErrorInfo } from "../logging";
+import type { ErrorInfo } from "../logging";
 
 export class AxiosErrorHandler {
     static getStackFromErrorBody(errorParsed: object | string): string {

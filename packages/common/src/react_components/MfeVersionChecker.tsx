@@ -1,7 +1,7 @@
 import { Alert, BodyShort, Button } from "@navikt/ds-react";
 import React, { useEffect, useMemo } from "react";
 
-import { buildMfeRemoteEntryUrl, MFERemoteTarget, useMfeVersions } from "./hooks/useMfeVersions";
+import { buildMfeRemoteEntryUrl, type MFERemoteTarget, useMfeVersions } from "./hooks/useMfeVersions";
 
 interface MfeVersionCheckerProps {
     /** List of MFE federation names to check */
@@ -22,7 +22,7 @@ export default function MfeVersionChecker({ federationNames, deployEnv, pollInte
                 name,
                 remoteEntryUrl: buildMfeRemoteEntryUrl(name, deployEnv),
             })),
-        [federationNames, deployEnv]
+        [federationNames, deployEnv],
     );
 
     const { data: versionStatuses, isLoading, error } = useMfeVersions(targets, { pollIntervalMs });
@@ -32,7 +32,7 @@ export default function MfeVersionChecker({ federationNames, deployEnv, pollInte
             "[MfeVersionChecker] Sjekker MFE-versjoner for",
             targets.map((t) => t.name).join(", "),
             deployEnv,
-            pollIntervalMs
+            pollIntervalMs,
         );
         if (!versionStatuses) {
             return;

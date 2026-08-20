@@ -1,5 +1,5 @@
-import { initializeFaro, getWebInstrumentations } from "@grafana/faro-web-sdk";
 import { ReactIntegration } from "@grafana/faro-react";
+import { getWebInstrumentations, initializeFaro } from "@grafana/faro-web-sdk";
 import type { NaisConfig } from "~/nais.ts";
 
 let faroInstance: ReturnType<typeof initializeFaro> | null = null;

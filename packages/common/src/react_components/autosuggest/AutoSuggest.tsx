@@ -1,7 +1,6 @@
 import { TextField } from "@navikt/ds-react";
-import React, { ChangeEvent, useRef, useState } from "react";
-import { useEffect } from "react";
-import { ReactElement } from "react";
+import type React from "react";
+import { type ChangeEvent, type ReactElement, useEffect, useRef, useState } from "react";
 
 import { removeNonPrintableCharachters } from "../../utils/StringUtils";
 
@@ -48,8 +47,8 @@ export default function AutoSuggest(props: AutoSuggestProps) {
         const filteredOptions = options.filter(
             (currentOptionString) =>
                 toUppercaseForEveryFirstLetter(currentOptionString).search(
-                    getRegExForSearchedFirstLetterTerms(searchTermTrimmed)
-                ) > -1
+                    getRegExForSearchedFirstLetterTerms(searchTermTrimmed),
+                ) > -1,
         );
         if (props.sortOptions != false) {
             return filteredOptions.sort(sortByLengthOfString);

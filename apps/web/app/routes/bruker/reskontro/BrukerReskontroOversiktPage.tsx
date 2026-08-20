@@ -1,19 +1,17 @@
-import {Box, Heading, List, LocalAlert, VStack} from "@navikt/ds-react";
-import {useState} from "react";
-import type {Route} from "./+types/BrukerReskontroOversiktPage.ts";
-import {SakNokkelTall} from "../../sak/reskontro/SakNokkelTall";
+import { Box, Heading, List, LocalAlert, VStack } from "@navikt/ds-react";
+import { useState } from "react";
+import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
+import { SakNokkelTall } from "../../sak/reskontro/SakNokkelTall";
+import type { Route } from "./+types/BrukerReskontroOversiktPage.ts";
 import BrukerTransaksjonerAggregertTabell from "./BrukerTransaksjonerAggregertTabell";
 import BrukerTransaksjonerFilterPanel from "./BrukerTransaksjonerFilterPanel.tsx";
-import {useBrukerTransaksjonsfilter} from "./useBrukerTransaksjonsfilter";
-import {useObfuscateFnr} from "~/common/person/useObfuscateFnr.ts";
+import { useBrukerTransaksjonsfilter } from "./useBrukerTransaksjonsfilter";
 
-export default function BrukerReskontroOversiktPage({
-                                                     params,
-                                                 }: Route.ComponentProps) {
-    const {decodeFnr} = useObfuscateFnr();
+export default function BrukerReskontroOversiktPage({ params }: Route.ComponentProps) {
+    const { decodeFnr } = useObfuscateFnr();
     const brukerid = params.brukerid;
-    const ident = decodeFnr(brukerid)
-    const {filtrertData, totalTransCount} = useBrukerTransaksjonsfilter(ident || "");
+    const ident = decodeFnr(brukerid);
+    const { filtrertData, totalTransCount } = useBrukerTransaksjonsfilter(ident || "");
     const [showAlert, setShowAlert] = useState(true);
     const documentTitle = `Sakreskontro - ${brukerid}`;
 
@@ -24,12 +22,8 @@ export default function BrukerReskontroOversiktPage({
             {showAlert && (
                 <LocalAlert status="announcement">
                     <LocalAlert.Header>
-                        <LocalAlert.Title>
-                            Denne siden er under arbeid
-                        </LocalAlert.Title>
-                        <LocalAlert.CloseButton
-                            onClick={() => setShowAlert(false)}
-                        />
+                        <LocalAlert.Title>Denne siden er under arbeid</LocalAlert.Title>
+                        <LocalAlert.CloseButton onClick={() => setShowAlert(false)} />
                     </LocalAlert.Header>
                     <LocalAlert.Content>
                         Følgende er ikke enda implementert
@@ -43,14 +37,9 @@ export default function BrukerReskontroOversiktPage({
             )}
 
             {/*<SakNokkelTall saksnummer={brukerid}/>*/}
-            <Box
-                borderColor="neutral-subtle"
-                padding="space-16"
-                borderWidth="1"
-                borderRadius="4"
-            >
+            <Box borderColor="neutral-subtle" padding="space-16" borderWidth="1" borderRadius="4">
                 <VStack gap="space-16">
-                    <BrukerTransaksjonerFilterPanel/>
+                    <BrukerTransaksjonerFilterPanel />
                     <BrukerTransaksjonerAggregertTabell
                         transaksjoner={filtrertData}
                         totalTransCount={totalTransCount}

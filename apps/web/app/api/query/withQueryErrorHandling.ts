@@ -15,12 +15,8 @@ export async function withQueryErrorHandling<T>(
 
         const status = axiosError?.response?.status;
         if (status === 403 || status === 401) {
-            await SecureLoggerService.warn(
-                `Ingen tilgang til ${queryName} for ${context}`,
-            );
-            throw new TilgangsFeilError(
-                `Du har ikke tilgang til ${queryName} for ${context}`,
-            );
+            await SecureLoggerService.warn(`Ingen tilgang til ${queryName} for ${context}`);
+            throw new TilgangsFeilError(`Du har ikke tilgang til ${queryName} for ${context}`);
         }
         if (status === 404 && notFoundValue !== undefined) {
             return notFoundValue;

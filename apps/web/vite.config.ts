@@ -1,5 +1,9 @@
+import { fileURLToPath } from "node:url";
+import mdx from "@mdx-js/rollup";
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
+import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 import { defineConfig } from "vite";
 import { readBuildEnv } from "./env.build";
 
@@ -7,9 +11,31 @@ export default defineConfig(({ command, mode }) => {
     const { CDN_BASE_URL } = readBuildEnv({ command, mode });
 
     return {
-        plugins: [reactRouter(), tailwindcss()],
+        plugins: [
+            // MDX brukes av brukerveiledningene i @bidrag/behandling-app.
+            // providerImportSource kreves for at MDXProvider i PageWrapper skal
+            // levere komponenter (ikoner, Heading osv.) inn i .mdx-filene.
+            {
+                enforce: "pre",
+                ...mdx({
+                    providerImportSource: "@mdx-js/react",
+                    remarkPlugins: [remarkGfm],
+                    rehypePlugins: [rehypeSlug],
+                }),
+            },
+            reactRouter(),
+            tailwindcss(),
+        ],
         resolve: {
             tsconfigPaths: true,
+            alias: [
+                // tsconfig peker @bidrag/behandling-app til en type-deklarasjon for å slippe
+                // strict typesjekk av pakkens kildekode. Vite må fortsatt bruke kildekoden.
+                {
+                    find: /^@bidrag\/behandling-app$/,
+                    replacement: fileURLToPath(new URL("../behandling-app/src/index.ts", import.meta.url)),
+                },
+            ],
         },
         server: {
             port: 3000,

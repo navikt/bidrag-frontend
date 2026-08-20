@@ -2,8 +2,7 @@ import { v4 as uuidV4 } from "uuid";
 
 import { LoggerService } from "../logging/LoggerService";
 import { SecureLoggerService } from "../logging/SecureLoggerService";
-import { ApiError, SimpleError } from "../types";
-import { ApiResponse } from "../types";
+import { ApiError, type ApiResponse, SimpleError } from "../types";
 import { SecuritySessionUtils } from "../utils";
 
 export interface FetchConfig {
@@ -64,7 +63,7 @@ export class DefaultRestService {
         url: string,
         method: MethodType,
         body?: string,
-        config?: FetchConfig
+        config?: FetchConfig,
     ): Promise<ApiResponse<T>> {
         const requestTrace = SecuritySessionUtils.createRequestTrace(`${method} ${this.baseUrl}${url}`);
         const headers = await this.createDefaultHeaders(SecuritySessionUtils.getCorrelationId());
@@ -91,7 +90,7 @@ export class DefaultRestService {
                     const responseError = typeof responseParsed == "object" ? responseParsed?.error : responseParsed;
                     const warningMessage = response?.headers?.get("Warning") ?? responseParsed.message ?? responseError;
                     LoggerService.warn(
-                        `Fikk respons med status ${response.status} og melding ${warningMessage} fra endepunkt ${this.baseUrl}${url}`
+                        `Fikk respons med status ${response.status} og melding ${warningMessage} fra endepunkt ${this.baseUrl}${url}`,
                     );
                     return { ok: false, status: response.status, data: warningMessage } as ApiResponse<T>;
                 }
@@ -119,7 +118,7 @@ export class DefaultRestService {
                 if (body) {
                     SecureLoggerService.error(
                         errorMessage,
-                        new SimpleError(`Requesten som førte til feilen inneholdt melding ${body}`)
+                        new SimpleError(`Requesten som førte til feilen inneholdt melding ${body}`),
                     );
                 }
 
@@ -156,7 +155,7 @@ export class DefaultRestService {
         const resolvedCorrelationId =
             error.headers?.get("traceparent") ?? error.headers?.get("x-correlation-id") ?? correlationId;
         const warningMessage = error?.headers?.get("Warning");
-        const stackTrace = this.getStackFromErrorBody(errorParsed);
+        const stackTrace = DefaultRestService.getStackFromErrorBody(errorParsed);
         const errorMessageFromResponse = `${warningMessage ?? "ukjent feil"} - status=${error.statusText}(${
             error.status
         })`;

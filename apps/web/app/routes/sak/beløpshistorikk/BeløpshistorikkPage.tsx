@@ -46,19 +46,11 @@ export default function BeløpshistorikkPage() {
     );
 }
 
-function TabPanel({
-    value,
-    children,
-}: {
-    value: string;
-    children: ReactNode;
-}) {
+function TabPanel({ value, children }: { value: string; children: ReactNode }) {
     return (
         <Tabs.Panel value={value}>
             <Box paddingBlock={"space-32"}>
-                <Suspense fallback={<Loader size="medium" />}>
-                    {children}
-                </Suspense>
+                <Suspense fallback={<Loader size="medium" />}>{children}</Suspense>
             </Box>
         </Tabs.Panel>
     );

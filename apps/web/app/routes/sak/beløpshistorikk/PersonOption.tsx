@@ -1,4 +1,4 @@
-import {useBidragCommons} from "@bidrag/common";
+import { useBidragCommons } from "@bidrag/common";
 
 interface PersonOptionProps {
     personident: string;

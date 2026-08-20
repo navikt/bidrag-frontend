@@ -2,12 +2,12 @@ const SESSION_STATE_KEY = "bisys.sessionState";
 const ENHET_KEY = "bisys.enhet";
 
 const sessionStateFromUrl = (searchParams: URLSearchParams) => {
-    return  searchParams.get("sessionState");
-}
+    return searchParams.get("sessionState");
+};
 
 const enhetFromUrl = (searchParams: URLSearchParams) => {
     return searchParams.get("enhet");
-}
+};
 
 export function persistBisysParams(url: URL): void {
     const searchParams = url.searchParams;

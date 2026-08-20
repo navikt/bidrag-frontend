@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import {useBidragCommons} from "../api/BidragCommonsContext";
+import type { ReactNode } from "react";
+import { useBidragCommons } from "../api/BidragCommonsContext";
 
 type MaskerSensitivInfoProps = {
     children: ReactNode;

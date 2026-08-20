@@ -1,4 +1,4 @@
-import {formatISO, parseISO} from "date-fns";
+import { formatISO, parseISO } from "date-fns";
 
 /**
  * Formaterer dato til norsk format
@@ -20,7 +20,7 @@ export function sisteDagiMnd(dato: string): string | null {
 }
 
 export function toQueryParam(date: Date): string {
-    return formatISO(date, {representation: "date"});
+    return formatISO(date, { representation: "date" });
 }
 
 export function parseDateQueryParam(value: string | null): Date | undefined {

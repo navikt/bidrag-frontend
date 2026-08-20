@@ -1,0 +1,75 @@
+.ql-top-container {
+    height: inherit;
+    width: max-content;
+    height: auto;
+    border-style: solid;
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: var(--ax-border-neutral);
+}
+
+.resizable .ql-editor {
+    width: 450px;
+    max-height: 800px;
+    min-height: 200px;
+    height: auto;
+    resize: both;
+    overflow: auto;
+    border-end-end-radius: 0;
+}
+
+.error {
+    border: 1px solid;
+    border-radius: 4px;
+    border-color: var(--ax-border-danger);
+    box-shadow: 0 0 0 1px var(--ax-border-danger);
+}
+
+.ql-editor {
+    width: 400px;
+    font-size: 16px;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+    overflow-y: auto;
+}
+
+.ql-container {
+    height: inherit;
+    width: auto;
+}
+
+.ql-toolbar {
+    width: auto;
+}
+
+.ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid var(--ax-border-neutral);
+}
+
+.ql-container.ql-snow {
+    border: none;
+}
+
+.readonly > .ql-container {
+    background-color: var(--ax-bg-neutral-soft);
+    border-color: var(--ax-border-neutral-subtle);
+    cursor: default;
+}
+
+.ql-snow .ql-formats button[aria-label="header: 3"]:before {
+    content: "Undertittel";
+    width: max-content;
+    font-size: 16px;
+}
+
+.ql-snow .ql-formats button[aria-label="header: 3"].ql-active {
+    font-weight: bold;
+}
+
+.ql-snow .ql-formats button[aria-label="header: 3"] svg {
+    display: none;
+    width: max-content;
+}

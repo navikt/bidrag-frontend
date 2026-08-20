@@ -16,11 +16,11 @@ export class Base64ByteConverter {
             throw new Error(`Invalid base64 string: contains illegal characters`);
         }
         let tmp;
-        const lens = this.getLens(b64);
+        const lens = Base64ByteConverter.getLens(b64);
         const validLen = lens[0];
         const placeHoldersLen = lens[1];
 
-        const arr = new Uint8Array(this._byteLength(validLen, placeHoldersLen));
+        const arr = new Uint8Array(Base64ByteConverter._byteLength(validLen, placeHoldersLen));
 
         let curByte = 0;
 
@@ -65,7 +65,9 @@ export class Base64ByteConverter {
 
         // go through the array every three bytes, we'll deal with trailing stuff later
         for (let i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-            parts.push(this.encodeChunk(uint8, i, i + maxChunkLength > len2 ? len2 : i + maxChunkLength));
+            parts.push(
+                Base64ByteConverter.encodeChunk(uint8, i, i + maxChunkLength > len2 ? len2 : i + maxChunkLength),
+            );
         }
 
         // pad the end with zeros, but make sure to not forget the extra bytes
@@ -97,7 +99,7 @@ export class Base64ByteConverter {
 
     // base64 is 4/3 + up to two characters of the original data
     private static byteLength(b64: string) {
-        const lens = this.getLens(b64);
+        const lens = Base64ByteConverter.getLens(b64);
         const validLen = lens[0];
         const placeHoldersLen = lens[1];
         return ((validLen + placeHoldersLen) * 3) / 4 - placeHoldersLen;
@@ -108,7 +110,9 @@ export class Base64ByteConverter {
     }
 
     private static tripletToBase64(num: number) {
-        return lookup[(num >> 18) & 0x3f]! + lookup[(num >> 12) & 0x3f]! + lookup[(num >> 6) & 0x3f]! + lookup[num & 0x3f]!;
+        return (
+            lookup[(num >> 18) & 0x3f]! + lookup[(num >> 12) & 0x3f]! + lookup[(num >> 6) & 0x3f]! + lookup[num & 0x3f]!
+        );
     }
 
     private static encodeChunk(uint8: Uint8Array, start: number, end: number) {
@@ -116,7 +120,7 @@ export class Base64ByteConverter {
         const output = [];
         for (let i = start; i < end; i += 3) {
             tmp = ((uint8[i]! << 16) & 0xff0000) + ((uint8[i + 1]! << 8) & 0xff00) + (uint8[i + 2]! & 0xff);
-            output.push(this.tripletToBase64(tmp));
+            output.push(Base64ByteConverter.tripletToBase64(tmp));
         }
         return output.join("");
     }

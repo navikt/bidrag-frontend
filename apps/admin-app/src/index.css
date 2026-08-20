@@ -1,5 +1,7 @@
 @import "tailwindcss/index";
-@import "@navikt/ds-css";
+/* Må importeres inn i components-laget, ellers blir Aksel sine egne aksel.*-lag
+   deklarert etter "utilities" og vinner over Tailwind-klassene. */
+@import "@navikt/ds-css" layer(components);
 @import "@bidrag/common/styles.css";
 @import "tailwindcss/theme";
 @import "tailwindcss/utilities";

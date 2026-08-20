@@ -5,15 +5,15 @@ export class FileUtils {
     static dataToFileUrl(data: FileData, type: string): string {
         let byteData = data;
         if (typeof data === "string") {
-            byteData = this._base64ToArrayBuffer(data);
+            byteData = FileUtils._base64ToArrayBuffer(data);
         }
         const fileBlob = new Blob([byteData as BlobPart], { type: type });
         return URL.createObjectURL(fileBlob);
     }
 
     static openFile(data: FileData, openInNewWindow = true): void {
-        const fileURL = this.dataToFileUrl(data, "application/pdf");
-        this.openFileUrl(fileURL, openInNewWindow);
+        const fileURL = FileUtils.dataToFileUrl(data, "application/pdf");
+        FileUtils.openFileUrl(fileURL, openInNewWindow);
     }
 
     static async openFileUrl(fileURL?: string, openInNewWindow = false): Promise<void> {
