@@ -44,10 +44,10 @@ export default function LeggTilForelder({ form, rolleType, rolleNavn, muligeAndr
             type: rolleType,
             rolleType: rolleType,
             objektnummer: "",
-            reellMottager: null,
-            reellMottaker: null,
+            reellMottager: undefined,
+            reellMottaker: undefined,
             mottagerErVerge: false,
-            samhandlerIdent: null,
+            samhandlerIdent: undefined,
         };
         form.setValue("roller", [...roller, nyForelder], { shouldValidate: true });
         setVisSøk(false);

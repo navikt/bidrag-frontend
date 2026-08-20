@@ -23,12 +23,12 @@ export const RolleSchema = z.object({
     fodselsnummer: z.string(),
     type: RolleTypeSchema,
     objektnummer: z.string(),
-    reellMottager: z.string().nullable().optional(),
-    reellMottaker: z.string().nullable().optional(),
-    reellMottakerType: z.string().nullable().optional(),
-    reellMottakerNavn: z.string().nullable().optional(),
+    reellMottager: z.string().optional(),
+    reellMottaker: z.string().optional(),
+    reellMottakerType: z.string().optional(),
+    reellMottakerNavn: z.string().optional(),
     mottagerErVerge: z.boolean(),
-    samhandlerIdent: z.string().nullable().optional(),
+    samhandlerIdent: z.string().optional(),
     foedselsnummer: z.string().optional(),
     rolleType: RolleTypeSchema,
     // Personinfo hentet ved initialisering
@@ -43,7 +43,7 @@ export const BarnRolleSchema = RolleSchema.extend({
     alder: z.number().optional(),
     erMyndig: z.boolean().optional(),
     // Reell mottaker valg
-    reellMottakerType: z.enum(["barnet_selv", "samhandler"]).optional().nullable(),
+    reellMottakerType: z.enum(["barnet_selv", "samhandler"]).optional(),
     reellMottakerNavn: z.string().optional(),
 });
 

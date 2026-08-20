@@ -8,7 +8,7 @@ import ReellMottakerSøk from "./components/ReellMottakerSøk.tsx";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;
-    rolleIndex?: number;
+    rolleIndex: number;
     onAvbryt: () => void;
     onSelect?: () => void;
     disabled?: boolean;
@@ -58,8 +58,8 @@ export default function ReellMottakerVelger({
 
         if (kunSamhandlerSomReellMottaker) {
             form.setValue(`roller.${rolleIndex}.reellMottakerType`, "samhandler");
-            form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident ?? null);
-            form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn ?? null);
+            form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident);
+            form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn);
             return;
         }
 
@@ -74,8 +74,8 @@ export default function ReellMottakerVelger({
         }
 
         form.setValue(`roller.${rolleIndex}.reellMottakerType`, "samhandler");
-        form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident ?? null);
-        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn ?? null);
+        form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident);
+        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn);
     }, [barn, form, kunSamhandlerSomReellMottaker, lagretSamhandler, rolleIndex]);
 
     const handleRadioChange = (value: string) => {
@@ -88,8 +88,8 @@ export default function ReellMottakerVelger({
 
         if (kunSamhandlerSomReellMottaker && nyType === "barnet_selv") {
             form.setValue(`roller.${rolleIndex}.reellMottakerType`, "samhandler");
-            form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident ?? null);
-            form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn ?? null);
+            form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident);
+            form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn);
             return;
         }
 
@@ -109,16 +109,16 @@ export default function ReellMottakerVelger({
                 form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler.ident);
                 form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler.navn);
             } else {
-                form.setValue(`roller.${rolleIndex}.reellMottaker`, null);
-                form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, null);
+                form.setValue(`roller.${rolleIndex}.reellMottaker`, undefined);
+                form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, undefined);
             }
         }
     };
 
     const fjernSamhandler = () => {
-        form.setValue(`roller.${rolleIndex}.reellMottakerType`, null);
-        form.setValue(`roller.${rolleIndex}.reellMottaker`, null);
-        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, null);
+        form.setValue(`roller.${rolleIndex}.reellMottakerType`, undefined);
+        form.setValue(`roller.${rolleIndex}.reellMottaker`, undefined);
+        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, undefined);
     };
 
     if (!barn) {

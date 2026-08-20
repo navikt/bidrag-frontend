@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
-import type { MotpartBarnRelasjonDto, PersonDto } from "@bidrag/api/PersonApi";
+import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { SecureLoggerService } from "@bidrag/common";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
@@ -69,7 +69,7 @@ export function useSakForslag({ sak }: { sak: BidragssakDto | undefined }): SakF
                 // Kun én forelder kjent
                 if (barnListe.length === 0) {
                     // Ingen barn i saken - vis alle motparter og deres barn
-                    relasjoner.forEach((rel: MotpartBarnRelasjonDto) => {
+                    relasjoner.forEach((rel: MotpartBarnRelasjon) => {
                         if (rel.motpart) {
                             motparter.push(rel.motpart);
                             barnMap.set(rel.motpart.ident, rel.fellesBarn);
@@ -77,12 +77,12 @@ export function useSakForslag({ sak }: { sak: BidragssakDto | undefined }): SakF
                     });
                 } else {
                     // Barn i saken - filtrer motparter basert på barn
-                    const relevanteRelasjoner = relasjoner.filter((rel: MotpartBarnRelasjonDto) => {
+                    const relevanteRelasjoner = relasjoner.filter((rel: MotpartBarnRelasjon) => {
                         const barnIRelasjon = rel.fellesBarn.map((b) => b.ident);
                         return barnIdenter.some((barnIdent) => barnIdent && barnIRelasjon.includes(barnIdent));
                     });
 
-                    relevanteRelasjoner.forEach((rel: MotpartBarnRelasjonDto) => {
+                    relevanteRelasjoner.forEach((rel: MotpartBarnRelasjon) => {
                         if (rel.motpart) {
                             motparter.push(rel.motpart);
                             const søskenIkkeISaken = rel.fellesBarn.filter((barn) => !barnIdenter.includes(barn.ident));
@@ -94,11 +94,11 @@ export function useSakForslag({ sak }: { sak: BidragssakDto | undefined }): SakF
                 setMuligeAndreForeldre(motparter);
             } else {
                 // Begge foreldre kjent - hent søsken
-                const andreForelderIdent = bp ? bm?.fodselsnummer : bp?.fodselsnummer;
+                const andreForelderIdent = kjentForelder === bp ? bm?.fodselsnummer : bp?.fodselsnummer;
 
                 if (andreForelderIdent && barnListe.length > 0) {
                     const relasjonMedAndreForelder = relasjoner.find(
-                        (rel: MotpartBarnRelasjonDto) => rel.motpart?.ident === andreForelderIdent,
+                        (rel: MotpartBarnRelasjon) => rel.motpart?.ident === andreForelderIdent,
                     );
 
                     if (relasjonMedAndreForelder) {

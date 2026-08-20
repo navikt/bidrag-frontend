@@ -23,11 +23,11 @@ export default class SakErrorBoundary extends Component<Props, State> {
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error("Error caught in SakErrorBoundary:", error, errorInfo);
     }
 
-    render() {
+    override render() {
         if (this.state.hasError && this.state.error) {
             const error = this.state.error;
             const isTilgangsfeil = error instanceof TilgangsFeilError;

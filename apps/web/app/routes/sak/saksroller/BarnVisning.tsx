@@ -104,7 +104,7 @@ export default function BarnVisning({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [index, visReellMottaker, hentOgNullstillSamhandler]);
 
-    const handleEndreReellMottaker = (type: "barnet_selv" | "samhandler" | null, ident?: string | null, navn?: string) => {
+    const handleEndreReellMottaker = (type?: "barnet_selv" | "samhandler", ident?: string, navn?: string) => {
         const oppdaterteRoller = [...roller];
         const currentRolle = oppdaterteRoller[index] as BarnRolle;
 
@@ -113,10 +113,10 @@ export default function BarnVisning({
             currentRolle.reellMottaker = currentRolle.fodselsnummer;
             currentRolle.reellMottakerNavn = currentRolle.navn;
         } else if (type === "samhandler") {
-            currentRolle.reellMottaker = ident || null;
+            currentRolle.reellMottaker = ident;
             currentRolle.reellMottakerNavn = navn;
         } else {
-            currentRolle.reellMottaker = null;
+            currentRolle.reellMottaker = undefined;
             currentRolle.reellMottakerNavn = undefined;
         }
 

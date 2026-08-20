@@ -75,15 +75,15 @@ export default function LeggTilBarn({
 
         if (erMyndig || erBmUkjent) {
             setVisReellMottaker(true);
-            leggTilBarn(person, null, undefined, undefined, false);
+            leggTilBarn(person, undefined, undefined, undefined, false);
         } else {
-            leggTilBarn(person, null);
+            leggTilBarn(person);
         }
     };
 
     const leggTilBarn = (
         person: PersonDto,
-        reellMottakerType: "barnet_selv" | "samhandler" | null,
+        reellMottakerType?: "barnet_selv" | "samhandler",
         reellMottakerIdent?: string,
         reellMottakerNavn?: string,
         reset: boolean = true,
@@ -96,15 +96,15 @@ export default function LeggTilBarn({
             type: "BA",
             rolleType: "BA",
             objektnummer: "",
-            reellMottager: reellMottakerType === "samhandler" ? reellMottakerIdent || null : null,
+            reellMottager: reellMottakerType === "samhandler" ? reellMottakerIdent : undefined,
             reellMottaker:
                 reellMottakerType === "samhandler"
-                    ? reellMottakerIdent || null
+                    ? reellMottakerIdent
                     : reellMottakerType === "barnet_selv"
                       ? person.ident
-                      : null,
+                      : undefined,
             mottagerErVerge: false,
-            samhandlerIdent: reellMottakerType === "samhandler" ? reellMottakerIdent || null : null,
+            samhandlerIdent: reellMottakerType === "samhandler" ? reellMottakerIdent : undefined,
             navn: person.visningsnavn,
             fødselsdato: person?.fødselsdato,
             diskresjonskode: person.diskresjonskode,

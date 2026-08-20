@@ -67,7 +67,7 @@ export function useHentSakMedPersoninfo(saksnummer: string): SakMedPersoninfo {
                             ? rolle.fodselsnummer === rolle.reellMottaker.ident
                                 ? "barnet_selv"
                                 : "samhandler"
-                            : null,
+                            : undefined,
                         alder: alder ?? undefined,
                         erMyndig,
                         rollehistorikk: mapRollehistorikk(rolle),
