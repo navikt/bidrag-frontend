@@ -1,8 +1,7 @@
-import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
 import { PersonNavnIdent } from "@bidrag/common";
 import { formaterBelop } from "@bidrag/utils/belopUtils";
 import { formaterDato } from "@bidrag/utils/datoUtils";
-import { Alert, BodyShort, Button, Dialog, Loader, Table } from "@navikt/ds-react";
+import { Alert, BodyShort, Dialog, Loader, Table } from "@navikt/ds-react";
 import { useQuery } from "@tanstack/react-query";
 import { hentTransaksjonerPaTransaksjonsid } from "~/api/query/reskontro.query";
 
@@ -24,7 +23,7 @@ export function MotposterDialog({ transaksjonsid, onClose }: MotposterDialogProp
     const motposter = data?.transaksjoner ?? [];
 
     return (
-        <Dialog open={!!transaksjonsid} onOpenChange={(open) => !open && onClose()} >
+        <Dialog open={!!transaksjonsid} onOpenChange={(open) => !open && onClose()}>
             <Dialog.Popup width={"80%"}>
                 <Dialog.Header>
                     <Dialog.Title>Motposter for transaksjon {transaksjonsid ?? ""}</Dialog.Title>
@@ -67,12 +66,11 @@ export function MotposterDialog({ transaksjonsid, onClose }: MotposterDialogProp
                                             <PersonNavnIdent ident={t.mottaker} variant={"ident"} />
                                         </Table.DataCell>
                                         <Table.DataCell>
-                                            <TransaksjonType kode={t.transaksjonskode}/>
+                                            <TransaksjonType kode={t.transaksjonskode} />
                                         </Table.DataCell>
                                         <Table.DataCell>{t.valutakode ?? "NOK"}</Table.DataCell>
                                         <Table.DataCell align="right">{formaterBelop(t.beløp)}</Table.DataCell>
                                         <Table.DataCell align="right">{formaterBelop(t.restBeløp)}</Table.DataCell>
-
                                     </Table.Row>
                                 ))}
                             </Table.Body>
