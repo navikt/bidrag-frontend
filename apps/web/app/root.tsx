@@ -8,6 +8,8 @@ import { env } from "~/env.server.ts";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
 import { userContext } from "~/server/context.ts";
 import { getNaisConfig } from "~/server/naisConfig.server.ts";
+import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts";
+import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
 import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
 import { Loader } from "@navikt/ds-react";
@@ -22,12 +24,25 @@ import faviconUrl from "./assets/bisys_favicon.ico";
 export const middleware = [authMiddleware];
 export const clientMiddleware = [bisysParamsMiddleware];
 
-export async function loader({ context }: Route.LoaderArgs) {
+export async function loader({ context, request }: Route.LoaderArgs) {
     const navUser = context.get(userContext);
     const naisConfig = await getNaisConfig();
+    const url = new URL(request.url);
+
+    // Evaluerer toggles på serveren, slik at riktig verdi finnes allerede ved første
+    // render. Uten dette ville useFlag returnert false til proxy-fetchen var ferdig.
+    const unleashToggles = await evaluerAlleToggles(
+        serverUnleashContext({
+            bruker: navUser,
+            saksnummer: url.pathname.match(/\/sak\/([^/]+)/)?.[1],
+            enhet: url.searchParams.get("enhet") ?? undefined,
+        }),
+    );
+
     return {
         navUser,
         naisConfig,
+        unleashToggles,
         bisysUrl: env.BISYS_URL,
     };
 }
@@ -36,7 +51,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 const UNLEASH_PROXY_PATH = "/unleash/proxy";
 
 export default function App({ loaderData }: Route.ComponentProps) {
-    const { navUser, naisConfig, bisysUrl } = loaderData;
+    const { navUser, naisConfig, unleashToggles, bisysUrl } = loaderData;
     const unleashClient = useMemo(
         () =>
             new UnleashClient({
@@ -48,8 +63,12 @@ export default function App({ loaderData }: Route.ComponentProps) {
                 clientKey: "bidrag-frontend",
                 appName: "bidrag-frontend",
                 disableMetrics: true,
+                // Verdiene fra serveren gjelder med én gang, og overstyrer det som
+                // måtte ligge lagret i nettleseren fra en tidligere sesjon
+                bootstrap: unleashToggles,
+                bootstrapOverride: true,
             }),
-        [],
+        [unleashToggles],
     );
 
     useEffect(() => {

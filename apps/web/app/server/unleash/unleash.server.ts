@@ -16,9 +16,9 @@ const DEAKTIVERT_VARIANT: Variant = {
  * Lokale overstyringer av feature toggles, satt via UNLEASH_LOCAL_TOGGLES, f.eks.
  * `UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.bereg_sum=true,annet.flagg=false`.
  *
- * Gjør at man kan utvikle mot feature toggles uten API-token mot Unleash (tokenet
- * ligger i en Kubernetes-secret som krever utvidede rettigheter). Overstyringene
- * ignoreres i produksjon.
+ * Settes i apps/web/.env.development. Gjør at man kan utvikle mot feature toggles uten
+ * API-token mot Unleash (tokenet ligger i en Kubernetes-secret som krever utvidede
+ * rettigheter). Overstyringene ignoreres i produksjon.
  */
 function lokaleOverstyringer(): Map<string, boolean> {
     const overstyringer = new Map<string, boolean>();
@@ -53,7 +53,10 @@ export function initUnleash(): Promise<Unleash | null> {
     const apiToken = env.UNLEASH_SERVER_API_TOKEN;
 
     if (!apiUrl || !apiToken) {
-        navLogger.warn("UNLEASH_SERVER_API_URL/UNLEASH_SERVER_API_TOKEN er ikke satt – alle feature toggles er av");
+        navLogger.warn(
+            "Unleash er ikke konfigurert – alle feature toggles er av. " +
+                "Lokalt: skru flagg av/på med UNLEASH_LOCAL_TOGGLES i apps/web/.env.development",
+        );
         isReadyPromise = Promise.resolve(null);
         return isReadyPromise;
     }

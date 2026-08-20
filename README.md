@@ -106,31 +106,27 @@ Konteksten inneholder `userId` (NAVident) samt `properties.saksnummer` og
 
 ### Feature toggles lokalt
 
-Du trenger normalt **ikke** Unleash-tokenet for å utvikle. Overstyr flaggene i
-`apps/web/.env.development.local`, som er gitignorert (`.env.*.local`) og overstyrer
-verdiene i `.env.development`:
+Lokalt kobler vi **ikke** til Unleash. API-tokenet ligger i en Kubernetes-secret som
+krever utvidede rettigheter (`container.secrets.get`), og de fleste utviklere har ikke
+tilgang. Uten tilkobling er alle feature toggles av.
+
+Skru derfor flaggene av/på manuelt i `apps/web/.env.development`:
 
 ```bash
-# apps/web/.env.development.local
 UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.bereg_sum=true,annet.flagg=false
 ```
 
-Overstyringene gjelder både server-side (`flaggIsEnabled`) og klienten (`useFlag`), og
-ignoreres i produksjon.
+- Flagg uten `=verdi` tolkes som `true`.
+- Overstyringene gjelder både klienten (`useFlag`) og server-side (`flaggIsEnabled`).
+- De ignoreres i produksjon, så de kan ikke lekke ut.
+- **Dev-serveren må startes på nytt** etter endring – miljøvariabler leses kun ved oppstart.
 
-### Kjøre mot ekte Unleash lokalt
+Når du legger til et nytt flagg i koden, legg det også inn her, slik at andre utviklere
+ser at det finnes.
 
-Tokenet skal **aldri** i `apps/web/.env.development` – den fila er sporet i git.
-
-```bash
-# Krever naisdevice + kubectl-kontekst mot dev-gcp
-pnpm run unleash:token:local
-```
-
-Scriptet skriver tokenet til den gitignorerte `.env.development.local`. Å lese secrets
-i namespacet krever utvidede rettigheter (`container.secrets.get`); får du
-`Error from server (Forbidden)`, bruk `UNLEASH_LOCAL_TOGGLES` over, eller be om
-midlertidig tilgang (JITA) i [nais console](https://console.nav.cloud.nais.io).
+I q1/q2/prod settes `UNLEASH_SERVER_API_URL`/`_TOKEN`/`_ENV` automatisk av Nais via
+secreten fra `ApiToken`-ressursen i `.nais/unleash-apitoken.yaml`, og flaggene styres
+fra Unleash-web.
 
 ## Scripts
 
