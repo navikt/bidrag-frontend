@@ -3,9 +3,15 @@ import { PersonNavnIdent } from "@bidrag/common";
 import { formaterBelop, formaterDato } from "@bidrag/utils";
 import { Button, Table } from "@navikt/ds-react";
 import { useState } from "react";
+import { DUMMY_BARN } from "~/routes/sak/reskontro/konstanter.ts";
 import { MotposterDialog } from "~/routes/sak/reskontro/MotposterDialog.tsx";
 
-export function DetaljTransaksjonerTabell({ transaksjoner }: { transaksjoner: Transaksjon[] }) {
+interface DetaljTransaksjonerTabellProps {
+    transaksjoner: Transaksjon[];
+    skjulMotposter?: boolean;
+}
+
+export function DetaljTransaksjonerTabell({ transaksjoner, skjulMotposter }: DetaljTransaksjonerTabellProps) {
     const [valgtMotpostId, setValgtMotpostId] = useState<number | null>(null);
 
     return (
@@ -21,7 +27,7 @@ export function DetaljTransaksjonerTabell({ transaksjoner }: { transaksjoner: Tr
                         <Table.HeaderCell>Valuta</Table.HeaderCell>
                         <Table.HeaderCell align="right">Beløp</Table.HeaderCell>
                         <Table.HeaderCell align="right">Restbeløp</Table.HeaderCell>
-                        <Table.HeaderCell>Motposter</Table.HeaderCell>
+                        {!skjulMotposter && <Table.HeaderCell>Motposter</Table.HeaderCell>}
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -29,7 +35,7 @@ export function DetaljTransaksjonerTabell({ transaksjoner }: { transaksjoner: Tr
                         <Table.Row key={`${t.transaksjonsid}-${t.delytelsesid}`}>
                             <Table.DataCell>{formaterDato(t.periode?.fom)}</Table.DataCell>
                             <Table.DataCell>
-                                <PersonNavnIdent ident={t.barn} bareFornavn />
+                                {t.barn !== DUMMY_BARN ? <PersonNavnIdent ident={t.barn} bareFornavn /> : "-"}
                             </Table.DataCell>
                             <Table.DataCell>{t.saksnummer}</Table.DataCell>
                             <Table.DataCell>
@@ -41,20 +47,24 @@ export function DetaljTransaksjonerTabell({ transaksjoner }: { transaksjoner: Tr
                             <Table.DataCell>{t.valutakode ?? "NOK"}</Table.DataCell>
                             <Table.DataCell align="right">{formaterBelop(t.beløp)}</Table.DataCell>
                             <Table.DataCell align="right">{formaterBelop(t.restBeløp)}</Table.DataCell>
-                            <Table.DataCell>
-                                <Button
-                                    variant="tertiary"
-                                    size="xsmall"
-                                    onClick={() => setValgtMotpostId(t.transaksjonsid ?? null)}
-                                >
-                                    {t.transaksjonsid}
-                                </Button>
-                            </Table.DataCell>
+                            {!skjulMotposter && (
+                                <Table.DataCell>
+                                    <Button
+                                        variant="tertiary"
+                                        size="xsmall"
+                                        onClick={() => setValgtMotpostId(t.transaksjonsid ?? null)}
+                                    >
+                                        {t.transaksjonsid}
+                                    </Button>
+                                </Table.DataCell>
+                            )}
                         </Table.Row>
                     ))}
                 </Table.Body>
             </Table>
-            <MotposterDialog transaksjonsid={valgtMotpostId} onClose={() => setValgtMotpostId(null)} />
+            {!skjulMotposter && (
+                <MotposterDialog transaksjonsid={valgtMotpostId} onClose={() => setValgtMotpostId(null)} />
+            )}
         </>
     );
 }
