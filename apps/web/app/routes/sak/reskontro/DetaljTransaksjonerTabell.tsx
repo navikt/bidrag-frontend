@@ -19,9 +19,9 @@ export function DetaljTransaksjonerTabell({ transaksjoner, skjulMotposter }: Det
         if (valutaKode !== "NOK") {
             return `${formaterBelop(t.beløpIOpprinneligValuta)} ${valutaKode}`;
         }
-        return null
+        return null;
         // return "-";
-    }
+    };
     return (
         <>
             <Table size="small" stickyHeader>
@@ -43,14 +43,14 @@ export function DetaljTransaksjonerTabell({ transaksjoner, skjulMotposter }: Det
                         <Table.Row key={`${t.transaksjonsid}-${t.delytelsesid}`}>
                             <Table.DataCell>{formaterDato(t.periode?.fom)}</Table.DataCell>
                             <Table.DataCell>
-                                {t.barn !== DUMMY_BARN ? <PersonNavnIdent ident={t.barn} bareFornavn/> : "-"}
+                                {t.barn !== DUMMY_BARN ? <PersonNavnIdent ident={t.barn} bareFornavn /> : "-"}
                             </Table.DataCell>
                             <Table.DataCell>{t.saksnummer}</Table.DataCell>
                             <Table.DataCell>
-                                <PersonNavnIdent ident={t.skyldner} variant={"ident"}/>
+                                <PersonNavnIdent ident={t.skyldner} variant={"ident"} />
                             </Table.DataCell>
                             <Table.DataCell>
-                                <PersonNavnIdent ident={t.mottaker} variant={"ident"}/>
+                                <PersonNavnIdent ident={t.mottaker} variant={"ident"} />
                             </Table.DataCell>
                             <Table.DataCell>{renderValuta(t)}</Table.DataCell>
                             <Table.DataCell align="right">{formaterBelop(t.beløp)}</Table.DataCell>

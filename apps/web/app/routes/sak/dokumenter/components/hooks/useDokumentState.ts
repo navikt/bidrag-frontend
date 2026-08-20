@@ -292,7 +292,7 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
 
                 return next;
             },
-            { replace: true },
+          { replace: true, preventScrollReset: true },
         );
     }, [visning, valgteDokumentreferanser, selectedDocument?.dokumentreferanse]);
 

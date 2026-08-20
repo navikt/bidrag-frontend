@@ -73,7 +73,7 @@ export default function TransaksjonerFilterPanel() {
                 updated.forEach((v) => next.append(key, v));
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -96,7 +96,7 @@ export default function TransaksjonerFilterPanel() {
                     : next.delete(PARAM_FRA);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -109,7 +109,7 @@ export default function TransaksjonerFilterPanel() {
                     : next.delete(PARAM_TIL);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true }
         );
     };
 
@@ -134,7 +134,7 @@ export default function TransaksjonerFilterPanel() {
                     : next.delete(PARAM_OPEN_TRANS);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 

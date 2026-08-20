@@ -38,7 +38,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 updated.forEach((v) => next.append(key, v));
                 return next;
             },
-            { replace: true },
+          { replace: true, preventScrollReset: true },
         );
     };
 
@@ -54,7 +54,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 date ? next.set(PARAM_FRA, toQueryParam(date)) : next.delete(PARAM_FRA);
                 return next;
             },
-            { replace: true },
+          { replace: true, preventScrollReset: true },
         );
     };
 
@@ -65,7 +65,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 date ? next.set(PARAM_TIL, toQueryParam(sisteDagIMnd(date))) : next.delete(PARAM_TIL);
                 return next;
             },
-            { replace: true },
+          { replace: true, preventScrollReset: true },
         );
     };
 
@@ -81,7 +81,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 setTilSelected();
                 return next;
             },
-            { replace: true },
+          { replace: true, preventScrollReset: true },
         );
     };
 
