@@ -22,7 +22,7 @@ const createPayload = (formValues: EndringsloggFormValues) => {
     return payload;
 };
 
-export function EndringsloggCreatePage() {
+export default function EndringsloggCreatePage() {
     const mutation = useCreateEndringslogg();
     const mutationEdit = useEditEndringslogg();
     const queryClient = useQueryClient();
