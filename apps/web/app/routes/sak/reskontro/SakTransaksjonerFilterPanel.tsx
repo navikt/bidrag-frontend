@@ -1,11 +1,11 @@
-import { TransaksjonerFilterPanelView } from "~/common/reskontro/TransaksjonerFilterPanelView";
+import { TransaksjonerFilterPanel } from "~/common/reskontro/TransaksjonerFilterPanel.tsx";
 import { useTransaksjoner } from "./useTransaksjoner";
 
-export function TransaksjonerFilterPanel({ saksnummer }: { saksnummer: string }) {
+export function SakTransaksjonerFilterPanel({ saksnummer }: { saksnummer: string }) {
     const { unikeMottakere, unikeBarn, unikeTransaksjonskoder } = useTransaksjoner(saksnummer);
 
     return (
-        <TransaksjonerFilterPanelView
+        <TransaksjonerFilterPanel
             unikeMottakere={unikeMottakere}
             unikeBarn={unikeBarn}
             unikeTransaksjonskoder={unikeTransaksjonskoder}

@@ -22,7 +22,7 @@ interface TransaksjonerFilterPanelViewProps {
 }
 
 /** Felles filterpanel for transaksjoner — brukes både på sak og bruker. */
-export function TransaksjonerFilterPanelView({
+export function TransaksjonerFilterPanel({
     unikeMottakere,
     unikeBarn,
     unikeTransaksjonskoder,
