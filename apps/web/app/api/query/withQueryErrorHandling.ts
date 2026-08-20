@@ -2,6 +2,20 @@ import { type ProblemDetail, TilgangsFeilError } from "@bidrag/api";
 import { ApiError, SecureLoggerService } from "@bidrag/common";
 import axios, { type AxiosError } from "axios";
 
+interface WithQueryErrorHandlingOptions<T> {
+    context?: Record<string, string | number | undefined>;
+    notFoundValue?: T;
+}
+export async function withQueryErrorHandlingV2<T>(
+    queryName: string,
+    fn: () => Promise<T>,
+    options: WithQueryErrorHandlingOptions<T> = {},
+): Promise<T> {
+    const { context = {}, notFoundValue } = options;
+    return withQueryErrorHandling<T>(queryName, fn, context, notFoundValue);
+}
+
+
 export async function withQueryErrorHandling<T>(
     queryName: string,
     fn: () => Promise<T>,
