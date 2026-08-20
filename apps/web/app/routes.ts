@@ -5,6 +5,7 @@ export default [
     route("internal/health/readiness", "./server/readiness.ts"),
     route("log/:type?", "./server/logger/logRoute.ts"),
     route("proxy/:app/*", "./server/auth/proxy.ts"),
+    route("unleash/proxy/*", "./server/unleash/unleashProxyRoute.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),

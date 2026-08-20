@@ -69,7 +69,7 @@ jobs:
         uses: nais/deploy/actions/deploy@849e900e3cfa7faf7ad1532bb3a3e6499c932199 # v2
         env:
           CLUSTER: dev-gcp
-          RESOURCE: .nais/nais.yaml
+          RESOURCE: .nais/unleash-apitoken.yaml,.nais/nais.yaml
           VARS: .nais/q1.yaml
           IMAGE: ${{ needs.build-and-push.outputs.image }}
           TELEMETRY: ${{ needs.build-and-push.outputs.telemetry }}
@@ -89,7 +89,7 @@ jobs:
         uses: nais/deploy/actions/deploy@849e900e3cfa7faf7ad1532bb3a3e6499c932199 # v2
         env:
           CLUSTER: dev-gcp
-          RESOURCE: .nais/nais.yaml
+          RESOURCE: .nais/unleash-apitoken.yaml,.nais/nais.yaml
           VARS: .nais/q2.yaml
           IMAGE: ${{ needs.build-and-push.outputs.image }}
           TELEMETRY: ${{ needs.build-and-push.outputs.telemetry }}
@@ -110,7 +110,7 @@ jobs:
         uses: nais/deploy/actions/deploy@849e900e3cfa7faf7ad1532bb3a3e6499c932199 # v2
         env:
           CLUSTER: prod-gcp
-          RESOURCE: .nais/nais.yaml
+          RESOURCE: .nais/unleash-apitoken.yaml,.nais/nais.yaml
           VARS: .nais/prod.yaml
           IMAGE: ${{ needs.build-and-push.outputs.image }}
           TELEMETRY: ${{ needs.build-and-push.outputs.telemetry }}

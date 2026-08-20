@@ -31,6 +31,7 @@ spec:
         - application: {{rule.application }}
       {{/each}}
       external:
+        - host: {{unleash.host}}
       {{#each outbound.external as |host|}}
         - host: {{host}}
       {{/each}}
@@ -58,6 +59,8 @@ spec:
     initialDelay: 30
   readiness:
     path: /internal/health/readiness
+  envFrom:
+    - secret: {{name}}-unleash-api-token
   env:
     - name: NODE_ENV
       value: production
