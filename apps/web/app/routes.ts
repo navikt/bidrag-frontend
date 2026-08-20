@@ -8,6 +8,7 @@ export default [
     route("proxy/:app/*", "./server/auth/proxy.ts"),
     route("unleash/proxy/*", "./server/unleash/unleashProxyRoute.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
+    route("samhandler/*", "./routes/samhandler/SamhandlerRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
     route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),

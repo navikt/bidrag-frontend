@@ -153,7 +153,7 @@ export default function ReellMottakerVelger({
                     <Radio value="ingen" disabled={isRequired || !kanFjerne}>
                         Ingen
                     </Radio>
-                    <Radio disabled={!kunSamhandlerSomReellMottaker} value="barnet_selv">
+                    <Radio disabled={kunSamhandlerSomReellMottaker} value="barnet_selv">
                         {barnNavn} (barnet selv)
                     </Radio>
                     <Radio value="samhandler">Søk samhandler</Radio>
