@@ -3,7 +3,7 @@ import { formaterBelop } from "@bidrag/utils/belopUtils";
 import { formaterDato, sortByDateAsc } from "@bidrag/utils/datoUtils";
 import { Box, Pagination, type SortState, Table, VStack } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
-import { DetaljTransaksjonerTabell } from "~/routes/sak/reskontro/DetaljTransaksjonerTabell.tsx";
+import { DetaljTransaksjonerTabell } from "~/common/components/reskontro/DetaljTransaksjonerTabell.tsx";
 import { FiltrertTransaksjonSummer } from "./FiltrertTransaksjonSummer";
 import { visningsnavnForSøknadstype } from "./søknadstyper";
 import { aggregerTransaksjoner } from "./TransaksjonAggregat";
