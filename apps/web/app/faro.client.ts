@@ -1,6 +1,7 @@
-import { initializeFaro, getWebInstrumentations } from "@grafana/faro-web-sdk";
 import { ReactIntegration } from "@grafana/faro-react";
+import { getWebInstrumentations, initializeFaro } from "@grafana/faro-web-sdk";
 import type { NaisConfig } from "~/nais.ts";
+import { maskPathnameForPageId } from "./faro.utils.ts";
 
 let faroInstance: ReturnType<typeof initializeFaro> | null = null;
 
@@ -21,9 +22,7 @@ export function initFaro(nais: NaisConfig) {
         ],
         pageTracking: {
             generatePageId: (location) => {
-                return location.pathname
-                    .replace(/\/sak\/[^/]+/, "/sak/{saksnummer}")
-                    .replace(/\/proxy\/[^/]+/, "/proxy/{app}");
+                return maskPathnameForPageId(location.pathname);
             },
         },
         beforeSend: (item) => {

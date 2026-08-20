@@ -2,8 +2,14 @@ name: bidrag-frontend
 
 ingresses:
   - https://bidrag.intern.nav.no
+replicas: 2
 
 env:
+  - name: BIDRAG_ADMIN_URL
+    value: http://bidrag-admin
+  - name: BIDRAG_ADMIN_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-admin/.default
+
   - name: BIDRAG_SAK_URL
     value: https://bidrag-sak.prod-fss-pub.nais.io
   - name: BIDRAG_SAK_AUDIENCE
@@ -44,9 +50,30 @@ env:
   - name: BIDRAG_RESKONTRO_AUDIENCE
     value: api://prod-gcp.bidrag.bidrag-reskontro/.default
 
+  - name: BIDRAG_DOKUMENT_URL
+    value: https://bidrag-dokument.prod-fss-pub.nais.io/bidrag-dokument
+  - name: BIDRAG_DOKUMENT_AUDIENCE
+    value: api://prod-fss.bidrag.bidrag-dokument/.default
+
+  - name: BIDRAG_BEHANDLING_URL
+    value: http://bidrag-behandling
+  - name: BIDRAG_BEHANDLING_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-behandling/.default
+
   - name: BISYS_URL
     value: https://wasapp.adeo.no/rtv-bidrag/
 
+  - name: BIDRAG_UI_BASE_URL
+    value: https://bidrag-ui.nais.adeo.no
+
+  - name: BIDRAG_DOKUMENT_FORSENDELSE_URL
+    value: http://bidrag-dokument-forsendelse
+  - name: BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-dokument-forsendelse/.default
+
+unleash:
+  host: bidrag-unleash-api.nav.cloud.nais.io
+  environment: production
 
 outbound:
   rules:
@@ -55,7 +82,11 @@ outbound:
     - application: bidrag-belopshistorikk
     - application: bidrag-vedtak
     - application: bidrag-reskontro
+    - application: bidrag-dokument-forsendelse
+    - application: bidrag-admin
+    - application: bidrag-behandling
   external:
     - bidrag-sak.prod-fss-pub.nais.io
     - bidrag-organisasjon.prod-fss-pub.nais.io
     - bidrag-person.prod-fss-pub.nais.io
+    - bidrag-dokument.prod-fss-pub.nais.io

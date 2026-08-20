@@ -1,0 +1,19 @@
+/*
+ * Målrettede overstyringer av Aksel sine interne BEM-klassenavn (f.eks. `.navds-accordion__item`,
+ * `.aksel-accordion__content-inner`). Disse må skrives som vanlig CSS (ikke Tailwind sine
+ * `[&_.klasse]`-arbitrary variants), fordi Tailwind tolker understrek ("_") i arbitrary-verdier
+ * som mellomrom – noe som ødelegger BEM-klassenavn med dobbel understrek ("__") og gjør at
+ * selectoren aldri treffer riktig element.
+ */
+
+/* Fjerner Aksel sin standard header-topp-/bunnlinje, siden vi tegner en egen venstre-kant per rad. */
+.accordion :global(.navds-accordion__item) {
+    border: none;
+}
+
+/* Se forklaring ved bruk i DokumentTre.tsx: content-inner er et grid-element uten `min-width: 0`,
+ * så uten denne overstyringen "blør" lange dokumenttitler ut over sidepanelet i stedet for å
+ * trunkeres med ellipsis. */
+.accordionContent :global(.aksel-accordion__content-inner) {
+    min-width: 0;
+}

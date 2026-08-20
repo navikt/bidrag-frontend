@@ -1,11 +1,16 @@
 {
+    "files": {
+        "includes": ["**", "!!**/packages/api/src/api"]
+    },
     "vcs": {
         "enabled": true,
-        "clientKind": "git"
+        "clientKind": "git",
+        "useIgnoreFile": true
     },
 
     "formatter": {
         "enabled": true,
+        "lineWidth": 120,
         "useEditorconfig": true
     },
 

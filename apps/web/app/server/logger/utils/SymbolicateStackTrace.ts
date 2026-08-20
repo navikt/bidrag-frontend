@@ -1,4 +1,5 @@
-import { RawSourceMap, SourceMapConsumer } from "source-map";
+import { type RawSourceMap, SourceMapConsumer } from "source-map";
+import { env } from "~/env.server.ts";
 
 const STACK_FRAME_REGEX = /^(\s*at\s+(?:.*?\()?)(.+):(\d+):(\d+)(\)?)$/;
 const SOURCE_MAP_URL_REGEX = /^[\s\S]*[#@]\s*sourceMappingURL=(\S+)\s*$/m;
@@ -41,14 +42,14 @@ interface IParseStackFrameResult {
 }
 
 function hasAllowedHost(url: URL): boolean {
-    const allowedHosts = process.env.STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS;
+    const allowedHosts = env.STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS;
 
     // Keep local development working even with host restrictions.
-    if (process.env.NODE_ENV === "development" && ["localhost", "127.0.0.1"].includes(url.hostname)) {
+    if (env.NODE_ENV === "development" && ["localhost", "127.0.0.1"].includes(url.hostname)) {
         return true;
     }
 
-    if (!allowedHosts || !allowedHosts.trim()) {
+    if (!allowedHosts?.trim()) {
         return true;
     }
 
@@ -158,7 +159,7 @@ function createEmptyFailureCounters(): Record<SymbolicationFailureReason, number
 
 function registerFailure(
     failures: Record<SymbolicationFailureReason, number>,
-    failureReason?: SymbolicationFailureReason
+    failureReason?: SymbolicationFailureReason,
 ): void {
     if (!failureReason) {
         return;
@@ -339,7 +340,7 @@ export async function symbolicateStackTrace(stackTrace?: string): Promise<ISymbo
                 registerFailure(failures, "original_position_not_found");
             }
             return mappedFrame;
-        })
+        }),
     );
 
     return {

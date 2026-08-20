@@ -1,10 +1,13 @@
 import { Box, Loader, Tabs, VStack } from "@navikt/ds-react";
 import { type ReactNode, Suspense } from "react";
 import { useParams } from "react-router";
+import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import { BeløpshistorikkTabell } from "./BeløpshistorikkTabell";
 import { Engangsbetalinger } from "./Engangsbetalinger";
 import { Gebyr } from "./Gebyr";
 import PerioderFilterPanel from "./PerioderFilterPanel";
+
+export const handle: SakSideTittelHandle = { sakSideTittel: "Beløpshistorikk" };
 
 export default function BeløpshistorikkPage() {
     const params = useParams();

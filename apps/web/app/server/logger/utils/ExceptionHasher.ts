@@ -1,7 +1,7 @@
-import {ErrorCode} from "@bidrag/common";
-import {randomBytes, webcrypto} from "crypto";
+import { randomInt, webcrypto } from "node:crypto";
+import type { ErrorCode } from "@bidrag/common";
 
-const {subtle} = webcrypto;
+const { subtle } = webcrypto;
 const INSTANCE_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const INSTANCE_CODE_LENGTH = 5;
 
@@ -26,8 +26,8 @@ function exceptionToInstanceCode(errorCode: string) {
 }
 
 function createReadableUniqueCode(): string {
-    const code = Array.from(randomBytes(INSTANCE_CODE_LENGTH))
-        .map((randomValue) => INSTANCE_CODE_ALPHABET[randomValue % INSTANCE_CODE_ALPHABET.length])
+    const code = Array.from({ length: INSTANCE_CODE_LENGTH })
+        .map(() => INSTANCE_CODE_ALPHABET[randomInt(INSTANCE_CODE_ALPHABET.length)])
         .join("");
 
     return code;
@@ -44,5 +44,5 @@ async function sha256(message: string): Promise<string> {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
 
     // convert bytes to hex string
-    return hashArray.map((b) => ("00" + b.toString(16)).slice(-2)).join("");
+    return hashArray.map((b) => `00${b.toString(16)}`.slice(-2)).join("");
 }

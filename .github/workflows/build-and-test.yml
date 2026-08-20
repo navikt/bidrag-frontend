@@ -5,38 +5,27 @@ on:
       READER_TOKEN:
         required: true
         description: 'Token with read access to the repository'
-    inputs:
-      docker:
-        description: 'Build Docker image'
-        required: false
-        default: true
-        type: boolean
-    outputs:
-      image:
-        description: 'Docker image'
-        value: ${{ jobs.bygg.outputs.image }}
-      telemetry:
-        description: 'Telemetry data'
-        value: ${{ jobs.bygg.outputs.telemetry }}
 
 jobs:
   bygg:
-    name: "Test, bygg og push Docker-image"
+    name: "Test, bygg og valider kode"
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
       id-token: write
-    outputs:
-      image: ${{ steps.docker-build-push.outputs.image }}
-      telemetry: ${{ steps.docker-build-push.outputs.telemetry }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
         with:
           node-auth-token: ${{ secrets.READER_TOKEN }}
+
+      - name: Lint endrede filer
+        run: pnpm run biome:ci:changed
 
       - name: Typecheck
         run: pnpm run typecheck
@@ -44,22 +33,8 @@ jobs:
       - name: Test
         run: pnpm run test
 
-      - name: Bygg Bygg deploybar applikasjon for Docker
+      - name: Bygg deploybar applikasjon for Docker
         run: pnpm run deploy:docker
         env:
+          # Inkluderer miljøvariablene bygget forventer, selv om vi ikke laster opp til CDN her
           CDN_BASE_URL: https://cdn.nav.no/bidrag/bidrag-frontend/dist/
-
-      - name: Last opp klientbundler til CDN
-        uses: nais/deploy/actions/cdn-upload/v2@9ce59af14f70c3a7093ba1e20d6679af2b1c7be9
-        with:
-          team: bidrag
-          source: apps/web/build/client
-          destination: /bidrag-frontend/dist
-          source_keep_parent_name: false
-
-      - name: Push Docker-image til GAR
-        if: ${{ inputs.docker }}
-        uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
-        id: docker-build-push
-        with:
-          team: bidrag
