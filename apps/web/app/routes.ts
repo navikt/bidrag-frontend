@@ -1,4 +1,5 @@
-import { index, layout, type RouteConfig, route } from "@react-router/dev/routes";
+import adminroutes from "@bidrag/admin-app/routes";
+import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
     route("internal/health/liveness", "./server/liveness.ts"),
@@ -6,6 +7,7 @@ export default [
     route("log/:type?", "./server/logger/logRoute.ts"),
     route("me", "./server/meRoute.ts"),
     route("proxy/:app/*", "./server/auth/proxy.ts"),
+    route("unleash/proxy/*", "./server/unleash/unleashProxyRoute.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
     route("modia/person", "./routes/modia/ModiaRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
@@ -13,6 +15,7 @@ export default [
     route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),
 
     index("routes/_index.tsx"),
+    ...prefix("admin", adminroutes),
 
     // Behandling (migrert fra den frittstående bidrag-behandling-ui)
     route("behandling/brukerveiledning/forskudd", "./routes/behandling/brukerveiledning/ForskuddBrukerveiledning.tsx"),

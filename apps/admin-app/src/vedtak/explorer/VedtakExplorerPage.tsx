@@ -37,7 +37,7 @@ interface VedtakExplorerGraphProps {
     vedtakId?: string;
 }
 
-export function VedtakExplorerPage() {
+export default function VedtakExplorerPage() {
     lastVisningsnavn();
     return (
         <PageWrapper name="">

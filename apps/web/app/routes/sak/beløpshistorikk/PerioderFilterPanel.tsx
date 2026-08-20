@@ -1,9 +1,11 @@
 import type { Stonadstype } from "@bidrag/api/BelopshistorikkApi";
 import { parseDateQueryParam, toQueryParam } from "@bidrag/utils";
-import { Box, DatePicker, HStack, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
+import { EraserIcon } from "@navikt/aksel-icons";
+import { Box, Button, HStack, MonthPicker, UNSAFE_Combobox, useMonthpicker } from "@navikt/ds-react";
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
 import { useSearchParams } from "react-router";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper";
+import { sisteDagIMnd } from "~/routes/sak/beløpshistorikk/periode.utils.ts";
 import { PARAM_BARN, PARAM_FRA, PARAM_TIL, PARAM_TYPE } from "./konstanter.ts";
 import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";
 
@@ -60,21 +62,45 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
         setSearchParams(
             (prev) => {
                 const next = new URLSearchParams(prev);
-                date ? next.set(PARAM_TIL, toQueryParam(date)) : next.delete(PARAM_TIL);
+                date ? next.set(PARAM_TIL, toQueryParam(sisteDagIMnd(date))) : next.delete(PARAM_TIL);
                 return next;
             },
             { replace: true },
         );
     };
 
-    const { datepickerProps: fraDatepickerProps, inputProps: fraInputProps } = useDatepicker({
+    const clearFilter = () => {
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete(PARAM_TIL);
+                next.delete(PARAM_FRA);
+                next.delete(PARAM_BARN);
+                next.delete(PARAM_TYPE);
+                setFraSelected();
+                setTilSelected();
+                return next;
+            },
+            { replace: true },
+        );
+    };
+
+    const {
+        monthpickerProps: fraMonthPickerProps,
+        inputProps: fraMonthInputProps,
+        setSelected: setFraSelected,
+    } = useMonthpicker({
         defaultSelected: parseDateQueryParam(searchParams.get(PARAM_FRA)),
-        onDateChange: handleFraChange,
+        onMonthChange: handleFraChange,
     });
 
-    const { datepickerProps: tilDatepickerProps, inputProps: tilInputProps } = useDatepicker({
+    const {
+        monthpickerProps: tilMonthPickerProps,
+        inputProps: tilMonthInputProps,
+        setSelected: setTilSelected,
+    } = useMonthpicker({
         defaultSelected: parseDateQueryParam(searchParams.get(PARAM_TIL)),
-        onDateChange: handleTilChange,
+        onMonthChange: handleTilChange,
     });
 
     return (
@@ -102,13 +128,19 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 />
 
                 <HStack gap={"space-8"}>
-                    <DatePicker {...fraDatepickerProps}>
-                        <DatePicker.Input {...fraInputProps} label="Fra" size="small" />
-                    </DatePicker>
-                    <DatePicker {...tilDatepickerProps}>
-                        <DatePicker.Input {...tilInputProps} label="Til" size="small" />
-                    </DatePicker>
+                    <MonthPicker {...fraMonthPickerProps}>
+                        <MonthPicker.Input {...fraMonthInputProps} label="Fra og med" size={"small"} />
+                    </MonthPicker>
+                    <MonthPicker {...tilMonthPickerProps}>
+                        <MonthPicker.Input {...tilMonthInputProps} label="Til og med" size={"small"} />
+                    </MonthPicker>
                 </HStack>
+                <Button
+                    size={"small"}
+                    variant={"tertiary"}
+                    onClick={clearFilter}
+                    icon={<EraserIcon title="Fjern filter" />}
+                >Fjern filter</Button>
             </HStack>
         </Box>
     );
