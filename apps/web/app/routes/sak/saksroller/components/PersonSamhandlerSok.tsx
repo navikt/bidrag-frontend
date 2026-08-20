@@ -67,7 +67,7 @@ export default function PersonSamhandlerSok({
                         hideLabel={false}
                         onClick={(e) => e.stopPropagation()}
                         onSearchClick={onInputChange}
-                        onChange={!primary ? onInputChange : setSearchValue}
+                        onChange={setSearchValue}
                     />
                     <div
                         className={`items-center flex ${compact ? "flex-row gap-1 mt-1" : "flex-row gap-2"} ${searchErrorMessage ? "self-end" : "self-end"}`}

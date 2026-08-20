@@ -62,7 +62,7 @@ export default function SamhandlerSokPopup({ windowId, onResult, onError }: Samh
                 if (!hasCalledOnResultRef.current) {
                     hasCalledOnResultRef.current = true;
                     resultReceivedRef.current = true;
-                    onError?.(error);
+                    onError?.(error instanceof Error ? error.message : "Samhandlersøk feilet");
                     onResult(null);
                 }
             })

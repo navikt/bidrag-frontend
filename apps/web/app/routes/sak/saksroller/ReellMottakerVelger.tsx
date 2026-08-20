@@ -149,7 +149,7 @@ export default function ReellMottakerVelger({
                 disabled={disabled}
                 error={feil}
             >
-                <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }} wrap={false}>
+                <Stack gap={{ xs: "space-0", sm: "space-24" }} direction={{ xs: "column", sm: "row" }} wrap={false}>
                     <Radio value="ingen" disabled={isRequired || !kanFjerne}>
                         Ingen
                     </Radio>

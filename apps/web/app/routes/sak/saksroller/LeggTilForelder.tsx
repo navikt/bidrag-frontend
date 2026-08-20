@@ -24,7 +24,8 @@ export default function LeggTilForelder({
     const roller = form.watch("roller") || [];
 
     const handlePersonValgt = (person: PersonDto) => {
-        const denAndreForelderen = roller.find((r) => r.type !== rolleType);
+        const denAndreForelderenType = rolleType === "BM" ? "BP" : "BM";
+        const denAndreForelderen = roller.find((r) => r.type === denAndreForelderenType);
         const denAndreForelderenRolle = rolleType === "BM" ? "bidragspliktig" : "bidragsmottaker";
 
         if (denAndreForelderen?.fodselsnummer && denAndreForelderen.fodselsnummer === person.ident) {

@@ -259,7 +259,7 @@ function PersonEndringerSvar({ gruppe }: { gruppe: Persongruppe }) {
                 <PersonInfo ident={gruppe.ident} />
                 {harLagtTilRolle && (
                     <Tag size="xsmall" variant="alt1">
-                        Nytt rolle
+                        Ny rolle
                     </Tag>
                 )}
             </FormSummary.Label>

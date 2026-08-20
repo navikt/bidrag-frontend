@@ -43,7 +43,9 @@ export default function SamhandlerSokButton({
                 }
                 onResult(res.payload);
             })
-            .catch(onError)
+            .catch((error) => {
+                onError?.(error instanceof Error ? error.message : "Samhandlersøk feilet");
+            })
             .finally(() => {
                 closeModal();
                 window.focus();

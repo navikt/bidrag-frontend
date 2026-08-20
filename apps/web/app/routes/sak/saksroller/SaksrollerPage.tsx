@@ -149,12 +149,12 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                 saksnummer: data.saksnummer,
                 roller: data.roller.map((rolle) => {
                     const barnRolle = rolle as BarnRolle;
-                    const bidragSakRolle =
-                        rolle.rolleType === "BP"
-                            ? Rolletype.BP
-                            : rolle.rolleType === "BM"
-                              ? Rolletype.BM
-                              : Rolletype.BA;
+                    const bidragSakRolle = {
+                        BA: Rolletype.BA,
+                        BM: Rolletype.BM,
+                        BP: Rolletype.BP,
+                        RM: Rolletype.RM,
+                    }[rolle.rolleType];
                     return {
                         fodselsnummer: rolle.fodselsnummer || "",
                         type: bidragSakRolle,
@@ -163,7 +163,7 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                             rolle.rolleType === "BA" && barnRolle?.reellMottaker
                                 ? { ident: barnRolle.reellMottaker || "", verge: false }
                                 : null,
-                        mottagerErVerge: false,
+                        mottagerErVerge: rolle.mottagerErVerge,
                         rolleType: bidragSakRolle,
                         rollehistorikk: [],
                     };
