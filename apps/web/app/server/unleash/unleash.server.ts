@@ -14,7 +14,7 @@ const DEAKTIVERT_VARIANT: Variant = {
 
 /**
  * Lokale overstyringer av feature toggles, satt via UNLEASH_LOCAL_TOGGLES, f.eks.
- * `UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.bereg_sum=true,annet.flagg=false`.
+ * `UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.beregn_sum=true,annet.flagg=false`.
  *
  * Settes i apps/web/.env.development. Gjør at man kan utvikle mot feature toggles uten
  * API-token mot Unleash (tokenet ligger i en Kubernetes-secret som krever utvidede

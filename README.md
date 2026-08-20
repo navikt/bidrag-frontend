@@ -95,7 +95,7 @@ egen proxy-rute `/unleash/proxy`, slik at API-tokenet aldri forlater serveren.
 
 ```tsx
 // Klient
-const visNyLosning = useFlag("frontend.belopshistorikk.bereg_sum");
+const visNyLosning = useFlag("frontend.belopshistorikk.beregn_sum");
 
 // Server (loader/action)
 const enabled = await flaggIsEnabled("mitt.flagg", serverUnleashContext({ bruker, saksnummer }));
@@ -113,7 +113,7 @@ tilgang. Uten tilkobling er alle feature toggles av.
 Skru derfor flaggene av/på manuelt i `apps/web/.env.development`:
 
 ```bash
-UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.bereg_sum=true,annet.flagg=false
+UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.beregn_sum=true,annet.flagg=false
 ```
 
 - Flagg uten `=verdi` tolkes som `true`.

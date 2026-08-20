@@ -15,7 +15,7 @@ interface BeløpshistorikkProps {
 
 export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
     const { filtrertData, totalCount } = useBeløphistorikkfilter(saksnummer);
-    const visBeregnetSum = useFlag("frontend.belopshistorikk.bereg_sum");
+    const visBeregnetSum = useFlag("frontend.belopshistorikk.beregn_sum");
     const [stønaderPage, setStønaderPage] = useState(1);
     const [sort, setSort] = useState<SortState | undefined>();
 
