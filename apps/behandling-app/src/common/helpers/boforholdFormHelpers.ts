@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
 import {
     type BoforholdDtoV2,
     Bostatuskode,
@@ -6,15 +7,13 @@ import {
     Kilde,
     type RolleDto,
     type SivilstandDto,
+    type SivilstandGrunnlagDto,
     Sivilstandskode,
     TypeBehandling,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import {
-    type RelatertPersonGrunnlagDto,
-    type SivilstandGrunnlagDto,
-    SivilstandskodePDL,
-} from "@bidrag/api/BidragGrunnlagApi";
+import { SivilstandskodePDL } from "@bidrag/api/PersonApi";
 import { firstDayOfMonth } from "@bidrag/common";
+import type { RelatertPersonGrunnlagDto } from "../../__tests__/helpers/boforholdFormHelpers.spec.tsx";
 import type {
     BoforholdFormValues,
     BoforholdOpplysninger,

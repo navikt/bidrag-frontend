@@ -5,6 +5,7 @@
     "type": "module",
     "exports": {
         ".": "./src/index.ts",
+        "./routes": "./src/routes.ts",
         "./styles.css": "./src/styles.css"
     },
     "scripts": {
@@ -35,6 +36,7 @@
         "tailwindcss": "catalog:"
     },
     "devDependencies": {
+        "@react-router/dev": "catalog:",
         "@types/lodash": "^4.17.14",
         "@types/mdx": "^2.0.13",
         "@types/node": "^25",

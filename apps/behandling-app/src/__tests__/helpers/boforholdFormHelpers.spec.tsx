@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
 import {
     Bostatuskode,
     type BostatusperiodeDto,
@@ -7,7 +8,7 @@ import {
     type SivilstandGrunnlagDto,
     TypeBehandling,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import { type RelatertPersonGrunnlagDto, SivilstandskodePDL } from "@bidrag/api/BidragGrunnlagApi";
+import { SivilstandskodePDL } from "@bidrag/api/PersonApi";
 import { IdentUtils } from "@bidrag/common";
 import { describe, expect, it } from "vitest";
 import {
@@ -21,6 +22,26 @@ import {
     mapHusstandsMedlemmerToBarn,
 } from "../../common/helpers/boforholdFormHelpers";
 import { toISODateString } from "../../utils/date-utils";
+export interface RelatertPersonGrunnlagDto {
+    /** Personid til BM/BP */
+    partPersonId?: string;
+    /** Personid til relatert person. Dette er husstandsmedlem eller barn av BM/BP */
+    relatertPersonPersonId?: string;
+    /** Navn på den relaterte personen, format <Fornavn, mellomnavn, Etternavn */
+    navn?: string;
+    /**
+     * Den relaterte personens fødselsdato
+     * @format date
+     */
+    fødselsdato?: string;
+    /** Angir om den relaterte personen er barn av BM/BP */
+    erBarnAvBmBp: boolean;
+    /** Liste over perioder personen bor i samme husstand som BM/BP */
+    borISammeHusstandDtoListe: {
+        periodeFra: string,
+        periodeTil?: string,
+    }[];
+}
 
 describe("BoforholdFormHelpers", () => {
     it("should merge periods if there is no gap between 2 periods in Folkeregistre", () => {

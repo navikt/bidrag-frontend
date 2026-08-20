@@ -1,4 +1,5 @@
 import adminroutes from "@bidrag/admin-app/routes";
+import behandlingroutes from "@bidrag/behandling-app/routes";
 import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
@@ -18,44 +19,7 @@ export default [
     ...prefix("admin", adminroutes),
 
     // Behandling (migrert fra den frittstående bidrag-behandling-ui)
-    route("behandling/brukerveiledning/forskudd", "./routes/behandling/brukerveiledning/ForskuddBrukerveiledning.tsx"),
-    route("behandling/brukerveiledning/bidrag", "./routes/behandling/brukerveiledning/BidragBrukerveiledning.tsx"),
-    route(
-        "behandling/brukerveiledning/sarbidrag",
-        "./routes/behandling/brukerveiledning/SaerbidragBrukerveiledning.tsx",
-    ),
-
-    route("behandling/:behandlingId", "./routes/behandling/BehandlingPage.tsx", { id: "behandling" }),
-    route("behandling/:behandlingId/notat", "./routes/behandling/NotatPage.tsx", { id: "behandling-notat" }),
-    route("behandling/:behandlingId/begrunnelse/:broadcastChannel", "./routes/behandling/BegrunnelsePage.tsx", {
-        id: "behandling-begrunnelse",
-    }),
-
-    route("sak/:saksnummer/behandling/:behandlingId", "./routes/behandling/BehandlingPage.tsx", {
-        id: "sak-behandling",
-    }),
-    route("sak/:saksnummer/behandling/:behandlingId/notat", "./routes/behandling/NotatPage.tsx", {
-        id: "sak-behandling-notat",
-    }),
-    route(
-        "sak/:saksnummer/behandling/:behandlingId/begrunnelse/:broadcastChannel",
-        "./routes/behandling/BegrunnelsePage.tsx",
-        { id: "sak-behandling-begrunnelse" },
-    ),
-
-    route("vedtak/:vedtaksid", "./routes/behandling/BehandlingPage.tsx", { id: "vedtak" }),
-    route("vedtak/:vedtaksid/notat", "./routes/behandling/NotatPage.tsx", { id: "vedtak-notat" }),
-
-    route("admin/", "./routes/admin/AdminLayout.tsx", [
-        index("./routes/admin/index.tsx"),
-        route("endringslogg", "./routes/admin/endringslogg/EndringsloggLayout.tsx", [
-            index("./routes/admin/endringslogg/index.tsx"),
-            route("ny", "./routes/admin/endringslogg/EndringsloggCreatePage.tsx"),
-            route(":id", "./routes/admin/endringslogg/EndringsloggEditPage.tsx"),
-        ]),
-        route("dokumentasjon", "./routes/admin/dokumentasjon/DokumentasjonPage.tsx"),
-        route("vedtak/explorer", "./routes/admin/vedtak/explorer/VedtakExplorerPage.tsx"),
-    ]),
+    ...behandlingroutes,
 
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),
