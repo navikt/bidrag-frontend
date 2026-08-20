@@ -3,7 +3,8 @@
     "private": true,
     "type": "module",
     "exports": {
-        ".": "./src/index.ts"
+        ".": "./src/index.ts",
+        "./routes": "./src/routes.ts"
     },
     "scripts": {
         "typecheck": "tsc --noEmit"
@@ -22,6 +23,10 @@
         "react-hook-form": "^7.82.0",
         "svg-pan-zoom": "^3.6.2",
         "dompurify": "^3.4.13"
+    },
+
+    "devDependencies": {
+        "@react-router/dev": "catalog:"
     },
 
     "peerDependencies": {
