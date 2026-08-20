@@ -5,6 +5,7 @@ import type {
     OppdaterEndringsloggRequest,
 } from "@bidrag/api/BidragAdminApi";
 import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router";
 import { useEditEndringslogg, useHentEndringslogg } from "../api/endringsloggApi.ts";
 import EndringsloggForm, { type EndringsloggFormValues } from "./components/EndringsloggForm.tsx";
 
@@ -21,8 +22,8 @@ const createPayload = (formValues: EndringsloggFormValues) => {
     return payload;
 };
 
-export function EndringsloggEditPage(params: { id: string }) {
-    const id = params.id;
+export default function EndringsloggEditPage() {
+    const { id } = useParams();
     const queryClient = useQueryClient();
     const endringslogg = useHentEndringslogg(Number(id));
     const mutation = useEditEndringslogg();

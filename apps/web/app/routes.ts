@@ -1,4 +1,5 @@
-import { index, layout, type RouteConfig, route } from "@react-router/dev/routes";
+import adminroutes from "@bidrag/admin-app/routes";
+import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
     route("internal/health/liveness", "./server/liveness.ts"),
@@ -12,17 +13,7 @@ export default [
     route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),
 
     index("routes/_index.tsx"),
-
-    route("admin/", "./routes/admin/AdminLayout.tsx", [
-        index("./routes/admin/index.tsx"),
-        route("endringslogg", "./routes/admin/endringslogg/EndringsloggLayout.tsx", [
-            index("./routes/admin/endringslogg/index.tsx"),
-            route("ny", "./routes/admin/endringslogg/EndringsloggCreatePage.tsx"),
-            route(":id", "./routes/admin/endringslogg/EndringsloggEditPage.tsx"),
-        ]),
-        route("dokumentasjon", "./routes/admin/dokumentasjon/DokumentasjonPage.tsx"),
-        route("vedtak/explorer", "./routes/admin/vedtak/explorer/VedtakExplorerPage.tsx"),
-    ]),
+    ...prefix("admin", adminroutes),
 
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),

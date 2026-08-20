@@ -1,3 +1,3 @@
-export function DokumentasjonPage() {
+export default function DokumentasjonPage() {
     return <div>DOKUMENTASJON</div>;
 }

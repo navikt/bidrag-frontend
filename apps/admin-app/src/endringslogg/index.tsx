@@ -208,7 +208,7 @@ const AktiverSwitch = ({ endringsloggId, aktiv }: { endringsloggId: number; akti
     );
 };
 
-export function EndringsloggIndexPage() {
+export default function EndringsloggIndexPage() {
     const endringslogger = useHentEndringslogger();
     const [previewed, setPreviewed] = useState<EndringsLoggDto | null>(null);
     return (
