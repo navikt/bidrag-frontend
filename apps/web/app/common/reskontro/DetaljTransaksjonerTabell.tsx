@@ -3,8 +3,8 @@ import { PersonNavnIdent } from "@bidrag/common";
 import { formaterBelop, formaterDato } from "@bidrag/utils";
 import { Button, Table } from "@navikt/ds-react";
 import { useState } from "react";
-import { DUMMY_BARN } from "~/routes/sak/reskontro/konstanter.ts";
-import { MotposterDialog } from "~/routes/sak/reskontro/MotposterDialog.tsx";
+import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
+import { MotposterDialog } from "~/common/reskontro/MotposterDialog.tsx";
 
 interface DetaljTransaksjonerTabellProps {
     transaksjoner: Transaksjon[];

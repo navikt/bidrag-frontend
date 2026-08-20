@@ -1,4 +1,4 @@
-import { visningsnavnForTransaksjonskode } from "./transaksjonstyper";
+import { visningsnavnForTransaksjonskode } from "./transaksjonstyper.ts";
 
 interface TransaksjonTypeProps {
     kode?: string | null;

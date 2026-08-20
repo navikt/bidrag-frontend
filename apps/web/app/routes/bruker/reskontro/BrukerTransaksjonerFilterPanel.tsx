@@ -1,4 +1,4 @@
-import { TransaksjonerFilterPanelView } from "~/common/components/reskontro/TransaksjonerFilterPanelView.tsx";
+import { TransaksjonerFilterPanelView } from "~/common/reskontro/TransaksjonerFilterPanelView.tsx";
 import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner.ts";
 
 export function BrukerTransaksjonerFilterPanel({ ident }: { ident: string }) {

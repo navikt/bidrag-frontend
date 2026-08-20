@@ -1,7 +1,7 @@
 import { Alert, BodyShort, Dialog, Loader } from "@navikt/ds-react";
 import { useQuery } from "@tanstack/react-query";
-import { hentTransaksjonerPaTransaksjonsid } from "~/api/query/reskontro.query";
-import { DetaljTransaksjonerTabell } from "~/common/components/reskontro/DetaljTransaksjonerTabell.tsx";
+import { hentTransaksjonerPaTransaksjonsid } from "~/api/query/reskontro.query.ts";
+import { DetaljTransaksjonerTabell } from "~/common/reskontro/DetaljTransaksjonerTabell.tsx";
 
 interface MotposterDialogProps {
     transaksjonsid: number | null;

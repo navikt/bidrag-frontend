@@ -1,4 +1,4 @@
-import { TransaksjonerFilterPanelView } from "~/common/components/reskontro/TransaksjonerFilterPanelView";
+import { TransaksjonerFilterPanelView } from "~/common/reskontro/TransaksjonerFilterPanelView";
 import { useTransaksjoner } from "./useTransaksjoner";
 
 export function TransaksjonerFilterPanel({ saksnummer }: { saksnummer: string }) {

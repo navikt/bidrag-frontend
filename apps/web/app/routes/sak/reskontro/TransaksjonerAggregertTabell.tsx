@@ -3,11 +3,11 @@ import { formaterBelop } from "@bidrag/utils/belopUtils";
 import { formaterDato, sortByDateAsc } from "@bidrag/utils/datoUtils";
 import { Box, Pagination, type SortState, Table, VStack } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
-import { DetaljTransaksjonerTabell } from "~/common/components/reskontro/DetaljTransaksjonerTabell.tsx";
-import { FiltrertTransaksjonSummer } from "./FiltrertTransaksjonSummer";
-import { visningsnavnForSøknadstype } from "./søknadstyper";
-import { aggregerTransaksjoner } from "./TransaksjonAggregat";
-import { TransaksjonType } from "./TransaksjonType";
+import { DetaljTransaksjonerTabell } from "~/common/reskontro/DetaljTransaksjonerTabell.tsx";
+import { FiltrertTransaksjonSummer } from "~/common/reskontro/FiltrertTransaksjonSummer.tsx";
+import { visningsnavnForSøknadstype } from "~/common/reskontro/søknadstyper.ts";
+import { aggregerTransaksjoner } from "~/common/reskontro/TransaksjonAggregat.ts";
+import { TransaksjonType } from "~/common/reskontro/TransaksjonType.tsx";
 
 interface TransaksjonerAggregertTabellProps {
     transaksjoner: Transaksjon[];

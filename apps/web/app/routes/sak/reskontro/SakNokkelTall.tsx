@@ -7,7 +7,7 @@ import { hentInnkrevingForSaksnummer } from "~/api/query/reskontro.query";
 import { useHentSak } from "~/api/useApi.ts";
 import { medReturMål } from "~/common/navigation/returLink.ts";
 import { ObfuscateFnrLink } from "~/common/person/ObfuscateFnrLink.tsx";
-import { DUMMY_BARN } from "./konstanter";
+import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
 
 interface SakNokkelTallProps {
     saksnummer: string;

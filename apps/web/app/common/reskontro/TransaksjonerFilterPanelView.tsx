@@ -4,7 +4,6 @@ import { Box, Button, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker
 import { useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
-import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
 import {
     PARAM_BARN,
     PARAM_FRA,
@@ -12,8 +11,9 @@ import {
     PARAM_MOTTAKERE,
     PARAM_OPEN_TRANS,
     PARAM_TIL,
-} from "~/routes/sak/reskontro/konstanter.ts";
-import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "~/routes/sak/reskontro/transaksjonstyper.ts";
+} from "~/common/reskontro/konstanter.ts";
+import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "~/common/reskontro/transaksjonstyper.ts";
+import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
 
 interface TransaksjonerFilterPanelViewProps {
     unikeMottakere: (string | null | undefined)[];
