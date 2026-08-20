@@ -88,6 +88,50 @@ Deploy skjer automatisk via GitHub Actions:
 | q2 | PR mot main                  | `.nais/q2.yaml` |
 | prod | Merge til main               | `.nais/prod.yaml` |
 
+## Feature toggles (Unleash)
+
+Server-side brukes Unleash sin Node-SDK (`unleash-client`). Nettleseren snakker med vår
+egen proxy-rute `/unleash/proxy`, slik at API-tokenet aldri forlater serveren.
+
+```tsx
+// Klient
+const visNyLosning = useFlag("frontend.belopshistorikk.bereg_sum");
+
+// Server (loader/action)
+const enabled = await flaggIsEnabled("mitt.flagg", serverUnleashContext({ bruker, saksnummer }));
+```
+
+Konteksten inneholder `userId` (NAVident) samt `properties.saksnummer` og
+`properties.enhet`, så toggles kan styres per saksbehandler, sak eller enhet.
+
+### Feature toggles lokalt
+
+Du trenger normalt **ikke** Unleash-tokenet for å utvikle. Overstyr flaggene i
+`apps/web/.env.development.local`, som er gitignorert (`.env.*.local`) og overstyrer
+verdiene i `.env.development`:
+
+```bash
+# apps/web/.env.development.local
+UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.bereg_sum=true,annet.flagg=false
+```
+
+Overstyringene gjelder både server-side (`flaggIsEnabled`) og klienten (`useFlag`), og
+ignoreres i produksjon.
+
+### Kjøre mot ekte Unleash lokalt
+
+Tokenet skal **aldri** i `apps/web/.env.development` – den fila er sporet i git.
+
+```bash
+# Krever naisdevice + kubectl-kontekst mot dev-gcp
+pnpm run unleash:token:local
+```
+
+Scriptet skriver tokenet til den gitignorerte `.env.development.local`. Å lese secrets
+i namespacet krever utvidede rettigheter (`container.secrets.get`); får du
+`Error from server (Forbidden)`, bruk `UNLEASH_LOCAL_TOGGLES` over, eller be om
+midlertidig tilgang (JITA) i [nais console](https://console.nav.cloud.nais.io).
+
 ## Scripts
 
 ### migrate-imports

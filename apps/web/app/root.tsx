@@ -15,6 +15,7 @@ import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
+import { UnleashContextUpdater } from "~/common/unleash/UnleashContextUpdater.tsx";
 import type { Route } from "./+types/root.ts";
 import faviconUrl from "./assets/bisys_favicon.ico";
 
@@ -27,29 +28,28 @@ export async function loader({ context }: Route.LoaderArgs) {
     return {
         navUser,
         naisConfig,
-        unleashConfig:
-            env.UNLEASH_PROXY_URL && env.UNLEASH_PROXY_CLIENT_KEY
-                ? {
-                      url: env.UNLEASH_PROXY_URL,
-                      clientKey: env.UNLEASH_PROXY_CLIENT_KEY,
-                  }
-                : null,
         bisysUrl: env.BISYS_URL,
     };
 }
 
+/** Klienten snakker med vår egen server-side Unleash-proxy, ikke Unleash direkte. */
+const UNLEASH_PROXY_PATH = "/unleash/proxy";
+
 export default function App({ loaderData }: Route.ComponentProps) {
-    const { navUser, naisConfig, unleashConfig, bisysUrl } = loaderData;
+    const { navUser, naisConfig, bisysUrl } = loaderData;
     const unleashClient = useMemo(
         () =>
             new UnleashClient({
-                url: unleashConfig?.url ?? "http://localhost",
-                clientKey: unleashConfig?.clientKey ?? "local",
+                url:
+                    typeof window === "undefined"
+                        ? `http://localhost${UNLEASH_PROXY_PATH}`
+                        : `${window.location.origin}${UNLEASH_PROXY_PATH}`,
+                // Proxyen autentiseres med saksbehandlerens sesjon, ikke med clientKey
+                clientKey: "bidrag-frontend",
                 appName: "bidrag-frontend",
-                disableRefresh: true,
                 disableMetrics: true,
             }),
-        [unleashConfig],
+        [],
     );
 
     useEffect(() => {
@@ -63,21 +63,18 @@ export default function App({ loaderData }: Route.ComponentProps) {
     }, [navUser]);
 
     useEffect(() => {
-        if (!unleashConfig) {
-            return;
-        }
-
         void unleashClient.start();
 
         return () => {
             unleashClient.stop();
         };
-    }, [unleashClient, unleashConfig]);
+    }, [unleashClient]);
 
     return (
         <QueryClientWrapper>
             <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} />}>
                 <FlagProvider unleashClient={unleashClient} startClient={false}>
+                    <UnleashContextUpdater />
                     <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
                         <ClientOnly fallback={<Loader size="large" />}>
                             <Outlet />

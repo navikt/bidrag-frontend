@@ -10,10 +10,10 @@
         "typecheck": "react-router typegen && tsc --noEmit"
     },
     "dependencies": {
+        "@bidrag/admin-app": "workspace:*",
         "@bidrag/api": "workspace:*",
         "@bidrag/common": "workspace:*",
         "@bidrag/utils": "workspace:*",
-        "@bidrag/admin-app": "workspace:*",
         "@grafana/faro-react": "^2.7.1",
         "@grafana/faro-web-sdk": "^2.7.1",
         "@navikt/aksel-icons": "catalog:",
@@ -37,6 +37,7 @@
         "source-map": "^0.7.6",
         "sqids": "^0.3.0",
         "tailwindcss": "catalog:",
+        "unleash-client": "^6.12.1",
         "unleash-proxy-client": "^3.7.8",
         "zod": "^4.1.12"
     },
