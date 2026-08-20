@@ -1,9 +1,9 @@
 import { Box, Heading, VStack } from "@navikt/ds-react";
+import { TransaksjonerAggregertTabell } from "~/routes/sak/reskontro/TransaksjonerAggregertTabell.tsx";
+import { TransaksjonerFilterPanel } from "~/routes/sak/reskontro/TransaksjonerFilterPanel.tsx";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SakReskontroOversiktPage.ts";
 import { SakNokkelTall } from "./SakNokkelTall";
-import TransaksjonerAggregertTabell from "./TransaksjonerAggregertTabell";
-import TransaksjonerFilterPanel from "./TransaksjonerFilterPanel";
 import { useTransaksjonsfilter } from "./useTransaksjonsfilter";
 
 export const handle: SakSideTittelHandle = { sakSideTittel: "Saksreskontro" };
@@ -21,7 +21,7 @@ export default function SakReskontroOversiktPage({ params }: Route.ComponentProp
             <SakNokkelTall saksnummer={saksnummer} />
             <Box borderColor="neutral-subtle" padding="space-16" borderWidth="1" borderRadius="4">
                 <VStack gap="space-16">
-                    <TransaksjonerFilterPanel />
+                    <TransaksjonerFilterPanel saksnummer={saksnummer} />
                     <TransaksjonerAggregertTabell transaksjoner={filtrertData} totalTransCount={totalTransCount} />
                 </VStack>
             </Box>

@@ -1,8 +1,8 @@
 import { Box, Heading, VStack } from "@navikt/ds-react";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
+import { BrukerTransaksjonerAggregertTabell } from "~/routes/bruker/reskontro/BrukerTransaksjonerAggregertTabell.tsx";
+import { BrukerTransaksjonerFilterPanel } from "~/routes/bruker/reskontro/BrukerTransaksjonerFilterPanel.tsx";
 import type { Route } from "./+types/BrukerReskontroOversiktPage.ts";
-import BrukerTransaksjonerAggregertTabell from "./BrukerTransaksjonerAggregertTabell";
-import BrukerTransaksjonerFilterPanel from "./BrukerTransaksjonerFilterPanel.tsx";
 import { useBrukerTransaksjonsfilter } from "./useBrukerTransaksjonsfilter";
 
 export default function BrukerReskontroOversiktPage({ params }: Route.ComponentProps) {
@@ -20,7 +20,7 @@ export default function BrukerReskontroOversiktPage({ params }: Route.ComponentP
             {/*<SakNokkelTall saksnummer={brukerid}/>*/}
             <Box borderColor="neutral-subtle" padding="space-16" borderWidth="1" borderRadius="4">
                 <VStack gap="space-16">
-                    <BrukerTransaksjonerFilterPanel />
+                    <BrukerTransaksjonerFilterPanel ident={ident} />
                     <BrukerTransaksjonerAggregertTabell
                         transaksjoner={filtrertData}
                         totalTransCount={totalTransCount}

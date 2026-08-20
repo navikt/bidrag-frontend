@@ -16,10 +16,7 @@ interface TransaksjonerAggregertTabellProps {
 
 const ROWS_PER_PAGE = 50;
 
-export default function TransaksjonerAggregertTabell({
-    transaksjoner,
-    totalTransCount,
-}: TransaksjonerAggregertTabellProps) {
+export function TransaksjonerAggregertTabell({ transaksjoner, totalTransCount }: TransaksjonerAggregertTabellProps) {
     const aggregater = useMemo(
         () => aggregerTransaksjoner(transaksjoner).sort((a, b) => sortByDateAsc(b.dato, a.dato)),
         [transaksjoner],

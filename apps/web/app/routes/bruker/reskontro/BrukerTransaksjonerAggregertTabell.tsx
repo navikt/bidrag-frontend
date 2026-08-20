@@ -16,7 +16,7 @@ interface TransaksjonerAggregertTabellProps {
 
 const ROWS_PER_PAGE = 50;
 
-export default function BrukerTransaksjonerAggregertTabell({
+export function BrukerTransaksjonerAggregertTabell({
     transaksjoner,
     totalTransCount,
 }: TransaksjonerAggregertTabellProps) {
