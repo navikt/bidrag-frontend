@@ -1,6 +1,7 @@
 import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
+import { OpenDocumentUtils } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
 import {
     ArrowCirclepathIcon,
@@ -176,6 +177,12 @@ export default function JournalpostTabell({
         return hoveddokRef ? `/dokument/${journalpostId}/${hoveddokRef}` : undefined;
     };
 
+    const åpneMbdokDokument = (journalpostId: string, dokumentreferanse: string) => {
+        OpenDocumentUtils.openMbdokDocument(journalpostId, dokumentreferanse).catch((error: unknown) => {
+            window.alert(error instanceof Error ? error.message : "Kunne ikke åpne dokumentet");
+        });
+    };
+
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
 
     const toggleExpandedRad = (id: string) => {
@@ -190,6 +197,9 @@ export default function JournalpostTabell({
             const kanÅpnes = Boolean(
                 dok.status === DokumentStatus.FERDIGSTILT && dok.dokumentreferanse && rad.jp.journalpostId,
             );
+            const kanÅpnesMedMbdok = Boolean(
+                dok.status === DokumentStatus.UNDER_PRODUKSJON && dok.dokumentreferanse && rad.jp.journalpostId,
+            );
 
             return (
                 <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
@@ -203,6 +213,18 @@ export default function JournalpostTabell({
                         >
                             {dok.tittel ?? dok.dokumentreferanse}
                         </Link>
+                    ) : kanÅpnesMedMbdok ? (
+                        <Link
+                            className="min-w-0 truncate"
+                            href="#"
+                            title={dok.tittel ?? dok.dokumentreferanse ?? ""}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                åpneMbdokDokument(rad.jp.journalpostId as string, dok.dokumentreferanse as string);
+                            }}
+                        >
+                            {dok.tittel ?? dok.dokumentreferanse}
+                        </Link>
                     ) : (
                         <span className="min-w-0 truncate">{dok.tittel ?? "-"}</span>
                     )}
@@ -213,6 +235,7 @@ export default function JournalpostTabell({
         const antall = rad.jp.dokumenter?.length ?? 0;
         const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
         const href = åpneDokumentHref(rad.jp);
+        const hoveddokRef = rad.jp.dokumenter?.[0]?.dokumentreferanse;
 
         if (href) {
             return (
@@ -224,6 +247,27 @@ export default function JournalpostTabell({
                         href={href}
                         title={tekst}
                         aria-label="Åpne dokument"
+                    >
+                        {tekst}
+                    </Link>
+                </HStack>
+            );
+        }
+
+        if (rad.jp.status === JournalpostStatus.UNDER_PRODUKSJON && rad.jp.journalpostId && hoveddokRef) {
+            const journalpostId = rad.jp.journalpostId;
+            return (
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
+                    <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
+                    <Link
+                        className="min-w-0 truncate"
+                        href="#"
+                        title={tekst}
+                        aria-label="Åpne dokument"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            åpneMbdokDokument(journalpostId, hoveddokRef);
+                        }}
                     >
                         {tekst}
                     </Link>
