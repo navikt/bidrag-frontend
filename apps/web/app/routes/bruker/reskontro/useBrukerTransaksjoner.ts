@@ -6,21 +6,11 @@ import { hentReskontroTransaksjonerForBruker } from "~/api/query/reskontro.query
 import { DUMMY_BARN } from "../../sak/reskontro/konstanter.ts";
 
 export function useBrukerTransaksjoner(ident: string) {
-    const { data } = useSuspenseQuery(
-        hentReskontroTransaksjonerForBruker(ident),
-    );
+    const { data } = useSuspenseQuery(hentReskontroTransaksjonerForBruker(ident));
     const alletransaksjoner = data?.transaksjoner ?? [];
-    const unikeMottakere = useMemo(
-        () => unikeVerdier(alletransaksjoner.map((t) => t.mottaker)),
-        [alletransaksjoner],
-    );
+    const unikeMottakere = useMemo(() => unikeVerdier(alletransaksjoner.map((t) => t.mottaker)), [alletransaksjoner]);
     const unikeBarn = useMemo(
-        () =>
-            unikeVerdier(
-                alletransaksjoner
-                    .map((t) => t.barn)
-                    .filter((b) => b !== DUMMY_BARN),
-            ),
+        () => unikeVerdier(alletransaksjoner.map((t) => t.barn).filter((b) => b !== DUMMY_BARN)),
         [alletransaksjoner],
     );
     const unikeTransaksjonskoder = useMemo(

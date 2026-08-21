@@ -1,15 +1,12 @@
-import {getToken, validateToken} from "@navikt/oasis";
-import {redirect} from "react-router";
-import type {Route} from "../../../.react-router/types/app/+types/root.ts";
-import {authTokenContext, userContext} from "./auth.context.ts";
-import {parseToken} from "./auth.utils.server.ts";
+import { getToken, validateToken } from "@navikt/oasis";
+import { redirect } from "react-router";
+import type { Route } from "../../../.react-router/types/app/+types/root.ts";
+import { authTokenContext, userContext } from "./auth.context.ts";
+import { parseToken } from "./auth.utils.server.ts";
 
 const OFFENTLIGE_STIER = ["/internal/", "/oauth2/"];
 
-export const authMiddleware: Route.MiddlewareFunction = async (
-    {request, context},
-    next,
-) => {
+export const authMiddleware: Route.MiddlewareFunction = async ({ request, context }, next) => {
     const url = new URL(request.url);
 
     if (OFFENTLIGE_STIER.some((sti) => url.pathname.startsWith(sti))) {
@@ -26,7 +23,7 @@ export const authMiddleware: Route.MiddlewareFunction = async (
     const valid = await validateToken(token);
 
     if (!valid.ok) {
-        throw new Response("Ugyldig token", {status: 401});
+        throw new Response("Ugyldig token", { status: 401 });
     }
 
     const user = parseToken(token);

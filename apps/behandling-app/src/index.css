@@ -1,0 +1,67 @@
+@import "tailwindcss/base";
+@import "@navikt/ds-css";
+@import "@navikt/bidrag-ui-common/styles/index.css";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "forskudd.css";
+.blur-sensitive-info .personnavn,
+.blur-sensitive-info .personinfo,
+.blur-sensitive-info .personident {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+}
+
+.blur-sensitive-info:hover {
+    filter: none;
+}
+.blur-sensitive-info {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+}
+
+.blur-sensitive-info:hover {
+    filter: none;
+}
+
+.bd_datadisplay dt:after {
+    content: ":";
+}
+
+.bd_datadisplay dt:before {
+    content: "";
+    display: block;
+}
+
+.bd_datadisplay dt,
+.bd_datadisplay dd {
+    display: inline;
+}
+.bd_datadisplay dd {
+    margin-left: 5px;
+}
+figure {
+    border: thin #c0c0c0 solid;
+    display: flex;
+    flex-flow: column;
+    padding: 5px;
+    max-width: 50rem;
+}
+
+figcaption {
+    background-color: var(--ax-neutral-300);
+    font: italic smaller sans-serif;
+    padding: 3px;
+    text-align: center;
+}
+
+.mx-auto h4 {
+    font-size: var(--ax-font-size-heading-small);
+    margin-bottom: 5px;
+}
+.mx-auto h1 {
+    font-size: "var(--ax-font-size-heading-xlarge)";
+}
+.mx-auto h2 {
+    font-size: "var(--ax-font-size-heading-large)";
+    margin-top: 0;
+}

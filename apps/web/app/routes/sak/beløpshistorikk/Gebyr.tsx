@@ -7,15 +7,10 @@ interface EngangsbetalingerProps {
     saksnummer: string;
 }
 
-const GebyrTyper: Array<Engangsbeloptype> = [
-    Engangsbeloptype.GEBYR_MOTTAKER,
-    Engangsbeloptype.GEBYR_SKYLDNER,
-];
+const GebyrTyper: Array<Engangsbeloptype> = [Engangsbeloptype.GEBYR_MOTTAKER, Engangsbeloptype.GEBYR_SKYLDNER];
 
 export function Gebyr({ saksnummer }: EngangsbetalingerProps) {
-    const { data: engangsbetalinger } = useSuspenseQuery(
-        hentEngangsbetalingerQuery(saksnummer),
-    );
+    const { data: engangsbetalinger } = useSuspenseQuery(hentEngangsbetalingerQuery(saksnummer));
 
     const gebyr = engangsbetalinger?.filter((e) => GebyrTyper.includes(e.type));
 

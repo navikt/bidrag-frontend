@@ -9,13 +9,8 @@ export function hentBelopshistorikkQuery(saksnummer: string) {
             withQueryErrorHandling(
                 "hent_belopshistorikk",
                 async () => {
-                    const { data } =
-                        await BIDRAG_BELOPSHISTORIKK_API.hentStonaderForSak.hentStonaderForSak(
-                            saksnummer,
-                        );
-                    await SecureLoggerService.info(
-                        `Hentet beløpshistorikk for sak ${saksnummer}`,
-                    );
+                    const { data } = await BIDRAG_BELOPSHISTORIKK_API.hentStonaderForSak.hentStonaderForSak(saksnummer);
+                    await SecureLoggerService.info(`Hentet beløpshistorikk for sak ${saksnummer}`);
                     return data;
                 },
                 { saksnummer },
@@ -30,13 +25,8 @@ export function hentEngangsbetalingerQuery(saksnummer: string) {
             withQueryErrorHandling(
                 "hent_belopshistorikk",
                 async () => {
-                    const { data } =
-                        await BIDRAG_BELOPSHISTORIKK_API.engangsbelop.hentEngangsbelopForSak(
-                            saksnummer,
-                        );
-                    await SecureLoggerService.info(
-                        `Hentet engangsbetalinger for sak ${saksnummer}`,
-                    );
+                    const { data } = await BIDRAG_BELOPSHISTORIKK_API.engangsbelop.hentEngangsbelopForSak(saksnummer);
+                    await SecureLoggerService.info(`Hentet engangsbetalinger for sak ${saksnummer}`);
                     return data;
                 },
                 { saksnummer },

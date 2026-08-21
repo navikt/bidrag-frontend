@@ -35,16 +35,9 @@ export abstract class AbstractLoggerService {
         }
     }
 
-    static warn(
-        msg: string,
-        error?: LogErrorType | ErrorInfo,
-    ): Promise<LogResponse> {
+    static warn(msg: string, error?: LogErrorType | ErrorInfo): Promise<LogResponse> {
         try {
-            return this.mapAndLog(
-                msg,
-                LogLevel.WARNING,
-                error,
-            );
+            return this.mapAndLog(msg, LogLevel.WARNING, error);
         } catch (e) {
             console.log(e);
             return Promise.resolve({
@@ -54,10 +47,7 @@ export abstract class AbstractLoggerService {
         }
     }
 
-    static error(
-        msg: string,
-        error: LogErrorType | ErrorInfo | IErrorContext,
-    ): Promise<LogResponse> {
+    static error(msg: string, error: LogErrorType | ErrorInfo | IErrorContext): Promise<LogResponse> {
         try {
             return this.mapAndLog(msg, LogLevel.ERROR, error);
         } catch (e) {
@@ -70,10 +60,7 @@ export abstract class AbstractLoggerService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    protected static log(
-        _logInfo: LogInfo,
-        _headers?: Record<string, string>,
-    ): Promise<LogResponse> {
+    protected static log(_logInfo: LogInfo, _headers?: Record<string, string>): Promise<LogResponse> {
         throw new Error("Not implemented");
     }
 
@@ -108,9 +95,7 @@ export abstract class AbstractLoggerService {
         return this.log(logInfo, carrier);
     }
 
-    protected static normalizeErrorInfo(
-        error?: LogErrorType | ErrorInfo | IErrorContext,
-    ): ErrorInfo | undefined {
+    protected static normalizeErrorInfo(error?: LogErrorType | ErrorInfo | IErrorContext): ErrorInfo | undefined {
         if (!error) {
             return undefined;
         }

@@ -1,11 +1,11 @@
-import type {Transaksjon} from "@bidrag/api/BidragReskontroApi";
+import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
 
 export class TransaksjonAggregat {
-    readonly dato?: string ;
-    readonly transaksjonskode?: string ;
-    readonly beskrivelse?: string ;
-    readonly mottaker?: string ;
-    readonly søknadstype?: string ;
+    readonly dato?: string;
+    readonly transaksjonskode?: string;
+    readonly beskrivelse?: string;
+    readonly mottaker?: string;
+    readonly søknadstype?: string;
 
     private readonly _transaksjoner: Transaksjon[];
 

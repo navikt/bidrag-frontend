@@ -1,7 +1,6 @@
 import { TextField } from "@navikt/ds-react";
-import React, { ChangeEvent, useRef, useState } from "react";
-import { useEffect } from "react";
-import { ReactElement } from "react";
+import type React from "react";
+import { type ChangeEvent, type ReactElement, useEffect, useRef, useState } from "react";
 
 import { removeNonPrintableCharachters } from "../../utils/StringUtils";
 
@@ -13,7 +12,7 @@ export function capitalizeFirstLetter(s: string) {
 export function convertStringToNumber(value: string | number): number {
     if (typeof value === "string") {
         const result = parseInt(value, 10);
-        return isNaN(result) ? 0 : result;
+        return Number.isNaN(result) ? 0 : result;
     }
     return value;
 }
@@ -48,10 +47,10 @@ export default function AutoSuggest(props: AutoSuggestProps) {
         const filteredOptions = options.filter(
             (currentOptionString) =>
                 toUppercaseForEveryFirstLetter(currentOptionString).search(
-                    getRegExForSearchedFirstLetterTerms(searchTermTrimmed)
-                ) > -1
+                    getRegExForSearchedFirstLetterTerms(searchTermTrimmed),
+                ) > -1,
         );
-        if (props.sortOptions != false) {
+        if (props.sortOptions !== false) {
             return filteredOptions.sort(sortByLengthOfString);
         }
         return filteredOptions;
@@ -167,9 +166,10 @@ export default function AutoSuggest(props: AutoSuggestProps) {
     }
 
     const className = `${props.label ? "has-label" : ""} ${props.description ? "has-description" : ""} ${
-        props.options.length == 0 ? "empty-list" : ""
+        props.options.length === 0 ? "empty-list" : ""
     }`;
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: onBlur på wrapper brukes kun til å lukke forslagslisten når fokus forlater komponenten
         <div className={"autosuggest relative"} onBlur={onBlur}>
             <div className={`autosuggest-input ${className}`}>
                 <TextField
@@ -188,7 +188,7 @@ export default function AutoSuggest(props: AutoSuggestProps) {
                     className="w-full autosuggest_input"
                     autoComplete="off"
                     error={props.error}
-                    id={"autogsuggest_" + props.label}
+                    id={`autogsuggest_${props.label}`}
                     value={userInput}
                 />
             </div>
@@ -223,6 +223,7 @@ function SelectableOptions({ show, options, activeOption, onSelect, avoidBlur, o
                 <li className="option-no-content">Ingen resultat</li>
             ) : (
                 options.map((optionName, index) => (
+                    // biome-ignore lint/a11y/useKeyWithClickEvents: tastaturnavigasjon håndteres av onKeyDown på tekstfeltet (piltaster og Enter)
                     <li
                         className={index === activeOption ? "option-active" : ""}
                         key={optionName}

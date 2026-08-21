@@ -34,7 +34,7 @@ export function vedtakToMermaidResponse(vedtak: VedtakDto): MermaidResponse {
     const mermaidString = treeToMermaidString(tree);
     return {
         mermaidGraph: mermaidString,
-        grunnlagListe: vedtak.grunnlagListe as unknown as import("@bidrag/api/BidragBehandlingApiV1").GrunnlagDto[],
+        grunnlagListe: vedtak.grunnlagListe,
         vedtak: vedtakToTreeDto(vedtak),
         stønadsendringer: vedtak.stønadsendringListe.map((stønadsendring) => stønadsendringToTreeDto(stønadsendring)),
         perioder: vedtak.stønadsendringListe.flatMap((stønadsendring) =>

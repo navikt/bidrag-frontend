@@ -12,7 +12,7 @@ import {
 import type { ComposeOption, ECharts, SetOptionOpts } from "echarts/core";
 import { getInstanceByDom, init, use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { CSSProperties, ReactElement, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactElement, useEffect, useRef, useState } from "react";
 
 use([
     LegendComponent,
@@ -76,8 +76,8 @@ export function EChartLineChart({ option, style }: ReactEChartsProps): ReactElem
                     e.key === "ArrowRight"
                         ? (currentIndex + 1) % dataLen
                         : currentIndex <= 0
-                        ? dataLen - 1
-                        : currentIndex - 1;
+                          ? dataLen - 1
+                          : currentIndex - 1;
                 chart?.dispatchAction({
                     type: "highlight",
                     seriesIndex: 0,

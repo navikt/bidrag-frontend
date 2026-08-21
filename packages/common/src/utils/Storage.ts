@@ -9,7 +9,7 @@ export class SessionStorage {
     static getOrDefault(key: string, defaultValue: string) {
         const value = window.sessionStorage.getItem(key);
         if (!value) {
-            this.set(key, defaultValue);
+            SessionStorage.set(key, defaultValue);
             return defaultValue;
         }
         return value;

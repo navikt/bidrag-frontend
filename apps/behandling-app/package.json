@@ -1,0 +1,53 @@
+{
+    "name": "@bidrag/behandling-app",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts",
+        "./routes": "./src/routes.ts",
+        "./styles.css": "./src/styles.css"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run --passWithNoTests"
+    },
+    "dependencies": {
+        "@bidrag/api": "workspace:*",
+        "@bidrag/common": "workspace:*",
+        "@bidrag/utils": "workspace:*",
+        "@mdx-js/react": "^3.1.1",
+        "@navikt/aksel-icons": "catalog:",
+        "@navikt/ds-react": "catalog:",
+        "@navikt/ds-css": "catalog:",
+        "@navikt/ds-tailwind": "catalog:",
+        "@theme-ui/mdx": "^0.17.1",
+        "@uiw/react-json-view": "^2.0.0-alpha.40",
+        "axios": "^1.18.0",
+        "date-fns": "^4.4.0",
+        "echarts": "^6.1.0",
+        "lodash": "^4.17.21",
+        "quill": "^2.0.3",
+        "quill-paste-smart": "^2.0.0",
+        "react-day-picker": "^9.14.0",
+        "react-error-boundary": "^6.1.2",
+        "react-hook-form": "^7.82.0",
+        "theme-ui": "^0.17.4",
+        "tailwindcss": "catalog:"
+    },
+    "devDependencies": {
+        "@react-router/dev": "catalog:",
+        "@types/lodash": "^4.17.14",
+        "@types/mdx": "^2.0.13",
+        "@types/node": "^25",
+        "jsdom": "^30.0.1",
+        "vite": "^8.0.16"
+    },
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "@unleash/proxy-client-react": "^5.0.1",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-router": "catalog:"
+    }
+}
