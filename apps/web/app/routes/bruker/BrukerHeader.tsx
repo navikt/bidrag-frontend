@@ -11,7 +11,7 @@ interface ISakHeaderProps {
     skjermbilde?: ISkjermbildeDetaljer;
 }
 
-export default function BrukerHeader({ bruker, skjermbilde }: ISakHeaderProps) {
+export function BrukerHeader({ bruker, skjermbilde }: ISakHeaderProps) {
     return (
         <Bleed marginInline="full">
             <div className="bg-(--ax-neutral-100) border-(--ax-border-neutral-subtle) border-solid border-b w-full border-0">
