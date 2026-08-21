@@ -1,7 +1,6 @@
 import { Box, Heading, List, LocalAlert, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
-import { SakNokkelTall } from "../../sak/reskontro/SakNokkelTall";
 import type { Route } from "./+types/BrukerReskontroOversiktPage.ts";
 import BrukerTransaksjonerAggregertTabell from "./BrukerTransaksjonerAggregertTabell";
 import BrukerTransaksjonerFilterPanel from "./BrukerTransaksjonerFilterPanel.tsx";

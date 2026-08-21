@@ -4,8 +4,6 @@
 @import "@bidrag/common/styles.css";
 @import "@bidrag/behandling-app/styles.css";
 
-
-
 /*Flytte til common styles.css? */
 @source "../../../packages/common/src/**/*.{tsx,ts}";
 @source "../../behandling-app/src/**/*.{tsx,ts,mdx}";

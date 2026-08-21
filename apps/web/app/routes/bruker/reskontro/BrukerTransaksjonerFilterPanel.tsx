@@ -56,7 +56,9 @@ export default function BrukerTransaksjonerFilterPanel() {
                 const updated = isSelected ? [...current, option] : current.filter((v) => v !== option);
                 const next = new URLSearchParams(prev);
                 next.delete(key);
-                updated.forEach((v) => next.append(key, v));
+                updated.forEach((v) => {
+                    next.append(key, v);
+                });
                 return next;
             },
             { replace: true },
