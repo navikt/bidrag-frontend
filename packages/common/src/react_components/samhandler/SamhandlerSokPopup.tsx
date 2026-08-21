@@ -8,9 +8,6 @@ type SamhandlerSokPopupProps = {
     onError?: (errorMessage: string) => void;
 };
 
-const width = Math.min(1500, screen.width);
-const height = Math.min(1200, screen.height);
-
 export default function SamhandlerSokPopup({ windowId, onResult, onError }: SamhandlerSokPopupProps) {
     const popupRef = useRef<Window | null>(null);
     const resultReceivedRef = useRef<boolean>(false);
@@ -20,6 +17,9 @@ export default function SamhandlerSokPopup({ windowId, onResult, onError }: Samh
     useEffect(() => {
         resultReceivedRef.current = false;
         hasCalledOnResultRef.current = false;
+
+        const width = Math.min(1500, screen.width);
+        const height = Math.min(1200, screen.height);
 
         popupRef.current = window.open(
             `/samhandler/søk/?windowId=${windowId}`,
@@ -62,7 +62,7 @@ export default function SamhandlerSokPopup({ windowId, onResult, onError }: Samh
                 if (!hasCalledOnResultRef.current) {
                     hasCalledOnResultRef.current = true;
                     resultReceivedRef.current = true;
-                    onError?.(error);
+                    onError?.(error instanceof Error ? error.message : "Samhandlersøk feilet");
                     onResult(null);
                 }
             })

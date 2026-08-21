@@ -7,8 +7,6 @@ type SamhandlerSokProps = {
     onResult: (data: SamhandlerBroadcastMessage | null) => void;
     onError?: (errorMessage: string) => void;
 };
-const width = Math.min(1500, screen.width);
-const height = Math.min(1200, screen.height);
 
 export default function SamhandlerSokButton({
     onResult,
@@ -28,6 +26,10 @@ export default function SamhandlerSokButton({
     function openSamhandlerSearch() {
         openModal();
         searchCanceled.current = false;
+
+        const width = Math.min(1500, screen.width);
+        const height = Math.min(1200, screen.height);
+
         const openedWindow = window.open(
             `/samhandler/søk/?windowId=${windowId}`,
             "_blank",
@@ -41,7 +43,9 @@ export default function SamhandlerSokButton({
                 }
                 onResult(res.payload);
             })
-            .catch(onError)
+            .catch((error) => {
+                onError?.(error instanceof Error ? error.message : "Samhandlersøk feilet");
+            })
             .finally(() => {
                 closeModal();
                 window.focus();
