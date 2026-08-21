@@ -1,7 +1,7 @@
-import {visningsnavnForTransaksjonskode} from "./transaksjonstyper";
+import { visningsnavnForTransaksjonskode } from "./transaksjonstyper.ts";
 
 interface TransaksjonTypeProps {
-    kode?: string;
+    kode?: string | null;
 }
 
 export function TransaksjonType({ kode }: TransaksjonTypeProps) {

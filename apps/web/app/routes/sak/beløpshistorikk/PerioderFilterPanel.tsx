@@ -13,8 +13,8 @@ interface PerioderFilterPanelProps {
     saksnummer: string;
 }
 
-export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelProps) {
-    const { unikeKravhavere, unikeTyper } = useBeløphistorikkfilter(saksnummer!);
+export function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelProps) {
+    const { unikeKravhavere, unikeTyper } = useBeløphistorikkfilter(saksnummer);
     const [searchParams, setSearchParams] = useSearchParams();
 
     const valgteTyper = searchParams.getAll(PARAM_TYPE);
@@ -35,10 +35,12 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 const updated = isSelected ? [...current, option] : current.filter((v) => v !== option);
                 const next = new URLSearchParams(prev);
                 next.delete(key);
-                updated.forEach((v) => next.append(key, v));
+                for (const v of updated) {
+                    next.append(key, v);
+                }
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -54,7 +56,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 date ? next.set(PARAM_FRA, toQueryParam(date)) : next.delete(PARAM_FRA);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -65,7 +67,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 date ? next.set(PARAM_TIL, toQueryParam(sisteDagIMnd(date))) : next.delete(PARAM_TIL);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -81,7 +83,7 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                 setTilSelected();
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -140,7 +142,9 @@ export default function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelP
                     variant={"tertiary"}
                     onClick={clearFilter}
                     icon={<EraserIcon title="Fjern filter" />}
-                >Fjern filter</Button>
+                >
+                    Fjern filter
+                </Button>
             </HStack>
         </Box>
     );
