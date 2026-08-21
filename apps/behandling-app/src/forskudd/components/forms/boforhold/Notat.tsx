@@ -1,5 +1,5 @@
 import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";

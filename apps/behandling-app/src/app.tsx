@@ -11,10 +11,10 @@ import { BidragCommonsProvider, BidragContainer } from "@navikt/bidrag-ui-common
 import { Loader } from "@navikt/ds-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { FlagProvider, IConfig, useFlagsStatus } from "@unleash/proxy-client-react";
+import { FlagProvider, type IConfig, useFlagsStatus } from "@unleash/proxy-client-react";
 import { scrollToHash } from "@utils/window-utils";
 import { AxiosError } from "axios";
-import React, { lazy, PropsWithChildren, Suspense, useEffect } from "react";
+import { lazy, type PropsWithChildren, Suspense, useEffect } from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { BidragProgressbarFullScreen } from "./barnebidrag/components/BidragProgressbar";
@@ -30,6 +30,7 @@ import { SærligeugifterProviderWrapper } from "./særbidrag/context/Særligeugi
 import BrukerveiledningSærbidrag from "./særbidrag/docs/BrukerveiledningSærbidrag.mdx";
 import { NewSærbidragPage } from "./særbidrag/pages/NewSaerbidragPage";
 import { SærbidragPage } from "./særbidrag/pages/SærbidragPage";
+
 // export const faro = initializeFaro({
 //     app: {
 //         name: "bidrag-behandling-ui",
@@ -291,7 +292,7 @@ const ForskuddBehandling = () => {
         window.dispatchEvent(
             new CustomEvent<EndringsloggTilhorerSkjermbilde>("skjermbildeSet", {
                 detail: EndringsloggTilhorerSkjermbilde.BEHANDLING_FORSKUDD,
-            })
+            }),
         );
     }, []);
 
@@ -310,7 +311,7 @@ const SærligeutgifterBehandling = () => {
         window.dispatchEvent(
             new CustomEvent<EndringsloggTilhorerSkjermbilde>("skjermbildeSet", {
                 detail: EndringsloggTilhorerSkjermbilde.BEHANDLINGSAeRBIDRAG,
-            })
+            }),
         );
     }, []);
 
@@ -333,7 +334,7 @@ const BarnebidragBehandling = () => {
     useEffect(() => {
         if (type) {
             window.dispatchEvent(
-                new CustomEvent<EndringsloggTilhorerSkjermbilde>("skjermbildeSet", { detail: getSkjermbilde(type) })
+                new CustomEvent<EndringsloggTilhorerSkjermbilde>("skjermbildeSet", { detail: getSkjermbilde(type) }),
             );
         }
     }, [type]);

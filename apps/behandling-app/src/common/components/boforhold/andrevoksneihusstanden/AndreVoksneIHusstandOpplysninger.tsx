@@ -43,14 +43,12 @@ const Opplysninger = ({ perioder }: { perioder: PeriodeAndreVoksneIHusstanden[] 
                     {perioder.map((periode, index) => (
                         <Table.Row key={`${periode.status}-${index}`}>
                             <Table.DataCell className="flex justify-start gap-2">
-                                <>
-                                    {virkningsOrSoktFraDato &&
-                                    new Date(periode.periode.fom) < new Date(virkningsOrSoktFraDato)
-                                        ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
-                                        : DateToDDMMYYYYString(new Date(periode.periode.fom))}
-                                    <div>{"-"}</div>
-                                    {periode.periode.til ? DateToDDMMYYYYString(new Date(periode.periode.til)) : ""}
-                                </>
+                                {virkningsOrSoktFraDato &&
+                                new Date(periode.periode.fom) < new Date(virkningsOrSoktFraDato)
+                                    ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
+                                    : DateToDDMMYYYYString(new Date(periode.periode.fom))}
+                                <div>{"-"}</div>
+                                {periode.periode.til ? DateToDDMMYYYYString(new Date(periode.periode.til)) : ""}
                             </Table.DataCell>
                             <Table.DataCell>
                                 <div className="flex flex-row gap-[10px]">
@@ -85,12 +83,17 @@ const VoksneIHusstandPeriodePersonerButton = ({
             <Button variant="tertiary" size="xsmall" onClick={() => setOpenState(!openState)} ref={buttonRef}>
                 Hvem bor på adresse?
             </Button>
-            <Popover open={openState} aria-label="" onClose={() => setOpenState(false)} anchorEl={buttonRef.current}>
+            <Popover
+                open={openState}
+                aria-label="Hvem bor på adresse?"
+                onClose={() => setOpenState(false)}
+                anchorEl={buttonRef.current}
+            >
                 <Popover.Content style={{ padding: "8px" }}>
                     <ul className="list-decimal">
                         {husstandsmedlemmer.map((husstandsmedlem, index) => {
                             return (
-                                <li key={husstandsmedlem.navn + "-" + index}>
+                                <li key={`${husstandsmedlem.navn}-${index}`}>
                                     <span className="personnavn">{husstandsmedlem.navn}</span> (
                                     {DateToDDMMYYYYString(dateOrNull(husstandsmedlem.fødselsdato))})
                                     {husstandsmedlem.harRelasjonTilBp && ", relasjon til BP"}
@@ -222,7 +225,7 @@ function NyOpplysningerFraFolkeregistreTabell({
                 <tbody>
                     {ikkeAktivertePerioder?.map((periode, index) => (
                         <tr key={index + periode.periode.fom}>
-                            <td width="100px" scope="row">
+                            <td width="100px">
                                 {virkningsOrSoktFraDato && isBeforeDate(periode.periode.fom, virkningsOrSoktFraDato)
                                     ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
                                     : DateToDDMMYYYYString(new Date(periode.periode.fom))}

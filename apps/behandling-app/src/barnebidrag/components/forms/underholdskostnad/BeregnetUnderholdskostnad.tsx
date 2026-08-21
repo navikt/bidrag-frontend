@@ -1,5 +1,4 @@
 import { BodyShort, Box, Heading, HStack, Table } from "@navikt/ds-react";
-import React from "react";
 import { useFormContext } from "react-hook-form";
 import elementId from "../../../../common/constants/elementIds";
 import text from "../../../../common/constants/texts";

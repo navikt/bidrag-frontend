@@ -6,7 +6,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavn, RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
 import { BodyShort, Box, Button, Heading } from "@navikt/ds-react";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { useFormContext } from "react-hook-form";
 import { formatterBeløp } from "../../../utils/number-utils";
 import text from "../../constants/texts";
@@ -196,7 +196,7 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
                                     ) => (
                                         <Fragment key={i + rapporteringstype}>
                                             <tr>
-                                                <td width="250px" scope="row">
+                                                <td width="250px">
                                                     {hentVisningsnavn(rapporteringstype, periode.fom, periode.til)}
                                                 </td>
                                                 <td width="75px">{formatterBeløp(beløp)}</td>

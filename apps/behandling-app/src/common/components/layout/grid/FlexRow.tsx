@@ -1,4 +1,4 @@
-import React, { type PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
 interface FlexRowProps {
     className?: string;

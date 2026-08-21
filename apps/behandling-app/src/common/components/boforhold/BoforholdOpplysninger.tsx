@@ -6,7 +6,6 @@ import {
     TypeBehandling,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { BodyShort, Box, Button, Heading, HStack, ReadMore, Table } from "@navikt/ds-react";
-import React from "react";
 import { useFormContext } from "react-hook-form";
 import { DateToDDMMYYYYHHMMString, DateToDDMMYYYYString, dateOrNull, isBeforeDate } from "../../../utils/date-utils";
 import elementIds from "../../constants/elementIds";
@@ -82,14 +81,11 @@ const Opplysninger = ({ perioder }: { perioder: BostatusperiodeGrunnlagDto[] }) 
                     {perioder.map((periode, index) => (
                         <Table.Row key={`${periode.bostatus}-${index}`}>
                             <Table.DataCell className="flex justify-start gap-2" textSize="small">
-                                <>
-                                    {virkningsOrSoktFraDato &&
-                                    new Date(periode.datoFom) < new Date(virkningsOrSoktFraDato)
-                                        ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
-                                        : DateToDDMMYYYYString(new Date(periode.datoFom))}
-                                    <div>{"-"}</div>
-                                    {periode.datoTom ? DateToDDMMYYYYString(new Date(periode.datoTom)) : ""}
-                                </>
+                                {virkningsOrSoktFraDato && new Date(periode.datoFom) < new Date(virkningsOrSoktFraDato)
+                                    ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
+                                    : DateToDDMMYYYYString(new Date(periode.datoFom))}
+                                <div>{"-"}</div>
+                                {periode.datoTom ? DateToDDMMYYYYString(new Date(periode.datoTom)) : ""}
                             </Table.DataCell>
                             <Table.DataCell textSize="small">{hentVisningsnavn(periode.bostatus)}</Table.DataCell>
                         </Table.Row>
@@ -235,7 +231,7 @@ function NyOpplysningerFraFolkeregistreTabell({
                 <tbody>
                     {ikkeAktivertePerioder?.map((periode, index) => (
                         <tr key={index + periode.datoFom}>
-                            <td width="100px" scope="row">
+                            <td width="100px">
                                 {virkningsOrSoktFraDato && isBeforeDate(periode.datoFom, virkningsOrSoktFraDato)
                                     ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
                                     : DateToDDMMYYYYString(new Date(periode.datoFom))}

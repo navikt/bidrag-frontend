@@ -8,7 +8,7 @@ import {
     ExclamationmarkTriangleIcon,
 } from "@navikt/aksel-icons";
 import { BodyShort, Button, VStack } from "@navikt/ds-react";
-import React, { type ReactElement, type ReactNode, useEffect, useState } from "react";
+import { type ReactElement, type ReactNode, useEffect, useState } from "react";
 import { scrollToHash } from "../../../utils/window-utils";
 
 export const MenuButton = ({

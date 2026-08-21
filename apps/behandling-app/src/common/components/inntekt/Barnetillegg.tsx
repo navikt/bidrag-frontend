@@ -9,7 +9,6 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils, PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { Alert, BodyShort, Box, Heading, Table } from "@navikt/ds-react";
-import React from "react";
 import { useFormContext } from "react-hook-form";
 import type { OppdatereInntektRequestLosnet } from "../../../types/apiSpecFix";
 import { formatterBeløp } from "../../../utils/number-utils";
@@ -128,15 +127,13 @@ const Beløpstype = ({ item, field }: { item: InntektFormPeriode; field: string 
         );
     }
     return (
-        <>
-            <FormControlledSelectField
-                name={`${field}.beløpstype`}
-                className="w-fit h-max"
-                label={text.label.beløpstype}
-                hideLabel
-                options={options}
-            />
-        </>
+        <FormControlledSelectField
+            name={`${field}.beløpstype`}
+            className="w-fit h-max"
+            label={text.label.beløpstype}
+            hideLabel
+            options={options}
+        />
     );
 };
 export const Barnetillegg = () => {

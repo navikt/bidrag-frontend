@@ -1,5 +1,5 @@
 import { Loader } from "@navikt/ds-react";
-import React, { memo, Suspense } from "react";
+import { memo, Suspense } from "react";
 import text from "../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../common/context/BehandlingContext";
 import { shouldShowGrunnlagLoadingProgressbar } from "../../../common/helpers/shouldShowGrunnlagProgressbar";

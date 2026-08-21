@@ -1,6 +1,5 @@
 import { type BostatusperiodeDto, type HusstandsmedlemDtoV2, TypeBehandling } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils } from "@bidrag/common";
-import React from "react";
 import { useFormContext } from "react-hook-form";
 import { DateToDDMMYYYYString, dateOrNull, isAfterDate } from "../../../utils/date-utils";
 import text from "../../constants/texts";

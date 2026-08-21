@@ -1,5 +1,5 @@
 import { Checkbox } from "@navikt/ds-react";
-import React, { type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import type { Sak } from "./sak";
 
@@ -10,17 +10,15 @@ interface SelectSakCheckboxProps {
 }
 export default function SelectSakCheckbox({ sak, isSelected, onChecked }: SelectSakCheckboxProps): ReactElement {
     return (
-        <>
-            <Checkbox
-                className={"sakstilknyttningCheckbox"}
-                checked={isSelected}
-                value={sak.saksnummer}
-                onChange={() => {
-                    onChecked();
-                }}
-            >
-                {" "}
-            </Checkbox>
-        </>
+        <Checkbox
+            className={"sakstilknyttningCheckbox"}
+            checked={isSelected}
+            value={sak.saksnummer}
+            onChange={() => {
+                onChecked();
+            }}
+        >
+            {" "}
+        </Checkbox>
     );
 }

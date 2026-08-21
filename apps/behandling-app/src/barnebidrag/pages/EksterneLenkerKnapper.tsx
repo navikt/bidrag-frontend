@@ -76,7 +76,7 @@ export function EksterneLenkerKnapperBidrag() {
                 icon={<ExternalLinkIcon />}
                 onClick={() => {
                     // faro.api.pushEvent("click.button.brukerveiledning", { type: TypeBehandling.BIDRAG });
-                    window.open(url + "#" + renderHref(), "_blank");
+                    window.open(`${url}#${renderHref()}`, "_blank");
                 }}
             >
                 Brukerveiledning

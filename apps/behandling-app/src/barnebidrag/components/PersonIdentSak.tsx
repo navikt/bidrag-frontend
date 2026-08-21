@@ -4,7 +4,6 @@ import { BodyShort, VStack } from "@navikt/ds-react";
 import { useMemo } from "react";
 import { useGetBehandlingV2 } from "../../common/hooks/useApiData";
 import useFeatureToogle from "../../common/hooks/useFeatureToggle";
-import { RolleType } from "../../forskudd/enum/RolleType";
 
 export default function PersonIdentSak({
     ident,

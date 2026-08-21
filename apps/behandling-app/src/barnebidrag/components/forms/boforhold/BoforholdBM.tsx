@@ -1,7 +1,7 @@
 import { type BostatusperiodeGrunnlagDto, OpplysningerType, Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { BodyShort, Box, Button, ExpansionCard, Heading, HStack, Table, Tag } from "@navikt/ds-react";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import elementIds from "../../../../common/constants/elementIds";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";

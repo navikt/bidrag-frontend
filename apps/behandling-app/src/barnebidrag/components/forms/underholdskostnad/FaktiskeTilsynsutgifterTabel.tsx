@@ -1,5 +1,4 @@
 import { BodyLong, BodyShort, Box, Heading, HStack, Table } from "@navikt/ds-react";
-import React from "react";
 import { useFormContext } from "react-hook-form";
 import { FormControlledTextarea } from "../../../../common/components/formFields/FormControlledTextArea";
 import { FormControlledTextField } from "../../../../common/components/formFields/FormControlledTextField";

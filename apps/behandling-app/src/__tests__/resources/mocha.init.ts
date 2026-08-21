@@ -4,15 +4,15 @@ import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach } from "mocha";
 import sinon from "sinon";
 
-// @ts-ignore
+// @ts-expect-error
 
 export const sinonSandbox = sinon.createSandbox();
 export async function mochaGlobalSetup() {
-    // @ts-ignore
+    // @ts-expect-error
     global.window.showErrorPage = (error) => {
         console.log("showErrorPage was called with error=", error);
     };
-    // @ts-ignore
+    // @ts-expect-error
     global.window.logErrorMessage = (message) => {
         console.log("logErrorMessage was called with message=", message);
     };
@@ -20,7 +20,7 @@ export async function mochaGlobalSetup() {
     global.window.focus = () => null;
     global.window.close = () => null;
 
-    // @ts-ignore
+    // @ts-expect-error
     global.window.logToServer = {
         info: (_message: string) => null,
         warning: (_message: string) => null,

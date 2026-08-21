@@ -2,7 +2,7 @@ import "./errorModal.css";
 
 import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
 import { BodyLong, Heading, Modal } from "@navikt/ds-react";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 
 export const ErrorModal = () => {

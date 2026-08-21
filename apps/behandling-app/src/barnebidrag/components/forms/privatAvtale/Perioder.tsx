@@ -10,7 +10,7 @@ import {
 import { ObjectUtils } from "@bidrag/common";
 import { FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Heading, Table } from "@navikt/ds-react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { FormControlledMonthPicker } from "../../../../common/components/formFields/FormControlledMonthPicker";

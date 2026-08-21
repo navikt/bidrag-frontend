@@ -15,7 +15,7 @@ const getLatestBeregnTilDato = (roller: RolleDto[]) => {
         );
 };
 
-export const useFomTomDato = (isDatepickerTom: boolean, datoFra?: Date, gjelderRolleId?: number): [Date, Date] => {
+export const useFomTomDato = (_isDatepickerTom: boolean, datoFra?: Date, gjelderRolleId?: number): [Date, Date] => {
     const { roller } = useGetBehandlingV2();
     const virkningsOrSoktFraDato = useVirkningsdato(gjelderRolleId);
     const rolle = roller.find((r) => r.id === gjelderRolleId);

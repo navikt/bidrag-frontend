@@ -1,5 +1,4 @@
 import type { MonthValidationT } from "@navikt/ds-react";
-import React from "react";
 import { useController, useFormContext } from "react-hook-form";
 import { isFirstDayOfMonth, isLastDayOfMonth, toISODateString } from "../../../utils/date-utils";
 

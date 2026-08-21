@@ -16,6 +16,4 @@ export const sortBehandlingRoller = (rolleA, rolleB) => {
     if (dateDiff !== 0) return dateDiff;
 
     return rolleA.navn.localeCompare(rolleB.navn, "no", { sensitivity: "base" });
-
-    return 0;
 };

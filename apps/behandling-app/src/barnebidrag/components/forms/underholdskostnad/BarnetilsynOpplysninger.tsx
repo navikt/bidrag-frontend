@@ -1,6 +1,6 @@
 import { type BarnetilsynGrunnlagDto, OpplysningerType } from "@bidrag/api/BidragBehandlingApiV1";
 import { BodyShort, Box, Button, Heading, ReadMore, Table } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
@@ -62,14 +62,12 @@ const Opplysninger = ({ perioder, ident }: { perioder: BarnetilsynGrunnlagDto[];
                     {perioder.map((periode, index) => (
                         <Table.Row key={`${periode.partPersonId}-${index}`} className="align-top">
                             <Table.DataCell className="flex justify-start gap-2">
-                                <>
-                                    {virkningsOrSoktFraDato &&
-                                    new Date(periode.periodeFra) < new Date(virkningsOrSoktFraDato)
-                                        ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
-                                        : DateToDDMMYYYYString(new Date(periode.periodeFra))}
-                                    <div>{"-"}</div>
-                                    {periode.periodeTil ? DateToDDMMYYYYString(new Date(periode.periodeTil)) : ""}
-                                </>
+                                {virkningsOrSoktFraDato &&
+                                new Date(periode.periodeFra) < new Date(virkningsOrSoktFraDato)
+                                    ? DateToDDMMYYYYString(virkningsOrSoktFraDato)
+                                    : DateToDDMMYYYYString(new Date(periode.periodeFra))}
+                                <div>{"-"}</div>
+                                {periode.periodeTil ? DateToDDMMYYYYString(new Date(periode.periodeTil)) : ""}
                             </Table.DataCell>
                         </Table.Row>
                     ))}

@@ -44,6 +44,8 @@ const FeedbackForm = ({ onDoNotShow }: Props) => {
     };
 
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: onClick brukes kun til stopPropagation, ikke som interaktivt element
+        // biome-ignore lint/a11y/useKeyWithClickEvents: onClick brukes kun til stopPropagation, ikke som interaktivt element
         <div className="FeedbackForm" onClick={handleFormClick}>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <VStack>

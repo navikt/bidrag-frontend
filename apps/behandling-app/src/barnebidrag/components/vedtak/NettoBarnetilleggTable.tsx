@@ -41,7 +41,7 @@ export const NettoBarnetilleggTable = ({ rolle }: NettoBarnetilleggTableProps) =
                 </Table.Header>
                 <Table.Body>
                     {barnetillegg.barnetillegg.map((bt, index) => (
-                        <Table.Row className="align-top" key={bt.visningsnavn + "-" + index}>
+                        <Table.Row className="align-top" key={`${bt.visningsnavn}-${index}`}>
                             <Table.DataCell textSize="small">{bt.visningsnavn}</Table.DataCell>
                             {!harBareTiltakspenger && (
                                 <Table.DataCell textSize="small">

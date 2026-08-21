@@ -8,7 +8,7 @@ import {
 import { ObjectUtils, toISODateString } from "@bidrag/common";
 import { ArrowUndoIcon, FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { Alert, Box, Button, Heading, Table } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import type { RelaxSpecTypes } from "../../../../types/apiSpecFix";
 import { DateToDDMMYYYYString, dateOrNull, formatDateToYearMonth, isAfterDate } from "../../../../utils/date-utils";

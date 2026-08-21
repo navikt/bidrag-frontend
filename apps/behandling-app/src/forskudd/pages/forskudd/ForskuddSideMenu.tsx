@@ -1,6 +1,6 @@
 import { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent } from "@bidrag/common";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { MenuButton, SideMenu } from "../../../common/components/SideMenu/SideMenu";
 import behandlingQueryKeys from "../../../common/constants/behandlingQueryKeys";
@@ -242,26 +242,24 @@ const InntektMenuButton = ({
                                     />
                                 </>
                             ) : (
-                                <>
-                                    <MenuButton
-                                        title={text.title.skattepliktigeogPensjonsgivendeInntekt}
-                                        onStepChange={() =>
-                                            onStepChange(
-                                                STEPS[ForskuddStepper.INNTEKT],
-                                                {
-                                                    [behandlingQueryKeys.tab]: rolle.id.toString(),
-                                                },
-                                                elementIds.seksjon_inntekt_skattepliktig,
-                                            )
-                                        }
-                                        interactive={interactive}
-                                        size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
-                                        unconfirmedUpdates={ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.årsinntekter?.some(
-                                            (inntekt) => inntekt.ident === rolle.ident,
-                                        )}
-                                    />
-                                </>
+                                <MenuButton
+                                    title={text.title.skattepliktigeogPensjonsgivendeInntekt}
+                                    onStepChange={() =>
+                                        onStepChange(
+                                            STEPS[ForskuddStepper.INNTEKT],
+                                            {
+                                                [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                            },
+                                            elementIds.seksjon_inntekt_skattepliktig,
+                                        )
+                                    }
+                                    interactive={interactive}
+                                    size="small"
+                                    active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                                    unconfirmedUpdates={ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.årsinntekter?.some(
+                                        (inntekt) => inntekt.ident === rolle.ident,
+                                    )}
+                                />
                             )
                         }
                     />

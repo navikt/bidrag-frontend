@@ -258,7 +258,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             if (stepKey) {
                 setActiveStepState(stepKey as stepDef);
             }
-            trackTabNavigation(query?.["tab"]);
+            trackTabNavigation(query?.tab);
             navigate(`${location.pathname + url}`);
         },
         [location, steps],
@@ -408,7 +408,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         const firstPreviousInteractiveButton = (() => {
             for (let i = currentStepIndex - 1; i >= 0; i--) {
                 const step = sideMenu[i];
-                if (step && step.visible && step.interactive) return step;
+                if (step?.visible && step.interactive) return step;
             }
             return undefined;
         })();
@@ -617,41 +617,39 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
     return (
         <BehandlingContext.Provider value={value}>
-            <>
-                <ConfirmationModal
-                    ref={ref}
-                    closeable
-                    description={getPageErrorTexts().description}
-                    heading={
-                        <Heading size="small" className="flex gap-x-1.5 items-center">
-                            <XMarkOctagonFillIcon
-                                title="a11y-title"
-                                fontSize="1.5rem"
-                                color="var(--ax-text-danger-decoration)"
-                            />
-                            {getPageErrorTexts().title}
-                        </Heading>
-                    }
-                    footer={
-                        <>
-                            <Button type="button" onClick={() => ref.current?.close()} size="small">
-                                {text.label.tilbakeTilUtfylling}
-                            </Button>
-                            <Button type="button" variant="secondary" size="small" onClick={onConfirm}>
-                                {text.label.gåVidereUtenÅLagre}
-                            </Button>
-                        </>
-                    }
-                />
-                <ErrorConfirmationModal
-                    onConfirm={saveErrorState?.retryFn}
-                    onCancel={saveErrorState?.rollbackFn}
-                    onClose={() => setSaveErrorState({ error: false })}
-                    open={saveErrorState?.error}
-                />
-                <UserFeedbackDialog />
-                {children}
-            </>
+            <ConfirmationModal
+                ref={ref}
+                closeable
+                description={getPageErrorTexts().description}
+                heading={
+                    <Heading size="small" className="flex gap-x-1.5 items-center">
+                        <XMarkOctagonFillIcon
+                            title="a11y-title"
+                            fontSize="1.5rem"
+                            color="var(--ax-text-danger-decoration)"
+                        />
+                        {getPageErrorTexts().title}
+                    </Heading>
+                }
+                footer={
+                    <>
+                        <Button type="button" onClick={() => ref.current?.close()} size="small">
+                            {text.label.tilbakeTilUtfylling}
+                        </Button>
+                        <Button type="button" variant="secondary" size="small" onClick={onConfirm}>
+                            {text.label.gåVidereUtenÅLagre}
+                        </Button>
+                    </>
+                }
+            />
+            <ErrorConfirmationModal
+                onConfirm={saveErrorState?.retryFn}
+                onCancel={saveErrorState?.rollbackFn}
+                onClose={() => setSaveErrorState({ error: false })}
+                open={saveErrorState?.error}
+            />
+            <UserFeedbackDialog />
+            {children}
         </BehandlingContext.Provider>
     );
 }

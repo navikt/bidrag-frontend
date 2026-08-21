@@ -13,7 +13,7 @@ import {
 import { capitalize, ObjectUtils } from "@bidrag/common";
 import { ArrowUndoIcon, FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { Box, Button, Heading, HStack, ReadMore, Table, Tag, VStack } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { FormControlledMonthPicker } from "../../../../common/components/formFields/FormControlledMonthPicker";
@@ -371,7 +371,7 @@ const SivilistandPerioder = ({ virkningstidspunkt }: { virkningstidspunkt: Date 
     return (
         <div>
             <Box padding="space-12" background="neutral-soft" className="overflow-hidden">
-                {valideringsfeilSivilstand && valideringsfeilSivilstand.harFeil && (
+                {valideringsfeilSivilstand?.harFeil && (
                     <div className="mb-4">
                         {valideringsfeilSivilstand && (
                             <BehandlingAlert variant="warning">
@@ -557,7 +557,7 @@ const Opplysninger = () => {
                     {opplysninger.map((periode, index) => (
                         <Table.Row key={`${periode.type}-${index}`}>
                             <Table.DataCell className="flex justify-start gap-2">
-                                <>{periode.gyldigFom ? DateToDDMMYYYYString(new Date(periode.gyldigFom)) : "\u00A0"}</>
+                                {periode.gyldigFom ? DateToDDMMYYYYString(new Date(periode.gyldigFom)) : "\u00A0"}
                             </Table.DataCell>
                             <Table.DataCell>{capitalize(periode.type)?.replaceAll("_", " ")}</Table.DataCell>
                         </Table.Row>
@@ -666,9 +666,7 @@ function NyOpplysningerFraFolkeregistreTabell({ onActivateOpplysninger }: NyOppl
                 <tbody>
                     {ikkeAktiverteOpplysninger.sivilstand?.map((periode, index) => (
                         <tr key={index + periode.datoFom}>
-                            <td width="100px" scope="row">
-                                {DateToDDMMYYYYString(new Date(periode.datoFom))}
-                            </td>
+                            <td width="100px">{DateToDDMMYYYYString(new Date(periode.datoFom))}</td>
                             <td width="100px">
                                 {" "}
                                 {periode.datoTom ? DateToDDMMYYYYString(new Date(periode.datoTom)) : ""}

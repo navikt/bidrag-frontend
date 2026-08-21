@@ -661,38 +661,34 @@ const InntektMenuButton = ({
                                     />
                                 </>
                             ) : (
-                                <>
-                                    <MenuButton
-                                        title={text.title.skattepliktigeogPensjonsgivendeInntekt}
-                                        onStepChange={() =>
-                                            onStepChange(
-                                                STEPS[BarnebidragStepper.INNTEKT],
-                                                {
-                                                    [behandlingQueryKeys.tab]: inntektRolle.gjelder.id.toString(),
-                                                },
-                                                elementIds.seksjon_inntekt_skattepliktig,
-                                            )
-                                        }
-                                        interactive={interactive}
-                                        size="small"
-                                        active={
-                                            activeButton ===
-                                            `${BarnebidragStepper.INNTEKT}.${inntektRolle.gjelder.id.toString()}`
-                                        }
-                                        valideringsfeil={
-                                            !lesemodus &&
-                                            checkForValidationErrors(
-                                                inntektRolle.inntekter?.valideringsfeil?.årsinntekter,
-                                            )
-                                        }
-                                        unconfirmedUpdates={
-                                            !lesemodus &&
-                                            ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.årsinntekter?.some(
-                                                (inntekt) => inntekt.ident === inntektRolle.gjelder.ident,
-                                            )
-                                        }
-                                    />
-                                </>
+                                <MenuButton
+                                    title={text.title.skattepliktigeogPensjonsgivendeInntekt}
+                                    onStepChange={() =>
+                                        onStepChange(
+                                            STEPS[BarnebidragStepper.INNTEKT],
+                                            {
+                                                [behandlingQueryKeys.tab]: inntektRolle.gjelder.id.toString(),
+                                            },
+                                            elementIds.seksjon_inntekt_skattepliktig,
+                                        )
+                                    }
+                                    interactive={interactive}
+                                    size="small"
+                                    active={
+                                        activeButton ===
+                                        `${BarnebidragStepper.INNTEKT}.${inntektRolle.gjelder.id.toString()}`
+                                    }
+                                    valideringsfeil={
+                                        !lesemodus &&
+                                        checkForValidationErrors(inntektRolle.inntekter?.valideringsfeil?.årsinntekter)
+                                    }
+                                    unconfirmedUpdates={
+                                        !lesemodus &&
+                                        ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.årsinntekter?.some(
+                                            (inntekt) => inntekt.ident === inntektRolle.gjelder.ident,
+                                        )
+                                    }
+                                />
                             )
                         }
                     />
@@ -877,7 +873,7 @@ export const BarnebidragSideMenu = () => {
         if (!tab) return;
 
         const tabId = parseInt(tab, 10);
-        if (isNaN(tabId)) return;
+        if (Number.isNaN(tabId)) return;
 
         const rolle = roller.find((r) => r.id === tabId && r.rolletype === Rolletype.BA);
         if (!rolle?.saksnummer || rolle.saksnummer === selectedSaksnummer) return;
@@ -889,16 +885,15 @@ export const BarnebidragSideMenu = () => {
         <div className="flex flex-col">
             <SideMenu
                 otherChildren={
-                    <>
-                        {lesemodus && !erVedtakFattet && (
-                            <Alert inline variant="info" size="small" className="mt-2">
-                                <Heading level="3" size="xsmall">
-                                    Lesemodus
-                                </Heading>
-                                Behandlingen vises i lesemodus og kan derfor ikke endres
-                            </Alert>
-                        )}
-                    </>
+                    lesemodus &&
+                    !erVedtakFattet && (
+                        <Alert inline variant="info" size="small" className="mt-2">
+                            <Heading level="3" size="xsmall">
+                                Lesemodus
+                            </Heading>
+                            Behandlingen vises i lesemodus og kan derfor ikke endres
+                        </Alert>
+                    )
                 }
             >
                 {sideMenu

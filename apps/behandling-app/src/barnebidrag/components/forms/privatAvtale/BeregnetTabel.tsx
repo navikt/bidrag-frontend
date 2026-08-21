@@ -1,6 +1,5 @@
 import type { BeregnetPrivatAvtalePeriodeDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { BodyShort, Table } from "@navikt/ds-react";
-import React from "react";
 import text from "../../../../common/constants/texts";
 import { DateToDDMMYYYYString, dateOrNull, deductDays } from "../../../../utils/date-utils";
 import { formatterBeløpForBeregning, formatterProsent } from "../../../../utils/number-utils";

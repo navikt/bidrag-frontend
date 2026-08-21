@@ -2,7 +2,7 @@ import { Inntektstype, Kilde } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils } from "@bidrag/common";
 import { HourglassBottomFilledIcon, SackKronerFillIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, Checkbox, Heading, HStack, Table } from "@navikt/ds-react";
-import React, { type BaseSyntheticEvent, useState } from "react";
+import { type BaseSyntheticEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import elementId from "../../constants/elementIds";
 import text from "../../constants/texts";

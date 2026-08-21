@@ -1,5 +1,5 @@
 import { BodyLong, Modal } from "@navikt/ds-react";
-import React, { forwardRef, type MutableRefObject, type ReactNode } from "react";
+import { forwardRef, type MutableRefObject, type ReactNode } from "react";
 
 export const ConfirmationModal = forwardRef(
     (

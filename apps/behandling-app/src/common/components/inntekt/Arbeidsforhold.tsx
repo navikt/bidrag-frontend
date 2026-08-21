@@ -1,7 +1,6 @@
 import type { ArbeidsforholdGrunnlagDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { capitalize } from "@bidrag/common";
 import { Label } from "@navikt/ds-react";
-import React from "react";
 import { ISODateTimeStringToDDMMYYYYString } from "../../../utils/date-utils";
 import text from "../../constants/texts";
 import { useGetArbeidsforhold } from "../../hooks/useApiData";
@@ -82,7 +81,7 @@ function mapToTabledata(arbeidsforhold: ArbeidsforholdGrunnlagDto): Arbeidsforho
                 : "-",
         stillingsprosent:
             sisteAnsettelsesDetalj?.avtaltStillingsprosent != null
-                ? sisteAnsettelsesDetalj.avtaltStillingsprosent + "%"
+                ? `${sisteAnsettelsesDetalj.avtaltStillingsprosent}%`
                 : "-",
     };
 }

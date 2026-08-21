@@ -3,7 +3,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { isValidDate } from "@bidrag/common";
 import { TrashIcon } from "@navikt/aksel-icons";
 import { Box, Button, Radio, RadioGroup, Search, TextField, VStack } from "@navikt/ds-react";
-import React, { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { type UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { toISODateString } from "../../../utils/date-utils";
 import { removePlaceholder } from "../../../utils/string-utils";

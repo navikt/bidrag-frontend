@@ -1,5 +1,4 @@
 import { BodyShort, ExpansionCard } from "@navikt/ds-react";
-import React from "react";
 import text from "../../constants/texts";
 import { useGetBehandlingV2 } from "../../hooks/useApiData";
 import { BehandlingAlert } from "../BehandlingAlert";

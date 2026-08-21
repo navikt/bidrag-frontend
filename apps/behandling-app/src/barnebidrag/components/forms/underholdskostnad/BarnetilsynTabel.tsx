@@ -6,7 +6,6 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils } from "@bidrag/common";
 import { BodyShort, Box, Heading, HStack, Table } from "@navikt/ds-react";
-import React from "react";
 import { useFormContext } from "react-hook-form";
 import { FormControlledSelectField } from "../../../../common/components/formFields/FormControlledSelectField";
 import LeggTilPeriodeButton from "../../../../common/components/formFields/FormLeggTilPeriode";

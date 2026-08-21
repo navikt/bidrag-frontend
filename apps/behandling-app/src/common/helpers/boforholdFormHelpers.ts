@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: forEach-callbacks returnerer verdi fra en kjedet operasjon, returverdien brukes ikke */
 import {
     type BoforholdDtoV2,
     Bostatuskode,

@@ -1,6 +1,6 @@
 import { TrashIcon } from "@navikt/aksel-icons";
 import { Button, Heading } from "@navikt/ds-react";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import text from "../../constants/texts";
 import { ConfirmationModal } from "../modal/ConfirmationModal";
 

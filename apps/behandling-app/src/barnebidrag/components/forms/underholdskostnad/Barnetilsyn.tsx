@@ -2,7 +2,7 @@ import { Kilde } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils, PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Heading, Switch } from "@navikt/ds-react";
-import React, { type ChangeEvent, useRef } from "react";
+import { type ChangeEvent, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { FormControlledMonthPicker } from "../../../../common/components/formFields/FormControlledMonthPicker";
@@ -157,50 +157,48 @@ export const RolleInfoBox = ({
 
     return (
         underhold && (
-            <>
-                <div className="grid grid-cols-[max-content_auto] items-center p-2 bg-[white] border border-solid border-[var(--ax-border-neutral)]">
-                    <div className="flex">
-                        {underhold.gjelderBarn.medIBehandlingen && (
-                            <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={underhold.gjelderBarn.ident} />
-                        )}
-                        <PersonNavnIdent
-                            ident={underhold.gjelderBarn.ident}
-                            navn={underhold.gjelderBarn.navn}
-                            fødselsdato={underhold.gjelderBarn.fødselsdato}
-                        />
-                    </div>
-                    {!underhold.gjelderBarn.medIBehandlingen &&
-                        underhold.gjelderBarn.kilde &&
-                        underhold.gjelderBarn.kilde === Kilde.MANUELL && (
-                            <>
-                                <div className="flex items-center justify-end">
-                                    <DeleteButton onDelete={() => ref.current?.showModal()} />
-                                </div>
-                                <ConfirmationModal
-                                    ref={ref}
-                                    closeable
-                                    description={text.varsel.ønskerDuÅSletteBarnet}
-                                    heading={<Heading size="small">{text.varsel.ønskerDuÅSlette}</Heading>}
-                                    footer={
-                                        <>
-                                            <Button type="button" onClick={onConfirm} size="small">
-                                                {text.label.jaSlett}
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                variant="secondary"
-                                                size="small"
-                                                onClick={() => ref.current?.close()}
-                                            >
-                                                {text.label.avbryt}
-                                            </Button>
-                                        </>
-                                    }
-                                />
-                            </>
-                        )}
+            <div className="grid grid-cols-[max-content_auto] items-center p-2 bg-[white] border border-solid border-[var(--ax-border-neutral)]">
+                <div className="flex">
+                    {underhold.gjelderBarn.medIBehandlingen && (
+                        <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={underhold.gjelderBarn.ident} />
+                    )}
+                    <PersonNavnIdent
+                        ident={underhold.gjelderBarn.ident}
+                        navn={underhold.gjelderBarn.navn}
+                        fødselsdato={underhold.gjelderBarn.fødselsdato}
+                    />
                 </div>
-            </>
+                {!underhold.gjelderBarn.medIBehandlingen &&
+                    underhold.gjelderBarn.kilde &&
+                    underhold.gjelderBarn.kilde === Kilde.MANUELL && (
+                        <>
+                            <div className="flex items-center justify-end">
+                                <DeleteButton onDelete={() => ref.current?.showModal()} />
+                            </div>
+                            <ConfirmationModal
+                                ref={ref}
+                                closeable
+                                description={text.varsel.ønskerDuÅSletteBarnet}
+                                heading={<Heading size="small">{text.varsel.ønskerDuÅSlette}</Heading>}
+                                footer={
+                                    <>
+                                        <Button type="button" onClick={onConfirm} size="small">
+                                            {text.label.jaSlett}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            size="small"
+                                            onClick={() => ref.current?.close()}
+                                        >
+                                            {text.label.avbryt}
+                                        </Button>
+                                    </>
+                                }
+                            />
+                        </>
+                    )}
+            </div>
         )
     );
 };

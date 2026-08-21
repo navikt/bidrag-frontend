@@ -1,5 +1,5 @@
 import { Loader } from "@navikt/ds-react";
-import React, { memo, Suspense } from "react";
+import { memo, Suspense } from "react";
 import { BidragProgressbar } from "../../../barnebidrag/components/BidragProgressbar";
 import text from "../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../common/context/BehandlingContext";

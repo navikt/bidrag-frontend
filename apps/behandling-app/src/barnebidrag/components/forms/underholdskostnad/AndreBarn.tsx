@@ -2,7 +2,7 @@ import { type BarnDto, SletteUnderholdselementTypeEnum } from "@bidrag/api/Bidra
 import { RolleTypeAbbreviation } from "@bidrag/common";
 import { PlusIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Heading } from "@navikt/ds-react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { AddBarnForm } from "../../../../common/components/AddBarnForm";
 import StatefulAlert from "../../../../common/components/StatefulAlert";

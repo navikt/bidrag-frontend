@@ -14,7 +14,7 @@ export default function ForholdsmessigFordelingInfo() {
     const erLesemodusVedtak = lesemodus?.fattetTidspunkt !== undefined;
     return (
         <>
-            <Dialog open={modalOpen} onOpenChange={setModalOpen} aria-label="">
+            <Dialog open={modalOpen} onOpenChange={setModalOpen} aria-label="Forholdsmessig fordeling detaljer">
                 <Dialog.Popup className="w-fit" position="center">
                     <Dialog.Header>Forholdsmessig fordeling detaljer</Dialog.Header>
                     <Dialog.Body className="min-w-[700px]">

@@ -1,7 +1,7 @@
 import { LocalStorage } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Alert, Button, Heading } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FloatingBottomToolbar } from "../../../common/components/FloatingBottomToolbar";
 import { NavigationLoaderWrapper } from "../../../common/components/NavigationLoaderWrapper";
 import elementIds from "../../../common/constants/elementIds";
@@ -109,7 +109,7 @@ function BrukerveiledningKnapp() {
                 icon={<ExternalLinkIcon />}
                 onClick={() => {
                     // faro.api.pushEvent("click.button.brukerveiledning", { type: TypeBehandling.FORSKUDD });
-                    window.open(environment.url.forskuddBrukerveiledning + "#" + renderHref(), "_blank");
+                    window.open(`${environment.url.forskuddBrukerveiledning}#${renderHref()}`, "_blank");
                 }}
             >
                 Brukerveiledning

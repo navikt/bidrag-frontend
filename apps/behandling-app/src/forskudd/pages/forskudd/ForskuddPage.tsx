@@ -2,7 +2,7 @@ import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { BidragContainer, LocalStorage } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Alert, Button, Heading, Stepper } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FlexRow } from "../../../common/components/layout/grid/FlexRow";
 import { NavigationLoaderWrapper } from "../../../common/components/NavigationLoaderWrapper";
 import elementIds from "../../../common/constants/elementIds";
@@ -150,7 +150,7 @@ function BrukerveiledningKnapp() {
                 } `}
                 size="xsmall"
                 icon={<ExternalLinkIcon />}
-                onClick={() => window.open(environment.url.forskuddBrukerveiledning + "#" + renderHref(), "_blank")}
+                onClick={() => window.open(`${environment.url.forskuddBrukerveiledning}#${renderHref()}`, "_blank")}
             >
                 Brukerveiledning
             </Button>

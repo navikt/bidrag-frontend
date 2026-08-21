@@ -2,7 +2,7 @@ import { type ResultatBeregningBarnDto, type ResultatRolle, Vedtakstype } from "
 import { dateToDDMMYYYYString, PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { Alert, Heading, Table } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { VedtakProvider } from "../../../../barnebidrag/components/vedtak/VedtakCommon";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
 import { AdminButtons } from "../../../../common/components/vedtak/AdminButtons";

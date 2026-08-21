@@ -1,5 +1,4 @@
 import { BodyShort, Heading } from "@navikt/ds-react";
-import React from "react";
 import { DateToDDMMYYYYHHMMString, dateOrNull } from "../../../utils/date-utils";
 import text from "../../constants/texts";
 import { useGetBehandlingV2 } from "../../hooks/useApiData";

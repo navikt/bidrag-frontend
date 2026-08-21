@@ -2,13 +2,13 @@ import { IdentUtils } from "@navikt/bidrag-ui-common";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { FlagProvider, IConfig } from "@unleash/proxy-client-react";
+import { FlagProvider, type IConfig } from "@unleash/proxy-client-react";
 import { expect } from "chai";
 import { describe } from "mocha";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import origFetch from "node-fetch";
-import React, { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { BrowserRouter } from "react-router-dom";
 import sinon from "sinon";
 
@@ -43,10 +43,10 @@ const renderWithRouter = (ui, { route = "/" } = {}) => {
 };
 
 const server = setupServer(
-    rest.post(`http://localhost/token`, (req, res, ctx) => {
+    rest.post(`http://localhost/token`, (_req, res, ctx) => {
         return res(ctx.text("123334343"));
     }),
-    rest.get(`http://localhost/unleash`, (req, res, ctx) => {
+    rest.get(`http://localhost/unleash`, (_req, res, ctx) => {
         return res(
             ctx.set("Content-Type", "application/json"),
             ctx.body(
@@ -80,59 +80,59 @@ const server = setupServer(
                             impressionData: true,
                         },
                     ],
-                })
-            )
+                }),
+            ),
         );
     }),
-    rest.options(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId`, (req, res, ctx) => {
+    rest.options(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId`, (_req, res, ctx) => {
         return res(ctx.set({ "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Origin": "*" }));
     }),
-    rest.options(`${environment.url.bidragBehandling}/api/v2/behandling/:behandlingId`, (req, res, ctx) => {
+    rest.options(`${environment.url.bidragBehandling}/api/v2/behandling/:behandlingId`, (_req, res, ctx) => {
         return res(ctx.set({ "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Origin": "*" }));
     }),
     rest.options(
         `${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId/virkningstidspunkt`,
-        (req, res, ctx) => {
+        (_req, res, ctx) => {
             return res(ctx.set({ "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Origin": "*" }));
-        }
+        },
     ),
-    rest.options(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId/boforhold`, (req, res, ctx) => {
+    rest.options(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId/boforhold`, (_req, res, ctx) => {
         return res(ctx.set({ "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Origin": "*" }));
     }),
-    rest.get(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId/boforhold`, (req, res, ctx) => {
+    rest.get(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId/boforhold`, (_req, res, ctx) => {
         return res(
             ctx.set({
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type": "application/json",
             }),
-            ctx.body(JSON.stringify(boforholdData))
+            ctx.body(JSON.stringify(boforholdData)),
         );
     }),
-    rest.get(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId`, (req, res, ctx) => {
+    rest.get(`${environment.url.bidragBehandling}/api/v1/behandling/:behandlingId`, (_req, res, ctx) => {
         return res(
             ctx.set({
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type": "application/json",
             }),
-            ctx.body(JSON.stringify(behandlingMockApiData))
+            ctx.body(JSON.stringify(behandlingMockApiData)),
         );
     }),
-    rest.get(`${environment.url.bidragBehandling}/api/v2/behandling/:behandlingId`, (req, res, ctx) => {
+    rest.get(`${environment.url.bidragBehandling}/api/v2/behandling/:behandlingId`, (_req, res, ctx) => {
         return res(
             ctx.set({
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type": "application/json",
             }),
-            ctx.body(JSON.stringify(behandlingMockApiData))
+            ctx.body(JSON.stringify(behandlingMockApiData)),
         );
     }),
-    rest.options(`${environment.url.bidragPerson}/informasjon`, (req, res, ctx) => {
+    rest.options(`${environment.url.bidragPerson}/informasjon`, (_req, res, ctx) => {
         return res(ctx.set({ "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Origin": "*" }));
     }),
-    rest.post(`${environment.url.bidragPerson}/informasjon`, (req, res, ctx) => {
+    rest.post(`${environment.url.bidragPerson}/informasjon`, (_req, res, ctx) => {
         return res(
             ctx.set({
                 "Access-Control-Allow-Headers": "*",
@@ -153,10 +153,10 @@ const server = setupServer(
                     aktoerId: "2601080498043",
                     kortnavn: "Kognitiv Forsikring",
                     kortNavn: "Kognitiv Forsikring",
-                })
-            )
+                }),
+            ),
         );
-    })
+    }),
 );
 
 before(() => {
@@ -178,7 +178,7 @@ describe("ForskuddPage", () => {
                     <ForskuddPage />
                 </ForskuddBehandlingProviderWrapper>
             </QueryClientProvider>,
-            { route: "/forskudd/1?steg=virkningstidspunkt" }
+            { route: "/forskudd/1?steg=virkningstidspunkt" },
         );
 
         await waitFor(() => {
@@ -194,7 +194,7 @@ describe("ForskuddPage", () => {
                     <ForskuddPage />
                 </ForskuddBehandlingProviderWrapper>
             </QueryClientProvider>,
-            { route: "/forskudd/1?steg=boforhold" }
+            { route: "/forskudd/1?steg=boforhold" },
         );
 
         await waitFor(() => {
@@ -210,7 +210,7 @@ describe("ForskuddPage", () => {
                     <ForskuddPage />
                 </ForskuddBehandlingProviderWrapper>
             </QueryClientProvider>,
-            { route: "/forskudd/1?steg=vedtak" }
+            { route: "/forskudd/1?steg=vedtak" },
         );
 
         await waitFor(() => {

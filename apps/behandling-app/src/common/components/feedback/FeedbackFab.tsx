@@ -39,7 +39,7 @@ const FeedbackFab = () => {
             const target = e.target as Element;
 
             // Check if click is inside the fab button
-            if (fabElement && fabElement.contains(target)) {
+            if (fabElement?.contains(target)) {
                 return;
             }
 
@@ -97,7 +97,7 @@ const FeedbackFab = () => {
     return (
         <Box ref={node} id="feedbackFab" shadow="dialog" className="FeedbackFab">
             {!isAnswered && (
-                <button onClick={toggleIsOpen} className="FeedbackFab__button">
+                <button type="button" onClick={toggleIsOpen} className="FeedbackFab__button">
                     <VStack align="center">
                         <BodyShort size="small" className="FeedbackFab__button-text">
                             Gi tilbakemelding

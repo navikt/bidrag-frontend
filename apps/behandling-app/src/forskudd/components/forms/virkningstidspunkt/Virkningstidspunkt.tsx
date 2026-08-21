@@ -9,7 +9,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, toISODateString } from "@bidrag/common";
 import { BodyShort, Label, Tabs } from "@navikt/ds-react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { useSearchParams } from "react-router";
 import { useGetActiveAndDefaultVirkningstidspunktTab } from "../../../../barnebidrag/hooks/useGetActiveAndDefaultVirkningstidspunktTab";
@@ -293,15 +293,12 @@ const VirkningstidspunktRolle = ({
                                     {hentVisningsnavnVedtakstype(value, behandling.vedtakstype)}
                                 </option>
                             ))}
-                            {avslagsListeDeprekert.includes(getValues(`roller.${rolleIndex}.årsakAvslag`)) && (
-                                <>
-                                    {avslagsListeDeprekert.map((value) => (
-                                        <option key={value} value={value} disabled>
-                                            {hentVisningsnavnVedtakstype(value, behandling.vedtakstype)}
-                                        </option>
-                                    ))}
-                                </>
-                            )}
+                            {avslagsListeDeprekert.includes(getValues(`roller.${rolleIndex}.årsakAvslag`)) &&
+                                avslagsListeDeprekert.map((value) => (
+                                    <option key={value} value={value} disabled>
+                                        {hentVisningsnavnVedtakstype(value, behandling.vedtakstype)}
+                                    </option>
+                                ))}
                         </optgroup>
                     )}
                 </FormControlledSelectField>
@@ -518,17 +515,15 @@ const VirkningstidspunktForm = () => {
     }, [JSON.stringify(useFormMethods.formState.errors)]);
 
     return (
-        <>
-            <FormProvider {...useFormMethods}>
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <NewFormLayout
-                        title={text.label.virkningstidspunkt}
-                        main={<Main initialValues={initialValues} />}
-                        side={<Side />}
-                    />
-                </form>
-            </FormProvider>
-        </>
+        <FormProvider {...useFormMethods}>
+            <form onSubmit={(e) => e.preventDefault()}>
+                <NewFormLayout
+                    title={text.label.virkningstidspunkt}
+                    main={<Main initialValues={initialValues} />}
+                    side={<Side />}
+                />
+            </form>
+        </FormProvider>
     );
 };
 

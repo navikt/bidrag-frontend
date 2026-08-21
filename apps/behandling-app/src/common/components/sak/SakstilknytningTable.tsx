@@ -129,11 +129,9 @@ export default function SakstilknytningTable({ gjelderBarnIdent, onClose }: Saks
     function renderTable() {
         if (saker.length === 0) {
             return (
-                <>
-                    <Alert variant="info" size="small" inline className={"no-sak-alert"}>
-                        Bidragspliktig har ingen tilknyttede saker
-                    </Alert>
-                </>
+                <Alert variant="info" size="small" inline className={"no-sak-alert"}>
+                    Bidragspliktig har ingen tilknyttede saker
+                </Alert>
             );
         }
         return (
@@ -213,9 +211,7 @@ function RollerExpandableContent(sak: Sak) {
                                         <span className="ml-2 personnavn">Ingen reell mottaker</span>
                                     </div>
                                 )
-                            ) : (
-                                <></>
-                            )}
+                            ) : null}
                         </div>
                     ))}
             </HGrid>

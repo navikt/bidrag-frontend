@@ -2,7 +2,7 @@ import { MDXProvider, useMDXComponents } from "@mdx-js/react";
 import { ArrowRightIcon, Buildings2Icon, PersonIcon, SackKronerFillIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Heading, Label } from "@navikt/ds-react";
 import { useThemedStylesWithMdx } from "@theme-ui/mdx";
-import React, { type PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { type Theme, ThemeUIProvider } from "theme-ui";
 
 import { AdminPanelFloatingButton } from "../barnebidrag/admin/AdminPanel";
@@ -75,13 +75,11 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
     const componentsWithStyles = useThemedStylesWithMdx(useMDXComponents());
     useTracker();
     return (
-        <>
-            <ThemeUIProvider theme={theme}>
-                <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>
-                    <div className={name}>{children}</div>
-                </MDXProvider>
-                <AdminPanelFloatingButton />
-            </ThemeUIProvider>
-        </>
+        <ThemeUIProvider theme={theme}>
+            <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>
+                <div className={name}>{children}</div>
+            </MDXProvider>
+            <AdminPanelFloatingButton />
+        </ThemeUIProvider>
     );
 }

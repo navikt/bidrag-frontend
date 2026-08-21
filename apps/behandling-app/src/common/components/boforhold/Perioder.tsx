@@ -11,7 +11,7 @@ import {
 import { ObjectUtils } from "@bidrag/common";
 import { ArrowUndoIcon, FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { Button, Heading, Table } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import type { RelaxSpecTypes } from "../../../types/apiSpecFix";
 import { DateToDDMMYYYYString, dateOrNull, formatDateToYearMonth, isAfterEqualsDate } from "../../../utils/date-utils";
@@ -483,7 +483,7 @@ export const Perioder = ({ barnIndex }: { barnIndex: number }) => {
                 <StatefulAlert
                     variant="info"
                     size="small"
-                    alertKey={"18åralert" + behandlingId + barn.ident}
+                    alertKey={`18åralert${behandlingId}${barn.ident}`}
                     className="w-[708px]"
                     closeButton
                 >

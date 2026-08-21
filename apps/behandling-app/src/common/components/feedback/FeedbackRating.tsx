@@ -11,7 +11,7 @@ interface FeedbackRatingProps {
 
 const FeedbackRating = ({ name, selected, handleChange }: FeedbackRatingProps) => {
     return (
-        <section className={"FeedbackRating" + (selected === "-1" ? " not-started" : "")}>
+        <section className={`FeedbackRating${selected === "-1" ? " not-started" : ""}`}>
             <RatingOption
                 value="1"
                 src={smilies.veldigMisfornoyd}

@@ -6,7 +6,6 @@ import {
     type InntektValideringsfeil,
     type InntektValideringsfeilV2Dto,
     Kilde,
-    OppdatereManuellInntekt,
     Rolletype,
     TypeBehandling,
 } from "@bidrag/api/BidragBehandlingApiV1";

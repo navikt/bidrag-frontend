@@ -322,17 +322,15 @@ function PrivatAvtaleAnnenBarnDetaljer({
 }
 export const RolleInfoBox = ({ item }: { item: PrivatAvtaleFormValue }) => {
     return (
-        <>
-            <div className="grid grid-cols-[max-content_auto] items-center p-2 bg-[white] border border-solid border-[var(--ax-border-neutral)]">
-                <div className="flex">
-                    <PersonNavnIdent
-                        ident={item.gjelderBarn.ident}
-                        navn={item.gjelderBarn.navn}
-                        fødselsdato={item.gjelderBarn.fødselsdato}
-                        visAlder
-                    />
-                </div>
+        <div className="grid grid-cols-[max-content_auto] items-center p-2 bg-[white] border border-solid border-[var(--ax-border-neutral)]">
+            <div className="flex">
+                <PersonNavnIdent
+                    ident={item.gjelderBarn.ident}
+                    navn={item.gjelderBarn.navn}
+                    fødselsdato={item.gjelderBarn.fødselsdato}
+                    visAlder
+                />
             </div>
-        </>
+        </div>
     );
 };

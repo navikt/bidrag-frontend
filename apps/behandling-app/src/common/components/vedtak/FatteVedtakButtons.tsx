@@ -105,7 +105,7 @@ export const FatteVedtakButtons = ({
                 >
                     <option value="">Ikke utsett</option>
                     {utsettDagerListe.map((dager, index) => (
-                        <option value={dager} key={dager + "-" + index}>
+                        <option value={dager} key={`${dager}-${index}`}>
                             {dager} dager
                         </option>
                     ))}

@@ -1,6 +1,6 @@
 import type { InntektDtoV2 } from "@bidrag/api/BidragBehandlingApiV1";
 import { BodyShort, Box, Label } from "@navikt/ds-react";
-import React, { memo, useState } from "react";
+import { memo, useState } from "react";
 import { datesAreFromSameMonthAndYear, deductMonths, getAListOfMonthsFromDate } from "../../../utils/date-utils";
 import { capitalize } from "../../../utils/string-utils";
 import text from "../../constants/texts";

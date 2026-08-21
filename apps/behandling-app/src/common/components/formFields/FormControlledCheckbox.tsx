@@ -1,5 +1,5 @@
 import { Checkbox } from "@navikt/ds-react";
-import React, { type BaseSyntheticEvent } from "react";
+import type { BaseSyntheticEvent } from "react";
 import { useController, useFormContext } from "react-hook-form";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 

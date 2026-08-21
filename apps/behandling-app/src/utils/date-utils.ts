@@ -52,7 +52,7 @@ export const deductMonthsIgnoreday = (date: Date, months: number) => {
 export const lastDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0);
 export const firstDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1);
 export const isValidDate = (date: unknown | Date): boolean =>
-    !!(date && date instanceof Date && isFinite(date.getTime()));
+    !!(date && date instanceof Date && Number.isFinite(date.getTime()));
 
 export const toDateString = (date: Date) => date.toLocaleDateString("no-NO", { dateStyle: "short" });
 
@@ -159,12 +159,12 @@ export const isBeforeOrEqualsDate = (date: Date | string, comparedWith: Date | s
 };
 export const getYearFromDate = (date?: Date | string): number | undefined => {
     if (!date) return;
-    if (typeof date == "string") return new Date(date).getFullYear();
+    if (typeof date === "string") return new Date(date).getFullYear();
     return date.getFullYear();
 };
 export const dateToMMYYYY = (date?: Date | string): string | undefined => {
     if (!date) return;
-    if (typeof date == "string")
+    if (typeof date === "string")
         return new Date(date).toLocaleDateString("nb-NB", { month: "2-digit", year: "numeric" });
     return date.toLocaleDateString("nb-NB", { month: "2-digit", year: "numeric" });
 };

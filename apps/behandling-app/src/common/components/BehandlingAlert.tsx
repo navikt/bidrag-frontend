@@ -7,7 +7,7 @@ type ForskuddAlertProps = {
 
 export const BehandlingAlert = ({ children, ...alertProps }: ForskuddAlertProps & AlertProps) => {
     return (
-        <Alert {...alertProps} size="small" className={"w-[708px] ax-sm:max-w-[688px] " + (alertProps.className ?? "")}>
+        <Alert {...alertProps} size="small" className={`w-[708px] ax-sm:max-w-[688px] ${alertProps.className ?? ""}`}>
             {children}
         </Alert>
     );

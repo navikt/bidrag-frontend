@@ -1,5 +1,3 @@
-import React from "react";
-
 import { useHentPersonData } from "../hooks/useApiData";
 
 export const PersonNavn = ({ ident, navn, bold }: { ident?: string; navn?: string; bold?: boolean }) => {

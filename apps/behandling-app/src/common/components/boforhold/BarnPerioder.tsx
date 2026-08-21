@@ -1,7 +1,7 @@
 import { Kilde, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { Box, Button, Heading } from "@navikt/ds-react";
-import React, { Fragment, useState } from "react";
+import { Fragment, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import elementIds from "../../constants/elementIds";
 import text from "../../constants/texts";

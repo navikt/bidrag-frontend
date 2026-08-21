@@ -1,5 +1,5 @@
 import { BodyLong, BodyShort, Label } from "@navikt/ds-react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { reformatText } from "../components/CustomEditor";
 import { CustomQuillEditor } from "../components/CustomQuillEditor";

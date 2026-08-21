@@ -6,7 +6,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { RolleTypeAbbreviation } from "@bidrag/common";
 import { BodyShort, Tabs } from "@navikt/ds-react";
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";

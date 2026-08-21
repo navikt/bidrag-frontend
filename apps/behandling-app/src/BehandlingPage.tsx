@@ -18,7 +18,7 @@ import { NewForskuddPage } from "./forskudd/pages/forskudd/NewForskuddPage";
 import { SærligeugifterProviderWrapper } from "./særbidrag/context/SærligeugifterProviderWrapper";
 import { NewSærbidragPage } from "./særbidrag/pages/NewSaerbidragPage";
 import { SærbidragPage } from "./særbidrag/pages/SærbidragPage";
-import "./styles.css"
+import "./styles.css";
 export type BehandlingPageProps = {
     behandlingId?: string;
     vedtakId?: string;

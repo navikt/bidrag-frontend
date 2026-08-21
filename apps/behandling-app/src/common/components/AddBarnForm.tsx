@@ -2,7 +2,7 @@ import { Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { isValidDate } from "@bidrag/common";
 import { Box, Button, Radio, RadioGroup, Search, Select, Stack, TextField, VStack } from "@navikt/ds-react";
-import React, { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { toISODateString } from "../../utils/date-utils";
 import { removePlaceholder } from "../../utils/string-utils";
 import { PERSON_API } from "../constants/api";

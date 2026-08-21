@@ -5,7 +5,7 @@ import {
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { BodyShort, Heading, Tabs } from "@navikt/ds-react";
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
@@ -117,7 +117,7 @@ const Main = () => {
 
 const Side = () => {
     const { onStepChange, setSaveErrorState, getNextStep, selectedRoller } = useBehandlingProvider();
-    const { erBisysVedtak, inntekterV2: inntektRoller, vedtakstype, stønadstype } = useGetBehandlingV2();
+    const { erBisysVedtak, inntekterV2: inntektRoller, vedtakstype } = useGetBehandlingV2();
     const saveInntektBegrunnelse = useOnSaveInntektBegrunnelse();
     const { watch, getValues, setValue } = useFormContext<InntektFormValues>();
     const visibleInntektRoller = useMemo(() => {

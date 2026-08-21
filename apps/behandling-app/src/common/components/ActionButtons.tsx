@@ -1,7 +1,6 @@
 import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Button, Link } from "@navikt/ds-react";
-import React from "react";
 import { useParams } from "react-router";
 import text from "../constants/texts";
 import { useBehandlingProvider } from "../context/BehandlingContext";

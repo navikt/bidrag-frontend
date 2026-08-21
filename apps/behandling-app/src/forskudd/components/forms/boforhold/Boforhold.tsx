@@ -1,6 +1,6 @@
 import { Rolletype } from "@bidrag/api/BidragDokumentProduksjonApi";
 import { Heading } from "@navikt/ds-react";
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { BarnPerioder } from "../../../../common/components/boforhold/BarnPerioder";
 import { NyOpplysningerAlert } from "../../../../common/components/boforhold/BoforholdOpplysninger";

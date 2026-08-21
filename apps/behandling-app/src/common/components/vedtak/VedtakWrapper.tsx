@@ -313,7 +313,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             });
         }
         if (feilInnhold.husstandsmedlem != null) {
-            feilInnhold.husstandsmedlem.forEach((value) =>
+            feilInnhold.husstandsmedlem.forEach((value) => {
                 feilliste.push(
                     <ErrorSummary.Item
                         href={`#${elementIds.seksjon_boforhold}_${value.barn.husstandsmedlemId}`}
@@ -321,8 +321,8 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                     >
                         Boforhold: Perioder for barn {value.barn.navn}
                     </ErrorSummary.Item>,
-                ),
-            );
+                );
+            });
         }
 
         if (feilInnhold.andreVoksneIHusstanden != null) {
@@ -403,7 +403,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             });
         if (feilliste.length === 0) {
             const feilInnhold =
-                typeof feil.detaljer == "string"
+                typeof feil.detaljer === "string"
                     ? []
                     : Object.keys(feil.detaljer)
                           .filter((key) =>

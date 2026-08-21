@@ -1,5 +1,4 @@
 import type { MutationStatus } from "@tanstack/react-query";
-import React from "react";
 import { useController, useFormContext } from "react-hook-form";
 import { CustomTextareaEditor } from "../CustomEditor";
 

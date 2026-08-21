@@ -1,5 +1,4 @@
 import { isValidDate } from "@bidrag/common";
-import React from "react";
 import { dateOrNull } from "../../utils/date-utils";
 
 import text from "../constants/texts";

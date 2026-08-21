@@ -1,7 +1,7 @@
 import { LoggerService } from "@bidrag/common";
 import { Alert, BodyShort, Button, Heading, Loader } from "@navikt/ds-react";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import text from "../../constants/texts";

@@ -1,7 +1,6 @@
 import { Rolletype, Stonadstype, TypeBehandling } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { Box, Heading, Table } from "@navikt/ds-react";
-import React from "react";
 import { hasValue } from "../../../utils/array-utils";
 import { DateToDDMMYYYYString, dateOrNull, deductDays } from "../../../utils/date-utils";
 import text from "../../constants/texts";

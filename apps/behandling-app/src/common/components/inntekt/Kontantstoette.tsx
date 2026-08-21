@@ -1,7 +1,6 @@
 import { Inntektsrapportering, Kilde, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { Box, Heading, Table } from "@navikt/ds-react";
-import React from "react";
 import elementId from "../../constants/elementIds";
 import text from "../../constants/texts";
 import { useGetBehandlingV2 } from "../../hooks/useApiData";
@@ -110,7 +109,7 @@ export const Kontantstøtte = () => {
                                                 <Table.Body>
                                                     {controlledFields.map((item, index) => (
                                                         <Table.ExpandableRow
-                                                            key={item?.id + "-" + item.gjelderRolleId}
+                                                            key={`${item?.id}-${item.gjelderRolleId}`}
                                                             content={<ExpandableContent item={item} />}
                                                             togglePlacement="right"
                                                             className="align-top"

@@ -1,6 +1,5 @@
 import { Inntektsrapportering, Kilde } from "@bidrag/api/BidragBehandlingApiV1";
 import { Box, Heading, Table } from "@navikt/ds-react";
-import React from "react";
 import elementId from "../../constants/elementIds";
 import text from "../../constants/texts";
 import type { InntektFormPeriode } from "../../types/inntektFormValues";

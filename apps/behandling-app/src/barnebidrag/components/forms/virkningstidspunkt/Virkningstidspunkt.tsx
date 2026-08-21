@@ -872,7 +872,7 @@ const VirkningstidspunktBarn = ({
         if (!confirmationModal.open) return null;
         return (
             <Modal
-                aria-label=""
+                aria-label="Bekreft endring av årsak"
                 onClose={() => onAarsakSelect(confirmationModal.previousÅrsakAvslag)}
                 open={confirmationModal != null}
             >
@@ -931,15 +931,12 @@ const VirkningstidspunktBarn = ({
                                 {hentVisningsnavnVedtakstype(value, vedtakstype)}
                             </option>
                         ))}
-                        {avslagsListeDeprekert.includes(getValues(`roller.${barnIndex}.årsakAvslag`)) && (
-                            <>
-                                {avslagsListeDeprekert.map((value) => (
-                                    <option key={value} value={value} disabled>
-                                        {hentVisningsnavnVedtakstype(value, vedtakstype)}
-                                    </option>
-                                ))}
-                            </>
-                        )}
+                        {avslagsListeDeprekert.includes(getValues(`roller.${barnIndex}.årsakAvslag`)) &&
+                            avslagsListeDeprekert.map((value) => (
+                                <option key={value} value={value} disabled>
+                                    {hentVisningsnavnVedtakstype(value, vedtakstype)}
+                                </option>
+                            ))}
                     </optgroup>
                     {((erSøktAVIkkeBM && erTypeOpphør) || harEksisterendeOpphør) && (
                         <optgroup label={text.label.avslag}>
@@ -963,15 +960,12 @@ const VirkningstidspunktBarn = ({
                         </option>
                     ),
                 )}
-                {avslagsListeDeprekert.includes(getValues(`roller.${barnIndex}.årsakAvslag`)) && (
-                    <>
-                        {avslagsListeDeprekert.map((value) => (
-                            <option key={value} value={value} disabled>
-                                {hentVisningsnavnVedtakstype(value, vedtakstype)}
-                            </option>
-                        ))}
-                    </>
-                )}
+                {avslagsListeDeprekert.includes(getValues(`roller.${barnIndex}.årsakAvslag`)) &&
+                    avslagsListeDeprekert.map((value) => (
+                        <option key={value} value={value} disabled>
+                            {hentVisningsnavnVedtakstype(value, vedtakstype)}
+                        </option>
+                    ))}
                 {(erSøktAVIkkeBM && erTypeOpphør ? avvisningsListeOpphør : avvisningsListe).map((value) => (
                     <option key={value} value={value}>
                         {hentVisningsnavnVedtakstype(value, vedtakstype)}
@@ -1103,9 +1097,7 @@ const VirkningstidspunktBarn = ({
             />
 
             {behandling.erKlageEllerOmgjøring && selectedVirkningstidspunkt.avslag == null && (
-                <>
-                    <Beregningsperiode barnIndex={barnIndex} />
-                </>
+                <Beregningsperiode barnIndex={barnIndex} />
             )}
 
             {er18ÅrsBidrag && !erTypeOpphør && !(lesemodus && !item.kanSkriveVurderingAvSkolegang) && (
@@ -1190,56 +1182,54 @@ const BeregnTilVelger = ({ initialValues }) => {
         );
     };
     return (
-        <>
-            <RadioGroup
-                name={`beregnTil.beregnTil`}
-                legend="Velg hvilken periode vedtaket skal vurderes"
-                size="small"
-                onChange={updateBeregnTilDato}
-                readOnly={lesemodus}
-                className="w-[550px] mt-2"
-                defaultValue={getValues("beregnTil")}
+        <RadioGroup
+            name={`beregnTil.beregnTil`}
+            legend="Velg hvilken periode vedtaket skal vurderes"
+            size="small"
+            onChange={updateBeregnTilDato}
+            readOnly={lesemodus}
+            className="w-[550px] mt-2"
+            defaultValue={getValues("beregnTil")}
+        >
+            <Radio
+                value={BeregnTil.OPPRINNELIG_VEDTAKSTIDSPUNKT}
+                description={`Beregn og periodiser til og med måneden opprinnelig vedtak ble fattet. Etterfølgende vedtak vil løpe etter beregningsperioden.`}
             >
-                <Radio
-                    value={BeregnTil.OPPRINNELIG_VEDTAKSTIDSPUNKT}
-                    description={`Beregn og periodiser til og med måneden opprinnelig vedtak ble fattet. Etterfølgende vedtak vil løpe etter beregningsperioden.`}
-                >
-                    Ut måneden opprinnelig vedtak ble fattet
-                </Radio>
-                <Radio
-                    value={BeregnTil.INNEVAeRENDEMANED}
-                    description="Beregn og periodiser ut nåværende måned. Dette vil overskrive perioder fra etterfølgende vedtak"
-                >
-                    Ut nåværende måned
-                </Radio>
-                <Radio
-                    value={BeregnTil.ETTERFOLGENDEMANUELLVEDTAK}
-                    readOnly={virkningstidspunktV3.etterfølgendeVedtak === undefined}
-                    description={
-                        virkningstidspunktV3.etterfølgendeVedtak
-                            ? `Beregn og periodiser fram til etterfølgende vedtak med virkningstidspunkt ${DateToDDMMYYYYString(dateOrNull(virkningstidspunktV3.etterfølgendeVedtak?.virkningstidspunkt))}. Etterfølgende vedtak vil løpe etter beregningsperioden.`
-                            : ""
-                    }
-                >
-                    <div className="flex flex-row gap-2">
-                        {" "}
-                        <div>Til etterfølgende vedtak</div>
-                        {virkningstidspunktV3.etterfølgendeVedtak && (
-                            <Link
-                                className="w-max"
-                                to={`/sak/${saksnummer}/vedtak/${virkningstidspunktV3.etterfølgendeVedtak?.vedtaksid}/?steg=vedtak&enhet=${enhet}&sessionState=${sessionState}`}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <BodyShort size="small">
-                                    <ExternalLinkIcon aria-hidden />
-                                </BodyShort>
-                            </Link>
-                        )}
-                    </div>
-                </Radio>
-            </RadioGroup>
-        </>
+                Ut måneden opprinnelig vedtak ble fattet
+            </Radio>
+            <Radio
+                value={BeregnTil.INNEVAeRENDEMANED}
+                description="Beregn og periodiser ut nåværende måned. Dette vil overskrive perioder fra etterfølgende vedtak"
+            >
+                Ut nåværende måned
+            </Radio>
+            <Radio
+                value={BeregnTil.ETTERFOLGENDEMANUELLVEDTAK}
+                readOnly={virkningstidspunktV3.etterfølgendeVedtak === undefined}
+                description={
+                    virkningstidspunktV3.etterfølgendeVedtak
+                        ? `Beregn og periodiser fram til etterfølgende vedtak med virkningstidspunkt ${DateToDDMMYYYYString(dateOrNull(virkningstidspunktV3.etterfølgendeVedtak?.virkningstidspunkt))}. Etterfølgende vedtak vil løpe etter beregningsperioden.`
+                        : ""
+                }
+            >
+                <div className="flex flex-row gap-2">
+                    {" "}
+                    <div>Til etterfølgende vedtak</div>
+                    {virkningstidspunktV3.etterfølgendeVedtak && (
+                        <Link
+                            className="w-max"
+                            to={`/sak/${saksnummer}/vedtak/${virkningstidspunktV3.etterfølgendeVedtak?.vedtaksid}/?steg=vedtak&enhet=${enhet}&sessionState=${sessionState}`}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <BodyShort size="small">
+                                <ExternalLinkIcon aria-hidden />
+                            </BodyShort>
+                        </Link>
+                    )}
+                </div>
+            </Radio>
+        </RadioGroup>
     );
 };
 
@@ -1460,17 +1450,15 @@ const VirkningstidspunktForm = () => {
     }, [JSON.stringify(useFormMethods.formState.errors)]);
 
     return (
-        <>
-            <FormProvider {...useFormMethods}>
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <NewFormLayout
-                        title={text.label.virkningstidspunkt}
-                        main={<Main initialValues={initialValues} />}
-                        side={<Side />}
-                    />
-                </form>
-            </FormProvider>
-        </>
+        <FormProvider {...useFormMethods}>
+            <form onSubmit={(e) => e.preventDefault()}>
+                <NewFormLayout
+                    title={text.label.virkningstidspunkt}
+                    main={<Main initialValues={initialValues} />}
+                    side={<Side />}
+                />
+            </form>
+        </FormProvider>
     );
 };
 

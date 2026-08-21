@@ -1,5 +1,5 @@
 import { DatePicker, type DateValidationT, useDatepicker } from "@navikt/ds-react";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { dateOrNull, isValidDate } from "../../../utils/date-utils";
 
 interface DatePickerInputProps {

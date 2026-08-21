@@ -10,7 +10,7 @@ import {
 import { ObjectUtils, PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { TrashIcon } from "@navikt/aksel-icons";
 import { Alert, Box, Button, Heading, Tabs } from "@navikt/ds-react";
-import React, { Fragment, useCallback, useEffect, useMemo, useRef } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { useSearchParams } from "react-router";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -271,48 +271,41 @@ const PrivatAvtaleBarn = ({
     };
 
     return (
-        <>
-            <Box background="neutral-soft" className="overflow-hidden grid gap-2 py-2 px-4">
-                {!multiple && (
-                    <div
-                        className={`grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]`}
-                    >
-                        <div>
-                            <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={item.gjelderBarn.ident} />
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <PersonNavnIdent
-                                navn={item.gjelderBarn.navn}
-                                ident={item.gjelderBarn.ident}
-                                fødselsdato={item.gjelderBarn.fødselsdato}
-                                visAlder
-                                stønad18År={item.gjelderBarn.stønadstype === Stonadstype.BIDRAG18AAR}
-                            />
-                        </div>
+        <Box background="neutral-soft" className="overflow-hidden grid gap-2 py-2 px-4">
+            {!multiple && (
+                <div
+                    className={`grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]`}
+                >
+                    <div>
+                        <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={item.gjelderBarn.ident} />
                     </div>
-                )}
-                {!item.privatAvtale?.avtaleId && (
-                    <Button
-                        type="button"
-                        onClick={onCreatePrivatAvtale}
-                        variant="tertiary"
-                        size="small"
-                        className="w-fit"
-                        disabled={lesemodus}
-                    >
-                        {text.label.opprettePrivatAvtale}
-                    </Button>
-                )}
-                {item.privatAvtale?.avtaleId && (
-                    <PrivatAvtalePerioder
-                        prefix="roller"
-                        item={item}
-                        barnIndex={barnIndex}
-                        initialValues={initialValues}
-                    />
-                )}
-            </Box>
-        </>
+                    <div className="flex items-center gap-4">
+                        <PersonNavnIdent
+                            navn={item.gjelderBarn.navn}
+                            ident={item.gjelderBarn.ident}
+                            fødselsdato={item.gjelderBarn.fødselsdato}
+                            visAlder
+                            stønad18År={item.gjelderBarn.stønadstype === Stonadstype.BIDRAG18AAR}
+                        />
+                    </div>
+                </div>
+            )}
+            {!item.privatAvtale?.avtaleId && (
+                <Button
+                    type="button"
+                    onClick={onCreatePrivatAvtale}
+                    variant="tertiary"
+                    size="small"
+                    className="w-fit"
+                    disabled={lesemodus}
+                >
+                    {text.label.opprettePrivatAvtale}
+                </Button>
+            )}
+            {item.privatAvtale?.avtaleId && (
+                <PrivatAvtalePerioder prefix="roller" item={item} barnIndex={barnIndex} initialValues={initialValues} />
+            )}
+        </Box>
     );
 };
 
@@ -466,17 +459,15 @@ const PrivatAvtaleForm = () => {
     }, [errors]);
 
     return (
-        <>
-            <FormProvider {...useFormMethods}>
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <NewFormLayout
-                        title={text.label.privatAvtale}
-                        main={<Main initialValues={initialValues} />}
-                        side={<Side />}
-                    />
-                </form>
-            </FormProvider>
-        </>
+        <FormProvider {...useFormMethods}>
+            <form onSubmit={(e) => e.preventDefault()}>
+                <NewFormLayout
+                    title={text.label.privatAvtale}
+                    main={<Main initialValues={initialValues} />}
+                    side={<Side />}
+                />
+            </form>
+        </FormProvider>
     );
 };
 

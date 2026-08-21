@@ -1,5 +1,5 @@
 import { type MonthValidationT, MonthPicker as NavMonthPicker, useMonthpicker } from "@navikt/ds-react";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { dateOrNull, isValidDate, lastDayOfMonth } from "../../../utils/date-utils";
 
 /** Bruk matcher-typen fra ds-react sin egen react-day-picker-versjon. */
@@ -63,19 +63,17 @@ export const MonthPicker = ({
     }, [defaultValue, fieldValue]);
 
     return (
-        <>
-            <NavMonthPicker {...monthpickerProps} onMonthSelect={onMonthSelect} dropdownCaption>
-                <NavMonthPicker.Input
-                    {...inputProps}
-                    className={`${className} [&_input]:w-[96px] [&_input]:placeholder:text-ax-small`}
-                    label={label}
-                    error={error}
-                    readOnly={readonly}
-                    hideLabel={hideLabel}
-                    placeholder={placeholder}
-                    size="small"
-                />
-            </NavMonthPicker>
-        </>
+        <NavMonthPicker {...monthpickerProps} onMonthSelect={onMonthSelect} dropdownCaption>
+            <NavMonthPicker.Input
+                {...inputProps}
+                className={`${className} [&_input]:w-[96px] [&_input]:placeholder:text-ax-small`}
+                label={label}
+                error={error}
+                readOnly={readonly}
+                hideLabel={hideLabel}
+                placeholder={placeholder}
+                size="small"
+            />
+        </NavMonthPicker>
     );
 };

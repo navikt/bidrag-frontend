@@ -21,6 +21,8 @@ export function getAllSearchParams(): URLSearchParams {
 
 export function getAllSearchParamsExcludingKeys(...key: string[]): URLSearchParams {
     const urlSearchParams = new URLSearchParams(window.location.search);
-    Array.from(key).forEach((k) => urlSearchParams.delete(k));
+    Array.from(key).forEach((k) => {
+        urlSearchParams.delete(k);
+    });
     return urlSearchParams;
 }

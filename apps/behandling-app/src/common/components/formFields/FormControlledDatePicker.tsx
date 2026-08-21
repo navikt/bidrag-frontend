@@ -1,5 +1,4 @@
 import type { DateValidationT } from "@navikt/ds-react";
-import React from "react";
 import { useController, useFormContext } from "react-hook-form";
 import { toISODateString } from "../../../utils/date-utils";
 import text from "../../constants/texts";

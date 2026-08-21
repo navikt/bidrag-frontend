@@ -2,7 +2,7 @@ import { type GebyrDtoV3, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1"
 import { PersonNavnIdent, RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
 import { BodyShort, Box, Heading, Label } from "@navikt/ds-react";
 import { type UseMutationResult, useSuspenseQueries } from "@tanstack/react-query";
-import React, { Fragment, useCallback, useEffect, useMemo } from "react";
+import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { type FieldPathByValue, FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";

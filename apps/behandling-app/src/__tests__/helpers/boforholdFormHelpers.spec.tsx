@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: forEach-callbacks returnerer verdi fra en kjedet operasjon, returverdien brukes ikke */
 import {
     Bostatuskode,
     type BostatusperiodeDto,
@@ -38,8 +38,8 @@ export interface RelatertPersonGrunnlagDto {
     erBarnAvBmBp: boolean;
     /** Liste over perioder personen bor i samme husstand som BM/BP */
     borISammeHusstandDtoListe: {
-        periodeFra: string,
-        periodeTil?: string,
+        periodeFra: string;
+        periodeTil?: string;
     }[];
 }
 

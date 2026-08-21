@@ -78,8 +78,7 @@ const VedtakEndelig = () => {
         lastetFørstegang.current = true;
     }, [activeStep]);
     if (
-        beregning &&
-        beregning.resultat?.ugyldigBeregning &&
+        beregning?.resultat?.ugyldigBeregning &&
         beregning.resultat.ugyldigBeregning.feiltype === UgyldigBeregningDtoFeiltypeEnum.UFULSTENDING_GRUNNLAG_FF
     ) {
         return <Klagevedtak endeligVedtak />;
@@ -147,7 +146,11 @@ export const VedtakLenke = ({ vedtaksid, visText = false }: { vedtaksid?: number
             target="_blank"
             rel="noreferrer"
         >
-            {typeof visText == "boolean" && visText ? "Grunnlag fra vedtak" : typeof visText == "string" ? visText : ""}{" "}
+            {typeof visText === "boolean" && visText
+                ? "Grunnlag fra vedtak"
+                : typeof visText === "string"
+                  ? visText
+                  : ""}{" "}
             <ExternalLinkIcon aria-hidden />
         </Link>
     );
@@ -299,7 +302,7 @@ function BeregningTabellBarn({
                     return (
                         <VStack>
                             <ResultatTabell
-                                key={i + `Delvedtak ${hentVisningsnavn(vedtakstype)}`}
+                                key={`${i}Delvedtak ${hentVisningsnavn(vedtakstype)}`}
                                 erAvslag={delvedtak.perioder.every((p) => p.erDirekteAvslag)}
                                 avvistAldersjustering={avvistAldersjustering}
                                 beregnet={

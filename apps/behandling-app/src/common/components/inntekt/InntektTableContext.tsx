@@ -1,5 +1,5 @@
 import { type RolleDto, Rolletype, TypeBehandling } from "@bidrag/api/BidragBehandlingApiV1";
-import React, { createContext, type PropsWithChildren, useContext } from "react";
+import { createContext, type PropsWithChildren, useContext } from "react";
 
 import { InntektTableType } from "../../helpers/inntektFormHelpers";
 import { Barnetillegg } from "./Barnetillegg";

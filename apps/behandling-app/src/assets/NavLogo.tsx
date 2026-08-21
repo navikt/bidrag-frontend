@@ -1,7 +1,12 @@
-import React from "react";
-
 export const NavLogo = () => (
-    <svg viewBox="0 0 559 328" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+    <svg
+        viewBox="0 0 559 328"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+        role="img"
+    >
+        <title>Nav</title>
         <rect width="559" height="328" fill="url(#pattern0)" />
         <defs>
             <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">

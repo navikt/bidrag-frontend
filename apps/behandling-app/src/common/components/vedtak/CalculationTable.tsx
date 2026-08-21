@@ -34,14 +34,13 @@ export const CalculationTabell: React.FC<CalculationTableProps> = ({
     const harBeregning = data.some((d) => d.value);
     return (
         <div className={className}>
-            <>
-                {title && (
-                    <Heading as="h4" className="inline-block align-middle" size="xsmall">
-                        {title}
-                    </Heading>
-                )}
-                {titleLink}
-            </>
+            {title && (
+                <Heading as="h4" className="inline-block align-middle" size="xsmall">
+                    {title}
+                </Heading>
+            )}
+            {titleLink}
+
             <Table size="small" zebraStripes={zebraStripes} className="w-full">
                 <Table.Header>
                     <Table.Row>

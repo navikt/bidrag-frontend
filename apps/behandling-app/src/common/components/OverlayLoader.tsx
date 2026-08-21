@@ -1,5 +1,4 @@
 import { Loader } from "@navikt/ds-react";
-import React from "react";
 
 export const OverlayLoader = ({ loading }: { loading: boolean }) => {
     if (!loading) return null;

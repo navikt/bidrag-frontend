@@ -1,5 +1,4 @@
 import { Button } from "@navikt/ds-react";
-import React from "react";
 import texts from "../../constants/texts";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 

@@ -1,5 +1,5 @@
 import { Checkbox, CheckboxGroup } from "@navikt/ds-react";
-import React, { type ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import { useController, useFormContext } from "react-hook-form";
 
 export const FormControlledCheckboxGroup = ({

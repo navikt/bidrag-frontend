@@ -914,7 +914,7 @@ export const useGetBeregningBidrag = (endelig: boolean) => {
                 return { resultat: response.data, ugyldigBeregning: ugyldigBeregning };
             } catch (error) {
                 console.log("error beregnBarnebidrag", error);
-                const feilmelding = error.response.headers["warning"]?.split(",") ?? [];
+                const feilmelding = error.response.headers.warning?.split(",") ?? [];
                 if (error instanceof AxiosError && error.response.status === 400) {
                     if (error.response?.data) {
                         return {
@@ -950,7 +950,7 @@ export const useGetBeregningSærbidrag = () => {
                 const response = await BEHANDLING_API_V1.api.beregnSaerbidrag(Number(behandlingId));
                 return { resultat: response.data };
             } catch (error) {
-                const feilmelding = error.response.headers["warning"]?.split(",") ?? [];
+                const feilmelding = error.response.headers.warning?.split(",") ?? [];
                 if (error instanceof AxiosError && error.response.status === 400) {
                     if (error.response?.data) {
                         return {
@@ -984,7 +984,7 @@ export const useGetBeregningForskudd = () => {
                 const response = await BEHANDLING_API_V1.api.beregnForskudd1(Number(behandlingId));
                 return { resultat: response.data };
             } catch (error) {
-                const feilmelding = error.response.headers["warning"]?.split(",") ?? [];
+                const feilmelding = error.response.headers.warning?.split(",") ?? [];
                 if (error instanceof AxiosError && error.response.status === 400) {
                     if (error.response?.data) {
                         return {

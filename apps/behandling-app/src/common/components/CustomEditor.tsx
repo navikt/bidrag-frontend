@@ -2,7 +2,7 @@ import { ExpandIcon, PadlockLockedFillIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Button, Label } from "@navikt/ds-react";
 import type { MutationStatus } from "@tanstack/react-query";
 import { useFlag } from "@unleash/proxy-client-react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useBehandlingProvider } from "../context/BehandlingContext";
 import { CustomQuillEditor } from "./CustomQuillEditor";
 import { SaveStatusIndicator } from "./SaveStatusIndicator";
@@ -86,39 +86,37 @@ export function CustomTextareaEditor({
     }, [openInNewWindow, prefilledHtml]);
 
     return (
-        <>
-            <BodyLong size="small" as="div" className={className}>
-                {label && (
-                    <Label className="flex items-center gap-2" spacing size="small" htmlFor={name}>
-                        {disabled && <PadlockLockedFillIcon />} {label}{" "}
-                        {!withOpenInNewWindow && (
-                            <Button
-                                size="xsmall"
-                                variant="tertiary-neutral"
-                                icon={<ExpandIcon title="Ny fane" />}
-                                onClick={onOpenInNewWindow}
-                                type="button"
-                            />
-                        )}
-                        {mutationState && <SaveStatusIndicator mutationStatus={mutationState} />}
-                    </Label>
-                )}
+        <BodyLong size="small" as="div" className={className}>
+            {label && (
+                <Label className="flex items-center gap-2" spacing size="small" htmlFor={name}>
+                    {disabled && <PadlockLockedFillIcon />} {label}{" "}
+                    {!withOpenInNewWindow && (
+                        <Button
+                            size="xsmall"
+                            variant="tertiary-neutral"
+                            icon={<ExpandIcon title="Ny fane" />}
+                            onClick={onOpenInNewWindow}
+                            type="button"
+                        />
+                    )}
+                    {mutationState && <SaveStatusIndicator mutationStatus={mutationState} />}
+                </Label>
+            )}
 
-                {description && (
-                    <BodyShort spacing textColor="subtle" size="small" className="max-w-[500px] mt-[-0.375rem]">
-                        {description}
-                    </BodyShort>
-                )}
-                <CustomQuillEditor
-                    ref={quillRef}
-                    resize={resize}
-                    readOnly={disabled}
-                    defaultValue={reformattedValue}
-                    prefilledHtml={begrunnelsePrefillMal ? prefilledHtml : undefined}
-                    onTextChange={onTextChange}
-                    error={error}
-                />
-            </BodyLong>
-        </>
+            {description && (
+                <BodyShort spacing textColor="subtle" size="small" className="max-w-[500px] mt-[-0.375rem]">
+                    {description}
+                </BodyShort>
+            )}
+            <CustomQuillEditor
+                ref={quillRef}
+                resize={resize}
+                readOnly={disabled}
+                defaultValue={reformattedValue}
+                prefilledHtml={begrunnelsePrefillMal ? prefilledHtml : undefined}
+                onTextChange={onTextChange}
+                error={error}
+            />
+        </BodyLong>
     );
 }

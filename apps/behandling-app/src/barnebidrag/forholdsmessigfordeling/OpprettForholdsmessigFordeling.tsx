@@ -164,7 +164,7 @@ export default function OpprettForholdsmessigFordelingPrompt() {
 
     return (
         <>
-            <Dialog open={modalOpen} onOpenChange={setModalOpen} aria-label="">
+            <Dialog open={modalOpen} onOpenChange={setModalOpen} aria-label="Opprett forholdsmessig fordeling">
                 <Dialog.Popup className="w-fit" position="center">
                     <Dialog.Header>
                         {harOpprettetFF ? "Oppdater forholdsmessig fordeling" : "Opprett forholdsmessig fordeling"}

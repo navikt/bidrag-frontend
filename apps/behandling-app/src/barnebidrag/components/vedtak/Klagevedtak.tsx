@@ -1,7 +1,7 @@
 import { type ResultatBidragsberegningBarnDto, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, BodyShort, Heading, Skeleton, Table, VStack } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ActionButtons } from "../../../common/components/ActionButtons";
 import { QueryErrorWrapper } from "../../../common/components/query-error-boundary/QueryErrorWrapper";
 import { AdminButtons } from "../../../common/components/vedtak/AdminButtons";
@@ -160,11 +160,7 @@ const Side = () => {
 
     const onNext = () => onStepChange(STEPS[BarnebidragStepper.VEDTAK_ENDELIG]);
 
-    return (
-        <>
-            <ActionButtons onNext={onNext} />
-        </>
-    );
+    return <ActionButtons onNext={onNext} />;
 };
 
 export default ({ endeligVedtak = false }: { endeligVedtak?: boolean }) => {

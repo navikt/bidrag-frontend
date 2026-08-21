@@ -5,7 +5,7 @@ import type { InntektFormValues } from "../../../../common/types/inntektFormValu
 export const createInitialForskuddInntektValues = (
     inntekter: InntekterDtoRolle[],
     virkningsdato: Date,
-    erBisysVedtak: boolean,
+    _erBisysVedtak: boolean,
 ): InntektFormValues => {
     const transformFn = transformInntekt(virkningsdato);
     const bmInntekt = inntekter.find((inntektRolle) => inntektRolle.gjelder.rolletype === Rolletype.BM);

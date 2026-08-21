@@ -1,6 +1,6 @@
 import { BidragCell, BidragGrid } from "@bidrag/common";
 import { Heading } from "@navikt/ds-react";
-import React, { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export const FormLayout = ({
     title,

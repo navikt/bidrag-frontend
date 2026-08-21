@@ -86,7 +86,13 @@ const RenderNotatPdf = ({ behandlingId, vedtakId }: NotatProps) => {
         return URL.createObjectURL(fileBlob);
     }
     return (
-        <object data={notatUrl + "#toolbar=0&view=FitBH&zoom=scale"} type="application/pdf" width="100%" height="89%" />
+        <object
+            data={`${notatUrl}#toolbar=0&view=FitBH&zoom=scale`}
+            type="application/pdf"
+            aria-label="Notat"
+            width="100%"
+            height="89%"
+        />
     );
 };
 const RenderNotatHtml = ({ behandlingId, vedtakId }: NotatProps) => {
@@ -153,7 +159,7 @@ if (typeof customElements !== "undefined" && customElements.get("notat-view") ==
                 return template;
             }
 
-            attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+            attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
                 if (name === "html") {
                     this.html = newValue;
                     this.render();
