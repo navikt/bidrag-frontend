@@ -15,6 +15,7 @@ build/
 # Editor
 .vscode/
 .idea/
+*.iml
 *.suo
 *.ntvs*
 *.njsproj

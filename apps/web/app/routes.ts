@@ -8,6 +8,7 @@ export default [
     route("proxy/:app/*", "./server/auth/proxy.ts"),
     route("unleash/proxy/*", "./server/unleash/unleashProxyRoute.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
+    route("samhandler/*", "./routes/samhandler/SamhandlerRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
     route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),
@@ -34,5 +35,6 @@ export default [
         route("notat", "routes/forsendelse/NotatRedirect.ts"),
         route("forsendelse/*", "routes/forsendelse/ForsendelseRedirect.ts"),
         route("vedtak/:vedtaksid", "routes/behandling/VedtakRedirect.ts"),
+        route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
     ]),
 ] satisfies RouteConfig;
