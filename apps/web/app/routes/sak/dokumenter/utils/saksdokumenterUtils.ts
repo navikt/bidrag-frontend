@@ -76,19 +76,19 @@ export function kanAapneDokument(
     dokumentreferanse?: string | null,
 ): boolean {
     const harJournalpostId = Boolean(jp.journalpostId);
-    const erFerdigstilt = !jp.journalpostId?.startsWith("BIF-") || dokumentStatus === DokumentStatusDto.FERDIGSTILT;
+    const erKlarTilVisning =
+        !jp.journalpostId?.startsWith("BIF-") ||
+        dokumentStatus === DokumentStatusDto.FERDIGSTILT ||
+        dokumentStatus === DokumentStatusDto.UNDER_PRODUKSJON;
     const harGyldigReferanse = Boolean(dokumentreferanse || (jp.dokumenter?.length ?? 0) === 1);
 
-    return harJournalpostId && erFerdigstilt && harGyldigReferanse;
+    return harJournalpostId && erKlarTilVisning && harGyldigReferanse;
 }
 
 const utledAarsakTilLukketDokument = (
-    status?: DokumentStatusDto | null,
+    _status?: DokumentStatusDto | null,
     dokumentreferanse?: string | null,
 ): string | undefined => {
-    if (status === DokumentStatusDto.UNDER_PRODUKSJON) {
-        return "Under produksjon";
-    }
     if (!dokumentreferanse) {
         return "Mangler referanse";
     }
