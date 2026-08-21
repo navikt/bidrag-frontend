@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from "uuid";
 
 import { SessionStorage } from "./Storage";
 
-const tracerName = "bidrag-ui-session";
+const _tracerName = "bidrag-ui-session";
 
 interface RequestTraceContext {
     correlationId: string;
@@ -38,11 +38,11 @@ export class SecuritySessionUtils {
         return SessionStorage.getOrDefault("traceparent", `${SecuritySessionUtils.getAppName()}/${uuidV4()}`);
     }
 
-    static createRequestTrace(spanName: string): RequestTraceContext {
+    static createRequestTrace(_spanName: string): RequestTraceContext {
         // const tracer = trace.getTracer(tracerName);
 
         // context er fra @opentelemetry/api — aktiveres når OTel-integrasjonen tas i bruk
-        const parentContext = window.__otelSessionContext || context.active();
+        const _parentContext = window.__otelSessionContext || context.active();
 
         // const span = tracer.startSpan(spanName, undefined, parentContext);
         // const traceContext = trace.setSpan(parentContext, span);

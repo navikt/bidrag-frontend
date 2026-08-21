@@ -15,7 +15,7 @@ export class Base64ByteConverter {
         if (!Base64ByteConverter.VALID_BASE64.test(b64)) {
             throw new Error(`Invalid base64 string: contains illegal characters`);
         }
-        let tmp;
+        let tmp: number;
         const lens = Base64ByteConverter.getLens(b64);
         const validLen = lens[0];
         const placeHoldersLen = lens[1];
@@ -27,7 +27,7 @@ export class Base64ByteConverter {
         // if there are placeholders, only get up to the last complete 4 chars
         const len = placeHoldersLen > 0 ? validLen - 4 : validLen;
 
-        let i;
+        let i: number;
         for (i = 0; i < len; i += 4) {
             tmp =
                 (revLookup[b64.charCodeAt(i)]! << 18) |
@@ -57,7 +57,7 @@ export class Base64ByteConverter {
     }
 
     static fromByteArray(uint8: Uint8Array) {
-        let tmp;
+        let tmp: number;
         const len = uint8.length;
         const extraBytes = len % 3; // if we have 1 byte left, pad 2 bytes
         const parts = [];
@@ -73,10 +73,10 @@ export class Base64ByteConverter {
         // pad the end with zeros, but make sure to not forget the extra bytes
         if (extraBytes === 1) {
             tmp = uint8[len - 1]!;
-            parts.push(lookup[tmp >> 2]! + lookup[(tmp << 4) & 0x3f]! + "==");
+            parts.push(`${lookup[tmp >> 2]! + lookup[(tmp << 4) & 0x3f]!}==`);
         } else if (extraBytes === 2) {
             tmp = (uint8[len - 2]! << 8) + uint8[len - 1]!;
-            parts.push(lookup[tmp >> 10]! + lookup[(tmp >> 4) & 0x3f]! + lookup[(tmp << 2) & 0x3f]! + "=");
+            parts.push(`${lookup[tmp >> 10]! + lookup[(tmp >> 4) & 0x3f]! + lookup[(tmp << 2) & 0x3f]!}=`);
         }
 
         return parts.join("");
@@ -97,14 +97,6 @@ export class Base64ByteConverter {
         return [validLen, placeHoldersLen];
     }
 
-    // base64 is 4/3 + up to two characters of the original data
-    private static byteLength(b64: string) {
-        const lens = Base64ByteConverter.getLens(b64);
-        const validLen = lens[0];
-        const placeHoldersLen = lens[1];
-        return ((validLen + placeHoldersLen) * 3) / 4 - placeHoldersLen;
-    }
-
     private static _byteLength(validLen: number, placeHoldersLen: number) {
         return ((validLen + placeHoldersLen) * 3) / 4 - placeHoldersLen;
     }
@@ -116,7 +108,7 @@ export class Base64ByteConverter {
     }
 
     private static encodeChunk(uint8: Uint8Array, start: number, end: number) {
-        let tmp;
+        let tmp: number;
         const output = [];
         for (let i = start; i < end; i += 3) {
             tmp = ((uint8[i]! << 16) & 0xff0000) + ((uint8[i + 1]! << 8) & 0xff00) + (uint8[i + 2]! & 0xff);

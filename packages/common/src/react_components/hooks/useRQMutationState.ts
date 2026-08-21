@@ -21,7 +21,7 @@ export function useRQMutationState(compareToKeyInput?: MutationKey | MutationKey
     const queryClient = useQueryClient(_queryClient);
 
     useEffect(() => {
-        if (compareToKeyInput == undefined) return;
+        if (compareToKeyInput == null) return;
 
         const mutationCache = queryClient.getMutationCache();
 
@@ -85,7 +85,7 @@ export function useRQMutationState(compareToKeyInput?: MutationKey | MutationKey
     }, [compareToKeyInput, queryClient]);
 
     function getCompareToMutationKeys(): MutationKey[] {
-        if (compareToKeyInput == null || compareToKeyInput == undefined || compareToKeyInput.length == 0) return [];
+        if (compareToKeyInput == null || compareToKeyInput.length === 0) return [];
         if (Array.isArray(compareToKeyInput[0])) return compareToKeyInput as MutationKey[];
         return [compareToKeyInput as MutationKey];
     }

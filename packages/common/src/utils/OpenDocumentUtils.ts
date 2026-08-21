@@ -21,7 +21,7 @@ export class OpenDocumentUtils {
     ): string {
         const opimizeForPrintQuery = optimizeForPrint != null ? `&optimizeForPrint=${optimizeForPrint}` : "";
         const openInNewWindowQuery = `openInNewWindow=${openInNewWindow ? "true" : "false"}`;
-        const dokumentReferanseParam = dokumentreferanse ? "/" + dokumentreferanse : "";
+        const dokumentReferanseParam = dokumentreferanse ? `/${dokumentreferanse}` : "";
         return `/aapnedokument/${journalpostid}${dokumentReferanseParam}?${openInNewWindowQuery}${opimizeForPrintQuery}`;
     }
 

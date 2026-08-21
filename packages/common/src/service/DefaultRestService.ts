@@ -70,7 +70,7 @@ export class DefaultRestService {
         const requestStart = performance.now();
         return fetch(`${this.baseUrl}${url}`, {
             mode: "cors",
-            credentials: this.app == "self" ? "include" : "omit",
+            credentials: this.app === "self" ? "include" : "omit",
             cache: "no-cache",
             body,
             method,
@@ -87,7 +87,7 @@ export class DefaultRestService {
                 // Handle 4xx errors on service level
                 if (!response.ok) {
                     const responseParsed = await DefaultRestService.parseResponseBody(response);
-                    const responseError = typeof responseParsed == "object" ? responseParsed?.error : responseParsed;
+                    const responseError = typeof responseParsed === "object" ? responseParsed?.error : responseParsed;
                     const warningMessage = response?.headers?.get("Warning") ?? responseParsed.message ?? responseError;
                     LoggerService.warn(
                         `Fikk respons med status ${response.status} og melding ${warningMessage} fra endepunkt ${this.baseUrl}${url}`,
@@ -110,7 +110,7 @@ export class DefaultRestService {
                 const errorMessage = `${error.message} - ${requestInfo}`;
 
                 if (err instanceof TypeError) {
-                    LoggerService.warn("TypeError: " + errorMessage, error);
+                    LoggerService.warn(`TypeError: ${errorMessage}`, error);
                 } else {
                     LoggerService.error(errorMessage, error);
                 }
@@ -142,7 +142,7 @@ export class DefaultRestService {
                 ? await SecuritySessionUtils.getSecurityTokenForApp(appName, this.cluster)
                 : "";
         return {
-            Authorization: "Bearer " + idToken,
+            Authorization: `Bearer ${idToken}`,
             "Content-type": "application/json; charset=UTF-8",
             "X-Correlation-ID": correlationId,
             "Nav-Call-Id": correlationId,
@@ -169,7 +169,7 @@ export class DefaultRestService {
         }
         if (errorParsed && typeof errorParsed === "object") {
             return Object.entries(errorParsed as Record<string, unknown>)
-                .map(([key, value]) => `key=${String(value)}`)
+                .map(([_key, value]) => `key=${String(value)}`)
                 .join("-");
         }
 
