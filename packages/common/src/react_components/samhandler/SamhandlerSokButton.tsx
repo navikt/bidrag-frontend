@@ -1,7 +1,7 @@
-import { Button, type ButtonProps, Modal } from "@navikt/ds-react";
-import { type ReactNode, useRef } from "react";
+import { Button, type ButtonProps, HStack, Loader } from "@navikt/ds-react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { Broadcast, BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
+import { BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
 
 type SamhandlerSokProps = {
     onResult: (data: SamhandlerBroadcastMessage | null) => void;
@@ -12,21 +12,35 @@ export default function SamhandlerSokButton({
     onResult,
     onError,
     ...buttonProps
-}: SamhandlerSokProps & Exclude<ButtonProps, "children">): ReactNode {
-    const ref = useRef<HTMLDialogElement>(null);
-    const windowId = crypto.randomUUID();
-
-    const closeModal = () => {
-        searchCanceled.current = true;
-        ref.current?.close();
+}: SamhandlerSokProps & Omit<ButtonProps, "children" | "onError">): ReactNode {
+    const [venter, setVenter] = useState(false);
+    const popup = useRef<Window | null>(null);
+    const kanal = useRef<BroadcastChannel | null>(null);
+    const lukkPopup = () => {
+        if (popup.current && !popup.current.closed) {
+            popup.current.close();
+        }
+        popup.current = null;
+        window.focus();
     };
-    const openModal = () => ref.current?.showModal();
-    const searchCanceled = useRef<boolean>(false);
+
+    useEffect(() => {
+        return () => {
+            kanal.current?.close();
+            lukkPopup();
+        };
+    }, []);
+
+    const avbryt = () => {
+        kanal.current?.close();
+        kanal.current = null;
+        lukkPopup();
+        setVenter(false);
+    };
 
     function openSamhandlerSearch() {
-        openModal();
-        searchCanceled.current = false;
-
+        avbryt();
+        const windowId = crypto.randomUUID();
         const width = Math.min(1500, screen.width);
         const height = Math.min(1200, screen.height);
 
@@ -36,56 +50,60 @@ export default function SamhandlerSokButton({
             `location=yes,height=${height},width=${width},scrollbars=yes,status=yes`,
         );
 
-        Broadcast.waitForBroadcast<SamhandlerBroadcastMessage>(BroadcastNames.SAMHANDLERSOK_RESULT_EVENT, windowId)
-            .then((res) => {
-                if (searchCanceled.current) {
-                    return;
-                }
-                onResult(res.payload);
-            })
-            .catch((error) => {
-                onError?.(error instanceof Error ? error.message : "Samhandlersøk feilet");
-            })
-            .finally(() => {
-                closeModal();
-                window.focus();
-                openedWindow?.close();
-            });
+        if (!openedWindow) {
+            onError?.("Kunne ikke åpne samhandlersøk. Tillat popup-vinduer for denne siden.");
+            return;
+        }
+
+        popup.current = openedWindow;
+        setVenter(true);
+
+        const resultChannel = new BroadcastChannel(BroadcastNames.SAMHANDLERSOK_RESULT_EVENT);
+        kanal.current = resultChannel;
+        resultChannel.onmessage = (event: MessageEvent<string>) => {
+            let data: { id?: string; payload: SamhandlerBroadcastMessage | null };
+            try {
+                data = JSON.parse(event.data) as { id?: string; payload: SamhandlerBroadcastMessage | null };
+            } catch {
+                onError?.("Kunne ikke lese resultatet fra samhandlersøk");
+                return;
+            }
+
+            if (data.id !== windowId) {
+                return;
+            }
+
+            resultChannel.close();
+            kanal.current = null;
+            setVenter(false);
+            onResult(data.payload);
+            lukkPopup();
+        };
+        resultChannel.onmessageerror = () => {
+            avbryt();
+            onError?.("Kunne ikke lese resultatet fra samhandlersøk");
+        };
     }
 
     return (
-        <>
-            <Modal
-                ref={ref}
-                aria-label={"samhandlersok"}
-                onClose={closeModal}
-                onCancel={(e) => {
-                    e.preventDefault();
-                }}
-                closeOnBackdropClick={false}
-                header={{
-                    heading: "Venter på resultat fra samhandlersøk ...",
-                    closeButton: false,
-                }}
+        <div className={"pdlSearchButton whitespace-nowrap self-center h-full"}>
+            <Button
+                {...buttonProps}
+                variant={buttonProps.variant ?? "secondary"}
+                size={buttonProps.size ?? "small"}
+                type={"button"}
+                title={venter ? "Venter på resultat fra samhandlersøk" : "Åpne samhandlersøk"}
+                onClick={venter ? avbryt : openSamhandlerSearch}
             >
-                <Modal.Footer>
-                    <Button size="medium" type={"button"} title="Avbryt" onClick={closeModal}>
-                        Avbryt
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            <div className={"pdlSearchButton whitespace-nowrap self-center h-full"}>
-                <Button
-                    {...buttonProps}
-                    variant={buttonProps.variant ?? "secondary"}
-                    size={buttonProps.size ?? "small"}
-                    type={"button"}
-                    title="Åpne samhandlersøk"
-                    onClick={openSamhandlerSearch}
-                >
-                    Samhandlersøk
-                </Button>
-            </div>
-        </>
+                {venter ? (
+                    <HStack gap="space-4" align="center" wrap={false}>
+                        <span>Avbryt</span>
+                        <Loader size="xsmall" title="Venter på resultat fra samhandlersøk" />
+                    </HStack>
+                ) : (
+                    "Samhandlersøk"
+                )}
+            </Button>
+        </div>
     );
 }

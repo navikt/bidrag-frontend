@@ -8,5 +8,5 @@ type Props = {
 };
 
 export default function SøkPerson({ label, personInformasjon }: Props) {
-    return <PersonSamhandlerSok label={label} primary onResult={personInformasjon} />;
+    return <PersonSamhandlerSok label={label} onResult={personInformasjon} />;
 }

@@ -9,6 +9,7 @@ export default [
     route("unleash/proxy/*", "./server/unleash/unleashProxyRoute.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
     route("samhandler/*", "./routes/samhandler/SamhandlerRedirect.ts"),
+    route("personsok", "./routes/personsok/PersonSokPage.tsx"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
     route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),

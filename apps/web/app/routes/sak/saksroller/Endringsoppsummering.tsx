@@ -1,4 +1,5 @@
-import { BodyShort, FormSummary, Heading, Label, Tag, VStack } from "@navikt/ds-react";
+import { BodyShort, FormSummary, HStack, Tag } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 
 import PersonInfo from "./components/PersonInfo.tsx";
 import type { BarnRolle, SakRedigeringData } from "./sakvisning-schema.ts";
@@ -14,7 +15,13 @@ type NormalisertRolle = {
 type Endringsrad =
     | {
           id: string;
-          type: "lagtTil" | "fjernet";
+          type: "lagtTil";
+          rolleType: string;
+          ident: string;
+      }
+    | {
+          id: string;
+          type: "fjernet";
           rolleType: string;
           ident: string;
       }
@@ -129,6 +136,13 @@ function lagEndringsoppsummering(
     return [...lagtTil, ...fjernet, ...endretReellMottaker];
 }
 
+export function harEndringer(
+    opprinneligeRoller: SakRedigeringData["roller"],
+    nåværendeRoller: SakRedigeringData["roller"],
+): boolean {
+    return lagEndringsoppsummering(opprinneligeRoller, nåværendeRoller).length > 0;
+}
+
 function grupperEtterPerson(endringer: Endringsrad[]): Persongruppe[] {
     const grupper = new Map<string, Persongruppe>();
 
@@ -174,75 +188,59 @@ function renderReellMottaker(identBarn: string, mottakerIdent: string, mottakerN
     return trimmetMottakerIdent;
 }
 
-function EndringsTomTilstand() {
+function ReellMottakerRad({ etikett, verdi }: { etikett: string; verdi: ReactNode }) {
     return (
-        <FormSummary.Answer>
-            <FormSummary.Label>
-                <Label size="small">Status</Label>
-            </FormSummary.Label>
-            <FormSummary.Value>
-                <BodyShort size="small">Ingen endringer gjort.</BodyShort>
-            </FormSummary.Value>
-        </FormSummary.Answer>
+        <FormSummary.Value>
+            <HStack gap="space-8" align="start">
+                <BodyShort size="small" textColor="subtle">
+                    {etikett}
+                </BodyShort>
+                {verdi}
+            </HStack>
+        </FormSummary.Value>
     );
 }
 
 function ReellMottakerDetaljer({ endring }: { endring: Extract<Endringsrad, { type: "endretReellMottaker" }> }) {
     return (
         <>
-            <FormSummary.Value>
-                <BodyShort size="small" className=" flex flex-row gap-2">
-                    <dl>
-                        <div className="grid w-fit grid-cols-[25px_max-content] gap-x-2 gap-y-1 items-start">
-                            <dt>
-                                <BodyShort size="small" className="text-ax-neutral-800">
-                                    Fra:
-                                </BodyShort>
-                            </dt>
-                            <dd className="ml-0">
-                                {renderReellMottaker(
-                                    endring.ident,
-                                    endring.fraReellMottaker,
-                                    endring.fraReellMottakerNavn,
-                                )}
-                            </dd>
-                        </div>
-                    </dl>
-                </BodyShort>
-            </FormSummary.Value>
-
-            <FormSummary.Value>
-                <BodyShort size="small" className=" flex flex-row gap-2">
-                    <dl>
-                        <div className="grid w-fit grid-cols-[25px_max-content] gap-x-2 gap-y-1 items-start">
-                            <dt>
-                                <BodyShort size="small" className="text-ax-neutral-800">
-                                    Til:
-                                </BodyShort>
-                            </dt>
-                            <dd className="ml-0">
-                                {renderReellMottaker(
-                                    endring.ident,
-                                    endring.tilReellMottaker,
-                                    endring.tilReellMottakerNavn,
-                                )}
-                            </dd>
-                        </div>
-                    </dl>
-                </BodyShort>
-            </FormSummary.Value>
+            <ReellMottakerRad
+                etikett="Fra:"
+                verdi={renderReellMottaker(endring.ident, endring.fraReellMottaker, endring.fraReellMottakerNavn)}
+            />
+            <ReellMottakerRad
+                etikett="Til:"
+                verdi={renderReellMottaker(endring.ident, endring.tilReellMottaker, endring.tilReellMottakerNavn)}
+            />
         </>
     );
 }
 
+function reellMottakerStatus(endring: Extract<Endringsrad, { type: "endretReellMottaker" }>): string {
+    const fraTom = endring.fraReellMottaker.trim() === "" || endring.fraReellMottaker === "ingen";
+    const tilTom = endring.tilReellMottaker.trim() === "" || endring.tilReellMottaker === "ingen";
+
+    if (fraTom) return "Lagt til reell mottaker";
+    if (tilTom) return "Fjernet reell mottaker";
+    return "Endret reell mottaker";
+}
+
 function EndringsRadSvar({ endring }: { endring: Exclude<Endringsrad, { type: "lagtTil" }> }) {
+    if (endring.type === "fjernet") {
+        return (
+            <FormSummary.Answer key={endring.id}>
+                <FormSummary.Label>Fjernet rolle</FormSummary.Label>
+                <FormSummary.Value>
+                    <BodyShort size="small">{endring.rolleType}</BodyShort>
+                </FormSummary.Value>
+            </FormSummary.Answer>
+        );
+    }
+
     return (
         <FormSummary.Answer key={endring.id}>
-            <FormSummary.Label>
-                {endring.type === "fjernet" ? "Fjernet rolle" : "Endret reell mottaker"}
-            </FormSummary.Label>
-
-            {endring.type === "endretReellMottaker" && <ReellMottakerDetaljer endring={endring} />}
+            <FormSummary.Label>{reellMottakerStatus(endring)}</FormSummary.Label>
+            <ReellMottakerDetaljer endring={endring} />
         </FormSummary.Answer>
     );
 }
@@ -283,31 +281,20 @@ export default function Endringsoppsummering({
     const endringer = lagEndringsoppsummering(opprinneligeRoller, nåværendeRoller);
     const grupperteEndringer = grupperEtterPerson(endringer);
 
+    if (grupperteEndringer.length === 0) {
+        return null;
+    }
+
     return (
-        <div className="bg-[white] rounded-lg shadow-sm border border-ax-neutral-300 p-6">
-            <VStack gap="space-4">
-                <Heading level="3" size="small">
-                    Oppsummering av endringer
-                </Heading>
-                <FormSummary>
-                    <FormSummary.Header>
-                        <FormSummary.Heading level="4">
-                            <Heading level="3" size="xsmall">
-                                Endringer per person
-                            </Heading>
-                        </FormSummary.Heading>
-                    </FormSummary.Header>
-                    <FormSummary.Answers>
-                        {grupperteEndringer.length === 0 ? (
-                            <EndringsTomTilstand />
-                        ) : (
-                            grupperteEndringer.map((gruppe) => (
-                                <PersonEndringerSvar key={gruppe.personKey} gruppe={gruppe} />
-                            ))
-                        )}
-                    </FormSummary.Answers>
-                </FormSummary>
-            </VStack>
-        </div>
+        <FormSummary>
+            <FormSummary.Header>
+                <FormSummary.Heading level="2">Oppsummering av endringer</FormSummary.Heading>
+            </FormSummary.Header>
+            <FormSummary.Answers>
+                {grupperteEndringer.map((gruppe) => (
+                    <PersonEndringerSvar key={gruppe.personKey} gruppe={gruppe} />
+                ))}
+            </FormSummary.Answers>
+        </FormSummary>
     );
 }

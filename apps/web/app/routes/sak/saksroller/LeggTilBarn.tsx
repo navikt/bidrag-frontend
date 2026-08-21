@@ -1,244 +1,262 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
+import { PersonSokButton } from "@bidrag/common";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
-import { PlusIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Button, Heading } from "@navikt/ds-react";
+import { PersonTallShortIcon, PlusIcon } from "@navikt/aksel-icons";
+import { Alert, BodyLong, Button, Detail, Heading, HStack, Modal, Search, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useParams } from "react-router";
+
+import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
 import PersonInfo from "./components/PersonInfo.tsx";
-import PersonSøkWrapper from "./PersonSøkWrapper.tsx";
 import ReellMottakerVelger from "./ReellMottakerVelger.tsx";
 import { type BarnRolle, MYNDYG_BARN_ALDER, type SakRedigeringData } from "./sakvisning-schema.ts";
 
 const MAKS_ALDER_BARN = 24;
 
 interface LeggTilBarnProps {
-    hentOgNullstillSamhandler: (barnIndex: number, isLeggTilBarn: boolean) => { ident: string; navn: string } | null;
     søsken?: PersonDto[];
     erOppfostringsbidrag?: boolean;
     visSøk?: boolean;
     setVisSøk?: (v: boolean) => void;
 }
 
-export default function LeggTilBarn({
-    hentOgNullstillSamhandler,
-    søsken = [],
-    erOppfostringsbidrag = false,
-    ...props
-}: LeggTilBarnProps) {
+export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps) {
     const [internalVisSøk, setInternalVisSøk] = useState(false);
     const visSøk = typeof props.visSøk === "boolean" ? props.visSøk : internalVisSøk;
     const setVisSøk = props.setVisSøk ?? setInternalVisSøk;
+    const [ident, setIdent] = useState("");
+    const [feil, setFeil] = useState<string | undefined>(undefined);
     const [valgtBarn, setValgtBarn] = useState<PersonDto | null>(null);
     const [visReellMottaker, setVisReellMottaker] = useState(false);
 
+    const søkFn = useHentSamhandlerEllerPersonForIdent(false);
+    const { saksnummer } = useParams();
     const form = useFormContext<SakRedigeringData>();
     const roller = form.watch("roller") || [];
-    // Filtrer ut søsken som allerede er lagt til i saken
+
     const tilgjengeligeSøsken = søsken.filter(
         (søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident),
     );
 
-    const handlePersonValgt = (person: PersonDto) => {
+    const alderFor = (person: PersonDto) =>
+        person?.fødselsdato ? beregnAlder(person.fødselsdato) : (beregnAlderFraFnr(person.ident) ?? 0);
+
+    /** Returnerer feilmelding hvis barnet ikke kan legges til. */
+    const valider = (person: PersonDto): string | undefined => {
         if (roller.some((b) => b.fodselsnummer === person.ident)) {
-            if (person?.visningsnavn && person?.ident) {
-                throw new Error(`${person.visningsnavn} (${person.ident}) er allerede lagt til i saken`);
-            } else if (person?.ident) {
-                throw new Error(`Dette barnet (${person.ident}) er allerede lagt til`);
-            } else {
-                throw new Error("Dette barnet er allerede lagt til");
-            }
+            return person.visningsnavn
+                ? `${person.visningsnavn} (${person.ident}) er allerede lagt til i saken`
+                : `Dette barnet (${person.ident}) er allerede lagt til`;
         }
 
-        const alder = person?.fødselsdato ? beregnAlder(person.fødselsdato) : (beregnAlderFraFnr(person.ident) ?? 0);
-
-        if (alder > MAKS_ALDER_BARN) {
-            if (person?.visningsnavn && person?.ident) {
-                throw new Error(
-                    `${person.visningsnavn} (${person.ident}) er ${alder} år og kan ikke legges til i saken. Maks alder er 24 år.`,
-                );
-            } else if (person?.ident) {
-                throw new Error(
-                    `Dette barnet (${person.ident}) er ${alder} år og kan ikke legges til i saken. Maks alder er 24 år.`,
-                );
-            } else {
-                throw new Error(`Barnet er over ${MAKS_ALDER_BARN} år og kan ikke legges til`);
-            }
+        const personAlder = alderFor(person);
+        if (personAlder > MAKS_ALDER_BARN) {
+            return `${person.visningsnavn ?? "Barnet"} er ${personAlder} år og kan ikke legges til. Maks alder er ${MAKS_ALDER_BARN} år.`;
         }
 
-        setValgtBarn(person);
-
-        const bm = roller.find((r) => r.type === "BM");
-        const erBmUkjent = !bm?.fodselsnummer;
-
-        const erMyndig = alder >= MYNDYG_BARN_ALDER;
-
-        if (erMyndig || erBmUkjent) {
-            setVisReellMottaker(true);
-            leggTilBarn(person, undefined, undefined, undefined, false);
-        } else {
-            leggTilBarn(person);
-        }
+        return undefined;
     };
 
-    const leggTilBarn = (
-        person: PersonDto,
-        reellMottakerType?: "barnet_selv" | "samhandler",
-        reellMottakerIdent?: string,
-        reellMottakerNavn?: string,
-        reset: boolean = true,
-    ) => {
-        const alder = person?.fødselsdato ? beregnAlder(person.fødselsdato) : (beregnAlderFraFnr(person.ident) ?? 0);
+    const leggTil = (person: PersonDto) => {
+        const valideringsfeil = valider(person);
+        if (valideringsfeil) {
+            setFeil(valideringsfeil);
+            return;
+        }
 
+        const personAlder = alderFor(person);
         const nyttBarn: BarnRolle = {
             fodselsnummer: person.ident,
             foedselsnummer: person.ident,
             type: "BA",
             rolleType: "BA",
             objektnummer: "",
-            reellMottager: reellMottakerType === "samhandler" ? reellMottakerIdent : undefined,
-            reellMottaker:
-                reellMottakerType === "samhandler"
-                    ? reellMottakerIdent
-                    : reellMottakerType === "barnet_selv"
-                      ? person.ident
-                      : undefined,
             mottagerErVerge: false,
-            samhandlerIdent: reellMottakerType === "samhandler" ? reellMottakerIdent : undefined,
             navn: person.visningsnavn ?? undefined,
             fødselsdato: person.fødselsdato ?? undefined,
             diskresjonskode: person.diskresjonskode ?? undefined,
-            alder,
-            erMyndig: alder >= MYNDYG_BARN_ALDER,
-            reellMottakerType: reellMottakerType,
-            reellMottakerNavn:
-                reellMottakerType === "samhandler"
-                    ? reellMottakerNavn
-                    : reellMottakerType === "barnet_selv"
-                      ? (person.visningsnavn ?? undefined)
-                      : undefined,
+            alder: personAlder,
+            erMyndig: personAlder >= MYNDYG_BARN_ALDER,
         };
 
-        const oppdaterteRoller = [...roller, nyttBarn];
-        form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
+        form.setValue("roller", [...roller, nyttBarn], { shouldValidate: true });
 
-        if (reset) {
-            resetEtterBarnLagtTil();
-        }
-    };
+        const bm = roller.find((rolle) => rolle.type === "BM");
+        const reellMottakerPåkrevd = nyttBarn.erMyndig || !bm?.fodselsnummer;
 
-    const resetEtterBarnLagtTil = () => {
-        if (tilgjengeligeSøsken.length <= 1) {
-            resetState();
+        if (reellMottakerPåkrevd) {
+            setValgtBarn(person);
+            setVisReellMottaker(true);
+            setVisSøk(false);
+            setFeil(undefined);
+        } else if (tilgjengeligeSøsken.length <= 1) {
+            lukk();
         } else {
-            setValgtBarn(null);
-            setVisReellMottaker(false);
+            setIdent("");
+            setFeil(undefined);
         }
     };
 
-    const resetState = () => {
-        setVisSøk(false);
-        setValgtBarn(null);
-        setVisReellMottaker(false);
+    const handleLeggTil = async () => {
+        if (!ident.trim()) {
+            setFeil("Skriv inn fødselsnummer eller D-nummer");
+            return;
+        }
+
+        try {
+            const treff = await søkFn.mutateAsync({ ident: ident.trim() });
+            if (!treff?.isValid) {
+                setFeil("Finner ingen person med oppgitt fødselsnummer");
+                return;
+            }
+            leggTil(treff as PersonDto);
+        } catch {
+            setFeil("Finner ingen person med oppgitt fødselsnummer");
+        }
     };
 
-    if (!visSøk) {
+    const lukk = () => {
+        setVisSøk(false);
+        setIdent("");
+        setFeil(undefined);
+    };
+
+    const resetEtterReellMottaker = () => {
+        setVisReellMottaker(false);
+        setValgtBarn(null);
+        setIdent("");
+        setFeil(undefined);
+    };
+
+    if (visReellMottaker && valgtBarn) {
+        const rolleIndex = roller.findIndex((rolle) => rolle.fodselsnummer === valgtBarn.ident);
+        const bm = roller.find((rolle) => rolle.type === "BM");
+        const reellMottakerPåkrevd = alderFor(valgtBarn) >= MYNDYG_BARN_ALDER || !bm?.fodselsnummer;
+
         return (
-            <div className="flex justify-end">
-                <Button
-                    icon={<PlusIcon aria-hidden />}
-                    variant="secondary"
-                    size="xsmall"
-                    type="button"
-                    onClick={() => setVisSøk(true)}
-                >
-                    Legg til barn
-                </Button>
-            </div>
+            <ReellMottakerVelger
+                barnNavn={valgtBarn.visningsnavn ?? "Barnet"}
+                rolleIndex={rolleIndex}
+                onAvbryt={resetEtterReellMottaker}
+                onBekreft={resetEtterReellMottaker}
+                kanFjerne={!reellMottakerPåkrevd}
+                isRequired={reellMottakerPåkrevd}
+                kunSamhandlerSomReellMottaker={props.erOppfostringsbidrag}
+            />
         );
     }
 
-    if (!valgtBarn) {
-        const bp = roller.find((i) => i.type === "BP");
-        const bm = roller.find((i) => i.type === "BM");
+    if (!visSøk) {
         return (
-            <PersonSøkWrapper
-                tittel="Legg til nytt barn i saken"
-                beskrivelse="Søk opp barnet som skal legges til i saken"
-                søkeLabel="Søk etter barn"
-                onPersonValgt={handlePersonValgt}
-                onAvbryt={resetState}
+            <Button
+                icon={<PlusIcon aria-hidden />}
+                variant="secondary"
+                size="small"
+                type="button"
+                className="self-start"
+                onClick={() => setVisSøk(true)}
             >
-                {tilgjengeligeSøsken.length > 0 && (
-                    <div className="mb-4 p-3 bg-ax-bg-default rounded-lg">
-                        <Heading level="4" size="xsmall" spacing>
-                            Andre barn som kan legges til ({tilgjengeligeSøsken.length})
-                        </Heading>
-                        <BodyLong size="small" className="text-ax-neutral-800 mb-3">
-                            {bp && bm
-                                ? "Andre barn som har begge foreldrene til felles"
-                                : "Andre barn som deler forelder med barn i saken"}
-                        </BodyLong>
-                        <div className="space-y-2">
-                            {tilgjengeligeSøsken.map((søskenBarn) => {
-                                const alder = søskenBarn?.fødselsdato
-                                    ? beregnAlder(søskenBarn.fødselsdato)
-                                    : beregnAlderFraFnr(søskenBarn.ident);
+                Legg til nytt barn
+            </Button>
+        );
+    }
 
-                                return (
+    const bp = roller.find((i) => i.type === "BP");
+    const bm = roller.find((i) => i.type === "BM");
+
+    return (
+        <Modal open onClose={lukk} width="medium" aria-label="Legg til nytt barn i saken">
+            <Modal.Header>
+                <VStack gap="space-2">
+                    {saksnummer && <Detail>Sak {saksnummer}</Detail>}
+                    <HStack gap="space-4" align="center" wrap={false}>
+                        <PersonTallShortIcon aria-hidden fontSize="1.5rem" />
+                        <Heading level="2" size="medium">
+                            Legg til nytt barn i saken
+                        </Heading>
+                    </HStack>
+                </VStack>
+            </Modal.Header>
+
+            <Modal.Body>
+                <VStack gap="space-16">
+                    <BodyLong size="small" textColor="subtle">
+                        Søk opp barnet som skal legges til i saken
+                    </BodyLong>
+
+                    {tilgjengeligeSøsken.length > 0 && (
+                        <VStack gap="space-8">
+                            <Heading level="3" size="xsmall">
+                                Andre barn som kan legges til ({tilgjengeligeSøsken.length})
+                            </Heading>
+                            <BodyLong size="small" textColor="subtle">
+                                {bp && bm
+                                    ? "Andre barn som har begge foreldrene til felles"
+                                    : "Andre barn som deler forelder med barn i saken"}
+                            </BodyLong>
+                            <VStack gap="space-2">
+                                {tilgjengeligeSøsken.map((søskenBarn) => (
                                     <Button
                                         key={søskenBarn.ident}
                                         type="button"
                                         variant="tertiary"
                                         className="w-full justify-start"
-                                        onClick={() => handlePersonValgt(søskenBarn)}
+                                        onClick={() => leggTil(søskenBarn)}
                                     >
                                         <PersonInfo
                                             navn={søskenBarn?.visningsnavn}
                                             ident={søskenBarn?.ident}
-                                            alder={alder ?? undefined}
+                                            rolle="BA"
+                                            alder={alderFor(søskenBarn)}
                                             fødselsdato={søskenBarn?.fødselsdato || ""}
                                         />
                                     </Button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-            </PersonSøkWrapper>
-        );
-    }
+                                ))}
+                            </VStack>
+                        </VStack>
+                    )}
 
-    const alder = valgtBarn?.fødselsdato
-        ? beregnAlder(valgtBarn.fødselsdato)
-        : (beregnAlderFraFnr(valgtBarn.ident) ?? 0);
-    const bm = roller.find((r) => r.type === "BM");
-    const erBmUkjent = !bm?.fodselsnummer;
-    const rolleIndex = roller.findIndex((r) => r.fodselsnummer === valgtBarn.ident);
-    const reellMottakerPaakrevd = alder >= MYNDYG_BARN_ALDER || erBmUkjent;
+                    <HStack gap="space-16" align="end" wrap={false}>
+                        <Search
+                            label="Søk etter barn"
+                            description="Fødselsnummer eller D-nummer (11 siffer)"
+                            variant="simple"
+                            size="small"
+                            hideLabel={false}
+                            value={ident}
+                            onChange={(verdi) => {
+                                setIdent(verdi);
+                                setFeil(undefined);
+                            }}
+                        />
+                        <PersonSokButton
+                            onError={(melding) => setFeil(melding)}
+                            onResult={(data) => {
+                                if (data?.ident) {
+                                    setIdent(data.ident);
+                                    setFeil(undefined);
+                                }
+                            }}
+                        />
+                    </HStack>
 
-    return (
-        <div className="mt-3 p-4 bg-ax-accent-100 rounded-lg">
-            <Alert variant="info" className="mb-4">
-                <BodyLong size="small">
-                    <strong>{`${valgtBarn.visningsnavn} (${valgtBarn.ident})`}</strong>
-                    {alder >= MYNDYG_BARN_ALDER
-                        ? " er over 18 år og krever reell mottaker."
-                        : erBmUkjent
-                          ? " - Bidragsmottaker er ukjent, velg reell mottaker."
-                          : ""}
-                </BodyLong>
-            </Alert>
+                    {feil && (
+                        <Alert variant="warning" inline size="small">
+                            {feil}
+                        </Alert>
+                    )}
+                </VStack>
+            </Modal.Body>
 
-            {visReellMottaker && (
-                <ReellMottakerVelger
-                    barnNavn={valgtBarn.visningsnavn ?? ""}
-                    rolleIndex={rolleIndex}
-                    onAvbryt={resetEtterBarnLagtTil}
-                    onSelect={resetEtterBarnLagtTil}
-                    isRequired={reellMottakerPaakrevd}
-                    kunSamhandlerSomReellMottaker={erOppfostringsbidrag}
-                />
-            )}
-        </div>
+            <Modal.Footer>
+                <Button type="button" onClick={handleLeggTil} loading={søkFn.isPending}>
+                    Legg til
+                </Button>
+                <Button type="button" variant="secondary" onClick={lukk}>
+                    Avbryt
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 }

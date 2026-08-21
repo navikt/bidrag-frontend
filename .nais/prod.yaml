@@ -63,6 +63,12 @@ env:
   - name: BISYS_URL
     value: https://wasapp.adeo.no/rtv-bidrag/
 
+  - name: MODIA_URL
+    value: https://modiapersonoversikt.intern.nav.no
+
+  - name: PERSONSOK_URL
+    value: https://pdl-web.intern.nav.no/sokperson
+
   - name: BIDRAG_UI_BASE_URL
     value: https://bidrag-ui.nais.adeo.no
 

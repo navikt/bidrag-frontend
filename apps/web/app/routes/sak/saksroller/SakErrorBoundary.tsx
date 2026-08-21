@@ -1,5 +1,5 @@
 import { TilgangsFeilError } from "@bidrag/api";
-import { Alert, BodyLong, Heading } from "@navikt/ds-react";
+import { Alert, BodyLong, Box, Heading } from "@navikt/ds-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {
@@ -26,6 +26,14 @@ export default class SakErrorBoundary extends Component<Props, State> {
         console.error("Error caught in SakErrorBoundary:", error, errorInfo);
     }
 
+    private renderError(content: ReactNode) {
+        return (
+            <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
+                <Alert variant="error">{content}</Alert>
+            </Box>
+        );
+    }
+
     override render() {
         if (this.state.hasError && this.state.error) {
             const error = this.state.error;
@@ -33,45 +41,39 @@ export default class SakErrorBoundary extends Component<Props, State> {
             const isSakNotFound = error.message.includes("Fant ikke sak");
 
             if (isTilgangsfeil) {
-                return (
-                    <div className="max-w-5xl mx-auto p-6">
-                        <Alert variant="error">
-                            <Heading level="3" size="small" spacing>
-                                Ingen tilgang
-                            </Heading>
-                            <BodyLong spacing>
-                                Du har ikke tilgang til sak {this.props.saksnummer}. Dette kan skyldes diskresjonskode
-                                eller manglende rettigheter.
-                            </BodyLong>
-                        </Alert>
-                    </div>
+                return this.renderError(
+                    <>
+                        <Heading level="3" size="small" spacing>
+                            Ingen tilgang
+                        </Heading>
+                        <BodyLong spacing>
+                            Du har ikke tilgang til sak {this.props.saksnummer}. Dette kan skyldes diskresjonskode eller
+                            manglende rettigheter.
+                        </BodyLong>
+                    </>,
                 );
             }
 
             if (isSakNotFound) {
-                return (
-                    <div className="max-w-5xl mx-auto p-6">
-                        <Alert variant="error">
-                            <Heading level="3" size="small" spacing>
-                                Sak ikke funnet
-                            </Heading>
-                            <BodyLong spacing>Fant ingen sak med saksnummer {this.props.saksnummer}</BodyLong>
-                        </Alert>
-                    </div>
+                return this.renderError(
+                    <>
+                        <Heading level="3" size="small" spacing>
+                            Sak ikke funnet
+                        </Heading>
+                        <BodyLong spacing>Fant ingen sak med saksnummer {this.props.saksnummer}</BodyLong>
+                    </>,
                 );
             }
 
-            return (
-                <div className="max-w-5xl mx-auto p-6">
-                    <Alert variant="error">
-                        <Heading level="3" size="small" spacing>
-                            Feil under lasting av sak
-                        </Heading>
-                        <BodyLong spacing>
-                            Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
-                        </BodyLong>
-                    </Alert>
-                </div>
+            return this.renderError(
+                <>
+                    <Heading level="3" size="small" spacing>
+                        Feil under lasting av sak
+                    </Heading>
+                    <BodyLong spacing>
+                        Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
+                    </BodyLong>
+                </>,
             );
         }
 

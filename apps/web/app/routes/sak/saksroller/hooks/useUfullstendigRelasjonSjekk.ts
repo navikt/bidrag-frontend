@@ -24,10 +24,11 @@ export function useUfullstendigRelasjonSjekk() {
         [queryClient],
     );
 
-    const harUfullstendigRelasjon = useCallback(
-        async (barn: string[], bidragsmottaker?: string, bidragspliktig?: string): Promise<boolean> => {
+    /** Returnerer identene til barna som mangler fullstendig relasjon til begge partene. */
+    const finnBarnMedUfullstendigRelasjon = useCallback(
+        async (barn: string[], bidragsmottaker?: string, bidragspliktig?: string): Promise<string[]> => {
             if (!bidragsmottaker || !bidragspliktig) {
-                return true;
+                return barn;
             }
 
             const resultat = await Promise.all(
@@ -39,20 +40,20 @@ export function useUfullstendigRelasjonSjekk() {
                         .map((i) => i.relatertPersonsIdent);
 
                     if (foreldreIdent.length < 2) {
-                        return true;
+                        return barnIdent;
                     }
 
-                    const harBidragsmottaker = foreldreIdent.includes(bidragsmottaker);
-                    const harBidragspliktig = foreldreIdent.includes(bidragspliktig);
+                    const manglerPart =
+                        !foreldreIdent.includes(bidragsmottaker) || !foreldreIdent.includes(bidragspliktig);
 
-                    return !harBidragsmottaker || !harBidragspliktig;
+                    return manglerPart ? barnIdent : null;
                 }),
             );
 
-            return resultat.some((erUfullstendig) => erUfullstendig);
+            return resultat.filter((ident): ident is string => ident !== null);
         },
         [hentForelderBarnRelasjon],
     );
 
-    return { harUfullstendigRelasjon };
+    return { finnBarnMedUfullstendigRelasjon };
 }

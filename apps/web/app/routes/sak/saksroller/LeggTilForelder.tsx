@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonPlusIcon } from "@navikt/aksel-icons";
-import { BodyLong, Button, Heading } from "@navikt/ds-react";
+import { BodyLong, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonInfo from "./components/PersonInfo.tsx";
@@ -20,7 +20,7 @@ export default function LeggTilForelder({
     rolleNavn,
     muligeAndreForeldre = [],
 }: LeggTilForelderProps) {
-    const [visSøk, setVisSøk] = useState<boolean>(false);
+    const [visSøk, setVisSøk] = useState(false);
     const roller = form.watch("roller") || [];
 
     const handlePersonValgt = (person: PersonDto) => {
@@ -47,7 +47,7 @@ export default function LeggTilForelder({
             fødselsdato: person.fødselsdato ?? undefined,
             diskresjonskode: person.diskresjonskode ?? undefined,
             type: rolleType,
-            rolleType: rolleType,
+            rolleType,
             objektnummer: "",
             reellMottager: undefined,
             reellMottaker: undefined,
@@ -60,14 +60,16 @@ export default function LeggTilForelder({
 
     if (!visSøk) {
         return (
-            <div className="p-6 bg-ax-warning-200 rounded-lg">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <BodyLong className="font-medium">{rolleNavn}</BodyLong>
-                        <BodyLong size="small" className="text-ax-neutral-800">
+            <Box background="warning-soft" borderRadius="12" padding="space-24">
+                <HStack justify="space-between" align="center" gap="space-16">
+                    <VStack gap="space-4">
+                        <Heading level="3" size="xsmall">
+                            {rolleNavn}
+                        </Heading>
+                        <BodyLong size="small" textColor="subtle">
                             Ukjent - ikke registrert
                         </BodyLong>
-                    </div>
+                    </VStack>
                     <Button
                         icon={<PersonPlusIcon aria-hidden />}
                         variant="secondary"
@@ -76,8 +78,8 @@ export default function LeggTilForelder({
                     >
                         Legg til person
                     </Button>
-                </div>
-            </div>
+                </HStack>
+            </Box>
         );
     }
 
@@ -90,33 +92,37 @@ export default function LeggTilForelder({
             onAvbryt={() => setVisSøk(false)}
         >
             {muligeAndreForeldre.length > 0 && (
-                <div className="mb-4 p-3 bg-ax-bg-default rounded-lg">
+                <Box
+                    background="raised"
+                    borderColor="neutral-subtleA"
+                    borderWidth="1"
+                    borderRadius="12"
+                    padding="space-16"
+                >
                     <Heading level="4" size="xsmall" spacing>
                         Foreslåtte foreldre ({muligeAndreForeldre.length})
                     </Heading>
-                    <BodyLong size="small" className="text-ax-neutral-800 mb-3">
+                    <BodyLong size="small" textColor="subtle" spacing>
                         Klikk på en person for å legge til
                     </BodyLong>
-                    <div className="space-y-2">
-                        {muligeAndreForeldre.map((forelder) => {
-                            return (
-                                <Button
-                                    key={forelder.ident}
-                                    type="button"
-                                    variant="tertiary"
-                                    className="w-full justify-start"
-                                    onClick={() => handlePersonValgt(forelder)}
-                                >
-                                    <PersonInfo
-                                        navn={forelder.visningsnavn}
-                                        ident={forelder.ident}
-                                        fødselsdato={forelder?.fødselsdato || ""}
-                                    />
-                                </Button>
-                            );
-                        })}
-                    </div>
-                </div>
+                    <VStack gap="space-8">
+                        {muligeAndreForeldre.map((forelder) => (
+                            <Button
+                                key={forelder.ident}
+                                type="button"
+                                variant="tertiary"
+                                className="w-full justify-start"
+                                onClick={() => handlePersonValgt(forelder)}
+                            >
+                                <PersonInfo
+                                    navn={forelder.visningsnavn}
+                                    ident={forelder.ident}
+                                    fødselsdato={forelder.fødselsdato || ""}
+                                />
+                            </Button>
+                        ))}
+                    </VStack>
+                </Box>
             )}
         </PersonSøkWrapper>
     );

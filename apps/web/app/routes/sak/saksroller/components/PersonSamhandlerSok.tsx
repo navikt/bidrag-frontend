@@ -9,7 +9,7 @@ export default function PersonSamhandlerSok({
     label,
     onResult,
     visSamhandlerSøk = false,
-    primary = false,
+    primary = true,
     compact = false,
 }: {
     valgIdent?: string;
@@ -28,31 +28,30 @@ export default function PersonSamhandlerSok({
         samhandlerPersonFn
             .mutateAsync({ ident: value?.trim() })
             .then(async (data) => {
+                if (!data?.isValid) {
+                    setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
+                    return;
+                }
+
                 setSearchErrorMessage(undefined);
-                if (data?.isValid) {
-                    try {
-                        return await onResult(data);
-                    } catch (err) {
-                        const errorMessage = err instanceof Error ? err.message : "En feil oppstod";
-                        setSearchErrorMessage(errorMessage);
-                    }
+                try {
+                    return await onResult(data);
+                } catch (err) {
+                    setSearchErrorMessage(err instanceof Error ? err.message : "En feil oppstod");
                 }
             })
             .catch(() => {
-                if (!searchErrorMessage) {
-                    setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
-                }
+                setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
             });
     }
 
-    const containerWidth = compact ? "w-full" : "w-[50rem]";
-    const inputWidth = compact ? "w-[30rem]" : "w-[30rem]";
-    const gapSize = compact ? "gap-2" : !primary ? "gap-2" : "gap-[3rem]";
+    const containerWidth = compact ? "w-full p-0" : "w-[50rem] p-2";
+    const inputWidth = compact ? "min-w-0 flex-1" : "w-[30rem]";
 
     return (
-        <div className={`flex gap-2 p-2 items-center ${containerWidth}`}>
+        <div className={`flex gap-2 items-center ${containerWidth}`}>
             <div className="w-full">
-                <div className={`flex flex-row items-center ${gapSize}`}>
+                <div className="flex flex-row flex-wrap items-end gap-2">
                     <Search
                         label={label || "Person- eller samhandlerident"}
                         variant={primary ? "primary" : "simple"}
@@ -66,13 +65,17 @@ export default function PersonSamhandlerSok({
                         value={searchValue}
                         hideLabel={false}
                         onClick={(e) => e.stopPropagation()}
-                        onSearchClick={onInputChange}
                         onChange={setSearchValue}
+                        onSearchClick={onInputChange}
+                        onKeyUp={(event) => {
+                            if (!primary && event.key === "Enter" && searchValue.trim()) {
+                                onInputChange(searchValue);
+                            }
+                        }}
                     />
-                    <div
-                        className={`items-center flex ${compact ? "flex-row gap-1 mt-1" : "flex-row gap-2"} ${searchErrorMessage ? "self-end" : "self-end"}`}
-                    >
+                    <div className="flex flex-row flex-wrap items-end gap-2">
                         <PersonSokButton
+                            onError={(feil) => setSearchErrorMessage(feil)}
                             onResult={(data) => {
                                 if (data?.ident) onInputChange(data.ident);
                             }}

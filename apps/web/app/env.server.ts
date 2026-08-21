@@ -29,6 +29,8 @@ const EnvSchema = z.object({
     BIDRAG_BEHANDLING_URL: z.url(),
     BIDRAG_BEHANDLING_AUDIENCE: NonEmpty,
     BISYS_URL: z.url(),
+    MODIA_URL: z.url(),
+    PERSONSOK_URL: z.url(),
     BIDRAG_UI_BASE_URL: z.url(),
     UNLEASH_SERVER_API_URL: z.url().optional(),
     UNLEASH_SERVER_API_TOKEN: NonEmpty.optional(),
