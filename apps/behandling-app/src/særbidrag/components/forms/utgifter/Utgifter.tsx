@@ -251,7 +251,6 @@ const Main = ({
     mutation: UseMutationResult<OppdatereUtgiftResponse, Error, UtgifterPayload, unknown>;
 }) => {
     const behandling = useGetBehandlingV2();
-    const { isbehandlingVesntremenyEnabled } = useFeatureToogle();
     const { getValues } = useFormContext<UtgiftFormValues>();
     const [avslag, erMaksBeløpMed] = getValues(["avslag", "maksGodkjentBeløpTaMed"]);
     const erAvslagValgt =
@@ -329,7 +328,7 @@ const Main = ({
                         <UtgifterListe mutation={mutation} />
                     </Box>
                     <BeregnetUtgifter />
-                    {isbehandlingVesntremenyEnabled && erKonfirmasjon && behandling.utgift.utgifter.length > 0 && (
+                    {erKonfirmasjon && behandling.utgift.utgifter.length > 0 && (
                         <>
                             <FlexRow>
                                 <FormControlledSwitch

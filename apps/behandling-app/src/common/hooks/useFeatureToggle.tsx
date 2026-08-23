@@ -20,6 +20,5 @@ export default function useFeatureToogle() {
         isFatteVedtakEnabled: useFlag("behandling.fattevedtak_klage"),
         isOpphørsdatoEnabled: useFlag("behandling.opphorsdato"),
         isBidragV2Enabled: useFlag("behandling.v2_endring"),
-        isbehandlingVesntremenyEnabled: useFlag("behandling_vesntremeny"),
     };
 }

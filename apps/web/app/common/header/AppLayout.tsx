@@ -10,9 +10,9 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, bruker, bisysUrl }: AppLayoutProps) {
     return (
-        <Page>
+        <Page >
             <AppHeader bruker={bruker ?? undefined} bisysUrl={bisysUrl} />
-            <Page.Block as="main" gutters>
+            <Page.Block as="main">
                 {children}
             </Page.Block>
         </Page>

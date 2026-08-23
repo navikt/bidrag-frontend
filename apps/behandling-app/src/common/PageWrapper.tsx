@@ -6,7 +6,6 @@ import type { PropsWithChildren } from "react";
 import { type Theme, ThemeUIProvider } from "theme-ui";
 
 import { AdminPanelFloatingButton } from "../barnebidrag/admin/AdminPanel";
-import { useTracker } from "./hooks/useTracker";
 
 interface PageWrapperProps {
     name: string;
@@ -73,7 +72,6 @@ const theme: Theme = {
 
 export default function PageWrapper({ children, name }: PropsWithChildren<PageWrapperProps>) {
     const componentsWithStyles = useThemedStylesWithMdx(useMDXComponents());
-    useTracker();
     return (
         <ThemeUIProvider theme={theme}>
             <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>

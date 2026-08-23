@@ -39,6 +39,18 @@ import useFeatureToogle from "../hooks/useFeatureToggle";
 import { useMutationStatus } from "../hooks/useMutationStatus";
 import { useQueryParams } from "../hooks/useQueryParams";
 
+// Faro initialiseres og eksponeres globalt (window.faro) av web-shellet. behandling-app
+// har ikke @grafana/faro-web-sdk som avhengighet, så vi deklarerer kun det vi trenger.
+declare global {
+    interface Window {
+        faro?: {
+            api: {
+                pushEvent: (name: string, attributes?: Record<string, string>) => void;
+            };
+        };
+    }
+}
+
 interface SaveErrorState {
     error: boolean;
     retryFn?: () => void;
@@ -439,46 +451,30 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
                 const tabRoleIndex = getFirstNumericalValue(tabIdentifier);
                 const rolle = behandling.roller.find((r) => r.id.toString() === tabRoleIndex?.toString());
 
-                console.log(
-                    "Tracking page tab navigation in Umami with tab index:",
-                    activeStep,
-                    tabIdentifier,
-                    tabRoleIndex,
-                    "and role:",
-                    rolle?.rolletype ?? tabIdentifier,
-                );
-                //@ts-expect-error
-                window.umami.track("undersidenavigering", {
-                    side: activeStep,
-                    rolle: rolle?.rolletype ?? tabIdentifier,
+                window.faro?.api.pushEvent("undersidenavigering", {
+                    side: String(activeStep),
+                    rolle: String(rolle?.rolletype ?? tabIdentifier),
                 });
             }
         } catch (e) {
-            console.warn("Umami tracking failed", e);
-            // Do nothing, umami is not critical and should not cause errors if it fails
+            console.warn("Faro tracking failed", e);
+            // Do nothing, tracking is not critical and should not cause errors if it fails
         }
     };
     const trackStep = (stepIndex: number, currentStep: stepDef) => {
         try {
             if (environment.system.sporingEnabled) {
                 const nextStep = Object.keys(steps).find((k) => steps[k] === stepIndex);
-                console.log(
-                    "Tracking page navigation in Umami with next step:",
-                    nextStep,
-                    "and current step",
-                    currentStep,
-                );
                 if (nextStep !== currentStep) {
-                    //@ts-expect-error
-                    window.umami.track("sidenavigering", {
-                        navigerTilSide: nextStep,
-                        navigerFraSide: currentStep,
+                    window.faro?.api.pushEvent("sidenavigering", {
+                        navigerTilSide: String(nextStep),
+                        navigerFraSide: String(currentStep),
                     });
                 }
             }
         } catch (e) {
-            console.warn("Umami tracking failed", e);
-            // Do nothing, umami is not critical and should not cause errors if it fails
+            console.warn("Faro tracking failed", e);
+            // Do nothing, tracking is not critical and should not cause errors if it fails
         }
     };
     const onStepChange = useCallback(

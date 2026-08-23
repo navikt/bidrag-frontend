@@ -39,7 +39,6 @@ export function CustomTextareaEditor({
     error,
     mutationState,
 }: CustomEditorProps) {
-    const begrunnelsePrefillMal = useFlag("behandling.preutfylt_begrunnelse_mal");
     const { lesemodus } = useBehandlingProvider();
     const [openInNewWindow, setOpenInNewWindow] = useState<boolean>(false);
     const quillRef = useRef(null);
@@ -113,7 +112,7 @@ export function CustomTextareaEditor({
                 resize={resize}
                 readOnly={disabled}
                 defaultValue={reformattedValue}
-                prefilledHtml={begrunnelsePrefillMal ? prefilledHtml : undefined}
+                prefilledHtml={prefilledHtml}
                 onTextChange={onTextChange}
                 error={error}
             />

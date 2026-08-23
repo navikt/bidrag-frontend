@@ -34,6 +34,18 @@
     overflow-y: auto;
 }
 
+/* Tailwind sin preflight nullstiller overskrifters font-weight til "inherit",
+   så vi må gjenopprette fet skrift for overskriftene som brukes i
+   begrunnelsesmalene og limt-inn Word-innhold (h3/h4). */
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6 {
+    font-weight: bold;
+}
+
 .ql-container {
     height: inherit;
     width: auto;

@@ -4,8 +4,7 @@
 const system = {
     isDevelopment: import.meta.env.DEV,
     isProduction: import.meta.env.PROD,
-    /** Umami-sporing er ikke satt opp i bidrag-frontend (bruker Faro) */
-    sporingEnabled: false,
+    sporingEnabled: true,
 };
 
 const url = {

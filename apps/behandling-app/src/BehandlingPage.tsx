@@ -10,15 +10,13 @@ import { BidragBehandlingHeader } from "./common/components/header/BidragBehandl
 import { ErrorModal } from "./common/components/modal/ErrorModal";
 import text from "./common/constants/texts";
 import { useBehandlingV2 } from "./common/hooks/useApiData";
-import useFeatureToogle from "./common/hooks/useFeatureToggle";
 import { prefetchVisningsnavn } from "./common/hooks/useVisningsnavn";
 import { ForskuddBehandlingProviderWrapper } from "./forskudd/context/ForskuddBehandlingProviderWrapper";
-import { ForskuddPage } from "./forskudd/pages/forskudd/ForskuddPage";
 import { NewForskuddPage } from "./forskudd/pages/forskudd/NewForskuddPage";
 import { SærligeugifterProviderWrapper } from "./særbidrag/context/SærligeugifterProviderWrapper";
 import { NewSærbidragPage } from "./særbidrag/pages/NewSaerbidragPage";
-import { SærbidragPage } from "./særbidrag/pages/SærbidragPage";
 import "./styles.css";
+
 export type BehandlingPageProps = {
     behandlingId?: string;
     vedtakId?: string;
@@ -44,26 +42,24 @@ function getSkjermbilde(type: TypeBehandling) {
 }
 
 function ForskuddBehandling() {
-    const { isbehandlingVesntremenyEnabled } = useFeatureToogle();
     useEffect(() => dispatchSkjermbilde(EndringsloggTilhorerSkjermbilde.BEHANDLING_FORSKUDD), []);
 
     return (
         <ForskuddBehandlingProviderWrapper>
             <BidragBehandlingHeader />
-            {isbehandlingVesntremenyEnabled ? <NewForskuddPage /> : <ForskuddPage />}
+            <NewForskuddPage />
             <ErrorModal />
         </ForskuddBehandlingProviderWrapper>
     );
 }
 
 function SærligeutgifterBehandling() {
-    const { isbehandlingVesntremenyEnabled } = useFeatureToogle();
     useEffect(() => dispatchSkjermbilde(EndringsloggTilhorerSkjermbilde.BEHANDLINGSAeRBIDRAG), []);
 
     return (
         <SærligeugifterProviderWrapper>
             <BidragBehandlingHeader />
-            {isbehandlingVesntremenyEnabled ? <NewSærbidragPage /> : <SærbidragPage />}
+            <NewSærbidragPage />
             <ErrorModal />
         </SærligeugifterProviderWrapper>
     );
