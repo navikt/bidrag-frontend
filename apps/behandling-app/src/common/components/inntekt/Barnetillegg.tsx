@@ -322,7 +322,10 @@ export const Barnetillegg = () => {
                                                         {error?.message}
                                                     </Alert>
                                                 )}
-                                                <Table size="small" className="table-fixed table bg-[white] w-fit text-wrap">
+                                                <Table
+                                                    size="small"
+                                                    className="table-fixed table bg-[white] w-fit text-wrap"
+                                                >
                                                     <Table.Header>
                                                         <Table.Row className="align-baseline">
                                                             <Table.HeaderCell
@@ -443,7 +446,9 @@ export const Barnetillegg = () => {
                                                                         : "w-[115px]"
                                                                 }
                                                             >
-                                                                {erIRedigeringsmodus && !erOffentligIRedigeringsmodus ? text.label.beløp12MndKort : text.label.beløp12Mnd}
+                                                                {erIRedigeringsmodus && !erOffentligIRedigeringsmodus
+                                                                    ? text.label.beløp12MndKort
+                                                                    : text.label.beløp12Mnd}
                                                             </Table.HeaderCell>
 
                                                             <Table.HeaderCell
