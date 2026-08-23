@@ -86,7 +86,7 @@ export const BarnPerioder = () => {
                             className="overflow-hidden grid gap-2"
                             id={`${elementIds.seksjon_boforhold}_${item.id}`}
                         >
-                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]">
+                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border-0 border-[var(--ax-border-neutral)]">
                                 <div>
                                     {item.medIBehandling && (
                                         <RolleTag

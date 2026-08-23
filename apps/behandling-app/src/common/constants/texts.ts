@@ -161,6 +161,7 @@ const tekster = {
         beløp: "Beløp",
         beløpMnd: "Beløp (mnd)",
         beløp12Mnd: "Beløp (12 mnd)",
+        beløp12MndKort: "Beløp (12m)",
         beregnet_tilsynsutgift: "Beregnet tilsynsutgift",
         beskrivelse: "Beskrivelse",
         betaltAvBp: "Betalt av BP",

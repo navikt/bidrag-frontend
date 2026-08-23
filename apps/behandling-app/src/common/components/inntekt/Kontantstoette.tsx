@@ -27,7 +27,7 @@ export const Kontantstøtte = () => {
                 {barna.map((barn) => (
                     <div className="grid gap-y-2" key={barn.gjelderBarn.id}>
                         {barna.length > 1 && (
-                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]">
+                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border-0 border-[var(--ax-border-neutral)]">
                                 <div className="w-8 mr-2 h-max">
                                     <RolleTag
                                         rolleType={RolleTypeAbbreviation.BA}

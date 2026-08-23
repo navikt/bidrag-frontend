@@ -1,7 +1,6 @@
 import { ExpandIcon, PadlockLockedFillIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Button, Label } from "@navikt/ds-react";
 import type { MutationStatus } from "@tanstack/react-query";
-import { useFlag } from "@unleash/proxy-client-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useBehandlingProvider } from "../context/BehandlingContext";
 import { CustomQuillEditor } from "./CustomQuillEditor";

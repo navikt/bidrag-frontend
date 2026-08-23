@@ -66,7 +66,7 @@ export const MonthPicker = ({
         <NavMonthPicker {...monthpickerProps} onMonthSelect={onMonthSelect} dropdownCaption>
             <NavMonthPicker.Input
                 {...inputProps}
-                className={`${className} [&_input]:w-[96px] [&_input]:placeholder:text-ax-small`}
+                className={`${className} [&_input]:w-[96px] [&_input]:placeholder:text-[length:var(--ax-font-size-small)]`}
                 label={label}
                 error={error}
                 readOnly={readonly}

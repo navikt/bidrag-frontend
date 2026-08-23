@@ -93,7 +93,7 @@ export const BeregnetInntekter = () => {
                         {inntektPerBarn.inntektGjelderBarn &&
                             rolle.rolletype !== Rolletype.BA &&
                             beregnetInntekterForRolle.length > 1 && (
-                                <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]">
+                                <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border-0 border-[var(--ax-border-neutral)]">
                                     <div className="w-8 mr-2 h-max">
                                         <RolleTag
                                             rolleType={RolleTypeAbbreviation.BA}

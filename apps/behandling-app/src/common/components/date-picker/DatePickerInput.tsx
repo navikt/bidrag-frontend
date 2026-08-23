@@ -58,7 +58,7 @@ export const DatePickerInput = ({
         <DatePicker {...datepickerProps}>
             <DatePicker.Input
                 {...inputProps}
-                className={`${className} [&_input]:w-[96px] [&_input]:placeholder:text-ax-small`}
+                className={`${className} [&_input]:w-[96px] [&_input]:placeholder:text-[length:var(--ax-font-size-small)]`}
                 hideLabel={hideLabel}
                 placeholder={placeholder}
                 label={label}

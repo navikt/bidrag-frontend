@@ -65,7 +65,7 @@ export const BoforholdBM = () => {
                             className="overflow-hidden grid gap-2 py-2 px-4"
                             id={`${elementIds.seksjon_boforhold}_${husstandsmedlem.ident}`}
                         >
-                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]">
+                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border-0 border-[var(--ax-border-neutral)]">
                                 <div>
                                     <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={husstandsmedlem.ident} />
                                 </div>
@@ -182,7 +182,7 @@ const NyOpplysningerFraFolkeregistreTabell = () => {
             <div className="grid gap-4">
                 {(ikkeAktivtHusstandsmedlemBMV2?.husstandsmedlem ?? []).map((husstandsmedlem) => (
                     <Box key={husstandsmedlem.ident} background="neutral-soft">
-                        <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]">
+                        <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border-0 border-[var(--ax-border-neutral)]">
                             <div>
                                 <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={husstandsmedlem.ident} />
                             </div>

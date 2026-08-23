@@ -267,7 +267,7 @@ export const Barnetillegg = () => {
                 {barna.map((barn) => (
                     <div className="grid gap-y-2" key={barn.gjelderBarn.id}>
                         {barna.length > 1 && (
-                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]">
+                            <div className="grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border-0 border-[var(--ax-border-neutral)]">
                                 <div className="w-8 mr-2 h-max">
                                     <RolleTag
                                         rolleType={RolleTypeAbbreviation.BA}
@@ -322,7 +322,7 @@ export const Barnetillegg = () => {
                                                         {error?.message}
                                                     </Alert>
                                                 )}
-                                                <Table size="small" className="table-fixed table bg-[white] w-fit">
+                                                <Table size="small" className="table-fixed table bg-[white] w-fit text-wrap">
                                                     <Table.Header>
                                                         <Table.Row className="align-baseline">
                                                             <Table.HeaderCell
@@ -439,11 +439,11 @@ export const Barnetillegg = () => {
                                                                 align="right"
                                                                 className={
                                                                     erIRedigeringsmodus && !erOffentligIRedigeringsmodus
-                                                                        ? "w-[80px]"
-                                                                        : "w-[125px]"
+                                                                        ? "w-[75px]"
+                                                                        : "w-[115px]"
                                                                 }
                                                             >
-                                                                {text.label.beløp12Mnd}
+                                                                {erIRedigeringsmodus && !erOffentligIRedigeringsmodus ? text.label.beløp12MndKort : text.label.beløp12Mnd}
                                                             </Table.HeaderCell>
 
                                                             <Table.HeaderCell

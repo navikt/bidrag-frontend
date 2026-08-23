@@ -57,7 +57,6 @@ export const FormControlledMonthPicker = ({
 
     const onValidate = (monthValidation: MonthValidationT) => {
         const date: string = getValues(name);
-        console.log("Validating date:", date, monthValidation);
         const isFirstOrLastDayOfMonth = lastDayOfMonthPicker
             ? isLastDayOfMonth(new Date(date))
             : isFirstDayOfMonth(new Date(date));

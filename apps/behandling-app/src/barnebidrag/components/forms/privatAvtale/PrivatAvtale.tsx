@@ -274,7 +274,7 @@ const PrivatAvtaleBarn = ({
         <Box background="neutral-soft" className="overflow-hidden grid gap-2 py-2 px-4">
             {!multiple && (
                 <div
-                    className={`grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border border-[var(--ax-border-neutral)]`}
+                    className={`grid grid-cols-[max-content_max-content_auto] p-2 bg-[white] border-0 border-[var(--ax-border-neutral)]`}
                 >
                     <div>
                         <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={item.gjelderBarn.ident} />

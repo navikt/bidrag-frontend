@@ -114,7 +114,7 @@ export const SkattepliktigeOgPensjonsgivende = () => {
                     <div className="grid gap-y-2">
                         {controlledFields.length > 0 && (
                             <div className="overflow-x-auto whitespace-nowrap">
-                                <Table size="small" className="table-fixed table bg-[white] w-fit">
+                                <Table size="small" className="table-fixed table bg-[white] w-fit text-wrap">
                                     <Table.Header>
                                         <Table.Row className="align-baseline">
                                             <Table.HeaderCell
