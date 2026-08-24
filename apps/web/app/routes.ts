@@ -1,5 +1,5 @@
 import adminroutes from "@bidrag/admin-app/routes";
-import behandlingroutes from "@bidrag/behandling-app/routes";
+import behandlingroutes from "@bidrag/behandling/routes";
 import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [

@@ -32,8 +32,8 @@ export default defineConfig(({ command, mode }) => {
                 // tsconfig peker @bidrag/behandling-app til en type-deklarasjon for å slippe
                 // strict typesjekk av pakkens kildekode. Vite må fortsatt bruke kildekoden.
                 {
-                    find: /^@bidrag\/behandling-app$/,
-                    replacement: fileURLToPath(new URL("../behandling-app/src/index.ts", import.meta.url)),
+                    find: /^@bidrag\/behandling$/,
+                    replacement: fileURLToPath(new URL("../behandling/src/index.ts", import.meta.url)),
                 },
             ],
         },

@@ -241,7 +241,7 @@ importers:
       '@bidrag/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@bidrag/behandling-app':
+      '@bidrag/behandling':
         specifier: workspace:*
         version: link:../behandling
       '@bidrag/common':

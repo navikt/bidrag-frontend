@@ -2,8 +2,8 @@
 @import "@navikt/ds-css" layer(components);
 @import "@navikt/ds-tailwind/v4";
 @import "@bidrag/common/styles.css";
-@import "@bidrag/behandling-app/styles.css";
+@import "@bidrag/behandling/styles.css";
 
 /*Flytte til common styles.css? */
 @source "../../../packages/common/src/**/*.{tsx,ts}";
-@source "../../behandling-app/src/**/*.{tsx,ts,mdx}";
+@source "../../behandling/src/**/*.{tsx,ts,mdx}";
