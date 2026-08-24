@@ -1,8 +1,8 @@
 import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
-import { Bleed, Box, CopyButton } from "@navikt/ds-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Bleed, Box, CopyButton, Skeleton } from "@navikt/ds-react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHentFodselsdatoer } from "../../api/useApiData";
 import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
 import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
@@ -217,6 +217,12 @@ interface ExpandedRolesProps {
     saksnummerRoller: SaksnummerRoller | undefined;
 }
 
+const RolleCardSkeleton = () => (
+    <Skeleton
+        variant="text" width={"220px"} height={"54px"}
+    />
+);
+
 const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
     if (!saksnummerRoller) return null;
 
@@ -233,7 +239,12 @@ const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
         >
             {saksnummerRoller.roller.map((rolle) => (
                 <Box key={rolle.id} style={ROLE_CARD_CONTAINER_STYLE}>
-                    <RolleCard rolle={rolle} />
+                    {/* Suspense skoperes rundt kun rollekortet (person-navn-oppslaget), ikke hele
+                    SakHeader, slik at tittel/faner alltid rendres umiddelbart og kun selve
+                    navnevisningen viser en liten skjelett-boks mens personoppslaget laster. */}
+                    <Suspense fallback={<RolleCardSkeleton />}>
+                        <RolleCard rolle={rolle} />
+                    </Suspense>
                 </Box>
             ))}
         </Box>

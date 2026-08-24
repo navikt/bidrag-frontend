@@ -1,8 +1,8 @@
 // routes/sak/SakBaseLayout.tsx
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader } from "@bidrag/common";
-import { Loader, VStack } from "@navikt/ds-react";
-import { Suspense, useEffect, useMemo } from "react";
+import { VStack } from "@navikt/ds-react";
+import { useEffect, useMemo } from "react";
 import { Outlet, useMatches } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
 import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
@@ -47,13 +47,11 @@ export default function SakBaseLayout({ params }: Route.ComponentProps) {
                 const tittel = overstyrtTittel ?? routeTittel;
                 return (
                     <VStack gap={"space-32"}>
-                        <Suspense fallback={<Loader size="xsmall" />}>
-                            <SakHeader
-                                saksnummer={saksnummer}
-                                roller={roller}
-                                skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
-                            />
-                        </Suspense>
+                        <SakHeader
+                            saksnummer={saksnummer}
+                            roller={roller}
+                            skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
+                        />
                         {/* Rendres direkte uten Page.Block for å tillate full bredde */}
                         <Outlet />
                     </VStack>
