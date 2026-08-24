@@ -63,13 +63,13 @@ class CustomClipboard extends Clipboard {
 // Quill.register("modules/clipboard", CustomClipboard, true);
 Quill.register("modules/resize", QuillResize);
 
-type EditorProps = {
+export type EditorProps = {
     readOnly: boolean;
     defaultValue: string;
     onTextChange: (html: string) => void;
     resize?: boolean;
     error?: string;
-    ref: RefObject<HTMLDivElement>;
+    ref: RefObject<HTMLDivElement | null>;
 };
 export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, resize, error }: EditorProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -127,7 +127,6 @@ export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, r
         ref.current = quillEditor;
 
         return () => {
-            // @ts-expect-error
             ref.current = null;
             // biome-ignore lint/style/noNonNullAssertion: Ingen risiko
             container!.innerHTML = "";

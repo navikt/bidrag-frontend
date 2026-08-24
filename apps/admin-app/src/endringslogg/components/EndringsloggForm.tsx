@@ -33,6 +33,7 @@ import {
 } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { EndringsModal } from "../index.tsx";
+import { CustomQuillEditor } from "./customEditor/CustomQuillEditor.tsx";
 
 type Endring = {
     innhold: string;
@@ -107,7 +108,7 @@ const EndringsBox = ({
 }: {
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
-    const _quillRef = useRef(null);
+    const quillRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDialogElement>(null);
     const { getValues, control, resetField, setError, clearErrors } = useFormContext<EndringsloggFormValues>();
 
@@ -198,12 +199,11 @@ const EndringsBox = ({
                                     </Select>
                                 )}
                             />
-                            {/*
                             <Controller
                                 name="endring.innhold"
                                 defaultValue=""
                                 control={control}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <CustomQuillEditor
                                         ref={quillRef}
                                         resize
@@ -214,7 +214,6 @@ const EndringsBox = ({
                                     />
                                 )}
                             />
-                            */}
                         </VStack>
                     </Box>
                 </Modal.Body>
@@ -235,7 +234,7 @@ const EndringsFormBox = ({
     index: number;
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
-    const _quillRef = useRef(null);
+    const _quillRef = useRef<HTMLDivElement>(null);
     const { control } = useFormContext<EndringsloggFormValues>();
 
     return (
@@ -314,28 +313,26 @@ const EndringsFormBox = ({
                         </Select>
                     )}
                 />
-                {/*
-                    <Controller
-                        name={`endringer.${index}.innhold`}
-                        control={control}
-                        rules={{
-                            required: {
-                                value: true,
-                                message: "Dette feltet er påkrevd",
-                            },
-                        }}
-                        render={({field, fieldState}) => (
-                            <CustomQuillEditor
-                                ref={quillRef}
-                                resize
-                                onTextChange={(innhold) => field.onChange(innhold)}
-                                readOnly={false}
-                                error={fieldState.error?.message}
-                                defaultValue={field.value}
-                            />
-                        )}
-                    />
-                    */}
+                <Controller
+                    name={`endringer.${index}.innhold`}
+                    control={control}
+                    rules={{
+                        required: {
+                            value: true,
+                            message: "Dette feltet er påkrevd",
+                        },
+                    }}
+                    render={({ field, fieldState }) => (
+                        <CustomQuillEditor
+                            ref={_quillRef}
+                            resize
+                            onTextChange={(innhold) => field.onChange(innhold)}
+                            readOnly={false}
+                            error={fieldState.error?.message}
+                            defaultValue={field.value}
+                        />
+                    )}
+                />
             </VStack>
         </Box>
     );

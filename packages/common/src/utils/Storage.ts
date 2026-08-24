@@ -1,3 +1,4 @@
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class SessionStorage {
     static reset() {
         window.sessionStorage.clear();
@@ -19,6 +20,7 @@ export class SessionStorage {
     }
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class LocalStorage {
     static reset() {
         window.localStorage.clear();
