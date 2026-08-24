@@ -1,14 +1,15 @@
+import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
+import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import { Bleed, Box, CopyButton } from "@navikt/ds-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
 import { useHentFodselsdatoer } from "../../api/useApiData";
 import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
 import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
 import RolleCard from "../roller/RolleCard";
 
 type TypeBehandling = string;
-type HeaderRolle = IRolleDetaljer & { visningsnavn?: string };
+type HeaderRolle = RolleDto & { visningsnavn?: string };
 
 interface ISkjermbildeDetaljer {
     navn: string;
@@ -17,7 +18,7 @@ interface ISkjermbildeDetaljer {
 
 type SaksnummerRoller = {
     saksnummer: string;
-    roller: IRolleDetaljer[];
+    roller: HeaderRolle[];
 };
 
 /** New props for full featured header */
@@ -26,7 +27,7 @@ interface ISakHeaderNewProps {
     type: TypeBehandling;
     selectedSaksnummer?: string;
     setSelectedSaksnummer: (saksnummer: string | undefined) => void;
-    setSelectedRoller: (roller: IRolleDetaljer[]) => void;
+    setSelectedRoller: (roller: HeaderRolle[]) => void;
     HeaderTittel: React.ComponentType<{ type: TypeBehandling; style?: React.CSSProperties }>;
 }
 
@@ -102,104 +103,42 @@ const ROLLE_SORTERINGSVEKT: Record<string, number> = {
 
 const BARN_ROLLETYPER = new Set<string>([RolleTypeAbbreviation.BA, RolleTypeFullName.BARN]);
 
-/**
- * Beregner alder basert på norsk fødselsnummer/d-nummer (11 siffer).
- * Returnerer `null` for identer som ikke er gyldige fødselsnumre (f.eks. aktørId),
- * slik at disse sorteres sist blant barna i stedet for å feile.
- *
- * NB: Duplisert (forenklet) versjon av `beregnAlderFraFnr` i `@bidrag/utils`. Kan ikke
- * importeres herfra siden `@bidrag/utils` avhenger av `@bidrag/common` (ville gitt sirkulær avhengighet).
- */
-function beregnAlderFraIdent(ident: string): number | null {
-    if (!/^\d{11}$/.test(ident)) return null;
-
-    const dag = Number.parseInt(ident.substring(0, 2), 10);
-    const måned = Number.parseInt(ident.substring(2, 4), 10);
-    const år = Number.parseInt(ident.substring(4, 6), 10);
-    const individnummer = Number.parseInt(ident.substring(6, 9), 10);
-
-    const reellDag = dag > 40 ? dag - 40 : dag;
-
-    let fødselsår: number;
-    if (individnummer <= 499) {
-        fødselsår = 1900 + år;
-    } else if (individnummer <= 749 && år >= 54) {
-        fødselsår = 1800 + år;
-    } else if (individnummer <= 999 && år <= 39) {
-        fødselsår = 2000 + år;
-    } else {
-        fødselsår = 1900 + år;
+const getRolleSortWeight = (rolle: HeaderRolle) => {
+    if (rolle.rolletype === Rolletype.BM) {
+        return 0;
     }
-
-    const fødselsdato = new Date(fødselsår, måned - 1, reellDag);
-    if (Number.isNaN(fødselsdato.getTime())) return null;
-
-    const nå = new Date();
-    let alder = nå.getFullYear() - fødselsår;
-    if (
-        nå.getMonth() < fødselsdato.getMonth() ||
-        (nå.getMonth() === fødselsdato.getMonth() && nå.getDate() < fødselsdato.getDate())
-    ) {
-        alder--;
+    if (rolle.rolletype === Rolletype.BP) {
+        return 1;
     }
-    return alder;
-}
-
-/**
- * Beregner alder basert på en fødselsdato (ISO-streng) hentet fra BIDRAG_PERSON/PDL.
- * Brukes når vi har den ekte fødselsdatoen tilgjengelig, i stedet for å gjette ut fra fnr.
- */
-function beregnAlderFraFødselsdato(fødselsdato: string): number | null {
-    const dato = new Date(fødselsdato);
-    if (Number.isNaN(dato.getTime())) return null;
-
-    const nå = new Date();
-    let alder = nå.getFullYear() - dato.getFullYear();
-    if (nå.getMonth() < dato.getMonth() || (nå.getMonth() === dato.getMonth() && nå.getDate() < dato.getDate())) {
-        alder--;
-    }
-    return alder;
-}
-
-/**
- * Henter alder for en ident. Bruker fødselsdato fra BIDRAG_PERSON når den er tilgjengelig
- * (håndterer også aktørId/NPID, som ikke kan tolkes fra selve identen), og faller ellers
- * tilbake til å parse fødselsnummeret direkte slik at sorteringen fungerer mens dataene
- * fra BIDRAG_PERSON lastes (eller dersom kallet feiler).
- */
-function hentAlder(ident: string, fødselsdatoPerIdent?: Record<string, string>): number | null {
-    const fødselsdato = fødselsdatoPerIdent?.[ident];
-    if (fødselsdato) {
-        const alder = beregnAlderFraFødselsdato(fødselsdato);
-        if (alder !== null) return alder;
-    }
-    return beregnAlderFraIdent(ident);
-}
-
+    return rolle.erRevurdering ? 3 : 2;
+};
 /**
  * Sorterer roller innad i en sak: BM først, deretter BP, så barn (BA) sortert etter alder
  * (eldst først). Roller uten kjent sorteringsvekt havner sist, i opprinnelig rekkefølge.
  */
-function sammenlignRoller(a: HeaderRolle, b: HeaderRolle, fødselsdatoPerIdent?: Record<string, string>): number {
-    const vektA = ROLLE_SORTERINGSVEKT[a.rolleType] ?? Number.MAX_SAFE_INTEGER;
-    const vektB = ROLLE_SORTERINGSVEKT[b.rolleType] ?? Number.MAX_SAFE_INTEGER;
-    if (vektA !== vektB) return vektA - vektB;
-
-    if (BARN_ROLLETYPER.has(a.rolleType) && BARN_ROLLETYPER.has(b.rolleType)) {
-        const alderA = hentAlder(a.ident, fødselsdatoPerIdent);
-        const alderB = hentAlder(b.ident, fødselsdatoPerIdent);
-        if (alderA !== null && alderB !== null) return alderB - alderA; // eldst først
-        if (alderA !== null) return -1;
-        if (alderB !== null) return 1;
+const compareRoller = (a: HeaderRolle, b: HeaderRolle) => {
+    const weightDiff = getRolleSortWeight(a) - getRolleSortWeight(b);
+    if (weightDiff !== 0) {
+        return weightDiff;
     }
 
-    return 0;
-}
+    if (
+        a.rolletype !== Rolletype.BM &&
+        a.rolletype !== Rolletype.BP &&
+        b.rolletype !== Rolletype.BM &&
+        b.rolletype !== Rolletype.BP
+    ) {
+        const alderA = a.fødselsdato ? new Date(a.fødselsdato).getTime() : Number.POSITIVE_INFINITY;
+        const alderB = b.fødselsdato ? new Date(b.fødselsdato).getTime() : Number.POSITIVE_INFINITY;
+        if (alderA !== alderB) {
+            return alderA - alderB;
+        }
+    }
 
-const mapSaksnummerRoller = (
-    roller: HeaderRolle[],
-    fødselsdatoPerIdent?: Record<string, string>,
-): SaksnummerRoller[] => {
+    return a.id - b.id;
+};
+
+const mapSaksnummerRoller = (roller: HeaderRolle[]): SaksnummerRoller[] => {
     const saksnummerOrder = Array.from(new Set(roller.map((rolle) => rolle.saksnummer)));
 
     return saksnummerOrder
@@ -207,7 +146,7 @@ const mapSaksnummerRoller = (
         .map((saksnummer) => {
             const rollerISak = roller
                 .filter((rolle) => rolle.saksnummer === saksnummer)
-                .sort((a, b) => sammenlignRoller(a, b, fødselsdatoPerIdent));
+                .sort((a, b) => compareRoller(a, b));
             return {
                 saksnummer,
                 roller: rollerISak,
@@ -339,31 +278,55 @@ const useAktivtSaksnummer = (
     }, [saksnummerRoller, harFlereSaksnummer, selectedSaksnummer]);
 };
 
+const rolleSignatur = (roller: HeaderRolle[]) =>
+    roller
+        .map((rolle) => rolle.id)
+        .sort()
+        .join(",");
+
 const useSyncAktivtSaksnummerToState = (
     aktivSaksnummerRoller: SaksnummerRoller | undefined,
     saksnummerRoller: SaksnummerRoller[],
     harFlereSaksnummer: boolean,
     setSelectedSaksnummer: (saksnummer: string | undefined) => void,
-    setSelectedRoller: (roller: IRolleDetaljer[]) => void,
+    setSelectedRoller: (roller: HeaderRolle[]) => void,
     expandedSaksnummer: string | undefined,
     setExpandedSaksnummer: (saksnummer: string | undefined) => void,
 ) => {
     const initialExpandRef = useRef(true);
+    // `aktivSaksnummerRoller` kan få en ny objekt-/array-referanse på hver render selv om det
+    // faktiske innholdet er uendret (f.eks. fordi `useSuspenseQueries` i behandling-app returnerer
+    // et nytt array hver gang, uavhengig av om dataene faktisk har endret seg). Uten denne
+    // innholds-sjekken vil effekten kalle `setSelectedRoller` på hver render, som trigger et nytt
+    // render av forelderen, som gir en ny referanse igjen -> uendelig løkke ("Maximum update depth").
+    const sisteRolleSignatur = useRef<string | undefined>(undefined);
+    const sisteSaksnummer = useRef<string | undefined>(undefined);
 
     useEffect(() => {
         if (!aktivSaksnummerRoller) {
-            setSelectedSaksnummer(undefined);
-            setSelectedRoller([]);
-            setExpandedSaksnummer(undefined);
+            if (sisteRolleSignatur.current !== "") {
+                setSelectedSaksnummer(undefined);
+                setSelectedRoller([]);
+                setExpandedSaksnummer(undefined);
+                sisteRolleSignatur.current = "";
+                sisteSaksnummer.current = undefined;
+            }
             initialExpandRef.current = true;
             return;
         }
 
         const førsteSaksnummer = saksnummerRoller[0]?.saksnummer;
         const saksnummerSomSkalBrukes = harFlereSaksnummer ? aktivSaksnummerRoller.saksnummer : førsteSaksnummer;
+        const nyRolleSignatur = rolleSignatur(aktivSaksnummerRoller.roller);
 
-        setSelectedSaksnummer(saksnummerSomSkalBrukes);
-        setSelectedRoller(aktivSaksnummerRoller.roller);
+        if (sisteSaksnummer.current !== saksnummerSomSkalBrukes) {
+            setSelectedSaksnummer(saksnummerSomSkalBrukes);
+            sisteSaksnummer.current = saksnummerSomSkalBrukes;
+        }
+        if (sisteRolleSignatur.current !== nyRolleSignatur) {
+            setSelectedRoller(aktivSaksnummerRoller.roller);
+            sisteRolleSignatur.current = nyRolleSignatur;
+        }
 
         // Auto-expand only on first data load
         if (initialExpandRef.current) {
@@ -398,12 +361,23 @@ export default function SakHeader(props: ISakHeaderProps) {
 
     if (isLegacy) {
         const legacyProps = props as ISakHeaderLegacyProps;
-        // Transform legacy props to new format
+        // Transform legacy props (IRolleDetaljer, brukt av apps/web sitt PDL-baserte rolleoppslag)
+        // til RolleDto-baserte HeaderRolle som resten av komponenten forventer.
         const transformedProps: ISakHeaderNewProps = {
-            rollerMedPersonNavn: legacyProps.roller.map((r) => ({
-                ...r,
-                saksnummer: legacyProps.saksnummer,
-            })),
+            rollerMedPersonNavn: legacyProps.roller.map(
+                (r): HeaderRolle => ({
+                    id: r.id ?? 0,
+                    rolletype: r.rolleType as unknown as Rolletype,
+                    ident: r.ident,
+                    navn: r.navn,
+                    visningsnavn: r.navn,
+                    fødselsdato: null,
+                    erRevurdering: false,
+                    stønadstype: r.stønad18År ? Stonadstype.BIDRAG18AAR : undefined,
+                    saksnummer: r.saksnummer ?? legacyProps.saksnummer,
+                    søknader: [],
+                }),
+            ),
             type: "Saksnummer",
             selectedSaksnummer: undefined,
             setSelectedSaksnummer: () => {},
@@ -436,7 +410,7 @@ function HeaderRenderer({
             Array.from(
                 new Set(
                     rollerMedPersonNavn
-                        .filter((rolle) => BARN_ROLLETYPER.has(rolle.rolleType))
+                        .filter((rolle) => BARN_ROLLETYPER.has(rolle.rolletype))
                         .map((rolle) => rolle.ident)
                         .filter((ident): ident is string => Boolean(ident)),
                 ),
@@ -447,7 +421,7 @@ function HeaderRenderer({
 
     // Calculate grouped saksnummer
     const saksnummerRoller = useMemo(
-        () => mapSaksnummerRoller(rollerMedPersonNavn, fodselsdatoer?.identerTilDatoer),
+        () => mapSaksnummerRoller(rollerMedPersonNavn),
         [rollerMedPersonNavn, fodselsdatoer],
     );
     const harFlereSaksnummer = saksnummerRoller.length > 1;
@@ -509,63 +483,64 @@ function HeaderRenderer({
     );
 
     return (
-        <Bleed marginInline="full">
-            <Box
-                style={{
-                    background: "var(--ax-bg-neutral-soft)",
-                    borderBottom: "1px solid var(--ax-border-neutral-subtle)",
-                }}
-            >
-                <style>{`
+
+            <Bleed marginInline="full">
+                <Box
+                    style={{
+                        background: "var(--ax-bg-neutral-soft)",
+                        borderBottom: "1px solid var(--ax-border-neutral-subtle)",
+                    }}
+                >
+                    <style>{`
                 @keyframes saksnummerFlash {
                     0%   { box-shadow: 0 0 0 3px var(--ax-border-accent, #0067c5); }
                     100% { box-shadow: 0 0 0 0px transparent; }
                 }
             `}</style>
 
-                {/* Title and tabs */}
-                <Box>
-                    <Box
-                        style={{
-                            display: "flex",
-                            padding: "0rem 1rem",
-                            background: "var(--ax-bg-neutral-soft)",
-                        }}
-                    >
+                    {/* Title and tabs */}
+                    <Box>
                         <Box
                             style={{
                                 display: "flex",
-                                alignItems: "center",
-                                flexShrink: 0,
-                                padding: "0.5rem 1.5rem 0.5rem 0",
+                                padding: "0rem 1rem",
+                                background: "var(--ax-bg-neutral-soft)",
                             }}
                         >
-                            <HeaderTittel
-                                type={type}
-                                style={{ color: "var(--ax-bg-brand-beige-strong)", whiteSpace: "nowrap" }}
-                            />
-                        </Box>
-
-                        <Box style={{ display: "flex", minWidth: 0 }}>
-                            {saksnummerRoller.map((item) => (
-                                <SaksnummerTab
-                                    key={item.saksnummer}
-                                    item={item}
-                                    isSelected={aktivtSaksnummer === item.saksnummer}
-                                    isExpanded={expandedSaksnummer === item.saksnummer}
-                                    isFlashing={flashingSaksnummer === item.saksnummer}
-                                    harFlereSaksnummer={harFlereSaksnummer}
-                                    onSelect={onSelectSaksnummer}
-                                    onToggleExpand={onToggleExpanded}
+                            <Box
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    flexShrink: 0,
+                                    padding: "0.5rem 1.5rem 0.5rem 0",
+                                }}
+                            >
+                                <HeaderTittel
+                                    type={type}
+                                    style={{ color: "var(--ax-bg-brand-beige-strong)", whiteSpace: "nowrap" }}
                                 />
-                            ))}
-                        </Box>
-                    </Box>
+                            </Box>
 
-                    {/* Expanded roles panel */}
-                    <ExpandedRoles saksnummerRoller={expandedSaksnummerRoller} />
+                            <Box style={{ display: "flex", minWidth: 0 }}>
+                                {saksnummerRoller.map((item) => (
+                                    <SaksnummerTab
+                                        key={item.saksnummer}
+                                        item={item}
+                                        isSelected={aktivtSaksnummer === item.saksnummer}
+                                        isExpanded={expandedSaksnummer === item.saksnummer}
+                                        isFlashing={flashingSaksnummer === item.saksnummer}
+                                        harFlereSaksnummer={harFlereSaksnummer}
+                                        onSelect={onSelectSaksnummer}
+                                        onToggleExpand={onToggleExpanded}
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
+
+                        {/* Expanded roles panel */}
+                        <ExpandedRoles saksnummerRoller={expandedSaksnummerRoller} />
+                    </Box>
                 </Box>
-            </Box>
-        </Bleed>
+            </Bleed>
     );
 }

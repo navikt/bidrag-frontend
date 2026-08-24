@@ -57,7 +57,7 @@ interface SaveErrorState {
     rollbackFn?: () => void;
 }
 
-const toRolleDetaljer = (rolle: RolleDto): IRolleDetaljer => ({
+export const toRolleDetaljer = (rolle: RolleDto): IRolleDetaljer => ({
     ...rolle,
     navn: rolle.navn ?? "",
     ident: rolle.ident ?? "",

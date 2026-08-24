@@ -3,12 +3,12 @@ import { TypeBehandling } from "@bidrag/api/BidragBehandlingApiV1";
 import { Loader } from "@navikt/ds-react";
 import { useFlagsStatus } from "@unleash/proxy-client-react";
 import { type PropsWithChildren, useEffect } from "react";
-import { BidragProgressbarFullScreen } from "./barnebidrag/components/BidragProgressbar";
 import { BarnebidragProviderWrapper } from "./barnebidrag/context/BarnebidragProviderWrapper";
 import { BarnebidragPage } from "./barnebidrag/pages/BarnebidragPage";
 import { BidragBehandlingHeader } from "./common/components/header/BidragBehandlingHeader";
 import { ErrorModal } from "./common/components/modal/ErrorModal";
 import text from "./common/constants/texts";
+import { BehandlingCommonsProvider } from "./common/context/BehandlingCommonsProvider";
 import { useBehandlingV2 } from "./common/hooks/useApiData";
 import { prefetchVisningsnavn } from "./common/hooks/useVisningsnavn";
 import { ForskuddBehandlingProviderWrapper } from "./forskudd/context/ForskuddBehandlingProviderWrapper";
@@ -96,7 +96,7 @@ export function BehandlingPageWrapper({ children }: PropsWithChildren) {
         );
     }
 
-    return <>{children}</>;
+    return <BehandlingCommonsProvider>{children}</BehandlingCommonsProvider>;
 }
 
 /**
@@ -129,10 +129,3 @@ export function BehandlingPage({ behandlingId, vedtakId }: BehandlingPageProps) 
     );
 }
 
-export function BehandlingPageLoader() {
-    return (
-        <div className="flex justify-center overflow-hidden">
-            <BidragProgressbarFullScreen />
-        </div>
-    );
-}

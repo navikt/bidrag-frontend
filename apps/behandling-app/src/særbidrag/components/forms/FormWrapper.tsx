@@ -1,6 +1,6 @@
+import { BidragProgressbar } from "@bidrag/common";
 import { Loader } from "@navikt/ds-react";
 import React, { memo, Suspense } from "react";
-import { BidragProgressbar } from "../../../barnebidrag/components/BidragProgressbar";
 import text from "../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../common/context/BehandlingContext";
 import { shouldShowGrunnlagLoadingProgressbar } from "../../../common/helpers/shouldShowGrunnlagProgressbar";

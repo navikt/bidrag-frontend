@@ -1,11 +1,10 @@
+import { BidragProgressbar } from "@bidrag/common";
 import { Loader } from "@navikt/ds-react";
 import { memo, Suspense } from "react";
 import text from "../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../common/context/BehandlingContext";
 import { shouldShowGrunnlagLoadingProgressbar } from "../../../common/helpers/shouldShowGrunnlagProgressbar";
-
 import { BarnebidragStepper } from "../../enum/BarnebidragStepper";
-import { BidragProgressbar } from "../BidragProgressbar";
 import Klagevedtak from "../vedtak/Klagevedtak";
 import Vedtak from "../vedtak/Vedtak";
 import VedtakEndelig from "../vedtak/VedtakEndelig";
