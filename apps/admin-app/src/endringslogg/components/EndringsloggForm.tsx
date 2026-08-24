@@ -33,7 +33,7 @@ import {
 } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { EndringsModal } from "../index.tsx";
-import {CustomQuillEditor} from "./customEditor/CustomQuillEditorImpl.tsx";
+import { CustomQuillEditor } from "./customEditor/CustomQuillEditorImpl.tsx";
 
 type Endring = {
     innhold: string;
