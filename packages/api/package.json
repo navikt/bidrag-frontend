@@ -31,7 +31,7 @@
         "api:belopshistorikk": "swagger-typescript-api -p https://bidrag-belopshistorikk-q2.intern.dev.nav.no/v3/api-docs --axios -n BelopshistorikkApi.ts -o src/api",
         "api:bidragDokument": "swagger-typescript-api -p https://bidrag-dokument.intern.dev.nav.no/bidrag-dokument/v3/api-docs --extract-enums --enum-names-as-values --axios -n BidragDokumentApi.ts -o src/api",
         "api:bidragVedtak": "swagger-typescript-api -p https://bidrag-vedtak-q2.intern.dev.nav.no/v3/api-docs --axios -n BidragVedtakApi.ts -o src/api",
-        "api:reskontro": "swagger-typescript-api -p https://bidrag-reskontro-q2.intern.dev.nav.no/v3/api-docs --axios -n BidragReskontroApi.ts -o src/api",
+        "api:reskontro": "swagger-typescript-api generate -p https://bidrag-reskontro-q2.intern.dev.nav.no/v3/api-docs --axios -n BidragReskontroApi.ts -o src/api",
         "api:forsendelse": "swagger-typescript-api -p https://bidrag-dokument-forsendelse.intern.dev.nav.no/v3/api-docs --axios -n BidragForsendelseApi.ts -o src/api"
     },
     "dependencies": {

@@ -69,6 +69,22 @@ export function hentInnkrevingForSaksnummer(saksnummer: string) {
     });
 }
 
+export function hentInnkrevingssakPaPerson(ident: string) {
+    return queryOptions({
+        queryKey: ["hentInnkrevingssakPaPerson", ident],
+        queryFn: () =>
+            withQueryErrorHandling("hentInnkrevingssakPaPerson", async () => {
+                const { data } =
+                    await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaPerson(
+                        {
+                            ident: ident,
+                        },
+                    );
+                return data;
+            }),
+    });
+}
+
 export function hentTransaksjonskoder() {
     return queryOptions({
         queryKey: ["hentTransaksjonskoder"],
