@@ -5,14 +5,16 @@ import { dateToDDMMYYYYString } from "@bidrag/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, BodyLong, Box, Heading, HGrid, HStack, Loader, Tag, VStack } from "@navikt/ds-react";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { type FieldErrors, FormProvider, useForm } from "react-hook-form";
 
 import { useOppdaterSaksroller } from "~/api/useApi.ts";
+import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SaksrollerPage.ts";
 import BarnVisning from "./BarnVisning.tsx";
 import SakButtons from "./components/SakButtons.tsx";
-import Endringsoppsummering, { harEndringer } from "./Endringsoppsummering.tsx";
+import Endringsoppsummering from "./Endringsoppsummering.tsx";
 import ForelderVisning from "./ForelderVisning.tsx";
+import { useEndringssporing } from "./hooks/useEndringssporing.ts";
 import { useHentSakMedPersoninfo } from "./hooks/useHentSakMedPersoninfo.ts";
 import { useSakForslag } from "./hooks/useSakForslag.tsx";
 import { useSakvisningSamhandlerHandling } from "./hooks/useSakvisningSamhandlerHandling.ts";
@@ -24,9 +26,28 @@ import { type BarnRolle, erBarn, type SakRedigeringData, SakRedigeringSchema } f
 import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "./utils.ts";
 
-type SakstypeVisning = "Barnebidrag" | "Ektefellebidrag" | "Oppfostringsbidrag" | "Farskap";
+export type SakstypeVisning = "Barnebidrag" | "Ektefellebidrag" | "Oppfostringsbidrag" | "Farskap";
 
-function utledSakstype(roller: SakRedigeringData["roller"]): SakstypeVisning {
+export const handle: SakSideTittelHandle = { sakSideTittel: "Saksroller" };
+
+export function finnFørsteValideringsfeil(feil: FieldErrors<SakRedigeringData>): string | undefined {
+    const verdier: unknown[] = [feil];
+
+    while (verdier.length > 0) {
+        const verdi = verdier.shift();
+        if (!verdi || typeof verdi !== "object") {
+            continue;
+        }
+
+        if ("message" in verdi && typeof verdi.message === "string" && "type" in verdi && verdi.type === "custom") {
+            return verdi.message;
+        }
+
+        verdier.push(...Object.values(verdi));
+    }
+}
+
+export function utledSakstype(roller: SakRedigeringData["roller"]): SakstypeVisning {
     const harBarn = roller.some((r) => r.type === "BA");
     const harBP = roller.some((r) => r.type === "BP");
     const harBM = roller.some((r) => r.type === "BM");
@@ -47,6 +68,7 @@ interface SakvisningProps {
 
 function SakvisningContent({ saksnummer }: SakvisningProps) {
     const [feilmelding, setFeilmelding] = useState<string | null>(null);
+    const [valideringsFeil, setValideringsFeil] = useState<string | null>(null);
     const [suksessmelding, setSuksessmelding] = useState<string | null>(null);
     const [barnMedUfullstendigRelasjon, setBarnMedUfullstendigRelasjon] = useState<string[]>([]);
 
@@ -87,8 +109,19 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
               [])
             : [];
 
-    // Initialiser form med berikede roller når data er lastet eller oppdatert
-    useEffect(() => {
+    const { endringsliste, harEndringer } = useEndringssporing({
+        opprinneligeRoller: berikedeRoller,
+        nåværendeRoller: aktiveRoller,
+        barnMedUfullstendigRelasjon,
+        dataOppdatertNøkkel: dataUpdatedAt,
+        onNyEndring: () => {
+            setFeilmelding(null);
+            setValideringsFeil(null);
+            setSuksessmelding(null);
+        },
+    });
+
+    function initialiserFormMedBerikedeRoller() {
         if (berikedeRoller.length === 0) {
             return;
         }
@@ -96,15 +129,17 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
         if (lastDataUpdateRef.current !== dataUpdatedAt) {
             lastDataUpdateRef.current = dataUpdatedAt;
             setFeilmelding(null);
+            setValideringsFeil(null);
             reset({
                 saksnummer,
                 roller: berikedeRoller,
             });
         }
-    }, [berikedeRoller, saksnummer, dataUpdatedAt, reset]);
+    }
 
-    // Håndter feil
-    useEffect(() => {
+    useEffect(initialiserFormMedBerikedeRoller, [berikedeRoller, saksnummer, dataUpdatedAt, reset]);
+
+    function håndterLastefeil() {
         if (error) {
             if (error instanceof TilgangsFeilError) {
                 setFeilmelding(
@@ -114,17 +149,19 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                 setFeilmelding("Kunne ikke laste sak. Vennligst prøv igjen.");
             }
         }
-    }, [error]);
+    }
 
-    // Scroll til statusmelding
-    useEffect(() => {
+    useEffect(håndterLastefeil, [error]);
+
+    function scrollTilStatusmelding() {
         if ((feilmelding || suksessmelding) && statusRef.current) {
             statusRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
             statusRef.current.focus();
         }
-    }, [feilmelding, suksessmelding]);
+    }
 
-    // Sjekk ufullstendig relasjon
+    useEffect(scrollTilStatusmelding, [feilmelding, suksessmelding]);
+
     useEffect(() => {
         async function sjekkUfullstendigRelasjon() {
             if (sak && barnIdenter.length > 0) {
@@ -134,13 +171,13 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
             }
         }
         sjekkUfullstendigRelasjon();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bp?.fodselsnummer, bm?.fodselsnummer, barnIdenterKey, sak, finnBarnMedUfullstendigRelasjon]);
 
     const onSubmit = async (data: SakRedigeringData): Promise<string> => {
         try {
             setSuksessmelding(null);
             setFeilmelding(null);
+            setValideringsFeil(null);
 
             const request: OppdaterRollerISakRequest = {
                 saksnummer: data.saksnummer,
@@ -190,6 +227,10 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                     }
                 },
                 (e) => {
+                    setValideringsFeil(
+                        finnFørsteValideringsfeil(e) ??
+                            "Kan ikke lagre saken. Kontroller feltene som er markert med feil.",
+                    );
                     reject(new Error("Validation failed", { cause: e }));
                 },
             )();
@@ -391,10 +432,7 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                                             </Box>
                                         }
                                     >
-                                        <Endringsoppsummering
-                                            opprinneligeRoller={berikedeRoller}
-                                            nåværendeRoller={aktiveRoller}
-                                        />
+                                        <Endringsoppsummering endringsliste={endringsliste} />
                                     </Suspense>
 
                                     <VStack gap="space-12">
@@ -406,8 +444,9 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                                             onSubmit={handleSubmitAsync}
                                             onRefetch={refetch}
                                             feilmelding={feilmelding}
+                                            valideringsFeil={valideringsFeil}
                                             harAdvarsel={barnMedUfullstendigRelasjon.length > 0}
-                                            harEndringer={harEndringer(berikedeRoller, aktiveRoller)}
+                                            harEndringer={harEndringer}
                                             suksessmelding={suksessmelding}
                                             statusRef={statusRef}
                                         />
@@ -424,19 +463,23 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
 
 export default function SaksrollerPage({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;
+    const tabTitle = `Saksroller - ${saksnummer}`;
 
     return (
-        <SakErrorBoundary saksnummer={saksnummer}>
-            <Suspense
-                fallback={
-                    <VStack align="center" justify="center" gap="space-12" minHeight="100vh">
-                        <Loader size="2xlarge" title="Laster sak..." />
-                        <BodyLong>Laster sak</BodyLong>
-                    </VStack>
-                }
-            >
-                <SakvisningContent saksnummer={saksnummer} />
-            </Suspense>
-        </SakErrorBoundary>
+        <>
+            <title>{tabTitle}</title>
+            <SakErrorBoundary saksnummer={saksnummer}>
+                <Suspense
+                    fallback={
+                        <VStack align="center" justify="center" gap="space-12" minHeight="100vh">
+                            <Loader size="2xlarge" title="Laster sak..." />
+                            <BodyLong>Laster sak</BodyLong>
+                        </VStack>
+                    }
+                >
+                    <SakvisningContent saksnummer={saksnummer} />
+                </Suspense>
+            </SakErrorBoundary>
+        </>
     );
 }

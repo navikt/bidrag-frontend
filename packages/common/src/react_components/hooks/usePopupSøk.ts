@@ -45,6 +45,25 @@ export function usePopupSøk<T>({
 
     useEffect(() => ryddOpp, []);
 
+    function oppdagPopupLukketUtenValg() {
+        if (popup.current?.closed) {
+            kanal.current?.close();
+            kanal.current = null;
+            popup.current = null;
+            setVenter(false);
+        }
+    }
+
+    useEffect(() => {
+        if (!venter) {
+            return;
+        }
+
+        const intervallId = window.setInterval(oppdagPopupLukketUtenValg, 500);
+
+        return () => window.clearInterval(intervallId);
+    }, [venter]);
+
     const åpne = () => {
         avbryt();
 

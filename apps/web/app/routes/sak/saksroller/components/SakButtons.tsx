@@ -1,7 +1,7 @@
 import { RedirectTo } from "@bidrag/common";
 import { FloppydiskIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, Button, Heading, Modal } from "@navikt/ds-react";
-import { type RefObject, useState } from "react";
+import { type RefObject, useEffect, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import type { loader as rootLoader } from "~/root.tsx";
@@ -12,6 +12,7 @@ export default function SakButtons({
     onSubmit,
     onRefetch,
     feilmelding,
+    valideringsFeil,
     harAdvarsel,
     harEndringer,
     suksessmelding,
@@ -20,6 +21,7 @@ export default function SakButtons({
     onSubmit: () => Promise<string>;
     onRefetch: () => Promise<unknown>;
     feilmelding?: string | null;
+    valideringsFeil?: string | null;
     harAdvarsel: boolean;
     harEndringer: boolean;
     suksessmelding?: string | null;
@@ -29,6 +31,12 @@ export default function SakButtons({
     const [bekreftHandling, setBekreftHandling] = useState<Lagrehandling | null>(null);
     const [ingenEndringer, setIngenEndringer] = useState(false);
     const [lagrer, setLagrer] = useState(false);
+
+    useEffect(() => {
+        if (harEndringer) {
+            setIngenEndringer(false);
+        }
+    }, [harEndringer]);
 
     const lagreNySoknad = async () => {
         const saksnummer = await onSubmit();
@@ -103,6 +111,7 @@ export default function SakButtons({
             )}
             {ingenEndringer && !harEndringer && <Alert variant="info">Ingen endringer å lagre.</Alert>}
             {feilmelding && <Alert variant="error">{feilmelding}</Alert>}
+            {valideringsFeil && <Alert variant="error">{valideringsFeil}</Alert>}
 
             <div className="flex justify-end gap-2">
                 <Button

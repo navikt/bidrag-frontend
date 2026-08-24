@@ -12,18 +12,20 @@ type NormalisertRolle = {
     reellMottakerNavn?: string;
 };
 
-type Endringsrad =
+export type Endringsrad =
     | {
           id: string;
           type: "lagtTil";
           rolleType: string;
           ident: string;
+          harUfullstendigRelasjon: boolean;
       }
     | {
           id: string;
           type: "fjernet";
           rolleType: string;
           ident: string;
+          harUfullstendigRelasjon: boolean;
       }
     | {
           id: string;
@@ -34,17 +36,18 @@ type Endringsrad =
           tilReellMottaker: string;
           fraReellMottakerNavn?: string;
           tilReellMottakerNavn?: string;
+          harUfullstendigRelasjon: boolean;
       };
 
 type Persongruppe = {
     personKey: string;
     ident: string;
     endringer: Endringsrad[];
+    harUfullstendigRelasjon: boolean;
 };
 
 type SakvisningEndringsoppsummeringProps = {
-    opprinneligeRoller: SakRedigeringData["roller"];
-    nåværendeRoller: SakRedigeringData["roller"];
+    endringsliste: Endringsrad[];
 };
 
 function lagRolleSignatur(rolle: SakRedigeringData["roller"][number]): string {
@@ -77,15 +80,18 @@ function erPersonIdent(ident: string): boolean {
     return /^\d{11}$/.test(ident);
 }
 
-function lagEndringsoppsummering(
+export function lagEndringsoppsummering(
     opprinneligeRoller: SakRedigeringData["roller"],
     nåværendeRoller: SakRedigeringData["roller"],
+    barnMedUfullstendigRelasjon: string[] = [],
 ): Endringsrad[] {
     const opprinnelige = normaliserRoller(opprinneligeRoller);
     const nåværende = normaliserRoller(nåværendeRoller);
 
     const opprinneligeMap = new Map(opprinnelige.map((rolle) => [rolle.key, rolle]));
     const nåværendeMap = new Map(nåværende.map((rolle) => [rolle.key, rolle]));
+
+    const harUfullstendigRelasjon = (ident: string) => barnMedUfullstendigRelasjon.includes(ident);
 
     const lagtTil = nåværende
         .filter((rolle) => !opprinneligeMap.has(rolle.key))
@@ -95,6 +101,7 @@ function lagEndringsoppsummering(
                 type: "lagtTil",
                 rolleType: rolle.rolleType,
                 ident: rolle.fodselsnummer,
+                harUfullstendigRelasjon: harUfullstendigRelasjon(rolle.fodselsnummer),
             }),
         );
 
@@ -106,6 +113,7 @@ function lagEndringsoppsummering(
                 type: "fjernet",
                 rolleType: rolle.rolleType,
                 ident: rolle.fodselsnummer,
+                harUfullstendigRelasjon: harUfullstendigRelasjon(rolle.fodselsnummer),
             }),
         );
 
@@ -129,6 +137,7 @@ function lagEndringsoppsummering(
                     tilReellMottaker: til,
                     fraReellMottakerNavn: opprinneligRolle.reellMottakerNavn,
                     tilReellMottakerNavn: rolle.reellMottakerNavn,
+                    harUfullstendigRelasjon: harUfullstendigRelasjon(rolle.fodselsnummer),
                 } satisfies Endringsrad,
             ];
         });
@@ -153,6 +162,8 @@ function grupperEtterPerson(endringer: Endringsrad[]): Persongruppe[] {
         const eksisterende = grupper.get(personKey);
         if (eksisterende) {
             eksisterende.endringer.push(endring);
+            eksisterende.harUfullstendigRelasjon =
+                eksisterende.harUfullstendigRelasjon || endring.harUfullstendigRelasjon;
             return;
         }
 
@@ -160,6 +171,7 @@ function grupperEtterPerson(endringer: Endringsrad[]): Persongruppe[] {
             personKey,
             ident,
             endringer: [endring],
+            harUfullstendigRelasjon: endring.harUfullstendigRelasjon,
         });
     });
 
@@ -260,6 +272,11 @@ function PersonEndringerSvar({ gruppe }: { gruppe: Persongruppe }) {
                         Ny rolle
                     </Tag>
                 )}
+                {gruppe.harUfullstendigRelasjon && (
+                    <Tag size="xsmall" variant="warning">
+                        Ufullstendig relasjon
+                    </Tag>
+                )}
             </FormSummary.Label>
             {øvrigeEndringer.length > 0 && (
                 <FormSummary.Value>
@@ -274,12 +291,8 @@ function PersonEndringerSvar({ gruppe }: { gruppe: Persongruppe }) {
     );
 }
 
-export default function Endringsoppsummering({
-    opprinneligeRoller,
-    nåværendeRoller,
-}: SakvisningEndringsoppsummeringProps) {
-    const endringer = lagEndringsoppsummering(opprinneligeRoller, nåværendeRoller);
-    const grupperteEndringer = grupperEtterPerson(endringer);
+export default function Endringsoppsummering({ endringsliste }: SakvisningEndringsoppsummeringProps) {
+    const grupperteEndringer = grupperEtterPerson(endringsliste);
 
     if (grupperteEndringer.length === 0) {
         return null;
