@@ -13,29 +13,29 @@ export interface BroadcastMessage<T> {
     payload: T | null;
 }
 
-export class Broadcast {
-    static convertToBroadcastMessage<T>(id: string, payload: T): BroadcastMessage<T> {
+export const Broadcast = {
+    convertToBroadcastMessage<T>(id: string, payload: T): BroadcastMessage<T> {
         return {
             id,
             payload,
         };
-    }
+    },
 
-    static convertToBroadcastErrorMessage<T>(id: string, error: T | string): BroadcastMessage<T> {
+    convertToBroadcastErrorMessage<T>(id: string, error: T | string): BroadcastMessage<T> {
         return {
             id,
             error: typeof error === "string" ? { message: error } : error,
             payload: null,
         };
-    }
+    },
 
-    static sendBroadcast<T>(name: string, data: BroadcastMessage<T>): void {
+    sendBroadcast<T>(name: string, data: BroadcastMessage<T>): void {
         const bc = new BroadcastChannel(name);
         bc.postMessage(JSON.stringify(data));
         bc.close();
-    }
+    },
 
-    static waitForBroadcast<T>(name: string, payloadSchema: z.ZodType<T>, id?: string): Promise<BroadcastMessage<T>> {
+    waitForBroadcast<T>(name: string, payloadSchema: z.ZodType<T>, id?: string): Promise<BroadcastMessage<T>> {
         return new Promise((resolve, reject) => {
             function onResult(obj: MessageEvent<string>): void {
                 try {
@@ -64,8 +64,8 @@ export class Broadcast {
                 reject(event);
             };
         });
-    }
-}
+    },
+};
 
 export enum BroadcastNames {
     EDIT_DOCUMENT_RESULT = "EDIT_DOCUMENT_RESULT",

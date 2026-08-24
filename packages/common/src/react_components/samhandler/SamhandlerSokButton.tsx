@@ -9,7 +9,7 @@ type SamhandlerSokProps = {
     onError?: (errorMessage: string) => void;
 };
 
-export default function SamhandlerSokButton({
+export default function SamhandlerSøkButton({
     onResult,
     onError,
     ...buttonProps
