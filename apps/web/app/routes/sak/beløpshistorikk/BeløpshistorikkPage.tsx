@@ -1,11 +1,11 @@
 import { Box, Loader, Tabs, VStack } from "@navikt/ds-react";
 import { type ReactNode, Suspense } from "react";
 import { useParams } from "react-router";
+import { PerioderFilterPanel } from "~/routes/sak/beløpshistorikk/PerioderFilterPanel.tsx";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import { BeløpshistorikkTabell } from "./BeløpshistorikkTabell";
 import { Engangsbetalinger } from "./Engangsbetalinger";
 import { Gebyr } from "./Gebyr";
-import PerioderFilterPanel from "./PerioderFilterPanel";
 
 export const handle: SakSideTittelHandle = { sakSideTittel: "Beløpshistorikk" };
 
@@ -46,19 +46,11 @@ export default function BeløpshistorikkPage() {
     );
 }
 
-function TabPanel({
-    value,
-    children,
-}: {
-    value: string;
-    children: ReactNode;
-}) {
+function TabPanel({ value, children }: { value: string; children: ReactNode }) {
     return (
         <Tabs.Panel value={value}>
             <Box paddingBlock={"space-32"}>
-                <Suspense fallback={<Loader size="medium" />}>
-                    {children}
-                </Suspense>
+                <Suspense fallback={<Loader size="medium" />}>{children}</Suspense>
             </Box>
         </Tabs.Panel>
     );

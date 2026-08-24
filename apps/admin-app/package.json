@@ -1,0 +1,38 @@
+{
+    "name": "@bidrag/admin-app",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts",
+        "./routes": "./src/routes.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@bidrag/api": "workspace:*",
+        "@bidrag/common": "workspace:*",
+        "@navikt/aksel-icons": "catalog:",
+        "@navikt/ds-react": "catalog:",
+        "echarts": "^6.1.0",
+        "mermaid": "^11.16.0",
+        "quill": "^2.0.3",
+        "quill-paste-smart": "^2.0.0",
+        "quill-resize-module": "2.0.8",
+        "react-error-boundary": "^6.1.2",
+        "react-hook-form": "^7.82.0",
+        "svg-pan-zoom": "^3.6.2",
+        "dompurify": "^3.4.13"
+    },
+
+    "devDependencies": {
+        "@react-router/dev": "catalog:"
+    },
+
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-router": "catalog:"
+    }
+}
