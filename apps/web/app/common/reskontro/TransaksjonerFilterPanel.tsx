@@ -3,8 +3,8 @@ import { EraserIcon } from "@navikt/aksel-icons";
 import { Box, Button, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router";
-import type { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
-import { usePersonOptions } from "~/common/filter/usePersonOptions.ts";
+import type { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper";
+import { usePersonOptions } from "~/common/filter/usePersonOptions";
 import {
     PARAM_BARN,
     PARAM_FRA,
@@ -12,9 +12,9 @@ import {
     PARAM_MOTTAKERE,
     PARAM_OPEN_TRANS,
     PARAM_TIL,
-} from "~/common/reskontro/konstanter.ts";
-import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "~/common/reskontro/transaksjonstyper.ts";
-import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
+} from "~/common/reskontro/konstanter";
+import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "~/common/reskontro/transaksjonstyper";
+import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter";
 
 interface TransaksjonerFilterPanelViewProps {
     unikeMottakere: string[];

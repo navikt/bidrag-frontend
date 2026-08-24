@@ -5,9 +5,9 @@ import { Box, Button, HStack, MonthPicker, UNSAFE_Combobox, useMonthpicker } fro
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
 import { useSearchParams } from "react-router";
 import type { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper";
-import { usePersonOptions } from "~/common/filter/usePersonOptions.ts";
-import { sisteDagIMnd } from "~/routes/sak/beløpshistorikk/periode.utils.ts";
-import { PARAM_BARN, PARAM_FRA, PARAM_TIL, PARAM_TYPE } from "./konstanter.ts";
+import { usePersonOptions } from "~/common/filter/usePersonOptions";
+import { sisteDagIMnd } from "~/routes/sak/beløpshistorikk/periode.utils";
+import { PARAM_BARN, PARAM_FRA, PARAM_TIL, PARAM_TYPE } from "./konstanter";
 import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";
 
 interface PerioderFilterPanelProps {

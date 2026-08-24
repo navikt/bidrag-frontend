@@ -2,8 +2,8 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useBidragCommons } from "@bidrag/common";
 import { unikeVerdier } from "@bidrag/utils";
 import { useMemo } from "react";
-import { useHentFlerePersoninformasjonSuspense } from "~/api/useApi.ts";
-import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
+import { useHentFlerePersoninformasjonSuspense } from "~/api/useApi";
+import { IdentQueryParamMapper } from "./IdentQueryParamMapper";
 
 type NameFunction = (person: PersonDto) => string | undefined;
 
