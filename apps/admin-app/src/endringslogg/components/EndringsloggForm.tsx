@@ -199,21 +199,21 @@ const EndringsBox = ({
                                     </Select>
                                 )}
                             />
-                            <Controller
-                                name="endring.innhold"
-                                defaultValue=""
-                                control={control}
-                                render={({ field, fieldState }) => (
-                                    <CustomQuillEditor
-                                        ref={quillRef}
-                                        resize
-                                        onTextChange={(innhold) => field.onChange(innhold)}
-                                        readOnly={false}
-                                        error={fieldState.error?.message}
-                                        defaultValue={field.value}
-                                    />
-                                )}
-                            />
+                            {/*<Controller*/}
+                            {/*    name="endring.innhold"*/}
+                            {/*    defaultValue=""*/}
+                            {/*    control={control}*/}
+                            {/*    render={({ field, fieldState }) => (*/}
+                            {/*        <CustomQuillEditor*/}
+                            {/*            ref={quillRef}*/}
+                            {/*            resize*/}
+                            {/*            onTextChange={(innhold) => field.onChange(innhold)}*/}
+                            {/*            readOnly={false}*/}
+                            {/*            error={fieldState.error?.message}*/}
+                            {/*            defaultValue={field.value}*/}
+                            {/*        />*/}
+                            {/*    )}*/}
+                            {/*/>*/}
                         </VStack>
                     </Box>
                 </Modal.Body>
@@ -313,26 +313,26 @@ const EndringsFormBox = ({
                         </Select>
                     )}
                 />
-                <Controller
-                    name={`endringer.${index}.innhold`}
-                    control={control}
-                    rules={{
-                        required: {
-                            value: true,
-                            message: "Dette feltet er påkrevd",
-                        },
-                    }}
-                    render={({ field, fieldState }) => (
-                        <CustomQuillEditor
-                            ref={_quillRef}
-                            resize
-                            onTextChange={(innhold) => field.onChange(innhold)}
-                            readOnly={false}
-                            error={fieldState.error?.message}
-                            defaultValue={field.value}
-                        />
-                    )}
-                />
+                {/*<Controller*/}
+                {/*    name={`endringer.${index}.innhold`}*/}
+                {/*    control={control}*/}
+                {/*    rules={{*/}
+                {/*        required: {*/}
+                {/*            value: true,*/}
+                {/*            message: "Dette feltet er påkrevd",*/}
+                {/*        },*/}
+                {/*    }}*/}
+                {/*    render={({ field, fieldState }) => (*/}
+                {/*        <CustomQuillEditor*/}
+                {/*            ref={_quillRef}*/}
+                {/*            resize*/}
+                {/*            onTextChange={(innhold) => field.onChange(innhold)}*/}
+                {/*            readOnly={false}*/}
+                {/*            error={fieldState.error?.message}*/}
+                {/*            defaultValue={field.value}*/}
+                {/*        />*/}
+                {/*    )}*/}
+                {/*/>*/}
             </VStack>
         </Box>
     );
