@@ -1,8 +1,8 @@
 import { TransaksjonerFilterPanel } from "~/common/reskontro/TransaksjonerFilterPanel.tsx";
-import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner.ts";
+import { useTransaksjoner } from "./useTransaksjoner";
 
-export function BrukerTransaksjonerFilterPanel({ ident }: { ident: string }) {
-    const { unikeMottakere, unikeBarn, unikeTransaksjonskoder } = useBrukerTransaksjoner(ident);
+export function SakTransaksjonerFilterPanel({ saksnummer }: { saksnummer: string }) {
+    const { unikeMottakere, unikeBarn, unikeTransaksjonskoder } = useTransaksjoner(saksnummer);
 
     return (
         <TransaksjonerFilterPanel

@@ -1,7 +1,7 @@
 import { BIDRAG_RESKONTRO_API } from "@bidrag/api";
 import { SecureLoggerService } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
-import { withQueryErrorHandling } from "./withQueryErrorHandling.ts";
+import { withQueryErrorHandling, withQueryErrorHandlingV2 } from "./withQueryErrorHandling.ts";
 
 export function hentReskontroTransaksjonerForBruker(ident: string) {
     return queryOptions({
@@ -11,15 +11,10 @@ export function hentReskontroTransaksjonerForBruker(ident: string) {
                 "hentReskontroTransaksjonerForBruker",
                 async () => {
                     if (!ident) throw new Error("ident is required");
-                    const { data } =
-                        await BIDRAG_RESKONTRO_API.transaksjoner.hentTransaksjonerPaPerson(
-                            {
-                                ident: ident,
-                            },
-                        );
-                    await SecureLoggerService.info(
-                        `Hentet reskontro transaksjoner for bruker  ${ident}`,
-                    );
+                    const { data } = await BIDRAG_RESKONTRO_API.transaksjoner.hentTransaksjonerPaPerson({
+                        ident: ident,
+                    });
+                    await SecureLoggerService.info(`Hentet reskontro transaksjoner for bruker  ${ident}`);
                     return data;
                 },
                 { ident },
@@ -36,15 +31,10 @@ export function hentReskontroTransaksjonerForSaksnummer(saksnummer: string) {
                 "hentReskontroTransaksjonerForSaksnummer",
                 async () => {
                     if (!saksnummer) throw new Error("saksnummer is required");
-                    const { data } =
-                        await BIDRAG_RESKONTRO_API.transaksjoner.hentTransaksjonerPaBidragssak(
-                            {
-                                saksnummer: saksnummer,
-                            },
-                        );
-                    await SecureLoggerService.info(
-                        `Hentet rekontro transaksjoner for sak  ${saksnummer}`,
-                    );
+                    const { data } = await BIDRAG_RESKONTRO_API.transaksjoner.hentTransaksjonerPaBidragssak({
+                        saksnummer: saksnummer,
+                    });
+                    await SecureLoggerService.info(`Hentet rekontro transaksjoner for sak  ${saksnummer}`);
                     return data;
                 },
                 { saksnummer },
@@ -58,12 +48,9 @@ export function hentInnkrevingForSaksnummer(saksnummer: string) {
         queryKey: ["hentInnkrevingForSaksnummer", saksnummer],
         queryFn: () =>
             withQueryErrorHandling("hentInnkrevingForSaksnummer", async () => {
-                const { data } =
-                    await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaBidragssak(
-                        {
-                            saksnummer: saksnummer,
-                        },
-                    );
+                const { data } = await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaBidragssak({
+                    saksnummer: saksnummer,
+                });
                 return data;
             }),
     });
@@ -90,10 +77,27 @@ export function hentTransaksjonskoder() {
         queryKey: ["hentTransaksjonskoder"],
         queryFn: () =>
             withQueryErrorHandling("hentTransaksjonskoder", async () => {
-                const { data } =
-                    await BIDRAG_RESKONTRO_API.transaksjonskoder.hentTransaksjonskoder();
+                const { data } = await BIDRAG_RESKONTRO_API.transaksjonskoder.hentTransaksjonskoder();
                 return data;
             }),
+        staleTime: Infinity,
+    });
+}
+
+export function hentTransaksjonerPaTransaksjonsid(transaksjonsId: number) {
+    return queryOptions({
+        queryKey: ["hentTransaksjonerPaTransaksjonsid", transaksjonsId],
+        queryFn: () =>
+            withQueryErrorHandlingV2(
+                "hentTransaksjonerPaTransaksjonsid",
+                async () => {
+                    const { data } = await BIDRAG_RESKONTRO_API.transaksjoner.hentTransaksjonerPaTransaksjonsid({
+                        transaksjonsid: transaksjonsId,
+                    });
+                    return data;
+                },
+                { notFoundValue: { transaksjoner: [] } },
+            ),
         staleTime: Infinity,
     });
 }

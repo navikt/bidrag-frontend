@@ -1,11 +1,11 @@
-import type {Transaksjon} from "@bidrag/api/BidragReskontroApi";
+import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
 
 export class TransaksjonAggregat {
-    readonly dato?: string ;
-    readonly transaksjonskode?: string ;
-    readonly beskrivelse?: string ;
-    readonly mottaker?: string ;
-    readonly søknadstype?: string ;
+    readonly dato?: string;
+    readonly transaksjonskode?: string;
+    readonly beskrivelse?: string;
+    readonly mottaker?: string;
+    readonly søknadstype?: string;
 
     private readonly _transaksjoner: Transaksjon[];
 
@@ -27,7 +27,11 @@ export class TransaksjonAggregat {
     }
 
     get nøkkel(): string {
-        return generateNøkkel(this._transaksjoner[0]!);
+        const first = this._transaksjoner[0];
+        if (!first) {
+            throw new Error("Kan ikke lage aggregat av uten noen elementer i lista");
+        }
+        return generateNøkkel(first);
     }
 
     get antall(): number {
