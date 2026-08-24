@@ -4,7 +4,8 @@ import { EraserIcon } from "@navikt/aksel-icons";
 import { Box, Button, HStack, MonthPicker, UNSAFE_Combobox, useMonthpicker } from "@navikt/ds-react";
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
 import { useSearchParams } from "react-router";
-import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper";
+import type { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper";
+import { usePersonOptions } from "~/common/filter/usePersonOptions.ts";
 import { sisteDagIMnd } from "~/routes/sak/beløpshistorikk/periode.utils.ts";
 import { PARAM_BARN, PARAM_FRA, PARAM_TIL, PARAM_TYPE } from "./konstanter.ts";
 import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";
@@ -16,12 +17,14 @@ interface PerioderFilterPanelProps {
 export function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelProps) {
     const { unikeKravhavere, unikeTyper } = useBeløphistorikkfilter(saksnummer);
     const [searchParams, setSearchParams] = useSearchParams();
+    const {
+        mapper: barnMapper,
+        options: barnOptions,
+        selectedOptions: barnSelectedOptions,
+    } = usePersonOptions(unikeKravhavere);
 
     const valgteTyper = searchParams.getAll(PARAM_TYPE);
-
-    const barnMapper = new IdentQueryParamMapper(unikeKravhavere);
-
-    const valgteBarn = barnMapper.toIdents(searchParams.getAll(PARAM_BARN));
+    const valgteBarn = barnSelectedOptions(searchParams.getAll(PARAM_BARN));
 
     const typeOptions = unikeTyper.map((type) => ({
         label: hentVisningsnavnFraType("stønadstype", type as Stonadstype),
@@ -110,8 +113,8 @@ export function PerioderFilterPanel({ saksnummer }: PerioderFilterPanelProps) {
             <HStack gap="space-8" wrap align={"end"}>
                 <UNSAFE_Combobox
                     label="Barn"
-                    options={barnMapper.allIdents}
-                    readOnly={barnMapper.allIdents.length <= 1}
+                    options={barnOptions}
+                    readOnly={barnOptions.length <= 1}
                     isMultiSelect
                     selectedOptions={valgteBarn}
                     onToggleSelected={(option, isSelected) =>
