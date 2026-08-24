@@ -2,6 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useBidragCommons } from "@bidrag/common";
 import { unikeVerdier } from "@bidrag/utils";
 import { useMemo } from "react";
+import { useHentFlerePersoninformasjonSuspense } from "~/api/useApi.ts";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
 
 type NameFunction = (person: PersonDto) => string | undefined;
@@ -10,17 +11,21 @@ const fullName: NameFunction = (person) => `${person.visningsnavn}, ${person.ide
 const shortName: NameFunction = (person) => person.fornavn ?? person.visningsnavn;
 
 export function usePersonOptions(idents: string[]) {
-    const { useHentPersonData, erMaskert } = useBidragCommons();
+    const { erMaskert } = useBidragCommons();
 
     const unikeIdents = useMemo(() => unikeVerdier(idents).sort(), [idents]);
-    const personer: Map<string, PersonDto> = new Map(
-        unikeIdents.map((ident) => [ident, useHentPersonData(ident).data]),
+    const personResultater = useHentFlerePersoninformasjonSuspense(unikeIdents);
+    const personer: Map<string, PersonDto | undefined> = new Map(
+        unikeIdents.map((ident, i) => [ident, personResultater[i]?.data]),
     );
     const mapper = new IdentQueryParamMapper(unikeIdents);
 
     const nullsafeLabel = (ident: string, name: NameFunction) => {
         const person = personer.get(ident);
-        return (person && name(person)) ?? ident;
+       if (person){
+           return name(person) ?? ident;
+       }
+       return ident
     };
 
     const option = (ident: string, name: NameFunction) => ({
@@ -28,7 +33,8 @@ export function usePersonOptions(idents: string[]) {
         value: ident,
     });
 
-    const optionsFunction = (name: NameFunction = fullName) => unikeIdents.map((ident) => option(ident, name));
+    const optionsFunction = (name: NameFunction = fullName) =>
+        unikeIdents.map((ident) => option(ident, name));
 
     const selectedOptions = (selected: string[], name: NameFunction = shortName) =>
         mapper.toIdents(selected).map((ident) => option(ident, name));

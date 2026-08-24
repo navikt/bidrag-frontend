@@ -483,6 +483,7 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
                 }
             },
             enabled: enabled && ident.length === 11,
+            staleTime: Infinity,
             retry: (failureCount: number, error: Error) => {
                 if (error instanceof TilgangsFeilError) {
                     return false;
