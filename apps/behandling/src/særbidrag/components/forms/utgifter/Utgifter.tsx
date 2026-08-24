@@ -319,7 +319,7 @@ const Main = ({
             </FlexRow>
             {!erAvslagValgt && (
                 <>
-                    <Box background="neutral-soft" className="overflow-hidden grid gap-2 py-2 px-4">
+                    <Box background="neutral-soft" className="overflow-hidden grid gap-2 py-2 px-4 text-wrap">
                         <FlexRow>
                             <Heading level="2" size="small">
                                 {text.title.oversiktOverUtgifter}
@@ -566,7 +566,7 @@ const UtgifterListe = ({
                     data-section={elementIds.seksjon_perioder}
                 >
                     <OverlayLoader loading={tableMutationStatus === "pending"} />
-                    <Table size="small" className="table-fixed table bg-[white] w-full">
+                    <Table size="small" className="table-fixed table bg-[white] w-full text-wrap">
                         <Table.Header>
                             <Table.Row className="align-baseline">
                                 <Table.HeaderCell textSize="small" scope="col" align="center" className="w-[74px]">
