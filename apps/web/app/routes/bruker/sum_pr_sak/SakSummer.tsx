@@ -1,9 +1,15 @@
 import type { Bidragssak, SaksinformasjonBarn } from "@bidrag/api/BidragReskontroApi";
-import { PersonNavnIdent } from "@bidrag/common";
+import { PersonNavnIdent, RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
 import { formaterBelop, sumNullable } from "@bidrag/utils";
 import { Alert, Box, HStack, Label, Table, VStack } from "@navikt/ds-react";
 import { useHentSak } from "~/api/useApi.ts";
-import { DUMMY_BARN } from "~/routes/sak/reskontro/konstanter.ts";
+import {
+    beregnTotalGjeld,
+    beregnTotalOffentligGjeld,
+    beregnTotalPrivatGjeld,
+    beregnTotaltTilUtbetaling,
+} from "~/common/reskontro/gjeldsberegninger.ts";
+import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
 
 const gjeld = (barn: SaksinformasjonBarn) => {
     return sumNullable(barn.restGjeldOffentlig, barn.restGjeldPrivat);
@@ -17,7 +23,7 @@ interface SakSummerProps {
     bidragSak: Bidragssak;
 }
 
-export function SakSummer({ bidragSak }: SakSummerProps) {
+export function SakSummer({ bidragSak, ident }: SakSummerProps) {
     if (!bidragSak.saksnummer) {
         return <Alert variant={"warning"}>Saksnummer mangler for bidragssak</Alert>;
     }
@@ -25,18 +31,21 @@ export function SakSummer({ bidragSak }: SakSummerProps) {
     const { data: sak } = useHentSak(bidragSak.saksnummer);
 
     /**ELIN returnerer noen ganger et "ekstra" barn med fødselsnr 444444 44441. */
+    const rolle = sak?.roller.find((rolle) => rolle.fodselsnummer === ident)?.type;
 
     const barn = bidragSak?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
-    const totalGjeld = barn.reduce((acc, barn) => acc + gjeld(barn), 0);
-    const totalPrivatGjeld = barn.reduce((acc, barn) => sumNullable(acc, barn.restGjeldPrivat), 0);
-    const totalOffGjeld = barn.reduce((acc, barn) => sumNullable(acc, barn.restGjeldOffentlig), 0);
-    const totaltTilUtbetaling = barn.reduce((acc, barn) => acc + tilUtbetaling(barn), 0);
-    const bmGjeld = sumNullable(bidragSak?.bmGjeldRest, bidragSak?.bmGjeldFastsettelsesgebyr);
+    const totalGjeld = beregnTotalGjeld(barn);
+    const totalPrivatGjeld = beregnTotalPrivatGjeld(barn);
+    const totalOffGjeld = beregnTotalOffentligGjeld(barn);
+    const totaltTilUtbetaling = beregnTotaltTilUtbetaling(barn);
 
     const NokkeltallForSak = () => (
         <VStack gap={"space-16"}>
-            <HStack gap={"space-8"} justify={"space-between"}>
-                <Label>Sak {bidragSak.saksnummer}</Label>
+            <HStack justify={"space-between"}>
+                <HStack gap={"space-8"}>
+                    {rolle && <RolleTag rolleType={rolle as unknown as RolleTypeAbbreviation} />}
+                    <Label>Sak {bidragSak.saksnummer} </Label>
+                </HStack>
             </HStack>
             <Box
                 asChild

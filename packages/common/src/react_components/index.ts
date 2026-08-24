@@ -3,7 +3,6 @@ export { default as BisysLink } from "./bisys/BisysLink";
 export { default as BidragCell } from "./grid/BidragCell";
 export { default as BidragContainer } from "./grid/BidragContainer";
 export { default as BidragGrid } from "./grid/BidragGrid";
-export { default as BrukerHeader } from "./header/BrukerHeader";
 export { default as SakHeader } from "./header/SakHeader";
 export * from "./hooks";
 export { default as PersonIdent } from "./person/PersonIdent";
