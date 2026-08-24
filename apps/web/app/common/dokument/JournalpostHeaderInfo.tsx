@@ -83,7 +83,7 @@ export function JournalpostHeaderInfo({
                 >
                     {innhold}
                 </Detail>
-                <HStack gap={"space-4"} justify={"start"} >
+                <HStack gap={"space-4"} justify={"start"}>
                     <Detail textColor={"default"}>{dokDato}</Detail>
                     {(visAntall || (harDokumenter && harLestMinstEtt)) && (
                         <HStack gap="space-1" align="center" className="shrink-0 text-gray-500">

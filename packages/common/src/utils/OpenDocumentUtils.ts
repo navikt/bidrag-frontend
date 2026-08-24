@@ -24,7 +24,7 @@ export class OpenDocumentUtils {
     ): string {
         const opimizeForPrintQuery = optimizeForPrint != null ? `&optimizeForPrint=${optimizeForPrint}` : "";
         const openInNewWindowQuery = `openInNewWindow=${openInNewWindow ? "true" : "false"}`;
-        const dokumentReferanseParam = dokumentreferanse ? "/" + dokumentreferanse : "";
+        const dokumentReferanseParam = dokumentreferanse ? `/${dokumentreferanse}` : "";
         return `/aapnedokument/${journalpostid}${dokumentReferanseParam}?${openInNewWindowQuery}${opimizeForPrintQuery}`;
     }
 
@@ -123,8 +123,8 @@ export class OpenDocumentUtils {
 
         if (dokumentMetadata?.format === DokumentFormatDto.MBDOK) {
             return OpenDocumentUtils.launchDokumentReaderWithIframe(journalpostId, dokumentreferanse)
-                .then((src) => this.openDocumentExternal(src))
-                .catch(this.handleOpenDocumentError)
+                .then((src) => OpenDocumentUtils.openDocumentExternal(src))
+                .catch(OpenDocumentUtils.handleOpenDocumentError)
                 .then(() => {
                     if (closeTabAfterOpen) {
                         setTimeout(() => window.close(), 400);
@@ -138,7 +138,7 @@ export class OpenDocumentUtils {
             `Åpner dokument med journalpostid ${journalpostId} og dokumentreferanse ${dokumentId} i brevklient`,
         );
         try {
-            const dokumentreferanse = await this.getDokumentReferanse(journalpostId, dokumentId);
+            const dokumentreferanse = await OpenDocumentUtils.getDokumentReferanse(journalpostId, dokumentId);
             const response = await BIDRAG_DOKUMENT_API.tilgang.giTilgangTilDokument(journalpostId, dokumentreferanse);
             return response.data.dokumentUrl;
         } catch (error) {
@@ -181,7 +181,7 @@ export class OpenDocumentUtils {
             const authUrl = new URL(currentUrl.replace("/aapnedokument/", "/aapnedokument_auth/"));
             const searchParams = authUrl.searchParams;
             searchParams.set("openInNewWindow", "false");
-            const updatedUrl = authUrl.origin + authUrl.pathname + "?" + searchParams.toString();
+            const updatedUrl = `${authUrl.origin + authUrl.pathname}?${searchParams.toString()}`;
             window.open(updatedUrl);
         }
     }

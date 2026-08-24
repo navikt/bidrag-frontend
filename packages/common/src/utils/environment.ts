@@ -1,17 +1,5 @@
 // @ts-nocheck
 
-interface envVarProps {
-    name: string;
-    required: boolean;
-}
-const envVar = ({ name, required = true }: envVarProps) => {
-    if (!process.env[name] && required) {
-        console.error(`Missing required environment variable '${name}'`);
-        process.exit(1);
-    }
-    return process.env[name];
-};
-
 const system = {
     isTest: process.env.NODE_ENV === "TEST",
     isDevelopment: process.env.NODE_ENV === "development",
