@@ -91,7 +91,10 @@ const RenderNotatPdf = ({ behandlingId, vedtakId }: NotatProps) => {
             type="application/pdf"
             aria-label="Notat"
             width="100%"
-            height="89%"
+            height="90vh"
+            style={{
+                height: "60vh",
+            }}
         />
     );
 };
