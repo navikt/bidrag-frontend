@@ -1,14 +1,13 @@
 import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
-import { PersonNavnIdent } from "@bidrag/common";
 import { formaterBelop } from "@bidrag/utils/belopUtils";
 import { formaterDato, sortByDateAsc } from "@bidrag/utils/datoUtils";
 import { Box, Pagination, type SortState, Table, VStack } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
-
-import { FiltrertTransaksjonSummer } from "../../sak/reskontro/FiltrertTransaksjonSummer.tsx";
-import { visningsnavnForSøknadstype } from "../../sak/reskontro/søknadstyper.ts";
-import { aggregerTransaksjoner } from "../../sak/reskontro/TransaksjonAggregat.ts";
-import { TransaksjonType } from "../../sak/reskontro/TransaksjonType.tsx";
+import { DetaljTransaksjonerTabell } from "~/common/reskontro/DetaljTransaksjonerTabell.tsx";
+import { FiltrertTransaksjonSummer } from "~/common/reskontro/FiltrertTransaksjonSummer.tsx";
+import { visningsnavnForSøknadstype } from "~/common/reskontro/søknadstyper.ts";
+import { aggregerTransaksjoner } from "~/common/reskontro/TransaksjonAggregat.ts";
+import { TransaksjonType } from "~/common/reskontro/TransaksjonType.tsx";
 
 interface TransaksjonerAggregertTabellProps {
     transaksjoner: Transaksjon[];
@@ -17,44 +16,7 @@ interface TransaksjonerAggregertTabellProps {
 
 const ROWS_PER_PAGE = 50;
 
-function SubTabell({ transaksjoner }: { transaksjoner: Transaksjon[] }) {
-    return (
-        <Table size="small" stickyHeader>
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell>Periode</Table.HeaderCell>
-                    <Table.HeaderCell>Gjelder</Table.HeaderCell>
-                    <Table.HeaderCell>Saksnummer</Table.HeaderCell>
-                    <Table.HeaderCell>Kilde</Table.HeaderCell>
-                    <Table.HeaderCell>Mottaker</Table.HeaderCell>
-                    <Table.HeaderCell>Valuta</Table.HeaderCell>
-                    <Table.HeaderCell align="right">Valutabel.</Table.HeaderCell>
-                    <Table.HeaderCell align="right">Beløp</Table.HeaderCell>
-                    <Table.HeaderCell align="right">Restbeløp</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
-            <Table.Body>
-                {transaksjoner.map((t) => (
-                    <Table.Row key={`${t.transaksjonsid}-${t.delytelsesid}`}>
-                        <Table.DataCell>{formaterDato(t.periode?.fom)}</Table.DataCell>
-                        <Table.DataCell>
-                            <PersonNavnIdent ident={t.barn} bareFornavn />
-                        </Table.DataCell>
-                        <Table.DataCell>{t.saksnummer}</Table.DataCell>
-                        <Table.DataCell>{t.skyldner}</Table.DataCell>
-                        <Table.DataCell>{t.mottaker}</Table.DataCell>
-                        <Table.DataCell>{t.valutakode ?? "NOK"}</Table.DataCell>
-                        <Table.DataCell align="right">{formaterBelop(t.beløpIOpprinneligValuta)}</Table.DataCell>
-                        <Table.DataCell align="right">{formaterBelop(t.beløp)}</Table.DataCell>
-                        <Table.DataCell align="right">{formaterBelop(t.restBeløp)}</Table.DataCell>
-                    </Table.Row>
-                ))}
-            </Table.Body>
-        </Table>
-    );
-}
-
-export default function BrukerTransaksjonerAggregertTabell({
+export function BrukerTransaksjonerAggregertTabell({
     transaksjoner,
     totalTransCount,
 }: TransaksjonerAggregertTabellProps) {
@@ -142,7 +104,7 @@ export default function BrukerTransaksjonerAggregertTabell({
                             expandOnRowClick
                             content={
                                 <Box paddingBlock="space-4">
-                                    <SubTabell transaksjoner={aggregat.transaksjoner} />
+                                    <DetaljTransaksjonerTabell transaksjoner={aggregat.transaksjoner} />
                                 </Box>
                             }
                         >

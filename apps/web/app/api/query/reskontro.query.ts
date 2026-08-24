@@ -1,7 +1,7 @@
 import { BIDRAG_RESKONTRO_API } from "@bidrag/api";
 import { SecureLoggerService } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
-import { withQueryErrorHandling } from "./withQueryErrorHandling.ts";
+import { withQueryErrorHandling, withQueryErrorHandlingV2 } from "./withQueryErrorHandling.ts";
 
 export function hentReskontroTransaksjonerForBruker(ident: string) {
     return queryOptions({
@@ -64,6 +64,24 @@ export function hentTransaksjonskoder() {
                 const { data } = await BIDRAG_RESKONTRO_API.transaksjonskoder.hentTransaksjonskoder();
                 return data;
             }),
+        staleTime: Infinity,
+    });
+}
+
+export function hentTransaksjonerPaTransaksjonsid(transaksjonsId: number) {
+    return queryOptions({
+        queryKey: ["hentTransaksjonerPaTransaksjonsid", transaksjonsId],
+        queryFn: () =>
+            withQueryErrorHandlingV2(
+                "hentTransaksjonerPaTransaksjonsid",
+                async () => {
+                    const { data } = await BIDRAG_RESKONTRO_API.transaksjoner.hentTransaksjonerPaTransaksjonsid({
+                        transaksjonsid: transaksjonsId,
+                    });
+                    return data;
+                },
+                { notFoundValue: { transaksjoner: [] } },
+            ),
         staleTime: Infinity,
     });
 }

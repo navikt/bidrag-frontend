@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { hentReskontroTransaksjonerForSaksnummer } from "~/api/query/reskontro.query";
 
-import { DUMMY_BARN } from "./konstanter";
+import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
 
 export function useTransaksjoner(saksnummer: string) {
     const { data } = useSuspenseQuery(hentReskontroTransaksjonerForSaksnummer(saksnummer));

@@ -10,8 +10,8 @@ import {
     PARAM_MOTTAKERE,
     PARAM_OPEN_TRANS,
     PARAM_TIL,
-} from "../../sak/reskontro/konstanter.ts";
-import { isTransaksjonGruppe, transaksjonstypeGrupper } from "../../sak/reskontro/transaksjonstyper.ts";
+} from "~/common/reskontro/konstanter.ts";
+import { isTransaksjonGruppe, transaksjonstypeGrupper } from "~/common/reskontro/transaksjonstyper.ts";
 import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner.ts";
 
 export function useBrukerTransaksjonsfilter(ident: string) {

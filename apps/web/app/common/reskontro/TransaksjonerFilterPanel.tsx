@@ -1,25 +1,40 @@
 import { parseDateQueryParam, toQueryParam } from "@bidrag/utils/datoUtils";
-import { Box, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
+import { EraserIcon } from "@navikt/aksel-icons";
+import { Box, Button, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
 import { useMemo } from "react";
-import { useParams, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
-import { PARAM_BARN, PARAM_FRA, PARAM_KODER, PARAM_MOTTAKERE, PARAM_OPEN_TRANS, PARAM_TIL } from "./konstanter";
-import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "./transaksjonstyper";
-import { useTransaksjoner } from "./useTransaksjoner";
+import {
+    PARAM_BARN,
+    PARAM_FRA,
+    PARAM_KODER,
+    PARAM_MOTTAKERE,
+    PARAM_OPEN_TRANS,
+    PARAM_TIL,
+} from "~/common/reskontro/konstanter.ts";
+import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "~/common/reskontro/transaksjonstyper.ts";
+import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
 
-export default function TransaksjonerFilterPanel() {
-    const { saksnummer } = useParams();
-    const { unikeMottakere, unikeBarn, unikeTransaksjonskoder } = useTransaksjoner(saksnummer!);
+interface TransaksjonerFilterPanelViewProps {
+    unikeMottakere: (string | null | undefined)[];
+    unikeBarn: (string | null | undefined)[];
+    unikeTransaksjonskoder: string[];
+}
+
+/** Felles filterpanel for transaksjoner — brukes både på sak og bruker. */
+export function TransaksjonerFilterPanel({
+    unikeMottakere,
+    unikeBarn,
+    unikeTransaksjonskoder,
+}: TransaksjonerFilterPanelViewProps) {
     const [searchParams, setSearchParams] = useSearchParams();
-
-    const valgteKoder = searchParams.getAll(PARAM_KODER);
 
     const mottakerMapper = new IdentQueryParamMapper(unikeMottakere);
     const barnMapper = new IdentQueryParamMapper(unikeBarn);
 
+    const valgteKoder = searchParams.getAll(PARAM_KODER);
     const valgteMottakere = mottakerMapper.toIdents(searchParams.getAll(PARAM_MOTTAKERE));
     const valgteBarn = barnMapper.toIdents(searchParams.getAll(PARAM_BARN));
-
     const checked = searchParams.get(PARAM_OPEN_TRANS) === "true";
 
     const kodeOptionsExtended = Object.entries(transaksjonstypeGrupper).map(([kode, type]) => {
@@ -46,12 +61,12 @@ export default function TransaksjonerFilterPanel() {
                 const updated = isSelected ? [...current, option] : current.filter((v) => v !== option);
                 const next = new URLSearchParams(prev);
                 next.delete(key);
-                updated.forEach((v) => {
+                for (const v of updated) {
                     next.append(key, v);
-                });
+                }
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -67,7 +82,7 @@ export default function TransaksjonerFilterPanel() {
                 date ? next.set(PARAM_FRA, toQueryParam(date)) : next.delete(PARAM_FRA);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -78,16 +93,24 @@ export default function TransaksjonerFilterPanel() {
                 date ? next.set(PARAM_TIL, toQueryParam(date)) : next.delete(PARAM_TIL);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
         );
     };
 
-    const { datepickerProps: fraDatepickerProps, inputProps: fraInputProps } = useDatepicker({
+    const {
+        datepickerProps: fraDatepickerProps,
+        inputProps: fraInputProps,
+        setSelected: setFraSelected,
+    } = useDatepicker({
         defaultSelected: parseDateQueryParam(searchParams.get(PARAM_FRA)),
         onDateChange: handleFraChange,
     });
 
-    const { datepickerProps: tilDatepickerProps, inputProps: tilInputProps } = useDatepicker({
+    const {
+        datepickerProps: tilDatepickerProps,
+        inputProps: tilInputProps,
+        setSelected: setTilSelected,
+    } = useDatepicker({
         defaultSelected: parseDateQueryParam(searchParams.get(PARAM_TIL)),
         onDateChange: handleTilChange,
     });
@@ -99,7 +122,26 @@ export default function TransaksjonerFilterPanel() {
                 value ? next.set(PARAM_OPEN_TRANS, "true") : next.delete(PARAM_OPEN_TRANS);
                 return next;
             },
-            { replace: true },
+            { replace: true, preventScrollReset: true },
+        );
+    };
+
+    const clearFilter = () => {
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete(PARAM_TIL);
+                next.delete(PARAM_FRA);
+                next.delete(PARAM_BARN);
+                next.delete(PARAM_TYPE);
+                next.delete(PARAM_KODER);
+                next.delete(PARAM_MOTTAKERE);
+                next.delete(PARAM_OPEN_TRANS);
+                setFraSelected();
+                setTilSelected();
+                return next;
+            },
+            { replace: true, preventScrollReset: true },
         );
     };
 
@@ -148,6 +190,14 @@ export default function TransaksjonerFilterPanel() {
                 <Switch size={"small"} checked={checked} onChange={(e) => handleOpenTrans(e.target.checked)}>
                     Vis bare åpne
                 </Switch>
+                <Button
+                    size={"small"}
+                    variant={"tertiary"}
+                    onClick={clearFilter}
+                    icon={<EraserIcon title="Fjern filter" />}
+                >
+                    Fjern filter
+                </Button>
             </HStack>
         </Box>
     );

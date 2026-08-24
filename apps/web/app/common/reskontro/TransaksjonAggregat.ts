@@ -27,7 +27,11 @@ export class TransaksjonAggregat {
     }
 
     get nøkkel(): string {
-        return generateNøkkel(this._transaksjoner[0]!);
+        const first = this._transaksjoner[0];
+        if (!first) {
+            throw new Error("Kan ikke lage aggregat av uten noen elementer i lista");
+        }
+        return generateNøkkel(first);
     }
 
     get antall(): number {
