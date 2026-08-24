@@ -24,7 +24,6 @@ export function useUfullstendigRelasjonSjekk() {
         [queryClient],
     );
 
-    /** Returnerer identene til barna som mangler fullstendig relasjon til begge partene. */
     const finnBarnMedUfullstendigRelasjon = useCallback(
         async (barn: string[], bidragsmottaker?: string, bidragspliktig?: string): Promise<string[]> => {
             if (!bidragsmottaker || !bidragspliktig) {

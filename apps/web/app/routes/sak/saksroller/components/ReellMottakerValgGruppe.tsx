@@ -1,5 +1,4 @@
 import { Alert, Box, Label, Radio, RadioGroup, VStack } from "@navikt/ds-react";
-import { useEffect, useState } from "react";
 
 import FunnetPersonInfo from "./FunnetPersonInfo.tsx";
 import PersonInfo from "./PersonInfo.tsx";
@@ -19,6 +18,7 @@ type Props = {
     barnIdent: string;
     barnFødselsdato?: string;
     valg: ReellMottakerValg;
+    lagretSamhandler: { ident: string; navn: string } | null;
     onValg: (valg: ReellMottakerValg) => void;
     visBarnekort?: boolean;
     kanFjerne?: boolean;
@@ -33,6 +33,7 @@ export default function ReellMottakerValgGruppe({
     barnIdent,
     barnFødselsdato,
     valg,
+    lagretSamhandler,
     onValg,
     visBarnekort = false,
     kanFjerne = false,
@@ -41,38 +42,6 @@ export default function ReellMottakerValgGruppe({
     disabled,
     feil,
 }: Props) {
-    // Husker forrige samhandler slik at den kommer tilbake om saksbehandler bytter fram og tilbake.
-    const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(null);
-
-    useEffect(() => {
-        if (valg.type === "samhandler" && valg.ident && valg.navn) {
-            setLagretSamhandler({ ident: valg.ident, navn: valg.navn });
-        }
-    }, [valg.type, valg.ident, valg.navn]);
-
-    useEffect(() => {
-        if (!isRequired || valg.type) {
-            return;
-        }
-
-        if (kunSamhandlerSomReellMottaker) {
-            onValg({ type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn });
-            return;
-        }
-
-        onValg({ type: "barnet_selv", ident: barnIdent, navn: barnNavn });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isRequired, kunSamhandlerSomReellMottaker, lagretSamhandler, valg.type, barnIdent, barnNavn]);
-
-    useEffect(() => {
-        if (!kunSamhandlerSomReellMottaker || valg.type !== "barnet_selv") {
-            return;
-        }
-
-        onValg({ type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [kunSamhandlerSomReellMottaker, lagretSamhandler, valg.type]);
-
     const handleRadioChange = (value: string) => {
         if (value === "ingen") {
             onValg({});
@@ -80,15 +49,6 @@ export default function ReellMottakerValgGruppe({
         }
 
         if (value === "barnet_selv") {
-            if (kunSamhandlerSomReellMottaker) {
-                onValg({ type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn });
-                return;
-            }
-
-            if (valg.type === "samhandler" && valg.ident && valg.navn) {
-                setLagretSamhandler({ ident: valg.ident, navn: valg.navn });
-            }
-
             onValg({ type: "barnet_selv", ident: barnIdent, navn: barnNavn });
             return;
         }

@@ -1,7 +1,7 @@
 import { RedirectTo } from "@bidrag/common";
 import { FloppydiskIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, Button, Heading, Modal } from "@navikt/ds-react";
-import { type RefObject, useEffect, useState } from "react";
+import { type RefObject, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import type { loader as rootLoader } from "~/root.tsx";
@@ -27,38 +27,29 @@ export default function SakButtons({
 }) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const [bekreftHandling, setBekreftHandling] = useState<Lagrehandling | null>(null);
-    const [lagrer, setLagrer] = useState(false);
     const [ingenEndringer, setIngenEndringer] = useState(false);
+    const [lagrer, setLagrer] = useState(false);
 
-    useEffect(() => {
-        if (harEndringer) {
-            setIngenEndringer(false);
-        }
-    }, [harEndringer]);
-
-    const lagre = async (handling: Lagrehandling) => {
-        setLagrer(true);
-        try {
-            const saksnummer = await onSubmit();
-            setBekreftHandling(null);
-
-            if (handling === "nySoknad") {
-                RedirectTo.nySoknad(saksnummer, bisysUrl);
-                return;
-            }
-            if (handling === "gaaTilSak") {
-                RedirectTo.behandleSak(saksnummer, bisysUrl);
-                return;
-            }
-            await onRefetch();
-        } catch {
-            return;
-        } finally {
-            setLagrer(false);
-        }
+    const lagreNySoknad = async () => {
+        const saksnummer = await onSubmit();
+        RedirectTo.nySoknad(saksnummer, bisysUrl);
     };
 
-    const velgLagrehandling = (handling: Lagrehandling) => {
+    const lagreOgGaaTilSak = async () => {
+        const saksnummer = await onSubmit();
+        RedirectTo.behandleSak(saksnummer, bisysUrl);
+    };
+
+    const lagreOgBliVaerende = async () => {
+        await onSubmit();
+        await onRefetch();
+    };
+
+    const velgLagrehandling = (handling: Lagrehandling, lagre: () => Promise<void>) => {
+        if (lagrer) {
+            return;
+        }
+
         if (!harEndringer) {
             setIngenEndringer(true);
             return;
@@ -69,7 +60,38 @@ export default function SakButtons({
             return;
         }
 
-        void lagre(handling);
+        void (async () => {
+            setLagrer(true);
+            try {
+                await lagre();
+            } catch {
+                return;
+            } finally {
+                setLagrer(false);
+            }
+        })();
+    };
+
+    const bekreftLagring = async () => {
+        if (lagrer) {
+            return;
+        }
+
+        setLagrer(true);
+        try {
+            if (bekreftHandling === "nySoknad") {
+                await lagreNySoknad();
+            } else if (bekreftHandling === "gaaTilSak") {
+                await lagreOgGaaTilSak();
+            } else {
+                await lagreOgBliVaerende();
+            }
+            setBekreftHandling(null);
+        } catch {
+            return;
+        } finally {
+            setLagrer(false);
+        }
     };
 
     return (
@@ -79,8 +101,8 @@ export default function SakButtons({
                     <Alert variant="success">{suksessmelding}</Alert>
                 </div>
             )}
-            {ingenEndringer && <Alert variant="info">Ingen endringer å lagre.</Alert>}
-            {feilmelding && !bekreftHandling && <Alert variant="error">{feilmelding}</Alert>}
+            {ingenEndringer && !harEndringer && <Alert variant="info">Ingen endringer å lagre.</Alert>}
+            {feilmelding && <Alert variant="error">{feilmelding}</Alert>}
 
             <div className="flex justify-end gap-2">
                 <Button
@@ -89,7 +111,8 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå til ny søknad skjermbildet"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    onClick={() => velgLagrehandling("nySoknad")}
+                    disabled={lagrer}
+                    onClick={() => velgLagrehandling("nySoknad", lagreNySoknad)}
                 >
                     Lagre og ny søknad
                 </Button>
@@ -99,7 +122,8 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå tilbake til sak"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    onClick={() => velgLagrehandling("gaaTilSak")}
+                    disabled={lagrer}
+                    onClick={() => velgLagrehandling("gaaTilSak", lagreOgGaaTilSak)}
                 >
                     Lagre og gå til sak
                 </Button>
@@ -107,7 +131,8 @@ export default function SakButtons({
                     type="button"
                     size="xsmall"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    onClick={() => velgLagrehandling("bliVaerende")}
+                    disabled={lagrer}
+                    onClick={() => velgLagrehandling("bliVaerende", lagreOgBliVaerende)}
                 >
                     Lagre
                 </Button>
@@ -116,7 +141,11 @@ export default function SakButtons({
             {bekreftHandling && (
                 <Modal
                     open
-                    onClose={() => setBekreftHandling(null)}
+                    onClose={() => {
+                        if (!lagrer) {
+                            setBekreftHandling(null);
+                        }
+                    }}
                     width="small"
                     aria-label="Bekreft lagring av saksroller"
                 >
@@ -130,7 +159,7 @@ export default function SakButtons({
                         <BodyLong>Kontroller relasjonsadvarselen før du lagrer endringene.</BodyLong>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button type="button" loading={lagrer} onClick={() => lagre(bekreftHandling)}>
+                        <Button type="button" loading={lagrer} disabled={lagrer} onClick={() => void bekreftLagring()}>
                             Lagre
                         </Button>
                         <Button

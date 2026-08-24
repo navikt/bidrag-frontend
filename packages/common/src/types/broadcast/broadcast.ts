@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export interface BroadcastError {
     message: string;
     stack?: string;
@@ -22,7 +24,7 @@ export class Broadcast {
     static convertToBroadcastErrorMessage<T>(id: string, error: T | string): BroadcastMessage<T> {
         return {
             id,
-            error: typeof error == "string" ? { message: error } : error,
+            error: typeof error === "string" ? { message: error } : error,
             payload: null,
         };
     }
@@ -33,19 +35,34 @@ export class Broadcast {
         bc.close();
     }
 
-    static waitForBroadcast<T>(name: string, id?: string): Promise<BroadcastMessage<T>> {
+    static waitForBroadcast<T>(name: string, payloadSchema: z.ZodType<T>, id?: string): Promise<BroadcastMessage<T>> {
         return new Promise((resolve, reject) => {
             function onResult(obj: MessageEvent<string>): void {
-                const data = JSON.parse(obj.data) as BroadcastMessage<T>;
-                if (!id || data.id === id) {
-                    resolve(data);
+                try {
+                    const data = z
+                        .object({
+                            id: z.string(),
+                            payload: payloadSchema.nullable(),
+                        })
+                        .passthrough()
+                        .parse(JSON.parse(obj.data));
+
+                    if (!id || data.id === id) {
+                        resolve(data as BroadcastMessage<T>);
+                        bc.close();
+                    }
+                } catch {
                     bc.close();
+                    reject(new Error("Kunne ikke lese broadcast-resultatet."));
                 }
             }
 
             const bc = new BroadcastChannel(name);
             bc.onmessage = onResult;
-            bc.onmessageerror = (ev: MessageEvent) => reject(ev);
+            bc.onmessageerror = (event: MessageEvent) => {
+                bc.close();
+                reject(event);
+            };
         });
     }
 }

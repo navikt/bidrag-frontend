@@ -26,14 +26,6 @@ export default class SakErrorBoundary extends Component<Props, State> {
         console.error("Error caught in SakErrorBoundary:", error, errorInfo);
     }
 
-    private renderError(content: ReactNode) {
-        return (
-            <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
-                <Alert variant="error">{content}</Alert>
-            </Box>
-        );
-    }
-
     override render() {
         if (this.state.hasError && this.state.error) {
             const error = this.state.error;
@@ -41,39 +33,45 @@ export default class SakErrorBoundary extends Component<Props, State> {
             const isSakNotFound = error.message.includes("Fant ikke sak");
 
             if (isTilgangsfeil) {
-                return this.renderError(
-                    <>
-                        <Heading level="3" size="small" spacing>
-                            Ingen tilgang
-                        </Heading>
-                        <BodyLong spacing>
-                            Du har ikke tilgang til sak {this.props.saksnummer}. Dette kan skyldes diskresjonskode eller
-                            manglende rettigheter.
-                        </BodyLong>
-                    </>,
+                return (
+                    <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
+                        <Alert variant="error">
+                            <Heading level="3" size="small" spacing>
+                                Ingen tilgang
+                            </Heading>
+                            <BodyLong spacing>
+                                Du har ikke tilgang til sak {this.props.saksnummer}. Dette kan skyldes diskresjonskode
+                                eller manglende rettigheter.
+                            </BodyLong>
+                        </Alert>
+                    </Box>
                 );
             }
 
             if (isSakNotFound) {
-                return this.renderError(
-                    <>
-                        <Heading level="3" size="small" spacing>
-                            Sak ikke funnet
-                        </Heading>
-                        <BodyLong spacing>Fant ingen sak med saksnummer {this.props.saksnummer}</BodyLong>
-                    </>,
+                return (
+                    <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
+                        <Alert variant="error">
+                            <Heading level="3" size="small" spacing>
+                                Sak ikke funnet
+                            </Heading>
+                            <BodyLong spacing>Fant ingen sak med saksnummer {this.props.saksnummer}</BodyLong>
+                        </Alert>
+                    </Box>
                 );
             }
 
-            return this.renderError(
-                <>
-                    <Heading level="3" size="small" spacing>
-                        Feil under lasting av sak
-                    </Heading>
-                    <BodyLong spacing>
-                        Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
-                    </BodyLong>
-                </>,
+            return (
+                <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
+                    <Alert variant="error">
+                        <Heading level="3" size="small" spacing>
+                            Feil under lasting av sak
+                        </Heading>
+                        <BodyLong spacing>
+                            Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
+                        </BodyLong>
+                    </Alert>
+                </Box>
             );
         }
 

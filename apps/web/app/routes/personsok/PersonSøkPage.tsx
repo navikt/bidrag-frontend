@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 
 import { env } from "~/env.server.ts";
-import type { Route } from "./+types/PersonSokPage.ts";
+import type { Route } from "./+types/PersonSøkPage.ts";
 
 export const PERSONSOK_RESULT_EVENT = "personsok-result";
 
@@ -12,9 +12,9 @@ export function loader() {
 
 /**
  * Åpnes i eget vindu. Uten `aktorid` sendes brukeren til PDL-søket, som kommer
- * tilbake hit med identen. Da kringkastes resultatet til vinduet som åpnet oss.
+ * tilbake hit med identen. Da kringkastes resultatet til vinduet som åpnet denne.
  */
-export default function PersonSokPage({ loaderData }: Route.ComponentProps) {
+export default function PersonSøkPage({ loaderData }: Route.ComponentProps) {
     const [searchParams] = useSearchParams();
     const aktorid = searchParams.get("aktorid");
     const windowId = searchParams.get("windowId");

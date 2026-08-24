@@ -38,11 +38,28 @@ export default function ReellMottakerVelger({
     }) as BarnRolle | undefined;
 
     // Utkast, slik at endringsoppsummeringen bak modalen først oppdateres ved bekreftelse.
-    const [utkast, setUtkast] = useState<ReellMottakerValg>(() => ({
-        type: barn?.reellMottakerType,
-        ident: barn?.reellMottaker,
-        navn: barn?.reellMottakerNavn,
-    }));
+    const [utkast, setUtkast] = useState<ReellMottakerValg>(() => {
+        const eksisterendeValg = {
+            type: barn?.reellMottakerType,
+            ident: barn?.reellMottaker,
+            navn: barn?.reellMottakerNavn,
+        };
+
+        if (kunSamhandlerSomReellMottaker && eksisterendeValg.type === "barnet_selv") {
+            return { type: "samhandler" };
+        }
+
+        if (isRequired && !eksisterendeValg.type) {
+            return kunSamhandlerSomReellMottaker
+                ? { type: "samhandler" }
+                : { type: "barnet_selv", ident: barn?.fodselsnummer, navn: barnNavn };
+        }
+
+        return eksisterendeValg;
+    });
+    const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(() =>
+        utkast.type === "samhandler" && utkast.ident && utkast.navn ? { ident: utkast.ident, navn: utkast.navn } : null,
+    );
 
     if (!barn) {
         return null;
@@ -53,6 +70,18 @@ export default function ReellMottakerVelger({
         form.setValue(`roller.${rolleIndex}.reellMottaker`, utkast.ident);
         form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, utkast.navn, { shouldValidate: true });
         onBekreft?.();
+    };
+
+    const handleValg = (nyttValg: ReellMottakerValg) => {
+        if (utkast.type === "samhandler" && utkast.ident && utkast.navn && nyttValg.type !== "samhandler") {
+            setLagretSamhandler({ ident: utkast.ident, navn: utkast.navn });
+        }
+
+        if (nyttValg.type === "samhandler" && nyttValg.ident && nyttValg.navn) {
+            setLagretSamhandler({ ident: nyttValg.ident, navn: nyttValg.navn });
+        }
+
+        setUtkast(nyttValg);
     };
 
     const kanBekrefte =
@@ -78,7 +107,8 @@ export default function ReellMottakerVelger({
                     barnIdent={barn.fodselsnummer}
                     barnFødselsdato={barn.fødselsdato}
                     valg={utkast}
-                    onValg={setUtkast}
+                    lagretSamhandler={lagretSamhandler}
+                    onValg={handleValg}
                     visBarnekort
                     kanFjerne={kanFjerne}
                     isRequired={isRequired}

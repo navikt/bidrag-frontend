@@ -4,7 +4,7 @@ import { Alert, Loader, Search } from "@navikt/ds-react";
 import { useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
 
-export default function PersonSamhandlerSok({
+export default function PersonSamhandlerSøk({
     valgIdent,
     label,
     onResult,

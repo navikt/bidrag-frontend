@@ -1,6 +1,11 @@
 import { useEffect, useRef } from "react";
 
-import { Broadcast, BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
+import {
+    Broadcast,
+    BroadcastNames,
+    type SamhandlerBroadcastMessage,
+    SamhandlerBroadcastMessageSchema,
+} from "../../types";
 
 type SamhandlerSokPopupProps = {
     windowId: string;
@@ -40,7 +45,11 @@ export default function SamhandlerSokPopup({ windowId, onResult, onError }: Samh
             }
         }, 500);
 
-        Broadcast.waitForBroadcast<SamhandlerBroadcastMessage>(BroadcastNames.SAMHANDLERSOK_RESULT_EVENT, windowId)
+        Broadcast.waitForBroadcast(
+            BroadcastNames.SAMHANDLERSOK_RESULT_EVENT,
+            SamhandlerBroadcastMessageSchema,
+            windowId,
+        )
             .then((res) => {
                 if (checkIntervalRef.current) {
                     clearInterval(checkIntervalRef.current);

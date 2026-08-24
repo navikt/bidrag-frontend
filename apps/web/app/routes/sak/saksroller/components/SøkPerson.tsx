@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 
-import PersonSamhandlerSok from "./PersonSamhandlerSok.tsx";
+import PersonSamhandlerSøk from "./PersonSamhandlerSøk.tsx";
 
 type Props = {
     label: string;
@@ -8,5 +8,5 @@ type Props = {
 };
 
 export default function SøkPerson({ label, personInformasjon }: Props) {
-    return <PersonSamhandlerSok label={label} onResult={personInformasjon} />;
+    return <PersonSamhandlerSøk label={label} onResult={personInformasjon} />;
 }
