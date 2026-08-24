@@ -33,6 +33,7 @@ interface ReturDestinasjon {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const sakSti = (saksnummer: string, side?: string) => (side ? `/sak/${saksnummer}/${side}` : `/sak/${saksnummer}`);
+const sakshistorikkSti = (saksnummer: string, side?: string) => (side ? `/sakshistorikk/${saksnummer}/${side}` : `/sakshistorikk/${saksnummer}`);
 const brukerSti = (brukerid: string, side?: string) => (side ? `/bruker/${brukerid}/${side}` : `/bruker/${brukerid}`);
 
 /**
@@ -41,6 +42,11 @@ const brukerSti = (brukerid: string, side?: string) => (side ? `/bruker/${bruker
  */
 const bisysSakDestinasjon = (saksnummer: string): ReturDestinasjon => ({
     sti: "/bisys/sak",
+    params: { saksnr: saksnummer },
+});
+
+const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => ({
+    sti: "/bisys/sakshistorikk",
     params: { saksnr: saksnummer },
 });
 
@@ -90,6 +96,7 @@ const fraBruker = (label: string, side: string): EksplisittReturMål => ({
  * Nye returmål legges til her — resten av mekanikken er generisk.
  */
 const RETUR_MÅL = {
+    behandling: fraSak("Behandling", "behandling"),
     sakshistorikk: fraSak("Sakshistorikk", "sakshistorikk"),
     belopshistorikk: fraSak("Beløpshistorikk", "belopshistorikk"),
     fogdhistorikk: fraSak("Fogdhistorikk", "fogdhistorikk"),
@@ -132,6 +139,13 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
         undersider: ["fogdhistorikk", "belopshistorikk", "reskontro", "sakshistorikk"],
         undersideSti: sakSti,
         destinasjon: bisysSakDestinasjon,
+    },
+    {
+        label: "Sakshistorikk",
+        id: ({ saksnummer }) => saksnummer,
+        undersider: ["behandling"],
+        undersideSti: sakSti,
+        destinasjon: bisysSakshistorikkDestinasjon,
     },
     {
         label: "Brukeroversikt",
@@ -197,7 +211,10 @@ export function useReturLink(): ReturLenke | null {
     const { pathname } = useLocation();
 
     const kontekst = hentSakBrukerFraUrl(pathname, searchParams);
+
     const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst);
+    console.log(kontekst, pathname, mål)
+
     if (!mål) return null;
 
     return { label: mål.label, href: byggHref(mål, searchParams) };

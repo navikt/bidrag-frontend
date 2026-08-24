@@ -14,6 +14,7 @@ const LENKE_STYLE = {
 export default function BisysHeaderLink() {
     const { bisysUrl, bisysLinkTarget } = useBisysLink();
     const returLink = useReturLink();
+    console.log(bisysLinkTarget, returLink)
 
     // Når brukeren er rutet hit fra en annen side i appen, peker tilbakelenken dit i stedet for til Bisys.
     if (returLink) {
@@ -30,6 +31,9 @@ export default function BisysHeaderLink() {
 
     let linkLabel: string;
     switch (bisysLinkTarget) {
+        case "sakshistorikk":
+            linkLabel = "Tilbake til sakshistorikk";
+            break;
         case "sak":
             linkLabel = "Tilbake til sak";
             break;

@@ -22,11 +22,11 @@ export function BehandleLink({ saksnummer, hendelse, enhet, sessionState, kanSkr
     if (hendelse.erKlageberettigetVedtak) {
         if (!hendelse.hendelseId) return null;
         params.set("executeKlage", hendelse.hendelseId);
-        return <Link href={`/bisys/sakHistorikk?${params}`}>Lag klage</Link>;
+        return <Link href={`/bisys/sakshistorikk?${params}`}>Lag klage</Link>;
     }
 
     if (hendelse.erLukket) return null;
 
     params.set("executeSoknad", "1");
-    return <Link href={`/bisys/sakHistorikk?${params}`}>Søknad</Link>;
+    return <Link href={`/bisys/sakshistorikk?${params}`}>Søknad</Link>;
 }

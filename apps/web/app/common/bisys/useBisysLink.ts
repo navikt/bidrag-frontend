@@ -3,7 +3,7 @@ import { getBisysSessionParams } from "./bisys-params.ts";
 
 const SESSION_BISYS_LINK_TARGET = "bisys.linktarget";
 const SESSION_BISYS_LINK_PARAMS = "bisys.linkParams";
-const BISYS_LINK_TARGETS = ["sak", "oppgaveliste"] as const;
+const BISYS_LINK_TARGETS = ["sak", "oppgaveliste", "sakshistorikk"] as const;
 
 type BisysLinkTarget = (typeof BISYS_LINK_TARGETS)[number];
 type BisysParamName = "saksnr";

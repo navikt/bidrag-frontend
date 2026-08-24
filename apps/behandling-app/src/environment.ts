@@ -10,7 +10,7 @@ const system = {
 const url = {
     /** Redirect-rute i apps/web som slår opp BISYS_URL på serveren */
     bisysSak: "/bisys/sak",
-    bisysSakshistorikk: "/bisys/sakHistorikk",
+    bisysSakshistorikk: "/bisys/sakshistorikk",
     /** Redirect-rute i apps/web som slår opp MODIA_URL på serveren */
     modiaPerson: "/modia/person",
     forskuddBrukerveiledning: "/behandling/brukerveiledning/forskudd",
