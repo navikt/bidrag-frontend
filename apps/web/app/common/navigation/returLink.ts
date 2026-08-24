@@ -33,7 +33,8 @@ interface ReturDestinasjon {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const sakSti = (saksnummer: string, side?: string) => (side ? `/sak/${saksnummer}/${side}` : `/sak/${saksnummer}`);
-const sakshistorikkSti = (saksnummer: string, side?: string) => (side ? `/sakshistorikk/${saksnummer}/${side}` : `/sakshistorikk/${saksnummer}`);
+const sakshistorikkSti = (saksnummer: string, side?: string) =>
+    side ? `/sakshistorikk/${saksnummer}/${side}` : `/sakshistorikk/${saksnummer}`;
 const brukerSti = (brukerid: string, side?: string) => (side ? `/bruker/${brukerid}/${side}` : `/bruker/${brukerid}`);
 
 /**
@@ -213,7 +214,7 @@ export function useReturLink(): ReturLenke | null {
     const kontekst = hentSakBrukerFraUrl(pathname, searchParams);
 
     const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst);
-    console.log(kontekst, pathname, mål)
+    console.log(kontekst, pathname, mål);
 
     if (!mål) return null;
 

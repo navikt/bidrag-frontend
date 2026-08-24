@@ -483,64 +483,63 @@ function HeaderRenderer({
     );
 
     return (
-
-            <Bleed marginInline="full">
-                <Box
-                    style={{
-                        background: "var(--ax-bg-neutral-soft)",
-                        borderBottom: "1px solid var(--ax-border-neutral-subtle)",
-                    }}
-                >
-                    <style>{`
+        <Bleed marginInline="full">
+            <Box
+                style={{
+                    background: "var(--ax-bg-neutral-soft)",
+                    borderBottom: "1px solid var(--ax-border-neutral-subtle)",
+                }}
+            >
+                <style>{`
                 @keyframes saksnummerFlash {
                     0%   { box-shadow: 0 0 0 3px var(--ax-border-accent, #0067c5); }
                     100% { box-shadow: 0 0 0 0px transparent; }
                 }
             `}</style>
 
-                    {/* Title and tabs */}
-                    <Box>
+                {/* Title and tabs */}
+                <Box>
+                    <Box
+                        style={{
+                            display: "flex",
+                            padding: "0rem 1rem",
+                            background: "var(--ax-bg-neutral-soft)",
+                        }}
+                    >
                         <Box
                             style={{
                                 display: "flex",
-                                padding: "0rem 1rem",
-                                background: "var(--ax-bg-neutral-soft)",
+                                alignItems: "center",
+                                flexShrink: 0,
+                                padding: "0.5rem 1.5rem 0.5rem 0",
                             }}
                         >
-                            <Box
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    flexShrink: 0,
-                                    padding: "0.5rem 1.5rem 0.5rem 0",
-                                }}
-                            >
-                                <HeaderTittel
-                                    type={type}
-                                    style={{ color: "var(--ax-bg-brand-beige-strong)", whiteSpace: "nowrap" }}
-                                />
-                            </Box>
-
-                            <Box style={{ display: "flex", minWidth: 0 }}>
-                                {saksnummerRoller.map((item) => (
-                                    <SaksnummerTab
-                                        key={item.saksnummer}
-                                        item={item}
-                                        isSelected={aktivtSaksnummer === item.saksnummer}
-                                        isExpanded={expandedSaksnummer === item.saksnummer}
-                                        isFlashing={flashingSaksnummer === item.saksnummer}
-                                        harFlereSaksnummer={harFlereSaksnummer}
-                                        onSelect={onSelectSaksnummer}
-                                        onToggleExpand={onToggleExpanded}
-                                    />
-                                ))}
-                            </Box>
+                            <HeaderTittel
+                                type={type}
+                                style={{ color: "var(--ax-bg-brand-beige-strong)", whiteSpace: "nowrap" }}
+                            />
                         </Box>
 
-                        {/* Expanded roles panel */}
-                        <ExpandedRoles saksnummerRoller={expandedSaksnummerRoller} />
+                        <Box style={{ display: "flex", minWidth: 0 }}>
+                            {saksnummerRoller.map((item) => (
+                                <SaksnummerTab
+                                    key={item.saksnummer}
+                                    item={item}
+                                    isSelected={aktivtSaksnummer === item.saksnummer}
+                                    isExpanded={expandedSaksnummer === item.saksnummer}
+                                    isFlashing={flashingSaksnummer === item.saksnummer}
+                                    harFlereSaksnummer={harFlereSaksnummer}
+                                    onSelect={onSelectSaksnummer}
+                                    onToggleExpand={onToggleExpanded}
+                                />
+                            ))}
+                        </Box>
                     </Box>
+
+                    {/* Expanded roles panel */}
+                    <ExpandedRoles saksnummerRoller={expandedSaksnummerRoller} />
                 </Box>
-            </Bleed>
+            </Box>
+        </Bleed>
     );
 }
