@@ -12,6 +12,7 @@ interface RequestTraceContext {
     // span: Span;
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class SecuritySessionUtils {
     // static async hentSecuritySessionTokenFromBackend() {
     //     const tokenReq = await fetch("/session", { method: "GET" });
