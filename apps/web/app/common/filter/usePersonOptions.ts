@@ -22,10 +22,10 @@ export function usePersonOptions(idents: string[]) {
 
     const nullsafeLabel = (ident: string, name: NameFunction) => {
         const person = personer.get(ident);
-       if (person){
-           return name(person) ?? ident;
-       }
-       return ident
+        if (person) {
+            return name(person) ?? ident;
+        }
+        return ident;
     };
 
     const option = (ident: string, name: NameFunction) => ({
@@ -33,8 +33,7 @@ export function usePersonOptions(idents: string[]) {
         value: ident,
     });
 
-    const optionsFunction = (name: NameFunction = fullName) =>
-        unikeIdents.map((ident) => option(ident, name));
+    const optionsFunction = (name: NameFunction = fullName) => unikeIdents.map((ident) => option(ident, name));
 
     const selectedOptions = (selected: string[], name: NameFunction = shortName) =>
         mapper.toIdents(selected).map((ident) => option(ident, name));
