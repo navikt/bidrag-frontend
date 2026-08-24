@@ -1,6 +1,7 @@
 import { Link } from "@navikt/ds-react";
 import { Link as RouterLink } from "react-router";
 import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
+import { ClientOnly } from "~/common/ClientOnly.tsx";
 import { useReturLink } from "~/common/navigation/returLink.ts";
 
 const LENKE_STYLE = {
@@ -11,10 +12,15 @@ const LENKE_STYLE = {
     padding: "0 var(--ax-space-20)",
 } as const;
 
+/**
+ * `useReturLink` bygger kun på URL-en (`useLocation`/`useSearchParams`) og er derfor trygg å
+ * rendre på serveren - i motsetning til `useBisysLink`, som leser `sessionStorage` og ville gitt
+ * hydration-mismatch. Vi gater derfor kun bisys-fallbacken bak `ClientOnly`, slik at tilbakelenken
+ * vises med en gang (også under SSR/hydrering) når vi faktisk har et returmål, i stedet for at hele
+ * knappen forsvinner helt til klienten er ferdig montert.
+ */
 export default function BisysHeaderLink() {
-    const { bisysUrl, bisysLinkTarget } = useBisysLink();
     const returLink = useReturLink();
-    console.log(bisysLinkTarget, returLink);
 
     // Når brukeren er rutet hit fra en annen side i appen, peker tilbakelenken dit i stedet for til Bisys.
     if (returLink) {
@@ -24,6 +30,16 @@ export default function BisysHeaderLink() {
             </Link>
         );
     }
+
+    return (
+        <ClientOnly>
+            <BisysFallbackLink />
+        </ClientOnly>
+    );
+}
+
+function BisysFallbackLink() {
+    const { bisysUrl, bisysLinkTarget } = useBisysLink();
 
     if (!bisysUrl) {
         return null;
