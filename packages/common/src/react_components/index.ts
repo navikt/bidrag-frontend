@@ -8,6 +8,7 @@ export { default as BrukerHeader } from "./header/BrukerHeader";
 export { default as SakHeader } from "./header/SakHeader";
 export * from "./hooks";
 export { default as PopupSokButton } from "./PopupSøkButton";
+export { default as ModiaLink } from "./person/ModiaLink";
 export { default as PersonIdent } from "./person/PersonIdent";
 export { default as PersonNavn } from "./person/PersonNavn";
 export { default as PersonNavnIdent } from "./person/PersonNavnIdent";

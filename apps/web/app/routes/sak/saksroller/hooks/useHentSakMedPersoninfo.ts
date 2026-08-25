@@ -1,5 +1,3 @@
-import type { TilgangsFeilError } from "@bidrag/api";
-
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import type { BidragssakDto, RolleDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
@@ -12,8 +10,6 @@ import { MYNDYG_BARN_ALDER } from "../sakvisning-schema.ts";
 export interface SakMedPersoninfo {
     sak: BidragssakDto;
     berikedeRoller: Rolle[];
-    error: Error | TilgangsFeilError | null;
-    harTilgang: boolean;
     erEktefellebidrag: boolean;
     refetch: () => Promise<unknown>;
     dataUpdatedAt: number;
@@ -27,8 +23,6 @@ export function useHentSakMedPersoninfo(saksnummer: string): SakMedPersoninfo {
     }, [sak]);
 
     const personQueries = useHentFlerePersoninformasjonSuspense(sakIdenter, sakIdenter.length > 0);
-
-    const harTilgang = true; // Hvis suspense ikke kastet, har vi tilgang
 
     const erEktefellebidrag = useMemo(() => {
         const harBarn = sak.roller.some((r) => r.type === "BA");
@@ -48,8 +42,6 @@ export function useHentSakMedPersoninfo(saksnummer: string): SakMedPersoninfo {
     return {
         sak,
         berikedeRoller,
-        error: null,
-        harTilgang,
         erEktefellebidrag,
         refetch,
         dataUpdatedAt,

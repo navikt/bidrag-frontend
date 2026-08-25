@@ -90,7 +90,7 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle }: Props) 
                                     {sortertHistorikk.map((historikk, index) => (
                                         <Table.Row key={index}>
                                             <Table.DataCell textSize="small">
-                                                {historikk.reellMottaker || "-"}
+                                                <span className="personident">{historikk.reellMottaker || "-"}</span>
                                             </Table.DataCell>
                                             <Table.DataCell textSize="small">
                                                 {historikk.typeEndring || "-"}

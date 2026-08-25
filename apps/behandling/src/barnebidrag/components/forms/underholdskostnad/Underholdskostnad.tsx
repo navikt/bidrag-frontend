@@ -4,14 +4,13 @@ import {
     type UnderholdDto,
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import { RolleTypeAbbreviation } from "@bidrag/common";
+import { ModiaLink, RolleTypeAbbreviation } from "@bidrag/common";
 import { BodyShort, Tabs } from "@navikt/ds-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";
-import ModiaLink from "../../../../common/components/inntekt/ModiaLink";
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
 import { toUnderholdskostnadTabQueryParameter } from "../../../../common/constants/behandlingQueryKeys";

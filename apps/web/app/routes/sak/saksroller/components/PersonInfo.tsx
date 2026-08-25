@@ -1,13 +1,10 @@
-import { IdentUtils, PersonIdent, PersonNavnIdent, RolleTag, type RolleType } from "@bidrag/common";
+import { IdentUtils, ModiaLink, PersonIdent, PersonNavnIdent, RolleTag, type RolleType } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
-import { ExternalLinkIcon } from "@navikt/aksel-icons";
-import { BodyShort, HStack, Link, Loader } from "@navikt/ds-react";
+import { BodyShort, HStack, Link, Loader, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import { useRouteLoaderData } from "react-router";
 
 import { useHentPersonData, useHentSamhandler } from "~/api/useApi.ts";
-import type { loader as rootLoader } from "~/root.tsx";
 import type { RolleType as SaksrolleType } from "../sakvisning-schema.ts";
 
 type Props = {
@@ -23,25 +20,6 @@ type Props = {
     /** Innhold som skal ligge innrykket under navnelinjen, på linje med teksten og ikke rolletaggen. */
     children?: ReactNode;
 };
-
-function ModiaLenke({ ident }: { ident: string }) {
-    const { modiaUrl } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
-
-    if (!modiaUrl) {
-        return null;
-    }
-
-    return (
-        <Link
-            href={`${modiaUrl}/person?sokFnr=${ident}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Åpne personen i Modia"
-        >
-            Modia <ExternalLinkIcon aria-hidden />
-        </Link>
-    );
-}
 
 function PersonInfoContent({
     navn,
@@ -65,8 +43,8 @@ function PersonInfoContent({
         <HStack gap="space-8" align="start" wrap={false}>
             {rolle && <RolleTag rolleType={rolle as RolleType} ident={ident} stønad18År={stønad18År} />}
 
-            <div className="flex flex-col min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+            <VStack minWidth="0" flexGrow="1">
+                <HStack gap="space-8" align="center">
                     {!erSamhandlerIdent && (
                         <BodyShort
                             size="small"
@@ -77,10 +55,10 @@ function PersonInfoContent({
                             {data?.visningsnavn ?? navn}
                         </BodyShort>
                     )}
-                    {visModiaLenke && !erSamhandlerIdent && <ModiaLenke ident={ident} />}
+                    {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} />}
                     {tags}
                     {headingActions}
-                </div>
+                </HStack>
 
                 <BodyShort textColor="subtle" className="flex items-center" size="small">
                     {erSamhandlerIdent ? (
@@ -88,11 +66,9 @@ function PersonInfoContent({
                             <BodyShort size="small" className="personnavn">
                                 {navn ?? samhandlerData?.navn}
                             </BodyShort>
-                            <div className="flex flex-row">
-                                <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
-                                    <PersonIdent ident={ident} />
-                                </Link>
-                            </div>
+                            <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
+                                <PersonIdent ident={ident} />
+                            </Link>
                         </HStack>
                     ) : (
                         <PersonNavnIdent variant="ident" showCopyButton={true} ident={ident} />
@@ -102,7 +78,7 @@ function PersonInfoContent({
                 </BodyShort>
 
                 {children}
-            </div>
+            </VStack>
         </HStack>
     );
 }

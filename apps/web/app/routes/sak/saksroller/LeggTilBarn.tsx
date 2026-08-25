@@ -42,8 +42,7 @@ export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps
     const alderFor = (person: PersonDto) =>
         person?.fødselsdato ? beregnAlder(person.fødselsdato) : (beregnAlderFraFnr(person.ident) ?? 0);
 
-    /** Returnerer feilmelding hvis barnet ikke kan legges til. */
-    const valider = (person: PersonDto): string | undefined => {
+    const finnValideringsfeil = (person: PersonDto): string | undefined => {
         if (roller.some((b) => b.fodselsnummer === person.ident)) {
             return person.visningsnavn
                 ? `${person.visningsnavn} (${person.ident}) er allerede lagt til i saken`
@@ -59,7 +58,7 @@ export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps
     };
 
     const leggTil = (person: PersonDto) => {
-        const valideringsfeil = valider(person);
+        const valideringsfeil = finnValideringsfeil(person);
         if (valideringsfeil) {
             setFeil(valideringsfeil);
             return;

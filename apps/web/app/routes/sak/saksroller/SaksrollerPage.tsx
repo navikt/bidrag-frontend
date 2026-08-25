@@ -1,9 +1,8 @@
-import { TilgangsFeilError } from "@bidrag/api";
 import type { OppdaterRollerISakRequest } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, BodyLong, Box, Heading, HGrid, HStack, Loader, Tag, VStack } from "@navikt/ds-react";
+import { Alert, BodyLong, Box, Heading, HGrid, HStack, Loader, Page, Tag, VStack } from "@navikt/ds-react";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, FormProvider, useForm } from "react-hook-form";
 
@@ -75,8 +74,7 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
     const statusRef = useRef<HTMLDivElement>(null);
     const lastDataUpdateRef = useRef<number>(0);
 
-    const { sak, berikedeRoller, error, harTilgang, erEktefellebidrag, refetch, dataUpdatedAt } =
-        useHentSakMedPersoninfo(saksnummer);
+    const { sak, berikedeRoller, erEktefellebidrag, refetch, dataUpdatedAt } = useHentSakMedPersoninfo(saksnummer);
 
     const oppdaterSaksrollerMutation = useOppdaterSaksroller();
     const { feil, muligeAndreForeldre, muligeBarnPerMotpart } = useSakForslag({ sak });
@@ -138,20 +136,6 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
     }
 
     useEffect(initialiserFormMedBerikedeRoller, [berikedeRoller, saksnummer, dataUpdatedAt, reset]);
-
-    function håndterLastefeil() {
-        if (error) {
-            if (error instanceof TilgangsFeilError) {
-                setFeilmelding(
-                    "Du har ikke tilgang til denne saken. Dette kan skyldes diskresjonskode eller manglende rettigheter.",
-                );
-            } else {
-                setFeilmelding("Kunne ikke laste sak. Vennligst prøv igjen.");
-            }
-        }
-    }
-
-    useEffect(håndterLastefeil, [error]);
 
     function scrollTilStatusmelding() {
         if ((feilmelding || suksessmelding) && statusRef.current) {
@@ -237,226 +221,214 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
         });
     }
 
-    if (!harTilgang) {
-        return (
-            <Box width="full" maxWidth="1200px" marginInline="auto" padding="space-24">
-                <Alert variant="error">
-                    <Heading level="3" size="small" spacing>
-                        Ingen tilgang
-                    </Heading>
-                    <BodyLong spacing>
-                        Du har ikke tilgang til sak {saksnummer}. Dette kan skyldes diskresjonskode eller manglende
-                        rettigheter.
-                    </BodyLong>
-                </Alert>
-            </Box>
-        );
-    }
-
     const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
 
     return (
         <FormProvider {...formMethods}>
-            <Box width="full" maxWidth="1200px" marginInline="auto" padding="space-24">
-                {oppdaterSaksrollerMutation.isPending && (
-                    <div className="fixed inset-0 bg-[white]/70 backdrop-blur-sm z-50 flex items-center justify-center">
-                        <div className="flex flex-col items-center gap-3">
-                            <Loader size="2xlarge" title="Lagrer endringer..." />
-                            <BodyLong textColor="subtle">Lagrer endringer...</BodyLong>
-                        </div>
-                    </div>
-                )}
-
-                <VStack gap="space-6">
-                    <VStack gap="space-4">
-                        <VStack gap="space-8">
-                            <Heading level="1" size="large">
-                                Rollebilde for sak {saksnummer}
-                            </Heading>
-                            {sak?.opprettetDato?.trim() !== "" && (
-                                <BodyLong size="small" textColor="subtle" spacing>
-                                    Saken opprettet: {dateToDDMMYYYYString(new Date(sak.opprettetDato))}
-                                </BodyLong>
-                            )}
-                            <HStack gap="space-8" wrap>
-                                <Tag size="small" variant="info">
-                                    {sakstype}
-                                </Tag>
-                                <Tag size="small" variant="info">
-                                    {sakskategoriTilVisningsnavn(sakskategori)}
-                                </Tag>
-                                {sak.eierfogd === EGEN_ANSATT_ENHET && (
-                                    <Tag size="small" variant="warning">
-                                        Egen ansatt
-                                    </Tag>
-                                )}
-                                {sak.eierfogd === ADRESSEBESKYTTELSE_ENHET && (
-                                    <Tag size="small" variant="warning">
-                                        Adressebeskyttelse
-                                    </Tag>
-                                )}
-                                {sak.avsluttet && (
-                                    <Tag size="small" variant="error">
-                                        Avsluttet sak
-                                    </Tag>
-                                )}
+            <Page.Block width="xl">
+                <Box padding="space-24">
+                    {oppdaterSaksrollerMutation.isPending && (
+                        <Box position="fixed" inset="space-0" className="bg-[white]/70 backdrop-blur-sm z-50">
+                            <HStack align="center" justify="center" height="100%">
+                                <VStack align="center" gap="space-12">
+                                    <Loader size="2xlarge" title="Lagrer endringer..." />
+                                    <BodyLong textColor="subtle">Lagrer endringer...</BodyLong>
+                                </VStack>
                             </HStack>
-                            <Box borderColor="neutral-subtleA" borderWidth="0 0 1 0" />
+                        </Box>
+                    )}
+
+                    <VStack gap="space-6">
+                        <VStack gap="space-4">
+                            <VStack gap="space-8">
+                                <Heading level="1" size="large">
+                                    Rollebilde for sak {saksnummer}
+                                </Heading>
+                                {sak?.opprettetDato?.trim() !== "" && (
+                                    <BodyLong size="small" textColor="subtle" spacing>
+                                        Saken opprettet: {dateToDDMMYYYYString(new Date(sak.opprettetDato))}
+                                    </BodyLong>
+                                )}
+                                <HStack gap="space-8" wrap>
+                                    <Tag size="small" variant="info">
+                                        {sakstype}
+                                    </Tag>
+                                    <Tag size="small" variant="info">
+                                        {sakskategoriTilVisningsnavn(sakskategori)}
+                                    </Tag>
+                                    {sak.eierfogd === EGEN_ANSATT_ENHET && (
+                                        <Tag size="small" variant="warning">
+                                            Egen ansatt
+                                        </Tag>
+                                    )}
+                                    {sak.eierfogd === ADRESSEBESKYTTELSE_ENHET && (
+                                        <Tag size="small" variant="warning">
+                                            Adressebeskyttelse
+                                        </Tag>
+                                    )}
+                                    {sak.avsluttet && (
+                                        <Tag size="small" variant="error">
+                                            Avsluttet sak
+                                        </Tag>
+                                    )}
+                                </HStack>
+                                <Box borderColor="neutral-subtleA" borderWidth="0 0 1 0" />
+                            </VStack>
+
+                            {erEktefellebidrag && (
+                                <Alert variant="info" size="small">
+                                    Dette er en ektefellebidragssak og inneholder ikke barn. Saken kan ikke redigeres.
+                                </Alert>
+                            )}
+
+                            {(feilmelding || feil) && (
+                                <Alert variant="error" ref={statusRef} tabIndex={-1}>
+                                    {feilmelding || feil}
+                                </Alert>
+                            )}
                         </VStack>
 
-                        {erEktefellebidrag && (
-                            <Alert variant="info" size="small">
-                                Dette er en ektefellebidragssak og inneholder ikke barn. Saken kan ikke redigeres.
-                            </Alert>
-                        )}
-
-                        {(feilmelding || feil) && (
-                            <Alert variant="error" ref={statusRef} tabIndex={-1}>
-                                {feilmelding || feil}
-                            </Alert>
-                        )}
-                    </VStack>
-
-                    <form onSubmit={(event) => event.preventDefault()}>
-                        <VStack gap="space-6">
-                            <Box background="sunken" padding="space-12">
-                                <HGrid columns={{ xs: 1, md: 2 }} gap="space-24">
-                                    <VStack gap="space-4">
-                                        <Heading level="2" size="small">
-                                            Bidragspliktig
-                                        </Heading>
-                                        <Box
-                                            background="raised"
-                                            borderColor="neutral-subtleA"
-                                            borderWidth="1"
-                                            borderRadius="12"
-                                            padding="space-12"
-                                        >
-                                            {bp?.fodselsnummer ? (
-                                                <ForelderVisning
-                                                    form={formMethods}
-                                                    rolle={bp}
-                                                    erNyForelder={!funnetPersonISak(bp.fodselsnummer)}
-                                                />
-                                            ) : (
-                                                <LeggTilForelder
-                                                    rolleType="BP"
-                                                    rolleNavn="Bidragspliktig"
-                                                    form={formMethods}
-                                                    muligeAndreForeldre={muligeAndreForeldre}
-                                                />
-                                            )}
-                                        </Box>
-                                    </VStack>
-
-                                    <VStack gap="space-4">
-                                        <Heading level="2" size="small">
-                                            Bidragsmottaker
-                                        </Heading>
-                                        <Box
-                                            background="raised"
-                                            borderColor="neutral-subtleA"
-                                            borderWidth="1"
-                                            borderRadius="12"
-                                            padding="space-12"
-                                        >
-                                            {bm?.fodselsnummer ? (
-                                                <ForelderVisning
-                                                    form={formMethods}
-                                                    rolle={bm}
-                                                    erNyForelder={!funnetPersonISak(bm.fodselsnummer)}
-                                                />
-                                            ) : (
-                                                <LeggTilForelder
-                                                    rolleType="BM"
-                                                    rolleNavn="Bidragsmottaker"
-                                                    form={formMethods}
-                                                    muligeAndreForeldre={muligeAndreForeldre}
-                                                />
-                                            )}
-                                        </Box>
-                                    </VStack>
-                                </HGrid>
-                            </Box>
-
-                            {!erEktefellebidrag && (
-                                <>
-                                    <Box background="sunken" padding="space-12">
+                        <form onSubmit={(event) => event.preventDefault()}>
+                            <VStack gap="space-6">
+                                <Box background="sunken" padding="space-12">
+                                    <HGrid columns={{ xs: 1, md: 2 }} gap="space-24">
                                         <VStack gap="space-4">
                                             <Heading level="2" size="small">
-                                                Barn i saken ({barn.length})
+                                                Bidragspliktig
                                             </Heading>
-
-                                            {barn.length === 0 ? (
-                                                <Alert variant="info">Ingen barn registrert i saken ennå</Alert>
-                                            ) : (
-                                                <HGrid columns={{ xs: 1, md: 2, lg: 3 }} gap="space-24">
-                                                    {barn.map((barnRolle, idx) => (
-                                                        <BarnVisning
-                                                            key={
-                                                                barnRolle.fodselsnummer ||
-                                                                barnRolle.objektnummer ||
-                                                                `${barnRolle.type}-${idx}`
-                                                            }
-                                                            rolle={barnRolle}
-                                                            index={roller.indexOf(barnRolle)}
-                                                            kanFjerneRM={!barnRolle.erMyndig && !!bm}
-                                                            closeEditorSignal={dataUpdatedAt}
-                                                            hentOgNullstillSamhandler={hentOgNullstillSamhandler}
-                                                            erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
-                                                            erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                                                        />
-                                                    ))}
-                                                </HGrid>
-                                            )}
-
-                                            <LeggTilBarn
-                                                søsken={muligeBarn}
-                                                erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                                                setVisSøk={setLeggTilBarnVisSøk}
-                                                visSøk={leggTilBarnVisSøk}
-                                            />
-                                        </VStack>
-                                    </Box>
-
-                                    <Suspense
-                                        fallback={
                                             <Box
                                                 background="raised"
                                                 borderColor="neutral-subtleA"
                                                 borderWidth="1"
                                                 borderRadius="12"
-                                                padding="space-24"
+                                                padding="space-12"
                                             >
-                                                <BodyLong size="small">Laster endringsoppsummering...</BodyLong>
+                                                {bp?.fodselsnummer ? (
+                                                    <ForelderVisning
+                                                        form={formMethods}
+                                                        rolle={bp}
+                                                        erNyForelder={!funnetPersonISak(bp.fodselsnummer)}
+                                                    />
+                                                ) : (
+                                                    <LeggTilForelder
+                                                        rolleType="BP"
+                                                        rolleNavn="Bidragspliktig"
+                                                        form={formMethods}
+                                                        muligeAndreForeldre={muligeAndreForeldre}
+                                                    />
+                                                )}
                                             </Box>
-                                        }
-                                    >
-                                        <Endringsoppsummering endringsliste={endringsliste} />
-                                    </Suspense>
+                                        </VStack>
 
-                                    <VStack gap="space-12">
-                                        <UfullstendigRelasjonAlert
-                                            barnIdenter={barnMedUfullstendigRelasjon}
-                                            roller={aktiveRoller}
-                                        />
-                                        <SakButtons
-                                            onSubmit={handleSubmitAsync}
-                                            onRefetch={refetch}
-                                            feilmelding={feilmelding}
-                                            valideringsFeil={valideringsFeil}
-                                            harAdvarsel={barnMedUfullstendigRelasjon.length > 0}
-                                            harEndringer={harEndringer}
-                                            suksessmelding={suksessmelding}
-                                            statusRef={statusRef}
-                                        />
-                                    </VStack>
-                                </>
-                            )}
-                        </VStack>
-                    </form>
-                </VStack>
-            </Box>
+                                        <VStack gap="space-4">
+                                            <Heading level="2" size="small">
+                                                Bidragsmottaker
+                                            </Heading>
+                                            <Box
+                                                background="raised"
+                                                borderColor="neutral-subtleA"
+                                                borderWidth="1"
+                                                borderRadius="12"
+                                                padding="space-12"
+                                            >
+                                                {bm?.fodselsnummer ? (
+                                                    <ForelderVisning
+                                                        form={formMethods}
+                                                        rolle={bm}
+                                                        erNyForelder={!funnetPersonISak(bm.fodselsnummer)}
+                                                    />
+                                                ) : (
+                                                    <LeggTilForelder
+                                                        rolleType="BM"
+                                                        rolleNavn="Bidragsmottaker"
+                                                        form={formMethods}
+                                                        muligeAndreForeldre={muligeAndreForeldre}
+                                                    />
+                                                )}
+                                            </Box>
+                                        </VStack>
+                                    </HGrid>
+                                </Box>
+
+                                {!erEktefellebidrag && (
+                                    <>
+                                        <Box background="sunken" padding="space-12">
+                                            <VStack gap="space-4">
+                                                <Heading level="2" size="small">
+                                                    Barn i saken ({barn.length})
+                                                </Heading>
+
+                                                {barn.length === 0 ? (
+                                                    <Alert variant="info">Ingen barn registrert i saken ennå</Alert>
+                                                ) : (
+                                                    <HGrid columns={{ xs: 1, md: 2, lg: 3 }} gap="space-24">
+                                                        {barn.map((barnRolle, idx) => (
+                                                            <BarnVisning
+                                                                key={
+                                                                    barnRolle.fodselsnummer ||
+                                                                    barnRolle.objektnummer ||
+                                                                    `${barnRolle.type}-${idx}`
+                                                                }
+                                                                rolle={barnRolle}
+                                                                index={roller.indexOf(barnRolle)}
+                                                                kanFjerneRM={!barnRolle.erMyndig && !!bm}
+                                                                closeEditorSignal={dataUpdatedAt}
+                                                                hentOgNullstillSamhandler={hentOgNullstillSamhandler}
+                                                                erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
+                                                                erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
+                                                            />
+                                                        ))}
+                                                    </HGrid>
+                                                )}
+
+                                                <LeggTilBarn
+                                                    søsken={muligeBarn}
+                                                    erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
+                                                    setVisSøk={setLeggTilBarnVisSøk}
+                                                    visSøk={leggTilBarnVisSøk}
+                                                />
+                                            </VStack>
+                                        </Box>
+
+                                        <Suspense
+                                            fallback={
+                                                <Box
+                                                    background="raised"
+                                                    borderColor="neutral-subtleA"
+                                                    borderWidth="1"
+                                                    borderRadius="12"
+                                                    padding="space-24"
+                                                >
+                                                    <BodyLong size="small">Laster endringsoppsummering...</BodyLong>
+                                                </Box>
+                                            }
+                                        >
+                                            <Endringsoppsummering endringsliste={endringsliste} />
+                                        </Suspense>
+
+                                        <VStack gap="space-12">
+                                            <UfullstendigRelasjonAlert
+                                                barnIdenter={barnMedUfullstendigRelasjon}
+                                                roller={aktiveRoller}
+                                            />
+                                            <SakButtons
+                                                onSubmit={handleSubmitAsync}
+                                                onRefetch={refetch}
+                                                feilmelding={feilmelding}
+                                                valideringsFeil={valideringsFeil}
+                                                harAdvarsel={barnMedUfullstendigRelasjon.length > 0}
+                                                harEndringer={harEndringer}
+                                                suksessmelding={suksessmelding}
+                                                statusRef={statusRef}
+                                            />
+                                        </VStack>
+                                    </>
+                                )}
+                            </VStack>
+                        </form>
+                    </VStack>
+                </Box>
+            </Page.Block>
         </FormProvider>
     );
 }

@@ -1,6 +1,6 @@
 import { RedirectTo } from "@bidrag/common";
 import { FloppydiskIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Button, Heading, Modal } from "@navikt/ds-react";
+import { Alert, BodyLong, Button, Heading, HStack, Modal } from "@navikt/ds-react";
 import { type RefObject, useEffect, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
@@ -113,7 +113,7 @@ export default function SakButtons({
             {feilmelding && <Alert variant="error">{feilmelding}</Alert>}
             {valideringsFeil && <Alert variant="error">{valideringsFeil}</Alert>}
 
-            <div className="flex justify-end gap-2">
+            <HStack justify="end" gap="space-8">
                 <Button
                     type="button"
                     variant="tertiary"
@@ -145,7 +145,7 @@ export default function SakButtons({
                 >
                     Lagre
                 </Button>
-            </div>
+            </HStack>
 
             {bekreftHandling && (
                 <Modal

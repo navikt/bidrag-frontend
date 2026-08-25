@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
-import { Alert, Loader, Search } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, HStack, Loader, Search } from "@navikt/ds-react";
 import { useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
 
@@ -45,13 +45,14 @@ export default function PersonSamhandlerSøk({
             });
     }
 
-    const containerWidth = compact ? "w-full p-0" : "w-[50rem] p-2";
+    const containerWidth = compact ? "100%" : "50rem";
+    const containerPadding = compact ? "space-0" : "space-8";
     const inputWidth = compact ? "min-w-0 flex-1" : "w-[30rem]";
 
     return (
-        <div className={`flex gap-2 items-center ${containerWidth}`}>
-            <div className="w-full">
-                <div className="flex flex-row flex-wrap items-end gap-2">
+        <HStack gap="space-8" align="center" width={containerWidth} padding={containerPadding}>
+            <Box width="100%">
+                <HStack gap="space-8" align="end" wrap>
                     <Search
                         label={label || "Person- eller samhandlerident"}
                         variant={primary ? "primary" : "simple"}
@@ -73,7 +74,7 @@ export default function PersonSamhandlerSøk({
                             }
                         }}
                     />
-                    <div className="flex flex-row flex-wrap items-end gap-2">
+                    <HStack gap="space-8" align="end" wrap>
                         <PersonSokButton
                             onError={(feil) => setSearchErrorMessage(feil)}
                             onResult={(data) => {
@@ -87,20 +88,20 @@ export default function PersonSamhandlerSøk({
                                 }}
                             />
                         )}
-                    </div>
-                </div>
+                    </HStack>
+                </HStack>
                 {samhandlerPersonFn.isPending && (
-                    <div className="flex gap-2">
+                    <HStack gap="space-8">
                         <Loader size="small" title="Søker…" />
-                        <div>Søker…</div>
-                    </div>
+                        <BodyShort>Søker…</BodyShort>
+                    </HStack>
                 )}
                 {(samhandlerPersonFn.error?.message || searchErrorMessage) && (
                     <Alert variant="warning" inline size="small" className="!mb-0 mt-1">
                         {samhandlerPersonFn.error?.message || searchErrorMessage}
                     </Alert>
                 )}
-            </div>
-        </div>
+            </Box>
+        </HStack>
     );
 }

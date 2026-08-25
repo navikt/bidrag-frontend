@@ -45,7 +45,6 @@ export async function loader({ context, request }: Route.LoaderArgs) {
         naisConfig,
         unleashToggles,
         bisysUrl: env.BISYS_URL,
-        modiaUrl: env.MODIA_URL,
     };
 }
 

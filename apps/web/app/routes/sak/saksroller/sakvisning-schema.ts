@@ -84,17 +84,3 @@ export type Diskresjonskode = z.infer<typeof DiskresjonskodeSchema>;
 export function erBarn(rolle: Rolle): boolean {
     return rolle.type === "BA";
 }
-
-export function erForelder(rolle: Rolle): boolean {
-    return rolle.type === "BP" || rolle.type === "BM";
-}
-
-export function getRolleNavn(rolleType: RolleType): string {
-    const rolleNavnMap: Record<RolleType, string> = {
-        BP: "Bidragspliktig",
-        BM: "Bidragsmottaker",
-        BA: "Barn",
-        RM: "Reell mottaker",
-    };
-    return rolleNavnMap[rolleType];
-}

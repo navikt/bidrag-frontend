@@ -1,5 +1,5 @@
 import { TilgangsFeilError } from "@bidrag/api";
-import { Alert, BodyLong, Box, Heading } from "@navikt/ds-react";
+import { Alert, BodyLong, Box, Heading, Page } from "@navikt/ds-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {
@@ -34,44 +34,50 @@ export default class SakErrorBoundary extends Component<Props, State> {
 
             if (isTilgangsfeil) {
                 return (
-                    <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
-                        <Alert variant="error">
-                            <Heading level="3" size="small" spacing>
-                                Ingen tilgang
-                            </Heading>
-                            <BodyLong spacing>
-                                Du har ikke tilgang til sak {this.props.saksnummer}. Dette kan skyldes diskresjonskode
-                                eller manglende rettigheter.
-                            </BodyLong>
-                        </Alert>
-                    </Box>
+                    <Page.Block width="lg">
+                        <Box padding="space-24">
+                            <Alert variant="error">
+                                <Heading level="3" size="small" spacing>
+                                    Ingen tilgang
+                                </Heading>
+                                <BodyLong spacing>
+                                    Du har ikke tilgang til sak {this.props.saksnummer}. Dette kan skyldes
+                                    diskresjonskode eller manglende rettigheter.
+                                </BodyLong>
+                            </Alert>
+                        </Box>
+                    </Page.Block>
                 );
             }
 
             if (isSakNotFound) {
                 return (
-                    <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
-                        <Alert variant="error">
-                            <Heading level="3" size="small" spacing>
-                                Sak ikke funnet
-                            </Heading>
-                            <BodyLong spacing>Fant ingen sak med saksnummer {this.props.saksnummer}</BodyLong>
-                        </Alert>
-                    </Box>
+                    <Page.Block width="lg">
+                        <Box padding="space-24">
+                            <Alert variant="error">
+                                <Heading level="3" size="small" spacing>
+                                    Sak ikke funnet
+                                </Heading>
+                                <BodyLong spacing>Fant ingen sak med saksnummer {this.props.saksnummer}</BodyLong>
+                            </Alert>
+                        </Box>
+                    </Page.Block>
                 );
             }
 
             return (
-                <Box width="full" maxWidth="1024px" marginInline="auto" padding="space-24">
-                    <Alert variant="error">
-                        <Heading level="3" size="small" spacing>
-                            Feil under lasting av sak
-                        </Heading>
-                        <BodyLong spacing>
-                            Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
-                        </BodyLong>
-                    </Alert>
-                </Box>
+                <Page.Block width="lg">
+                    <Box padding="space-24">
+                        <Alert variant="error">
+                            <Heading level="3" size="small" spacing>
+                                Feil under lasting av sak
+                            </Heading>
+                            <BodyLong spacing>
+                                Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
+                            </BodyLong>
+                        </Alert>
+                    </Box>
+                </Page.Block>
             );
         }
 
