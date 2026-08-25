@@ -41,18 +41,26 @@ export default function SakBaseLayout({ params }: Route.ComponentProps) {
         return undefined;
     }, [matches]);
 
+
+    const rendersOwnHeader = useMemo(
+        () => matches.some((match) => (match.handle as { rendersOwnHeader?: boolean } | undefined)?.rendersOwnHeader),
+        [matches],
+    );
+
+    if (rendersOwnHeader){
+        return <Outlet />
+    }
     return (
         <SakSideTittelProvider>
             {(overstyrtTittel) => {
                 const tittel = overstyrtTittel ?? routeTittel;
                 return (
                     <VStack gap={"space-32"}>
-                        <SakHeader
-                            saksnummer={saksnummer}
-                            roller={roller}
-                            skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
-                        />
-                        {/* Rendres direkte uten Page.Block for å tillate full bredde */}
+                            <SakHeader
+                                saksnummer={saksnummer}
+                                roller={roller}
+                                skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
+                            />
                         <Outlet />
                     </VStack>
                 );

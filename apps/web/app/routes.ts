@@ -1,5 +1,5 @@
 import adminroutes from "@bidrag/admin-app/routes";
-import behandlingroutes from "@bidrag/behandling/routes";
+import behandlingroutes, { sakRoutes as behandlingSakRoutes } from "@bidrag/behandling/routes";
 import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
@@ -28,6 +28,7 @@ export default [
     ]),
 
     route("sak/:saksnummer", "routes/sak/SakBaseLayout.tsx", [
+        ...behandlingSakRoutes,
         route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),
 
         layout("routes/sak/SakStandardLayout.tsx", [
@@ -41,5 +42,6 @@ export default [
         route("notat", "routes/forsendelse/NotatRedirect.ts"),
         route("forsendelse/*", "routes/forsendelse/ForsendelseRedirect.ts"),
         route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
+
     ]),
 ] satisfies RouteConfig;
