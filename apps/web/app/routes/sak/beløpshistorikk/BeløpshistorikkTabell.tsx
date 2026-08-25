@@ -76,7 +76,6 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
         [sortedData, stønaderPage, sort],
     );
 
-    const totalSum = useMemo(() => filtrertData.reduce((acc, rad) => acc + rad.periodSum, 0), [filtrertData]);
     const sumPerValuta = useMemo(() => {
         const grupper = filtrertData.reduce<Record<string, number>>((acc, rad) => {
             const valuta = rad.valutakode ?? "NOK";

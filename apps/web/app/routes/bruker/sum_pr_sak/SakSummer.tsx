@@ -4,6 +4,7 @@ import { sumNullable } from "@bidrag/utils";
 import { Alert, Box, Detail, HStack, Label, VStack } from "@navikt/ds-react";
 import { useHentSak } from "~/api/useApi.ts";
 import { SaksumTabellBP } from "~/routes/bruker/sum_pr_sak/SaksumTabellBP.tsx";
+import { useAktivPeriode } from "~/routes/bruker/sum_pr_sak/useAktivPeriode.ts";
 import { EnhetsNavn } from "~/routes/sak/fogdhistorikk/components/EnhetsNavn.tsx";
 
 const gjeld = (barn: SaksinformasjonBarn) => {
@@ -27,14 +28,12 @@ export function SakSummer({ bidragSak, ident }: SakSummerProps) {
 
     const rolle = sak?.roller.find((rolle) => rolle.fodselsnummer === ident)?.type;
 
-    console.log("sak", sak);
     function renderTabell() {
         switch (rolle) {
             case "BP":
-                return <SaksumTabellBP ident={ident} bidragSak={bidragSak} sak={sak}/>;
+                return <SaksumTabellBP ident={ident} bidragSak={bidragSak} sak={sak} />;
         }
         return <Alert variant={"info"}>Ukjent rolle {rolle}</Alert>;
-
     }
     const SakSum = () => (
         <VStack gap={"space-16"}>

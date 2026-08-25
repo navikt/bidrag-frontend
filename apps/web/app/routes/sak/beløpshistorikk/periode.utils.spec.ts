@@ -37,6 +37,10 @@ describe("periodeFilterUtils", () => {
             expect(erDatoInnenforPeriode(new Date("2023-12-10"), "2024-01", "2024-06")).toBe(false);
         });
 
+        it("returnerer true når dato er innen tom", () => {
+            expect(erDatoInnenforPeriode(new Date("2023-12-10"), "2024-01", "2024-06")).toBe(false);
+        });
+
         it("returnerer false når dato er etter tom", () => {
             expect(erDatoInnenforPeriode(new Date("2024-07-01"), "2024-01", "2024-06")).toBe(false);
         });

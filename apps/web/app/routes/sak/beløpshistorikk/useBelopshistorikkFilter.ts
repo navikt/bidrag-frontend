@@ -1,39 +1,19 @@
-import type { StonadDto, StonadPeriodeDto } from "@bidrag/api/BelopshistorikkApi";
 import type { VedtakDto } from "@bidrag/api/BidragVedtakApi";
 import { parseDateQueryParam, unikeVerdier } from "@bidrag/utils";
-import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
-import { hentBelopshistorikkQuery } from "~/api/query/belopshistorikk.query.ts";
 import { hentVedtakQuery } from "~/api/query/vedtak.query.ts";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
+import { useBeløphistorikk } from "~/common/reskontro/useBelopshistorikk.ts";
 import { PARAM_BARN, PARAM_FRA, PARAM_TIL, PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
 import { beregnAntallMåneder, erInnenforPeriode } from "./periode.utils";
 
-interface StonadMedPeriode
-    extends StonadPeriodeDto,
-        Pick<StonadDto, "kravhaver" | "type" | "skyldner" | "mottaker" | "innkreving"> {}
-
 export function useBeløphistorikkfilter(saksnummer: string) {
-    const { data: allestonader } = useSuspenseQuery(hentBelopshistorikkQuery(saksnummer));
+    const { allestonader, perioder } = useBeløphistorikk(saksnummer);
 
     const unikeKravhavere = useMemo(() => unikeVerdier(allestonader.map((t) => t.kravhaver)), [allestonader]);
     const unikeTyper = useMemo(() => unikeVerdier(allestonader.map((t) => t.type)), [allestonader]);
-
-    const perioder: Array<StonadMedPeriode> = useMemo(() => {
-        if (!allestonader) return [];
-
-        return allestonader.flatMap((stønad) =>
-            stønad.periodeListe.map((periode) => ({
-                ...periode,
-                kravhaver: stønad.kravhaver,
-                type: stønad.type,
-                skyldner: stønad.skyldner,
-                mottaker: stønad.mottaker,
-                innkreving: stønad.innkreving,
-            })),
-        );
-    }, [allestonader]);
 
     /** Må hente opp vedtak for å få vedtaksType og vedtaksTidspunkt, da dette ikke er med i beløpshistorikk-APIet */
     const unikeVedtaksIder = useMemo(() => {
