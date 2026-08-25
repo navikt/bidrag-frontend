@@ -4,5 +4,4 @@ import brukerveiledningRoutes from "./routes/groups/brukerveiledning.routes";
 
 export { default as sakRoutes } from "./routes/groups/sak.routes";
 
-
 export default [...brukerveiledningRoutes, ...behandlingRoutes] satisfies RouteConfig;

@@ -1,7 +1,6 @@
 import { useParams } from "react-router";
 import { BehandlingPage } from "../BehandlingPage";
 
-
 export const handle = { rendersOwnHeader: true };
 
 /**

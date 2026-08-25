@@ -42,6 +42,5 @@ export default [
         route("notat", "routes/forsendelse/NotatRedirect.ts"),
         route("forsendelse/*", "routes/forsendelse/ForsendelseRedirect.ts"),
         route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
-
     ]),
 ] satisfies RouteConfig;
