@@ -70,9 +70,6 @@ env:
   - name: MODIA_URL
     value: https://modiapersonoversikt.intern.nav.no
 
-  - name: MODIA_URL
-    value: https://modiapersonoversikt.intern.nav.no
-
   - name: PERSONSOK_URL
     value: https://pdl-web.intern.nav.no/sokperson
 
