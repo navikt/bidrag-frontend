@@ -1,8 +1,4 @@
-import {
-    parseAzureUserToken,
-    requestOboToken,
-    validateToken,
-} from "@navikt/oasis";
+import { parseAzureUserToken, requestOboToken, validateToken } from "@navikt/oasis";
 import { secureNavLogger } from "~/server/logger/navLogger.ts";
 import type { NavUser } from "../../common/NavUser.ts";
 

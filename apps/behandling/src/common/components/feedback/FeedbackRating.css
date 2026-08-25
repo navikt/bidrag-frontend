@@ -1,0 +1,45 @@
+.FeedbackRating {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.FeedbackRating img {
+    width: 40px;
+    height: 40px;
+}
+
+.FeedbackRating input + img {
+    opacity: 0.6;
+}
+
+.FeedbackRating img:hover {
+    transform: scale(1.4);
+}
+
+.FeedbackRating.not-started input + img {
+    opacity: 1;
+}
+
+.FeedbackRating .RatingOption input + img {
+    transition: transform 300ms;
+    border-radius: 50%;
+}
+
+.FeedbackRating .RatingOption input:checked + img {
+    transform: scale(1.4);
+    opacity: 1;
+}
+
+.FeedbackRating .RatingOption input:focus + img {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--ax-border-focus);
+}
+
+.screen-reader-only {
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+    position: absolute;
+    height: 1px;
+    width: 1px;
+}

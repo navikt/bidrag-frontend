@@ -1,0 +1,60 @@
+.FeedbackForm {
+    margin-top: 1.3rem;
+}
+
+.FeedbackForm .ButtonsContainer {
+    margin-top: 1rem;
+}
+
+.FeedbackForm__textarea {
+    margin-top: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.FeedbackForm__textarea .navds-textarea__input {
+    height: 76px;
+}
+
+.FeedbackForm__button--submit {
+    background-color: var(--ax-success-700);
+}
+
+.FeedbackForm__button--submit:hover {
+    background-color: var(--ax-success-800);
+}
+
+.FeedbackForm__button--submit:active {
+    background-color: var(--ax-success-900);
+}
+
+/* Overstyrer button-stylingen for at den skal oppleves som en Link. */
+
+.FeedbackForm__button--dontshow {
+    color: var(--ax-success-700);
+    text-decoration: underline;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.FeedbackForm__button--dontshow:hover {
+    color: var(--ax-success-700);
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.FeedbackForm__button--dontshow:active {
+    background-color: transparent;
+}
+
+.FeedbackForm__button--dontshow:active:hover {
+    background-color: transparent;
+}
+
+.FeedbackForm__button--dontshow .navds-label {
+    font-size: 1rem;
+}
+
+.FeedbackForm__button--dontshow .navds-label:active {
+    color: var(--ax-text-neutral-contrast);
+    background-color: var(--ax-success-800);
+}

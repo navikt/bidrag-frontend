@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from "uuid";
 
 import { SessionStorage } from "./Storage";
 
-const tracerName = "bidrag-ui-session";
+const _tracerName = "bidrag-ui-session";
 
 interface RequestTraceContext {
     correlationId: string;
@@ -12,6 +12,7 @@ interface RequestTraceContext {
     // span: Span;
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class SecuritySessionUtils {
     // static async hentSecuritySessionTokenFromBackend() {
     //     const tokenReq = await fetch("/session", { method: "GET" });
@@ -35,15 +36,15 @@ export class SecuritySessionUtils {
     }
 
     static getCorrelationId(): string {
-        return SessionStorage.getOrDefault("traceparent", `${this.getAppName()}/${uuidV4()}`);
+        return SessionStorage.getOrDefault("traceparent", `${SecuritySessionUtils.getAppName()}/${uuidV4()}`);
     }
 
-    static createRequestTrace(spanName: string): RequestTraceContext {
+    static createRequestTrace(_spanName: string): RequestTraceContext {
         // const tracer = trace.getTracer(tracerName);
 
         // context er fra @opentelemetry/api — aktiveres når OTel-integrasjonen tas i bruk
-        const parentContext = window.__otelSessionContext || context.active();
-        
+        const _parentContext = window.__otelSessionContext || context.active();
+
         // const span = tracer.startSpan(spanName, undefined, parentContext);
         // const traceContext = trace.setSpan(parentContext, span);
         const headers: Record<string, string> = {};
@@ -51,7 +52,7 @@ export class SecuritySessionUtils {
         // propagation.inject(traceContext, headers);
 
         return {
-            correlationId: headers.traceparent ?? this.getCorrelationId(),
+            correlationId: headers.traceparent ?? SecuritySessionUtils.getCorrelationId(),
             headers,
             // span,
         };
@@ -65,25 +66,42 @@ export class SecuritySessionUtils {
     }
 
     static getAppName() {
-        return  "bidrag-frontend";
+        return "bidrag-frontend";
     }
 
     static async getSession(): Promise<SessionResponse> {
         return {
             user_id: "",
-            correlation_id: this.getCorrelationId(),
+            correlation_id: SecuritySessionUtils.getCorrelationId(),
         };
     }
 
+    static async hentSaksbehandler(): Promise<NavUser | undefined> {
+        const response = await fetch("/me", { method: "GET", headers: { Accept: "application/json" } });
+
+        // Ved utløpt sesjon redirecter Wonderwall til innloggingssiden. fetch følger
+        // redirecten, så vi må sjekke innholdstypen og ikke bare response.ok.
+        if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) {
+            return undefined;
+        }
+
+        return (await response.json()) as NavUser;
+    }
+
     static async hentSaksbehandlerNavn(): Promise<string | undefined> {
-        const tokenReq = await fetch("/me", { method: "GET" });
-        return (await tokenReq.json()).displayName;
+        return (await SecuritySessionUtils.hentSaksbehandler())?.name;
     }
 
     static async hentSaksbehandlerId(): Promise<string | undefined> {
-        const tokenReq = await fetch("/me", { method: "GET" });
-        return (await tokenReq.json()).navIdent;
+        return (await SecuritySessionUtils.hentSaksbehandler())?.NAVident;
     }
+}
+
+/** Innlogget saksbehandler slik /me returnerer den. */
+export interface NavUser {
+    NAVident: string;
+    name: string;
+    username: string;
 }
 
 interface SessionResponse {

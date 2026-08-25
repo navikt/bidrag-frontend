@@ -11,7 +11,7 @@ export function createSakPayload(
     personensId: string,
     personensRolle: common.RolleTypeAbbreviation,
     selectedBarn: common.IPersonensReellMottakerRolle[],
-    motpartId?: string
+    motpartId?: string,
 ): common.OpprettSakPayload {
     return {
         eierfogd,
@@ -24,7 +24,7 @@ export function createSakPayloadForBA(
     personensId: string,
     personensRolle: common.RolleTypeAbbreviation,
     foreldre: common.IPersonensReellMottakerRolle[],
-    motpartReellMottaker?: string
+    motpartReellMottaker?: string,
 ): common.OpprettSakPayload {
     const hovedpersonensRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: personensId,
@@ -35,12 +35,14 @@ export function createSakPayloadForBA(
 
     const roller: common.OpprettSakRolleRequest[] = [
         hovedpersonensRolle,
-        ...foreldre.map((selected): common.OpprettSakRolleRequest => ({
-            reellMottager: selected.reellMottaker,
-            type: toRolletype(selected.rolle),
-            rolleType: toRolletype(selected.rolle),
-            fodselsnummer: selected.ident,
-        })),
+        ...foreldre.map(
+            (selected): common.OpprettSakRolleRequest => ({
+                reellMottager: selected.reellMottaker,
+                type: toRolletype(selected.rolle),
+                rolleType: toRolletype(selected.rolle),
+                fodselsnummer: selected.ident,
+            }),
+        ),
     ];
     if (foreldre.length === 1) {
         const enesteForeldre = foreldre[0];
@@ -62,7 +64,7 @@ function createSakRoller(
     personensId: string,
     personensRolle: common.RolleTypeAbbreviation,
     selectedBarn: common.IPersonensReellMottakerRolle[],
-    motpartId?: string
+    motpartId?: string,
 ): common.OpprettSakRolleRequest[] {
     const hovedPersonensRolle: common.OpprettSakRolleRequest = {
         fodselsnummer: personensId,
@@ -76,11 +78,13 @@ function createSakRoller(
     return [
         hovedPersonensRolle,
         motpartsRolle,
-        ...selectedBarn.map((selected): common.OpprettSakRolleRequest => ({
-            reellMottager: selected.reellMottaker,
-            type: toRolletype(selected.rolle),
-            rolleType: toRolletype(selected.rolle),
-            fodselsnummer: selected.ident,
-        })),
+        ...selectedBarn.map(
+            (selected): common.OpprettSakRolleRequest => ({
+                reellMottager: selected.reellMottaker,
+                type: toRolletype(selected.rolle),
+                rolleType: toRolletype(selected.rolle),
+                fodselsnummer: selected.ident,
+            }),
+        ),
     ];
 }

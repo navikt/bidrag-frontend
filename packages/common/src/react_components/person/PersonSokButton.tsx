@@ -1,7 +1,7 @@
-import { Button, ButtonProps, Modal } from "@navikt/ds-react";
-import { ReactNode, useRef } from "react";
+import { Button, type ButtonProps, Modal } from "@navikt/ds-react";
+import { type ReactNode, useRef } from "react";
 
-import { BroadcastError, PersonBroadcastMessage } from "../../types/broadcast";
+import type { BroadcastError, PersonBroadcastMessage } from "../../types/broadcast";
 
 type PersonSokProps = {
     onResult: (data: PersonBroadcastMessage | null) => void;
@@ -34,7 +34,7 @@ export default function PersonSokButton({
                 if (!data.ok && data.error) {
                     console.error(
                         "Det skjedde en feil ved henting av personinfo",
-                        (data.error as BroadcastError)?.stack
+                        (data.error as BroadcastError)?.stack,
                     );
                     return;
                 }

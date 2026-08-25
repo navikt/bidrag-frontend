@@ -4,7 +4,7 @@ import { env } from "~/env.server.ts";
 const BISYS_PATHS = {
     sak: "Sak.do",
     sakForside: "Sak.do",
-    sakHistorikk: "Sakshistorikk.do",
+    sakshistorikk: "Sakshistorikk.do",
     oppgaveliste: "Oppgaveliste.do",
     brukeroversikt: "Brukeroversikt.do",
 } as const;

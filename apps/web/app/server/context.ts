@@ -1,2 +1,1 @@
-export {userContext} from "~/server/auth/auth.context.ts";
-
+export { userContext } from "~/server/auth/auth.context.ts";

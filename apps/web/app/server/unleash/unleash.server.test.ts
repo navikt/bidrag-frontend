@@ -70,4 +70,12 @@ describe("lokale overstyringer (UNLEASH_LOCAL_TOGGLES)", () => {
         const { isEnabled } = await import("./unleash.server.ts");
         await expect(isEnabled("flagg.paa")).resolves.toBe(false);
     });
+
+    it("tåler at lista er skrevet over flere linjer", async () => {
+        envMock.UNLEASH_LOCAL_TOGGLES = "\n    flagg.paa=true,\n\n    flagg.av=false,\n    flagg.uten.verdi\n";
+        const { isEnabled } = await import("./unleash.server.ts");
+        await expect(isEnabled("flagg.paa")).resolves.toBe(true);
+        await expect(isEnabled("flagg.av")).resolves.toBe(false);
+        await expect(isEnabled("flagg.uten.verdi")).resolves.toBe(true);
+    });
 });

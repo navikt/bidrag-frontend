@@ -15,16 +15,16 @@ export type EditDocumentConfig = string;
 export class EditorConfigStorage {
     private static getKey = (id: string) => `editor_config_${id}`;
     private static stringify<T>(object: T): string {
-        if (typeof object == "string") return object;
-        if (typeof object == "object") return JSON.stringify(object);
+        if (typeof object === "string") return object;
+        if (typeof object === "object") return JSON.stringify(object);
         return object as string;
     }
     static save<T>(id: string, config: T) {
-        SessionStorage.set(this.getKey(id), this.stringify(config));
+        SessionStorage.set(EditorConfigStorage.getKey(id), EditorConfigStorage.stringify(config));
     }
 
     static get<T>(id: string): T | null {
-        const configString = SessionStorage.get(this.getKey(id));
+        const configString = SessionStorage.get(EditorConfigStorage.getKey(id));
         return configString ? JSON.parse(configString) : null;
     }
 }
