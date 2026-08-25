@@ -494,7 +494,7 @@ function HeaderRenderer({
     );
 
     return (
-        <Bleed marginInline="full">
+        <div>
             <Box
                 style={{
                     background: "var(--ax-bg-neutral-soft)",
@@ -551,6 +551,6 @@ function HeaderRenderer({
                     <ExpandedRoles saksnummerRoller={expandedSaksnummerRoller} />
                 </Box>
             </Box>
-        </Bleed>
+        </div>
     );
 }
