@@ -2,13 +2,12 @@ import type { Bidragssak, SaksinformasjonBarn } from "@bidrag/api/BidragReskontr
 import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { PersonIdent, PersonNavnIdent } from "@bidrag/common";
 import { formaterBelop, sumNullable } from "@bidrag/utils";
-import { Alert, HStack, Table, VStack } from "@navikt/ds-react";
+import { Alert, Table, VStack } from "@navikt/ds-react";
 import { useMemo } from "react";
 import {
     beregnTotalGjeld,
     beregnTotalOffentligGjeld,
     beregnTotalPrivatGjeld,
-    beregnTotaltTilUtbetaling,
 } from "~/common/reskontro/gjeldsberegninger.ts";
 import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
 import { useAktivPeriode } from "~/routes/bruker/sum_pr_sak/useAktivPeriode.ts";
@@ -16,17 +15,14 @@ import { useAktivPeriode } from "~/routes/bruker/sum_pr_sak/useAktivPeriode.ts";
 const gjeld = (barn: SaksinformasjonBarn) => {
     return sumNullable(barn.restGjeldOffentlig, barn.restGjeldPrivat);
 };
-const tilUtbetaling = (barn: SaksinformasjonBarn) => {
-    return sumNullable(barn.sumForskuddUtbetalt, barn.sumIkkeUtbetalt);
-};
 
-interface SakSummerProps {
+interface Props {
     ident: string;
     bidragSak: Bidragssak;
     sak?: BidragssakDto;
 }
 
-export function SaksumTabellBP({ bidragSak, ident, sak }: SakSummerProps) {
+export function SaksumTabellBP({ bidragSak, ident, sak }: Props) {
     if (!bidragSak.saksnummer) {
         return <Alert variant={"warning"}>Saksnummer mangler for bidragssak</Alert>;
     }
@@ -39,7 +35,6 @@ export function SaksumTabellBP({ bidragSak, ident, sak }: SakSummerProps) {
     const totalGjeld = beregnTotalGjeld(barn);
     const totalPrivatGjeld = beregnTotalPrivatGjeld(barn);
     const totalOffGjeld = beregnTotalOffentligGjeld(barn);
-    const totaltTilUtbetaling = beregnTotaltTilUtbetaling(barn);
 
     const bidrag = aktivePerioder
         .filter((p) => p.skyldner === ident)
@@ -92,7 +87,7 @@ export function SaksumTabellBP({ bidragSak, ident, sak }: SakSummerProps) {
                 <Table.Row>
                     <Table.DataCell />
                     <Table.DataCell align={"right"}>
-                        <VStack gap={"space-4"}  justify={"end"}>
+                        <VStack gap={"space-4"} justify={"end"}>
                             {sumBidragPerValuta.map(([valuta, sum]) => (
                                 <span key={valuta}>
                                     <strong>{formaterBelop(sum)}</strong> {valuta}
