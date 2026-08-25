@@ -11,8 +11,6 @@ export default function SumPrSakPage({ params }: Route.ComponentProps) {
     const fnr = decodeFnr(brukerId);
 
     const { data } = useSuspenseQuery(hentInnkrevingssakPaPerson(fnr));
-
-    data.skyldner
     const saker = data.bidragssaker ?? [];
 
     return (
