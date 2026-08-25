@@ -55,7 +55,6 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
     }
 
     function renderFFBeregning() {
-        console.log("forholdsmessigFordeling", kanFatteVedtakForRevurderingsbarn);
         if (!kanFatteVedtakForRevurderingsbarn) {
             return (
                 <>
