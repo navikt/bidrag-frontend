@@ -43,8 +43,8 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
             redusertTil25ProsentAvInntekt && harNokEvne
                 ? "Det nye beregnede bidraget overstiger 25 prosent av inntekten. Bidraget vil derfor forholdsmessig fordeles."
                 : harNokEvne
-                    ? "Bidraget vil derfor ikke forholdsmessig fordeles."
-                    : "Bidraget vil derfor forholdsmessig fordeles.";
+                  ? "Bidraget vil derfor ikke forholdsmessig fordeles."
+                  : "Bidraget vil derfor forholdsmessig fordeles.";
         return (
             <BodyShort size="small" className="mt-2">
                 {!harNokEvne

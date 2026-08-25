@@ -101,7 +101,7 @@ const BeregningTabellBarn = ({ resultatBarn }: { resultatBarn: ResultatBidragsbe
     const avslag = virkningstidspunktV3.barn.find((v) => v.rolle.ident === resultatBarn.barn.ident)?.avslag;
     const erAvslag = avslag !== null && avslag !== undefined;
     const avvistAldersjustering = resultatBarn.perioder.every(
-        (p) => p.aldersjusteringDetaljer != null && p.aldersjusteringDetaljer?.aldersjustert === false
+        (p) => p.aldersjusteringDetaljer != null && p.aldersjusteringDetaljer?.aldersjustert === false,
     );
     const rolle = roller.find((v) => v.ident === resultatBarn.barn.ident);
 

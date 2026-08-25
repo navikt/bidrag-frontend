@@ -119,9 +119,9 @@ export const GrunnlagFraVedtakButton = () => {
     );
 };
 export const TableRowResultatAvslag = ({
-                                           periode,
-                                           barn,
-                                       }: {
+    periode,
+    barn,
+}: {
     periode: ResultatBarnebidragsberegningPeriodeDto;
     barn: ResultatBidragsberegningBarnDto;
 }) => {
@@ -166,13 +166,13 @@ export const TableRowResultat = ({ periode }: { periode: ResultatBarnebidragsber
                 ) : (
                     <table>
                         <tbody>
-                        <tr>
-                            <td className="w-[45px]" align="right">
-                                {formatterProsent(periode.bpsAndelU)}
-                            </td>
-                            <td className="w-[10px]">/</td>
-                            <td>{formatterBeløpForBeregning(periode.bpsAndelBeløp)}</td>
-                        </tr>
+                            <tr>
+                                <td className="w-[45px]" align="right">
+                                    {formatterProsent(periode.bpsAndelU)}
+                                </td>
+                                <td className="w-[10px]">/</td>
+                                <td>{formatterBeløpForBeregning(periode.bpsAndelBeløp)}</td>
+                            </tr>
                         </tbody>
                     </table>
                 )}
@@ -183,17 +183,17 @@ export const TableRowResultat = ({ periode }: { periode: ResultatBarnebidragsber
                 ) : (
                     <table>
                         <tbody>
-                        {periode.beregningsdetaljer?.samværsfradrag != null ? (
-                            <tr>
-                                <td className="w-[45px]" align="right">
-                                    {formatterBeløpForBeregning(periode.samværsfradrag)}
-                                </td>
-                                <td className="w-[10px]">/</td>
-                                <td>{samværsklasse}</td>
-                            </tr>
-                        ) : (
-                            <tr></tr>
-                        )}
+                            {periode.beregningsdetaljer?.samværsfradrag != null ? (
+                                <tr>
+                                    <td className="w-[45px]" align="right">
+                                        {formatterBeløpForBeregning(periode.samværsfradrag)}
+                                    </td>
+                                    <td className="w-[10px]">/</td>
+                                    <td>{samværsklasse}</td>
+                                </tr>
+                            ) : (
+                                <tr></tr>
+                            )}
                         </tbody>
                     </table>
                 )}
@@ -205,19 +205,19 @@ export const TableRowResultat = ({ periode }: { periode: ResultatBarnebidragsber
                     ) : (
                         <table>
                             <tbody>
-                            <tr>
-                                <td className="w-[45px]" align="right">
-                                    {formatterBeløpForBeregning(
-                                        periode.beregningsdetaljer.delberegningBidragsevne?.bidragsevne
-                                    )}
-                                </td>
-                                <td className="w-[10px]">/</td>
-                                <td>
-                                    {formatterBeløpForBeregning(
-                                        periode.beregningsdetaljer.delberegningBidragsevne?.sumInntekt25Prosent
-                                    )}
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td className="w-[45px]" align="right">
+                                        {formatterBeløpForBeregning(
+                                            periode.beregningsdetaljer.delberegningBidragsevne?.bidragsevne,
+                                        )}
+                                    </td>
+                                    <td className="w-[10px]">/</td>
+                                    <td>
+                                        {formatterBeløpForBeregning(
+                                            periode.beregningsdetaljer.delberegningBidragsevne?.sumInntekt25Prosent,
+                                        )}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     )}
@@ -289,10 +289,10 @@ export const ForholdsmessigFordelingVarsel = () => {
     const minstEnPeriodeHarSlåttUtTilFF = beregning?.resultat?.minstEnPeriodeHarSlåttUtTilFF;
 
     const enPeriodeHarSlåttUtTilFFPga25Prosent = beregning?.resultat?.perioderSlåttUtTilFF?.some(
-        (b) => b.erEvneJustertNedTil25ProsentAvInntekt
+        (b) => b.erEvneJustertNedTil25ProsentAvInntekt,
     );
     const enPeriodeHarSlåttUtTilFFPgaRedusertEvne = beregning?.resultat?.perioderSlåttUtTilFF?.some(
-        (b) => !b.erEvneJustertNedTil25ProsentAvInntekt
+        (b) => !b.erEvneJustertNedTil25ProsentAvInntekt,
     );
     if (!minstEnPeriodeHarSlåttUtTilFF) return null;
     return (
@@ -302,7 +302,7 @@ export const ForholdsmessigFordelingVarsel = () => {
                 {enPeriodeHarSlåttUtTilFFPga25Prosent
                     ? "BPs totale andel av U overstiger 25% av inntekten. Bidraget er derfor forholdsmessig fordelt i minst en av periodene"
                     : enPeriodeHarSlåttUtTilFFPgaRedusertEvne &&
-                    "BP har ikke full bidragsevne. Bidraget er derfor forholdsmessig fordelt i minst en av periodene"}
+                      "BP har ikke full bidragsevne. Bidraget er derfor forholdsmessig fordelt i minst en av periodene"}
             </BodyShort>
         </Alert>
     );
@@ -325,14 +325,14 @@ export const VedtakResultatBarn = ({ barn }: { barn: ResultatRolle }) => (
     </div>
 );
 export const VedtakTableHeader = ({
-                                      resultatBarn,
-                                      avslag = false,
-                                      avvistAldersjustering = false,
-                                      resultatUtenBeregning = false,
-                                      bareVisResultat = false,
-                                      orkestrertVedtak = false,
-                                      manuellAldersjustering = false,
-                                  }: {
+    resultatBarn,
+    avslag = false,
+    avvistAldersjustering = false,
+    resultatUtenBeregning = false,
+    bareVisResultat = false,
+    orkestrertVedtak = false,
+    manuellAldersjustering = false,
+}: {
     resultatBarn?: ResultatBidragsberegningBarnDto;
     avslag: boolean;
     avvistAldersjustering: boolean;
@@ -463,9 +463,9 @@ export const VedtakTableHeader = ({
 };
 
 export const OpprettParagraf35cCheckbox = ({
-                                               periode,
-                                               resultatBarn,
-                                           }: {
+    periode,
+    resultatBarn,
+}: {
     periode: ResultatBarnebidragsberegningPeriodeDto;
     resultatBarn?: ResultatBidragsberegningBarnDto;
 }) => {
@@ -503,9 +503,9 @@ export const VedtakUgyldigBeregning = ({ resultat }: { resultat?: UgyldigBeregni
     );
 };
 export const VelgManuellVedtakModal = ({
-                                           barnIdent,
-                                           aldersjusteringForÅr,
-                                       }: {
+    barnIdent,
+    aldersjusteringForÅr,
+}: {
     barnIdent: string;
     aldersjusteringForÅr: number;
 }) => {
@@ -541,10 +541,10 @@ export const VelgManuellVedtakModal = ({
     );
 };
 export const VedtakLenke = ({
-                                vedtaksid,
-                                visText = false,
-                                label,
-                            }: {
+    vedtaksid,
+    visText = false,
+    label,
+}: {
     vedtaksid?: number;
     visText?: boolean;
     label?: string;
@@ -566,15 +566,15 @@ export const VedtakLenke = ({
     );
 };
 export const VedtakTableBody = ({
-                                    resultatBarn,
-                                    avslag,
-                                    opphør,
-                                    bareVisResultat = false,
-                                    orkestrertVedtak = false,
-                                    manuellAldersjustering = false,
-                                    kanFatteVedtakForRevurderingsbarn = false,
-                                    anbefalesÅFatteVedtakForRevurderingsbarn = false,
-                                }: {
+    resultatBarn,
+    avslag,
+    opphør,
+    bareVisResultat = false,
+    orkestrertVedtak = false,
+    manuellAldersjustering = false,
+    kanFatteVedtakForRevurderingsbarn = false,
+    anbefalesÅFatteVedtakForRevurderingsbarn = false,
+}: {
     resultatBarn: ResultatBidragsberegningBarnDto;
     avslag: boolean;
     opphør: boolean;
@@ -612,7 +612,7 @@ export const VedtakTableBody = ({
         return classes.trim();
     }
     function findPeriodWithLowestFom(
-        periods: ResultatBarnebidragsberegningPeriodeDto[]
+        periods: ResultatBarnebidragsberegningPeriodeDto[],
     ): ResultatBarnebidragsberegningPeriodeDto | undefined {
         if (periods.length === 0) return undefined;
 
@@ -627,7 +627,7 @@ export const VedtakTableBody = ({
         if (periode.klageOmgjøringDetaljer?.kanOpprette35c === false) return false;
         const vedtaksid = periode.klageOmgjøringDetaljer.resultatFraVedtak;
         const perioderMedSammeVedtak = resultatBarn.perioder.filter(
-            (p) => p.klageOmgjøringDetaljer?.resultatFraVedtak === vedtaksid
+            (p) => p.klageOmgjøringDetaljer?.resultatFraVedtak === vedtaksid,
         );
         if (perioderMedSammeVedtak.length < 2) return true;
         const førstePeriode = findPeriodWithLowestFom(perioderMedSammeVedtak);

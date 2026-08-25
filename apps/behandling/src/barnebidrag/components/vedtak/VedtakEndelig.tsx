@@ -147,7 +147,11 @@ export const VedtakLenke = ({ vedtaksid, visText = false }: { vedtaksid?: number
             target="_blank"
             rel="noreferrer"
         >
-            {typeof visText === "boolean" && visText ? "Grunnlag fra vedtak" : typeof visText === "string" ? visText : ""}{" "}
+            {typeof visText === "boolean" && visText
+                ? "Grunnlag fra vedtak"
+                : typeof visText === "string"
+                  ? visText
+                  : ""}{" "}
             <ExternalLinkIcon aria-hidden />
         </Link>
     );
@@ -238,9 +242,9 @@ const VedtakResultat = () => {
 };
 
 function BeregningTabellBarn({
-                                 resultatBarn,
-                                 bleManueltOverstyrtTilÅIkkeFatteVedtak,
-                             }: {
+    resultatBarn,
+    bleManueltOverstyrtTilÅIkkeFatteVedtak,
+}: {
     resultatBarn: ResultatBidragsberegningBarnDto;
     bleManueltOverstyrtTilÅIkkeFatteVedtak: boolean;
 }) {
@@ -291,13 +295,13 @@ function BeregningTabellBarn({
             <VStack gap="space-4">
                 {endeligVedtak.map((delvedtak, i) => {
                     const avvistAldersjustering = delvedtak.perioder.every(
-                        (p) => p.aldersjusteringDetaljer != null && p.aldersjusteringDetaljer?.aldersjustert === false
+                        (p) => p.aldersjusteringDetaljer != null && p.aldersjusteringDetaljer?.aldersjustert === false,
                     );
 
                     const vedtakstype = delvedtak.type;
 
                     const manuellAldersjustering = delvedtak.perioder.some(
-                        (p) => p?.klageOmgjøringDetaljer?.manuellAldersjustering
+                        (p) => p?.klageOmgjøringDetaljer?.manuellAldersjustering,
                     );
                     const rolle = roller.find((v) => v.ident === resultatBarn.barn.ident);
 
@@ -316,7 +320,7 @@ function BeregningTabellBarn({
                                 resultatBarn={{
                                     ...resultatBarn,
                                     kanFatteVedtakForRevurderingsbarn:
-                                    beregning.resultat?.kanFatteVedtakForRevurderingsbarn,
+                                        beregning.resultat?.kanFatteVedtakForRevurderingsbarn,
                                     perioder: delvedtak.perioder,
                                     resultatUtenBeregning: delvedtak.type === Vedtakstype.INDEKSREGULERING,
                                 }}
@@ -329,11 +333,11 @@ function BeregningTabellBarn({
                                         <div>Innkreves: </div>
                                         <div>
                                             {resultatBarn.innkrevesFraPerioder
-                                            .map(
-                                                (periode) =>
-                                                    `${DateToDDMMYYYYString(dateOrNull(periode.fom))} - ${periode.til != null ? DateToDDMMYYYYString(deductDays(dateOrNull(periode.til), 1)) : ""}`
-                                            )
-                                            .join(", ")}
+                                                .map(
+                                                    (periode) =>
+                                                        `${DateToDDMMYYYYString(dateOrNull(periode.fom))} - ${periode.til != null ? DateToDDMMYYYYString(deductDays(dateOrNull(periode.til), 1)) : ""}`,
+                                                )
+                                                .join(", ")}
                                         </div>
                                     </HStack>
                                 </BodyShort>
@@ -347,10 +351,10 @@ function BeregningTabellBarn({
 }
 
 const RevurderingsbarnVedtakInfo = ({
-                                        kanFatteVedtakForRevurderingsbarn,
-                                        revurderingsbarnVedtakDetaljer,
-                                        resultatBarn,
-                                    }: {
+    kanFatteVedtakForRevurderingsbarn,
+    revurderingsbarnVedtakDetaljer,
+    resultatBarn,
+}: {
     kanFatteVedtakForRevurderingsbarn?: boolean;
     revurderingsbarnVedtakDetaljer?: FatteVedtakDetaljerFraOmgjortVedtakForRevurderingsbarn | null;
     resultatBarn?: ResultatBidragsberegningBarnDto[];
@@ -380,8 +384,8 @@ const RevurderingsbarnVedtakInfo = ({
                         ? "I påklaget/omgjort vedtak ble det ikke fattet vedtak for revurderingsbarn. Det vil derfor ikke bli fattet vedtak for revurderingsbarn."
                         : "I påklaget/omgjort vedtak ble det ikke fattet vedtak for revurderingsbarn."
                     : kanFatteVedtakForRevurderingsbarn
-                        ? "I påklaget/omgjort vedtak ble det fattet vedtak for revurderingsbarn."
-                        : "I påklaget/omgjort vedtak ble det fattet vedtak for revurderingsbarn. Det vil derfor bli fattet vedtak for revurderingsbarn."}
+                      ? "I påklaget/omgjort vedtak ble det fattet vedtak for revurderingsbarn."
+                      : "I påklaget/omgjort vedtak ble det fattet vedtak for revurderingsbarn. Det vil derfor bli fattet vedtak for revurderingsbarn."}
             </BodyShort>
             {begrunnelseFraTidligereVedtak && (
                 <BodyShort size="small" className="mt-2">
@@ -404,13 +408,13 @@ type ResultatTabellProps = {
 };
 
 const ResultatTabell = ({
-                            erAvslag,
-                            avvistAldersjustering,
-                            resultatBarn,
-                            erOpphor,
-                            beregnet,
-                            manuellAldersjustering,
-                        }: ResultatTabellProps) => {
+    erAvslag,
+    avvistAldersjustering,
+    resultatBarn,
+    erOpphor,
+    beregnet,
+    manuellAldersjustering,
+}: ResultatTabellProps) => {
     return (
         <Table size="small">
             <VedtakTableHeader
