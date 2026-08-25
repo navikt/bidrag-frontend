@@ -4,6 +4,7 @@ const { route } = relative(import.meta.dirname);
 
 export default [
     route("sak/:saksnummer/behandling/:behandlingId", "../BehandlingRoute.tsx", { id: "sak-behandling" }),
+    route("sak/:saksnummer/vedtak/:vedtakId", "../BehandlingRoute.tsx", { id: "sak-vedtak" }),
     route("sak/:saksnummer/behandling/:behandlingId/begrunnelse/:broadcastChannel", "../BegrunnelseRoute.tsx", {
         id: "sak-behandling-begrunnelse",
     }),

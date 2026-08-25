@@ -6,6 +6,6 @@ import { BehandlingPage } from "../BehandlingPage";
  * lesemodus av et vedtak, avhengig av hvilken parameter som finnes i URLen.
  */
 export default function BehandlingRoute() {
-    const { behandlingId, vedtaksid } = useParams<{ behandlingId?: string; vedtaksid?: string }>();
-    return <BehandlingPage behandlingId={behandlingId} vedtakId={vedtaksid} />;
+    const { behandlingId, vedtakId } = useParams<{ behandlingId?: string; vedtakId?: string }>();
+    return <BehandlingPage behandlingId={behandlingId} vedtakId={vedtakId} />;
 }
