@@ -1,0 +1,9 @@
+.FeedbackThankYouMessage {
+    position: absolute;
+    width: 350px;
+}
+
+.FeedbackThankYouMessage.navds-box {
+    border-color: var(--ax-success-400);
+    background-color: var(--ax-success-100);
+}

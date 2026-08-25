@@ -7,7 +7,7 @@ export class CustomError extends Error {
         correlationId: string | null,
         message: string,
         stack?: string,
-        cause?: unknown | undefined
+        cause?: unknown | undefined,
     ) {
         super();
         this.name = name;

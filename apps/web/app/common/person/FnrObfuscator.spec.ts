@@ -22,7 +22,7 @@ describe("FnrObfuscator", () => {
 
     it("dekoder en kjent obfuskert verdi uten å bruke encode først", () => {
         const obfuscater = new FnrObfuscator();
-        const obfuscatedFnr = "L3omtfKl"
+        const obfuscatedFnr = "L3omtfKl";
         expect(obfuscater.decode(obfuscatedFnr)).toBe("12345678901");
     });
 
@@ -39,16 +39,11 @@ describe("FnrObfuscator", () => {
 
     it("kaster feil når fødselsnummer inneholder andre tegn enn tall", () => {
         const obfuscater = new FnrObfuscator();
-        expect(() => obfuscater.encode("1234abc")).toThrow(
-            "Fnr must be a number",
-        );
+        expect(() => obfuscater.encode("1234abc")).toThrow("Fnr must be a number");
     });
 
     it("kaster feil når obfuskert verdi ikke kan dekodes", () => {
         const obfuscater = new FnrObfuscator();
-        expect(() => obfuscater.decode("ugyldig-verdi")).toThrow(
-            "Invalid obfuscated Fnr",
-        );
+        expect(() => obfuscater.decode("ugyldig-verdi")).toThrow("Invalid obfuscated Fnr");
     });
 });
-

@@ -28,6 +28,8 @@ const EnvSchema = z.object({
     BIDRAG_ADMIN_AUDIENCE: NonEmpty,
     BIDRAG_BEHANDLING_URL: z.url(),
     BIDRAG_BEHANDLING_AUDIENCE: NonEmpty,
+    BIDRAG_DOKUMENT_PRODUKSJON_URL: z.url(),
+    BIDRAG_DOKUMENT_PRODUKSJON_AUDIENCE: NonEmpty,
     BISYS_URL: z.url(),
     MODIA_URL: z.url(),
     PERSONSOK_URL: z.url(),

@@ -1,0 +1,155 @@
+/* Denne fila er et bibliotek-stilark som importeres av apps/web/app/index.css.
+   Den skal IKKE importere "tailwindcss" selv - da får vi to Tailwind-instanser,
+   og den automatiske kildeskanningen tar utgangspunkt i feil katalog. */
+@import "./forskudd.css";
+
+/* Maksbredder for saksbehandlingsflatene. I Tailwind v4 driver --container-*
+   både max-w-*, w-* og basis-*, så én tokendefinisjon dekker begge behovene. */
+@theme {
+    --container-saksbehandling-inner: 960px;
+    --container-saksbehandling-inner-md: 720px;
+    --container-saksbehandling-inner-sm: 598px;
+    --container-content: 960px;
+}
+
+/* Klasser som bare finnes i dynamisk sammensatte strenger, og som Tailwind
+   derfor ikke oppdager ved skanning av kildefilene.
+   Merk: fargen het "border-danger" i ds-tailwind v7, men "ax-border-danger" i v8. */
+@source inline("border-ax-border-danger");
+@source inline("border-solid");
+@source inline("border-2");
+@source inline("w-[85px]");
+@source inline("{ax-lg:max-w-saksbehandling-inner,ax-md:max-w-saksbehandling-inner-md,ax-sm:max-w-saksbehandling-inner-sm}");
+
+.blur-sensitive-info .personnavn,
+.blur-sensitive-info .personinfo,
+.blur-sensitive-info .personident {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+}
+
+.blur-sensitive-info:hover {
+    filter: none;
+}
+.blur-sensitive-info {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+}
+
+.blur-sensitive-info:hover {
+    filter: none;
+}
+
+.bd_datadisplay dt:after {
+    content: ":";
+}
+
+.bd_datadisplay dt:before {
+    content: "";
+    display: block;
+}
+
+.bd_datadisplay dt,
+.bd_datadisplay dd {
+    display: inline;
+}
+.bd_datadisplay dd {
+    margin-left: 5px;
+}
+figure {
+    border: thin #c0c0c0 solid;
+    display: flex;
+    flex-flow: column;
+    padding: 5px;
+    max-width: 50rem;
+}
+
+figcaption {
+    background-color: var(--ax-neutral-300);
+    font: italic smaller sans-serif;
+    padding: 3px;
+    text-align: center;
+}
+
+.mx-auto h4 {
+    font-size: var(--ax-font-size-heading-small);
+    margin-bottom: 5px;
+}
+.mx-auto h1 {
+    font-size: "var(--ax-font-size-heading-xlarge)";
+}
+.mx-auto h2 {
+    font-size: "var(--ax-font-size-heading-large)";
+    margin-top: 0;
+}
+
+/*
+ * Brukerveiledningene er MDX og rendrer rå HTML. Tailwind sin preflight nullstiller
+ * nettleserens standardstiler, så vi gjenoppretter typografien for dette innholdet.
+ * (Den frittstående appen kjørte med preflight avslått.)
+ */
+.brukerveiledning h1,
+.brukerveiledning h2,
+.brukerveiledning h3,
+.brukerveiledning h4,
+.brukerveiledning h5,
+.brukerveiledning h6 {
+    font-weight: 600;
+    margin-block: 0.83em;
+}
+
+.brukerveiledning h1 {
+    font-size: var(--ax-font-size-heading-large, 1.75rem);
+}
+
+.brukerveiledning h2 {
+    font-size: var(--ax-font-size-heading-medium, 1.5rem);
+}
+
+.brukerveiledning h3 {
+    font-size: var(--ax-font-size-heading-small, 1.25rem);
+}
+
+.brukerveiledning h4,
+.brukerveiledning h5,
+.brukerveiledning h6 {
+    font-size: var(--ax-font-size-heading-xsmall, 1.125rem);
+}
+
+.brukerveiledning p {
+    margin-block: 1em;
+}
+
+.brukerveiledning ul,
+.brukerveiledning ol {
+    margin-block: 1em;
+    padding-inline-start: 2.5em;
+}
+
+.brukerveiledning ul {
+    list-style: disc;
+}
+
+.brukerveiledning ol {
+    list-style: decimal;
+}
+
+.brukerveiledning li {
+    margin-block: 0.25em;
+}
+
+.brukerveiledning a {
+    color: var(--ax-text-accent-subtle);
+    text-decoration: underline;
+}
+
+.brukerveiledning table {
+    margin-block: 1em;
+}
+
+.brukerveiledning th,
+.brukerveiledning td {
+    border: 1px solid var(--ax-border-neutral-subtle);
+    padding: var(--ax-space-8, 0.5rem);
+    text-align: left;
+}

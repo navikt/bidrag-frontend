@@ -1,4 +1,4 @@
-import { MutationStatus, QueryClient, useQueryClient } from "@tanstack/react-query";
+import { type MutationStatus, type QueryClient, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 export type MutationKey = any[];
@@ -21,7 +21,7 @@ export function useRQMutationState(compareToKeyInput?: MutationKey | MutationKey
     const queryClient = useQueryClient(_queryClient);
 
     useEffect(() => {
-        if (compareToKeyInput == undefined) return;
+        if (compareToKeyInput == null) return;
 
         const mutationCache = queryClient.getMutationCache();
 
@@ -35,7 +35,7 @@ export function useRQMutationState(compareToKeyInput?: MutationKey | MutationKey
                         : (mutationKey as string[])
                     : [];
                 return compareToMutationKeys.some((compareToKey) =>
-                    mutationKeyList.every((key) => compareToKey.includes(key))
+                    mutationKeyList.every((key) => compareToKey.includes(key)),
                 );
             });
 
@@ -85,7 +85,7 @@ export function useRQMutationState(compareToKeyInput?: MutationKey | MutationKey
     }, [compareToKeyInput, queryClient]);
 
     function getCompareToMutationKeys(): MutationKey[] {
-        if (compareToKeyInput == null || compareToKeyInput == undefined || compareToKeyInput.length == 0) return [];
+        if (compareToKeyInput == null || compareToKeyInput.length === 0) return [];
         if (Array.isArray(compareToKeyInput[0])) return compareToKeyInput as MutationKey[];
         return [compareToKeyInput as MutationKey];
     }
@@ -96,20 +96,20 @@ function areStatesEqual(left: MutationStateSummary, right: MutationStateSummary)
     if (left.status !== right.status) return false;
     if (left.errors.length !== right.errors.length) return false;
     if (left.pendingKeys.length !== right.pendingKeys.length) return false;
-    
+
     const errorsEqual = left.errors.every((error, index) => {
         const compareTo = right.errors[index];
         if (compareTo == null) return false;
         if (error.message !== compareTo.message) return false;
         return areKeysEqual(error.key, compareTo.key);
     });
-    
+
     const pendingKeysEqual = left.pendingKeys.every((key, index) => {
         const compareTo = right.pendingKeys[index];
         if (compareTo == null) return false;
         return areKeysEqual(key, compareTo);
     });
-    
+
     return errorsEqual && pendingKeysEqual;
 }
 

@@ -2,7 +2,7 @@ import { Tag } from "@navikt/ds-react";
 
 import { useBidragCommons } from "../../api/BidragCommonsContext";
 import { ROLE_FORKORTELSER, ROLE_TAGS, ROLE_TAGS_REVURDERING } from "../../types/roller/RoleTags";
-import { RolleType } from "../../types/roller/RolleType";
+import type { RolleType } from "../../types/roller/RolleType";
 
 const RolleTag = ({
     rolleType,
@@ -18,8 +18,13 @@ const RolleTag = ({
     const { useHentRevurderingsbarn } = useBidragCommons();
 
     const renderRolletype = ROLE_FORKORTELSER[rolleType] ?? rolleType;
-    const erRevurdering = useHentRevurderingsbarn && ident ? useHentRevurderingsbarn(ident, stønad18År) : false;
+    // `useHentRevurderingsbarn` er selv en hook (den kaller bl.a. useBehandlingV2/useSuspenseQuery
+    // internt), så den må kalles ubetinget på hver render - ikke inni en ternary/if - ellers bryter
+    // vi React sine Rules of Hooks, som gir ustabile fibre og kan trigge render-loops.
+    const erRevurderingsbarn = useHentRevurderingsbarn?.(ident, stønad18År) ?? false;
+    const erRevurdering = Boolean(ident) && erRevurderingsbarn;
     const variant = erRevurdering ? ROLE_TAGS_REVURDERING[rolleType] : ROLE_TAGS[rolleType];
+
     return (
         <Tag
             title={erRevurdering ? "Revurderingsbarn" : ""}

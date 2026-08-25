@@ -1,5 +1,5 @@
-import type { LogErrorType } from "./types";
-import type { IHeaderNavigationContext, IWindowAppContext, IWindowLogToServer } from "./windowTypes";
+import type {LogErrorType} from "./types";
+import type {IHeaderNavigationContext, IWindowAppContext, IWindowLogToServer} from "./windowTypes";
 
 declare global {
     interface Window {
