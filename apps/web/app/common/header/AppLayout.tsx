@@ -12,9 +12,7 @@ export function AppLayout({ children, bruker, bisysUrl }: AppLayoutProps) {
     return (
         <Page>
             <AppHeader bruker={bruker ?? undefined} bisysUrl={bisysUrl} />
-            <Page.Block as="main">
-                {children}
-            </Page.Block>
+            <Page.Block as="main">{children}</Page.Block>
         </Page>
     );
 }
