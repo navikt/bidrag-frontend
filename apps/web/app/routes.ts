@@ -40,7 +40,6 @@ export default [
         route("journal/:journalpostId", "routes/dokument/JournalRedirect.ts"),
         route("notat", "routes/forsendelse/NotatRedirect.ts"),
         route("forsendelse/*", "routes/forsendelse/ForsendelseRedirect.ts"),
-        route("vedtak/:vedtaksid", "routes/behandling/VedtakRedirect.ts"),
         route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
     ]),
 ] satisfies RouteConfig;
