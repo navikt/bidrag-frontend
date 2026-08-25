@@ -4,11 +4,7 @@ import { navLogger } from "~/server/logger/navLogger.ts";
 import type { Route } from "./+types/proxy.ts";
 import { getOnBehalfOfToken } from "./auth.utils.server.ts";
 
-async function proxyRequest(
-    request: Request,
-    app: string,
-    context: Route.LoaderArgs["context"],
-): Promise<Response> {
+async function proxyRequest(request: Request, app: string, context: Route.LoaderArgs["context"]): Promise<Response> {
     const authToken = context.get(authTokenContext);
     if (!authToken) throw new Response("Unauthorized", { status: 401 });
 
@@ -20,10 +16,7 @@ async function proxyRequest(
     const subPath = incomingUrl.pathname.replace(`/proxy/${app}`, "");
 
     const baseUrl = new URL(apiConfig.url);
-    const backendUrl = new URL(
-        baseUrl.pathname.replace(/\/$/, "") + subPath + incomingUrl.search,
-        baseUrl.origin,
-    );
+    const backendUrl = new URL(baseUrl.pathname.replace(/\/$/, "") + subPath + incomingUrl.search, baseUrl.origin);
     // Kopier headers fra original request, bytt ut Authorization
     const headers = new Headers(request.headers);
     headers.set("Authorization", `Bearer ${oboToken}`);
@@ -32,9 +25,7 @@ async function proxyRequest(
     const backendResponse = await fetch(backendUrl.toString(), {
         method: request.method,
         headers,
-        body: ["GET", "HEAD"].includes(request.method)
-            ? undefined
-            : request.body,
+        body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
         duplex: "half",
     } as RequestInit);
 

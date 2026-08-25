@@ -12,6 +12,7 @@ import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts"
 import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
 import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
+import { BidragProgressbarFullScreen } from "@bidrag/common";
 import { Loader } from "@navikt/ds-react";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
@@ -95,7 +96,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
                 <FlagProvider unleashClient={unleashClient} startClient={false}>
                     <UnleashContextUpdater />
                     <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
-                        <ClientOnly fallback={<Loader size="large" />}>
+                        <ClientOnly fallback={<BidragProgressbarFullScreen />}>
                             <Outlet />
                         </ClientOnly>
                     </AppLayout>

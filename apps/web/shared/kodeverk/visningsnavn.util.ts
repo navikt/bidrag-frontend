@@ -1,4 +1,3 @@
-import årsak from "./data/årsak.json";
 import behandlingstype from "./data/behandlingstype.json";
 import beregntil from "./data/beregntil.json";
 import bostatus from "./data/bostatus.json";
@@ -9,17 +8,18 @@ import offentligidtype from "./data/offentligidtype.json";
 import områdekode from "./data/områdekode.json";
 import privatavtaletype from "./data/privatavtaletype.json";
 import resultat from "./data/resultat.json";
-import særbidragskategori from "./data/særbidragskategori.json";
 import samværskalkulatorferietype from "./data/samværskalkulatorferietype.json";
 import samværskalkulatornetterfrekvens from "./data/samværskalkulatornetterfrekvens.json";
 import samværsklasse from "./data/samværsklasse.json";
 import sivilstand from "./data/sivilstand.json";
 import skolealder from "./data/skolealder.json";
 import sluttberegningBarnebidrag from "./data/sluttberegningBarnebidrag.json";
+import stønadstype from "./data/stønadstype.json";
+import særbidragskategori from "./data/særbidragskategori.json";
 import tilsynstype from "./data/tilsynstype.json";
 import utgiftstype from "./data/utgiftstype.json";
 import vedtakstype from "./data/vedtakstype.json";
-import stønadstype from "./data/stønadstype.json";
+import årsak from "./data/årsak.json";
 
 type VisningsnavnEntry = {
     intern: string;
@@ -65,7 +65,7 @@ export type VisningsnavnType = keyof typeof visningsnavnData;
 export function hentVisningsnavnFraType<T extends VisningsnavnType>(
     type: T,
     verdi: keyof (typeof visningsnavnData)[T] & string,
-    mål: "intern" | "bruker" = "intern"
+    mål: "intern" | "bruker" = "intern",
 ): string {
     const entry = (visningsnavnData[type] as Record<string, VisningsnavnEntry>)[verdi];
     if (!entry) return verdi;

@@ -1,4 +1,4 @@
-import { RolleType } from "./RolleType";
+import type { RolleType } from "./RolleType";
 
 export interface IRolleDetaljer {
     id?: number;
