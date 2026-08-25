@@ -1,0 +1,304 @@
+import tekster from "../../common/constants/texts";
+import elementIds from "../../common/constants/elementIds";
+import boforhold_nye_opplysninger from "./files/boforhold_nye_opplysninger.png";
+
+# Brukerveiledning barnebidrag 
+
+<h2 id={elementIds.brukerveildning.tittel_virkningstidspunkt}>1. Virkningstidspunkt</h2>
+
+#### Sette virkningstidspunkt
+Virkningstidspunktet styrer hvilke offentlige registrerte 
+opplysninger (data) som blir hentet inn. 
+Virkningstidspunktet kommer derfor først i flyten.
+- Hvis virkningstidspunktet endres etter at steg 2, 3 og 6 er fylt ut, må du oppdatere steg 2, 3 og 6 på nytt manuelt. Dette vil du få en beskjed om i en melding på skjermen.
+
+
+#### Velg årsak til innvilgelser / avslag / opphør
+- Årsak velger du fra en nedtrekksliste.
+- Dato for virkningstidspunkt blir forhåndsutfylt. 
+Denne datoen baserer seg på opplysninger 
+du har registrert ved journalføring (mottatt dato og søkt fra dato).
+- Du må vurdere om datoen stemmer. Hvis den ikke stemmer, må du endre datoen manuelt.
+
+#### Ved avslag
+Velg årsak til avslag
+- Årsak velger du fra en nedtrekksliste, og legger inn begrunnelsen for avslaget i begrunnelsesboksen
+
+Avslagsårsak sender deg direkte til steg 7 «Vedtak».
+
+#### Sette varighet av vedtaket
+- Default er at vedtaket står med løpende varighet.
+- Velger du "Velg opphørsdato" fra nedtrekkslisten må også opphørsdato settes.
+- I søknad om bidrag etter fylte 18 år er opphørsdato påkrevd
+
+#### Opplysninger blir lagret automatisk
+Opplysninger blir automatisk og fortløpende lagret, i både skjermbildet og saksbehandlingsnotat.
+ 
+<h2 id={elementIds.brukerveildning.tittel_privat_avtale}>2. Privat avtale</h2>
+Hvis partene dokumenterer en privat avtale, skal man bruke dette steget for å registrere avtalen for å 
+vurdere om endringen er på mer eller mindre enn 12 prosent. Man kan legge inn privat avtale per barn.
+Først må man legge inn måneden den private avtalen er avtalt og avtaletype for barnet det gjelder.
+
+Deretter legger man inn fra og med dato og beløp. Avtalen blir indeksregulert automatisk. 
+Indeksregulert beløp og indeksprosenten vil da vises i tabellen. Hvis avtalen ikke skal indeksreguleres,
+kan man deaktivere switchknappen.
+
+Hvis det allerede løper et bidrag i beløpshistorikken i periodene man legger inn privat avtale, vil 
+systemet lese mot beløpshistorikken når den vurderer om endringen er mer eller mindre enn 12 
+prosent. Hvis det ikke løper bidrag i beløpshistorikken, vil systemet lese mot beløpet i dette steget
+
+<h2 id={elementIds.brukerveildning.tittel_underholdskostnad}>3. Underholdskostnad</h2>
+Steget viser en oversikt på underholdskostnaden til barnet per periode. Du får også opplysninger om hvilke beløp som ligger til grunn i underholdskostnaden.
+Hvis det er flere barn i søknaden, kan man switche mellom barna.
+
+Dersom bidragsmottaker har tilsynsutgifter kan man legge dette inn ved å aktivere switchknappen. 
+Dersom bidragsmottaker mottar stønad til barnetilsyn eller tilleggsstønad vil dette vise, og switchknappen automatisk være på.
+
+#### BMs andre barn
+- Hvis bidragsmottaker har andre egne barn under 12 år, kommer dette opp automatisk. Men man har også mulighet for å legge inn barn manuelt. Dette er for å beregne korrekt skattefradrag. Beregningen av skattefradrag vises i detaljer i underholdskostnadstabellen på søknadsbarnet.
+- Dokumenterte tilsynsutgifter for bidragsmottakers andre barn må legges inn manuelt i denne tabellen.
+
+#### Stønad til barnetilsyn
+- Er bidragsmottaker innvilget stønad til barnetilsyn vil dette komme i tabellen. Løsningen vil vise en oversikt over opplysninger som er hentet fra Nav. Men saksbehandler må trykke på “rediger” for å legge inn verdier fra nedtrekkslistene på over/under skolealder og heltid/deltid.
+- Saksbehandler kan legge inn stønad til barnetilsyn manuelt, samt at man har mulighet for å redigere på perioder mottatt fra offentlig register. Dersom man redigerer perioden mottatt fra offentlig register, vil kilden endres fra offentlig til manuell.
+- Sjablonverdien legger seg som ett eget komponent i Underholdskostnaden.
+ 
+#### Faktiske tilsynsutgifter
+- Dokumenterte utgifter fra bidragsmottaker legges inn i faktiske tilsynsutgifter, og under fratrekk summerer man opp f.eks. kostpenger, redusert betaling og søskenmoderasjon. Systemer vil da regnet ut faktiske tilsynsutgifter minus fratrekk gange 11 måneder dele på 12 måneder.
+- Kommentarfeltet brukes for å beskrive beløpene som er lagt inn i tabellen.
+- Man kan legge inn flere ulike faktiske tilsynsutgifter i samme periode.
+- Beløpet legger seg som komponent i Underholdskostnaden med skattefradrag.
+
+#### Tilleggsstønad
+- Er bidragsmottaker innvilget tilleggsstønad vil dette komme i tabellen. Men saksbehandler må sjekke hvilket barn, dagsats og periode tilleggsstønaden er innvilget for. Man må legge inn dagsatsen bidragsmottaker er innvilget. Systemet vil da regnet ut dagsats x 260 stønadsdager dele på 12 måneder.
+- Saksbehandler kan legge inn tilleggsstønad manuelt.
+- Beløpet som legger som komponent i Underholdskostnaden er beregnet på følgende måte:
+ <br/>Faktisk tilsynsutgift minus fratrekk minus (dagsats x 260 stønadsdager dele på 12 måneder) gang 11 måneder dele 12 måneder = beregnet tilsynsutgift, deretter trekker man fra skattefradraget.
+
+<h2 id={elementIds.brukerveildning.tittel_inntekt}>4. Inntekt generelt</h2>
+
+### Partens inntekt 
+
+- Inntektene er hentet fra A-inntekt/A-ordningen. Du har også mulighet til å legge inn inntekt(er) manuelt. 
+
+- Arbeidsforhold er hentet fra AA-registeret. 
+
+- Kilde-kolonnen til høyre i bildet viser om du har brukt forhåndsutfylte eller manuelle opplysninger. Forhåndsutfylte opplysninger vises som en bygning symbol, mens manuelle opplysninger vises som en person symbol. 
+
+- Steget om inntekt inneholder én graf, 5 ulike tabeller og én oppsummeringstabell. Her får du informasjon om de forskjellige: 
+
+**Grafen** gir et bilde på hva parten har fått utbetalt 
+måned for måned i de siste 12 månedene. Dette vil gi deg en indikasjon på partenes inntekt. Er den stabil eller varierende?
+
+
+Hold musepekeren over grafen og du kan se 
+detaljer og spesifikasjoner av inntekt, samt de ulike
+inntektspostene for hver måned. Når inntekten er 
+stabil, kan du bruke 3 eller 12 måneder som er forhåndsutfylt.
+
+A-inntekt siste 3 eller 12 måneder er et 
+ferdigberegnet gjennomsnitt av 
+inntektsopplysninger fra de siste 3 eller 12 månedene, omregnet til årsinntekt.
+
+**Inntektstabellene** viser forskjellige typer inntekt: 
+pensjonsgivende inntekt og skatt, barnetillegg, (småbarnstillegg, kontantstøtte og utvidet barnetrygd kun for bidragsmottaker). 
+I tabellene for barnetillegg og kontantstøtte føres inntekten per barn.
+
+**Oppsummeringstabellen** nederst på siden, viser 
+inntekt per barn. Tallene her er basert på hvilken 
+inntekt du har valgt over. Systemet beregner den 
+totale inntekten per barn.
+
+- Hvis det har skjedd endringer i noen av inntektsopplysningene vi henter inn automatisk, vil du få beskjed om dette i en melding på skjermen. Det gjelder også hvis det kommer nye inntektsopplysninger. 
+
+- Alle opplysninger du legger inn, eller som blir hentet av løsningen, vil bli vist og lagret i notatet. 
+
+<h4 id="tabell_skattepliktig">Tabellen {tekster.title.skattepliktigeogPensjonsgivendeInntekt.toLowerCase()}</h4>
+
+- Løsningen henter inntektsopplysninger fra Skatteetaten og A-inntekt. 
+
+- Du må velge hvilken eller hvilke inntekter som skal være med. Du kan velge flere inntektstyper samtidig. Hvis parten for eksempel både har arbeidsinntekt og en ytelse, skal du legge inn én linje for arbeidsinntekt, og en annen linje for ytelse. 
+
+A-inntekt siste 12 måneder eller 3 måneder er et ferdigberegnet gjennomsnitt av inntektsopplysninger fra de siste 12 eller 3 månedene, omregnet til årsinntekt. 
+
+Hvis du trykker på pilen til høyre for beløpskolonnene, vi du se spesifiserte detaljer. Detaljene viser perioden inntekten er beregnet fra, og de ulike inntektspostene i inntektstypen oppsummert. 
+<br/>For eksempel: 
+> Fastlønn: 500 000 \
+  Overtid: 40 000
+
+Når vi passerer den 5. i hver måned (hvis 5. faller på en helg/helligdag vil det være neste arbeidsdag), vil de automatiske beregnede inntektsopplysningene fra A-inntekt oppdateres. Slik får du med inntekt fra forrige måned. 
+Dette er for å ha de ferskeste opplysningene ved beregningen av disse inntektstypene.
+Du vil få en melding på skjermen som viser hvilke 
+inntektstyper som oppdateres. Når du får en slik 
+melding, må du trykke på «oppdater opplysninger».
+- Inntektstypen overgangsstønad er beregnet som et
+gjennomsnitt fra mai til og med siste 
+inntektsperiode, omregnet til årsinntekt.
+- Hvis du skal legge inn ytelse med barnetillegg, må 
+du legge inn ytelsen uten barnetillegget. 
+Barnetillegget skal du legge inn i en egen 
+barnetilleggstabell.
+- Hvis parten har næringsinntekt, vil det vises <SackKronerFillIcon style={{color: "var(--a-icon-info)", verticalAlign: "middle"}}/> ikon som indikerer dette.
+
+<h4 id={elementIds.brukerveildning.tabell_barnetillegg}>Tabellen {tekster.title.barnetillegg.toLowerCase()}</h4>
+
+- Her blir alle typer barnetillegg som parten eventuelt 
+mottar registrert. De blir registrert per barn.
+- Løsningen henter automatisk barnetillegg parten 
+mottar i pensjon eller uføretrygd.
+- Hvis parten har andre barnetillegg, må du registrere 
+disse manuelt. Det gjelder barnetillegg fra både 
+offentlige og private aktører.
+- Det blir hentet inn nye opplysninger hver tolvte 
+time. Ved nye opplysninger vil du få en melding på 
+skjermen om hva som er endret. Når du får en slik 
+melding, må du trykke på «oppdater opplysninger».
+- Skattesats for barnetillegg blir beregnet automatisk av systemet basert på samme beregning som gjøres i bidragsevnevurderingen. Skattesatsen og beregningen av den vil vises i vedtaksbilde under detaljer av beregningen.
+
+<h4 id={elementIds.brukerveildning.tabell_utvidetbarnetrygd}>Tabellen {tekster.title.utvidetBarnetrygd.toLowerCase()}</h4>
+- Her blir utvidet barnetrygd som bidragsmottaker eventuelt 
+mottar registrert.
+- Løsningen henter automatisk utvidet barnetrygd, 
+og har allerede valgt denne inntekten slik at den 
+kommer med i beregningen.
+- Hvis denne inntekten ikke skal være med, må du 
+manuelt velge den bort.
+- Du kan også manuelt legge til utvidet barnetrygd, 
+om det som er innhentet er feil eller mangelfullt.
+- Det blir hentet inn nye opplysninger hver tolvte 
+time. Ved nye opplysninger vil du få en melding på 
+skjermen om hva som er endret. Når du får en slik 
+melding, må du trykke på «oppdater opplysninger».
+ 
+ <h4 id={elementIds.brukerveildning.tabell_småbarnstillegg}>Tabellen {tekster.title.småbarnstillegg.toLowerCase()}</h4>
+- Her blir småbarnstillegg som bidragsmottaker eventuelt mottar 
+registrert. Løsningen henter automatisk 
+småbarnstillegg, og har allerede valgt denne 
+inntekten slik at den kommer med i beregningen.
+- Hvis denne inntekten ikke skal være med, må du 
+manuelt velge den bort.
+- Du kan også manuelt legge til småbarnstillegg, om 
+det som er innhentet er feil eller mangelfullt.
+- Det blir hentet inn nye opplysninger hver tolvte 
+time. Ved nye opplysninger vil du få en melding på 
+skjermen om hva som er endret. Når du får en slik 
+melding, må du trykke på «oppdater opplysninger».
+
+ <h4 id={elementIds.brukerveildning.tabell_kontantstøtte}>Tabellen {tekster.title.kontantstøtte.toLowerCase()}</h4>
+- Her blir kontantstøtte som bidragsmottaker eventuelt mottar 
+registrert. De blir registrert per barn.
+- Løsningen henter kontantstøtte, og har allerede 
+valgt denne inntekten slik at den kommer med i 
+beregningen.
+- Hvis denne inntekten ikke skal være med, må du 
+manuelt velge den bort.
+- Du kan også manuelt legge til kontantstøtte, om 
+det som er innhentet er feil eller mangelfullt.
+- Det blir hentet inn nye opplysninger hver tolvte 
+time. Ved nye opplysninger vil du få en melding på 
+skjermen om hva som er endret. Når du får en slik 
+melding, må du trykke på «oppdater opplysninger».
+
+<h2 id={elementIds.brukerveildning.tittel_gebyr}>5. Gebyr</h2>
+- Systemet setter verdien fritatt eller ilagt automatisk basert på siste inntektsperiode på parten. I tilfeller hvor det er flere barn med ulike barnetillegg tar systemet med det høyeste barnetillegget i vurderingen.
+- Man kan manuelt overstyre verdien som systemet setter. Overstyrer man verdien må man fylle ut begrunnelse.
+
+<h2 id={elementIds.brukerveildning.tittel_boforhold}>6. Boforhold</h2>
+### Bidragspliktiges barn
+- Løsningen viser alle BPs barn fra offentlige registre, og hvilke av disse barna som er registrert på BPs adresse. 
+- Opplysningene fra offentlige registre er forhåndsutfylt i tabellen. Hvis det er dokumentert at opplysningene ikke stemmer, må du legge inn boforhold manuelt. 
+- Opplysningene oppdateres jevnlig, og du vil få melding på skjermen om det har skjedd endringer. 
+- Hvis opplysningene er mangelfulle, kan du legge inn barn basert på fødselsnummer. Eller, du kan bruke fritekstfeltet. 
+- Hvis BP har andre barn over 18 år vil man få tre valg i nedtrekkslisten: 
+  - 18 år dokumentert skolegang – barnet vil da telles som bar i bidragspliktiges husstand 
+  - 18 år regnes ikke som barn – barnet vil telles som at bidragspliktige deler bolig med annen voksen 
+  - 18 år ikke registeret på adresse – barnet telles ikke med hverken som barn eller at bidragspliktige deler bolig med annen voksen person 
+
+### Andre voksne i husstanden til den bidragspliktige 
+- Opplysningene fra offentlige registre er forhåndsutfylt i tabellen. Man kan ved å trykke på «Hvem bor på adresse?»  se mer informasjon om hvem som er folkeregisteret på samme adresse som den bidragspliktige. Personer som har en relasjon til den bidragspliktige vil være merket. Med relasjon til bidragspliktige mener man ektefelle, registrert samboer, foreldre eller en bidragspliktige har felles barn med. 
+- Hvis det er dokumentert at opplysningene ikke stemmer, må du legge inn status på boforhold manuelt. 
+- Opplysningene oppdateres jevnlig. Hvis det har skjedd endringer, vil du få beskjed om dette i en melding på skjermen. 
+- Opplysninger blir automatisk og fortløpende lagret, i både skjermbildet og saksbehandlingsnotatet. 
+
+<h2 id={elementIds.brukerveildning.tittel_samvær}>7. Samvær</h2>
+##### Vurder separat per barn
+Når det er flere barn i søknaden kan man sette ulike samværsklasser for barna. Da må
+man switche på «vurder separat per barn»-knappen. Barna vil da komme i egne faner på toppen.
+Hvis man skal sette samme samværsklasse for alle barna, må switchen være skrudd av.
+Det må skrives begrunnelse for samvær i notatet for hvert av barna hvis switchen er skrudd på
+##### Samvær
+- Man kan legge inn samværsklasse ved å velge samværsklasse direkte fra nedtrekkslisten, eller man kan legge inn i samværskalkulatoren.
+- Har man lagt inn i samværskalkulatoren kan man trykke på vis mer for å se hva som er lagt inn i kalkulatoren.
+- Har man lagt inn opplysninger i kalkulatoren og skal legge til flere perioder, vil kalkulatoren ta med de siste opplysningene som er lagt inn. Man kan da enten redigere på opplysningene eller nullstille.
+
+<h2 id={elementIds.brukerveildning.tittel_vedtak}>8. Fatte vedtak</h2>
+Dette er siste steget i løsningen, hvor du skal fatte vedtak. Her ligger oppsummering av verdiene du har lagt til grunn i behandling og notat.
+Ved å trykke på vis mer får man en detaljert visning av beregningen for den perioden. 
+
+Systemet setter automatisk 3 dagers utsettelse på fastsettelsesvedtak. 
+Dette kan endres ved å velge antall dager/ikke utsett i “utsett overføring til regnskap”.
+
+Indeksår vil vises i dette steget. Systemet vil automatisk sette indeksår på bakgrunn av beløpshistorikk,
+virkningstidspunkt og eventuelt beløpet som er registrert i steg 2 «Privat avtale».
+
+## 9. Etter vedtak
+Når du har fattet vedtak, går du tilbake til sakshistorikken 
+i Bisys. Der kan du se at:
+- Saksreskontro er oppdatert dersom det er innkreving av bidraget
+- Beløpshistorikken er oppdatert dersom det er innkreving av bidraget
+- Saksbehandlingsnotatet er lagret i pdf
+- Forsendelse er opprettet automatisk
+
+## 10. Diverse
+### Begrunnelse
+I alle steg skriver du begrunnelsen direkte i 
+løsningen.
+- Begrunnelsen blir fortløpende speilet i 
+saksbehandlingsnotatet.
+- Alle offentlige og manuelt registrerte opplysninger blir 
+automatisk lagret i saksbehandlingsnotatet.
+- Du skal ikke skrive inn beløp, beregninger eller 
+kilder. Unntaket er når du legger inn beløp 
+manuelt.
+
+### Saksbehandlingsnotat
+Saksbehandlingsnotatet speiler behandlingen, og 
+bygges fortløpende i saksbehandlingen.
+Notatet
+- Inkluderer begrunnelser, samt offentlige- og 
+manuelt registrerte opplysninger.
+- Består av én hoveddel og et vedlegg. 
+Hoveddelen består av det du velger at skal inn i 
+beregningen.
+Vedlegget består av alle offentlige opplysninger 
+som har vært tilgjengelig på vedtakstidspunktet.
+- Kan leses og redigeres når som helst i løpet av behandlingen. Men, vær obs på at notatet blir låst for redigering når vedtaket er fattet.
+- Gir mulighet for kommentarer i fritekstfelt.
+- Blir automatisk lagret i sakshistorikken etter at 
+vedtaket er fattet.
+
+Man kan endre størrelsen på notatet ved hjelp av pilen nederst i høyre hjørnet på
+notatet. Notatet kan også åpnes i egen fane ved å trykke på pilen ved siden av
+overskriften «Begrunnelse».
+
+### Feil-/ endringsmeldinger
+Hvis løsningen finner feil eller det er gjort endringer, får
+du beskjed om hva som er feil/endret i en melding som 
+kommer opp på skjermen.
+Meldingen kommer når
+- Opplysninger fra offentlige registre blir oppdatert i 
+løsningen.
+- Det er feil i perioder på inntekt.
+ 
+#### Nye opplysninger om boforhold
+Når det kommer nye opplysninger om boforhold fra offentlige registre som avviker fra gjeldende opplysninger vil du få følgende varsel:
+ <figure className="w-[45rem]">
+    <img src={boforhold_nye_opplysninger} />
+    <figcaption>Varsel om nye opplysninger om boforhold</figcaption>
+</figure>
+Under *Opplysninger fra offentlige registre* ser du de gamle opplysningene. Varselet viser de nye opplysningene som har kommet inn.
+Her kan du sammenligne de nye opplysningene med de gamle og vurdere om du skal oppdatere periodene som er lagt inn.
+
+Hvis du trykker **Ja** vil periodene bli overskrevet med de nye opplysningene.\
+Hvis du trykker **Nei** vil du beholde periodene som er lagt inn i tabellen under. \
+I begge tilfellene vil *Opplysninger fra offentlige registre* bli oppdatert.

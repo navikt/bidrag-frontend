@@ -1,0 +1,19 @@
+.error-modal {
+    background: var(--ax-bg-danger-soft);
+    border: 1px solid;
+    border-color: var(--ax-border-danger);
+}
+
+.error-heading {
+    display: flex;
+    align-items: center;
+    column-gap: 1rem;
+}
+
+.error-icon {
+    color: var(--ax-text-danger-decoration);
+}
+
+.error-body {
+    margin-left: 40px;
+}

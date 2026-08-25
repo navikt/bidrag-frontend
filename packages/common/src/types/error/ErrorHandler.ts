@@ -1,7 +1,7 @@
-import { AxiosError, AxiosResponse } from "axios";
+import type { AxiosError, AxiosResponse } from "axios";
 
 import { SecuritySessionUtils } from "../../utils";
-import { ErrorInfo } from "../logging";
+import type { ErrorInfo } from "../logging";
 
 export class AxiosErrorHandler {
     static getStackFromErrorBody(errorParsed: object | string): string {
@@ -10,7 +10,7 @@ export class AxiosErrorHandler {
         }
         if (errorParsed && typeof errorParsed === "object") {
             return Object.entries(errorParsed as Record<string, unknown>)
-                .map(([key, value]) => `key=${String(value)}`)
+                .map(([key, value]) => `${key}=${String(value)}`)
                 .join("-");
         }
 
@@ -21,7 +21,7 @@ export class AxiosErrorHandler {
         const responseText = response.data;
         try {
             return JSON.parse(responseText);
-        } catch (e) {
+        } catch (_e) {
             return responseText;
         }
     }
@@ -29,7 +29,7 @@ export class AxiosErrorHandler {
     static mapErrorResponseToApiError(error: AxiosError): ErrorInfo {
         const response = error.response;
         const stack = error.stack;
-        const corrId = error.config?.headers["traceparent"] ?? error.config?.headers["X-Correlation-ID"];
+        const corrId = error.config?.headers.traceparent ?? error.config?.headers["X-Correlation-ID"];
         const errorInfo = {
             cause: error.code,
             correlationId: corrId ?? SecuritySessionUtils.getCorrelationId(),
@@ -42,8 +42,8 @@ export class AxiosErrorHandler {
             const headers = response.headers ?? error.request.headers;
             const errorParsed = AxiosErrorHandler.parseResponseBody(response);
             const correlationId =
-                headers["traceparent"] ?? headers["x-correlation-id"] ?? SecuritySessionUtils.getCorrelationId();
-            const warningMessage = headers["Warning"];
+                headers.traceparent ?? headers["x-correlation-id"] ?? SecuritySessionUtils.getCorrelationId();
+            const warningMessage = headers.Warning;
             const stackTrace = AxiosErrorHandler.getStackFromErrorBody(errorParsed);
             const errorMessageFromResponse = `${error.message} - ${warningMessage ?? "ukjent feil"}`;
 

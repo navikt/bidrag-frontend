@@ -1,6 +1,6 @@
 {
     "files": {
-        "includes": ["**", "!!**/packages/api/src/api"]
+        "includes": ["**", "!!**/packages/api/src/api", "!!packages/common"]
     },
     "vcs": {
         "enabled": true,

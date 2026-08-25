@@ -1,0 +1,60 @@
+.FeedbackFab {
+    will-change: transform;
+    position: fixed;
+    top: 60%;
+    right: -10px;
+    transition: 0.5s;
+    z-index: 10000;
+}
+
+.FeedbackFab.navds-box {
+    border-radius: 3px;
+    box-shadow: -2px 2px 8px #0003;
+}
+
+.FeedbackFab__button {
+    width: 46px;
+    height: 168px;
+    border: 3px solid var(--ax-success-400);
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    background-color: var(--ax-success-100);
+    z-index: 10001;
+}
+
+.FeedbackFab__button-text {
+    color: var(--ax-success-1000);
+    position: absolute;
+    bottom: 13px;
+    left: 7px;
+    white-space: nowrap;
+    transform: rotate(-90deg);
+    transform-origin: 0 0;
+}
+
+.FeedbackFab__button-icon {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    bottom: 7px;
+    left: 8px;
+}
+
+.FeedbackFab__button:hover {
+    cursor: pointer;
+}
+
+.FeedbackFab__button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--ax-border-focus);
+}
+
+.FeedbackFab:hover {
+    transition: 0.5s;
+    right: -1px;
+}
+
+.FeedbackFab.open {
+    transition: 0.5s;
+    right: 336px;
+}

@@ -5,16 +5,13 @@ import "quill-paste-smart";
 
 import { ErrorMessage } from "@navikt/ds-react";
 import Quill from "quill";
-import QuillResize from "quill-resize-module";
-import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
 const Clipboard = Quill.import("modules/clipboard");
 
 //@ts-expect-error
-// biome-ignore lint/correctness/noUnusedVariables: reserved for future clipboard customization
 class CustomClipboard extends Clipboard {
-    onCaptureCopy(e: ClipboardEvent) {
+    onCaptureCopy(e: ClipboardEvent, isCut = false) {
         //@ts-expect-error
         const range = this.quill.getSelection();
         if (range == null) return;
@@ -25,13 +22,20 @@ class CustomClipboard extends Clipboard {
         const html = this.quill.getSemanticHTML(range);
         const styledHtml = this.tilpassFormatteringForLegacyBidragMaler(html);
 
-        e.clipboardData?.setData("text/plain", text);
-        e.clipboardData?.setData("text/html", styledHtml);
-        // console.log(text);
-        // console.log(styledHtml);
+        e.clipboardData.setData("text/plain", text);
+        e.clipboardData.setData("text/html", styledHtml);
+
+        if (isCut) {
+            //@ts-expect-error
+            this.quill.deleteText(range, Quill.sources.USER);
+        }
+
         e.preventDefault();
     }
 
+    onCaptureCut(e: ClipboardEvent) {
+        this.onCaptureCopy(e, true);
+    }
     tilpassFormatteringForLegacyBidragMaler(html: string): string {
         // Create a container and fill it with the copied HTML.
         const container = document.createElement("div");
@@ -60,30 +64,43 @@ class CustomClipboard extends Clipboard {
     }
 }
 
-// Quill.register("modules/clipboard", CustomClipboard, true);
-Quill.register("modules/resize", QuillResize);
-
-type EditorProps = {
+Quill.register("modules/clipboard", CustomClipboard, true);
+export type EditorProps = {
     readOnly: boolean;
     defaultValue: string;
+    prefilledHtml?: string;
     onTextChange: (html: string) => void;
     resize?: boolean;
-    error?: string;
-    ref: RefObject<HTMLDivElement>;
+    error?: React.ReactNode;
+    ref;
 };
-export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, resize, error }: EditorProps) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [quill, setQuill] = useState<Quill | null>(null);
+const normalizeEditorHtml = (html = "") => html.replaceAll("<p></p>", "<p><br/></p>");
+const isEmptyEditorHtml = (html = "") => {
+    const normalized = normalizeEditorHtml(html).trim();
+    return normalized === "" || normalized === "<p><br/></p>";
+};
+
+export const CustomQuillEditor = ({
+    readOnly,
+    defaultValue,
+    prefilledHtml,
+    onTextChange,
+    ref,
+    resize,
+    error,
+}: EditorProps) => {
+    const containerRef = useRef(null);
+    const [quill, setQuill] = useState(null);
+    const hasResolvedInitialPrefillRef = useRef(false);
 
     useEffect(() => {
         const textChangeHandler = () => {
-            if (quill !== null) {
-                if (quill.getLength() <= 1) {
-                    onTextChange("");
-                } else {
-                    onTextChange(quill.getSemanticHTML().replaceAll("<p></p>", "<p><br/></p>"));
-                }
+            if (quill.getLength() <= 1) {
+                onTextChange("");
+                return;
             }
+
+            onTextChange(normalizeEditorHtml(quill.getSemanticHTML()));
         };
 
         if (quill) {
@@ -97,53 +114,73 @@ export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, r
 
     useEffect(() => {
         const container = containerRef.current;
-        const editorContainer = container?.appendChild(container?.ownerDocument.createElement("div"));
-        // @ts-expect-error
+        const editorContainer = container.appendChild(container.ownerDocument.createElement("div"));
         const quillEditor = new Quill(editorContainer, {
             theme: "snow",
             readOnly,
             modules: {
-                resize: {},
                 history: {},
 
-                toolbar: {
-                    container: [
-                        [{ color: [] }, { background: [] }],
-                        ["bold", "italic", "underline", "image", "link", { header: 3 }],
-                        // [{ 'color': "red" }, { 'background': "yellow" }]
-                    ],
-                },
+                toolbar: readOnly
+                    ? false
+                    : {
+                          container: [
+                              ["bold", "italic", "underline", { header: 3 }],
+                              // [{ 'color': "red" }, { 'background': "yellow" }]
+                          ],
+                      },
                 clipboard: {
+                    allowed: {
+                        tags: ["strong", "h3", "h4", "em", "p", "br", "span", "u"],
+                        // attributes: ['href', 'rel', 'target', 'class', "style"]
+                        attributes: [],
+                    },
                     customButtons: [],
-                    keepSelection: true,
+                    keepSelection: false,
                     substituteBlockElements: true,
                     magicPasteLinks: false,
                     removeConsecutiveSubstitutionTags: false,
                 },
             },
         });
+
         setQuill(quillEditor);
-        // @ts-expect-error
         ref.current = quillEditor;
 
         return () => {
-            // @ts-expect-error
             ref.current = null;
-            // biome-ignore lint/style/noNonNullAssertion: Ingen risiko
-            container!.innerHTML = "";
+            container.innerHTML = "";
         };
     }, [ref]);
 
     useEffect(() => {
-        if (quill) {
-            const currentHTML = quill.getSemanticHTML().replaceAll("<p></p>", "<p><br/></p>");
-
-            if (defaultValue !== currentHTML) {
-                const updatedDelta = quill.clipboard.convert({ html: defaultValue });
-                quill.setContents(updatedDelta, "silent");
-            }
+        if (!quill) {
+            return;
         }
-    }, [quill, defaultValue]);
+
+        const normalizedPrefilledHtml = normalizeEditorHtml(prefilledHtml ?? "");
+        const normalizedDefaultValue = normalizeEditorHtml(defaultValue ?? "");
+        const shouldPrefill =
+            !hasResolvedInitialPrefillRef.current &&
+            normalizedPrefilledHtml.length > 0 &&
+            isEmptyEditorHtml(normalizedDefaultValue);
+        const nextHtml = shouldPrefill ? normalizedPrefilledHtml : normalizedDefaultValue;
+
+        if (!isEmptyEditorHtml(normalizedDefaultValue)) {
+            hasResolvedInitialPrefillRef.current = true;
+        }
+
+        if (shouldPrefill) {
+            hasResolvedInitialPrefillRef.current = true;
+        }
+
+        const currentHTML = normalizeEditorHtml(quill.getSemanticHTML());
+
+        if (nextHtml !== currentHTML) {
+            const updatedDelta = quill.clipboard.convert({ html: nextHtml });
+            quill.setContents(updatedDelta, "silent");
+        }
+    }, [quill, defaultValue, prefilledHtml]);
 
     useEffect(() => {
         if (quill) {
@@ -154,12 +191,10 @@ export const CustomQuillEditor = ({ readOnly, defaultValue, onTextChange, ref, r
     return (
         <div>
             <div
-                className={`ql-top-container ${readOnly ? "readonly" : ""} ${resize ? "resizable" : ""} ${
-                    error ? "error" : ""
-                }`}
+                className={`ql-top-container ${readOnly ? "readonly" : ""} ${resize ? "resizable" : ""} ${error ? "error" : ""}`}
                 ref={containerRef}
             ></div>
-            {error && (
+            {!readOnly && error && (
                 <ErrorMessage size="small" showIcon className="mt-2">
                     {error}
                 </ErrorMessage>

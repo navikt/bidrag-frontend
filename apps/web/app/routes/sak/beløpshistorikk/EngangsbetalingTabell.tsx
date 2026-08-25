@@ -15,17 +15,10 @@ interface EngangsbetalingTabellProps {
 
 const ROWS_PER_PAGE = 10;
 
-export default function EngangsbetalingTabell({
-    engangsbelop,
-    erGebyrTabell,
-}: EngangsbetalingTabellProps) {
+export default function EngangsbetalingTabell({ engangsbelop, erGebyrTabell }: EngangsbetalingTabellProps) {
     const [engangsPage, setEngangsPage] = useState(1);
     const paginertEngangser = useMemo(
-        () =>
-            engangsbelop.slice(
-                (engangsPage - 1) * ROWS_PER_PAGE,
-                engangsPage * ROWS_PER_PAGE,
-            ),
+        () => engangsbelop.slice((engangsPage - 1) * ROWS_PER_PAGE, engangsPage * ROWS_PER_PAGE),
         [engangsbelop, engangsPage],
     );
 
@@ -44,15 +37,11 @@ export default function EngangsbetalingTabell({
             <Table zebraStripes size={"small"}>
                 <Table.Header>
                     <Table.Row>
-                        <Table.HeaderCell>
-                            {erGebyrTabell ? "Skyldner" : "Navn/fødselsnr"}
-                        </Table.HeaderCell>
+                        <Table.HeaderCell>{erGebyrTabell ? "Skyldner" : "Navn/fødselsnr"}</Table.HeaderCell>
                         <Table.HeaderCell>Beløpsgruppe</Table.HeaderCell>
                         <Table.HeaderCell>Hendelse</Table.HeaderCell>
                         <Table.HeaderCell>Vedtaksdato</Table.HeaderCell>
-                        <Table.HeaderCell align={"right"}>
-                            Beløp
-                        </Table.HeaderCell>
+                        <Table.HeaderCell align={"right"}>Beløp</Table.HeaderCell>
                         <Table.HeaderCell>Valuta</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
@@ -61,34 +50,19 @@ export default function EngangsbetalingTabell({
                         <Table.Row key={engangsbetaling.engangsbeløpsid}>
                             <Table.DataCell>
                                 <PersonNavnIdent
-                                    ident={
-                                        erGebyrTabell
-                                            ? engangsbetaling.skyldner
-                                            : engangsbetaling.kravhaver
-                                    }
+                                    ident={erGebyrTabell ? engangsbetaling.skyldner : engangsbetaling.kravhaver}
                                     bareFornavn
                                 />
                             </Table.DataCell>
                             <Table.DataCell>
-                                {hentVisningsnavnFraType(
-                                    "engangsbeløptype",
-                                    engangsbetaling.type,
-                                )}
+                                {hentVisningsnavnFraType("engangsbeløptype", engangsbetaling.type)}
                             </Table.DataCell>
                             <Table.DataCell>
-                                <VedtaksType
-                                    vedtaksId={engangsbetaling.vedtaksid}
-                                />
+                                <VedtaksType vedtaksId={engangsbetaling.vedtaksid} />
                             </Table.DataCell>
-                            <Table.DataCell>
-                                {formaterDato(engangsbetaling.gyldigFra)}
-                            </Table.DataCell>
-                            <Table.DataCell align={"right"}>
-                                {engangsbetaling.beløp ?? "-"}
-                            </Table.DataCell>
-                            <Table.DataCell>
-                                {engangsbetaling.valutakode ?? "NOK"}
-                            </Table.DataCell>
+                            <Table.DataCell>{formaterDato(engangsbetaling.gyldigFra)}</Table.DataCell>
+                            <Table.DataCell align={"right"}>{engangsbetaling.beløp ?? "-"}</Table.DataCell>
+                            <Table.DataCell>{engangsbetaling.valutakode ?? "NOK"}</Table.DataCell>
                         </Table.Row>
                     ))}
                 </Table.Body>
