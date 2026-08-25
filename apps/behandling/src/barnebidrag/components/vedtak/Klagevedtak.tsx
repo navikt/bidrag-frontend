@@ -64,7 +64,6 @@ const Klagevedtak = () => {
         </VedtakProvider>
     );
 };
-
 const VedtakResultat = () => {
     const { data: beregning } = useGetBeregningBidrag(false);
 
@@ -96,13 +95,13 @@ const VedtakResultat = () => {
     );
 };
 const BeregningTabellBarn = ({ resultatBarn }: { resultatBarn: ResultatBidragsberegningBarnDto }) => {
-    const { isFetching, isLoading } = useGetBeregningBidrag(false);
+    const { isFetching, isLoading, data } = useGetBeregningBidrag(false);
     const { roller, virkningstidspunktV3, vedtakstype } = useGetBehandlingV2();
 
     const avslag = virkningstidspunktV3.barn.find((v) => v.rolle.ident === resultatBarn.barn.ident)?.avslag;
     const erAvslag = avslag !== null && avslag !== undefined;
     const avvistAldersjustering = resultatBarn.perioder.every(
-        (p) => p.aldersjusteringDetaljer != null && p.aldersjusteringDetaljer?.aldersjustert === false,
+        (p) => p.aldersjusteringDetaljer != null && p.aldersjusteringDetaljer?.aldersjustert === false
     );
     const rolle = roller.find((v) => v.ident === resultatBarn.barn.ident);
 
@@ -148,13 +147,12 @@ const BeregningTabellBarn = ({ resultatBarn }: { resultatBarn: ResultatBidragsbe
                 resultatBarn={resultatBarn}
                 avslag={erAvslag}
                 opphør={erOpphør}
-                anbefalesÅFatteVedtakForRevurderingsbarn={false}
-                kanFatteVedtakForRevurderingsbarn={false}
+                anbefalesÅFatteVedtakForRevurderingsbarn={data.resultat?.kanFatteVedtakForRevurderingsbarn ?? false}
+                kanFatteVedtakForRevurderingsbarn={data.resultat?.kanFatteVedtakForRevurderingsbarn ?? false}
             />
         </Table>
     );
 };
-
 const Side = () => {
     const { onStepChange } = useBehandlingProvider();
 

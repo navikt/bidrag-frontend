@@ -139,6 +139,7 @@ const VedtakUgyldigBeregning = ({ resultat }: { resultat?: UgyldigBeregningDto }
 
 const VedtakResultat = () => {
     const { data: beregning } = useGetBeregningBidrag(false);
+    const { medInnkreving } = useGetBehandlingV2();
 
     return (
         <VedtakWrapper feil={beregning.feil} steps={STEPS}>
@@ -149,6 +150,11 @@ const VedtakResultat = () => {
                         <VedtakResultatBarn barn={r.barn} />
                         <VedtakUgyldigBeregning resultat={r.ugyldigBeregning} />
                         {!erAvslag && <NesteIndeksår nesteIndeksår={r.indeksår} barnId={r.barn.ident} />}
+                        {medInnkreving && !r.medInnkreving && (
+                            <BodyShort size="small" spacing>
+                                Uten innkreving
+                            </BodyShort>
+                        )}
                         {r.barn.innbetaltBeløp && !erAvslag && (
                             <ResultatDescription
                                 data={[
