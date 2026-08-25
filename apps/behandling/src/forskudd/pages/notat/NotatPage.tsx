@@ -4,6 +4,7 @@ import { FileIcon, FilePdfIcon } from "@navikt/aksel-icons";
 import { Alert, Loader, Tabs } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { Suspense, useEffect, useMemo, useRef } from "react";
+import { z } from "zod";
 import text from "../../../common/constants/texts";
 import { QueryKeys, useNotat, useNotatPdf } from "../../../common/hooks/useApiData";
 
@@ -57,7 +58,7 @@ const RenderNotatPdf = ({ behandlingId, vedtakId }: NotatProps) => {
     const hasSubscribed = useRef<boolean>(false);
     async function subscribeToChanges() {
         console.debug("Waiting for broadcast PDF", notatBroadcastName, behandlingId);
-        await Broadcast.waitForBroadcast(notatBroadcastName, behandlingId.toString());
+        await Broadcast.waitForBroadcast(notatBroadcastName, z.unknown(), behandlingId.toString());
         console.debug("Received broadcast PDF", notatBroadcastName, behandlingId);
         queryClient.refetchQueries({ queryKey: QueryKeys.notatPdf(behandlingId) });
         setTimeout(() => subscribeToChanges(), 200);
@@ -103,7 +104,7 @@ const RenderNotatHtml = ({ behandlingId, vedtakId }: NotatProps) => {
     const queryClient = useQueryClient();
 
     async function subscribeToChanges() {
-        await Broadcast.waitForBroadcast(notatBroadcastName, behandlingId.toString());
+        await Broadcast.waitForBroadcast(notatBroadcastName, z.unknown(), behandlingId.toString());
         console.debug("Received broadcast HTML", notatBroadcastName, behandlingId);
         queryClient.refetchQueries({ queryKey: QueryKeys.notat(behandlingId) });
         setTimeout(() => subscribeToChanges(), 200);

@@ -17,7 +17,6 @@ type Props = {
     tags?: ReactNode;
     headingActions?: ReactNode;
     visModiaLenke?: boolean;
-    /** Innhold som skal ligge innrykket under navnelinjen, på linje med teksten og ikke rolletaggen. */
     children?: ReactNode;
 };
 
