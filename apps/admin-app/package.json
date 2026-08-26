@@ -22,7 +22,8 @@
         "react-error-boundary": "^6.1.2",
         "react-hook-form": "^7.82.0",
         "svg-pan-zoom": "^3.6.2",
-        "dompurify": "^3.4.13"
+        "dompurify": "^3.4.13",
+        "tailwindcss": "catalog:"
     },
 
     "devDependencies": {
