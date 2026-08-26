@@ -1,0 +1,31 @@
+.FeedbackPopup {
+    width: 350px;
+    position: absolute;
+    right: -340px;
+    bottom: -250px;
+    padding: 20px;
+    z-index: 10000;
+}
+
+.FeedbackPopup.navds-box {
+    border-color: var(--ax-success-400);
+    background-color: var(--ax-success-100);
+}
+
+.FeedbackPopup:focus {
+    outline: none;
+}
+
+.FeedbackPopup__title {
+    color: var(--ax-success-900);
+}
+
+.FeedbackPopup__alert-message {
+    margin-top: 1.2rem;
+    margin-bottom: 0;
+}
+
+.FeedbackPopup.closed {
+    transition: 0.5s;
+    visibility: hidden;
+}

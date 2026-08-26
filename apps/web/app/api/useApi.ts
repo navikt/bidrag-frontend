@@ -25,7 +25,6 @@ import type {
     OpprettSakRequest,
     SakshendelseDto,
 } from "@bidrag/api/SakApi";
-import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
 import { IdentUtils, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
 import {
     useMutation,
@@ -36,6 +35,7 @@ import {
     useSuspenseQuery,
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { hentSamhandlerQuery } from "~/api/query/samhandler.query.ts";
 import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
 
 // ==================== SAK ====================
@@ -297,35 +297,8 @@ export function useOppdaterSaksroller() {
 // ==================== SAMHANDLER ====================
 
 export function useHentSamhandler(ident: string, enabled: boolean = true) {
-    return useQuery<SamhandlerDto, AxiosError | TilgangsFeilError>({
-        queryKey: ["hent_samhandler", ident],
-        queryFn: async () => {
-            try {
-                if (!IdentUtils.isSamhandlerId(ident)) {
-                    return { samhandlerId: ident } as SamhandlerDto;
-                }
-                const { data } = await BIDRAG_SAMHANDLER_API.samhandler.hentSamhandler(JSON.stringify(ident));
-                await SecureLoggerService.info(`Hentet samhandler for ident ${ident}`);
-                return data;
-            } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til samhandler ${ident}`);
-                    throw new TilgangsFeilError("Du har ikke tilgang til denne samhandleren");
-                }
-                throw e;
-            }
-        },
-        enabled: enabled && !!ident,
-        retry: (failureCount, error) => {
-            if (error instanceof TilgangsFeilError) {
-                return false;
-            }
-            return failureCount < 1;
-        },
-        throwOnError: false,
+    return useQuery({
+        ...hentSamhandlerQuery(ident, enabled),
     });
 }
 
@@ -483,6 +456,7 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
                 }
             },
             enabled: enabled && ident.length === 11,
+            staleTime: Infinity,
             retry: (failureCount: number, error: Error) => {
                 if (error instanceof TilgangsFeilError) {
                     return false;

@@ -64,7 +64,7 @@ function generateBisysResultatUrl(
         ...(sessionState && { sessionState }),
     });
 
-    return `/bisys/sakHistorikk?${bisysResultatUrlParams}`;
+    return `/bisys/sakshistorikk?${bisysResultatUrlParams}`;
 }
 
 function generateResultatUrl(

@@ -1,5 +1,5 @@
+import { getBisysSessionParams } from "@bidrag/common";
 import { useLocation, useSearchParams } from "react-router";
-import { getBisysSessionParams } from "~/common/bisys/bisys-params.ts";
 
 /** Query-parameter som forteller hvilken side brukeren ble rutet fra. */
 export const RETUR_PARAM = "from";
@@ -41,6 +41,11 @@ const brukerSti = (brukerid: string, side?: string) => (side ? `/bruker/${bruker
  */
 const bisysSakDestinasjon = (saksnummer: string): ReturDestinasjon => ({
     sti: "/bisys/sak",
+    params: { saksnr: saksnummer },
+});
+
+const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => ({
+    sti: "/bisys/sakshistorikk",
     params: { saksnr: saksnummer },
 });
 
@@ -90,6 +95,7 @@ const fraBruker = (label: string, side: string): EksplisittReturMål => ({
  * Nye returmål legges til her — resten av mekanikken er generisk.
  */
 const RETUR_MÅL = {
+    behandling: fraSak("Behandling", "behandling"),
     sakshistorikk: fraSak("Sakshistorikk", "sakshistorikk"),
     belopshistorikk: fraSak("Beløpshistorikk", "belopshistorikk"),
     fogdhistorikk: fraSak("Fogdhistorikk", "fogdhistorikk"),
@@ -132,6 +138,13 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
         undersider: ["fogdhistorikk", "belopshistorikk", "reskontro", "sakshistorikk"],
         undersideSti: sakSti,
         destinasjon: bisysSakDestinasjon,
+    },
+    {
+        label: "Sakshistorikk",
+        id: ({ saksnummer }) => saksnummer,
+        undersider: ["behandling", "vedtak"],
+        undersideSti: sakSti,
+        destinasjon: bisysSakshistorikkDestinasjon,
     },
     {
         label: "Brukeroversikt",
@@ -197,7 +210,9 @@ export function useReturLink(): ReturLenke | null {
     const { pathname } = useLocation();
 
     const kontekst = hentSakBrukerFraUrl(pathname, searchParams);
+
     const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst);
+
     if (!mål) return null;
 
     return { label: mål.label, href: byggHref(mål, searchParams) };

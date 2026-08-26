@@ -1,3 +1,4 @@
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class SessionStorage {
     static reset() {
         window.sessionStorage.clear();
@@ -9,7 +10,7 @@ export class SessionStorage {
     static getOrDefault(key: string, defaultValue: string) {
         const value = window.sessionStorage.getItem(key);
         if (!value) {
-            this.set(key, defaultValue);
+            SessionStorage.set(key, defaultValue);
             return defaultValue;
         }
         return value;
@@ -19,6 +20,7 @@ export class SessionStorage {
     }
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class LocalStorage {
     static reset() {
         window.localStorage.clear();

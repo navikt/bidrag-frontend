@@ -1,11 +1,10 @@
 // routes/sak/SakBaseLayout.tsx
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader } from "@bidrag/common";
-import { Loader, VStack } from "@navikt/ds-react";
-import { Suspense, useEffect, useMemo } from "react";
+import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader, useBisysLink } from "@bidrag/common";
+import { VStack } from "@navikt/ds-react";
+import { useEffect, useMemo } from "react";
 import { Outlet, useMatches } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
-import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import type { Route } from "./+types/SakBaseLayout.ts"; // Merk navnebyttet!
 import { type SakSideTittelHandle, SakSideTittelProvider } from "./sakSideTittel";
 
@@ -41,20 +40,25 @@ export default function SakBaseLayout({ params }: Route.ComponentProps) {
         return undefined;
     }, [matches]);
 
+    const rendersOwnHeader = useMemo(
+        () => matches.some((match) => (match.handle as { rendersOwnHeader?: boolean } | undefined)?.rendersOwnHeader),
+        [matches],
+    );
+
+    if (rendersOwnHeader) {
+        return <Outlet />;
+    }
     return (
         <SakSideTittelProvider>
             {(overstyrtTittel) => {
                 const tittel = overstyrtTittel ?? routeTittel;
                 return (
                     <VStack gap={"space-32"}>
-                        <Suspense fallback={<Loader size="xsmall" />}>
-                            <SakHeader
-                                saksnummer={saksnummer}
-                                roller={roller}
-                                skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
-                            />
-                        </Suspense>
-                        {/* Rendres direkte uten Page.Block for å tillate full bredde */}
+                        <SakHeader
+                            saksnummer={saksnummer}
+                            roller={roller}
+                            skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
+                        />
                         <Outlet />
                     </VStack>
                 );

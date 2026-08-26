@@ -1,7 +1,7 @@
+import { getBisysSessionParams } from "@bidrag/common";
 import { useUnleashContext } from "@unleash/proxy-client-react";
 import { useEffect, useState } from "react";
 import { useMatches, useSearchParams } from "react-router";
-import { getBisysSessionParams } from "~/common/bisys/bisys-params.ts";
 
 type SaksnummerProperty = { saksnummer?: string };
 

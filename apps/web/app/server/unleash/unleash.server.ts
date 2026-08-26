@@ -27,7 +27,9 @@ function lokaleOverstyringer(): Map<string, boolean> {
         return overstyringer;
     }
 
-    for (const bit of env.UNLEASH_LOCAL_TOGGLES.split(",")) {
+    // Splitter på komma og whitespace, slik at lista kan skrives over flere linjer
+    // (og med kommentarer fjernet) i .env-fila uten at navnene blir feil.
+    for (const bit of env.UNLEASH_LOCAL_TOGGLES.split(/[,\s]+/)) {
         const [navn, verdi] = bit.split("=").map((del) => del.trim());
         if (navn) {
             overstyringer.set(navn, verdi !== "false");
