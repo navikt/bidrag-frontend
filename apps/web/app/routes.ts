@@ -31,6 +31,9 @@ export default [
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
     ]),
 
+    route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),
+    route("samhandler/:samhandlerId", "./routes/samhandler/SamhandlerDetaljer.tsx"),
+
     route("sak/:saksnummer", "routes/sak/SakBaseLayout.tsx", [
         ...behandlingSakRoutes,
         ...forsendelseSakRoutes,

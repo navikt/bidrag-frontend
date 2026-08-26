@@ -699,7 +699,15 @@ export const VedtakTableBody = ({
                     expandOnRowClick
                     className={getRowClassName(periode)}
                     expansionDisabled={skjulBeregning}
-                    content={!skjulBeregning && <DetaljertBeregningBidrag periode={periode} />}
+                    content={
+                        !skjulBeregning && (
+                            <DetaljertBeregningBidrag
+                                periode={periode}
+                                anbefalesÅFatteVedtakForRevurderingsbarn={anbefalesÅFatteVedtakForRevurderingsbarn}
+                                kanFatteVedtakForRevurderingsbarn={kanFatteVedtakForRevurderingsbarn}
+                            />
+                        )
+                    }
                 >
                     {inneholder35C && (
                         <Table.DataCell textSize="small">

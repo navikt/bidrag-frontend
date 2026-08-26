@@ -24,7 +24,8 @@
         "uuid": "^14"
     },
     "peerDependencies": {
-        "@bidrag/api": "workspace:"
+        "@bidrag/api": "workspace:",
+        "react-router": "catalog:"
     },
     "devDependencies": {
         "@opentelemetry/api": "^1.9.1",

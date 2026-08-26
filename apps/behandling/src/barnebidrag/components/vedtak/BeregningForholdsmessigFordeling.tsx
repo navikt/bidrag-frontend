@@ -33,7 +33,26 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
     const finnesPriorierteBidrag = beregningFordelingAvBidrag.sumBidragSomIkkeKanFordeles > 0;
 
     const evne = Math.min(delberegningBidragsevne.bidragsevne, delberegningBidragsevne.sumInntekt25Prosent);
-    const erNokEvne = evne >= beregningFordelingAvBidrag.sumBidragTilFordeling;
+    const harNokEvne = evne >= beregningFordelingAvBidrag.sumBidragTilFordeling;
+    const redusertTil25ProsentAvInntekt = sluttberegning?.bidragJustertNedTil25ProsentAvInntekt;
+    function renderTekst() {
+        const evneTekst = harNokEvne
+            ? `Evnen på ${formatterBeløpForBeregning(evne)} er tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.`
+            : `Evnen på ${formatterBeløpForBeregning(evne)} er ikke tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.`;
+        const tekstForholdsmessigFordeles =
+            redusertTil25ProsentAvInntekt && harNokEvne
+                ? "Det nye beregnede bidraget overstiger 25 prosent av inntekten. Bidraget vil derfor forholdsmessig fordeles."
+                : harNokEvne
+                  ? "Bidraget vil derfor ikke forholdsmessig fordeles."
+                  : "Bidraget vil derfor forholdsmessig fordeles.";
+        return (
+            <BodyShort size="small" className="mt-2">
+                {!harNokEvne
+                    ? `${evneTekst}${erSistePeriode ? ` ${tekstForholdsmessigFordeles}` : ""}`
+                    : `${evneTekst}${erSistePeriode ? ` ${tekstForholdsmessigFordeles}` : ""}`}
+            </BodyShort>
+        );
+    }
 
     function renderFFBeregning() {
         if (!kanFatteVedtakForRevurderingsbarn) {
@@ -93,11 +112,7 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
                     ].filter((d) => d)}
                 />
 
-                <BodyShort size="small" className="mt-2">
-                    {!erNokEvne
-                        ? `Evnen på ${formatterBeløpForBeregning(evne)} er ikke tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.${erSistePeriode ? " Det anbefales derfor å fatte vedtak for revurderingsbarn." : ""}`
-                        : `Evnen på ${formatterBeløpForBeregning(evne)} er tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.${erSistePeriode ? " Det anbefales derfor å ikke fatte vedtak for revurderingsbarn." : ""}`}
-                </BodyShort>
+                {renderTekst()}
             </>
         );
     }
@@ -109,7 +124,6 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
         </>
     );
 };
-
 export const BeregningForholdsmessigFordeling = () => {
     const { forholdsmessigFordeling: ffBehandling, roller } = useGetBehandlingV2();
     const {

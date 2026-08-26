@@ -180,6 +180,7 @@ const SaksnummerTab = ({
 
     const containerStyle: React.CSSProperties = {
         ...TAB_CONTAINER_STYLE,
+        position: "relative",
         background: backgroundColor,
         marginBottom: isSelected ? "-1px" : "0",
         borderBottom: isSelected ? "1px solid var(--ax-bg-default)" : "1px solid transparent",
@@ -208,6 +209,20 @@ const SaksnummerTab = ({
                 <button type="button" onClick={() => onToggleExpand(item.saksnummer)} style={CHEVRON_BUTTON_STYLE}>
                     {isExpanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
                 </button>
+            )}
+            {isSelected && (
+                <span
+                    aria-hidden
+                    style={{
+                        position: "absolute",
+                        left: "0.5rem",
+                        right: "0.5rem",
+                        bottom: "-2px",
+                        height: "3px",
+                        borderRadius: "999px",
+                        background: "var(--ax-bg-success-strong)",
+                    }}
+                />
             )}
         </Box>
     );

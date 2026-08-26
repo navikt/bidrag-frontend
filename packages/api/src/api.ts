@@ -1,6 +1,6 @@
 import { Api as BidragBelopshistorikk } from "./api/BelopshistorikkApi";
 import { Api as BidragAdminApi } from "./api/BidragAdminApi";
-import { Api as BidragBehandlingApi } from "./api/BidragBehandlingApiV1.ts";
+import { Api as BidragBehandlingApi } from "./api/BidragBehandlingApiV1";
 import { Api as BidragDokumentApi } from "./api/BidragDokumentApi";
 import { Api as BidragDokumentArkivApi } from "./api/BidragDokumentArkivApi";
 import { Api as BidragDokumentProduksjonApi } from "./api/BidragDokumentProduksjonApi";
