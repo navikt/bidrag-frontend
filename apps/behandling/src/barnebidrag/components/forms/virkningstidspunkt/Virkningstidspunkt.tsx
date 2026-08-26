@@ -25,7 +25,6 @@ import {
     Radio,
     RadioGroup,
     Switch,
-    Tabs,
     VStack,
 } from "@navikt/ds-react";
 import type React from "react";
@@ -43,6 +42,7 @@ import { FlexRow } from "../../../../common/components/layout/grid/FlexRow";
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { ConfirmationModal } from "../../../../common/components/modal/ConfirmationModal";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
 import urlSearchParams from "../../../../common/constants/behandlingQueryKeys";
 import { SOKNAD_LABELS } from "../../../../common/constants/soknadFraLabels";
 import text from "../../../../common/constants/texts";

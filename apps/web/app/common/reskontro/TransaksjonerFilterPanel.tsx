@@ -3,7 +3,8 @@ import { EraserIcon } from "@navikt/aksel-icons";
 import { Box, Button, DatePicker, HStack, Switch, UNSAFE_Combobox, useDatepicker } from "@navikt/ds-react";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router";
-import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
+import type { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper";
+import { usePersonOptions } from "~/common/filter/usePersonOptions";
 import {
     PARAM_BARN,
     PARAM_FRA,
@@ -11,13 +12,13 @@ import {
     PARAM_MOTTAKERE,
     PARAM_OPEN_TRANS,
     PARAM_TIL,
-} from "~/common/reskontro/konstanter.ts";
-import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "~/common/reskontro/transaksjonstyper.ts";
-import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
+} from "~/common/reskontro/konstanter";
+import { transaksjonstypeGrupper, visningsnavnForTransaksjonskode } from "~/common/reskontro/transaksjonstyper";
+import { PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter";
 
 interface TransaksjonerFilterPanelViewProps {
-    unikeMottakere: (string | null | undefined)[];
-    unikeBarn: (string | null | undefined)[];
+    unikeMottakere: string[];
+    unikeBarn: string[];
     unikeTransaksjonskoder: string[];
 }
 
@@ -28,13 +29,23 @@ export function TransaksjonerFilterPanel({
     unikeTransaksjonskoder,
 }: TransaksjonerFilterPanelViewProps) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const {
+        mapper: barnMapper,
+        options: barnOptions,
+        selectedOptions: barnSelectedOptions,
+    } = usePersonOptions(unikeBarn);
 
-    const mottakerMapper = new IdentQueryParamMapper(unikeMottakere);
-    const barnMapper = new IdentQueryParamMapper(unikeBarn);
+    const {
+        mapper: mottakerMapper,
+        options: mottakerOptions,
+        selectedOptions: mottakerSelectedOptions,
+    } = usePersonOptions(unikeMottakere);
+
+    const valgteBarn = barnSelectedOptions(searchParams.getAll(PARAM_BARN));
 
     const valgteKoder = searchParams.getAll(PARAM_KODER);
-    const valgteMottakere = mottakerMapper.toIdents(searchParams.getAll(PARAM_MOTTAKERE));
-    const valgteBarn = barnMapper.toIdents(searchParams.getAll(PARAM_BARN));
+    const valgteMottakere = mottakerSelectedOptions(searchParams.getAll(PARAM_MOTTAKERE));
+
     const checked = searchParams.get(PARAM_OPEN_TRANS) === "true";
 
     const kodeOptionsExtended = Object.entries(transaksjonstypeGrupper).map(([kode, type]) => {
@@ -158,8 +169,8 @@ export function TransaksjonerFilterPanel({
                 />
                 <UNSAFE_Combobox
                     label="Barn"
-                    options={barnMapper.allIdents}
-                    readOnly={barnMapper.allIdents.length <= 1}
+                    options={barnOptions}
+                    readOnly={barnOptions.length <= 1}
                     isMultiSelect
                     selectedOptions={valgteBarn}
                     onToggleSelected={(option, isSelected) =>
@@ -169,8 +180,8 @@ export function TransaksjonerFilterPanel({
                 />
                 <UNSAFE_Combobox
                     label="Mottaker"
-                    options={mottakerMapper.allIdents}
-                    readOnly={mottakerMapper.allIdents.length <= 1}
+                    options={mottakerOptions}
+                    readOnly={mottakerOptions.length <= 1}
                     isMultiSelect
                     selectedOptions={valgteMottakere}
                     onToggleSelected={(option, isSelected) =>

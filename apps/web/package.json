@@ -10,11 +10,12 @@
         "typecheck": "react-router typegen && tsc --noEmit"
     },
     "dependencies": {
-        "@bidrag/admin-app": "workspace:*",
         "@bidrag/api": "workspace:*",
         "@bidrag/behandling": "workspace:*",
         "@bidrag/common": "workspace:*",
         "@bidrag/utils": "workspace:*",
+        "@bidrag/admin-app": "workspace:*",
+        "@bidrag/samhandler": "workspace:*",
         "@grafana/faro-react": "^2.7.1",
         "@grafana/faro-web-sdk": "^2.7.1",
         "@hookform/resolvers": "^5.2.2",
@@ -36,7 +37,7 @@
         "pino-socket": "^8.0.0",
         "react": "catalog:",
         "react-dom": "catalog:",
-        "react-hook-form": "^7.71.1",
+        "react-hook-form": "^7.85.0",
         "react-router": "catalog:",
         "source-map": "^0.7.6",
         "sqids": "^0.3.0",

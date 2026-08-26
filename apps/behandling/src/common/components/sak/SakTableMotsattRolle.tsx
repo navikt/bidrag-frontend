@@ -28,7 +28,7 @@ export default function SakTableMotsattRolle({ sak }: { sak: Sak }) {
     }
 
     return (
-        <div className="[&_.personident]:grow [&>span]:flex-wrap w-35 flex-wrap">
+        <div className="[&_.personident]:grow w-35 flex-wrap w-fit">
             {sak.motsattRolle?.fodselsnummer ? (
                 <PersonNavnIdent
                     rolle={tilRolleType(sak.motsattRolle.type)}

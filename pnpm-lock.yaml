@@ -131,6 +131,9 @@ importers:
       svg-pan-zoom:
         specifier: ^3.6.2
         version: 3.6.2
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.1
     devDependencies:
       '@react-router/dev':
         specifier: 'catalog:'
@@ -239,6 +242,42 @@ importers:
         specifier: ^8.0.16
         version: 8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
 
+  apps/samhandler:
+    dependencies:
+      '@bidrag/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@bidrag/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@navikt/aksel-icons':
+        specifier: 'catalog:'
+        version: 8.13.1
+      '@navikt/ds-react':
+        specifier: 'catalog:'
+        version: 8.12.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.101.0(react@19.2.7)
+      axios:
+        specifier: ^1.18.0
+        version: 1.18.0
+      react:
+        specifier: 'catalog:'
+        version: 19.2.7
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.7(react@19.2.7)
+      react-hook-form:
+        specifier: ^7.85.0
+        version: 7.86.0(react@19.2.7)
+      react-router:
+        specifier: 'catalog:'
+        version: 8.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.1
+
   apps/web:
     dependencies:
       '@bidrag/admin-app':
@@ -253,6 +292,9 @@ importers:
       '@bidrag/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@bidrag/samhandler':
+        specifier: workspace:*
+        version: link:../samhandler
       '@bidrag/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -264,7 +306,7 @@ importers:
         version: 2.7.1
       '@hookform/resolvers':
         specifier: ^5.2.2
-        version: 5.4.0(react-hook-form@7.82.0(react@19.2.7))
+        version: 5.4.0(react-hook-form@7.86.0(react@19.2.7))
       '@navikt/aksel-icons':
         specifier: 'catalog:'
         version: 8.13.1
@@ -320,8 +362,8 @@ importers:
         specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       react-hook-form:
-        specifier: ^7.71.1
-        version: 7.82.0(react@19.2.7)
+        specifier: ^7.85.0
+        version: 7.86.0(react@19.2.7)
       react-router:
         specifier: 'catalog:'
         version: 8.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -414,6 +456,9 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
+      react-router:
+        specifier: 'catalog:'
+        version: 8.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       uuid:
         specifier: ^14
         version: 14.0.0
@@ -4039,6 +4084,12 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
 
+  react-hook-form@7.86.0:
+    resolution: {integrity: sha512-4kbWJrh5jPZt1+YqVcXcGKffGcXV/XVbozknLh0Yjh0KhpoAkus21TAQhzRYqNwFkkObmnSvRlZZ3GT+ehoIrA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -5366,10 +5417,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@hookform/resolvers@5.4.0(react-hook-form@7.82.0(react@19.2.7))':
+  '@hookform/resolvers@5.4.0(react-hook-form@7.86.0(react@19.2.7))':
     dependencies:
       '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.82.0(react@19.2.7)
+      react-hook-form: 7.86.0(react@19.2.7)
 
   '@humanwhocodes/momoa@2.0.4': {}
 
@@ -8833,6 +8884,10 @@ snapshots:
       '@types/react': 19.2.17
 
   react-hook-form@7.82.0(react@19.2.7):
+    dependencies:
+      react: 19.2.7
+
+  react-hook-form@7.86.0(react@19.2.7):
     dependencies:
       react: 19.2.7
 

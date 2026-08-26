@@ -20,7 +20,6 @@ import { useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { useDebounce } from "../../../../common/hooks/useDebounce";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
 import { usePageTabs } from "../../../../common/hooks/usePageTabs";
-
 import { BarnebidragStepper } from "../../../enum/BarnebidragStepper";
 import { useGetActiveAndDefaultUnderholdskostnadTab } from "../../../hooks/useGetActiveAndDefaultUnderholdskostnadTab";
 import { useOnUpdateUnderholdBegrunnelse } from "../../../hooks/useOnUpdateUnderhold";

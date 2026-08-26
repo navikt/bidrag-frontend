@@ -34,6 +34,8 @@ const EnvSchema = z.object({
     MODIA_URL: z.url(),
     PERSONSOK_URL: z.url(),
     BIDRAG_UI_BASE_URL: z.url(),
+    KODEVERK_URL: z.url(),
+    KODEVERK_URL_AUDIENCE: NonEmpty,
     UNLEASH_SERVER_API_URL: z.url().optional(),
     UNLEASH_SERVER_API_TOKEN: NonEmpty.optional(),
     UNLEASH_SERVER_API_ENV: NonEmpty.optional(),

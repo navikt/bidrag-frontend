@@ -1,9 +1,33 @@
+import { Behandlingstype, type ForholdsmessigFordelingBarnDto, SoktAvType } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, Button, Dialog, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
-
 import { useGetBehandlingV2 } from "../../common/hooks/useApiData";
 import { BarnListe } from "./BarnListe";
+export function harÅpenEgetTiltakUtenInnkreving(barn: ForholdsmessigFordelingBarnDto[]) {
+    return barn.some((b) =>
+        b.åpneBehandlinger.some(
+            (behandling) =>
+                behandling.behandlingstype === Behandlingstype.EGET_TILTAK &&
+                behandling.søktAvType === SoktAvType.NAV_BIDRAG &&
+                !behandling.medInnkreving,
+        ),
+    );
+}
 
+export function EgetTiltakNavBidragVarsel({ barn }: { barn: ForholdsmessigFordelingBarnDto[] }) {
+    if (!harÅpenEgetTiltakUtenInnkreving(barn)) return null;
+    return (
+        <Alert
+            size="small"
+            variant="warning"
+            className="ax-lg:max-w-saksbehandling-inner ax-md:max-w-saksbehandling-inner-md ax-sm:max-w-saksbehandling-inner-sm"
+        >
+            <Heading size="xsmall">{"Åpne behandlinger med eget tiltak u/innkreving"}</Heading>
+            Det finnes åpne behandlinger med eget tiltak u/innkreving. Denne vil inngå i behandling av FF. Hvis det
+            gjelder tilbakekreving så må søknaden avsluttes og behandles etter FF vedtaket er fattet.
+        </Alert>
+    );
+}
 export default function ForholdsmessigFordelingInfo() {
     const { forholdsmessigFordeling, lesemodus } = useGetBehandlingV2();
 
