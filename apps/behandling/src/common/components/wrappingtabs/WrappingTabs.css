@@ -1,0 +1,26 @@
+/**
+ * Aksel's Tabs only draws the selected-state underline as a thin bottom
+ * border on the individual tab button, relying on the surrounding
+ * `.aksel-tabs__tablist-wrapper` for the resting baseline that runs under the
+ * whole row. Since `WrappingTabsList` renders its own wrapping flex
+ * container instead of that wrapper, we re-create both effects here so the
+ * selected tab is still clearly highlighted and every row keeps its own
+ * baseline/underline once tabs wrap onto multiple lines.
+ */
+.wrapping-tabs__tablist .aksel-tabs__tab {
+    border-radius: var(--ax-radius-4) var(--ax-radius-4) 0 0;
+    box-shadow: inset 0 -1px var(--ax-border-neutral-subtleA);
+}
+
+.wrapping-tabs__tablist .aksel-tabs__tab:hover {
+    background-color: var(--ax-bg-moderate-hoverA);
+}
+
+.wrapping-tabs__tablist .aksel-tabs__tab[data-state="active"] {
+    background-color: var(--ax-bg-moderateA);
+    box-shadow: inset 0 -3px var(--ax-border-strong);
+}
+
+.wrapping-tabs__tablist .aksel-tabs__tab[data-state="active"]:hover {
+    background-color: var(--ax-bg-moderate-hoverA);
+}

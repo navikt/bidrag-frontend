@@ -1,5 +1,6 @@
 export { default as AutoSuggest } from "./autosuggest/AutoSuggest";
-export { default as BisysLink } from "./bisys/BisysLink";
+export * from "./BidragProgressbar";
+export{ default as BisysLink } from "./bisys/BisysLink";
 export { getBisysSessionParams, persistBisysParams } from "./bisys/bisys-params";
 export { useBisysLink } from "./bisys/useBisysLink";
 export { default as BidragCell } from "./grid/BidragCell";
@@ -15,6 +16,6 @@ export { default as PersonSokButton } from "./person/PersonSokButton";
 export { default as RolleCard } from "./roller/RolleCard";
 export { default as RolleDetaljer } from "./roller/RolleDetaljer";
 export { default as RolleTag } from "./roller/RolleTag";
-// export { default as SamhandlerSokButton } from "./samhandler/SamhandlerSokButton";
-// export { default as SamhandlerSokPopup } from "./samhandler/SamhandlerSokPopup";
 export { default as SaveStatusIndicator } from "./SaveStatusIndicator";
+export { default as SamhandlerSokButton } from "./samhandler/SamhandlerSokButton";
+export { default as SamhandlerSokPopup } from "./samhandler/SamhandlerSokPopup";

@@ -1,12 +1,14 @@
 {
     "extends": "../../tsconfig.base.json",
     "include": ["app", ".react-router/types/**/*"],
+    "exclude": ["../behandling"],
     "compilerOptions": {
         "sourceMap": true,
         "rootDirs": [".", "./.react-router/types"],
         "types": ["node", "react", "react-dom", "vite/client"],
         "paths": {
             "~/*": ["./app/*"],
+            "@bidrag/behandling": ["./app/types/behandling.d.ts"],
             "/nais.js": ["./app/nais.d.ts"],
             "@shared/*": ["./shared/*"]
         }

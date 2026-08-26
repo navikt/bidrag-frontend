@@ -1,47 +1,28 @@
 import type { Graderingsinfo, PersonDto } from "@bidrag/api/PersonApi";
-import {
-    QueryClient,
-    QueryClientProvider,
-    type UseSuspenseQueryResult,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, type UseSuspenseQueryResult } from "@tanstack/react-query";
 import type React from "react";
-import {
-    createContext,
-    type ReactNode,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { useHentPersonData, useHentPersonSkjermingInfo } from "./useApiData";
 
 // Define context type
 interface BidragCommonsContextType {
     queryClient: QueryClient;
-    useHentPersonData: (
-        ident?: string,
-    ) => UseSuspenseQueryResult<PersonDto, any>;
+    useHentPersonData: (ident?: string) => UseSuspenseQueryResult<PersonDto, any>;
     useHentRevurderingsbarn?: (ident?: string, stønad18År?: boolean) => boolean;
-    useHentPersonSkjermingInfo: (
-        ident?: string,
-    ) => UseSuspenseQueryResult<Graderingsinfo, any>;
+    useHentPersonSkjermingInfo: (ident?: string) => UseSuspenseQueryResult<Graderingsinfo, any>;
     uthevPerson?: (ident?: string, stønad18År?: boolean) => boolean;
     erMaskert: boolean; // NYTT
 }
 
 // Create context with undefined default value
-const BidragCommonsContext = createContext<
-    BidragCommonsContextType | undefined
->(undefined);
+const BidragCommonsContext = createContext<BidragCommonsContextType | undefined>(undefined);
 
 // Define provider props
 interface BidragCommonsProviderProps {
     children: ReactNode;
     /** @deprecated Denne bør ikke være her */
     client?: QueryClient;
-    useHentPersonData?: (
-        ident?: string,
-    ) => UseSuspenseQueryResult<PersonDto, any>;
+    useHentPersonData?: (ident?: string) => UseSuspenseQueryResult<PersonDto, any>;
     useHentRevurderingsbarn?: (ident?: string, stønad18År?: boolean) => boolean;
     uthevPerson?: (ident?: string, stønad18År?: boolean) => boolean;
 }
@@ -71,18 +52,13 @@ export const BidragCommonsProvider: React.FC<BidragCommonsProviderProps> = ({
     const [erMaskert, setErMaskert] = useState<boolean>(false);
 
     useEffect(() => {
-        window.localStorage.setItem(
-            "blur-sensitive-info-master",
-            id.current.toString(),
-        );
+        window.localStorage.setItem("blur-sensitive-info-master", id.current.toString());
 
         // Fjern gammel maskerings-tilstand
         window.localStorage.removeItem("blur-sensitive-info");
 
         const eventListener = (e: KeyboardEvent) => {
-            const masterId = window.localStorage.getItem(
-                "blur-sensitive-info-master",
-            );
+            const masterId = window.localStorage.getItem("blur-sensitive-info-master");
             if (masterId !== id.current.toString()) return;
 
             if (e.ctrlKey && (e.key === "ø" || e.key === "|")) {
@@ -91,9 +67,7 @@ export const BidragCommonsProvider: React.FC<BidragCommonsProviderProps> = ({
                 document.body.classList.toggle("blur-sensitive-info");
                 window.localStorage.setItem(
                     "blur-sensitive-info",
-                    document.body.classList
-                        .contains("blur-sensitive-info")
-                        .toString(),
+                    document.body.classList.contains("blur-sensitive-info").toString(),
                 );
 
                 setErMaskert((forrige) => !forrige);
@@ -115,9 +89,7 @@ export const BidragCommonsProvider: React.FC<BidragCommonsProviderProps> = ({
                 erMaskert,
             }}
         >
-            <QueryClientProvider client={queryClient.current}>
-                {children}
-            </QueryClientProvider>
+            <QueryClientProvider client={queryClient.current}>{children}</QueryClientProvider>
         </BidragCommonsContext.Provider>
     );
 };
@@ -125,9 +97,7 @@ export const BidragCommonsProvider: React.FC<BidragCommonsProviderProps> = ({
 export const useBidragCommons = () => {
     const context = useContext(BidragCommonsContext);
     if (context === undefined) {
-        throw new Error(
-            "useBidragCommons must be used within a BidragCommonsProvider",
-        );
+        throw new Error("useBidragCommons must be used within a BidragCommonsProvider");
     }
     return context;
 };

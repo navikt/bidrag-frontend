@@ -37,7 +37,7 @@ interface VedtakExplorerGraphProps {
     vedtakId?: string;
 }
 
-export function VedtakExplorerPage() {
+export default function VedtakExplorerPage() {
     lastVisningsnavn();
     return (
         <PageWrapper name="">
@@ -167,9 +167,9 @@ function _VedtakMermaidFlowChart({ behandlingId, vedtakId }: VedtakExplorerGraph
         if (grunnlag)
             return {
                 tittel: grunnlag.referanse,
-                innhold: grunnlag.innhold as object,
-                gjelderReferanse: grunnlag.gjelderReferanse,
-                gjelderBarnReferanse: grunnlag.gjelderBarnReferanse,
+                innhold: grunnlag.innhold as unknown as object,
+                gjelderReferanse: grunnlag.gjelderReferanse ?? undefined,
+                gjelderBarnReferanse: grunnlag.gjelderBarnReferanse ?? undefined,
                 type: grunnlag.type,
             };
         if (mermaidResponse.vedtak.nodeId === id)

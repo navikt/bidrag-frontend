@@ -44,6 +44,11 @@ const bisysSakDestinasjon = (saksnummer: string): ReturDestinasjon => ({
     params: { saksnr: saksnummer },
 });
 
+const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => ({
+    sti: "/bisys/sakshistorikk",
+    params: { saksnr: saksnummer },
+});
+
 /**
  * Brukeroversikten finnes bare i Bisys, og henter selv opp brukeren fra sesjonen,
  * så den trenger ingen parametere utover `sessionState`.
@@ -90,6 +95,7 @@ const fraBruker = (label: string, side: string): EksplisittReturMål => ({
  * Nye returmål legges til her — resten av mekanikken er generisk.
  */
 const RETUR_MÅL = {
+    behandling: fraSak("Behandling", "behandling"),
     sakshistorikk: fraSak("Sakshistorikk", "sakshistorikk"),
     belopshistorikk: fraSak("Beløpshistorikk", "belopshistorikk"),
     fogdhistorikk: fraSak("Fogdhistorikk", "fogdhistorikk"),
@@ -132,6 +138,13 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
         undersider: ["fogdhistorikk", "belopshistorikk", "reskontro", "sakshistorikk"],
         undersideSti: sakSti,
         destinasjon: bisysSakDestinasjon,
+    },
+    {
+        label: "Sakshistorikk",
+        id: ({ saksnummer }) => saksnummer,
+        undersider: ["behandling", "vedtak"],
+        undersideSti: sakSti,
+        destinasjon: bisysSakshistorikkDestinasjon,
     },
     {
         label: "Brukeroversikt",
@@ -197,7 +210,9 @@ export function useReturLink(): ReturLenke | null {
     const { pathname } = useLocation();
 
     const kontekst = hentSakBrukerFraUrl(pathname, searchParams);
+
     const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst);
+
     if (!mål) return null;
 
     return { label: mål.label, href: byggHref(mål, searchParams) };

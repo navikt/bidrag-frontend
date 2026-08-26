@@ -60,8 +60,15 @@ env:
   - name: BIDRAG_BEHANDLING_AUDIENCE
     value: api://prod-gcp.bidrag.bidrag-behandling/.default
 
+  - name: BIDRAG_DOKUMENT_PRODUKSJON_URL
+    value: http://bidrag-dokument-produksjon
+  - name: BIDRAG_DOKUMENT_PRODUKSJON_AUDIENCE
+    value: api://prod-gcp.bidrag.bidrag-dokument-produksjon/.default
+
   - name: BISYS_URL
     value: https://wasapp.adeo.no/rtv-bidrag/
+  - name: MODIA_URL
+    value: https://modiapersonoversikt.intern.nav.no
 
   - name: BIDRAG_UI_BASE_URL
     value: https://bidrag-ui.nais.adeo.no
@@ -76,6 +83,10 @@ env:
   - name: KODEVERK_URL_AUDIENCE
     value: api://prod-gcp.bidrag.bidrag-kodeverk/.default
 
+unleash:
+  host: bidrag-unleash-api.nav.cloud.nais.io
+  environment: production
+
 outbound:
   rules:
     - application: bidrag-tilgangskontroll
@@ -86,6 +97,7 @@ outbound:
     - application: bidrag-dokument-forsendelse
     - application: bidrag-admin
     - application: bidrag-behandling
+    - application: bidrag-dokument-produksjon
   external:
     - bidrag-sak.prod-fss-pub.nais.io
     - bidrag-organisasjon.prod-fss-pub.nais.io

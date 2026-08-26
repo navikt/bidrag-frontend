@@ -1,20 +1,24 @@
+import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
+import { Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { Box, CopyButton, HStack } from "@navikt/ds-react";
 
 import { useBidragCommons } from "../../api/BidragCommonsContext";
-import type { IRolleDetaljer, RolleTypeAbbreviation } from "../../types";
+import type { RolleTypeAbbreviation } from "../../types";
 import PersonNavnIdent from "../person/PersonNavnIdent";
 import RolleTag from "./RolleTag";
 
 interface IRolledetaljerProps {
     label?: string;
-    rolle: IRolleDetaljer;
+    rolle: RolleDto;
     withBorder?: boolean;
     highlight?: boolean;
 }
 
 const RolleCard = ({ rolle }: IRolledetaljerProps) => {
     const { uthevPerson } = useBidragCommons();
-    const highlight = uthevPerson?.(rolle.ident, rolle.stønad18År) === true;
+    const ident = rolle.ident ?? undefined;
+    const stønad18År = rolle.stønadstype === Stonadstype.BIDRAG18AAR;
+    const highlight = uthevPerson?.(ident, stønad18År) === true;
     return (
         <Box
             borderWidth="1"
@@ -32,12 +36,12 @@ const RolleCard = ({ rolle }: IRolledetaljerProps) => {
         >
             <HStack gap="space-8" align="center">
                 <RolleTag
-                    rolleType={rolle.rolleType as unknown as RolleTypeAbbreviation}
-                    ident={rolle.ident}
-                    stønad18År={rolle.stønad18År}
+                    rolleType={rolle.rolletype as unknown as RolleTypeAbbreviation}
+                    ident={ident}
+                    stønad18År={stønad18År}
                 />
-                <PersonNavnIdent ident={rolle.ident} variant="navnIdent" stønad18År={rolle.stønad18År} />
-                <CopyButton size="small" copyText={rolle.ident} />
+                <PersonNavnIdent ident={ident} variant="navnIdent" stønad18År={stønad18År} />
+                <CopyButton size="small" copyText={ident ?? ""} />
             </HStack>
         </Box>
     );

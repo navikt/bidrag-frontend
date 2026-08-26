@@ -88,6 +88,64 @@ Deploy skjer automatisk via GitHub Actions:
 | q2 | PR mot main                  | `.nais/q2.yaml` |
 | prod | Merge til main               | `.nais/prod.yaml` |
 
+## Feature toggles (Unleash)
+
+Server-side brukes Unleash sin Node-SDK (`unleash-client`). Nettleseren snakker med vår
+egen proxy-rute `/unleash/proxy`, slik at API-tokenet aldri forlater serveren.
+
+```tsx
+// Klient
+const visNyLosning = useFlag("frontend.belopshistorikk.beregn_sum");
+
+// Server (loader/action)
+const enabled = await flaggIsEnabled("mitt.flagg", serverUnleashContext({ bruker, saksnummer }));
+```
+
+Konteksten inneholder `userId` (NAVident) samt `properties.saksnummer` og
+`properties.enhet`, så toggles kan styres per saksbehandler, sak eller enhet.
+
+### Feature toggles lokalt
+
+Lokalt kobler vi **ikke** til Unleash. API-tokenet ligger i en Kubernetes-secret som
+krever utvidede rettigheter (`container.secrets.get`), og de fleste utviklere har ikke
+tilgang. Uten tilkobling er alle feature toggles av.
+
+Skru derfor flaggene av/på manuelt i `apps/web/.env.development`:
+
+```bash
+UNLEASH_LOCAL_TOGGLES=frontend.belopshistorikk.beregn_sum=true,annet.flagg=false
+```
+
+- Flagg uten `=verdi` tolkes som `true`.
+- Lista kan skrives over flere linjer hvis den settes i fnutter (`'...'`), slik den er i dag.
+- Flagg som ikke står i lista er av. `=false` er derfor bare dokumentasjon på at flagget finnes.
+- Overstyringene gjelder både klienten (`useFlag`) og server-side (`flaggIsEnabled`).
+- De ignoreres i produksjon, så de kan ikke lekke ut.
+- **Dev-serveren må startes på nytt** etter endring – miljøvariabler leses kun ved oppstart.
+
+Når du legger til et nytt flagg i koden, legg det også inn her, slik at andre utviklere
+ser at det finnes.
+
+#### Personlige overstyringer uten å røre den delte fila
+
+`apps/web/.env.development` er sjekket inn og deles av alle. Vil du skru på/av flagg
+kun hos deg selv (uten risiko for å committe det ved et uhell), oppretter du
+`apps/web/.env.development.local` — den er allerede gitignored (`.env.*.local`) og
+Vite laster den automatisk *etter* `.env.development`, slik at verdiene dine vinner:
+
+```bash
+# apps/web/.env.development.local (ikke sjekket inn)
+UNLEASH_LOCAL_TOGGLES=mitt.eget.flagg=true
+```
+
+Samme prinsipp gjelder alle andre variabler i `env.server.ts` — nyttig hvis du f.eks.
+vil peke `BIDRAG_BEHANDLING_URL` mot en annen q-sone lokalt uten å endre fila alle andre
+bruker. Husk at dev-serveren fortsatt må startes på nytt etter endring.
+
+I q1/q2/prod settes `UNLEASH_SERVER_API_URL`/`_TOKEN`/`_ENV` automatisk av Nais via
+secreten fra `ApiToken`-ressursen i `.nais/unleash-apitoken.yaml`, og flaggene styres
+fra Unleash-web.
+
 ## Scripts
 
 ### migrate-imports

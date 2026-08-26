@@ -8,7 +8,7 @@ import { hentBelopshistorikkQuery } from "~/api/query/belopshistorikk.query.ts";
 import { hentVedtakQuery } from "~/api/query/vedtak.query.ts";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";
 import { PARAM_BARN, PARAM_FRA, PARAM_TIL, PARAM_TYPE } from "~/routes/sak/beløpshistorikk/konstanter.ts";
-import { erInnenforPeriode } from "./periode.utils";
+import { beregnAntallMåneder, erInnenforPeriode } from "./periode.utils";
 
 interface StonadMedPeriode
     extends StonadPeriodeDto,
@@ -77,12 +77,21 @@ export function useBeløphistorikkfilter(saksnummer: string) {
         const fra = parseDateQueryParam(params.get(PARAM_FRA));
         const til = parseDateQueryParam(params.get(PARAM_TIL));
 
-        return perioderMedVedtak.filter((t) => {
-            if (typer.length > 0 && !typer.includes(t.type ?? "")) return false;
-            if (kravhavere.length > 0 && !kravhavere.includes(t.kravhaver ?? "")) return false;
-            if ((fra || til) && !erInnenforPeriode(fra, til, t.periode)) return false;
-            return true;
-        });
+        return perioderMedVedtak
+            .filter((t) => {
+                if (typer.length > 0 && !typer.includes(t.type ?? "")) return false;
+                if (kravhavere.length > 0 && !kravhavere.includes(t.kravhaver ?? "")) return false;
+                if ((fra || til) && !erInnenforPeriode(fra, til, t.periode)) return false;
+                return true;
+            })
+            .map((t) => {
+                const antallMåneder = beregnAntallMåneder(fra, til, t.periode);
+                return {
+                    ...t,
+                    antallMåneder,
+                    periodSum: antallMåneder * (t.beløp ?? 0),
+                };
+            });
     }, [perioderMedVedtak, searchString]);
 
     return {

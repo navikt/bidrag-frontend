@@ -16,9 +16,7 @@ export function AppHeader({ bruker, bisysUrl }: AppHeaderProps) {
         <InternalHeader>
             <InternalHeader.Title href="/">Bidrag</InternalHeader.Title>
             <Spacer />
-            <ClientOnly>
-                <BisysHeaderLink />
-            </ClientOnly>
+            <BisysHeaderLink />
             <AppSwitcher bisysUrl={bisysUrl} />
             <ClientOnly>
                 <EndringsloggHeader />

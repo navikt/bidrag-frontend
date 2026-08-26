@@ -8,4 +8,3 @@ export * from "./sakUtils";
 export * from "./stringUtils";
 export * from "./validationUtils";
 export * from "./visningsnavnUtils";
-
