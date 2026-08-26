@@ -3,7 +3,6 @@ import { formaterBelop, formaterDato, sisteDagFramTilDato } from "@bidrag/utils"
 import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { Detail, HStack, InfoCard, Pagination, type SortState, Table, VStack } from "@navikt/ds-react";
 import { hentVisningsnavnFraType } from "@shared/kodeverk";
-import { useFlag } from "@unleash/proxy-client-react";
 import { useEffect, useMemo, useState } from "react";
 import { useBeløphistorikkfilter } from "./useBelopshistorikkFilter";
 
@@ -15,7 +14,6 @@ interface BeløpshistorikkProps {
 
 export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
     const { filtrertData, totalCount } = useBeløphistorikkfilter(saksnummer);
-    const visBeregnetSum = useFlag("frontend.belopshistorikk.beregn_sum");
     const [stønaderPage, setStønaderPage] = useState(1);
     const [sort, setSort] = useState<SortState | undefined>();
 
@@ -76,7 +74,6 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
         [sortedData, stønaderPage, sort],
     );
 
-    const totalSum = useMemo(() => filtrertData.reduce((acc, rad) => acc + rad.periodSum, 0), [filtrertData]);
     const sumPerValuta = useMemo(() => {
         const grupper = filtrertData.reduce<Record<string, number>>((acc, rad) => {
             const valuta = rad.valutakode ?? "NOK";
@@ -105,16 +102,14 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                         {filtrertData.length}/{totalCount}
                     </strong>
                 </Detail>
-                {visBeregnetSum && (
-                    <HStack gap={"space-4"}>
-                        <Detail> Sum over valgt periode:</Detail>
-                        {sumPerValuta.map(([valuta, sum]) => (
-                            <Detail key={valuta}>
-                                <strong>{formaterBelop(sum)}</strong> {valuta}
-                            </Detail>
-                        ))}
-                    </HStack>
-                )}
+                <HStack gap={"space-4"}>
+                    <Detail> Sum over valgt periode:</Detail>
+                    {sumPerValuta.map(([valuta, sum]) => (
+                        <Detail key={valuta}>
+                            <strong>{formaterBelop(sum)}</strong> {valuta}
+                        </Detail>
+                    ))}
+                </HStack>
             </HStack>
 
             <Table zebraStripes size={"small"} sort={sort} onSortChange={handleSortChange}>
@@ -141,12 +136,8 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                             Beløp
                         </Table.ColumnHeader>
                         <Table.HeaderCell>Valuta</Table.HeaderCell>
-                        {visBeregnetSum && (
-                            <>
-                                <Table.ColumnHeader align={"right"}>Perioder</Table.ColumnHeader>
-                                <Table.ColumnHeader align={"right"}>Sum</Table.ColumnHeader>
-                            </>
-                        )}
+                        <Table.ColumnHeader align={"right"}>Perioder</Table.ColumnHeader>
+                        <Table.ColumnHeader align={"right"}>Sum</Table.ColumnHeader>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -166,12 +157,8 @@ export function BeløpshistorikkTabell({ saksnummer }: BeløpshistorikkProps) {
                             </Table.DataCell>
                             <Table.DataCell align={"right"}>{rad.beløp ?? ""}</Table.DataCell>
                             <Table.DataCell>{rad.valutakode ?? "NOK"}</Table.DataCell>
-                            {visBeregnetSum && (
-                                <>
-                                    <Table.DataCell align={"right"}>{rad.antallMåneder}</Table.DataCell>
-                                    <Table.DataCell align={"right"}>{formaterBelop(rad.periodSum)}</Table.DataCell>
-                                </>
-                            )}
+                            <Table.DataCell align={"right"}>{rad.antallMåneder}</Table.DataCell>
+                            <Table.DataCell align={"right"}>{formaterBelop(rad.periodSum)}</Table.DataCell>
                         </Table.Row>
                     ))}
                 </Table.Body>
