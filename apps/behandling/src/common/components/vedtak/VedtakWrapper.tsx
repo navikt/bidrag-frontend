@@ -212,7 +212,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                                 onStepChange(
                                     steps.samvær,
                                     samværTabQuery,
-                                    `#${elementIds.seksjon_samvær}_${value.samværId}`,
+                                    `${elementIds.seksjon_samvær}_${value.samværId}`,
                                 )
                             }
                         >
@@ -226,7 +226,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                                 onStepChange(
                                     steps.samvær,
                                     samværTabQuery,
-                                    `#${elementIds.seksjon_samvær}_${value.samværId}`,
+                                    `${elementIds.seksjon_samvær}_${value.samværId}`,
                                 )
                             }
                         >
@@ -285,7 +285,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                                         },
                                         underholdSaksnummer,
                                     ),
-                                    `#${elementIds.seksjon_underholdskostnad_tilleggstønad}`,
+                                    `${elementIds.seksjon_underholdskostnad_tilleggstønad}`,
                                 )
                             }
                         >
@@ -305,7 +305,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                                         },
                                         underholdSaksnummer,
                                     ),
-                                    `#${elementIds.seksjon_underholdskostnad_barnetilsyn}`,
+                                    `${elementIds.seksjon_underholdskostnad_barnetilsyn}`,
                                 )
                             }
                         >
@@ -327,7 +327,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                                         },
                                         underholdSaksnummer,
                                     ),
-                                    `#${elementIds.seksjon_underholdskostnad_tilleggstønad}`,
+                                    `${elementIds.seksjon_underholdskostnad_tilleggstønad}`,
                                 )
                             }
                         >
@@ -348,7 +348,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                                         },
                                         underholdSaksnummer,
                                     ),
-                                    `#${elementIds.seksjon_underholdskostnad_tilysnsutgifter}`,
+                                    `${elementIds.seksjon_underholdskostnad_tilysnsutgifter}`,
                                 )
                             }
                         >
