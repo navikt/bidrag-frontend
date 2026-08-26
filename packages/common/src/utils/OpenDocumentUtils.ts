@@ -88,7 +88,7 @@ export class OpenDocumentUtils {
         const dokumentMetadata = dokumentMetadataResponse.data[0];
 
         LoggerService.info(
-            `Åpner dokument med format ${dokumentMetadata?.format}: ${JSON.stringify(dokumentMetadata)}`,
+            `Åpner dokument ${journalpostId}/${dokumentreferanse} med format ${dokumentMetadata?.format} og status ${dokumentMetadata?.status}`,
         );
 
         // Dokumenter under produksjon er ikke arkivert enda, og metadata kan derfor komme litt forsinket
