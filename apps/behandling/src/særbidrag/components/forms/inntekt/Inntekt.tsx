@@ -1,6 +1,5 @@
 import { type OppdatereInntektBegrunnelseRequest, Rolletype, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, type RolleType } from "@bidrag/common";
-import { Tabs } from "@navikt/ds-react";
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -11,6 +10,7 @@ import { InntektTableComponent, InntektTableProvider } from "../../../../common/
 import { NyOpplysningerAlert } from "../../../../common/components/inntekt/NyOpplysningerAlert";
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
 import { INNTEKT_BEGRUNNELSE_MAL_SÆRBIDRAG } from "../../../../common/constants/ begrunnelseTemplate";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";

@@ -9,7 +9,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils, PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { TrashIcon } from "@navikt/aksel-icons";
-import { Alert, Box, Button, Heading, Tabs } from "@navikt/ds-react";
+import { Alert, Box, Button, Heading } from "@navikt/ds-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { useSearchParams } from "react-router";
@@ -18,6 +18,7 @@ import { CustomTextareaEditor } from "../../../../common/components/CustomEditor
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { ConfirmationModal } from "../../../../common/components/modal/ConfirmationModal";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
 import { default as urlSearchParams } from "../../../../common/constants/behandlingQueryKeys";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
