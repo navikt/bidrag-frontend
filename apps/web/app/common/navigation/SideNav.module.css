@@ -16,9 +16,10 @@
 
 .listItem {
     list-style: none;
-    :hover {
-        background: var(--ax-bg-accent-soft);
-    }
+}
+
+.listItem:hover {
+    background: var(--ax-bg-accent-soft);
 }
 
 .link {

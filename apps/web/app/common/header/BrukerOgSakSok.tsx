@@ -6,20 +6,19 @@ import { useNavigate } from "react-router";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
 
 export function BrukerOgSakSok() {
-    const [search, setSearch] = useState<string>();
+    const [search, setSearch] = useState<string>("");
     const [searchError, setSearchError] = useState<string>();
     const navigate = useNavigate();
     const { encodeFnr } = useObfuscateFnr();
     const enabledFlag = useFlag("frontend.sok-fnr-sak");
 
     async function doSearch() {
-        setSearchError(undefined);
-        const value = search ?? "";
-        const isFnr = IdentUtils.isFnr(value);
-        const isSak = IdentUtils.isSaksnummer(value);
+        setSearchError("");
+        const isFnr = IdentUtils.isFnr(search);
+        const isSak = IdentUtils.isSaksnummer(search);
 
         if (isFnr) {
-            const obfuscatedFnr = encodeFnr(value);
+            const obfuscatedFnr = encodeFnr(search);
             await navigate({ pathname: `/bruker/${obfuscatedFnr}` });
             setSearch("");
             setSearchError(undefined);
@@ -27,7 +26,7 @@ export function BrukerOgSakSok() {
         }
 
         if (isSak) {
-            await navigate({ pathname: `/sak/${value}` });
+            await navigate({ pathname: `/sak/${search}` });
             setSearch("");
             setSearchError(undefined);
             return;
