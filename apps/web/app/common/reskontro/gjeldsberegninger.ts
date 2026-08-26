@@ -1,6 +1,17 @@
 import type { SaksinformasjonBarn } from "@bidrag/api/BidragReskontroApi";
 import { sumNullable } from "@bidrag/utils/belopUtils";
 
+export function sumPerValuta(
+    perioder: { valutakode?: string | null; beløp?: number | null }[],
+): [string, number][] {
+    const grupper = perioder.reduce<Record<string, number>>((acc, rad) => {
+        const valuta = rad.valutakode ?? "NOK";
+        acc[valuta] = sumNullable(acc[valuta], rad.beløp);
+        return acc;
+    }, {});
+    return Object.entries(grupper).sort(([a], [b]) => a.localeCompare(b));
+}
+
 export function beregnBarnGjeld(barn: SaksinformasjonBarn): number {
     return sumNullable(barn.restGjeldOffentlig, barn.restGjeldPrivat);
 }
@@ -27,4 +38,16 @@ export function beregnTotaltTilUtbetaling(barnListe: SaksinformasjonBarn[]): num
 
 export function beregnBmGjeld(bmGjeldRest?: number | null, bmGjeldFastsettelsesgebyr?: number | null): number {
     return sumNullable(bmGjeldRest, bmGjeldFastsettelsesgebyr);
+}
+
+export function beregnTotalPrivatRestGjeld(barnListe: SaksinformasjonBarn[]): number {
+    return barnListe.reduce((sum, barn) => sumNullable(sum, barn.restGjeldPrivatAndel), 0);
+}
+
+export function beregnTotalIkkeUtbetalt(barnListe: SaksinformasjonBarn[]): number {
+    return barnListe.reduce((sum, barn) => sumNullable(sum, barn.sumIkkeUtbetalt), 0);
+}
+
+export function beregnTotalForskuddUtbetalt(barnListe: SaksinformasjonBarn[]): number {
+    return barnListe.reduce((sum, barn) => sumNullable(sum, barn.sumForskuddUtbetalt), 0);
 }
