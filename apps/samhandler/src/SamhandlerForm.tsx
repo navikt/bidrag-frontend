@@ -1,4 +1,4 @@
-import {OffentligIDType, type SamhandlerDto, Sprak, Valutakode} from "@bidrag/api/SamhandlerApi";
+import { OffentligIDType, type SamhandlerDto, Sprak, Valutakode } from "@bidrag/api/SamhandlerApi";
 import {
     BodyShort,
     Box,
@@ -16,14 +16,14 @@ import {
     TextField,
     VStack,
 } from "@navikt/ds-react";
-import type {UseMutationResult} from "@tanstack/react-query";
-import type {AxiosError} from "axios";
-import {useRef, useState} from "react";
-import {Controller, FormProvider, useForm} from "react-hook-form";
-import type {Samhandler} from "./SamhandlerSøk";
-import {sortInAlphabeticOrder} from "./utils/sorting";
-import {useHentLandkoder, useHentVisningsnavn} from "./utils/useApiData";
-import {erGyldigKontonummer, objectHasSomeValue} from "./utils/validator.ts";
+import type { UseMutationResult } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import { useRef, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import type { Samhandler } from "./SamhandlerSøk";
+import { sortInAlphabeticOrder } from "./utils/sorting";
+import { useHentLandkoder, useHentVisningsnavn } from "./utils/useApiData";
+import { erGyldigKontonummer, objectHasSomeValue } from "./utils/validator.ts";
 
 /** Definerer hvilket område samhandleren er knyttet til. */
 export enum SamhandlerDtoOmradekodeEnum {
@@ -106,24 +106,24 @@ const createPayload = (formValues: SamhandlerFormValues): SamhandlerDto => {
         notat: fallbackToUndefined(formValues.notat.trim()),
         adresse: objectHasSomeValue(formValues.adresse)
             ? {
-                adresselinje1: fallbackToUndefined(formValues.adresse.adresselinje1.trim()),
-                adresselinje2: fallbackToUndefined(formValues.adresse.adresselinje2.trim()),
-                adresselinje3: fallbackToUndefined(formValues.adresse.adresselinje3.trim()),
-                poststed: fallbackToUndefined(formValues.adresse.poststed.trim()),
-                postnummer: fallbackToUndefined(formValues.adresse.postnummer.trim()),
-                land: fallbackToUndefined(formValues.adresse.land.trim()),
-            }
+                  adresselinje1: fallbackToUndefined(formValues.adresse.adresselinje1.trim()),
+                  adresselinje2: fallbackToUndefined(formValues.adresse.adresselinje2.trim()),
+                  adresselinje3: fallbackToUndefined(formValues.adresse.adresselinje3.trim()),
+                  poststed: fallbackToUndefined(formValues.adresse.poststed.trim()),
+                  postnummer: fallbackToUndefined(formValues.adresse.postnummer.trim()),
+                  land: fallbackToUndefined(formValues.adresse.land.trim()),
+              }
             : undefined,
         kontonummer: objectHasSomeValue(formValues.kontonummer)
             ? {
-                norskKontonummer: fallbackToUndefined(formValues.kontonummer.norskKontonummer.trim()),
-                banknavn: fallbackToUndefined(formValues.kontonummer.banknavn.trim()),
-                bankCode: fallbackToUndefined(formValues.kontonummer.bankCode.trim()),
-                landkodeBank: fallbackToUndefined(formValues.kontonummer.landkodeBank.trim()),
-                swift: fallbackToUndefined(formValues.kontonummer.swift.trim()),
-                valutakode: fallbackToUndefined(formValues.kontonummer.valutakode),
-                iban: fallbackToUndefined(formValues.kontonummer.iban.trim()),
-            }
+                  norskKontonummer: fallbackToUndefined(formValues.kontonummer.norskKontonummer.trim()),
+                  banknavn: fallbackToUndefined(formValues.kontonummer.banknavn.trim()),
+                  bankCode: fallbackToUndefined(formValues.kontonummer.bankCode.trim()),
+                  landkodeBank: fallbackToUndefined(formValues.kontonummer.landkodeBank.trim()),
+                  swift: fallbackToUndefined(formValues.kontonummer.swift.trim()),
+                  valutakode: fallbackToUndefined(formValues.kontonummer.valutakode),
+                  iban: fallbackToUndefined(formValues.kontonummer.iban.trim()),
+              }
             : undefined,
     };
 
@@ -165,13 +165,13 @@ const createDefaultValues = (samhandler?: SamhandlerDto): SamhandlerFormValues =
 };
 
 export default function SamhandlerForm({
-                                           mutation,
-                                           samhandler,
-                                           onSuccess,
-                                           typeOfAction,
-                                           onClose,
-                                           inModal = true,
-                                       }: {
+    mutation,
+    samhandler,
+    onSuccess,
+    typeOfAction,
+    onClose,
+    inModal = true,
+}: {
     mutation: UseMutationResult<SamhandlerDto, AxiosError, SamhandlerDto, unknown>;
     samhandler?: SamhandlerDto;
     onSuccess: (samhandler: Samhandler) => void;
@@ -179,7 +179,7 @@ export default function SamhandlerForm({
     onClose: () => void;
     inModal?: boolean;
 }) {
-    const {data: visningsnavn} = useHentVisningsnavn();
+    const { data: visningsnavn } = useHentVisningsnavn();
     const landkoder = useHentLandkoder();
     const visningsnavnLandkoder = landkoder
         .map((landkode) => ({
@@ -201,7 +201,7 @@ export default function SamhandlerForm({
     });
 
     const validateKontoopplysninger = (isChecked = erRM) => {
-        const {kontonummer} = formMethods.getValues();
+        const { kontonummer } = formMethods.getValues();
         const hasAnyValue = checkIfKontoHasAnyNonEmptyValues(kontonummer);
 
         if (isChecked && !hasAnyValue) {
@@ -234,7 +234,7 @@ export default function SamhandlerForm({
             onError: (error) => {
                 if (error.response?.data && typeof error.response.data === "object") {
                     const errorData = error.response.data as Record<string, unknown>;
-                    const {duplikatSamhandler, ugyldigInput} = errorData;
+                    const { duplikatSamhandler, ugyldigInput } = errorData;
                     const ugyldigInputData = ugyldigInput as { feltnavn: string; feilmelding: string }[];
                     if (
                         Array.isArray(duplikatSamhandler) &&
@@ -253,7 +253,7 @@ export default function SamhandlerForm({
                     }
                 }
                 errorRef.current?.focus();
-                errorRef.current?.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
+                errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
             },
         });
     };
@@ -295,7 +295,7 @@ export default function SamhandlerForm({
                         )}
                     </ErrorSummary>
                 )}
-                <HGrid gap={{xs: "space-8", md: "space-12"}} columns={3} align="start">
+                <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={3} align="start">
                     <Controller
                         name="navn"
                         control={formMethods.control}
@@ -305,7 +305,7 @@ export default function SamhandlerForm({
                                 message: "Dette feltet er påkrevd",
                             },
                         }}
-                        render={({field, fieldState}) => (
+                        render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
                                 label="Navn"
@@ -324,7 +324,7 @@ export default function SamhandlerForm({
                                 message: "Dette feltet er påkrevd",
                             },
                         }}
-                        render={({field, fieldState}) => (
+                        render={({ field, fieldState }) => (
                             <Select
                                 {...field}
                                 label="Språk"
@@ -357,7 +357,7 @@ export default function SamhandlerForm({
                                 message: "Dette feltet er påkrevd",
                             },
                         }}
-                        render={({field, fieldState}) => (
+                        render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
                                 label="OffentligId"
@@ -376,7 +376,7 @@ export default function SamhandlerForm({
                                 message: "Dette feltet er påkrevd",
                             },
                         }}
-                        render={({field, fieldState}) => (
+                        render={({ field, fieldState }) => (
                             <Select
                                 {...field}
                                 label="OffentligId - type"
@@ -412,7 +412,7 @@ export default function SamhandlerForm({
                                 message: "Dette feltet er påkrevd",
                             },
                         }}
-                        render={({field, fieldState}) => (
+                        render={({ field, fieldState }) => (
                             <Select
                                 {...field}
                                 label="Kreditortype"
@@ -453,34 +453,34 @@ export default function SamhandlerForm({
                         Kontaktinformasjon
                     </Heading>
                     <Box borderColor="neutral" borderWidth="1" padding="space-8">
-                        <HGrid gap={{xs: "space-8", md: "space-12"}} align="start">
-                            <HGrid gap={{xs: "space-8", md: "space-12"}} columns={3} align="start">
+                        <HGrid gap={{ xs: "space-8", md: "space-12" }} align="start">
+                            <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={3} align="start">
                                 <Controller
                                     name="kontaktperson"
                                     control={formMethods.control}
-                                    render={({field}) => (
-                                        <TextField {...field} label="Kontaktperson" size="small" className="h-max"/>
+                                    render={({ field }) => (
+                                        <TextField {...field} label="Kontaktperson" size="small" className="h-max" />
                                     )}
                                 />
                                 <Controller
                                     name="kontaktTelefon"
                                     control={formMethods.control}
-                                    render={({field}) => (
-                                        <TextField {...field} label="Telefon" size="small" className="h-max"/>
+                                    render={({ field }) => (
+                                        <TextField {...field} label="Telefon" size="small" className="h-max" />
                                     )}
                                 />
                                 <Controller
                                     name="kontaktEpost"
                                     control={formMethods.control}
-                                    render={({field}) => (
-                                        <TextField {...field} label="Epost" size="small" className="h-max"/>
+                                    render={({ field }) => (
+                                        <TextField {...field} label="Epost" size="small" className="h-max" />
                                     )}
                                 />
                             </HGrid>
                             <Controller
                                 name="notat"
                                 control={formMethods.control}
-                                render={({field}) => <Textarea {...field} label="Notat" size="small"/>}
+                                render={({ field }) => <Textarea {...field} label="Notat" size="small" />}
                             />
                         </HGrid>
                     </Box>
@@ -490,7 +490,7 @@ export default function SamhandlerForm({
                         Adresse
                     </Heading>
                     <Box borderColor="neutral" borderWidth="1" padding="space-8">
-                        <HGrid gap={{xs: "space-8", md: "space-12"}} columns={3} align="start">
+                        <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={3} align="start">
                             <Controller
                                 name="adresse.adresselinje1"
                                 control={formMethods.control}
@@ -506,7 +506,7 @@ export default function SamhandlerForm({
                                         return true;
                                     },
                                 }}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <TextField
                                         {...field}
                                         label="Adresselinje 1"
@@ -523,7 +523,7 @@ export default function SamhandlerForm({
                             <Controller
                                 name="adresse.adresselinje2"
                                 control={formMethods.control}
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <TextField
                                         {...field}
                                         label="Adresselinje 2"
@@ -539,7 +539,7 @@ export default function SamhandlerForm({
                             <Controller
                                 name="adresse.adresselinje3"
                                 control={formMethods.control}
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <TextField
                                         {...field}
                                         label="Adresselinje 3"
@@ -567,7 +567,7 @@ export default function SamhandlerForm({
                                         return true;
                                     },
                                 }}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <TextField
                                         {...field}
                                         label="Postnummer"
@@ -580,8 +580,8 @@ export default function SamhandlerForm({
                             <Controller
                                 name="adresse.poststed"
                                 control={formMethods.control}
-                                render={({field}) => (
-                                    <TextField {...field} label="Poststed" size="small" className="h-max"/>
+                                render={({ field }) => (
+                                    <TextField {...field} label="Poststed" size="small" className="h-max" />
                                 )}
                             />
                             <Controller
@@ -597,7 +597,7 @@ export default function SamhandlerForm({
                                         return true;
                                     },
                                 }}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <Select
                                         {...field}
                                         label="Landkode"
@@ -635,7 +635,7 @@ export default function SamhandlerForm({
                         borderWidth="1"
                         padding="space-8"
                     >
-                        <HGrid gap={{xs: "space-8", md: "space-12"}} columns={3} align="start">
+                        <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={3} align="start">
                             <Controller
                                 name="kontonummer.norskKontonummer"
                                 control={formMethods.control}
@@ -653,7 +653,7 @@ export default function SamhandlerForm({
                                         return erGyldigKontonummer(value) || "Kontonummer er ikke gyldig";
                                     },
                                 }}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <TextField
                                         {...field}
                                         label="Kontonummer"
@@ -676,17 +676,17 @@ export default function SamhandlerForm({
                             <Controller
                                 name="kontonummer.banknavn"
                                 control={formMethods.control}
-                                render={({field}) => <TextField {...field} label="Banknavn" size="small"/>}
+                                render={({ field }) => <TextField {...field} label="Banknavn" size="small" />}
                             />
                             <Controller
                                 name="kontonummer.bankCode"
                                 control={formMethods.control}
-                                render={({field}) => <TextField {...field} label="Bankkode" size="small"/>}
+                                render={({ field }) => <TextField {...field} label="Bankkode" size="small" />}
                             />
                             <Controller
                                 name="kontonummer.landkodeBank"
                                 control={formMethods.control}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <Select
                                         {...field}
                                         label="Landkode"
@@ -706,7 +706,7 @@ export default function SamhandlerForm({
                             <Controller
                                 name="kontonummer.swift"
                                 control={formMethods.control}
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <TextField
                                         {...field}
                                         label="Swift"
@@ -735,7 +735,7 @@ export default function SamhandlerForm({
                                         return true;
                                     },
                                 }}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <Select
                                         {...field}
                                         label="Valutakode"
@@ -762,7 +762,7 @@ export default function SamhandlerForm({
                             <Controller
                                 name="kontonummer.iban"
                                 control={formMethods.control}
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <TextField
                                         {...field}
                                         label="Iban"
@@ -780,16 +780,13 @@ export default function SamhandlerForm({
                 {typeOfAction === "edit" && (
                     <InfoCard data-color="info">
                         <InfoCard.Header>
-                            <InfoCard.Title>
-                                Du må bekrefte endringene</InfoCard.Title>
+                            <InfoCard.Title>Du må bekrefte endringene</InfoCard.Title>
                         </InfoCard.Header>
                         <InfoCard.Content>
                             <BodyShort size="small">
                                 Endringene vil påvirke alle saker hvor samhandler-identen benyttes. Hvis du ikke ønsker
-                                at
-                                endringene skal gjelde i alle saker hvor samhandler-identen er benyttet, må du opprette
-                                ny
-                                samhandler.
+                                at endringene skal gjelde i alle saker hvor samhandler-identen er benyttet, må du
+                                opprette ny samhandler.
                             </BodyShort>
                             <Checkbox
                                 className="mt-4"
