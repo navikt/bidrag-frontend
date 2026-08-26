@@ -169,7 +169,7 @@ export default function BarnVisning({
             >
                 {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
 
-                {!visReellMottaker && !visRmFeil && (
+                {!visReellMottaker && (
                     <Box marginBlock="space-8 space-0">
                         {harReellMottaker ? (
                             <>

@@ -148,11 +148,13 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
 
     useEffect(() => {
         async function sjekkUfullstendigRelasjon() {
-            if (sak && barnIdenter.length > 0) {
-                setBarnMedUfullstendigRelasjon(
-                    await finnBarnMedUfullstendigRelasjon(barnIdenter, bm?.fodselsnummer, bp?.fodselsnummer),
-                );
+            if (!sak || barnIdenter.length === 0) {
+                setBarnMedUfullstendigRelasjon([]);
+                return;
             }
+            setBarnMedUfullstendigRelasjon(
+                await finnBarnMedUfullstendigRelasjon(barnIdenter, bm?.fodselsnummer, bp?.fodselsnummer),
+            );
         }
         sjekkUfullstendigRelasjon();
     }, [bp?.fodselsnummer, bm?.fodselsnummer, barnIdenterKey, sak, finnBarnMedUfullstendigRelasjon]);

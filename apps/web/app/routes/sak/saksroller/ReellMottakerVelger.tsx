@@ -85,7 +85,9 @@ export default function ReellMottakerVelger({
     };
 
     const kanBekrefte =
-        !isRequired || (utkast.type === "barnet_selv" ? Boolean(utkast.ident) : Boolean(utkast.type && utkast.ident));
+        utkast.type === "samhandler"
+            ? Boolean(utkast.ident)
+            : !isRequired || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
 
     return (
         <Modal open onClose={onAvbryt} width="medium" aria-label="Endre reell mottaker">

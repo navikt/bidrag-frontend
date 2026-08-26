@@ -46,6 +46,7 @@ export function useEndringssporing({
         }
 
         if (rolleEndringSignatur === forrigeSignaturRef.current) {
+            hoppOverPåfølgendeTilbakestillingRef.current = false;
             return;
         }
 
