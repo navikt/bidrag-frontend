@@ -47,12 +47,13 @@ export function hentInnkrevingForSaksnummer(saksnummer: string) {
     return queryOptions({
         queryKey: ["hentInnkrevingForSaksnummer", saksnummer],
         queryFn: () =>
-            withQueryErrorHandling("hentInnkrevingForSaksnummer", async () => {
+            withQueryErrorHandlingV2("hentInnkrevingForSaksnummer", async () => {
                 const { data } = await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaBidragssak({
                     saksnummer: saksnummer,
                 });
                 return data;
             }),
+        staleTime: Infinity,
     });
 }
 
@@ -60,15 +61,20 @@ export function hentInnkrevingssakPaPerson(ident: string) {
     return queryOptions({
         queryKey: ["hentInnkrevingssakPaPerson", ident],
         queryFn: () =>
-            withQueryErrorHandling("hentInnkrevingssakPaPerson", async () => {
-                const { data } =
-                    await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaPerson(
-                        {
-                            ident: ident,
-                        },
-                    );
-                return data;
-            }),
+            withQueryErrorHandlingV2(
+                "hentInnkrevingssakPaPerson",
+                async () => {
+                    const { data } = await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaPerson({
+                        ident: ident,
+                    });
+                    return data;
+                },
+                {
+                    notFoundValue: { bidragssaker: [] },
+                },
+            ),
+
+        staleTime: Infinity,
     });
 }
 

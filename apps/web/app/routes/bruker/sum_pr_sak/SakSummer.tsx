@@ -1,6 +1,7 @@
 import type { Bidragssak } from "@bidrag/api/BidragReskontroApi";
 import { RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
-import { Alert, Box, Detail, HStack, Label, VStack } from "@navikt/ds-react";
+import { Alert, Box, Detail, HStack, Label, Link, VStack } from "@navikt/ds-react";
+import { Link as RouterLink } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
 import { SaksumTabellBM } from "~/routes/bruker/sum_pr_sak/SaksumTabellBM.tsx";
 import { SaksumTabellBP } from "~/routes/bruker/sum_pr_sak/SaksumTabellBP.tsx";
@@ -42,7 +43,9 @@ export function SakSummer({ bidragSak, ident }: SakSummerProps) {
             <HStack justify={"space-between"}>
                 <HStack gap={"space-8"}>
                     {rolleType && <RolleTag rolleType={rolleType as unknown as RolleTypeAbbreviation} />}
-                    <Label>Sak {bidragSak.saksnummer} </Label>
+                    <Label>
+                        Sak <Link as={RouterLink} to={`/sak/${bidragSak.saksnummer}/reskontro`}>{bidragSak.saksnummer}</Link>{" "}
+                    </Label>
                     <Detail as={"span"}>
                         Enhet: {sak?.eierfogd} <EnhetsNavn enhetsnummer={sak?.eierfogd ?? null} />
                     </Detail>

@@ -1,4 +1,5 @@
-import { VStack } from "@navikt/ds-react";
+import { PersonNavn } from "@bidrag/common";
+import { BodyLong, Heading, VStack } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { hentInnkrevingssakPaPerson } from "~/api/query/reskontro.query.ts";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr";
@@ -16,12 +17,25 @@ export default function SumPrSakPage({ params }: Route.ComponentProps) {
     const { data } = useSuspenseQuery(hentInnkrevingssakPaPerson(fnr));
     const saker = data.bidragssaker ?? [];
 
+    const renderSaker = () => {
+        if (saker.length === 0) {
+            return <BodyLong>Ingen saker funnet </BodyLong>;
+        }
+        return (
+            <>
+                {saker.map((sak) => (
+                    <SakSummer bidragSak={sak} ident={fnr} key={sak.saksnummer} />
+                ))}
+            </>
+        );
+    };
     return (
         <VStack gap={"space-48"}>
             <title>Sum pr sak</title>
-            {saker.map((sak) => (
-                <SakSummer bidragSak={sak} ident={fnr} key={sak.saksnummer} />
-            ))}
+            <Heading size={"medium"}>
+                Sum pr sak for <PersonNavn ident={fnr} />
+            </Heading>
+            {renderSaker()}
         </VStack>
     );
 }
