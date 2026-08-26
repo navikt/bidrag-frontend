@@ -69,19 +69,19 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle }: Props) 
                                 </Box>
                             )}
 
-                            <Table size="small" className="w-full">
+                            <Table size="medium" className="w-full">
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell textSize="small" scope="col">
+                                        <Table.HeaderCell textSize="medium" scope="col">
                                             Ny reell mottaker
                                         </Table.HeaderCell>
-                                        <Table.HeaderCell textSize="small" scope="col">
+                                        <Table.HeaderCell textSize="medium" scope="col">
                                             Type endring
                                         </Table.HeaderCell>
-                                        <Table.HeaderCell textSize="small" scope="col">
+                                        <Table.HeaderCell textSize="medium" scope="col">
                                             Endret av
                                         </Table.HeaderCell>
-                                        <Table.HeaderCell textSize="small" scope="col">
+                                        <Table.HeaderCell textSize="medium" scope="col">
                                             Dato
                                         </Table.HeaderCell>
                                     </Table.Row>
@@ -89,16 +89,16 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle }: Props) 
                                 <Table.Body>
                                     {sortertHistorikk.map((historikk, index) => (
                                         <Table.Row key={index}>
-                                            <Table.DataCell textSize="small">
+                                            <Table.DataCell textSize="medium">
                                                 <span className="personident">{historikk.reellMottaker || "-"}</span>
                                             </Table.DataCell>
-                                            <Table.DataCell textSize="small">
+                                            <Table.DataCell textSize="medium">
                                                 {historikk.typeEndring || "-"}
                                             </Table.DataCell>
-                                            <Table.DataCell textSize="small">
+                                            <Table.DataCell textSize="medium">
                                                 {historikk.opprettetAv || "-"}
                                             </Table.DataCell>
-                                            <Table.DataCell textSize="small">
+                                            <Table.DataCell textSize="medium">
                                                 {historikk.opprettetDato
                                                     ? dateToDDMMYYYYString(historikk.opprettetDato)
                                                     : "-"}

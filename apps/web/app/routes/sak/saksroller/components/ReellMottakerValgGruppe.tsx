@@ -1,4 +1,4 @@
-import { Alert, Box, Label, Radio, RadioGroup, VStack } from "@navikt/ds-react";
+import { Box, Label, LocalAlert, Radio, RadioGroup, VStack } from "@navikt/ds-react";
 
 import FunnetPersonInfo from "./FunnetPersonInfo.tsx";
 import PersonInfo from "./PersonInfo.tsx";
@@ -57,7 +57,7 @@ export default function ReellMottakerValgGruppe({
     };
 
     return (
-        <VStack gap="space-16">
+        <VStack gap="space-24">
             {visBarnekort && barnIdent && (
                 <VStack gap="space-8">
                     <Label size="small">Barnet</Label>
@@ -94,9 +94,9 @@ export default function ReellMottakerValgGruppe({
             </RadioGroup>
 
             {kunSamhandlerSomReellMottaker && (
-                <Alert variant="warning" size="small">
-                    {KUN_SAMHANDLER_MELDING}
-                </Alert>
+                <LocalAlert status="warning" size="small">
+                    <LocalAlert.Content>{KUN_SAMHANDLER_MELDING}</LocalAlert.Content>
+                </LocalAlert>
             )}
 
             {valg.type === "samhandler" && (

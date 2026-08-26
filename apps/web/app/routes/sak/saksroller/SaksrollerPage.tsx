@@ -240,14 +240,14 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                         </Box>
                     )}
 
-                    <VStack gap="space-6">
+                    <VStack gap="space-24">
                         <VStack gap="space-4">
-                            <VStack gap="space-8">
+                            <VStack gap="space-4">
                                 <Heading level="1" size="large">
                                     Rollebilde for sak {saksnummer}
                                 </Heading>
                                 {sak?.opprettetDato?.trim() !== "" && (
-                                    <BodyLong size="small" textColor="subtle" spacing>
+                                    <BodyLong size="small" textColor="subtle">
                                         Saken opprettet: {dateToDDMMYYYYString(new Date(sak.opprettetDato))}
                                     </BodyLong>
                                 )}
@@ -274,7 +274,6 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                                         </Tag>
                                     )}
                                 </HStack>
-                                <Box borderColor="neutral-subtleA" borderWidth="0 0 1 0" />
                             </VStack>
 
                             {erEktefellebidrag && (
@@ -291,7 +290,7 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                         </VStack>
 
                         <form onSubmit={(event) => event.preventDefault()}>
-                            <VStack gap="space-6">
+                            <VStack gap="space-24">
                                 <Box background="sunken" padding="space-12">
                                     <HGrid columns={{ xs: 1, md: 2 }} gap="space-24">
                                         <VStack gap="space-4">

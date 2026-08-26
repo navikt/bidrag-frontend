@@ -52,7 +52,7 @@ export default function PersonSamhandlerSøk({
     return (
         <HStack gap="space-8" align="center" width={containerWidth} padding={containerPadding}>
             <Box width="100%">
-                <HStack gap="space-8" align="end" wrap>
+                <HStack gap={compact ? "space-24" : "space-8"} align="end" wrap>
                     <Search
                         label={label || "Person- eller samhandlerident"}
                         variant={primary ? "primary" : "simple"}
@@ -61,7 +61,7 @@ export default function PersonSamhandlerSøk({
                                 ? "Fødselsnummer, D-nummer (11 siffer) eller samhandler ident"
                                 : "Fødselsnummer eller D-nummer (11 siffer)"
                         }
-                        size="small"
+                        size={compact ? "medium" : "small"}
                         className={inputWidth}
                         value={searchValue}
                         hideLabel={false}
@@ -76,6 +76,7 @@ export default function PersonSamhandlerSøk({
                     />
                     <HStack gap="space-8" align="end" wrap>
                         <PersonSokButton
+                            size={compact ? "medium" : undefined}
                             onError={(feil) => setSearchErrorMessage(feil)}
                             onResult={(data) => {
                                 if (data?.ident) onInputChange(data.ident);
@@ -83,6 +84,7 @@ export default function PersonSamhandlerSøk({
                         />
                         {visSamhandlerSøk && (
                             <SamhandlerSokButton
+                                size={compact ? "medium" : undefined}
                                 onResult={(data) => {
                                     if (data?.samhandlerId) onInputChange(data.samhandlerId);
                                 }}

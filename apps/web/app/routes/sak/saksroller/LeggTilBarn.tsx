@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton } from "@bidrag/common";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
 import { PersonTallShortIcon, PlusIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Button, Detail, Heading, HStack, Modal, Search, VStack } from "@navikt/ds-react";
+import { Alert, BodyLong, Box, Button, Detail, Heading, HStack, Modal, Search, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router";
@@ -148,16 +148,17 @@ export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps
 
     if (!visSøk) {
         return (
-            <Button
-                icon={<PlusIcon aria-hidden />}
-                variant="secondary"
-                size="small"
-                type="button"
-                className="self-start"
-                onClick={() => setVisSøk(true)}
-            >
-                Legg til nytt barn
-            </Button>
+            <Box marginBlock="space-16 space-0">
+                <Button
+                    icon={<PlusIcon aria-hidden />}
+                    variant="secondary"
+                    size="small"
+                    type="button"
+                    onClick={() => setVisSøk(true)}
+                >
+                    Legg til nytt barn
+                </Button>
+            </Box>
         );
     }
 
@@ -216,12 +217,13 @@ export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps
                         </VStack>
                     )}
 
-                    <HStack gap="space-16" align="end" wrap={false}>
+                    <HStack gap="space-24" align="end" wrap={false}>
                         <Search
                             label="Søk etter barn"
                             description="Fødselsnummer eller D-nummer (11 siffer)"
                             variant="simple"
-                            size="small"
+                            size="medium"
+                            className="min-w-0 flex-1"
                             hideLabel={false}
                             value={ident}
                             onChange={(verdi) => {
@@ -230,6 +232,7 @@ export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps
                             }}
                         />
                         <PersonSokButton
+                            size="medium"
                             onError={(melding) => setFeil(melding)}
                             onResult={(data) => {
                                 if (data?.ident) {

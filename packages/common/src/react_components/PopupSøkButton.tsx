@@ -29,7 +29,7 @@ export default function PopupSøkButton<T>({
     const ventetittel = `Venter på resultat fra ${søkenavn}`;
 
     return (
-        <div className="pdlSearchButton whitespace-nowrap self-center h-full">
+        <div className="pdlSearchButton whitespace-nowrap self-end">
             <Button
                 {...buttonProps}
                 variant={buttonProps.variant ?? "secondary"}

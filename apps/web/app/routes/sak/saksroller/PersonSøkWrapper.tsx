@@ -41,13 +41,11 @@ export default function PersonSøkWrapper({
 
             <Modal.Body>
                 <VStack gap="space-16">
-                    <BodyLong size="small" textColor="subtle">
-                        {beskrivelse}
-                    </BodyLong>
+                    <BodyLong size="medium">{beskrivelse}</BodyLong>
 
                     {children}
 
-                    <SøkPerson label={søkeLabel} personInformasjon={(person) => onPersonValgt(person)} />
+                    <SøkPerson label={søkeLabel} personInformasjon={(person) => onPersonValgt(person)} compact />
                 </VStack>
             </Modal.Body>
 

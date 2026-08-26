@@ -1,6 +1,6 @@
 import { RedirectTo } from "@bidrag/common";
-import { FloppydiskIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Button, Heading, HStack, Modal } from "@navikt/ds-react";
+import { ExclamationmarkTriangleIcon, FloppydiskIcon } from "@navikt/aksel-icons";
+import { Alert, BodyLong, Button, Dialog, HStack, LocalAlert } from "@navikt/ds-react";
 import { type RefObject, useEffect, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
@@ -148,39 +148,54 @@ export default function SakButtons({
             </HStack>
 
             {bekreftHandling && (
-                <Modal
+                <Dialog
                     open
-                    onClose={() => {
-                        if (!lagrer) {
+                    onOpenChange={(open) => {
+                        if (!open && !lagrer) {
                             setBekreftHandling(null);
                         }
                     }}
-                    width="small"
-                    aria-label="Bekreft lagring av saksroller"
                 >
-                    <Modal.Header>
-                        <Heading level="2" size="medium">
-                            Lagre selv om det finnes en advarsel?
-                        </Heading>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {feilmelding && <Alert variant="error">{feilmelding}</Alert>}
-                        <BodyLong>Kontroller relasjonsadvarselen før du lagrer endringene.</BodyLong>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button type="button" loading={lagrer} disabled={lagrer} onClick={() => void bekreftLagring()}>
-                            Lagre
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            disabled={lagrer}
-                            onClick={() => setBekreftHandling(null)}
-                        >
-                            Avbryt
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                    <Dialog.Popup width="small" role="alertdialog" aria-label="Bekreft lagring av saksroller">
+                        <Dialog.Header>
+                            <Dialog.Title className="flex items-center gap-2 text-ax-warning-900">
+                                <ExclamationmarkTriangleIcon aria-hidden fontSize="1.25rem" />
+                                Advarsel
+                            </Dialog.Title>
+                            <Dialog.Description>
+                                Det finnes en relasjonsadvarsel. Kontroller før du lagrer endringene.
+                            </Dialog.Description>
+                        </Dialog.Header>
+                        <Dialog.Body>
+                            {feilmelding && (
+                                <LocalAlert status="error" size="small">
+                                    <LocalAlert.Content>{feilmelding}</LocalAlert.Content>
+                                </LocalAlert>
+                            )}
+                            {!feilmelding && (
+                                <BodyLong size="small">Du kan fortsatt lagre hvis dette er forventet.</BodyLong>
+                            )}
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                            <Button
+                                type="button"
+                                loading={lagrer}
+                                disabled={lagrer}
+                                onClick={() => void bekreftLagring()}
+                            >
+                                Lagre
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                disabled={lagrer}
+                                onClick={() => setBekreftHandling(null)}
+                            >
+                                Avbryt
+                            </Button>
+                        </Dialog.Footer>
+                    </Dialog.Popup>
+                </Dialog>
             )}
         </>
     );
