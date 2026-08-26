@@ -15,14 +15,14 @@ import { useSaksumTabell } from "~/routes/bruker/sum_pr_sak/useSaksumTabell.ts";
 
 const gjeld = (barn: SaksinformasjonBarn) => beregnBarnGjeld(barn);
 
-interface SakSummerProps {
+interface Props {
     ident: string;
     saksnummer: string;
     bidragSak: Bidragssak;
     sak?: BidragssakDto;
 }
 
-export function SaksumTabellBP({ bidragSak, saksnummer, ident, sak }: SakSummerProps) {
+export function SaksumTabellBP({ bidragSak, saksnummer, ident, sak }: Props) {
     const { sumBidragPerValuta, getBidragForBarn, reellMottakerIdent } = useSaksumTabell({
         saksnummer,
         ident,

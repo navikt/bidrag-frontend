@@ -35,6 +35,10 @@ export function BrukerOgSakSok() {
         setSearchError("Ugyldig søk. Søk på fødselsnummer eller saksnummer.");
     }
 
+    if (!enabledFlag) {
+        return null;
+    }
+
     return (
         <HStack
             as="form"

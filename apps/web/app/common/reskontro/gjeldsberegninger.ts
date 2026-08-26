@@ -1,9 +1,7 @@
 import type { SaksinformasjonBarn } from "@bidrag/api/BidragReskontroApi";
 import { sumNullable } from "@bidrag/utils/belopUtils";
 
-export function sumPerValuta(
-    perioder: { valutakode?: string | null; beløp?: number | null }[],
-): [string, number][] {
+export function sumPerValuta(perioder: { valutakode?: string | null; beløp?: number | null }[]): [string, number][] {
     const grupper = perioder.reduce<Record<string, number>>((acc, rad) => {
         const valuta = rad.valutakode ?? "NOK";
         acc[valuta] = sumNullable(acc[valuta], rad.beløp);

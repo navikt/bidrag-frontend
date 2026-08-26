@@ -11,14 +11,14 @@ interface UseSaksumTabellOptions {
     periodeFilter: PeriodeFilter;
 }
 
-export function useSaksumTabell({ saksnummer, ident, periodeFilter}: UseSaksumTabellOptions) {
+export function useSaksumTabell({ saksnummer, ident, periodeFilter }: UseSaksumTabellOptions) {
     const { aktivePerioder } = useAktivPeriode(saksnummer);
 
     const bidrag = aktivePerioder
         .filter((p) => p[periodeFilter] === ident)
         .filter((p) => p.type === "BIDRAG" || p.type === "BIDRAG18AAR");
 
-    const forskudd = aktivePerioder.filter((p) => p.mottaker === ident).filter((p) => p.type === "FORSKUDD")
+    const forskudd = aktivePerioder.filter((p) => p.mottaker === ident).filter((p) => p.type === "FORSKUDD");
 
     const sumBidragPerValuta = sumPerValuta(bidrag);
     const sumForskuddPerValuta = sumPerValuta(forskudd);

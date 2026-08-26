@@ -27,6 +27,6 @@ export function useBeløphistorikk(saksnummer: string) {
 
     return {
         allestonader,
-        perioder
+        perioder,
     };
 }

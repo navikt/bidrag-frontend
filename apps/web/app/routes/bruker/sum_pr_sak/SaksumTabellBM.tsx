@@ -2,7 +2,7 @@ import type { Bidragssak } from "@bidrag/api/BidragReskontroApi";
 import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { PersonIdent, PersonNavnIdent } from "@bidrag/common";
 import { formaterBelop } from "@bidrag/utils";
-import { Alert, Table } from "@navikt/ds-react";
+import { Table } from "@navikt/ds-react";
 import {
     beregnTotalForskuddUtbetalt,
     beregnTotalIkkeUtbetalt,
@@ -19,7 +19,7 @@ interface Props {
     sak?: BidragssakDto;
 }
 
-export function SaksumTabellBM({ saksnummer,bidragSak, ident, sak }: Props) {
+export function SaksumTabellBM({ saksnummer, bidragSak, ident, sak }: Props) {
     const { sumBidragPerValuta, sumForskuddPerValuta, getBidragForBarn, getForskuddForBarn, reellMottakerIdent } =
         useSaksumTabell({ saksnummer: saksnummer, ident, periodeFilter: "mottaker" });
 
@@ -29,8 +29,6 @@ export function SaksumTabellBM({ saksnummer,bidragSak, ident, sak }: Props) {
     const totalPrivatRestGjeld = beregnTotalPrivatRestGjeld(barn);
     const totalSumIkkeUtbetalt = beregnTotalIkkeUtbetalt(barn);
     const totalSumForskuddUtbetalt = beregnTotalForskuddUtbetalt(barn);
-
-
 
     return (
         <Table size="small">
@@ -80,4 +78,3 @@ export function SaksumTabellBM({ saksnummer,bidragSak, ident, sak }: Props) {
         </Table>
     );
 }
-

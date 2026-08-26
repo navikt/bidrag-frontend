@@ -16,7 +16,7 @@
 
 .listItem {
     list-style: none;
-    :hover{
+    :hover {
         background: var(--ax-bg-accent-soft);
     }
 }
@@ -29,12 +29,9 @@
     text-decoration: none;
     white-space: nowrap;
     color: var(--ax-text-default);
-
-
 }
 
 .link[aria-current="page"] {
     border-bottom: thin solid var(--ax-border-accent-strong);
     background: var(--ax-bg-accent-softA);
 }
-
