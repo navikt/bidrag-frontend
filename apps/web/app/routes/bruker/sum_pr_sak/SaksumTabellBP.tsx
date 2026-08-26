@@ -16,13 +16,13 @@ const gjeld = (barn: SaksinformasjonBarn) => {
     return sumNullable(barn.restGjeldOffentlig, barn.restGjeldPrivat);
 };
 
-interface Props {
+interface SakSummerProps {
     ident: string;
     bidragSak: Bidragssak;
     sak?: BidragssakDto;
 }
 
-export function SaksumTabellBP({ bidragSak, ident, sak }: Props) {
+export function SaksumTabellBP({ bidragSak, ident, sak }: SakSummerProps) {
     if (!bidragSak.saksnummer) {
         return <Alert variant={"warning"}>Saksnummer mangler for bidragssak</Alert>;
     }
