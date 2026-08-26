@@ -5,7 +5,7 @@ import {
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { RolleTypeAbbreviation } from "@bidrag/common";
-import { BodyShort, Tabs } from "@navikt/ds-react";
+import { BodyShort } from "@navikt/ds-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -14,6 +14,7 @@ import { CustomTextareaEditor } from "../../../../common/components/CustomEditor
 import ModiaLink from "../../../../common/components/inntekt/ModiaLink";
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
 import { toUnderholdskostnadTabQueryParameter } from "../../../../common/constants/behandlingQueryKeys";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
@@ -21,7 +22,6 @@ import { useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { useDebounce } from "../../../../common/hooks/useDebounce";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
 import { usePageTabs } from "../../../../common/hooks/usePageTabs";
-
 import { BarnebidragStepper } from "../../../enum/BarnebidragStepper";
 import { useGetActiveAndDefaultUnderholdskostnadTab } from "../../../hooks/useGetActiveAndDefaultUnderholdskostnadTab";
 import { useOnUpdateUnderholdBegrunnelse } from "../../../hooks/useOnUpdateUnderhold";

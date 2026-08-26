@@ -78,6 +78,11 @@ env:
     value: http://bidrag-dokument-forsendelse
   - name: BIDRAG_DOKUMENT_FORSENDELSE_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-dokument-forsendelse/.default
+    
+  - name: KODEVERK_URL
+    value: https://bidrag-kodeverk.intern.dev.nav.no
+  - name: KODEVERK_URL_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-kodeverk/.default
 
 unleash:
   host: bidrag-unleash-api.nav.cloud.nais.io

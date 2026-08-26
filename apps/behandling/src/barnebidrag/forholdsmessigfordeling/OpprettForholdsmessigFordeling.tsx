@@ -1,3 +1,4 @@
+import { BEHANDLING_API_V1 } from "@bidrag/api";
 import {
     type ForholdmessigFordelingDetaljerDto,
     type OpprettFFRequest,
@@ -9,7 +10,6 @@ import {
 import { Alert, BodyShort, Button, Dialog, Heading, HStack, Loader, VStack } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { BEHANDLING_API_V1 } from "../../common/constants/api";
 import {
     useGetBehandlingV2,
     useGetForholdsmessigFordelingDetaljer,
@@ -20,6 +20,7 @@ import { useQueryParams } from "../../common/hooks/useQueryParams";
 import { hentVisningsnavn } from "../../common/hooks/useVisningsnavn";
 import { formatterBeløpForBeregning } from "../../utils/number-utils";
 import { BarnListeOpprettFF } from "./BarnListe";
+import { EgetTiltakNavBidragVarsel } from "./ForholdsmessigFordelingInfo";
 
 export function OpprettForholdsmessigFordelingPanelContent({
     showButton = true,
@@ -112,6 +113,7 @@ export function OpprettForholdsmessigFordelingPanelContent({
                         </BodyShort>
                     </Alert>
                 )}
+                <EgetTiltakNavBidragVarsel barn={detaljer.barn} />
                 <BarnListeOpprettFF
                     barn={detaljer.barn}
                     skalBehandlesAvEnhet={detaljer.skalBehandlesAvEnhet}
@@ -164,7 +166,7 @@ export default function OpprettForholdsmessigFordelingPrompt() {
 
     return (
         <>
-            <Dialog open={modalOpen} onOpenChange={setModalOpen} aria-label="Opprett forholdsmessig fordeling">
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
                 <Dialog.Popup className="w-fit" position="center">
                     <Dialog.Header>
                         {harOpprettetFF ? "Oppdater forholdsmessig fordeling" : "Opprett forholdsmessig fordeling"}

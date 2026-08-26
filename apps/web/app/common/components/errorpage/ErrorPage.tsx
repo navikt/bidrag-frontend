@@ -1,4 +1,4 @@
-import { CustomError, LoggerService } from "@bidrag/common";
+import { CustomError, LoggerService, useBisysLink } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import {
     BodyLong,
@@ -15,7 +15,6 @@ import {
 } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import styles from "./errorpage.module.css";
 import { Iskrem } from "./Iskrem";
 
