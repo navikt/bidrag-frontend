@@ -1,11 +1,11 @@
-import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
-import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
-import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
-import { Bleed, Box, CopyButton, Skeleton } from "@navikt/ds-react";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useHentFodselsdatoer } from "../../api/useApiData";
-import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
-import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
+import type {RolleDto} from "@bidrag/api/BidragBehandlingApiV1";
+import {Rolletype, Stonadstype} from "@bidrag/api/BidragBehandlingApiV1";
+import {ChevronDownIcon, ChevronUpIcon} from "@navikt/aksel-icons";
+import {Box, CopyButton, Skeleton} from "@navikt/ds-react";
+import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {useHentFodselsdatoer} from "../../api/useApiData";
+import type {IRolleDetaljer} from "../../types/roller/IRolleDetaljer";
+import {RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName} from "../../types/roller/RolleType";
 import RolleCard from "../roller/RolleCard";
 
 type TypeBehandling = string;
@@ -40,8 +40,6 @@ interface ISakHeaderLegacyProps {
 
 type ISakHeaderProps = ISakHeaderNewProps | ISakHeaderLegacyProps;
 
-// Constants
-const FLASH_ANIMATION_DURATION = 800;
 
 // Styles
 const TAB_CONTAINER_STYLE: React.CSSProperties = {
@@ -145,7 +143,7 @@ const mapSaksnummerRoller = (roller: HeaderRolle[]): SaksnummerRoller[] => {
         .filter((s): s is string => s !== undefined)
         .map((saksnummer) => {
             const rollerISak = roller
-                .filter((rolle) => rolle.saksnummer === saksnummer)
+                .filter((rolle) => rolle.saksnummer === saksnummer || rolle.rolletype === Rolletype.BP)
                 .sort((a, b) => compareRoller(a, b));
             return {
                 saksnummer,
@@ -159,7 +157,6 @@ interface SaksnummerTabProps {
     item: SaksnummerRoller;
     isSelected: boolean;
     isExpanded: boolean;
-    isFlashing: boolean;
     harFlereSaksnummer: boolean;
     onSelect: (saksnummer: string) => void;
     onToggleExpand: (saksnummer: string) => void;
@@ -169,7 +166,6 @@ const SaksnummerTab = ({
     item,
     isSelected,
     isExpanded,
-    isFlashing,
     harFlereSaksnummer,
     onSelect,
     onToggleExpand,
@@ -184,9 +180,6 @@ const SaksnummerTab = ({
         background: backgroundColor,
         marginBottom: isSelected ? "-1px" : "0",
         borderBottom: isSelected ? "1px solid var(--ax-bg-default)" : "1px solid transparent",
-        ...(isFlashing && {
-            animation: "saksnummerFlash 0.8s ease-out forwards",
-        }),
     };
 
     return (
@@ -266,27 +259,6 @@ const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
     );
 };
 
-// Custom Hooks
-const useFlashAnimation = (aktivtSaksnummer: string | undefined) => {
-    const prevSaksnummerRef = useRef<string | undefined>(aktivtSaksnummer);
-    const [flashingSaksnummer, setFlashingSaksnummer] = useState<string | undefined>(undefined);
-
-    useEffect(() => {
-        if (
-            prevSaksnummerRef.current !== undefined &&
-            prevSaksnummerRef.current !== aktivtSaksnummer &&
-            aktivtSaksnummer
-        ) {
-            setFlashingSaksnummer(aktivtSaksnummer);
-            const timer = setTimeout(() => setFlashingSaksnummer(undefined), FLASH_ANIMATION_DURATION);
-            prevSaksnummerRef.current = aktivtSaksnummer;
-            return () => clearTimeout(timer);
-        }
-        prevSaksnummerRef.current = aktivtSaksnummer;
-    }, [aktivtSaksnummer]);
-
-    return flashingSaksnummer;
-};
 
 const useAktivtSaksnummer = (
     saksnummerRoller: SaksnummerRoller[],
@@ -347,6 +319,11 @@ const useSyncAktivtSaksnummerToState = (
 
         if (sisteSaksnummer.current !== saksnummerSomSkalBrukes) {
             setSelectedSaksnummer(saksnummerSomSkalBrukes);
+            // Når `saksnummerSomSkalBrukes` endres eksternt (f.eks. fra `BarnebidragSideMenu` etter
+            // klikk på en feilmelding som gjelder en rolle i en annen sak), må selve
+            // tab-visningen (`expandedSaksnummer`) også følge med - ellers vises fortsatt forrige
+            // sak som "aktiv" i SakHeader selv om `selectedSaksnummer` faktisk har byttet.
+            setExpandedSaksnummer(saksnummerSomSkalBrukes);
             sisteSaksnummer.current = saksnummerSomSkalBrukes;
         }
         if (sisteRolleSignatur.current !== nyRolleSignatur) {
@@ -455,9 +432,6 @@ function HeaderRenderer({
     // Determine active saksnummer based on availability and selection
     const aktivtSaksnummer = useAktivtSaksnummer(saksnummerRoller, harFlereSaksnummer, selectedSaksnummer);
 
-    // Flash effect when active saksnummer changes
-    const flashingSaksnummer = useFlashAnimation(aktivtSaksnummer);
-
     // Track which saksnummer is expanded
     const [expandedSaksnummer, setExpandedSaksnummer] = useState<string | undefined>(aktivtSaksnummer);
 
@@ -516,12 +490,6 @@ function HeaderRenderer({
                     borderBottom: "1px solid var(--ax-border-neutral-subtle)",
                 }}
             >
-                <style>{`
-                @keyframes saksnummerFlash {
-                    0%   { box-shadow: 0 0 0 3px var(--ax-border-accent, #0067c5); }
-                    100% { box-shadow: 0 0 0 0px transparent; }
-                }
-            `}</style>
 
                 {/* Title and tabs */}
                 <Box>
@@ -553,7 +521,6 @@ function HeaderRenderer({
                                     item={item}
                                     isSelected={aktivtSaksnummer === item.saksnummer}
                                     isExpanded={expandedSaksnummer === item.saksnummer}
-                                    isFlashing={flashingSaksnummer === item.saksnummer}
                                     harFlereSaksnummer={harFlereSaksnummer}
                                     onSelect={onSelectSaksnummer}
                                     onToggleExpand={onToggleExpanded}

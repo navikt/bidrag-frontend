@@ -290,6 +290,11 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
     const queryLesemodus = searchParams.get(behandlingQueryKeys.lesemodus) === "true";
     const [nextStep, setNextStep] = useState<number>(undefined);
+    // Beholder `query`/`hash` fra det opprinnelige `onStepChange`-kallet slik at de ikke går tapt
+    // når selve navigeringen utsettes (f.eks. mens en mutasjon pågår eller brukeren må bekrefte
+    // ulagrede endringer) - uten dette hoppet man til riktig steg, men mistet `tab`/`saksnummer`.
+    const [nextQuery, setNextQuery] = useState<Record<string, string>>(undefined);
+    const [nextHash, setNextHash] = useState<string>(undefined);
     const [nextTab, setNextTab] = useState<string>(undefined);
     const ref = useRef<HTMLDialogElement>(null);
     const erVirkningstidspunktNåværendeMånedEllerFramITid = isAfterEqualsDate(
@@ -299,7 +304,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
     const onConfirm = () => {
         ref.current?.close();
-        setActiveStep(nextStep);
+        setActiveStep(nextStep, nextQuery, nextHash);
         setPageErrorsOrUnsavedState({ ...pageErrorsOrUnsavedState, [activeStep]: { error: false } });
     };
 
@@ -340,13 +345,6 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     }, [behandling.roller]);
 
     useEffect(() => {
-        console.log(
-            "Mutation status changed",
-            mutationStatus,
-            mutationStatusDerived,
-            navigatingToNextPage,
-            navigatingToNextTab,
-        );
         if (mutating) {
             setMutationStatusDerived("pending");
         } else if (mutating === false && mutationStatus === "success") {
@@ -377,7 +375,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
         if (navigatingToNextPage) {
             if (mutationStatusDerived !== "error") {
-                setActiveStep(nextStep);
+                setActiveStep(nextStep, nextQuery, nextHash);
             }
             setNavigatingToNextPage(false);
         }
@@ -395,6 +393,8 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         navigatingToNextPage,
         navigatingToNextTab,
         nextStep,
+        nextQuery,
+        nextHash,
         nextTab,
         setNavigatingToNextTab,
         setNavigatingToNextPage,
@@ -500,10 +500,14 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
                     (currentPageErrors.openFields && Object.values(currentPageErrors.openFields).some((open) => open)))
             ) {
                 setNextStep(x);
+                setNextQuery(query);
+                setNextHash(hash);
                 ref.current?.showModal();
             } else if (mutating || mutationStatusDerived === "pending" || debouncingRef.current) {
                 setNavigatingToNextPage(true);
                 setNextStep(x);
+                setNextQuery(query);
+                setNextHash(hash);
             } else {
                 setActiveStep(x, query, hash);
             }
@@ -518,6 +522,8 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             setPageTabs,
             setActiveStep,
             setNextStep,
+            setNextQuery,
+            setNextHash,
             setNavigatingToNextPage,
             setNextStep,
             activeStep,

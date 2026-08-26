@@ -105,7 +105,8 @@ const Main = () => {
                         label={text.label.andreBarn}
                     />
                 </Tabs.List>
-                {visibleSøknadsBarnUnderholdskostnader.map((underhold, index) => {
+                {visibleSøknadsBarnUnderholdskostnader.map((underhold) => {
+                    const index = søknadsBarnUnderholdskostnader.findIndex((u) => u.id === underhold.id);
                     return (
                         <Tabs.Panel
                             key={`underholdskostnadTabPanel-${underhold.gjelderBarn.id}`}

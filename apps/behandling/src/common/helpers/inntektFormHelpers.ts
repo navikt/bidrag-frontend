@@ -271,6 +271,19 @@ export const getSaksnummerForIdent = (
     ident: string,
 ) => roller.find((r) => r.ident === ident && r.rolletype === Rolletype.BA)?.saksnummer ?? "";
 
+/**
+ * Brukes til å filtrere bort personer/roller som ikke tilhører aktivt valgt saksnummer i
+ * `BarnebidragSideMenu` (relevant for forholdsmessig fordeling, hvor en behandling kan
+ * dekke flere saksnummer samtidig). Dersom `selectedSaksnummer` ikke er satt ennå
+ * (f.eks. før `SakHeader` har rukket å synkronisere valgt sak), vises alle.
+ * BP (bidragspliktig) er alltid del av alle saker i behandlingen, og filtreres derfor aldri bort.
+ */
+export const erDelAvValgtSaksnummer = (
+    saksnummer: string | undefined | null,
+    selectedSaksnummer?: string,
+    rolletype?: Rolletype,
+) => rolletype === Rolletype.BP || !selectedSaksnummer || saksnummer === selectedSaksnummer;
+
 export const checkIfRolleHasValideringsfeil = (valideringsfeil?: InntektValideringsfeilV2Dto) => {
     return (
         valideringsfeil &&

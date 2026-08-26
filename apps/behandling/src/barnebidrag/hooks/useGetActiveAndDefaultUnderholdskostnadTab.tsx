@@ -35,7 +35,12 @@ export const useGetActiveAndDefaultUnderholdskostnadTab = (visibleUnderholdskost
         return toUnderholdskostnadTabQueryParameter(firstTab?.gjelderBarn?.id, firstTab?.id, true);
     }, [selectedTab, visibleTabs]);
 
-    const activeTab = selectedTab ?? defaultTab;
+    // `selectedTab` (fra URL) kan peke på en fane som ikke lenger er gyldig for den synlige
+    // (evt. saksnummer-filtrerte) listen - f.eks. dersom man navigerer inn fra et annet steg som
+    // satt `tab`-parameteren til en helt annen rolle-id. `defaultTab` har allerede validert dette
+    // og faller tilbake til første synlige barn, så `activeTab` skal alltid bruke den - ikke den
+    // rå (potensielt ugyldige) `selectedTab`-verdien direkte.
+    const activeTab = defaultTab;
 
     return [activeTab, defaultTab];
 };

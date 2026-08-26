@@ -2322,6 +2322,7 @@ export interface TotalBeregningUtgifterDto {
 export interface UnderholdBarnDto {
   /** @format int64 */
   id?: number | null;
+  rolleId?: number | null;
   navn?: string | null;
   ident?: string | null;
   /** @format date */
