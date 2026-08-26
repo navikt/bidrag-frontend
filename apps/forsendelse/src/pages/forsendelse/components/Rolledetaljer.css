@@ -1,0 +1,4 @@
+.rolledetaljer {
+    display: flex;
+    flex-direction: column;
+}

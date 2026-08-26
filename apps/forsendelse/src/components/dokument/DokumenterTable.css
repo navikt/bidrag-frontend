@@ -1,0 +1,7 @@
+.dokument-table .dokument-row.error {
+    border-left: 5px solid var(--ax-border-danger);
+}
+
+.dokument-table .dokument-row:focus {
+    border: 1px solid var(--ax-border-danger);
+}

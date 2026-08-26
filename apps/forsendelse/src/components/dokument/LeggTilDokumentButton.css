@@ -1,0 +1,58 @@
+tr.dokumentrad {
+    border-left: 2px solid var(--ax-border-neutral);
+    border-right: 2px solid var(--ax-border-neutral);
+}
+
+tr.dokumentrad.last {
+    border-bottom: 2px solid var(--ax-border-neutral);
+}
+
+tr.journalpostrad.open {
+    border-left: 2px solid var(--ax-border-neutral);
+    border-right: 2px solid var(--ax-border-neutral);
+    border-top: 2px solid var(--ax-border-neutral);
+}
+
+/* .dokumentrad {
+  background-color: var(--ax-bg-neutral-soft);
+}
+
+.dokumentrad:hover {
+  background-color: var(--ax-bg-neutral-soft);
+} */
+
+/*:not(.navds-table__row--selected):not(:hover)*/
+:root {
+    --bidrag-table-width: 1092px;
+}
+
+.bisys-table-container {
+    display: block;
+    overflow: auto;
+    width: 100%;
+    height: inherit;
+}
+
+.bisys-table-container table {
+    width: var(--bidrag-table-width);
+}
+
+.legg_til_dokument_modal {
+    width: 80vw;
+    max-width: 1200px;
+    height: max-content;
+    max-height: 1000px;
+    padding: "1rem 2rem";
+    overflow: hidden;
+}
+.legg_til_dokument_modal div[role="tabpanel"] {
+    height: 60vh;
+}
+
+.legg_til_dokument_modal .navds-accordion__content .bisys-table-container {
+    overflow: unset;
+}
+
+.legg_til_dokument_modal .navds-accordion__header {
+    width: var(--bidrag-table-width);
+}

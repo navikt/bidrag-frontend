@@ -1,0 +1,14 @@
+.person-detaljer {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    height: fit-content;
+    width: max-content;
+}
+
+.person-detaljer svg.person-circle {
+    scale: 1.8;
+    margin-right: 5px;
+    min-width: 15px;
+}

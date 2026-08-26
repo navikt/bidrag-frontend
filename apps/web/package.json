@@ -13,6 +13,7 @@
         "@bidrag/admin-app": "workspace:*",
         "@bidrag/api": "workspace:*",
         "@bidrag/behandling": "workspace:*",
+        "@bidrag/forsendelse": "workspace:*",
         "@bidrag/common": "workspace:*",
         "@bidrag/utils": "workspace:*",
         "@grafana/faro-react": "^2.7.1",

@@ -1,0 +1,17 @@
+/* Bibliotek-stilark for @bidrag/forsendelse. Importeres av apps/web/app/index.css.
+   Skal IKKE importere "tailwindcss" selv - da får vi to Tailwind-instanser. */
+
+figure {
+    border: thin #c0c0c0 solid;
+    display: flex;
+    flex-flow: column;
+    padding: 5px;
+    max-width: 50rem;
+}
+
+figcaption {
+    background-color: var(--ax-neutral-300);
+    font: italic smaller sans-serif;
+    padding: 3px;
+    text-align: center;
+}

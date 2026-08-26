@@ -1,0 +1,18 @@
+.static_data dl {
+    padding: 0 20px 0 5px;
+}
+
+.static_data dl:last-child {
+    border: none;
+}
+
+.static_data dl dd {
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+.forsendelse_description_list {
+    display: grid;
+    grid-template-columns: max-content max-content max-content max-content;
+    gap: 0 15px;
+}
