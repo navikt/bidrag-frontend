@@ -19,6 +19,7 @@ import {
     Heading,
     HStack,
     Link,
+    Loader,
     Modal,
     Popover,
     Tag,
@@ -121,6 +122,7 @@ export default function JournalpostTabell({
     const [kunVedtak, setKunVedtak] = useState(false);
     const [expandedRowIds, setExpandedRowIds] = useState<string[]>([]);
     const [filterÅpen, setFilterÅpen] = useState(false);
+    const [mbdokLaster, setMbdokLaster] = useState<Set<string>>(new Set());
     const filterKnappRef = useRef<HTMLButtonElement>(null);
 
     const visKunFarskapUtelukket = !kunVedtak && visFarskapUtelukket;
@@ -176,7 +178,23 @@ export default function JournalpostTabell({
         return hoveddokRef ? `/dokument/${journalpostId}/${hoveddokRef}` : undefined;
     };
 
+    const MBDOK_SPINNER_VARIGHET_MS = 5000;
+
+    const mbdokNøkkel = (journalpostId: string, dokumentreferanse: string) => `${journalpostId}-${dokumentreferanse}`;
+
     const åpneMbdokDokument = (journalpostId: string, dokumentreferanse: string) => {
+        const nøkkel = mbdokNøkkel(journalpostId, dokumentreferanse);
+        if (mbdokLaster.has(nøkkel)) return;
+
+        setMbdokLaster((prev) => new Set(prev).add(nøkkel));
+        window.setTimeout(() => {
+            setMbdokLaster((prev) => {
+                const neste = new Set(prev);
+                neste.delete(nøkkel);
+                return neste;
+            });
+        }, MBDOK_SPINNER_VARIGHET_MS);
+
         OpenDocumentUtils.openMbdokDocument(journalpostId, dokumentreferanse).catch((error: unknown) => {
             window.alert(error instanceof Error ? error.message : "Kunne ikke åpne dokumentet");
         });
@@ -199,6 +217,9 @@ export default function JournalpostTabell({
             const kanÅpnesMedMbdok = Boolean(
                 dok.status === DokumentStatus.UNDER_PRODUKSJON && dok.dokumentreferanse && rad.jp.journalpostId,
             );
+            const mbdokLasterForDok =
+                kanÅpnesMedMbdok &&
+                mbdokLaster.has(mbdokNøkkel(rad.jp.journalpostId as string, dok.dokumentreferanse as string));
 
             return (
                 <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
@@ -213,17 +234,22 @@ export default function JournalpostTabell({
                             {dok.tittel ?? dok.dokumentreferanse}
                         </Link>
                     ) : kanÅpnesMedMbdok ? (
-                        <Link
-                            className="min-w-0 truncate"
-                            href="#"
-                            title={dok.tittel ?? dok.dokumentreferanse ?? ""}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                åpneMbdokDokument(rad.jp.journalpostId as string, dok.dokumentreferanse as string);
-                            }}
-                        >
-                            {dok.tittel ?? dok.dokumentreferanse}
-                        </Link>
+                        <>
+                            <Link
+                                className="min-w-0 truncate"
+                                href="#"
+                                aria-disabled={mbdokLasterForDok}
+                                title={dok.tittel ?? dok.dokumentreferanse ?? ""}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (mbdokLasterForDok) return;
+                                    åpneMbdokDokument(rad.jp.journalpostId as string, dok.dokumentreferanse as string);
+                                }}
+                            >
+                                {dok.tittel ?? dok.dokumentreferanse}
+                            </Link>
+                            {mbdokLasterForDok && <Loader size="xsmall" title="Åpner dokument …" />}
+                        </>
                     ) : (
                         <span className="min-w-0 truncate">{dok.tittel ?? "-"}</span>
                     )}
@@ -255,21 +281,25 @@ export default function JournalpostTabell({
 
         if (rad.jp.status === JournalpostStatus.UNDER_PRODUKSJON && rad.jp.journalpostId && hoveddokRef) {
             const journalpostId = rad.jp.journalpostId;
+            const mbdokLasterForJp = mbdokLaster.has(mbdokNøkkel(journalpostId, hoveddokRef));
             return (
                 <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <Link
                         className="min-w-0 truncate"
                         href="#"
+                        aria-disabled={mbdokLasterForJp}
                         title={tekst}
                         aria-label="Åpne dokument"
                         onClick={(e) => {
                             e.preventDefault();
+                            if (mbdokLasterForJp) return;
                             åpneMbdokDokument(journalpostId, hoveddokRef);
                         }}
                     >
                         {tekst}
                     </Link>
+                    {mbdokLasterForJp && <Loader size="xsmall" title="Åpner dokument …" />}
                 </HStack>
             );
         }
@@ -488,6 +518,7 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
+                    className="[&_tbody_tr:has(td:first-child_button)]:cursor-pointer"
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
                     //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
