@@ -306,7 +306,9 @@ export default function SamhandlerSøk() {
     };
 
     return (
-        <VStack gap={"space-32"} padding={'space-24'}>
+        <VStack gap={"space-32"} padding={'space-24'} maxWidth={"1920px"} justify={"center"}
+                marginInline={"auto"}
+                width={"100%"}>
             <Heading level="1" size="large">
                 Søk samhandler
             </Heading>

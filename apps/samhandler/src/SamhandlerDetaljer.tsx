@@ -16,6 +16,7 @@ import {
 } from "@navikt/ds-react";
 import { memo, Suspense, useState } from "react";
 import { QueryErrorWrapper } from "./QueryErrorBoundary";
+import styles from "./SamhandlerDetaljer.module.css";
 import SamhandlerForm from "./SamhandlerForm";
 import type { Samhandler } from "./SamhandlerSøk";
 import {
@@ -31,8 +32,8 @@ type InfoRowProps = { label: string; value: React.ReactNode };
 function InfoRow({ label, value }: InfoRowProps) {
     return (
         <VStack gap={"space-2"}>
-            <Label size="small" textColor={"subtle"}>
-                {label.toUpperCase()}
+            <Label size="small" textColor={"subtle"} className={styles.infoRowLabel}>
+                {label}
             </Label>
             <BodyShort>{value}</BodyShort>
         </VStack>
