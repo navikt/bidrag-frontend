@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { PadlockLockedIcon, PencilIcon, PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { BodyLong, Button, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
+import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
+import { BodyLong, Box, Button, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import DiskresjonAlert from "./components/DiskresjonAlert.tsx";
@@ -58,37 +58,24 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
     return (
         <VStack gap="space-4">
             <HStack gap="space-4" align="start" justify="space-between" wrap={false}>
-                <div className="flex gap-3 flex-1">
-                    {rolle?.diskresjonskode ? (
-                        <PadlockLockedIcon
-                            aria-hidden
-                            fontSize="1.8rem"
-                            className="font-semibold text-ax-warning-900 flex-shrink-0 mt-1"
-                        />
-                    ) : (
-                        <PersonIcon
-                            aria-hidden
-                            fontSize="1.5rem"
-                            className="text-ax-brand-blue-600 flex-shrink-0 mt-1"
-                        />
-                    )}
-                    <div className="flex-1">
-                        <PersonInfo
-                            navn={rolle.navn}
-                            ident={rolle.fodselsnummer}
-                            fødselsdato={rolle.fødselsdato}
-                            tags={
-                                erNyForelder && (
-                                    <Tag variant="alt1" size="xsmall">
-                                        Ny
-                                    </Tag>
-                                )
-                            }
-                        />
-                        {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
-                    </div>
-                </div>
-                <HStack gap="space-2" className="flex-shrink-0">
+                <PersonInfo
+                    navn={rolle.navn}
+                    ident={rolle.fodselsnummer}
+                    fødselsdato={rolle.fødselsdato}
+                    rolle={rolle.type}
+                    visModiaLenke
+                    tags={
+                        erNyForelder && (
+                            <Tag variant="alt1" size="xsmall">
+                                Ny
+                            </Tag>
+                        )
+                    }
+                >
+                    {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
+                    <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} />
+                </PersonInfo>
+                <HStack gap="space-8" wrap={false}>
                     {!visSøk && erNyForelder && (
                         <Button
                             variant="tertiary"
@@ -115,28 +102,25 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
             </HStack>
 
             {visSøk && (
-                <div className="mt-2 p-4 bg-ax-accent-100 rounded-lg border border-ax-accent-300">
-                    <VStack gap="space-4">
-                        <div>
+                <Box background="accent-soft" borderColor="accent" borderWidth="1" borderRadius="12" padding="space-16">
+                    <VStack gap="space-16">
+                        <VStack gap="space-4">
                             <Heading level="3" size="small">
                                 Endre {forelderRolleNavn}
                             </Heading>
-                            <BodyLong size="small" className="text-ax-neutral-800 mt-1">
+                            <BodyLong size="small" textColor="subtle">
                                 Søk opp personen som skal være {forelderRolleNavn} i saken
                             </BodyLong>
-                        </div>
+                        </VStack>
 
                         <SøkPerson label={`Søk etter ${forelderRolleNavn}`} personInformasjon={handlePersonValgt} />
 
-                        <div>
-                            <Button size="small" variant="tertiary" onClick={() => setVisSøk(false)} type="button">
-                                Avbryt
-                            </Button>
-                        </div>
+                        <Button size="small" variant="tertiary" onClick={() => setVisSøk(false)} type="button">
+                            Avbryt
+                        </Button>
                     </VStack>
-                </div>
+                </Box>
             )}
-            <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} />
         </VStack>
     );
 }

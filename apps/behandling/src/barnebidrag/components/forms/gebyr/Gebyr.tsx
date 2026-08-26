@@ -1,5 +1,5 @@
 import { type GebyrDtoV3, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
-import { PersonNavnIdent, RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
+import { ModiaLink, PersonNavnIdent, RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
 import { BodyShort, Box, Heading, Label } from "@navikt/ds-react";
 import { type UseMutationResult, useSuspenseQueries } from "@tanstack/react-query";
 import { Fragment, useCallback, useEffect, useMemo } from "react";
@@ -9,7 +9,6 @@ import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { FormControlledSelectField } from "../../../../common/components/formFields/FormControlledSelectField";
 import { FormControlledTextarea } from "../../../../common/components/formFields/FormControlledTextArea";
 import AinntektLink from "../../../../common/components/inntekt/AinntektLink";
-import ModiaLink from "../../../../common/components/inntekt/ModiaLink";
 import { NyOpplysningerAlert } from "../../../../common/components/inntekt/NyOpplysningerAlert";
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";

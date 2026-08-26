@@ -1,20 +1,22 @@
-import { Alert, BodyShort, Button, Radio, RadioGroup, Stack } from "@navikt/ds-react";
-import { useEffect, useState } from "react";
+import { PersonPencilIcon } from "@navikt/aksel-icons";
+import { Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react";
+import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import FunnetPersonInfo from "./components/FunnetPersonInfo.tsx";
-import ReellMottakerSøk from "./components/ReellMottakerSøk.tsx";
-import type { SakRedigeringData } from "./sakvisning-schema.ts";
+import { useParams } from "react-router";
+
+import ReellMottakerValgGruppe, { type ReellMottakerValg } from "./components/ReellMottakerValgGruppe.tsx";
+import type { BarnRolle, SakRedigeringData } from "./sakvisning-schema.ts";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;
     rolleIndex: number;
     onAvbryt: () => void;
-    onSelect?: () => void;
     disabled?: boolean;
     kanFjerne?: boolean;
     isRequired?: boolean;
     feil?: string;
     kunSamhandlerSomReellMottaker?: boolean;
+    onBekreft?: () => void;
 }
 
 export default function ReellMottakerVelger({
@@ -23,165 +25,109 @@ export default function ReellMottakerVelger({
     disabled,
     onAvbryt,
     feil,
-    onSelect,
     kanFjerne = false,
     isRequired = false,
     kunSamhandlerSomReellMottaker = false,
+    onBekreft,
 }: ReellMottakerVelgerProps) {
     const form = useFormContext<SakRedigeringData>();
+    const { saksnummer } = useParams();
     const barn = useWatch({
         control: form.control,
         name: `roller.${rolleIndex}`,
+    }) as BarnRolle | undefined;
+
+    // Utkast, slik at endringsoppsummeringen bak modalen først oppdateres ved bekreftelse.
+    const [utkast, setUtkast] = useState<ReellMottakerValg>(() => {
+        const eksisterendeValg = {
+            type: barn?.reellMottakerType,
+            ident: barn?.reellMottaker,
+            navn: barn?.reellMottakerNavn,
+        };
+
+        if (kunSamhandlerSomReellMottaker && eksisterendeValg.type === "barnet_selv") {
+            return { type: "samhandler" };
+        }
+
+        if (isRequired && !eksisterendeValg.type) {
+            return kunSamhandlerSomReellMottaker
+                ? { type: "samhandler" }
+                : { type: "barnet_selv", ident: barn?.fodselsnummer, navn: barnNavn };
+        }
+
+        return eksisterendeValg;
     });
-
-    const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(null);
-    const kunSamhandlerFeilmelding =
-        "Barnet selv kan ikke velges som reell mottaker i oppfostringsbidrag. Velg samhandler (kommune).";
-    const samhandlerIdent = form.watch(`roller.${rolleIndex}.reellMottaker`);
-    const samhandlerNavn = form.watch(`roller.${rolleIndex}.reellMottakerNavn`);
-
-    useEffect(() => {
-        if (barn?.reellMottakerType === "samhandler" && samhandlerIdent && samhandlerNavn) {
-            setLagretSamhandler({ ident: samhandlerIdent, navn: samhandlerNavn });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [barn?.reellMottakerType, samhandlerIdent, samhandlerNavn]);
-
-    useEffect(() => {
-        if (!isRequired || !barn) {
-            return;
-        }
-        if (barn.reellMottakerType && barn.reellMottakerType !== "ingen") {
-            return;
-        }
-
-        if (kunSamhandlerSomReellMottaker) {
-            form.setValue(`roller.${rolleIndex}.reellMottakerType`, "samhandler");
-            form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident);
-            form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn);
-            return;
-        }
-
-        form.setValue(`roller.${rolleIndex}.reellMottakerType`, "barnet_selv");
-        form.setValue(`roller.${rolleIndex}.reellMottaker`, barn.fodselsnummer);
-        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, barn.navn);
-    }, [barn, form, isRequired, kunSamhandlerSomReellMottaker, lagretSamhandler, rolleIndex]);
-
-    useEffect(() => {
-        if (!kunSamhandlerSomReellMottaker || !barn || barn.reellMottakerType !== "barnet_selv") {
-            return;
-        }
-
-        form.setValue(`roller.${rolleIndex}.reellMottakerType`, "samhandler");
-        form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident);
-        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn);
-    }, [barn, form, kunSamhandlerSomReellMottaker, lagretSamhandler, rolleIndex]);
-
-    const handleRadioChange = (value: string) => {
-        if (value === "ingen") {
-            fjernSamhandler();
-            return;
-        }
-
-        const nyType = value as "barnet_selv" | "samhandler";
-
-        if (kunSamhandlerSomReellMottaker && nyType === "barnet_selv") {
-            form.setValue(`roller.${rolleIndex}.reellMottakerType`, "samhandler");
-            form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler?.ident);
-            form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler?.navn);
-            return;
-        }
-
-        if (nyType === "barnet_selv") {
-            if (barn?.reellMottakerType === "samhandler" && samhandlerIdent && samhandlerNavn) {
-                setLagretSamhandler({ ident: samhandlerIdent, navn: samhandlerNavn });
-            }
-
-            form.setValue(`roller.${rolleIndex}.reellMottakerType`, "barnet_selv");
-            form.setValue(`roller.${rolleIndex}.reellMottaker`, barn.fodselsnummer);
-            form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, barn.navn);
-            onSelect?.();
-        } else if (nyType === "samhandler") {
-            form.setValue(`roller.${rolleIndex}.reellMottakerType`, "samhandler");
-
-            if (lagretSamhandler) {
-                form.setValue(`roller.${rolleIndex}.reellMottaker`, lagretSamhandler.ident);
-                form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, lagretSamhandler.navn);
-            } else {
-                form.setValue(`roller.${rolleIndex}.reellMottaker`, undefined);
-                form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, undefined);
-            }
-        }
-    };
-
-    const fjernSamhandler = () => {
-        form.setValue(`roller.${rolleIndex}.reellMottakerType`, undefined);
-        form.setValue(`roller.${rolleIndex}.reellMottaker`, undefined);
-        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, undefined);
-    };
+    const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(() =>
+        utkast.type === "samhandler" && utkast.ident && utkast.navn ? { ident: utkast.ident, navn: utkast.navn } : null,
+    );
 
     if (!barn) {
         return null;
     }
 
+    const handleBekreft = () => {
+        form.setValue(`roller.${rolleIndex}.reellMottakerType`, utkast.type);
+        form.setValue(`roller.${rolleIndex}.reellMottaker`, utkast.ident);
+        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, utkast.navn, { shouldValidate: true });
+        onBekreft?.();
+    };
+
+    const handleValg = (nyttValg: ReellMottakerValg) => {
+        if (utkast.type === "samhandler" && utkast.ident && utkast.navn && nyttValg.type !== "samhandler") {
+            setLagretSamhandler({ ident: utkast.ident, navn: utkast.navn });
+        }
+
+        if (nyttValg.type === "samhandler" && nyttValg.ident && nyttValg.navn) {
+            setLagretSamhandler({ ident: nyttValg.ident, navn: nyttValg.navn });
+        }
+
+        setUtkast(nyttValg);
+    };
+
+    const kanBekrefte =
+        utkast.type === "samhandler"
+            ? Boolean(utkast.ident)
+            : !isRequired || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
+
     return (
-        <div className="space-y-4">
-            <RadioGroup
-                size="small"
-                legend={
-                    <div className="flex flex-row gap-2 items-center">
-                        <BodyShort size="small">Hvem er reell mottaker?</BodyShort>
-                        <div className="flex gap-2">
-                            <Button
-                                size="small"
-                                variant="tertiary"
-                                type="button"
-                                onClick={onAvbryt}
-                                disabled={disabled}
-                            >
-                                Lukk
-                            </Button>
-                        </div>
-                    </div>
-                }
-                value={barn.reellMottakerType || "ingen"}
-                onChange={handleRadioChange}
-                disabled={disabled}
-                error={feil}
-            >
-                <Stack gap={{ xs: "space-0", sm: "space-24" }} direction={{ xs: "column", sm: "row" }} wrap={false}>
-                    <Radio value="ingen" disabled={isRequired || !kanFjerne}>
-                        Ingen
-                    </Radio>
-                    <Radio disabled={kunSamhandlerSomReellMottaker} value="barnet_selv">
-                        {barnNavn} (barnet selv)
-                    </Radio>
-                    <Radio value="samhandler">Søk samhandler</Radio>
-                </Stack>
-            </RadioGroup>
+        <Modal open onClose={onAvbryt} width="medium" aria-label="Endre reell mottaker">
+            <Modal.Header>
+                <VStack gap="space-2">
+                    {saksnummer && <Detail>Sak {saksnummer}</Detail>}
+                    <HStack gap="space-4" align="center" wrap={false}>
+                        <PersonPencilIcon aria-hidden fontSize="1.5rem" />
+                        <Heading level="2" size="medium">
+                            Endre reell mottaker av barnebidraget
+                        </Heading>
+                    </HStack>
+                </VStack>
+            </Modal.Header>
 
-            {kunSamhandlerSomReellMottaker && (
-                <Alert variant="warning" size="small">
-                    {kunSamhandlerFeilmelding}
-                </Alert>
-            )}
-
-            {barn.reellMottakerType === "samhandler" && (
-                <ReellMottakerSøk
-                    barnIndex={rolleIndex}
-                    valgtSamhandlerId={samhandlerIdent ?? lagretSamhandler?.ident}
-                    onSelect={onSelect}
-                />
-            )}
-
-            {barn.reellMottakerType === "samhandler" && samhandlerNavn && samhandlerIdent && (
-                <FunnetPersonInfo
-                    label="Reell mottaker:"
-                    navn={samhandlerNavn}
-                    ident={samhandlerIdent}
+            <Modal.Body>
+                <ReellMottakerValgGruppe
+                    barnNavn={barnNavn}
+                    barnIdent={barn.fodselsnummer}
+                    barnFødselsdato={barn.fødselsdato}
+                    valg={utkast}
+                    lagretSamhandler={lagretSamhandler}
+                    onValg={handleValg}
+                    visBarnekort
+                    kanFjerne={kanFjerne}
+                    isRequired={isRequired}
+                    kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
                     disabled={disabled}
+                    feil={feil}
                 />
-            )}
-        </div>
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button type="button" onClick={handleBekreft} disabled={disabled || !kanBekrefte}>
+                    Legg til
+                </Button>
+                <Button type="button" variant="secondary" onClick={onAvbryt} disabled={disabled}>
+                    Avbryt
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 }
