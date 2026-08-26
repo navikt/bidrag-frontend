@@ -39,12 +39,12 @@ const SamhandlerDetaljerContent = memo(
         };
 
         return (
-            <VStack gap="space-6">
+            <VStack gap="space-6" >
                 {!isEditing && (
                     <>
                         {/* Header card */}
                         <Box
-                            background="default"
+                            background="neutral-soft"
                             borderRadius="0 16 4"
                             borderWidth="1"
                             borderColor="accent-subtle"
@@ -253,7 +253,7 @@ export default function SamhandlerDetaljer({ samhandlerId: id }: { samhandlerId?
     }
 
     return (
-        <div className="flex justify-center px-4 py-8">
+        <VStack className="flex justify-center" padding={"space-12 space-96"}>
             <div className="w-full max-w-4xl">
                 <VStack gap="space-6">
                     <div>
@@ -271,7 +271,7 @@ export default function SamhandlerDetaljer({ samhandlerId: id }: { samhandlerId?
                     </QueryErrorWrapper>
                 </VStack>
             </div>
-        </div>
+        </VStack>
     );
 }
 

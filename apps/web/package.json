@@ -10,7 +10,6 @@
         "typecheck": "react-router typegen && tsc --noEmit"
     },
     "dependencies": {
-        "@bidrag/admin-app": "workspace:*",
         "@bidrag/api": "workspace:*",
         "@bidrag/behandling": "workspace:*",
         "@bidrag/common": "workspace:*",
