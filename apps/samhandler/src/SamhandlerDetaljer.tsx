@@ -39,7 +39,7 @@ const SamhandlerDetaljerContent = memo(
         };
 
         return (
-            <VStack gap="space-6" >
+            <VStack gap="space-6">
                 {!isEditing && (
                     <>
                         {/* Header card */}
