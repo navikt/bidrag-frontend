@@ -1,3 +1,4 @@
+import { BIDRAG_PERSON_API } from "@bidrag/api";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 
@@ -35,10 +36,19 @@ export default function PersonSøkPage({ loaderData }: Route.ComponentProps) {
             return;
         }
 
-        const kanal = new BroadcastChannel(PERSONSOK_RESULT_EVENT);
-        kanal.postMessage(JSON.stringify({ id: windowId, ok: true, ident: aktorid }));
-        kanal.close();
-        window.close();
+        void (async () => {
+            const kanal = new BroadcastChannel(PERSONSOK_RESULT_EVENT);
+
+            try {
+                const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident: aktorid });
+                kanal.postMessage(JSON.stringify({ id: windowId, ok: true, ident: data.ident }));
+            } catch {
+                kanal.postMessage(JSON.stringify({ id: windowId, ok: false }));
+            } finally {
+                kanal.close();
+                window.close();
+            }
+        })();
     }, [aktorid, personsokUrl, windowId]);
 
     if (!personsokUrl) {

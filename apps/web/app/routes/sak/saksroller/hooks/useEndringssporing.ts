@@ -15,6 +15,10 @@ function lagRolleEndringSignaturUtenAdvarsel(endringsliste: ReturnType<typeof la
     return JSON.stringify(endringsliste.map(({ harUfullstendigRelasjon, ...rolleEndring }) => rolleEndring));
 }
 
+export function skalRapportereEndring(harEndringer: boolean, hopperOverTilbakestilling: boolean): boolean {
+    return !hopperOverTilbakestilling || harEndringer;
+}
+
 export function useEndringssporing({
     opprinneligeRoller,
     nåværendeRoller,
@@ -54,6 +58,9 @@ export function useEndringssporing({
 
         if (hoppOverPåfølgendeTilbakestillingRef.current) {
             hoppOverPåfølgendeTilbakestillingRef.current = false;
+            if (skalRapportereEndring(harEndringer, true)) {
+                onNyEndring();
+            }
             return;
         }
 
