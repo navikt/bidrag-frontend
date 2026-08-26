@@ -256,7 +256,11 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             const stepKey = Object.keys(steps).find((k) => steps[k] === x);
             const updatedSearchParams = [
                 [behandlingQueryKeys.steg, stepKey],
-                ...getAllSearchParamsExcludingKeys(behandlingQueryKeys.steg, behandlingQueryKeys.tab).entries(),
+                ...getAllSearchParamsExcludingKeys(
+                    behandlingQueryKeys.steg,
+                    behandlingQueryKeys.tab,
+                    behandlingQueryKeys.saksnummer,
+                ).entries(),
                 ...(query ? Object.entries(query) : []),
             ];
 

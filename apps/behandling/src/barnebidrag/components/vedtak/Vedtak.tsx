@@ -53,7 +53,6 @@ const Vedtak = () => {
     const kanViseFatteVedtakKnapp =
         !beregning?.feil && beregning?.resultat && beregning.resultat.kanFatteVedtak && !beregning?.ugyldigBeregning;
     useEffect(() => {
-
         queryClient.refetchQueries({ queryKey: QueryKeys.behandlingV2(behandlingId) });
         queryClient.refetchQueries({ queryKey: QueryKeys.beregnBarnebidrag(false) });
         if (lesemodusBehandling?.erOrkestrertVedtak || (vedtakstype === Vedtakstype.KLAGE && !lesemodus)) {
