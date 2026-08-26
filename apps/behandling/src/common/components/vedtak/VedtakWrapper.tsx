@@ -54,35 +54,55 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             feilInnhold.privatAvtale.forEach((value) => {
                 if (value?.manglerBegrunnelse === true) {
                     feilliste.push(
-                        <ErrorSummary.Item onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Begrunnelse må fylles ut for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.ingenLøpendePeriode === true) {
                     feilliste.push(
-                        <ErrorSummary.Item onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Det må legges til løpende periode for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.manglerAvtaledato === true) {
                     feilliste.push(
-                        <ErrorSummary.Item onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Avtaledato mangler for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.måVelgeVedtakHvisAvtaletypeErVedtakFraNav === true) {
                     feilliste.push(
-                        <ErrorSummary.Item onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Innkreving: Vedtak må velges når "Vedtak fra Nav" er valgt for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.harPeriodiseringsfeil) {
                     feilliste.push(
-                        <ErrorSummary.Item onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Perioder for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
@@ -203,7 +223,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 // `selectedSaksnummer` til riktig sak (relevant ved forholdsmessig fordeling).
                 const samværTabQuery = medSaksnummer(
                     { [behandlingQueryKeys.tab]: value.samværId?.toString() },
-                    roller.find((r) => r.ident === value.gjelderBarn)?.saksnummer,
+                    value.gjelderRolle?.saksnummer,
                 );
                 if (value.harPeriodiseringsfeil)
                     feilliste.push(

@@ -254,28 +254,36 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     const setActiveStep = useCallback(
         (x: number, query?: Record<string, string>, hash?: string) => {
             const stepKey = Object.keys(steps).find((k) => steps[k] === x);
-            const updatedSearchParams = [
-                [behandlingQueryKeys.steg, stepKey],
-                ...getAllSearchParamsExcludingKeys(
-                    behandlingQueryKeys.steg,
-                    behandlingQueryKeys.tab,
-                    behandlingQueryKeys.saksnummer,
-                ).entries(),
-                ...(query ? Object.entries(query) : []),
-            ];
 
-            const updatedSearchParamsString = Object.entries(updatedSearchParams)
-                .map(([, [key, value]]) => `&${key}=${value}`)
-                .join("");
-
-            const url = `?${updatedSearchParamsString}${hash ? `#${hash}` : ""}`;
+            // Bruker `URLSearchParams` sitt `set`/`delete` fremfor manuell streng-bygging - den
+            // gamle løsningen produserte f.eks. den ugyldige verdien "undefined" (som streng) i
+            // URL-en når et query-felt (som `tab`/`saksnummer`) var `undefined`, noe som kunne
+            // hindre sidemenyen/SakHeader fra å synkronisere seg korrekt mot riktig steg/sak.
+            const params = getAllSearchParamsExcludingKeys(
+                behandlingQueryKeys.steg,
+                behandlingQueryKeys.tab,
+                behandlingQueryKeys.saksnummer,
+            );
+            if (stepKey) {
+                params.set(behandlingQueryKeys.steg, stepKey);
+            }
+            if (query) {
+                Object.entries(query).forEach(([key, value]) => {
+                    if (value === undefined || value === null) {
+                        params.delete(key);
+                    } else {
+                        params.set(key, value);
+                    }
+                });
+            }
 
             // Update state immediately for responsive UI
             if (stepKey) {
                 setActiveStepState(stepKey as stepDef);
             }
             trackTabNavigation(query?.tab);
-            navigate(`${location.pathname + url}`);
+            const searchString = params.toString();
+            navigate({ pathname: location.pathname, search: searchString ? `?${searchString}` : "", hash: hash ?? "" });
         },
         [location, steps],
     );

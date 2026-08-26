@@ -12,14 +12,12 @@
 
 type UtilRequiredKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 
-/** @default null */
 export enum NotatMalType {
   FORSKUDD = "FORSKUDD",
   SAeRBIDRAG = "SÆRBIDRAG",
   BIDRAG = "BIDRAG",
 }
 
-/** @default null */
 export enum Beslutningstype {
   AVVIST = "AVVIST",
   STADFESTELSE = "STADFESTELSE",
@@ -27,7 +25,6 @@ export enum Beslutningstype {
   DELVEDTAK = "DELVEDTAK",
 }
 
-/** @default null */
 export enum BehandlingsrefKilde {
   BEHANDLING_ID = "BEHANDLING_ID",
   BISYSSOKNAD = "BISYS_SØKNAD",
@@ -37,7 +34,6 @@ export enum BehandlingsrefKilde {
   REVURDERING_FORSKUDD = "REVURDERING_FORSKUDD",
 }
 
-/** @default null */
 export enum Grunnlagstype {
   UKJENT = "UKJENT",
   INNTEKT_SKATTELEMENT = "INNTEKT_SKATTELEMENT",
@@ -120,6 +116,7 @@ export enum Grunnlagstype {
   BARNETILLEGG_PERIODE = "BARNETILLEGG_PERIODE",
   BELOPSHISTORIKKBIDRAG = "BELØPSHISTORIKK_BIDRAG",
   BELOPSHISTORIKKBIDRAG18AR = "BELØPSHISTORIKK_BIDRAG_18_ÅR",
+  BELOPSHISTORIKKOPPFOSTRINGSBIDRAG = "BELØPSHISTORIKK_OPPFOSTRINGSBIDRAG",
   BELOPSHISTORIKKFORSKUDD = "BELØPSHISTORIKK_FORSKUDD",
   MANUELLE_VEDTAK = "MANUELLE_VEDTAK",
   MANUELT_OVERSTYRT_GEBYR = "MANUELT_OVERSTYRT_GEBYR",
@@ -169,7 +166,6 @@ export enum Grunnlagstype {
   VALUTAKURS_GRUNNLAG = "VALUTAKURS_GRUNNLAG",
 }
 
-/** @default null */
 export enum Behandlingstatus {
   DOMTAVSLUTTET = "DØMT_AVSLUTTET",
   ERKJENT_AVSLUTTET = "ERKJENT_AVSLUTTET",
@@ -196,7 +192,6 @@ export enum Behandlingstatus {
   VEDTAK_FATTET = "VEDTAK_FATTET",
 }
 
-/** @default null */
 export enum Vedtakstype {
   INDEKSREGULERING = "INDEKSREGULERING",
   ALDERSJUSTERING = "ALDERSJUSTERING",
@@ -210,7 +205,6 @@ export enum Vedtakstype {
   ENDRING_MOTTAKER = "ENDRING_MOTTAKER",
 }
 
-/** @default null */
 export enum Valutakode {
   ALL = "ALL",
   ANG = "ANG",
@@ -252,7 +246,6 @@ export enum Valutakode {
   PHP = "PHP",
 }
 
-/** @default null */
 export enum Utgiftstype {
   KONFIRMASJONSAVGIFT = "KONFIRMASJONSAVGIFT",
   KONFIRMASJONSLEIR = "KONFIRMASJONSLEIR",
@@ -264,7 +257,6 @@ export enum Utgiftstype {
   ANNET = "ANNET",
 }
 
-/** @default null */
 export enum TypeBehandling {
   FORSKUDD = "FORSKUDD",
   SAeRBIDRAG = "SÆRBIDRAG",
@@ -272,7 +264,6 @@ export enum TypeBehandling {
   BIDRAG18AR = "BIDRAG_18_ÅR",
 }
 
-/** @default null */
 export enum SoktAvType {
   BIDRAGSMOTTAKER = "BIDRAGSMOTTAKER",
   BIDRAGSPLIKTIG = "BIDRAGSPLIKTIG",
@@ -290,7 +281,6 @@ export enum SoktAvType {
   KONVERTERING = "KONVERTERING",
 }
 
-/** @default null */
 export enum Saerbidragskategori {
   KONFIRMASJON = "KONFIRMASJON",
   TANNREGULERING = "TANNREGULERING",
@@ -298,7 +288,6 @@ export enum Saerbidragskategori {
   ANNET = "ANNET",
 }
 
-/** @default null */
 export enum Stonadstype {
   BIDRAG = "BIDRAG",
   FORSKUDD = "FORSKUDD",
@@ -308,7 +297,6 @@ export enum Stonadstype {
   OPPFOSTRINGSBIDRAG = "OPPFOSTRINGSBIDRAG",
 }
 
-/** @default null */
 export enum SivilstandskodePDL {
   GIFT = "GIFT",
   UGIFT = "UGIFT",
@@ -322,7 +310,6 @@ export enum SivilstandskodePDL {
   GJENLEVENDE_PARTNER = "GJENLEVENDE_PARTNER",
 }
 
-/** @default null */
 export enum Sivilstandskode {
   GIFT_SAMBOER = "GIFT_SAMBOER",
   BOR_ALENE_MED_BARN = "BOR_ALENE_MED_BARN",
@@ -331,7 +318,6 @@ export enum Sivilstandskode {
   UKJENT = "UKJENT",
 }
 
-/** @default null */
 export enum Samvaersklasse {
   SAMVAeRSKLASSE0 = "SAMVÆRSKLASSE_0",
   SAMVAeRSKLASSE1 = "SAMVÆRSKLASSE_1",
@@ -341,13 +327,11 @@ export enum Samvaersklasse {
   DELT_BOSTED = "DELT_BOSTED",
 }
 
-/** @default null */
 export enum SamvaerskalkulatorNetterFrekvens {
   HVERTAR = "HVERT_ÅR",
   ANNETHVERTAR = "ANNET_HVERT_ÅR",
 }
 
-/** @default null */
 export enum SamvaerskalkulatorFerietype {
   JULNYTTAR = "JUL_NYTTÅR",
   VINTERFERIE = "VINTERFERIE",
@@ -357,7 +341,6 @@ export enum SamvaerskalkulatorFerietype {
   ANNET = "ANNET",
 }
 
-/** @default null */
 export enum Rolletype {
   BA = "BA",
   BM = "BM",
@@ -366,14 +349,12 @@ export enum Rolletype {
   RM = "RM",
 }
 
-/** @default null */
 export enum PrivatAvtaleType {
   PRIVAT_AVTALE = "PRIVAT_AVTALE",
   DOM_RETTSFORLIK = "DOM_RETTSFORLIK",
   VEDTAK_FRA_NAV = "VEDTAK_FRA_NAV",
 }
 
-/** @default null */
 export enum OpplysningerType {
   UKJENT = "UKJENT",
   ARBEIDSFORHOLD = "ARBEIDSFORHOLD",
@@ -406,13 +387,11 @@ export enum OpplysningerType {
   SUMMERTEARSINNTEKTER = "SUMMERTE_ÅRSINNTEKTER",
 }
 
-/** @default null */
 export enum Kilde {
   MANUELL = "MANUELL",
   OFFENTLIG = "OFFENTLIG",
 }
 
-/** @default null */
 export enum Inntektstype {
   AAP = "AAP",
   DAGPENGER = "DAGPENGER",
@@ -443,7 +422,6 @@ export enum Inntektstype {
   BARNETILLEGG_SUMMERT = "BARNETILLEGG_SUMMERT",
 }
 
-/** @default null */
 export enum Inntektsrapportering {
   AINNTEKT = "AINNTEKT",
   AINNTEKT_BEREGNET_3MND = "AINNTEKT_BEREGNET_3MND",
@@ -492,7 +470,6 @@ export enum Inntektsrapportering {
   SKATTEGRUNNLAG_KORRIGERT_FOR_BARNETILLEGG = "SKATTEGRUNNLAG_KORRIGERT_FOR_BARNETILLEGG",
 }
 
-/** @default null */
 export enum InntektBelopstype {
   ValueARSBELOP = "ÅRSBELØP",
   MANEDSBELOP = "MÅNEDSBELØP",
@@ -500,13 +477,11 @@ export enum InntektBelopstype {
   DAGSATS = "DAGSATS",
 }
 
-/** @default null */
 export enum Innkrevingstype {
   MED_INNKREVING = "MED_INNKREVING",
   UTEN_INNKREVING = "UTEN_INNKREVING",
 }
 
-/** @default null */
 export enum GrunnlagInntektEndringstype {
   ENDRING = "ENDRING",
   INGEN_ENDRING = "INGEN_ENDRING",
@@ -514,7 +489,6 @@ export enum GrunnlagInntektEndringstype {
   NY = "NY",
 }
 
-/** @default null */
 export enum Engangsbeloptype {
   DIREKTE_OPPGJOR = "DIREKTE_OPPGJOR",
   DIREKTEOPPGJOR = "DIREKTE_OPPGJØR",
@@ -530,7 +504,6 @@ export enum Engangsbeloptype {
   SAeRBIDRAG = "SÆRBIDRAG",
 }
 
-/** @default null */
 export enum Bostatuskode {
   MED_FORELDER = "MED_FORELDER",
   DOKUMENTERT_SKOLEGANG = "DOKUMENTERT_SKOLEGANG",
@@ -546,14 +519,12 @@ export enum Bostatuskode {
   ALENE = "ALENE",
 }
 
-/** @default null */
 export enum BeregnTil {
   OPPRINNELIG_VEDTAKSTIDSPUNKT = "OPPRINNELIG_VEDTAKSTIDSPUNKT",
   INNEVAeRENDEMANED = "INNEVÆRENDE_MÅNED",
   ETTERFOLGENDEMANUELLVEDTAK = "ETTERFØLGENDE_MANUELL_VEDTAK",
 }
 
-/** @default null */
 export enum Behandlingstype {
   ENDRING = "ENDRING",
   EGET_TILTAK = "EGET_TILTAK",
@@ -580,7 +551,6 @@ export enum Behandlingstype {
   MANEDLIGPALOP = "MÅNEDLIG_PÅLOP",
 }
 
-/** @default null */
 export enum Behandlingstema {
   AVSKRIVNING = "AVSKRIVNING",
   BIDRAG = "BIDRAG",
@@ -609,7 +579,6 @@ export enum Behandlingstema {
   REISEKOSTNADER = "REISEKOSTNADER",
 }
 
-/** @default null */
 export enum TypeArsakstype {
   FRABARNETSFODSEL = "FRA_BARNETS_FØDSEL",
   FRA_SAMLIVSBRUDD = "FRA_SAMLIVSBRUDD",
@@ -643,7 +612,6 @@ export enum TypeArsakstype {
   MANEDETTERBETALTFORFALTBIDRAG = "MÅNED_ETTER_BETALT_FORFALT_BIDRAG",
 }
 
-/** @default null */
 export enum Resultatkode {
   OPPHOR = "OPPHØR",
   GEBYR_FRITATT = "GEBYR_FRITATT",
@@ -706,6 +674,7 @@ export enum Resultatkode {
   INNTIL1ARTILBAKE = "INNTIL_1_ÅR_TILBAKE",
   MAKS_25_PROSENT_AV_INNTEKT = "MAKS_25_PROSENT_AV_INNTEKT",
   MANGLER_BIDRAGSEVNE = "MANGLER_BIDRAGSEVNE",
+  INGEN_BIDRAGSEVNE = "INGEN_BIDRAGSEVNE",
   KOSTNADSBEREGNET_BIDRAG = "KOSTNADSBEREGNET_BIDRAG",
   INNKREVINGSGRUNNLAG = "INNKREVINGSGRUNNLAG",
   INDEKSREGULERING = "INDEKSREGULERING",
@@ -721,15 +690,11 @@ export interface VedtakResultatInnhold {
 }
 
 export interface OppdatereBegrunnelse {
-  /**
-   * Saksbehandlers begrunnelse
-   * @default ""
-   */
+  /** Saksbehandlers begrunnelse */
   nyBegrunnelse: string;
   /**
    * Id til rollen begrunnelsen gjelder for
    * @format int64
-   * @default ""
    */
   rolleid?: number | null;
 }
@@ -737,19 +702,23 @@ export interface OppdatereBegrunnelse {
 export interface OppdatereVirkningstidspunkt {
   /** @format int64 */
   rolleId?: number | null;
+  /** Oppdater årsak. Hvis verdien er satt til null så vil det ikke bli gjort noe endringer. Hvis verdien er satt så vil årsak settes til samme verdi fra forespørsel og avslag settes til null */
   årsak?: TypeArsakstype | null;
+  /** Oppdater avslag. Hvis verdien er satt til null så vil det ikke bli gjort noe endringer. Hvis verdien er satt så vil avslag settes til samme verdi fra forespørsel og årsak settes til null */
   avslag?: Resultatkode | null;
   /**
    * Oppdater virkningsdato. Hvis verdien er satt til null vil det ikke bli gjort noe endringer
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   virkningstidspunkt?: string | null;
   /** @format date */
   beregnTilDato?: string | null;
+  /** Oppdatere saksbehandlers begrunnelse */
   oppdatereBegrunnelse?: OppdatereBegrunnelse | null;
+  /** Oppdatere saksbehandlers begrunnelse for vurdering av skolegang. Dette kan bare settes hvis det er 18 års bidrag */
   oppdaterBegrunnelseVurderingAvSkolegang?: OppdatereBegrunnelse | null;
+  /** Deprekert - Bruk oppdatereBegrunnelse i stedet */
   notat?: OppdatereBegrunnelse | null;
 }
 
@@ -769,7 +738,6 @@ export interface AktiveGrunnlagsdata {
    * Erstattes av husstandsmedlem
    * @deprecated
    * @uniqueItems true
-   * @default ""
    */
   husstandsbarn: HusstandsmedlemGrunnlagDto[];
 }
@@ -782,7 +750,6 @@ export interface AndreVoksneIHusstandenDetaljerDto {
   /**
    * Relasjon til BP. Brukes for debugging
    * @deprecated
-   * @default ""
    */
   relasjon: AndreVoksneIHusstandenDetaljerDtoRelasjonEnum;
   erBeskyttet: boolean;
@@ -798,164 +765,98 @@ export interface AndreVoksneIHusstandenGrunnlagDto {
 export interface AndreVoksneIHusstandenPeriodeseringsfeil {
   hullIPerioder: Datoperiode[];
   overlappendePerioder: OverlappendeBostatusperiode[];
-  /**
-   * Er sann hvis det finnes en eller flere perioder som starter senere enn starten av dagens måned.
-   * @default false
-   */
+  /** Er sann hvis det finnes en eller flere perioder som starter senere enn starten av dagens måned. */
   fremtidigPeriode: boolean;
-  /**
-   * Er sann hvis det mangler sivilstand perioder."
-   * @default false
-   */
+  /** Er sann hvis det mangler sivilstand perioder." */
   manglerPerioder: boolean;
-  /**
-   * Er sann hvis det ikke finnes noe løpende periode. Det vil si en periode hvor datoTom er null
-   * @default false
-   */
+  /** Er sann hvis det ikke finnes noe løpende periode. Det vil si en periode hvor datoTom er null */
   ingenLøpendePeriode: boolean;
   harFeil: boolean;
 }
 
 export interface Ansettelsesdetaljer {
-  /**
-   * Fradato for ansettelsesdetalj. År + måned
-   * @default ""
-   */
+  /** Fradato for ansettelsesdetalj. År + måned */
   periodeFra?: string | null;
-  /**
-   * Eventuell sluttdato for ansettelsesdetalj. År + måned
-   * @default ""
-   */
+  /** Eventuell sluttdato for ansettelsesdetalj. År + måned */
   periodeTil?: string | null;
-  /**
-   * Type arbeidsforhold, Ordinaer, Maritim, Forenklet, Frilanser'
-   * @default ""
-   */
+  /** Type arbeidsforhold, Ordinaer, Maritim, Forenklet, Frilanser' */
   arbeidsforholdType?: string | null;
-  /**
-   * Beskrivelse av arbeidstidsordning. Eks: 'Ikke skift'
-   * @default ""
-   */
+  /** Beskrivelse av arbeidstidsordning. Eks: 'Ikke skift' */
   arbeidstidsordningBeskrivelse?: string | null;
-  /**
-   * Beskrivelse av ansettelsesform. Eks: 'Fast ansettelse'
-   * @default ""
-   */
+  /** Beskrivelse av ansettelsesform. Eks: 'Fast ansettelse' */
   ansettelsesformBeskrivelse?: string | null;
-  /**
-   * Beskrivelse av yrke. Eks: 'KONTORLEDER'
-   * @default ""
-   */
+  /** Beskrivelse av yrke. Eks: 'KONTORLEDER' */
   yrkeBeskrivelse?: string | null;
   /**
    * Avtalt antall timer i uken
    * @format double
-   * @default ""
    */
   antallTimerPrUke?: number | null;
   /**
    * Avtalt stillingsprosent
    * @format double
-   * @default ""
    */
   avtaltStillingsprosent?: number | null;
   /**
    * Dato for forrige endring i stillingsprosent
    * @format date
-   * @default ""
    */
   sisteStillingsprosentendringDato?: string | null;
   /**
    * Dato for forrige lønnsendring
    * @format date
-   * @default ""
    */
   sisteLønnsendringDato?: string | null;
 }
 
 export interface ArbeidsforholdGrunnlagDto {
-  /**
-   * Id til personen arbeidsforholdet gjelder
-   * @default ""
-   */
+  /** Id til personen arbeidsforholdet gjelder */
   partPersonId: string;
   /**
    * Startdato for arbeidsforholdet
    * @format date
-   * @default ""
    */
   startdato?: string | null;
   /**
    * Eventuell sluttdato for arbeidsforholdet
    * @format date
-   * @default ""
    */
   sluttdato?: string | null;
-  /**
-   * Navn på arbeidsgiver
-   * @default ""
-   */
+  /** Navn på arbeidsgiver */
   arbeidsgiverNavn?: string | null;
-  /**
-   * Arbeidsgivers organisasjonsnummer
-   * @default ""
-   */
+  /** Arbeidsgivers organisasjonsnummer */
   arbeidsgiverOrgnummer?: string | null;
-  /**
-   * Liste av ansettelsesdetaljer, med eventuell historikk
-   * @default ""
-   */
+  /** Liste av ansettelsesdetaljer, med eventuell historikk */
   ansettelsesdetaljerListe?: Ansettelsesdetaljer[] | null;
-  /**
-   * Liste over registrerte permisjoner
-   * @default ""
-   */
+  /** Liste over registrerte permisjoner */
   permisjonListe?: Permisjon[] | null;
-  /**
-   * Liste over registrerte permitteringer
-   * @default ""
-   */
+  /** Liste over registrerte permitteringer */
   permitteringListe?: Permittering[] | null;
 }
 
 export interface BarnetilsynGrunnlagDto {
-  /**
-   * Id til personen som mottar barnetilsynet
-   * @default ""
-   */
+  /** Id til personen som mottar barnetilsynet */
   partPersonId: string;
-  /**
-   * Id til barnet barnetilsynet er for
-   * @default ""
-   */
+  /** Id til barnet barnetilsynet er for */
   barnPersonId: string;
   /**
    * Periode fra-dato
    * @format date
-   * @default ""
    */
   periodeFra: string;
   /**
    * Periode til-dato
    * @format date
-   * @default ""
    */
   periodeTil?: string | null;
   /**
    * Beløpet barnetilsynet er på
    * @format int32
-   * @default ""
    */
   beløp?: number | null;
-  /**
-   * Angir om barnetilsynet er heltid eller deltid
-   * @default ""
-   */
+  /** Angir om barnetilsynet er heltid eller deltid */
   tilsynstype?: BarnetilsynGrunnlagDtoTilsynstypeEnum;
-  /**
-   * Angir om barnet er over eller under skolealder
-   * @default ""
-   */
+  /** Angir om barnet er over eller under skolealder */
   skolealder?: BarnetilsynGrunnlagDtoSkolealderEnum;
 }
 
@@ -965,7 +866,6 @@ export interface BegrunnelseDto {
   /**
    * Bruk innhold
    * @deprecated
-   * @default ""
    */
   kunINotat: string;
 }
@@ -1000,19 +900,16 @@ export interface BehandlingDtoV2 {
   opprettetTidspunkt: string;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   søktFomDato: string;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   mottattdato: string;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   klageMottattdato?: string | null;
@@ -1045,11 +942,9 @@ export interface BehandlingDtoV2 {
   ikkeAktiverteEndringerIGrunnlagsdata: IkkeAktiveGrunnlagsdata;
   /** @uniqueItems true */
   feilOppståttVedSisteGrunnlagsinnhenting?: Grunnlagsinnhentingsfeil[] | null;
+  /** Utgiftsgrunnlag for særbidrag. Vil alltid være null for forskudd og bidrag */
   utgift?: SaerbidragUtgifterDto | null;
-  /**
-   * Samværsperioder. Vil alltid være null for forskudd og særbidrag
-   * @default ""
-   */
+  /** Samværsperioder. Vil alltid være null for forskudd og særbidrag */
   samvær?: SamvaerBarnDto[] | null;
   samværV2?: SamvaerDtoV2 | null;
   privatAvtaleV3?: PrivatAvtaleDtoV3 | null;
@@ -1104,30 +999,22 @@ export interface BoforholdDtoV2 {
   andreVoksneIHusstanden: BostatusperiodeDto[];
   /** @uniqueItems true */
   sivilstand: SivilstandDto[];
-  /**
-   * Saksbehandlers begrunnelse
-   * @default ""
-   */
+  /** Saksbehandlers begrunnelse */
   begrunnelse: BegrunnelseDto;
   begrunnelseFraOpprinneligVedtak?: BegrunnelseDto | null;
   valideringsfeil: BoforholdValideringsfeil;
-  /**
-   * Er sann hvis status på andre voksne i husstanden er 'BOR_IKKE_MED_ANDRE_VOKSNE', men det er 18 åring i husstanden som regnes som voksen i husstanden
-   * @default false
-   */
+  /** Er sann hvis status på andre voksne i husstanden er 'BOR_IKKE_MED_ANDRE_VOKSNE', men det er 18 åring i husstanden som regnes som voksen i husstanden */
   egetBarnErEnesteVoksenIHusstanden?: boolean | null;
   beregnetBoforhold: DelberegningBoforhold[];
   /**
    * Erstattes av husstandsmedlem
    * @deprecated
    * @uniqueItems true
-   * @default ""
    */
   husstandsbarn: HusstandsmedlemDtoV2[];
   /**
    * Saksbehandlers begrunnelse
    * @deprecated
-   * @default ""
    */
   notat: BegrunnelseDto;
 }
@@ -1135,22 +1022,15 @@ export interface BoforholdDtoV2 {
 export interface BoforholdPeriodeseringsfeil {
   hullIPerioder: Datoperiode[];
   overlappendePerioder: OverlappendeBostatusperiode[];
-  /**
-   * Er sann hvis husstandsmedlem har en periode som starter senere enn starten av dagens måned.
-   * @default false
-   */
+  /** Er sann hvis husstandsmedlem har en periode som starter senere enn starten av dagens måned. */
   fremtidigPeriode: boolean;
   ugyldigSluttperiode: boolean;
   /**
    * Er sann hvis husstandsmedlem mangler perioder.
    *         Dette vil si at husstandsmedlem ikke har noen perioder i det hele tatt."
-   * @default false
    */
   manglerPerioder: boolean;
-  /**
-   * Er sann hvis husstandsmedlem ikke har noen løpende periode. Det vil si en periode hvor datoTom er null
-   * @default false
-   */
+  /** Er sann hvis husstandsmedlem ikke har noen løpende periode. Det vil si en periode hvor datoTom er null */
   ingenLøpendePeriode: boolean;
   barn: HusstandsmedlemPeriodiseringsfeilDto;
 }
@@ -1166,36 +1046,29 @@ export interface BostatusperiodeDto {
   id?: number | null;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoFom?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoTom?: string | null;
-  /** @default "" */
   bostatus: Bostatuskode;
-  /** @default "" */
   kilde: Kilde;
 }
 
 export interface BostatusperiodeGrunnlagDto {
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoFom?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoTom?: string | null;
-  /** @default "" */
   bostatus: Bostatuskode;
 }
 
@@ -1294,7 +1167,6 @@ export interface ForholdsmessigFordelingBarnDto {
   innkrevesFraDato?: string | null;
   opphørsdato?: string | null;
   sammeSakSomBehandling: boolean;
-  /** @default "" */
   åpneBehandlinger: ForholdsmessigFordelingApenBehandlingDto[];
   privateAvtale?: ForholdsmessigFordelingPrivateAvtaleDto | null;
 }
@@ -1325,16 +1197,17 @@ export interface ForholdsmessigFordelingApenBehandlingDto {
 }
 
 export interface GebyrDetaljerDto {
+  /**
+   * Skal fjernes
+   * @deprecated
+   */
   søknad?: SoknadDetaljerDto | null;
   inntekt: GebyrInntektDto;
   beløpGebyrsats: number;
   beregnetIlagtGebyr: boolean;
   endeligIlagtGebyr: boolean;
   begrunnelse?: string | null;
-  /**
-   * @deprecated
-   * @default ""
-   */
+  /** @deprecated */
   rolle: RolleDto;
   erManueltOverstyrt: boolean;
 }
@@ -1381,13 +1254,11 @@ export interface GebyrValideringsfeilDto {
   /**
    * Skal fjernes
    * @deprecated
-   * @default ""
    */
   gjelder: RolleDto;
   /**
    * Skal fjernes
    * @deprecated
-   * @default ""
    */
   søknad: SoknadDetaljerDto;
   manglerBegrunnelse: boolean;
@@ -1403,9 +1274,7 @@ export interface Grunnlagsinnhentingsfeil {
 export interface HusstandsmedlemDtoV2 {
   /** @format int64 */
   id?: number | null;
-  /** @default "" */
   kilde: Kilde;
-  /** @default false */
   medIBehandling: boolean;
   /** @uniqueItems true */
   perioder: BostatusperiodeDto[];
@@ -1414,7 +1283,6 @@ export interface HusstandsmedlemDtoV2 {
   stønadstype?: Stonadstype | null;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   fødselsdato?: string | null;
@@ -1447,7 +1315,6 @@ export interface HusstandsmedlemPeriodiseringsfeilDto {
   /**
    * Teknisk id på husstandsmedlem som har periodiseringsfeil
    * @format int64
-   * @default ""
    */
   husstandsmedlemId: number;
   erSøknadsbarn: boolean;
@@ -1459,19 +1326,12 @@ export interface IkkeAktivInntektDto {
   /** @format date-time */
   innhentetTidspunkt: string;
   endringstype: GrunnlagInntektEndringstype;
-  /** @default "" */
   rapporteringstype: Inntektsrapportering;
-  /** @default "" */
   beløp: number;
   periode: TypeArManedsperiode;
-  /** @default "" */
   ident: string;
-  /** @default "" */
   gjelderBarn?: string | null;
-  /**
-   * @uniqueItems true
-   * @default ""
-   */
+  /** @uniqueItems true */
   inntektsposter: InntektspostDtoV2[];
   /** @uniqueItems true */
   inntektsposterSomErEndret: InntektspostEndringDto[];
@@ -1494,7 +1354,6 @@ export interface IkkeAktiveGrunnlagsdata {
    * Erstattes av husstandsmedlem
    * @deprecated
    * @uniqueItems true
-   * @default ""
    */
   husstandsbarn: HusstandsmedlemGrunnlagDto[];
 }
@@ -1508,10 +1367,7 @@ export interface IkkeAktiveInntekter {
   kontantstøtte: IkkeAktivInntektDto[];
   /** @uniqueItems true */
   småbarnstillegg: IkkeAktivInntektDto[];
-  /**
-   * @uniqueItems true
-   * @default ""
-   */
+  /** @uniqueItems true */
   årsinntekter: IkkeAktivInntektDto[];
 }
 
@@ -1524,99 +1380,68 @@ export interface InntektBarn {
 export interface InntektDtoV2 {
   /** @format int64 */
   id?: number | null;
-  /** @default false */
   taMed: boolean;
-  /** @default "" */
   rapporteringstype: Inntektsrapportering;
-  /** @default "" */
   beløp: number;
   /**
    * @format date
-   * @default ""
    * @example "2024-01-01"
    */
   datoFom?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "2024-12-31"
    */
   datoTom?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "2024-01-01"
    */
   opprinneligFom?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "2024-12-31"
    */
   opprinneligTom?: string | null;
   /**
    * Bruk gjelderRolleId
    * @deprecated
-   * @default ""
    */
   ident?: string | null;
-  /**
-   * @format int64
-   * @default ""
-   */
+  /** @format int64 */
   gjelderRolleId: number | null;
   /**
    * Bruk gjelderBarnId
    * @deprecated
-   * @default ""
    */
   gjelderBarn?: string | null;
   /** @format int64 */
   gjelderBarnId?: number | null;
-  /** @default "" */
   kilde: Kilde;
-  /**
-   * @uniqueItems true
-   * @default ""
-   */
+  /** @uniqueItems true */
   inntektsposter: InntektspostDtoV2[];
-  /**
-   * @uniqueItems true
-   * @default ""
-   */
+  /** @uniqueItems true */
   inntektstyper: Inntektstype[];
   historisk?: boolean | null;
-  /**
-   * Avrundet månedsbeløp for barnetillegg
-   * @default ""
-   */
+  /** Avrundet månedsbeløp for barnetillegg */
   beløpMånedDagsats?: number | null;
-  /**
-   * Avrundet månedsbeløp for barnetillegg
-   * @default ""
-   */
+  /** Avrundet månedsbeløp for barnetillegg */
   månedsbeløp?: number | null;
-  /**
-   * Avrundet dagsats for barnetillegg
-   * @default ""
-   */
+  skatteprosent?: number | null;
+  /** Avrundet dagsats for barnetillegg */
   dagsats?: number | null;
   beløpstype?: InntektBelopstype | null;
-  skatteprosent?: number | null;
 }
 
 export interface InntektPerBarnDto {
   /**
    * Referanse til barn
    * @deprecated
-   * @default ""
    */
   inntektGjelderBarnIdent?: string | null;
+  /** Referanse til barn */
   inntektGjelderBarn?: RolleDto | null;
-  /**
-   * Liste over summerte inntektsperioder
-   * @default ""
-   */
+  /** Liste over summerte inntektsperioder */
   summertInntektListe: DelberegningSumInntekt[];
 }
 
@@ -1624,27 +1449,15 @@ export interface InntektValideringsfeil {
   /** @uniqueItems true */
   overlappendePerioder: OverlappendePeriode[];
   fremtidigPeriode: boolean;
-  /**
-   * Liste med perioder hvor det mangler inntekter. Vil alltid være tom liste for ytelser
-   * @default ""
-   */
+  /** Liste med perioder hvor det mangler inntekter. Vil alltid være tom liste for ytelser */
   hullIPerioder: Datoperiode[];
-  /**
-   * Er sann hvis det ikke finnes noen valgte inntekter. Vil alltid være false hvis det er ytelse
-   * @default false
-   */
+  /** Er sann hvis det ikke finnes noen valgte inntekter. Vil alltid være false hvis det er ytelse */
   manglerPerioder: boolean;
-  /**
-   * Hvis det er inntekter som har periode som starter før virkningstidspunkt
-   * @default false
-   */
+  /** Hvis det er inntekter som har periode som starter før virkningstidspunkt */
   perioderFørVirkningstidspunkt: boolean;
   ugyldigSluttPeriode: boolean;
   gjelderBarnRolle?: RolleDto | null;
-  /**
-   * Personident ytelsen gjelder for. Kan være null hvis det er en ytelse som ikke gjelder for et barn.
-   * @default ""
-   */
+  /** Personident ytelsen gjelder for. Kan være null hvis det er en ytelse som ikke gjelder for et barn. */
   gjelderBarn?: string | null;
   manglerSkatteprosent: boolean;
   rolle?: RolleDto | null;
@@ -1653,10 +1466,7 @@ export interface InntektValideringsfeil {
    * @deprecated
    */
   ident?: string | null;
-  /**
-   * Er sann hvis det ikke finnes noe løpende periode. Det vil si en periode hvor datoTom er null. Er bare relevant for årsinntekter
-   * @default false
-   */
+  /** Er sann hvis det ikke finnes noe løpende periode. Det vil si en periode hvor datoTom er null. Er bare relevant for årsinntekter */
   ingenLøpendePeriode: boolean;
 }
 
@@ -1682,12 +1492,10 @@ export interface InntekterDtoV3 {
   månedsinntekter: InntektDtoV2[];
   /** @uniqueItems true */
   småbarnstillegg: InntektDtoV2[];
-  /**
-   * @uniqueItems true
-   * @default ""
-   */
+  /** @uniqueItems true */
   årsinntekter: InntektDtoV2[];
   beregnetInntekt: BeregnetInntekterDto;
+  /** Saksbehandlers begrunnelser */
   begrunnelse?: BegrunnelseDto | null;
   begrunnelseFraOpprinneligVedtak?: BegrunnelseDto | null;
   valideringsfeil: InntektValideringsfeilV2Dto;
@@ -1771,13 +1579,9 @@ export interface PeriodeAndreVoksneIHusstanden {
   /**
    * Total antall husstandsmedlemmer som bor hos BP for gjeldende periode
    * @format int32
-   * @default ""
    */
   totalAntallHusstandsmedlemmer: number;
-  /**
-   * Detaljer om husstandsmedlemmer som bor hos BP for gjeldende periode. Antall hustandsmedlemmer er begrenset til maks 10 personer
-   * @default ""
-   */
+  /** Detaljer om husstandsmedlemmer som bor hos BP for gjeldende periode. Antall hustandsmedlemmer er begrenset til maks 10 personer */
   husstandsmedlemmer: AndreVoksneIHusstandenDetaljerDto[];
 }
 
@@ -1876,6 +1680,7 @@ export interface PrivatAvtalePeriodeDto {
 export interface PrivatAvtaleValideringsfeilDto {
   /** @format int64 */
   privatAvtaleId: number;
+  gjelderPerson: RolleDto;
   /** @uniqueItems true */
   perioderOverlapperMedLøpendeBidrag: Datoperiode[];
   manglerBegrunnelse: boolean;
@@ -1942,16 +1747,14 @@ export interface SamvaerDtoV2 {
 export interface SamvaerValideringsfeilDto {
   /** @format int64 */
   samværId: number;
+  gjelderRolle: RolleDto;
   manglerBegrunnelse: boolean;
   ingenLøpendeSamvær: boolean;
   manglerSamvær: boolean;
   ugyldigSluttperiode: boolean;
   /** @uniqueItems true */
   overlappendePerioder: OverlappendePeriode[];
-  /**
-   * Liste med perioder hvor det mangler inntekter. Vil alltid være tom liste for ytelser
-   * @default ""
-   */
+  /** Liste med perioder hvor det mangler inntekter. Vil alltid være tom liste for ytelser */
   hullIPerioder: Datoperiode[];
   harPeriodiseringsfeil: boolean;
   gjelderBarnNavn?: string | null;
@@ -1991,13 +1794,11 @@ export interface SivilstandDto {
   id?: number | null;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoFom: string;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoTom?: string | null;
@@ -2006,44 +1807,30 @@ export interface SivilstandDto {
 }
 
 export interface SivilstandGrunnlagDto {
-  /**
-   * Id til personen sivilstanden er rapportert for
-   * @default ""
-   */
+  /** Id til personen sivilstanden er rapportert for */
   personId?: string | null;
+  /** Type sivilstand fra PDL */
   type?: SivilstandskodePDL | null;
   /**
    * Dato sivilstanden er gyldig fra
    * @format date
-   * @default ""
    */
   gyldigFom?: string | null;
-  /**
-   * Personid som kun er satt om personen er ektefelle eller separert ektefelle
-   * @default ""
-   */
+  /** Personid som kun er satt om personen er ektefelle eller separert ektefelle */
   relatertVedSivilstand?: string | null;
   /**
    * Dato NAV tidligst har fått bekreftet sivilstanden
    * @format date
-   * @default ""
    */
   bekreftelsesdato?: string | null;
-  /**
-   * Master for opplysningen om sivilstand (FREG eller PDL)
-   * @default ""
-   */
+  /** Master for opplysningen om sivilstand (FREG eller PDL) */
   master?: string | null;
   /**
    * Tidspunktet sivilstanden er registrert
    * @format date-time
-   * @default ""
    */
   registrert?: string | null;
-  /**
-   * Angir om sivilstanden er historisk (true) eller aktiv (false)
-   * @default false
-   */
+  /** Angir om sivilstanden er historisk (true) eller aktiv (false) */
   historisk?: boolean | null;
 }
 
@@ -2064,25 +1851,13 @@ export interface SivilstandOverlappendePeriode {
 export interface SivilstandPeriodeseringsfeil {
   hullIPerioder: Datoperiode[];
   overlappendePerioder: SivilstandOverlappendePeriode[];
-  /**
-   * Er sann hvis det finnes en eller flere perioder som starter senere enn starten av dagens måned.
-   * @default false
-   */
+  /** Er sann hvis det finnes en eller flere perioder som starter senere enn starten av dagens måned. */
   fremtidigPeriode: boolean;
-  /**
-   * Er sann hvis det mangler sivilstand perioder."
-   * @default false
-   */
+  /** Er sann hvis det mangler sivilstand perioder." */
   manglerPerioder: boolean;
-  /**
-   * Er sann hvis en eller flere perioder har status UKJENT."
-   * @default false
-   */
+  /** Er sann hvis en eller flere perioder har status UKJENT." */
   ugyldigStatus: boolean;
-  /**
-   * Er sann hvis det ikke finnes noe løpende periode. Det vil si en periode hvor datoTom er null
-   * @default false
-   */
+  /** Er sann hvis det ikke finnes noe løpende periode. Det vil si en periode hvor datoTom er null */
   ingenLøpendePeriode: boolean;
   harFeil: boolean;
 }
@@ -2091,78 +1866,46 @@ export interface StonadDto {
   /**
    * Stønadsid
    * @format int32
-   * @default ""
    */
   stønadsid: number;
-  /**
-   * Stønadstype
-   * @default ""
-   */
+  /** Stønadstype */
   type: Stonadstype;
-  /**
-   * Referanse til sak
-   * @default ""
-   */
+  /** Referanse til sak */
   sak: string;
-  /**
-   * Personidenten til den som skal betale bidraget
-   * @default ""
-   */
+  /** Personidenten til den som skal betale bidraget */
   skyldner: string;
-  /**
-   * Personidenten til den som krever bidraget
-   * @default ""
-   */
+  /** Personidenten til den som krever bidraget */
   kravhaver: string;
-  /**
-   * Personidenten til den som mottar bidraget
-   * @default ""
-   */
+  /** Personidenten til den som mottar bidraget */
   mottaker: string;
   /**
    * Angir første år en stønad skal indeksreguleres
    * @deprecated
    * @format int32
-   * @default ""
    */
   førsteIndeksreguleringsår?: number | null;
   /**
    * Angir neste år siste perioden i stønaden skal indeksreguleres
    * @format int32
-   * @default ""
    */
   nesteIndeksreguleringsår?: number | null;
-  /**
-   * Angir om stønaden skal innkreves
-   * @default ""
-   */
+  /** Angir om stønaden skal innkreves */
   innkreving: Innkrevingstype;
-  /**
-   * opprettet_av
-   * @default ""
-   */
+  /** opprettet_av */
   opprettetAv: string;
   /**
    * opprettet tidspunkt
    * @format date-time
-   * @default ""
    */
   opprettetTidspunkt: string;
-  /**
-   * endret av
-   * @default ""
-   */
+  /** endret av */
   endretAv?: string | null;
   /**
    * når sist endret tidspunkt
    * @format date-time
-   * @default ""
    */
   endretTidspunkt?: string | null;
-  /**
-   * Liste over alle perioder som inngår i stønaden
-   * @default ""
-   */
+  /** Liste over alle perioder som inngår i stønaden */
   periodeListe: StonadPeriodeDto[];
 }
 
@@ -2170,58 +1913,40 @@ export interface StonadPeriodeDto {
   /**
    * Periodeid
    * @format int32
-   * @default ""
    */
   periodeid: number;
-  /**
-   * Periode med fra-og-med-dato og til-dato med format ÅÅÅÅ-MM
-   * @default ""
-   */
+  /** Periode med fra-og-med-dato og til-dato med format ÅÅÅÅ-MM */
   periode: TypeArManedsperiode;
   /**
    * Stønadsid
    * @format int32
-   * @default ""
    */
   stønadsid: number;
   /**
    * Vedtaksid
    * @format int32
-   * @default ""
    */
   vedtaksid: number;
   /**
    * Perioden er gyldig fra angitt tidspunkt (vedtakstidspunkt)
    * @format date-time
-   * @default ""
    */
   gyldigFra: string;
   /**
    * Angir tidspunkt perioden eventuelt er ugyldig fra (tidspunkt for vedtak med periode som erstattet denne)
    * @format date-time
-   * @default ""
    */
   gyldigTil?: string | null;
   /**
    * Periode-gjort-ugyldig-av-vedtaksid
    * @format int32
-   * @default ""
    */
   periodeGjortUgyldigAvVedtaksid?: number | null;
-  /**
-   * Beregnet stønadsbeløp
-   * @default ""
-   */
+  /** Beregnet stønadsbeløp */
   beløp?: number | null;
-  /**
-   * Valutakoden tilhørende stønadsbeløpet
-   * @default ""
-   */
+  /** Valutakoden tilhørende stønadsbeløpet */
   valutakode?: string | null;
-  /**
-   * Resultatkode for stønaden
-   * @default ""
-   */
+  /** Resultatkode for stønaden */
   resultatkode: string;
 }
 
@@ -2257,10 +1982,7 @@ export interface SaerbidragUtgifterDto {
   kategori: SaerbidragKategoriDto;
   beregning?: UtgiftBeregningDto | null;
   maksGodkjentBeløp?: MaksGodkjentBelopDto | null;
-  /**
-   * Saksbehandlers begrunnelse
-   * @default ""
-   */
+  /** Saksbehandlers begrunnelse */
   begrunnelse: BegrunnelseDto;
   begrunnelseFraOpprinneligVedtak?: BegrunnelseDto | null;
   utgifter: UtgiftspostDto[];
@@ -2269,7 +1991,6 @@ export interface SaerbidragUtgifterDto {
   /**
    * Saksbehandlers begrunnelse
    * @deprecated
-   * @default ""
    */
   notat: BegrunnelseDto;
 }
@@ -2315,13 +2036,13 @@ export interface TotalBeregningUtgifterDto {
   utgiftstype: string;
   totalKravbeløp: number;
   totalGodkjentBeløp: number;
-  /** @default "" */
   utgiftstypeVisningsnavn: string;
 }
 
 export interface UnderholdBarnDto {
   /** @format int64 */
   id?: number | null;
+  /** @format int64 */
   rolleId?: number | null;
   navn?: string | null;
   ident?: string | null;
@@ -2396,73 +2117,39 @@ export interface UnderholdskostnadValideringsfeil {
   /**
    * Tilleggsstønadsperioder som ikke overlapper fullstendig med faktiske tilsynsutgifter.
    * @uniqueItems true
-   * @default ""
    */
   tilleggsstønadsperioderUtenFaktiskTilsynsutgift: DatoperiodeDto[];
-  /**
-   * Minst en periode må legges til hvis det ikke finnes noen offentlige opplysninger for stønad til barnetilsyn
-   * @default false
-   */
+  /** Minst en periode må legges til hvis det ikke finnes noen offentlige opplysninger for stønad til barnetilsyn */
   manglerPerioderForTilsynsordning: boolean;
-  /**
-   * Må ha fylt ut begrunnelse hvis minst en periode er lagt til underholdskostnad
-   * @default false
-   */
+  /** Må ha fylt ut begrunnelse hvis minst en periode er lagt til underholdskostnad */
   manglerBegrunnelse: boolean;
+  gjelderBarn: UnderholdBarnDto;
   /** @format int64 */
   id: number;
-  gjelderBarn: UnderholdBarnDto;
 }
 
 export interface UnderholdskostnadValideringsfeilTabell {
-  /**
-   * Overlappende perioder i stønad til barnetilsyn eller tillegsstønad.
-   * @default ""
-   */
+  /** Overlappende perioder i stønad til barnetilsyn eller tillegsstønad. */
   overlappendePerioder: OverlappendePeriode[];
-  /**
-   * Perioder som starter senere enn starten av dagens måned.
-   * @default ""
-   */
+  /** Perioder som starter senere enn starten av dagens måned. */
   fremtidigePerioder: DatoperiodeDto[];
-  /**
-   * Er sann hvis antall perioder er 0."
-   * @default false
-   */
+  /** Er sann hvis antall perioder er 0." */
   harIngenPerioder: boolean;
   ugyldigPerioder: DatoperiodeDto[];
-  /**
-   * Er sann hvis det er satt at BM har tilsynsordning for barnet men det mangler perioder for tilsynsutgifter.
-   * @default false
-   */
+  /** Er sann hvis det er satt at BM har tilsynsordning for barnet men det mangler perioder for tilsynsutgifter. */
   manglerPerioderForTilsynsutgifter: boolean;
 }
 
 export interface UtgiftBeregningDto {
-  /**
-   * Beløp som er direkte betalt av BP
-   * @default ""
-   */
+  /** Beløp som er direkte betalt av BP */
   beløpDirekteBetaltAvBp: number;
-  /**
-   * Summen av godkjente beløp som brukes for beregningen
-   * @default ""
-   */
+  /** Summen av godkjente beløp som brukes for beregningen */
   totalGodkjentBeløp: number;
-  /**
-   * Summen av kravbeløp
-   * @default ""
-   */
+  /** Summen av kravbeløp */
   totalKravbeløp: number;
-  /**
-   * Summen av godkjente beløp som brukes for beregningen
-   * @default ""
-   */
+  /** Summen av godkjente beløp som brukes for beregningen */
   totalGodkjentBeløpBp?: number | null;
-  /**
-   * Summen av godkjent beløp for utgifter BP har betalt plus beløp som er direkte betalt av BP
-   * @default ""
-   */
+  /** Summen av godkjent beløp for utgifter BP har betalt plus beløp som er direkte betalt av BP */
   totalBeløpBetaltAvBp: number;
 }
 
@@ -2476,43 +2163,25 @@ export interface UtgiftspostDto {
   /**
    * Når utgifter gjelder. Kan være feks dato på kvittering
    * @format date
-   * @default ""
    */
   dato: string;
-  /**
-   * Type utgift. Kan feks være hva som ble kjøpt for kravbeløp (bugnad, klær, sko, etc)
-   * @default ""
-   */
+  /** Type utgift. Kan feks være hva som ble kjøpt for kravbeløp (bugnad, klær, sko, etc) */
   type: Utgiftstype | string;
-  /**
-   * Beløp som er betalt for utgiften det gjelder
-   * @default ""
-   */
+  /** Beløp som er betalt for utgiften det gjelder */
   kravbeløp: number;
-  /**
-   * Beløp som er godkjent for beregningen
-   * @default ""
-   */
+  /** Beløp som er godkjent for beregningen */
   godkjentBeløp: number;
-  /**
-   * Begrunnelse for hvorfor godkjent beløp avviker fra kravbeløp. Må settes hvis godkjent beløp er ulik kravbeløp
-   * @default ""
-   */
+  /** Begrunnelse for hvorfor godkjent beløp avviker fra kravbeløp. Må settes hvis godkjent beløp er ulik kravbeløp */
   kommentar: string;
   /**
    * Begrunnelse for hvorfor godkjent beløp avviker fra kravbeløp. Må settes hvis godkjent beløp er ulik kravbeløp
    * @deprecated
-   * @default ""
    */
   begrunnelse: string;
-  /**
-   * Om utgiften er betalt av BP
-   * @default false
-   */
+  /** Om utgiften er betalt av BP */
   betaltAvBp: boolean;
   /** @format int64 */
   id: number;
-  /** @default "" */
   utgiftstypeVisningsnavn: string;
 }
 
@@ -2520,13 +2189,11 @@ export interface VirkningstidspunktBarnDtoV2 {
   rolle: RolleDto;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   virkningstidspunkt?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   opprinneligVirkningstidspunkt?: string | null;
@@ -2536,10 +2203,7 @@ export interface VirkningstidspunktBarnDtoV2 {
   omgjortVedtakVedtakstidspunkt?: string | null;
   årsak?: TypeArsakstype | null;
   avslag?: Resultatkode | null;
-  /**
-   * Saksbehandlers begrunnelse
-   * @default ""
-   */
+  /** Saksbehandlers begrunnelse */
   begrunnelse: BegrunnelseDto;
   begrunnelseVurderingAvSkolegang?: BegrunnelseDto | null;
   begrunnelseVurderingAvSkolegangFraOpprinneligVedtak?: BegrunnelseDto | null;
@@ -2555,11 +2219,11 @@ export interface VirkningstidspunktBarnDtoV2 {
   beregnTilDato?: string | null;
   /** @format date */
   globalOpphørsdato?: string | null;
+  /** Løpende opphørsvedtak detaljer. Er satt hvis det finnes en vedtak hvor bidraget er opphørt */
   eksisterendeOpphør?: EksisterendeOpphorsvedtakDto | null;
   /**
    * Manuell vedtak valgt for beregning av aldersjustering
    * @format int32
-   * @default ""
    */
   grunnlagFraVedtak?: number | null;
   kanSkriveVurderingAvSkolegang: boolean;
@@ -2570,19 +2234,16 @@ export interface VirkningstidspunktBarnDtoV2 {
   vedtakstype: Vedtakstype;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   søktFomDato: string;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   mottattdato: string;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   klageMottattdato?: string | null;
@@ -2593,7 +2254,6 @@ export interface VirkningstidspunktBarnDtoV2 {
   /**
    * Bruk begrunnelse
    * @deprecated
-   * @default ""
    */
   notat: BegrunnelseDto;
 }
@@ -2634,13 +2294,11 @@ export interface VirkningstidspunktFeilV2Dto {
 
 export interface TypeArManedsperiode {
   /**
-   * @default ""
    * @pattern YYYY-MM
    * @example "2023-01"
    */
   fom: string;
   /**
-   * @default ""
    * @pattern YYYY-MM
    * @example "2023-01"
    */
@@ -2650,22 +2308,18 @@ export interface TypeArManedsperiode {
 export interface OppdatereVirkningstidspunktBegrunnelseDto {
   /** @format int64 */
   rolleId?: number | null;
+  /** Oppdatere saksbehandlers begrunnelse */
   oppdatereBegrunnelse?: OppdatereBegrunnelse | null;
+  /** Oppdatere saksbehandlers begrunnelse for vurdering av skolegang. Dette kan bare settes hvis det er 18 års bidrag */
   oppdaterBegrunnelseVurderingAvSkolegang?: OppdatereBegrunnelse | null;
 }
 
 export interface OppdaterVirkningstidspunktBegrunnelseBarnResponse {
   /** @format int64 */
   rolleId?: number | null;
-  /**
-   * Oppdatere saksbehandlers begrunnelse
-   * @default ""
-   */
+  /** Oppdatere saksbehandlers begrunnelse */
   oppdatertBegrunnelse?: string | null;
-  /**
-   * Oppdatere saksbehandlers begrunnelse for vurdering av skolegang. Dette kan bare settes hvis det er 18 års bidrag
-   * @default ""
-   */
+  /** Oppdatere saksbehandlers begrunnelse for vurdering av skolegang. Dette kan bare settes hvis det er 18 års bidrag */
   oppdatertBegrunnelseVurderingAvSkolegang?: string | null;
 }
 
@@ -2675,13 +2329,11 @@ export interface OppdatereVirkningstidspunktBegrunnelseResponseDto {
   /**
    * Oppdatere saksbehandlers begrunnelse
    * @deprecated
-   * @default ""
    */
   oppdatertBegrunnelse?: string | null;
   /**
    * Oppdatere saksbehandlers begrunnelse for vurdering av skolegang. Dette kan bare settes hvis det er 18 års bidrag
    * @deprecated
-   * @default ""
    */
   oppdatertBegrunnelseVurderingAvSkolegang?: string | null;
   barn: OppdaterVirkningstidspunktBegrunnelseBarnResponse[];
@@ -2693,60 +2345,53 @@ export interface OppdatereUtgift {
   /**
    * Når utgifter gjelder. Kan være feks dato på kvittering
    * @format date
-   * @default ""
    */
   dato: string;
-  /**
-   * Type utgift. Kan feks være hva som ble kjøpt for kravbeløp (bugnad, klær, sko, etc). Skal bare settes for kategori konfirmasjon
-   * @default ""
-   */
+  /** Type utgift. Kan feks være hva som ble kjøpt for kravbeløp (bugnad, klær, sko, etc). Skal bare settes for kategori konfirmasjon */
   type?: Utgiftstype | string;
   /**
    * Beløp som er betalt for utgiften det gjelder
-   * @default ""
+   * @min 0
    */
   kravbeløp: number;
   /**
    * Beløp som er godkjent for beregningen
-   * @default ""
+   * @min 0
    */
   godkjentBeløp: number;
-  /**
-   * Kommentar kan brukes til å legge inn nærmere informasjon om utgiften f.eks. fakturanr., butikk det er handlet i, informasjon om hvorfor man ikke har godkjent hele kravbeløpet
-   * @default ""
-   */
+  /** Kommentar kan brukes til å legge inn nærmere informasjon om utgiften f.eks. fakturanr., butikk det er handlet i, informasjon om hvorfor man ikke har godkjent hele kravbeløpet */
   kommentar?: string | null;
-  /**
-   * Om utgiften er betalt av BP
-   * @default false
-   */
+  /** Om utgiften er betalt av BP */
   betaltAvBp: boolean;
   /** @format int64 */
   id?: number | null;
 }
 
 export interface OppdatereUtgiftRequest {
+  /** Oppdater avslag. */
   avslag?: Resultatkode | null;
   beløpDirekteBetaltAvBp?: number | null;
   maksGodkjentBeløp?: MaksGodkjentBelopDto | null;
+  /** Legg til eller endre en utgift. Utgift kan ikke endres eller oppdateres hvis avslag er satt */
   nyEllerEndretUtgift?: OppdatereUtgift | null;
   /**
    * Slette en utgift. Utgift kan ikke endres eller oppdateres hvis avslag er satt
    * @format int64
-   * @default ""
    */
   sletteUtgift?: number | null;
+  /** Oppdatere saksbehandlers begrunnelse */
   oppdatereBegrunnelse?: OppdatereBegrunnelse | null;
+  /** Deprekert - bruk oppdatereBegrunnelse i stedet */
   notat?: OppdatereBegrunnelse | null;
 }
 
 export interface OppdatereUtgiftResponse {
+  /** Utgiftspost som ble oppdatert */
   oppdatertUtgiftspost?: UtgiftspostDto | null;
   utgiftposter: UtgiftspostDto[];
   /**
    * Saksbehandlers begrunnelse
    * @deprecated
-   * @default ""
    */
   begrunnelse?: string | null;
   beregning?: UtgiftBeregningDto | null;
@@ -2757,7 +2402,6 @@ export interface OppdatereUtgiftResponse {
   /**
    * Saksbehandlers begrunnelse
    * @deprecated
-   * @default ""
    */
   oppdatertNotat?: string | null;
 }
@@ -2805,7 +2449,6 @@ export interface OppdatereBegrunnelseRequest {
   /**
    * Id til underhold begrunnelsen gjelder for hvis søknadsbarn. Bidragsmottaker må være satt for andre barn hvis det finnes flere BMer
    * @format int64
-   * @default ""
    */
   underholdsid?: number | null;
   /** @format int64 */
@@ -2819,6 +2462,7 @@ export interface OppdaterSamvaerDto {
   /** @format int64 */
   barnId?: number | null;
   periode?: OppdaterSamvaersperiodeDto | null;
+  /** Oppdatere saksbehandlers begrunnelse */
   oppdatereBegrunnelse?: OppdatereBegrunnelse | null;
 }
 
@@ -2831,6 +2475,10 @@ export interface OppdaterSamvaersperiodeDto {
 }
 
 export interface OppdaterSamvaerResponsDto {
+  /**
+   * Samvær som ble oppdatert
+   * @deprecated
+   */
   oppdatertSamvær?: SamvaerBarnDto | null;
   erSammeForAlle: boolean;
   samværBarn: SamvaerBarnDto[];
@@ -2849,18 +2497,11 @@ export interface OppdaterePrivatAvtaleRequest {
   /**
    * Setter avtaledato på privat avtalen. Dersom avtaleDato er null, vil avtaledato fjernes.
    * @format date
-   * @default ""
    */
   avtaleDato?: string | null;
-  /**
-   * Setter om privat avtale periodene skal indeksreguleres eller ikke. Dersom skalIndeksreguleres er null, vil ikke indeksregulering endres.
-   * @default false
-   */
+  /** Setter om privat avtale periodene skal indeksreguleres eller ikke. Dersom skalIndeksreguleres er null, vil ikke indeksregulering endres. */
   skalIndeksreguleres?: boolean | null;
-  /**
-   * Oppdater begrunnelse
-   * @default ""
-   */
+  /** Oppdater begrunnelse */
   begrunnelse?: string | null;
   avtaleType?: PrivatAvtaleType | null;
   stønadstype?: Stonadstype | null;
@@ -2871,17 +2512,15 @@ export interface OppdaterePrivatAvtaleRequest {
 }
 
 export interface OppdaterePrivatAvtaleResponsDto {
+  /**
+   * Privat avtale som ble oppdatert
+   * @deprecated
+   */
   oppdatertPrivatAvtale?: PrivatAvtaleBarnDto | null;
   privatAvtale: PrivatAvtaleDtoV3;
-  /**
-   * @deprecated
-   * @default ""
-   */
+  /** @deprecated */
   begrunnelseAndreBarn?: string | null;
-  /**
-   * @deprecated
-   * @default false
-   */
+  /** @deprecated */
   mangleBegrunnelseAndreBarn: boolean;
 }
 
@@ -2921,15 +2560,18 @@ export interface OppdaterOpphorsdatoRequestDto {
 }
 
 export interface OppdatereInntektRequest {
+  /** Angi periodeinformasjon for inntekt */
   oppdatereInntektsperiode?: OppdaterePeriodeInntekt | null;
   oppdaterInnteksperiodeSkatteprosent: OppdatereSkatteprosentInntekt[];
+  /** Opprette eller oppdatere manuelt oppgitt inntekt */
   oppdatereManuellInntekt?: OppdatereManuellInntekt | null;
+  /** Oppdatere begrunnelse for inntekt */
   oppdatereBegrunnelse?: OppdatereBegrunnelse | null;
+  /** Deprekert, bruk oppdatereBegrunnelse i stedet */
   oppdatereNotat?: OppdatereBegrunnelse | null;
   /**
    * Angi id til inntekt som skal slettes
    * @format int64
-   * @default ""
    */
   sletteInntekt?: number | null;
   henteOppdatereBegrunnelse?: OppdatereBegrunnelse | null;
@@ -2939,67 +2581,54 @@ export interface OppdatereManuellInntekt {
   /**
    * Inntektens databaseid. Oppgis ikke ved opprettelse av inntekt.
    * @format int64
-   * @default ""
    */
   id?: number | null;
-  /**
-   * Angir om inntekten skal inkluderes i beregning. Hvis ikke spesifisert inkluderes inntekten.
-   * @default false
-   */
+  /** Angir om inntekten skal inkluderes i beregning. Hvis ikke spesifisert inkluderes inntekten. */
   taMed: boolean;
   /**
    * Angir inntektens rapporteringstype.
-   * @default ""
    * @example "KONTANTSTØTTE"
    */
   type: Inntektsrapportering;
-  /**
-   * Inntektens beløp i norske kroner
-   * @default ""
-   */
+  /** Inntektens beløp i norske kroner */
   beløp: number;
   beløpstype: InntektBelopstype;
   skatteprosent?: number | null;
   /**
    * @format date
-   * @default ""
    * @example "2024-01-01"
    */
   datoFom: string;
   /**
    * @format date
-   * @default ""
    * @example "2024-12-31"
    */
   datoTom?: string | null;
   /**
    * Ident til personen inntekten gjenlder for.
    * @deprecated
-   * @default ""
    * @example "12345678910"
    */
   ident?: string | null;
   /**
    * Id til rollen til personen inntekten gjenlder for.
    * @deprecated
-   * @default ""
    * @example "12345678910"
    */
   gjelderId: string | null;
   /**
    * Ident til barnet en ytelse gjelder for. sBenyttes kun for ytelser som er koblet til ett spesifikt barn, f.eks kontantstøtte
    * @deprecated
-   * @default ""
    * @example "12345678910"
    */
   gjelderBarn?: string | null;
   /**
    * Id til rollen til barnet en ytelse gjelder for. sBenyttes kun for ytelser som er koblet til ett spesifikt barn, f.eks kontantstøtte
    * @deprecated
-   * @default ""
    * @example "12345678910"
    */
   gjelderBarnId?: string | null;
+  /** Spesifisere inntektstype for detaljpost */
   inntektstype?: Inntektstype | null;
 }
 
@@ -3007,14 +2636,11 @@ export interface OppdaterePeriodeInntekt {
   /**
    * Id til inntekt som skal oppdateres
    * @format int64
-   * @default ""
    */
   id: number;
-  /**
-   * Anig om inntekten skal inkluderes i beregning
-   * @default false
-   */
+  /** Anig om inntekten skal inkluderes i beregning */
   taMedIBeregning: boolean;
+  /** Angi periode inntekten skal dekke ved beregnings */
   angittPeriode?: Datoperiode | null;
   skatteprosent?: number | null;
 }
@@ -3023,7 +2649,6 @@ export interface OppdatereSkatteprosentInntekt {
   /**
    * Id til inntekt som skal oppdateres
    * @format int64
-   * @default ""
    */
   id: number;
   skatteprosent?: number | null;
@@ -3034,10 +2659,7 @@ export interface InntektValideringsfeilDto {
   utvidetBarnetrygd?: InntektValideringsfeil | null;
   kontantstøtte?: InntektValideringsfeil[] | null;
   småbarnstillegg?: InntektValideringsfeil | null;
-  /**
-   * @uniqueItems true
-   * @default ""
-   */
+  /** @uniqueItems true */
   årsinntekter?: InntektValideringsfeil[] | null;
 }
 
@@ -3052,16 +2674,12 @@ export interface InntekterDtoV2 {
   månedsinntekter: InntektDtoV2[];
   /** @uniqueItems true */
   småbarnstillegg: InntektDtoV2[];
-  /**
-   * @uniqueItems true
-   * @default ""
-   */
+  /** @uniqueItems true */
   årsinntekter: InntektDtoV2[];
   beregnetInntekter: BeregnetInntekterDto[];
   /**
    * Saksbehandlers begrunnelser
    * @uniqueItems true
-   * @default ""
    */
   begrunnelser: BegrunnelseDto[];
   /** @uniqueItems true */
@@ -3070,7 +2688,6 @@ export interface InntekterDtoV2 {
   /**
    * Saksbehandlers begrunnelse
    * @deprecated
-   * @default ""
    */
   notat: BegrunnelseDto;
 }
@@ -3078,38 +2695,30 @@ export interface InntekterDtoV2 {
 export interface OppdatereInntektResponse {
   inntekter: InntekterDtoV2;
   inntekterV2: InntekterDtoRolle[];
+  /** @deprecated */
   gebyr?: GebyrDto | null;
   gebyrV2?: GebyrDtoV2 | null;
   gebyrV3?: GebyrDtoV3 | null;
   beregnetGebyrErEndret: boolean;
-  /**
-   * Periodiserte inntekter
-   * @default ""
-   */
+  /** Periodiserte inntekter */
   beregnetInntekter: BeregnetInntekterDto[];
-  /**
-   * Oppdatert begrunnelse
-   * @default ""
-   */
+  /** Oppdatert begrunnelse */
   begrunnelse?: string | null;
   valideringsfeil: InntektValideringsfeilDto;
   /**
    * Oppdatert begrunnelse
    * @deprecated
-   * @default ""
    */
   notat?: string | null;
 }
 
 export interface OppdatereInntektBegrunnelseRequest {
-  /**
-   * Oppdatere begrunnelse for inntekt
-   * @default ""
-   */
+  /** Oppdatere begrunnelse for inntekt */
   oppdatereBegrunnelse: OppdatereBegrunnelse;
 }
 
 export interface OppdatereInntektBegrunnelseRespons {
+  /** Oppdatere begrunnelse for inntekt */
   oppdatertBegrunnelse?: OppdatereBegrunnelse | null;
 }
 
@@ -3118,59 +2727,42 @@ export interface OppdaterGebyrDto {
   rolleId: number;
   /** @format int64 */
   søknadsid?: number | null;
-  /**
-   * Om gebyr skal overstyres. Settes til motsatte verdi av beregnet verdi
-   * @default false
-   */
+  /** Om gebyr skal overstyres. Settes til motsatte verdi av beregnet verdi */
   overstyrGebyr: boolean;
   begrunnelse?: string | null;
 }
 
 export interface OppdatereAndreVoksneIHusstanden {
+  /** Oppdatere bor-med-andre-voksne-status på periode */
   oppdaterePeriode?: OppdatereAndreVoksneIHusstandenperiode | null;
-  /**
-   * Id til perioden som skal slettes
-   * @default ""
-   */
+  /** Id til perioden som skal slettes */
   slettePeriode?: string | null;
-  /**
-   * Angi om historikken skal tilbakestilles til siste aktiverte grunnlagsdata
-   * @default ""
-   */
+  /** Angi om historikken skal tilbakestilles til siste aktiverte grunnlagsdata */
   tilbakestilleHistorikk: string;
-  /**
-   * Angi om siste endring skal angres
-   * @default ""
-   */
+  /** Angi om siste endring skal angres */
   angreSisteEndring: string;
 }
 
 export interface OppdatereAndreVoksneIHusstandenperiode {
-  /**
-   * Id til bostatusperioden som skal oppdateres, oppretter ny hvis null
-   * @default ""
-   */
+  /** Id til bostatusperioden som skal oppdateres, oppretter ny hvis null */
   idPeriode?: string | null;
   /**
    * Periode, fra-og-med til-og-med måned. Ignoreres for særbidrag
    * @format date
-   * @default ""
    * @example "2025-01"
    */
   periode: TypeArManedsperiode;
-  /** @default false */
   borMedAndreVoksne: boolean;
 }
 
-/**
- * Oppdaterer husstandsmedlem, sivilstand, eller notat
- * @default null
- */
+/** Oppdaterer husstandsmedlem, sivilstand, eller notat */
 export interface OppdatereBoforholdRequestV2 {
   oppdaterePeriodeMedAndreVoksneIHusstand?: OppdatereAndreVoksneIHusstanden | null;
   oppdatereHusstandsmedlem?: OppdatereHusstandsmedlem | null;
   oppdatereSivilstand?: OppdatereSivilstand | null;
+  /** Oppdatere saksbehandlers begrunnelse */
   oppdatereBegrunnelse?: OppdatereBegrunnelse | null;
+  /** Deprekert - Bruk oppdatereBegrunnelse i stedet */
   oppdatereNotat?: OppdatereBegrunnelse | null;
   henteOppdatereBegrunnelse?: OppdatereBegrunnelse | null;
 }
@@ -3179,59 +2771,40 @@ export interface OppdatereBostatusperiode {
   /**
    * Id til husstandsbarnet perioden skal gjelde for
    * @deprecated
-   * @default ""
    */
   idHusstandsbarn: string;
-  /**
-   * Id til husstandsmedlemmet perioden skal gjelde for
-   * @default ""
-   */
+  /** Id til husstandsmedlemmet perioden skal gjelde for */
   idHusstandsmedlem: string;
-  /**
-   * Id til perioden som skal oppdateres
-   * @default ""
-   */
+  /** Id til perioden som skal oppdateres */
   idPeriode?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoFom?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "2025-01-25"
    */
   datoTom?: string | null;
   periode: TypeArManedsperiode;
-  /** @default "" */
   bostatus: Bostatuskode;
 }
 
 export interface OppdatereHusstandsmedlem {
+  /** Informasjon om husstandsmedlem som skal opprettes */
   opprettHusstandsmedlem?: OpprettHusstandsstandsmedlem | null;
   oppdaterPeriode?: OppdatereBostatusperiode | null;
-  /**
-   * Id til perioden som skal slettes
-   * @default ""
-   */
+  /** Id til perioden som skal slettes */
   slettPeriode?: string | null;
-  /**
-   * Id til husstandsmedlemmet som skal slettes
-   * @default ""
-   */
+  /** Id til husstandsmedlemmet som skal slettes */
   slettHusstandsmedlem?: string | null;
   /**
    * Id til husstandsmedlemmet perioden skal resettes for.
    *         |Dette vil resette til opprinnelig perioder hentet fra offentlige registre
-   * @default ""
    */
   tilbakestillPerioderForHusstandsmedlem?: string | null;
-  /**
-   * Id til husstandsmedlemmet siste steg skal angres for
-   * @default ""
-   */
+  /** Id til husstandsmedlemmet siste steg skal angres for */
   angreSisteStegForHusstandsmedlem?: string | null;
 }
 
@@ -3239,15 +2812,9 @@ export interface OppdatereSivilstand {
   nyEllerEndretSivilstandsperiode?: Sivilstandsperiode | null;
   /** @format int64 */
   sletteSivilstandsperiode?: number | null;
-  /**
-   * Tilbakestiller til historikk fra offentlige registre
-   * @default ""
-   */
+  /** Tilbakestiller til historikk fra offentlige registre */
   tilbakestilleHistorikk: string;
-  /**
-   * Settes til true for å angre siste endring
-   * @default ""
-   */
+  /** Settes til true for å angre siste endring */
   angreSisteEndring: string;
 }
 
@@ -3272,9 +2839,9 @@ export interface OppdatereBoforholdResponse {
   /**
    * Oppdaterte perioder med andre voksne i Bps husstand
    * @uniqueItems true
-   * @default ""
    */
   oppdatertePerioderMedAndreVoksne: BostatusperiodeDto[];
+  /** Husstandsmedlem som ble opprettet */
   oppdatertHusstandsmedlem?: HusstandsmedlemDtoV2 | null;
   egetBarnErEnesteVoksenIHusstanden?: boolean | null;
   /** @uniqueItems true */
@@ -3282,7 +2849,15 @@ export interface OppdatereBoforholdResponse {
   begrunnelse?: string | null;
   valideringsfeil: BoforholdValideringsfeil;
   beregnetBoforhold: DelberegningBoforhold[];
+  /**
+   * Erstattes av oppdatertHusstandsmedlem
+   * @deprecated
+   */
   oppdatertHusstandsbarn?: HusstandsmedlemDtoV2 | null;
+  /**
+   * Saksbehandlers notat
+   * @deprecated
+   */
   oppdatertNotat?: OppdatereBegrunnelse | null;
 }
 
@@ -3293,25 +2868,13 @@ export interface OppdaterBeregnTilDatoRequestDto {
 }
 
 export interface AktivereGrunnlagRequestV2 {
-  /**
-   * Personident tilhørende rolle i behandling grunnlag skal aktiveres for
-   * @default ""
-   */
+  /** Personident tilhørende rolle i behandling grunnlag skal aktiveres for */
   personident?: string | null;
-  /**
-   * Grunnlagstype som skal aktiveres
-   * @default ""
-   */
+  /** Grunnlagstype som skal aktiveres */
   grunnlagstype: OpplysningerType;
-  /**
-   * Angi om manuelle opplysninger skal overskrives
-   * @default false
-   */
+  /** Angi om manuelle opplysninger skal overskrives */
   overskriveManuelleOpplysninger: boolean;
-  /**
-   * Ident på person grunnlag gjelder. Er relevant for blant annet Barnetillegg, Kontantstøtte og Boforhold
-   * @default ""
-   */
+  /** Ident på person grunnlag gjelder. Er relevant for blant annet Barnetillegg, Kontantstøtte og Boforhold */
   gjelderIdent?: string | null;
   /** @format int64 */
   gjelderRolleId?: number | null;
@@ -3325,7 +2888,6 @@ export interface AktivereGrunnlagResponseV2 {
 }
 
 export interface OppdaterRollerRequest {
-  /** @default "" */
   roller: OpprettRolleDto[];
   /** @format int64 */
   søknadsid?: number | null;
@@ -3333,27 +2895,16 @@ export interface OppdaterRollerRequest {
   rollerUnderBehandling: OpprettRolleDto[];
 }
 
-/**
- * Rolle beskrivelse som er brukte til å opprette nye roller
- * @default null
- */
+/** Rolle beskrivelse som er brukte til å opprette nye roller */
 export interface OpprettRolleDto {
-  /** @default "" */
   rolletype: Rolletype;
-  /**
-   * F.eks fødselsnummer. Påkrevd for alle rolletyper utenom for barn som ikke inngår i beregning.
-   * @default ""
-   */
+  /** F.eks fødselsnummer. Påkrevd for alle rolletyper utenom for barn som ikke inngår i beregning. */
   ident?: string | null;
-  /**
-   * Navn på rolleinnehaver hvis ident er ukjent. Gjelder kun barn som ikke inngår i beregning
-   * @default ""
-   */
+  /** Navn på rolleinnehaver hvis ident er ukjent. Gjelder kun barn som ikke inngår i beregning */
   navn?: string | null;
   /**
    * F.eks fødselsdato
    * @format date
-   * @default ""
    */
   fødselsdato?: string | null;
   innbetaltBeløp?: number | null;
@@ -3377,19 +2928,11 @@ export interface OpprettBehandlingRequest {
   søknadstype?: Behandlingstype | null;
   behandlingstype?: Behandlingstype | null;
   behandlingstema?: Behandlingstema | null;
-  /** @default "" */
   vedtakstype: Vedtakstype;
-  /**
-   * @format date
-   * @default ""
-   */
+  /** @format date */
   søktFomDato: string;
-  /**
-   * @format date
-   * @default ""
-   */
+  /** @format date */
   mottattdato: string;
-  /** @default "" */
   søknadFra: SoktAvType;
   /**
    * @minLength 7
@@ -3413,17 +2956,13 @@ export interface OpprettBehandlingRequest {
   søknadsreferanseid?: number | null;
   kategori?: OpprettKategoriRequestDto | null;
   innkrevingstype?: Innkrevingstype | null;
-  rollerUnderBehandling: OpprettRolleDto[];
   gebyrGjelder18År: boolean;
+  rollerUnderBehandling: OpprettRolleDto[];
 }
 
 export interface OpprettKategoriRequestDto {
-  /** @default "" */
   kategori: string;
-  /**
-   * Beskrivelse av kategorien som er valgt. Er påkrevd hvis kategori er ANNET
-   * @default ""
-   */
+  /** Beskrivelse av kategorien som er valgt. Er påkrevd hvis kategori er ANNET  */
   beskrivelse?: string | null;
 }
 
@@ -3470,19 +3009,11 @@ export interface OppdaterManuellVedtakResponse {
 }
 
 export interface OpprettBehandlingFraVedtakRequest {
-  /** @default "" */
   vedtakstype: Vedtakstype;
-  /**
-   * @format date
-   * @default ""
-   */
+  /** @format date */
   søktFomDato: string;
-  /**
-   * @format date
-   * @default ""
-   */
+  /** @format date */
   mottattdato: string;
-  /** @default "" */
   søknadFra: SoktAvType;
   /**
    * @minLength 7
@@ -3494,10 +3025,7 @@ export interface OpprettBehandlingFraVedtakRequest {
    * @maxLength 4
    */
   behandlerenhet: string;
-  /**
-   * @format int64
-   * @default ""
-   */
+  /** @format int64 */
   søknadsid: number;
   /** @format int64 */
   søknadsreferanseid?: number | null;
@@ -3534,17 +3062,10 @@ export interface KanBehandlesINyLosningRequest {
   søknadsbarn: SjekkRolleDto[];
 }
 
-/**
- * Rolle beskrivelse som er brukte til å opprette nye roller
- * @default null
- */
+/** Rolle beskrivelse som er brukte til å opprette nye roller */
 export interface SjekkRolleDto {
-  /** @default "" */
   rolletype: Rolletype;
-  /**
-   * F.eks fødselsnummer. Påkrevd for alle rolletyper utenom for barn som ikke inngår i beregning.
-   * @default ""
-   */
+  /** F.eks fødselsnummer. Påkrevd for alle rolletyper utenom for barn som ikke inngår i beregning. */
   ident?: string | null;
   erUkjent?: boolean | null;
 }
@@ -3677,308 +3198,149 @@ export interface TypeApenBehandlingBarnSoknad {
   behandlingstema?: Behandlingstema | null;
 }
 
-/** @default null */
 export interface OpprettBehandlingsreferanseRequestDto {
-  /**
-   * Kilde/type for en behandlingsreferanse
-   * @default ""
-   */
+  /** Kilde/type for en behandlingsreferanse */
   kilde: BehandlingsrefKilde;
-  /**
-   * Kildesystemets referanse til behandlingen
-   * @default ""
-   */
+  /** Kildesystemets referanse til behandlingen */
   referanse: string;
 }
 
-/** @default null */
 export interface OpprettEngangsbelopRequestDto {
-  /**
-   * Beløpstype. Særbidrag, gebyr m.m.
-   * @default ""
-   */
+  /** Beløpstype. Særbidrag, gebyr m.m. */
   type: Engangsbeloptype;
-  /**
-   * Referanse til sak
-   * @default ""
-   */
+  /** Referanse til sak */
   sak: string;
-  /**
-   * Personidenten til den som skal betale engangsbeløpet
-   * @default ""
-   */
+  /** Personidenten til den som skal betale engangsbeløpet */
   skyldner: string;
-  /**
-   * Personidenten til den som krever engangsbeløpet
-   * @default ""
-   */
+  /** Personidenten til den som krever engangsbeløpet */
   kravhaver: string;
-  /**
-   * Personidenten til den som mottar engangsbeløpet
-   * @default ""
-   */
+  /** Personidenten til den som mottar engangsbeløpet */
   mottaker: string;
-  /**
-   * Beregnet engangsbeløp
-   * @default ""
-   */
+  /** Beregnet engangsbeløp */
   beløp?: number | null;
-  /**
-   * Valutakoden tilhørende engangsbeløpet
-   * @default ""
-   */
+  /** Valutakoden tilhørende engangsbeløpet */
   valutakode?: string | null;
-  /**
-   * Resultatkoden tilhørende engangsbeløpet
-   * @default ""
-   */
+  /** Resultatkoden tilhørende engangsbeløpet */
   resultatkode: string;
-  /**
-   * Angir om engangsbeløpet skal innkreves
-   * @default ""
-   */
+  /** Angir om engangsbeløpet skal innkreves */
   innkreving: Innkrevingstype;
-  /**
-   * Angir om søknaden om engangsbeløp er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING'
-   * @default ""
-   */
+  /** Angir om søknaden om engangsbeløp er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING' */
   beslutning: Beslutningstype;
   /**
    * Id for vedtaket det er klaget på. Utgjør sammen med referanse en unik id for et engangsbeløp
    * @format int32
-   * @default ""
    */
   omgjørVedtakId?: number | null;
-  /**
-   * Referanse til engangsbeløp, brukes for å kunne omgjøre engangsbeløp senere i et klagevedtak. Unik innenfor et vedtak. Unik referanse blir generert av bidrag-vedtak hvis den ikke er angitt i requesten.
-   * @default ""
-   */
+  /** Referanse til engangsbeløp, brukes for å kunne omgjøre engangsbeløp senere i et klagevedtak. Unik innenfor et vedtak. Unik referanse blir generert av bidrag-vedtak hvis den ikke er angitt i requesten. */
   referanse?: string | null;
-  /**
-   * Referanse - delytelsesId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere
-   * @default ""
-   */
+  /** Referanse - delytelsesId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere */
   delytelseId?: string | null;
-  /**
-   * Referanse som brukes i utlandssaker
-   * @default ""
-   */
+  /** Referanse som brukes i utlandssaker */
   eksternReferanse?: string | null;
-  /**
-   * Liste over alle grunnlag som inngår i engangsbeløpet
-   * @default ""
-   */
+  /** Liste over alle grunnlag som inngår i engangsbeløpet */
   grunnlagReferanseListe: string[];
-  /**
-   * Beløp BP allerede har betalt. Kan være 0 eller høyere.
-   * @default ""
-   */
+  /** Beløp BP allerede har betalt. Kan være 0 eller høyere. */
   betaltBeløp?: number | null;
 }
 
-/** @default null */
 export interface OpprettGrunnlagRequestDto {
-  /**
-   * Referanse (unikt navn på grunnlaget)
-   * @default ""
-   */
+  /** Referanse (unikt navn på grunnlaget) */
   referanse: string;
-  /**
-   * Grunnlagstype
-   * @default ""
-   */
+  /** Grunnlagstype */
   type: Grunnlagstype;
-  /**
-   * Grunnlagsinnhold (generisk)
-   * @default ""
-   */
+  /** Grunnlagsinnhold (generisk) */
   innhold: string;
-  /**
-   * Liste over grunnlagsreferanser
-   * @default ""
-   */
+  /** Liste over grunnlagsreferanser */
   grunnlagsreferanseListe: string[];
-  /**
-   * Referanse til personobjektet grunnlaget gjelder
-   * @default ""
-   */
+  /** Referanse til personobjektet grunnlaget gjelder */
   gjelderReferanse?: string | null;
-  /**
-   * Referanse til barn personobjektet grunnlaget gjelder
-   * @default ""
-   */
+  /** Referanse til barn personobjektet grunnlaget gjelder */
   gjelderBarnReferanse?: string | null;
 }
 
-/** @default null */
 export interface OpprettPeriodeRequestDto {
-  /**
-   * Periode med fra-og-med-dato og til-dato med format ÅÅÅÅ-MM
-   * @default ""
-   */
+  /** Periode med fra-og-med-dato og til-dato med format ÅÅÅÅ-MM */
   periode: TypeArManedsperiode;
-  /**
-   * Beregnet stønadsbeløp
-   * @default ""
-   */
+  /** Beregnet stønadsbeløp */
   beløp?: number | null;
-  /**
-   * Valutakoden tilhørende stønadsbeløpet
-   * @default ""
-   */
+  /** Valutakoden tilhørende stønadsbeløpet */
   valutakode?: string | null;
-  /**
-   * Resultatkoden tilhørende stønadsbeløpet
-   * @default ""
-   */
+  /** Resultatkoden tilhørende stønadsbeløpet */
   resultatkode: string;
-  /**
-   * Referanse - delytelseId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere
-   * @default ""
-   */
+  /** Referanse - delytelseId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere */
   delytelseId?: string | null;
-  /**
-   * Liste over alle grunnlag som inngår i perioden
-   * @default ""
-   */
+  /** Liste over alle grunnlag som inngår i perioden */
   grunnlagReferanseListe: string[];
 }
 
-/** @default null */
 export interface OpprettStonadsendringRequestDto {
-  /**
-   * Stønadstype
-   * @default ""
-   */
+  /** Stønadstype */
   type: Stonadstype;
-  /**
-   * Referanse til sak
-   * @default ""
-   */
+  /** Referanse til sak */
   sak: string;
-  /**
-   * Personidenten til den som skal betale bidraget
-   * @default ""
-   */
+  /** Personidenten til den som skal betale bidraget */
   skyldner: string;
-  /**
-   * Personidenten til den som krever bidraget
-   * @default ""
-   */
+  /** Personidenten til den som krever bidraget */
   kravhaver: string;
-  /**
-   * Personidenten til den som mottar bidraget
-   * @default ""
-   */
+  /** Personidenten til den som mottar bidraget */
   mottaker: string;
   /**
    * Vedtaksid for siste vedtak. Ikke utfyllt for førstegangsvedtak
    * @format int32
-   * @default ""
    */
   sisteVedtaksid?: number | null;
   /**
    * Angir første år en stønad skal indeksreguleres
    * @format int32
-   * @default ""
    */
   førsteIndeksreguleringsår?: number | null;
-  /**
-   * Angir om stønaden skal innkreves
-   * @default ""
-   */
+  /** Angir om stønaden skal innkreves */
   innkreving: Innkrevingstype;
-  /**
-   * Angir om søknaden om stønadsendring er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING'
-   * @default ""
-   */
+  /** Angir om søknaden om stønadsendring er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING' */
   beslutning: Beslutningstype;
   /**
    * Id for vedtaket det er klaget på
    * @format int32
-   * @default ""
    */
   omgjørVedtakId?: number | null;
-  /**
-   * Referanse som brukes i utlandssaker
-   * @default ""
-   */
+  /** Referanse som brukes i utlandssaker */
   eksternReferanse?: string | null;
-  /**
-   * Liste over grunnlag som er knyttet direkte til stønadsendringen
-   * @default ""
-   */
+  /** Liste over grunnlag som er knyttet direkte til stønadsendringen */
   grunnlagReferanseListe: string[];
-  /**
-   * Liste over alle perioder som inngår i stønadsendringen
-   * @default ""
-   */
+  /** Liste over alle perioder som inngår i stønadsendringen */
   periodeListe: OpprettPeriodeRequestDto[];
 }
 
-/** @default null */
 export interface OpprettVedtakRequestDto {
-  /**
-   * Hva er kilden til vedtaket. Automatisk eller manuelt
-   * @default ""
-   */
+  /** Hva er kilden til vedtaket. Automatisk eller manuelt */
   kilde: OpprettVedtakRequestDtoKildeEnum;
-  /**
-   * Type vedtak
-   * @default ""
-   */
+  /** Type vedtak */
   type: Vedtakstype;
-  /**
-   * Skal bare brukes ved batchkjøring. Id til batchjobb som oppretter vedtaket
-   * @default ""
-   */
+  /** Skal bare brukes ved batchkjøring. Id til batchjobb som oppretter vedtaket */
   opprettetAv?: string | null;
   /**
    * Tidspunkt/timestamp når vedtaket er fattet. Er null for vedtaksforslag
    * @format date-time
-   * @default ""
    */
   vedtakstidspunkt?: string | null;
-  /**
-   * Referanse som er unik for vedtaket
-   * @default ""
-   */
+  /** Referanse som er unik for vedtaket */
   unikReferanse?: string | null;
-  /**
-   * Enheten som er ansvarlig for vedtaket. Kan være null for feks batch
-   * @default ""
-   */
+  /** Enheten som er ansvarlig for vedtaket. Kan være null for feks batch */
   enhetsnummer?: string | null;
   /**
    * Settes hvis overføring til Elin skal utsettes
    * @format date
-   * @default ""
    */
   innkrevingUtsattTilDato?: string | null;
-  /**
-   * Settes hvis vedtaket er fastsatt i utlandet
-   * @default ""
-   */
+  /** Settes hvis vedtaket er fastsatt i utlandet */
   fastsattILand?: string | null;
-  /**
-   * Liste over alle grunnlag som inngår i vedtaket
-   * @default ""
-   */
+  /** Liste over alle grunnlag som inngår i vedtaket */
   grunnlagListe: OpprettGrunnlagRequestDto[];
-  /**
-   * Liste over alle stønadsendringer som inngår i vedtaket
-   * @default ""
-   */
+  /** Liste over alle stønadsendringer som inngår i vedtaket */
   stønadsendringListe: OpprettStonadsendringRequestDto[];
-  /**
-   * Liste over alle engangsbeløp som inngår i vedtaket
-   * @default ""
-   */
+  /** Liste over alle engangsbeløp som inngår i vedtaket */
   engangsbeløpListe: OpprettEngangsbelopRequestDto[];
-  /**
-   * Liste med referanser til alle behandlinger som ligger som grunnlag til vedtaket
-   * @default ""
-   */
+  /** Liste med referanser til alle behandlinger som ligger som grunnlag til vedtaket */
   behandlingsreferanseListe: OpprettBehandlingsreferanseRequestDto[];
 }
 
@@ -4046,10 +3408,10 @@ export interface ResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
-  totalEndeligInntekt: number;
-  inntektBPMånedlig?: number | null;
-  inntektBMMånedlig?: number | null;
   inntektBarnMånedlig?: number | null;
+  inntektBPMånedlig?: number | null;
+  totalEndeligInntekt: number;
+  inntektBMMånedlig?: number | null;
 }
 
 export interface ResultatSaerbidragsberegningDto {
@@ -4080,10 +3442,10 @@ export interface Skatt {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattMånedsbeløp: number;
-  trygdeavgiftMånedsbeløp: number;
   trinnskattMånedsbeløp: number;
+  trygdeavgiftMånedsbeløp: number;
   skattAlminneligInntektMånedsbeløp: number;
+  skattMånedsbeløp: number;
 }
 
 export interface UnderholdEgneBarnIHusstand {
@@ -4098,7 +3460,6 @@ export interface GrunnlagFraVedtak {
   /**
    * Årstall for aldersjustering av grunnlag. Brukes hvis det er et vedtak som skal brukes for aldersjustering av grunnlag. Dette er relevant ved omgjøring/klagebehanding i bidrag ellers aldersjusteres det for inneværende år eller ikke er relevant
    * @format int32
-   * @default ""
    */
   aldersjusteringForÅr?: number | null;
   /** @format int32 */
@@ -4106,10 +3467,7 @@ export interface GrunnlagFraVedtak {
   grunnlagFraOmgjøringsvedtak: boolean;
   /** @format date-time */
   vedtakstidspunkt?: string | null;
-  /**
-   * Perioder i vedtaket som er valgt. Brukes når vedtakstype er innkreving og det er valgt å innkreve en vedtak fra NAV som opprinnelig var uten innkreving
-   * @default ""
-   */
+  /** Perioder i vedtaket som er valgt. Brukes når vedtakstype er innkreving og det er valgt å innkreve en vedtak fra NAV som opprinnelig var uten innkreving */
   perioder: VedtakPeriodeDto[];
 }
 
@@ -4146,64 +3504,35 @@ export interface ResultatRolle {
   fødselsdatoSortering: string;
 }
 
-/** @default null */
 export interface VedtakPeriodeDto {
-  /**
-   * Periode med fra-og-med-dato og til-dato med format ÅÅÅÅ-MM
-   * @default ""
-   */
+  /** Periode med fra-og-med-dato og til-dato med format ÅÅÅÅ-MM */
   periode: TypeArManedsperiode;
-  /**
-   * Beregnet stønadsbeløp
-   * @default ""
-   */
+  /** Beregnet stønadsbeløp */
   beløp?: number | null;
-  /**
-   * Valutakoden tilhørende stønadsbeløpet
-   * @default ""
-   */
+  /** Valutakoden tilhørende stønadsbeløpet */
   valutakode?: string | null;
-  /**
-   * Resultatkoden tilhørende stønadsbeløpet
-   * @default ""
-   */
+  /** Resultatkoden tilhørende stønadsbeløpet */
   resultatkode: string;
-  /**
-   * Referanse - delytelseId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere
-   * @default ""
-   */
+  /** Referanse - delytelseId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere */
   delytelseId?: string | null;
-  /**
-   * Liste over alle grunnlag som inngår i perioden
-   * @default ""
-   */
+  /** Liste over alle grunnlag som inngår i perioden */
   grunnlagReferanseListe: string[];
 }
 
 export interface AldersjusteringDetaljerGrunnlag {
   periode: TypeArManedsperiode;
-  /**
-   * Om grunnlaget er manuelt registrert av saksbehandler eller om det er innhentet fra ekstern kilde (skatt/folkregisteret...)
-   * @default false
-   */
+  /** Om grunnlaget er manuelt registrert av saksbehandler eller om det er innhentet fra ekstern kilde (skatt/folkregisteret...) */
   manueltRegistrert: boolean;
   /** @format int32 */
   grunnlagFraVedtak?: number | null;
   aldersjustert: boolean;
-  /**
-   * Er sann hvis automatiske løsningen ikke kunne aldersjustere og det må utføres manuelt
-   * @default false
-   */
+  /** Er sann hvis automatiske løsningen ikke kunne aldersjustere og det må utføres manuelt */
   aldersjusteresManuelt: boolean;
-  /**
-   * Er sann hvis aldersjustering er gjort manuelt
-   * @default false
-   */
+  /** Er sann hvis aldersjustering er gjort manuelt */
   aldersjustertManuelt: boolean;
   /**
    * Vedtaksid som er opprettet av automatisk aldersjustering. Dette settes hvis det er fattet manuell vedtak etter at automatisk aldersjustering ikke kunne hente grunnlag fra siste manuelle vedtak Vil bare bli satt hvis aldersjustertManuelt=true
    * @format int32
-   * @default ""
    */
   følgerAutomatiskVedtak?: number | null;
   begrunnelser?: string[] | null;
@@ -4407,8 +3736,8 @@ export interface ResultatBarnebidragsberegningPeriodeDto {
   vedtakstype: Vedtakstype;
   klageOmgjøringDetaljer?: KlageOmgjoringDetaljer | null;
   resultatFraVedtak?: ResultatFraVedtakGrunnlag | null;
-  delvedtakstypeVisningsnavn: string;
   resultatkodeVisningsnavn?: string | null;
+  delvedtakstypeVisningsnavn: string;
 }
 
 export interface ResultatBidragberegningDto {
@@ -4561,22 +3890,13 @@ export interface BehandlingInfoDto {
   soknadId?: string | null;
   engangsBelopType?: Engangsbeloptype | null;
   stonadType?: Stonadstype | null;
-  /**
-   * Brukes bare hvis stonadType og engangsbelopType er null
-   * @default ""
-   */
+  /** Brukes bare hvis stonadType og engangsbelopType er null */
   behandlingType?: string | null;
   vedtakType?: Vedtakstype | null;
-  /**
-   * Soknadtype er gamle kodeverdier som er erstattet av vedtaktype.
-   * @default ""
-   */
+  /** Soknadtype er gamle kodeverdier som er erstattet av vedtaktype. */
   soknadType?: string | null;
   erFattetBeregnet?: boolean | null;
-  /**
-   * Hvis resultatkoden fra BBM er IT så skal denne være sann
-   * @default false
-   */
+  /** Hvis resultatkoden fra BBM er IT så skal denne være sann */
   erVedtakIkkeTilbakekreving?: boolean | null;
   soknadFra?: SoktAvType | null;
   barnIBehandling: string[];
@@ -4633,7 +3953,6 @@ export interface HusstandsmedlemDto {
   /**
    * Teknisk id på husstandsmedlem som har periodiseringsfeil
    * @format int64
-   * @default ""
    */
   husstandsmedlemId: number;
 }
@@ -4643,6 +3962,7 @@ export interface MaBekrefteNyeOpplysninger {
   rolle: RolleDto;
   /** @format int64 */
   underholdskostnadId?: number | null;
+  /** Barn som det må bekreftes nye opplysninger for. Vil bare være satt hvis type = BOFORHOLD */
   gjelderBarn?: HusstandsmedlemDto | null;
 }
 
@@ -4654,295 +3974,146 @@ export interface ArbeidOgInntektLenkeRequest {
   ident: string;
 }
 
-/** @default null */
 export interface BehandlingsreferanseDto {
-  /**
-   * Kilde/type for en behandlingsreferanse
-   * @default ""
-   */
+  /** Kilde/type for en behandlingsreferanse */
   kilde: BehandlingsrefKilde;
-  /**
-   * Kildesystemets referanse til behandlingen
-   * @default ""
-   */
+  /** Kildesystemets referanse til behandlingen */
   referanse: string;
 }
 
-/** @default null */
 export interface EngangsbelopDto {
-  /**
-   * Type Engangsbeløp. Særbidrag, gebyr m.m.
-   * @default ""
-   */
+  /** Type Engangsbeløp. Særbidrag, gebyr m.m. */
   type: Engangsbeloptype;
-  /**
-   * Referanse til sak
-   * @default ""
-   */
+  /** Referanse til sak */
   sak: string;
-  /**
-   * Personidenten til den som skal betale engangsbeløpet
-   * @default ""
-   */
+  /** Personidenten til den som skal betale engangsbeløpet */
   skyldner: string;
-  /**
-   * Personidenten til den som krever engangsbeløpet
-   * @default ""
-   */
+  /** Personidenten til den som krever engangsbeløpet */
   kravhaver: string;
-  /**
-   * Personidenten til den som mottar engangsbeløpet
-   * @default ""
-   */
+  /** Personidenten til den som mottar engangsbeløpet */
   mottaker: string;
-  /**
-   * Beregnet engangsbeløp
-   * @default ""
-   */
+  /** Beregnet engangsbeløp */
   beløp?: number | null;
-  /**
-   * Valutakoden tilhørende engangsbeløpet
-   * @default ""
-   */
+  /** Valutakoden tilhørende engangsbeløpet */
   valutakode?: string | null;
-  /**
-   * Resultatkoden tilhørende engangsbeløpet
-   * @default ""
-   */
+  /** Resultatkoden tilhørende engangsbeløpet */
   resultatkode: string;
-  /**
-   * Angir om engangsbeløpet skal innkreves
-   * @default ""
-   */
+  /** Angir om engangsbeløpet skal innkreves */
   innkreving: Innkrevingstype;
-  /**
-   * Angir om søknaden om engangsbeløp er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING'
-   * @default ""
-   */
+  /** Angir om søknaden om engangsbeløp er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING' */
   beslutning: Beslutningstype;
   /**
    * Id for vedtaket det er klaget på. Utgjør sammen med referanse en unik id for et engangsbeløp
    * @format int32
-   * @default ""
    */
   omgjørVedtakId?: number | null;
-  /**
-   * Referanse til engangsbeløp, brukes for å kunne omgjøre engangsbeløp senere i et klagevedtak. Unik innenfor et vedtak.Referansen er enten angitt i requesten for opprettelse av vedtak eller generert av bidrag-vedtak hvis den ikke var angitt i requesten.
-   * @default ""
-   */
+  /** Referanse til engangsbeløp, brukes for å kunne omgjøre engangsbeløp senere i et klagevedtak. Unik innenfor et vedtak.Referansen er enten angitt i requesten for opprettelse av vedtak eller generert av bidrag-vedtak hvis den ikke var angitt i requesten. */
   referanse: string;
-  /**
-   * Referanse - delytelsesId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere
-   * @default ""
-   */
+  /** Referanse - delytelsesId/beslutningslinjeId -> bidrag-regnskap. Skal fjernes senere */
   delytelseId?: string | null;
-  /**
-   * Referanse som brukes i utlandssaker
-   * @default ""
-   */
+  /** Referanse som brukes i utlandssaker */
   eksternReferanse?: string | null;
-  /**
-   * Liste over alle grunnlag som inngår i beregningen
-   * @default ""
-   */
+  /** Liste over alle grunnlag som inngår i beregningen */
   grunnlagReferanseListe: string[];
-  /**
-   * Beløp BP allerede har betalt. Kan være 0 eller høyere.
-   * @default ""
-   */
+  /** Beløp BP allerede har betalt. Kan være 0 eller høyere. */
   betaltBeløp?: number | null;
 }
 
-/**
- * Grunnlag
- * @default null
- */
+/** Grunnlag */
 export interface GrunnlagDto {
-  /**
-   * Referanse (unikt navn på grunnlaget)
-   * @default ""
-   */
+  /** Referanse (unikt navn på grunnlaget) */
   referanse: string;
-  /**
-   * Grunnlagstype
-   * @default ""
-   */
+  /** Grunnlagstype */
   type: Grunnlagstype;
-  /**
-   * Grunnlagsinnhold (generisk)
-   * @default ""
-   */
+  /** Grunnlagsinnhold (generisk) */
   innhold: string;
-  /**
-   * Liste over grunnlagsreferanser
-   * @default ""
-   */
+  /** Liste over grunnlagsreferanser */
   grunnlagsreferanseListe: string[];
-  /**
-   * Referanse til personobjektet grunnlaget gjelder
-   * @default ""
-   */
+  /** Referanse til personobjektet grunnlaget gjelder */
   gjelderReferanse?: string | null;
-  /**
-   * Referanse til barn personobjektet grunnlaget gjelder
-   * @default ""
-   */
+  /** Referanse til barn personobjektet grunnlaget gjelder */
   gjelderBarnReferanse?: string | null;
 }
 
-/** @default null */
 export interface StonadsendringDto {
-  /**
-   * Stønadstype
-   * @default ""
-   */
+  /** Stønadstype */
   type: Stonadstype;
-  /**
-   * Referanse til sak
-   * @default ""
-   */
+  /** Referanse til sak */
   sak: string;
-  /**
-   * Personidenten til den som skal betale bidraget
-   * @default ""
-   */
+  /** Personidenten til den som skal betale bidraget */
   skyldner: string;
-  /**
-   * Personidenten til den som krever bidraget
-   * @default ""
-   */
+  /** Personidenten til den som krever bidraget */
   kravhaver: string;
-  /**
-   * Personidenten til den som mottar bidraget
-   * @default ""
-   */
+  /** Personidenten til den som mottar bidraget */
   mottaker: string;
   /**
    * Vedtaksid for siste vedtak. Ikke utfyllt for førstegangsvedtak
    * @format int32
-   * @default ""
    */
   sisteVedtaksid?: number | null;
   /**
    * Angir første år en stønad skal indeksreguleres
    * @format int32
-   * @default ""
    */
   førsteIndeksreguleringsår?: number | null;
-  /**
-   * Angir om stønaden skal innkreves
-   * @default ""
-   */
+  /** Angir om stønaden skal innkreves */
   innkreving: Innkrevingstype;
-  /**
-   * Angir om søknaden om engangsbeløp er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING'
-   * @default ""
-   */
+  /** Angir om søknaden om engangsbeløp er besluttet avvist, stadfestet eller skal medføre endringGyldige verdier er 'AVVIST', 'STADFESTELSE' og 'ENDRING' */
   beslutning: Beslutningstype;
   /**
    * Id for vedtaket det er klaget på
    * @format int32
-   * @default ""
    */
   omgjørVedtakId?: number | null;
-  /**
-   * Referanse som brukes i utlandssaker
-   * @default ""
-   */
+  /** Referanse som brukes i utlandssaker */
   eksternReferanse?: string | null;
-  /**
-   * Liste over grunnlag som er knyttet direkte til stønadsendringen
-   * @default ""
-   */
+  /** Liste over grunnlag som er knyttet direkte til stønadsendringen */
   grunnlagReferanseListe: string[];
-  /**
-   * Liste over alle perioder som inngår i stønadsendringen
-   * @default ""
-   */
+  /** Liste over alle perioder som inngår i stønadsendringen */
   periodeListe: VedtakPeriodeDto[];
 }
 
-/** @default null */
 export interface VedtakDto {
   /** @format int32 */
   vedtaksid: number;
-  /**
-   * Hva er kilden til vedtaket. Automatisk eller manuelt
-   * @default ""
-   */
+  /** Hva er kilden til vedtaket. Automatisk eller manuelt */
   kilde: VedtakDtoKildeEnum;
-  /**
-   * Type vedtak
-   * @default ""
-   */
+  /** Type vedtak */
   type: Vedtakstype;
-  /**
-   * Id til saksbehandler eller batchjobb som opprettet vedtaket. For saksbehandler er ident hentet fra token
-   * @default ""
-   */
+  /** Id til saksbehandler eller batchjobb som opprettet vedtaket. For saksbehandler er ident hentet fra token */
   opprettetAv: string;
-  /**
-   * Saksbehandlers navn
-   * @default ""
-   */
+  /** Saksbehandlers navn */
   opprettetAvNavn?: string | null;
-  /**
-   * Navn på applikasjon som vedtaket er opprettet i. Skal være i lowercase.
-   * @default ""
-   */
+  /** Navn på applikasjon som vedtaket er opprettet i. Skal være i lowercase. */
   kildeapplikasjon: string;
   /**
    * Tidspunkt/timestamp når vedtaket er fattet. Er null for vedtaksforslag
    * @format date-time
-   * @default ""
    */
   vedtakstidspunkt?: string | null;
-  /**
-   * Referanse som er unik for vedtaket
-   * @default ""
-   */
+  /** Referanse som er unik for vedtaket */
   unikReferanse?: string | null;
-  /**
-   * Enheten som er ansvarlig for vedtaket. Kan være null for feks batch
-   * @default ""
-   */
+  /** Enheten som er ansvarlig for vedtaket. Kan være null for feks batch */
   enhetsnummer?: string | null;
   /**
    * Settes hvis overføring til Elin skal utsettes
    * @format date
-   * @default ""
    */
   innkrevingUtsattTilDato?: string | null;
-  /**
-   * Settes hvis vedtaket er fastsatt i utlandet
-   * @default ""
-   */
+  /** Settes hvis vedtaket er fastsatt i utlandet */
   fastsattILand?: string | null;
   /**
    * Tidspunkt vedtaket er fattet
    * @format date-time
-   * @default ""
    */
   opprettetTidspunkt: string;
-  /**
-   * Liste over alle grunnlag som inngår i vedtaket
-   * @default ""
-   */
+  /** Liste over alle grunnlag som inngår i vedtaket */
   grunnlagListe: GrunnlagDto[];
-  /**
-   * Liste over alle stønadsendringer som inngår i vedtaket
-   * @default ""
-   */
+  /** Liste over alle stønadsendringer som inngår i vedtaket */
   stønadsendringListe: StonadsendringDto[];
-  /**
-   * Liste over alle engangsbeløp som inngår i vedtaket
-   * @default ""
-   */
+  /** Liste over alle engangsbeløp som inngår i vedtaket */
   engangsbeløpListe: EngangsbelopDto[];
-  /**
-   * Liste med referanser til alle behandlinger som ligger som grunnlag til vedtaket
-   * @default ""
-   */
+  /** Liste med referanser til alle behandlinger som ligger som grunnlag til vedtaket */
   behandlingsreferanseListe: BehandlingsreferanseDto[];
 }
 
@@ -4965,13 +4136,11 @@ export interface BehandlingDetaljerDtoV2 {
   opprettetTidspunkt: string;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   søktFomDato: string;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   mottattdato: string;
@@ -4988,7 +4157,6 @@ export interface BehandlingDetaljerDtoV2 {
   roller: RolleDto[];
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   virkningstidspunkt?: string | null;
@@ -5001,10 +4169,7 @@ export interface BehandlingDetaljerDtoV2 {
 
 export interface SaksbehandlerDto {
   ident: string;
-  /**
-   * Saksbehandlers navn (med eventuelt fornavn bak komma)
-   * @default ""
-   */
+  /** Saksbehandlers navn (med eventuelt fornavn bak komma) */
   navn?: string | null;
 }
 
@@ -5036,33 +4201,22 @@ export interface BidragsberegningOrkestratorRequestV2 {
   skalHensyntaLøpendeBidrag: boolean;
 }
 
-/**
- * Grunnlag for orkestrering av aldersjustering
- * @default null
- */
+/** Grunnlag for orkestrering av aldersjustering */
 export interface OmgjoringOrkestratorGrunnlag {
-  /**
-   * Id til stønad
-   * @default ""
-   */
+  /** Id til stønad */
   stønad: Stonadsid;
   /**
    * Vedtaksid til originale vedtak som ble fattet
    * @format int32
-   * @default ""
    */
   omgjørVedtakId: number;
   /**
    * Vedtaksid til påklaget vedtak
    * @format int32
-   * @default ""
    */
   påklagetVedtakId: number;
   manuellAldersjustering: OmgjoringorkestratorManuellAldersjustering[];
-  /**
-   * Om behandlingen gjelder paragraf35c
-   * @default false
-   */
+  /** Om behandlingen gjelder paragraf35c */
   gjelderParagraf35c: boolean;
   gjelderKlage: boolean;
   skalInnkreves: boolean;
@@ -5158,10 +4312,10 @@ export interface DokumentmalResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
-  totalEndeligInntekt: number;
-  inntektBPMånedlig?: number | null;
-  inntektBMMånedlig?: number | null;
   inntektBarnMånedlig?: number | null;
+  inntektBPMånedlig?: number | null;
+  totalEndeligInntekt: number;
+  inntektBMMånedlig?: number | null;
 }
 
 export type DokumentmalResultatBidragsberegningBarnDto = UtilRequiredKeys<
@@ -5185,10 +4339,10 @@ export interface DokumentmalSkattBeregning {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattMånedsbeløp: number;
-  trygdeavgiftMånedsbeløp: number;
   trinnskattMånedsbeløp: number;
+  trygdeavgiftMånedsbeløp: number;
   skattAlminneligInntektMånedsbeløp: number;
+  skattMånedsbeløp: number;
 }
 
 export interface DokumentmalUnderholdEgneBarnIHusstand {
@@ -5207,7 +4361,6 @@ export interface EndeligOrkestrertVedtak {
 export interface InntekterPerRolle {
   gjelder: DokumentmalPersonDto;
   arbeidsforhold: Arbeidsforhold[];
-  /** @default "" */
   årsinntekter: NotatInntektDto[];
   barnetillegg: NotatInntektDto[];
   utvidetBarnetrygd: NotatInntektDto[];
@@ -5234,17 +4387,11 @@ export interface NotatBarnetilsynOffentligeOpplysninger {
   skolealder?: NotatBarnetilsynOffentligeOpplysningerSkolealderEnum;
 }
 
-/**
- * Notat begrunnelse skrevet av saksbehandler
- * @default null
- */
+/** Notat begrunnelse skrevet av saksbehandler */
 export interface NotatBegrunnelseDto {
   innhold?: string | null;
   innholdFraOmgjortVedtak?: string | null;
-  /**
-   * @deprecated
-   * @default ""
-   */
+  /** @deprecated */
   intern?: string | null;
   gjelder?: DokumentmalPersonDto | null;
 }
@@ -5267,16 +4414,15 @@ export interface NotatBehandlingDetaljerDto {
    * @format date
    */
   virkningstidspunkt?: string | null;
+  /**
+   * Hent informasjon fra virkningstidspunkt
+   * @deprecated
+   */
   avslag?: Resultatkode | null;
-  /** @default "" */
-  avslagVisningsnavn?: string | null;
-  /** @default "" */
-  avslagVisningsnavnUtenPrefiks?: string | null;
-  /** @default "" */
   kategoriVisningsnavn?: string | null;
-  /** @default "" */
+  avslagVisningsnavn?: string | null;
+  avslagVisningsnavnUtenPrefiks?: string | null;
   vedtakstypeVisningsnavn?: string | null;
-  /** @default false */
   erAvvisning: boolean;
 }
 
@@ -5332,10 +4478,7 @@ export interface NotatGebyrDetaljerDto {
   endeligIlagtGebyr: boolean;
   begrunnelse?: string | null;
   beløpGebyrsats: number;
-  /**
-   * @deprecated
-   * @default ""
-   */
+  /** @deprecated */
   rolle: DokumentmalPersonDto;
   gebyrResultatVisningsnavn: string;
   erManueltOverstyrt: boolean;
@@ -5392,23 +4535,14 @@ export interface NotatInntektDto {
   gjelderBarn?: DokumentmalPersonDto | null;
   historisk: boolean;
   inntektsposter: NotatInntektspostDto[];
-  beløpstypeVisningsnavn: string;
-  /**
-   * Avrundet månedsbeløp for barnetillegg
-   * @default ""
-   */
+  /** Avrundet månedsbeløp for barnetillegg */
   beløpMånedDagsats?: number | null;
-  /**
-   * Avrundet månedsbeløp for barnetillegg
-   * @default ""
-   */
+  /** Avrundet månedsbeløp for barnetillegg */
   månedsbeløp?: number | null;
   skattefaktor?: number | null;
+  beløpstypeVisningsnavn: string;
   visningsnavn: string;
-  /**
-   * Avrundet dagsats for barnetillegg
-   * @default ""
-   */
+  /** Avrundet dagsats for barnetillegg */
   dagsats?: number | null;
   beløpstype?: InntektBelopstype | null;
 }
@@ -5441,10 +4575,7 @@ export interface NotatMaksGodkjentBelopDto {
 
 export interface NotatManueltOverstyrGebyrDto {
   begrunnelse?: string | null;
-  /**
-   * Skal bare settes hvis det er avslag
-   * @default false
-   */
+  /** Skal bare settes hvis det er avslag */
   ilagtGebyr?: boolean | null;
 }
 
@@ -5500,8 +4631,8 @@ export interface NotatResultatPeriodeDto {
   vedtakstype?: Vedtakstype | null;
   /** @format int32 */
   antallBarnIHusstanden: number;
-  sivilstandVisningsnavn?: string | null;
   resultatKodeVisningsnavn: string;
+  sivilstandVisningsnavn?: string | null;
 }
 
 export type NotatResultatSaerbidragsberegningDto = UtilRequiredKeys<
@@ -5609,7 +4740,6 @@ export interface NotatTotalBeregningUtgifterDto {
   utgiftstype: string;
   totalKravbeløp: number;
   totalGodkjentBeløp: number;
-  /** @default "" */
   utgiftstypeVisningsnavn: string;
 }
 
@@ -5666,30 +4796,15 @@ export interface NotatUnderholdskostnadPeriodeBeregningsdetaljer {
 }
 
 export interface NotatUtgiftBeregningDto {
-  /**
-   * Beløp som er direkte betalt av BP
-   * @default ""
-   */
+  /** Beløp som er direkte betalt av BP */
   beløpDirekteBetaltAvBp: number;
-  /**
-   * Summen av godkjente beløp som brukes for beregningen
-   * @default ""
-   */
+  /** Summen av godkjente beløp som brukes for beregningen */
   totalGodkjentBeløp: number;
-  /**
-   * Summen av kravbeløp
-   * @default ""
-   */
+  /** Summen av kravbeløp */
   totalKravbeløp: number;
-  /**
-   * Summen av godkjente beløp som brukes for beregningen
-   * @default ""
-   */
+  /** Summen av godkjente beløp som brukes for beregningen */
   totalGodkjentBeløpBp?: number | null;
-  /**
-   * Summen av godkjent beløp for utgifter BP har betalt plus beløp som er direkte betalt av BP
-   * @default ""
-   */
+  /** Summen av godkjent beløp for utgifter BP har betalt plus beløp som er direkte betalt av BP */
   totalBeløpBetaltAvBp: number;
 }
 
@@ -5697,35 +4812,18 @@ export interface NotatUtgiftspostDto {
   /**
    * Når utgifter gjelder. Kan være feks dato på kvittering
    * @format date
-   * @default ""
    */
   dato: string;
-  /**
-   * Type utgift. Kan feks være hva som ble kjøpt for kravbeløp (bugnad, klær, sko, etc)
-   * @default ""
-   */
+  /** Type utgift. Kan feks være hva som ble kjøpt for kravbeløp (bugnad, klær, sko, etc) */
   type: Utgiftstype | string;
-  /**
-   * Beløp som er betalt for utgiften det gjelder
-   * @default ""
-   */
+  /** Beløp som er betalt for utgiften det gjelder */
   kravbeløp: number;
-  /**
-   * Beløp som er godkjent for beregningen
-   * @default ""
-   */
+  /** Beløp som er godkjent for beregningen */
   godkjentBeløp: number;
-  /**
-   * Begrunnelse for hvorfor godkjent beløp avviker fra kravbeløp. Må settes hvis godkjent beløp er ulik kravbeløp
-   * @default ""
-   */
+  /** Begrunnelse for hvorfor godkjent beløp avviker fra kravbeløp. Må settes hvis godkjent beløp er ulik kravbeløp */
   begrunnelse?: string | null;
-  /**
-   * Om utgiften er betalt av BP
-   * @default false
-   */
+  /** Om utgiften er betalt av BP */
   betaltAvBp: boolean;
-  /** @default "" */
   utgiftstypeVisningsnavn: string;
 }
 
@@ -5758,13 +4856,11 @@ export interface NotatVirkningstidspunktBarnDto {
   søktAv?: SoktAvType | null;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   mottattDato?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   søktFraDato?: string | null;
@@ -5774,7 +4870,6 @@ export interface NotatVirkningstidspunktBarnDto {
   etterfølgendeVedtakVirkningstidspunkt?: string | null;
   /**
    * @format date
-   * @default ""
    * @example "01.12.2025"
    */
   virkningstidspunkt?: string | null;
@@ -5788,23 +4883,15 @@ export interface NotatVirkningstidspunktBarnDto {
    * @deprecated
    */
   notat: NotatBegrunnelseDto;
-  /** @default "" */
-  avslagVisningsnavn?: string | null;
-  /** @default "" */
-  avslagVisningsnavnUtenPrefiks?: string | null;
-  /** @default "" */
   behandlingstypeVisningsnavn?: string | null;
-  /** @default false */
+  avslagVisningsnavn?: string | null;
+  avslagVisningsnavnUtenPrefiks?: string | null;
   erAvvisning: boolean;
-  /** @default "" */
   årsakVisningsnavn?: string | null;
 }
 
 export interface NotatVirkningstidspunktDto {
-  /**
-   * Hvis det er likt for alle bruk avslag/årsak fra ett av barna
-   * @default false
-   */
+  /** Hvis det er likt for alle bruk avslag/årsak fra ett av barna */
   erLikForAlle: boolean;
   erVirkningstidspunktLikForAlle: boolean;
   erAvslagForAlle: boolean;
@@ -5897,7 +4984,6 @@ export interface SletteSamvaersperiodeElementDto {
 /**
  * Relasjon til BP. Brukes for debugging
  * @deprecated
- * @default ""
  */
 export enum AndreVoksneIHusstandenDetaljerDtoRelasjonEnum {
   BARN = "BARN",
@@ -5911,20 +4997,14 @@ export enum AndreVoksneIHusstandenDetaljerDtoRelasjonEnum {
   UKJENT = "UKJENT",
 }
 
-/**
- * Angir om barnetilsynet er heltid eller deltid
- * @default ""
- */
+/** Angir om barnetilsynet er heltid eller deltid */
 export enum BarnetilsynGrunnlagDtoTilsynstypeEnum {
   HELTID = "HELTID",
   DELTID = "DELTID",
   IKKE_ANGITT = "IKKE_ANGITT",
 }
 
-/**
- * Angir om barnet er over eller under skolealder
- * @default ""
- */
+/** Angir om barnet er over eller under skolealder */
 export enum BarnetilsynGrunnlagDtoSkolealderEnum {
   OVER = "OVER",
   UNDER = "UNDER",
@@ -5950,10 +5030,7 @@ export enum HentSoknadBehandlingStatusTypeEnum {
   VEDTAK_FATTET = "VEDTAK_FATTET",
 }
 
-/**
- * Hva er kilden til vedtaket. Automatisk eller manuelt
- * @default ""
- */
+/** Hva er kilden til vedtaket. Automatisk eller manuelt */
 export enum OpprettVedtakRequestDtoKildeEnum {
   MANUELT = "MANUELT",
   AUTOMATISK = "AUTOMATISK",
@@ -5986,10 +5063,7 @@ export enum InitalizeForsendelseRequestBehandlingStatusEnum {
   FEILREGISTRERT = "FEILREGISTRERT",
 }
 
-/**
- * Hva er kilden til vedtaket. Automatisk eller manuelt
- * @default ""
- */
+/** Hva er kilden til vedtaket. Automatisk eller manuelt */
 export enum VedtakDtoKildeEnum {
   MANUELT = "MANUELT",
   AUTOMATISK = "AUTOMATISK",
@@ -6096,8 +5170,7 @@ export class HttpClient<SecurityDataType = unknown> {
   }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL:
-        axiosConfig.baseURL || "https://bidrag-behandling-q2.intern.dev.nav.no",
+      baseURL: axiosConfig.baseURL || "http://localhost:8990",
     });
     this.secure = secure;
     this.format = format;
@@ -6211,7 +5284,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title bidrag-behandling
  * @version v1
- * @baseUrl https://bidrag-behandling-q2.intern.dev.nav.no
+ * @baseUrl http://localhost:8990
  */
 export class Api<
   SecurityDataType extends unknown,
@@ -7265,6 +6338,25 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/api/v2/admin/feilfiks/sivilstand/perioder/${behandlingId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Fjerner referanser i behandlingen som peker på en rolle som ikke lenger finnes i databasen (f.eks etter at en rolle har blitt slettet uten at alle referanser ble ryddet opp)
+     *
+     * @tags admin-controller
+     * @name FiksOrfanerteRolleReferanser
+     * @request POST:/api/v2/admin/feilfiks/orfanertrolle/{behandlingId}
+     * @secure
+     */
+    fiksOrfanerteRolleReferanser: (
+      behandlingId: number,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v2/admin/feilfiks/orfanertrolle/${behandlingId}`,
         method: "POST",
         secure: true,
         ...params,
