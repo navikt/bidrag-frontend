@@ -1,16 +1,17 @@
-import type { SamhandlerDto, SamhandlerSok } from "@bidrag/api/SamhandlerApi";
-import { Broadcast, BroadcastNames, useBisysLink } from "@bidrag/common";
-import { ExternalLinkIcon, HandFingerIcon, PencilIcon } from "@navikt/aksel-icons";
+import type {SamhandlerDto, SamhandlerSok} from "@bidrag/api/SamhandlerApi";
+import {Broadcast, BroadcastNames, useBisysLink} from "@bidrag/common";
+import {ExternalLinkIcon, HandFingerIcon, PencilIcon} from "@navikt/aksel-icons";
 import {
     Alert,
     BodyLong,
     BodyShort,
     Box,
     Button,
-    Link as DsLink,
     Heading,
     HGrid,
+    HStack,
     Label,
+    Link as DsLink,
     Modal,
     Select,
     Table,
@@ -18,13 +19,13 @@ import {
     TextField,
     VStack,
 } from "@navikt/ds-react";
-import { memo, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { Link, useSearchParams } from "react-router";
-import { QueryErrorWrapper } from "./QueryErrorBoundary";
+import {memo, useState} from "react";
+import {FormProvider, useForm} from "react-hook-form";
+import {Link, useSearchParams} from "react-router";
+import {QueryErrorWrapper} from "./QueryErrorBoundary";
 import SamhandlerForm from "./SamhandlerForm";
 import styles from "./SamhandlerSøk.module.css";
-import { sortInAlphabeticOrder } from "./utils/sorting";
+import {sortInAlphabeticOrder} from "./utils/sorting";
 import {
     kodeTilVisningsnavn,
     landkodeTilVisningsnavn,
@@ -41,9 +42,9 @@ export interface Samhandler extends SamhandlerDto {
 }
 
 const EditButton = ({
-    samhandler,
-    onSamhandlerUpdated,
-}: {
+                        samhandler,
+                        onSamhandlerUpdated,
+                    }: {
     samhandler: SamhandlerDto;
     onSamhandlerUpdated: (samhandler: Samhandler) => void;
 }) => {
@@ -55,7 +56,7 @@ const EditButton = ({
             <Button
                 size="xsmall"
                 variant="tertiary"
-                icon={<PencilIcon title="Rediger" />}
+                icon={<PencilIcon title="Rediger"/>}
                 onClick={() => setIsOpen(true)}
             ></Button>
             {isOpen && (
@@ -63,7 +64,7 @@ const EditButton = ({
                     className={styles.modal}
                     open
                     onClose={() => setIsOpen(false)}
-                    header={{ heading: `Samhandler ${samhandler.samhandlerId}` }}
+                    header={{heading: `Samhandler ${samhandler.samhandlerId}`}}
                 >
                     <SamhandlerForm
                         mutation={oppdaterSamhandler}
@@ -79,8 +80,8 @@ const EditButton = ({
 };
 
 const OpprettSamhandlerButton = ({
-    onSamhandlerCreated,
-}: {
+                                     onSamhandlerCreated,
+                                 }: {
     onSamhandlerCreated: (samhandler: Samhandler) => void;
 }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -92,7 +93,7 @@ const OpprettSamhandlerButton = ({
                 + Opprett ny samhandler
             </Button>
             {isOpen && (
-                <Modal open onClose={() => setIsOpen(false)} header={{ heading: "Opprett samhandler" }}>
+                <Modal open onClose={() => setIsOpen(false)} header={{heading: "Opprett samhandler"}}>
                     <SamhandlerForm
                         mutation={opprettSamhandler}
                         onSuccess={onSamhandlerCreated}
@@ -105,26 +106,26 @@ const OpprettSamhandlerButton = ({
     );
 };
 
-const AntallSaker = ({ samhandlerId }: { samhandlerId: string }) => {
-    const { data } = useHentSamhandlersSaker(samhandlerId);
+const AntallSaker = ({samhandlerId}: { samhandlerId: string }) => {
+    const {data} = useHentSamhandlersSaker(samhandlerId);
 
     return <BodyShort>{data.antallSaker}</BodyShort>;
 };
 
-const SakListe = ({ samhandlerId }: { samhandlerId: string }) => {
-    const { data } = useHentSamhandlersSaker(samhandlerId);
+const SakListe = ({samhandlerId}: { samhandlerId: string }) => {
+    const {data} = useHentSamhandlersSaker(samhandlerId);
 
-    const { bisysUrl, setBisysLinkTarget } = useBisysLink();
+    const {bisysUrl, setBisysLinkTarget} = useBisysLink();
 
     return (
         <VStack gap="space-4" align="start">
             {data.saksnummere.map((saksnummer) => {
-                setBisysLinkTarget("sak", { saksnr: saksnummer });
+                setBisysLinkTarget("sak", {saksnr: saksnummer});
                 if (!bisysUrl) return <span key={saksnummer}>{saksnummer}</span>;
 
                 return (
                     <DsLink key={saksnummer} variant="action" href={bisysUrl} target="_blank">
-                        {saksnummer} <ExternalLinkIcon aria-hidden />
+                        {saksnummer} <ExternalLinkIcon aria-hidden/>
                     </DsLink>
                 );
             })}
@@ -133,93 +134,98 @@ const SakListe = ({ samhandlerId }: { samhandlerId: string }) => {
 };
 
 const ExpandableContent = memo(
-    ({ samhandler, index }: { samhandler: Samhandler; index: number }) => {
+    ({samhandler, index}: { samhandler: Samhandler; index: number }) => {
         const evenRow = index === 0 || index % 2 === 0;
         const background = evenRow ? "neutral-soft" : "default";
         return (
             <HGrid gap="space-4">
-                <Box padding="space-4" background={background}>
-                    <Heading size="xsmall" className="mb-2">
-                        Adresse
-                    </Heading>
-                    <HGrid gap="space-4" columns={{ xs: 1, sm: 2, md: 3 }}>
-                        <div>
-                            <Label size="small">Adresselinje2</Label>
-                            <BodyShort size="small">{samhandler.adresse?.adresselinje2}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Adresselinje3</Label>
-                            <BodyShort size="small">{samhandler.adresse?.adresselinje3}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Postnummer</Label>
-                            <BodyShort size="small">{samhandler.adresse?.postnummer}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Poststed</Label>
-                            <BodyShort size="small">{samhandler.adresse?.poststed}</BodyShort>
-                        </div>
-                    </HGrid>
+                <Box asChild padding="space-4" background={background}>
+                    <VStack gap={'space-8'}>
+                        <Heading size="xsmall">
+                            Adresse
+                        </Heading>
+                        <HGrid gap="space-4" columns={{xs: 1, sm: 2, md: 3}}>
+                            <div>
+                                <Label size="small">Adresselinje2</Label>
+                                <BodyShort size="small">{samhandler.adresse?.adresselinje2}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Adresselinje3</Label>
+                                <BodyShort size="small">{samhandler.adresse?.adresselinje3}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Postnummer</Label>
+                                <BodyShort size="small">{samhandler.adresse?.postnummer}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Poststed</Label>
+                                <BodyShort size="small">{samhandler.adresse?.poststed}</BodyShort>
+                            </div>
+                        </HGrid>
+                    </VStack>
                 </Box>
 
-                <Box padding="space-4" background={background}>
-                    <Heading size="xsmall" className="mb-2">
-                        Kontaktinformasjon
-                    </Heading>
-                    <HGrid gap="space-4" columns={{ xs: 1, sm: 2, md: 3 }}>
-                        <div>
-                            <Label size="small">E-post</Label>
-                            <BodyShort size="small">{samhandler.kontaktEpost}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Telefon</Label>
-                            <BodyShort size="small">{samhandler.kontaktTelefon}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Kontaktperson</Label>
-                            <BodyShort size="small">{samhandler.kontaktperson}</BodyShort>
-                        </div>
-                    </HGrid>
+                <Box asChild padding="space-4" background={background}>
+                    <VStack gap={'space-8'}>
+                        <Heading size="xsmall">
+                            Kontaktinformasjon
+                        </Heading>
+                        <HGrid gap="space-4" columns={{xs: 1, sm: 2, md: 3}}>
+                            <div>
+                                <Label size="small">E-post</Label>
+                                <BodyShort size="small">{samhandler.kontaktEpost}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Telefon</Label>
+                                <BodyShort size="small">{samhandler.kontaktTelefon}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Kontaktperson</Label>
+                                <BodyShort size="small">{samhandler.kontaktperson}</BodyShort>
+                            </div>
+                        </HGrid></VStack>
                 </Box>
 
-                <Box padding="space-4" background={background}>
-                    <Heading size="xsmall" className="mb-2">
-                        Kontoopplysninger
-                    </Heading>
-                    <HGrid gap="space-4" columns={{ xs: 1, sm: 2, md: 3 }}>
-                        <div>
-                            <Label size="small">Bankkode</Label>
-                            <BodyShort size="small">{samhandler.kontonummer?.bankCode}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Banknavn</Label>
-                            <BodyShort size="small">{samhandler.kontonummer?.banknavn}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Iban</Label>
-                            <BodyShort size="small">{samhandler.kontonummer?.iban}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Landkode</Label>
-                            <BodyShort size="small">
-                                {landkodeTilVisningsnavn(samhandler.kontonummer?.landkodeBank)}
-                            </BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Norsk kontonummer</Label>
-                            <BodyShort size="small">{samhandler.kontonummer?.norskKontonummer}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Swift</Label>
-                            <BodyShort size="small">{samhandler.kontonummer?.swift}</BodyShort>
-                        </div>
-                        <div>
-                            <Label size="small">Valuta</Label>
-                            <BodyShort size="small">
-                                {kodeTilVisningsnavn(samhandler.kontonummer?.valutakode)}
-                            </BodyShort>
-                        </div>
-                    </HGrid>
+                <Box asChild padding="space-4" background={background}>
+                    <VStack gap={'space-8'}>
+                        <Heading size="xsmall">
+                            Kontoopplysninger
+                        </Heading>
+                        <HGrid gap="space-4" columns={{xs: 1, sm: 2, md: 3}}>
+                            <div>
+                                <Label size="small">Bankkode</Label>
+                                <BodyShort size="small">{samhandler.kontonummer?.bankCode}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Banknavn</Label>
+                                <BodyShort size="small">{samhandler.kontonummer?.banknavn}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Iban</Label>
+                                <BodyShort size="small">{samhandler.kontonummer?.iban}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Landkode</Label>
+                                <BodyShort size="small">
+                                    {landkodeTilVisningsnavn(samhandler.kontonummer?.landkodeBank)}
+                                </BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Norsk kontonummer</Label>
+                                <BodyShort size="small">{samhandler.kontonummer?.norskKontonummer}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Swift</Label>
+                                <BodyShort size="small">{samhandler.kontonummer?.swift}</BodyShort>
+                            </div>
+                            <div>
+                                <Label size="small">Valuta</Label>
+                                <BodyShort size="small">
+                                    {kodeTilVisningsnavn(samhandler.kontonummer?.valutakode)}
+                                </BodyShort>
+                            </div>
+                        </HGrid>
+                    </VStack>
                 </Box>
 
                 <div>
@@ -234,7 +240,7 @@ const ExpandableContent = memo(
                 <div>
                     <Label size="small">Saker registrert som RM</Label>
                     <QueryErrorWrapper>
-                        {samhandler.samhandlerId && <SakListe samhandlerId={samhandler.samhandlerId} />}
+                        {samhandler.samhandlerId && <SakListe samhandlerId={samhandler.samhandlerId}/>}
                     </QueryErrorWrapper>
                 </div>
             </HGrid>
@@ -249,7 +255,7 @@ export default function SamhandlerSøk() {
     const windowId = searchParams.get("windowId");
     const [searchResults, setSearchResults] = useState<Samhandler[]>([]);
     const searchMutation = useHentSamhandler();
-    const { data: visningsnavn } = useHentVisningsnavn();
+    const {data: visningsnavn} = useHentVisningsnavn();
     const landkoder = useHentLandkoder();
 
     const visningsnavnLandkoder = landkoder
@@ -291,7 +297,7 @@ export default function SamhandlerSøk() {
     };
 
     const onSamhandlerCreated = (samhandler: Samhandler) => {
-        setSearchResults([{ ...samhandler, addedManually: true }, ...searchResults]);
+        setSearchResults([{...samhandler, addedManually: true}, ...searchResults]);
     };
 
     const onSamhandlerUpdated = (samhandler: Samhandler) => {
@@ -300,61 +306,65 @@ export default function SamhandlerSøk() {
     };
 
     return (
-        <VStack gap={"space-32"} marginBlock={"space-32 space-32"} className={"py-96"}>
+        <VStack gap={"space-32"} padding={'space-24'}>
             <Heading level="1" size="large">
                 Søk samhandler
             </Heading>
             <FormProvider {...formMethods}>
                 <form onSubmit={formMethods.handleSubmit(onSearch)}>
-                    <Box background="neutral-soft" padding="space-8" className="grid gap-6">
-                        <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={{ xs: 1, sm: 2, md: 3 }}>
-                            <TextField {...formMethods.register("ident")} label="Ident" size="small" />
-                            <TextField {...formMethods.register("offentligId")} label="OffentligId" size="small" />
-                        </HGrid>
-                        <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={{ xs: 1, sm: 2, md: 3 }}>
-                            <TextField {...formMethods.register("navn")} label="Navn" size="small" />
-                            <TextField {...formMethods.register("postnummer")} label="Postnummer" size="small" />
-                            <TextField {...formMethods.register("poststed")} label="Poststed" size="small" />
-                        </HGrid>
-                        <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={{ xs: 1, sm: 2, md: 3 }}>
-                            <TextField {...formMethods.register("norskkontonr")} label="Kontonummer" size="small" />
-                            <TextField {...formMethods.register("iban")} label="Kontoopplysninger iban" size="small" />
-                            <TextField {...formMethods.register("swift")} label="Swift" size="small" />
-                        </HGrid>
-                        <HGrid gap={{ xs: "space-8", md: "space-12" }} columns={{ xs: 1, sm: 2, md: 3 }}>
-                            <TextField {...formMethods.register("banknavn")} label="Banknavn" size="small" />
-                            <Select {...formMethods.register("banklandkode")} label="Landkode" size="small">
-                                <option value="">- Velg landkode -</option>
-                                {visningsnavnLandkoder.map((landkode) => (
-                                    <option key={landkode.landkode} value={landkode.landkode}>
-                                        {landkode.visningsnavn}
-                                    </option>
-                                ))}
-                            </Select>
-                            <TextField {...formMethods.register("bankcode")} label="Bankkode" size="small" />
-                        </HGrid>
-                        <div className="flex flex-wrap flex-row gap-4 items-start">
-                            <Button variant="primary" size="small" loading={searchMutation.isPending}>
-                                Søk
-                            </Button>
-                            <Button variant="tertiary" size="small" type="button" onClick={() => formMethods.reset()}>
-                                Nullstill
-                            </Button>
-                        </div>
-                        {searchMutation.error && <Alert variant="error">Feil ved innhenting</Alert>}
+                    <Box asChild background="neutral-soft">
+                        <VStack padding="space-8" gap={'space-24'}>
+                            <HGrid gap={{xs: "space-8", md: "space-12"}} columns={{xs: 1, sm: 2, md: 3}}>
+                                <TextField {...formMethods.register("ident")} label="Ident" size="small"/>
+                                <TextField {...formMethods.register("offentligId")} label="OffentligId" size="small"/>
+                            </HGrid>
+                            <HGrid gap={{xs: "space-8", md: "space-12"}} columns={{xs: 1, sm: 2, md: 3}}>
+                                <TextField {...formMethods.register("navn")} label="Navn" size="small"/>
+                                <TextField {...formMethods.register("postnummer")} label="Postnummer" size="small"/>
+                                <TextField {...formMethods.register("poststed")} label="Poststed" size="small"/>
+                            </HGrid>
+                            <HGrid gap={{xs: "space-8", md: "space-12"}} columns={{xs: 1, sm: 2, md: 3}}>
+                                <TextField {...formMethods.register("norskkontonr")} label="Kontonummer" size="small"/>
+                                <TextField {...formMethods.register("iban")} label="Kontoopplysninger iban"
+                                           size="small"/>
+                                <TextField {...formMethods.register("swift")} label="Swift" size="small"/>
+                            </HGrid>
+                            <HGrid gap={{xs: "space-8", md: "space-12"}} columns={{xs: 1, sm: 2, md: 3}}>
+                                <TextField {...formMethods.register("banknavn")} label="Banknavn" size="small"/>
+                                <Select {...formMethods.register("banklandkode")} label="Landkode" size="small">
+                                    <option value="">- Velg landkode -</option>
+                                    {visningsnavnLandkoder.map((landkode) => (
+                                        <option key={landkode.landkode} value={landkode.landkode}>
+                                            {landkode.visningsnavn}
+                                        </option>
+                                    ))}
+                                </Select>
+                                <TextField {...formMethods.register("bankcode")} label="Bankkode" size="small"/>
+                            </HGrid>
+                            <HStack gap='space-16'>
+                                <Button variant="primary" size="small" loading={searchMutation.isPending}>
+                                    Søk
+                                </Button>
+                                <Button variant="tertiary" size="small" type="button"
+                                        onClick={() => formMethods.reset()}>
+                                    Nullstill
+                                </Button>
+                            </HStack>
+                            {searchMutation.error && <Alert variant="error">Feil ved innhenting</Alert>}
+                        </VStack>
                     </Box>
                 </form>
             </FormProvider>
-            <div className="flex flex-wrap flex-row gap-4 items-center justify-between">
+            <HStack gap={'space-16'} justify="space-between">
                 <Heading level="3" size="small">
                     Resultat
                 </Heading>
-                <OpprettSamhandlerButton onSamhandlerCreated={onSamhandlerCreated} />
-            </div>
+                <OpprettSamhandlerButton onSamhandlerCreated={onSamhandlerCreated}/>
+            </HStack>
             {searchMutation.isSuccess && searchResults.length < 1 && <BodyShort size="medium">Ingen treff</BodyShort>}
             {searchResults.length > 0 && (
-                <div className="overflow-x-auto whitespace-nowrap">
-                    <Table zebraStripes size="small" className="table w-full">
+                <Box overflowX={"auto"}>
+                    <Table zebraStripes size="small" width={'100%'}>
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell scope="col" textSize="small">
@@ -381,9 +391,9 @@ export default function SamhandlerSøk() {
                                 <Table.HeaderCell scope="col" textSize="small" align="right">
                                     Antall saker registrert som RM
                                 </Table.HeaderCell>
-                                <Table.HeaderCell scope="col" textSize="small" className="w-[40px]"></Table.HeaderCell>
-                                <Table.HeaderCell scope="col" textSize="small" className="w-[40px]"></Table.HeaderCell>
-                                <Table.HeaderCell scope="col" textSize="small" className="w-[20px]"></Table.HeaderCell>
+                                <Table.HeaderCell scope="col" textSize="small"></Table.HeaderCell>
+                                <Table.HeaderCell scope="col" textSize="small"></Table.HeaderCell>
+                                <Table.HeaderCell scope="col" textSize="small"></Table.HeaderCell>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
@@ -391,18 +401,20 @@ export default function SamhandlerSøk() {
                                 return (
                                     <Table.ExpandableRow
                                         key={samhandler.samhandlerId}
-                                        content={<ExpandableContent samhandler={samhandler} index={index} />}
+                                        content={<ExpandableContent samhandler={samhandler} index={index}/>}
                                         togglePlacement="right"
                                     >
                                         <Table.HeaderCell scope="row" textSize="small">
-                                            <Link to={`/samhandler/${samhandler.samhandlerId}`}>
-                                                {samhandler.samhandlerId}
-                                            </Link>
-                                            {samhandler.addedManually && (
-                                                <Tag variant="info" size="xsmall" className="ml-2">
-                                                    Ny
-                                                </Tag>
-                                            )}
+                                            <HStack gap={'space-8'}>
+                                                <Link to={`/samhandler/${samhandler.samhandlerId}`}>
+                                                    {samhandler.samhandlerId}
+                                                </Link>
+                                                {samhandler.addedManually && (
+                                                    <Tag variant="info" size="xsmall">
+                                                        Ny
+                                                    </Tag>
+                                                )}
+                                            </HStack>
                                         </Table.HeaderCell>
                                         <Table.DataCell textSize="small">{samhandler.offentligId}</Table.DataCell>
                                         <Table.DataCell textSize="small">
@@ -421,7 +433,7 @@ export default function SamhandlerSøk() {
                                         <Table.DataCell textSize="small" align="right">
                                             <QueryErrorWrapper>
                                                 {samhandler.samhandlerId && (
-                                                    <AntallSaker samhandlerId={samhandler.samhandlerId} />
+                                                    <AntallSaker samhandlerId={samhandler.samhandlerId}/>
                                                 )}
                                             </QueryErrorWrapper>
                                         </Table.DataCell>
@@ -435,7 +447,7 @@ export default function SamhandlerSøk() {
                                             <Button
                                                 size="xsmall"
                                                 variant="tertiary"
-                                                icon={<HandFingerIcon title="Velg" />}
+                                                icon={<HandFingerIcon title="Velg"/>}
                                                 onClick={() => onSelect(samhandler)}
                                             >
                                                 Velg
@@ -446,7 +458,7 @@ export default function SamhandlerSøk() {
                             })}
                         </Table.Body>
                     </Table>
-                </div>
+                </Box>
             )}
         </VStack>
     );
