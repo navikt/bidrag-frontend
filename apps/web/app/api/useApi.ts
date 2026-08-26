@@ -973,12 +973,7 @@ export function useHentDokumentUrl() {
     });
 }
 
-export function useHentSaksdokumentPdf(
-    journalpostId?: string,
-    dokumentreferanse?: string,
-    format?: DokumentFormatDto | string,
-    enabled: boolean = true,
-) {
+export function useHentSaksdokumentPdf(journalpostId?: string, dokumentreferanse?: string, enabled: boolean = true) {
     return useQuery({
         queryKey: ["pdf-dokument", journalpostId, dokumentreferanse],
         enabled: enabled && !!journalpostId,
@@ -989,7 +984,11 @@ export function useHentSaksdokumentPdf(
                 throw new Error("Mangler journalpostId for å hente dokument");
             }
 
-            const erMBDok = format === DokumentFormatDto.MBDOK;
+            // Formatet er ikke kjent på forhånd (f.eks. dokumenter under produksjon), så det må hentes her
+            const metadataResponse = dokumentreferanse
+                ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata1(journalpostId, dokumentreferanse)
+                : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata(journalpostId);
+            const erMBDok = metadataResponse.data[0]?.format === DokumentFormatDto.MBDOK;
 
             if (erMBDok) {
                 const url = await hentDokumentUrlApi({
