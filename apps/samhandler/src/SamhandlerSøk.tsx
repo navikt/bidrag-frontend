@@ -300,7 +300,7 @@ export default function SamhandlerSøk() {
     };
 
     return (
-        <VStack gap={"space-32"} marginBlock={"space-32 space-32"} padding={"space-0 space-96"}>
+        <VStack gap={"space-32"} marginBlock={"space-32 space-32"} className={"py-96"}>
             <Heading level="1" size="large">
                 Søk samhandler
             </Heading>

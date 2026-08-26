@@ -253,7 +253,7 @@ export default function SamhandlerDetaljer({ samhandlerId: id }: { samhandlerId?
     }
 
     return (
-        <VStack className="flex justify-center" padding={"space-12 space-96"}>
+        <VStack className="flex justify-center py-96">
             <div className="w-full max-w-4xl">
                 <VStack gap="space-6">
                     <div>
