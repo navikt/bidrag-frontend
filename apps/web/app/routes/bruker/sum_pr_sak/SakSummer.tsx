@@ -4,6 +4,7 @@ import { Alert, Box, Detail, HStack, Label, VStack } from "@navikt/ds-react";
 import { useHentSak } from "~/api/useApi.ts";
 import { SaksumTabellBM } from "~/routes/bruker/sum_pr_sak/SaksumTabellBM.tsx";
 import { SaksumTabellBP } from "~/routes/bruker/sum_pr_sak/SaksumTabellBP.tsx";
+import { SaksumTabellRM } from "~/routes/bruker/sum_pr_sak/SaksumTabellRM.tsx";
 import { EnhetsNavn } from "~/routes/sak/fogdhistorikk/components/EnhetsNavn.tsx";
 
 interface SakSummerProps {
@@ -18,24 +19,31 @@ export function SakSummer({ bidragSak, ident }: SakSummerProps) {
 
     const { data: sak } = useHentSak(bidragSak.saksnummer);
 
-    const rolle = sak?.roller.find((rolle) => rolle.fodselsnummer === ident)?.type;
+    const rolle = sak?.roller.find((rolle) => rolle.fodselsnummer === ident);
+    const isRMForSegSelv = ident === rolle?.reellMottaker?.ident;
+    const rolleType = isRMForSegSelv ? "RM" : rolle?.type;
 
     function renderTabell() {
-        switch (rolle) {
+        switch (rolleType) {
             case "BP":
                 return <SaksumTabellBP ident={ident} bidragSak={bidragSak} sak={sak} />;
             case "BM":
                 return <SaksumTabellBM ident={ident} bidragSak={bidragSak} sak={sak} />;
+            case "RM":
+                return <SaksumTabellRM ident={ident} bidragSak={bidragSak} sak={sak} />;
+            case "BA":
+            case "FR":
+                return <Alert variant={"info"}>Visning for rolle {rolleType} er ikke støttet</Alert>;
         }
-        return <Alert variant={"info"}>Ukjent rolle {rolle}</Alert>;
+        return null;
     }
     const SakSum = () => (
         <VStack gap={"space-16"}>
             <HStack justify={"space-between"}>
                 <HStack gap={"space-8"}>
-                    {rolle && <RolleTag rolleType={rolle as unknown as RolleTypeAbbreviation} />}
+                    {rolleType && <RolleTag rolleType={rolleType as unknown as RolleTypeAbbreviation} />}
                     <Label>Sak {bidragSak.saksnummer} </Label>
-                    <Detail>
+                    <Detail as={"span"}>
                         Enhet: {sak?.eierfogd} <EnhetsNavn enhetsnummer={sak?.eierfogd ?? null} />
                     </Detail>
                 </HStack>
