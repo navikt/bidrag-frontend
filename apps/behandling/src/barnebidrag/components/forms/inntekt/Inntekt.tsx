@@ -4,7 +4,7 @@ import {
     Stonadstype,
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import { BodyShort, Heading, Tabs } from "@navikt/ds-react";
+import { BodyShort, Heading } from "@navikt/ds-react";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -15,6 +15,7 @@ import { InntektTableComponent, InntektTableProvider } from "../../../../common/
 import { NyOpplysningerAlert } from "../../../../common/components/inntekt/NyOpplysningerAlert";
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
 import {
     INNTEKT_BEGRUNNELSE_MAL_BIDRAG,
     INNTEKT_BEGRUNNELSE_MAL_BM_BIDRAG,

@@ -8,7 +8,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { deductDays, PersonNavn, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
-import { BodyShort, Box, Button, Heading, Switch, Table, Tabs } from "@navikt/ds-react";
+import { BodyShort, Box, Button, Heading, Switch, Table } from "@navikt/ds-react";
 import type React from "react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
@@ -19,6 +19,7 @@ import { NewFormLayout } from "../../../../common/components/layout/grid/NewForm
 import { ConfirmationModal } from "../../../../common/components/modal/ConfirmationModal";
 import { OverlayLoader } from "../../../../common/components/OverlayLoader";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
 import elementIds from "../../../../common/constants/elementIds";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
@@ -468,6 +469,7 @@ export const SamværBarn = ({ gjelderBarn, gjelderBarnId }: { gjelderBarn: strin
                     if (!vurderSeparat) {
                         response.samværBarn
                             .filter((barn) => barn.barn.id !== gjelderBarnId)
+                            // biome-ignore lint/suspicious/useIterableCallbackReturn: Fix
                             .forEach((barn) =>
                                 setValue(
                                     `${barn.barn.id}.perioder`,

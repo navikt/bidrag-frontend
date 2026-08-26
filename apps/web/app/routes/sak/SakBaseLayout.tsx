@@ -1,11 +1,10 @@
 // routes/sak/SakBaseLayout.tsx
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader } from "@bidrag/common";
+import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader, useBisysLink } from "@bidrag/common";
 import { VStack } from "@navikt/ds-react";
 import { useEffect, useMemo } from "react";
 import { Outlet, useMatches } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
-import { useBisysLink } from "~/common/bisys/useBisysLink.ts";
 import type { Route } from "./+types/SakBaseLayout.ts"; // Merk navnebyttet!
 import { type SakSideTittelHandle, SakSideTittelProvider } from "./sakSideTittel";
 

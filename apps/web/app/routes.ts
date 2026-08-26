@@ -28,6 +28,9 @@ export default [
         route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
     ]),
 
+    route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),
+    route("samhandler/:samhandlerId", "./routes/samhandler/SamhandlerDetaljer.tsx"),
+
     route("sak/:saksnummer", "routes/sak/SakBaseLayout.tsx", [
         ...behandlingSakRoutes,
         route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),

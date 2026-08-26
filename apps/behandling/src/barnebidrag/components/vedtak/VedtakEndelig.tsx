@@ -78,7 +78,8 @@ const VedtakEndelig = () => {
         lastetFørstegang.current = true;
     }, [activeStep]);
     if (
-        beregning?.resultat?.ugyldigBeregning &&
+        beregning &&
+        beregning.resultat?.ugyldigBeregning &&
         beregning.resultat.ugyldigBeregning.feiltype === UgyldigBeregningDtoFeiltypeEnum.UFULSTENDING_GRUNNLAG_FF
     ) {
         return <Klagevedtak endeligVedtak />;
@@ -193,6 +194,7 @@ const VedtakUgyldigBeregning = ({ resultat }: { resultat: UgyldigBeregningDto })
 
 const VedtakResultat = () => {
     const { data: beregning } = useGetBeregningBidrag(true);
+    const { medInnkreving } = useGetBehandlingV2();
     const revurderingsbarnVedtakDetaljer = beregning.resultat?.fatteVedtakDetaljerFraOmgjortVedtak;
 
     return (
@@ -203,6 +205,11 @@ const VedtakResultat = () => {
                         <VedtakResultatBarn barn={r.barn} />
                         <VedtakUgyldigBeregning resultat={r.ugyldigBeregning} />
                         <NesteIndeksår nesteIndeksår={r.indeksår} barnId={r.barn.ident} />
+                        {medInnkreving && !r.medInnkreving && (
+                            <BodyShort size="small" spacing>
+                                Uten innkreving
+                            </BodyShort>
+                        )}
                         {r.barn.innbetaltBeløp && (
                             <ResultatDescription
                                 data={[
@@ -302,7 +309,7 @@ function BeregningTabellBarn({
                     return (
                         <VStack>
                             <ResultatTabell
-                                key={`${i}Delvedtak ${hentVisningsnavn(vedtakstype)}`}
+                                key={i + `Delvedtak ${hentVisningsnavn(vedtakstype)}`}
                                 erAvslag={delvedtak.perioder.every((p) => p.erDirekteAvslag)}
                                 avvistAldersjustering={avvistAldersjustering}
                                 beregnet={
