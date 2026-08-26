@@ -1,6 +1,6 @@
-import { SecureLoggerService } from "@bidrag/common";
-import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { BodyLong, Button, Tag } from "@navikt/ds-react";
+import { RolleTag, RolleTypeAbbreviation, SecureLoggerService } from "@bidrag/common";
+import { PencilIcon, PlusIcon, XMarkIcon } from "@navikt/aksel-icons";
+import { BodyLong, Box, Button, ErrorMessage, HStack, Tag } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -35,7 +35,6 @@ export default function BarnVisning({
     const form = useFormContext<SakRedigeringData>();
     const errors = form.formState.errors;
 
-    // Hent samhandler kun hvis det er en samhandler (ikke "barnet_selv")
     const skalHenteSamhandler =
         rolle.reellMottakerType === "samhandler" && rolle?.reellMottaker?.trim() !== "" && !rolle?.reellMottakerNavn;
 
@@ -136,78 +135,97 @@ export default function BarnVisning({
         setVisReellMottaker(false);
     };
 
+    const harReellMottaker = Boolean(rolle.reellMottaker);
+    const visRmFeil = Boolean(errors.roller?.[index]?.reellMottaker) && !visReellMottaker;
+
     return (
-        <div className="p-6 bg-ax-neutral-100 rounded-lg">
-            <div className="flex justify-between items-center w-full">
-                <div className="flex flex-col">
-                    <div className="flex gap-2 items-center">
-                        <PersonInfo
-                            navn={rolle.navn || ""}
-                            ident={rolle.fodselsnummer}
-                            alder={rolle.alder}
-                            fødselsdato={rolle.fødselsdato}
-                            tags={
-                                erNyttBarn && (
-                                    <Tag variant="alt1" size="xsmall">
-                                        Nytt barn
-                                    </Tag>
-                                )
-                            }
-                        />
-                    </div>
-                    {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
-                </div>
+        <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-16">
+            <PersonInfo
+                navn={rolle.navn || ""}
+                ident={rolle.fodselsnummer}
+                alder={rolle.alder}
+                fødselsdato={rolle.fødselsdato}
+                rolle="BA"
+                stønad18År={rolle.erMyndig}
+                tags={null}
+                headingActions={
+                    erNyttBarn && (
+                        <HStack gap="space-12" align="center" flexShrink="0" marginInline="auto space-0">
+                            <Tag variant="alt1" size="xsmall">
+                                Nytt barn
+                            </Tag>
+                            <Button
+                                type="button"
+                                variant="tertiary"
+                                size="small"
+                                icon={<XMarkIcon aria-hidden />}
+                                onClick={handleFjernBarn}
+                            >
+                                Fjern
+                            </Button>
+                        </HStack>
+                    )
+                }
+            >
+                {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
 
-                {erNyttBarn && (
-                    <Button
-                        type="button"
-                        variant="tertiary"
-                        size="small"
-                        icon={<XMarkIcon aria-hidden />}
-                        onClick={handleFjernBarn}
-                    >
-                        Fjern
-                    </Button>
+                {!visReellMottaker && (
+                    <Box marginBlock="space-8 space-0">
+                        {harReellMottaker ? (
+                            <>
+                                <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                                <HStack gap="space-12" align="center" justify="space-between" paddingBlock="space-8">
+                                    <HStack gap="space-8" align="center" minWidth="0">
+                                        <RolleTag rolleType={RolleTypeAbbreviation.RM} />
+                                        <BodyLong size="small" textColor="subtle" truncate>
+                                            {getReellMottakerInfo()}
+                                        </BodyLong>
+                                    </HStack>
+                                    <Button
+                                        variant="tertiary"
+                                        size="xsmall"
+                                        type="button"
+                                        icon={<PencilIcon aria-hidden />}
+                                        aria-label="Endre reell mottaker"
+                                        onClick={handleÅpneReellMottaker}
+                                    />
+                                </HStack>
+                                <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                            </>
+                        ) : (
+                            <Button
+                                variant="tertiary"
+                                size="small"
+                                type="button"
+                                icon={<PlusIcon aria-hidden />}
+                                onClick={handleÅpneReellMottaker}
+                            >
+                                Legg til reell mottaker
+                            </Button>
+                        )}
+                    </Box>
                 )}
-            </div>
 
-            <div className="mt-1 pt-1 ">
-                {!visReellMottaker && !errors.roller?.[index]?.reellMottaker && (
-                    <div className="flex gap-7 items-center">
-                        <div>
-                            <BodyLong size="small" className="font-medium">
-                                Reell mottaker:
-                            </BodyLong>
-                            <BodyLong size="small" className="text-ax-neutral-800">
-                                {getReellMottakerInfo()}
-                            </BodyLong>
-                        </div>
-
-                        <Button
-                            variant="tertiary"
-                            size="small"
-                            type="button"
-                            icon={<PencilIcon aria-hidden />}
-                            onClick={handleÅpneReellMottaker}
-                        >
-                            Endre
-                        </Button>
-                    </div>
+                {visRmFeil && (
+                    <ErrorMessage size="small" className="mt-2">
+                        {errors.roller?.[index]?.reellMottaker?.message}
+                    </ErrorMessage>
                 )}
 
-                {(visReellMottaker || errors.roller?.[index]?.reellMottaker) && (
-                    <ReellMottakerVelger
-                        rolleIndex={index}
-                        barnNavn={rolle.navn || "Barnet"}
-                        onAvbryt={handleLukkReellMottaker}
-                        kanFjerne={kanFjerneRM}
-                        isRequired={!kanFjerneRM}
-                        feil={errors.roller?.[index]?.reellMottaker?.message}
-                        kunSamhandlerSomReellMottaker={erOppfostringsbidrag}
-                    />
-                )}
-                <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} />
-            </div>
-        </div>
+                <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} />
+            </PersonInfo>
+
+            {visReellMottaker && (
+                <ReellMottakerVelger
+                    rolleIndex={index}
+                    barnNavn={rolle.navn || "Barnet"}
+                    onAvbryt={handleLukkReellMottaker}
+                    onBekreft={handleLukkReellMottaker}
+                    kanFjerne={kanFjerneRM}
+                    isRequired={!kanFjerneRM}
+                    kunSamhandlerSomReellMottaker={erOppfostringsbidrag}
+                />
+            )}
+        </Box>
     );
 }

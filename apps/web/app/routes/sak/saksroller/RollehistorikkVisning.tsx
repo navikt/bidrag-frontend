@@ -1,65 +1,116 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
-import { Button, Table } from "@navikt/ds-react";
+import { ClockDashedIcon, ExternalLinkIcon } from "@navikt/aksel-icons";
+import { Box, Button, Detail, Heading, HStack, Modal, Table, VStack } from "@navikt/ds-react";
 import { useState } from "react";
+import { useParams } from "react-router";
 
-import type { Rollehistorikk } from "./sakvisning-schema.ts";
+import PersonInfo from "./components/PersonInfo.tsx";
+import type { Rolle, Rollehistorikk } from "./sakvisning-schema.ts";
 
 type Props = {
     rollehistorikk?: Rollehistorikk[];
+    rolle?: Pick<Rolle, "navn" | "fodselsnummer" | "fødselsdato" | "type">;
 };
 
-export default function RollehistorikkVisning({ rollehistorikk }: Props) {
+export default function RollehistorikkVisning({ rollehistorikk, rolle }: Props) {
     const [isOpen, setIsOpen] = useState(false);
+    const { saksnummer } = useParams();
 
     if (!rollehistorikk || rollehistorikk.length === 0) {
         return null;
     }
 
+    const sortertHistorikk = [...rollehistorikk].sort((a, b) =>
+        a.opprettetDato && b.opprettetDato ? b.opprettetDato.getTime() - a.opprettetDato.getTime() : 0,
+    );
+
     return (
-        <div className="space-y-3">
-            <div className="flex justify-end">
-                <Button size="small" type="button" variant="tertiary" onClick={() => setIsOpen(!isOpen)}>
-                    {isOpen ? "Skjul rollehistorikk" : "Vis rollehistorikk"}
-                </Button>
-            </div>
+        <>
+            <Button
+                size="small"
+                type="button"
+                variant="tertiary"
+                icon={<ExternalLinkIcon aria-hidden />}
+                onClick={() => setIsOpen(true)}
+                className="self-start"
+            >
+                Vis rollehistorikk
+            </Button>
+
             {isOpen && (
-                <Table size="small" className="w-full" bgcolor="white">
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell textSize="small" scope="col" className="w-1/5">
-                                Nytt reell mottaker
-                            </Table.HeaderCell>
-                            <Table.HeaderCell textSize="small" scope="col" className="w-1/5">
-                                Type endring
-                            </Table.HeaderCell>
-                            <Table.HeaderCell textSize="small" scope="col" className="w-1/5">
-                                Endret av
-                            </Table.HeaderCell>
-                            <Table.HeaderCell textSize="small" scope="col" className="w-1/5">
-                                Endret dato
-                            </Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                        {[...rollehistorikk]
-                            .sort((a, b) =>
-                                a.opprettetDato && b.opprettetDato
-                                    ? b.opprettetDato.getTime() - a.opprettetDato.getTime()
-                                    : 0,
-                            )
-                            .map((rolle, index) => (
-                                <Table.Row key={index}>
-                                    <Table.DataCell textSize="small">{rolle.reellMottaker || "-"}</Table.DataCell>
-                                    <Table.DataCell textSize="small">{rolle.typeEndring || "-"}</Table.DataCell>
-                                    <Table.DataCell textSize="small">{rolle.opprettetAv || "-"}</Table.DataCell>
-                                    <Table.DataCell textSize="small">
-                                        {rolle.opprettetDato ? dateToDDMMYYYYString(rolle.opprettetDato) : "-"}
-                                    </Table.DataCell>
-                                </Table.Row>
-                            ))}
-                    </Table.Body>
-                </Table>
+                <Modal open onClose={() => setIsOpen(false)} width="medium" aria-label="Rollehistorikk">
+                    <Modal.Header>
+                        <VStack gap="space-2">
+                            {saksnummer && <Detail>Sak {saksnummer}</Detail>}
+                            <HStack gap="space-4" align="center" wrap={false}>
+                                <ClockDashedIcon aria-hidden fontSize="1.5rem" />
+                                <Heading level="2" size="medium">
+                                    Rollehistorikk
+                                </Heading>
+                            </HStack>
+                        </VStack>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <VStack gap="space-16">
+                            {rolle?.fodselsnummer && (
+                                <Box
+                                    background="raised"
+                                    borderColor="neutral-subtleA"
+                                    borderWidth="1"
+                                    borderRadius="12"
+                                    padding="space-12"
+                                >
+                                    <PersonInfo
+                                        navn={rolle.navn}
+                                        ident={rolle.fodselsnummer}
+                                        fødselsdato={rolle.fødselsdato}
+                                        rolle={rolle.type}
+                                    />
+                                </Box>
+                            )}
+
+                            <Table size="medium" className="w-full">
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell textSize="medium" scope="col">
+                                            Ny reell mottaker
+                                        </Table.HeaderCell>
+                                        <Table.HeaderCell textSize="medium" scope="col">
+                                            Type endring
+                                        </Table.HeaderCell>
+                                        <Table.HeaderCell textSize="medium" scope="col">
+                                            Endret av
+                                        </Table.HeaderCell>
+                                        <Table.HeaderCell textSize="medium" scope="col">
+                                            Dato
+                                        </Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {sortertHistorikk.map((historikk, index) => (
+                                        <Table.Row key={index}>
+                                            <Table.DataCell textSize="medium">
+                                                <span className="personident">{historikk.reellMottaker || "-"}</span>
+                                            </Table.DataCell>
+                                            <Table.DataCell textSize="medium">
+                                                {historikk.typeEndring || "-"}
+                                            </Table.DataCell>
+                                            <Table.DataCell textSize="medium">
+                                                {historikk.opprettetAv || "-"}
+                                            </Table.DataCell>
+                                            <Table.DataCell textSize="medium">
+                                                {historikk.opprettetDato
+                                                    ? dateToDDMMYYYYString(historikk.opprettetDato)
+                                                    : "-"}
+                                            </Table.DataCell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                        </VStack>
+                    </Modal.Body>
+                </Modal>
             )}
-        </div>
+        </>
     );
 }

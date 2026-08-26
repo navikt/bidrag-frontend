@@ -1,15 +1,15 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
-import { Alert, Loader, Search } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, HStack, Loader, Search } from "@navikt/ds-react";
 import { useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
 
-export default function PersonSamhandlerSok({
+export default function PersonSamhandlerSøk({
     valgIdent,
     label,
     onResult,
     visSamhandlerSøk = false,
-    primary = false,
+    primary = true,
     compact = false,
 }: {
     valgIdent?: string;
@@ -28,31 +28,31 @@ export default function PersonSamhandlerSok({
         samhandlerPersonFn
             .mutateAsync({ ident: value?.trim() })
             .then(async (data) => {
+                if (!data?.isValid) {
+                    setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
+                    return;
+                }
+
                 setSearchErrorMessage(undefined);
-                if (data?.isValid) {
-                    try {
-                        return await onResult(data);
-                    } catch (err) {
-                        const errorMessage = err instanceof Error ? err.message : "En feil oppstod";
-                        setSearchErrorMessage(errorMessage);
-                    }
+                try {
+                    return await onResult(data);
+                } catch (err) {
+                    setSearchErrorMessage(err instanceof Error ? err.message : "En feil oppstod");
                 }
             })
             .catch(() => {
-                if (!searchErrorMessage) {
-                    setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
-                }
+                setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
             });
     }
 
-    const containerWidth = compact ? "w-full" : "w-[50rem]";
-    const inputWidth = compact ? "w-[30rem]" : "w-[30rem]";
-    const gapSize = compact ? "gap-2" : !primary ? "gap-2" : "gap-[3rem]";
+    const containerWidth = compact ? "100%" : "50rem";
+    const containerPadding = compact ? "space-0" : "space-8";
+    const inputWidth = compact ? "min-w-0 flex-1" : "w-[30rem]";
 
     return (
-        <div className={`flex gap-2 p-2 items-center ${containerWidth}`}>
-            <div className="w-full">
-                <div className={`flex flex-row items-center ${gapSize}`}>
+        <HStack gap="space-8" align="center" width={containerWidth} padding={containerPadding}>
+            <Box width="100%">
+                <HStack gap={compact ? "space-24" : "space-8"} align="end" wrap>
                     <Search
                         label={label || "Person- eller samhandlerident"}
                         variant={primary ? "primary" : "simple"}
@@ -61,43 +61,49 @@ export default function PersonSamhandlerSok({
                                 ? "Fødselsnummer, D-nummer (11 siffer) eller samhandler ident"
                                 : "Fødselsnummer eller D-nummer (11 siffer)"
                         }
-                        size="small"
+                        size={compact ? "medium" : "small"}
                         className={inputWidth}
                         value={searchValue}
                         hideLabel={false}
                         onClick={(e) => e.stopPropagation()}
-                        onSearchClick={onInputChange}
                         onChange={setSearchValue}
+                        onSearchClick={onInputChange}
+                        onKeyUp={(event) => {
+                            if (!primary && event.key === "Enter" && searchValue.trim()) {
+                                onInputChange(searchValue);
+                            }
+                        }}
                     />
-                    <div
-                        className={`items-center flex ${compact ? "flex-row gap-1 mt-1" : "flex-row gap-2"} ${searchErrorMessage ? "self-end" : "self-end"}`}
-                    >
+                    <HStack gap="space-8" align="end" wrap>
                         <PersonSokButton
+                            size={compact ? "medium" : undefined}
+                            onError={(feil) => setSearchErrorMessage(feil)}
                             onResult={(data) => {
                                 if (data?.ident) onInputChange(data.ident);
                             }}
                         />
                         {visSamhandlerSøk && (
                             <SamhandlerSokButton
+                                size={compact ? "medium" : undefined}
                                 onResult={(data) => {
                                     if (data?.samhandlerId) onInputChange(data.samhandlerId);
                                 }}
                             />
                         )}
-                    </div>
-                </div>
+                    </HStack>
+                </HStack>
                 {samhandlerPersonFn.isPending && (
-                    <div className="flex gap-2">
+                    <HStack gap="space-8">
                         <Loader size="small" title="Søker…" />
-                        <div>Søker…</div>
-                    </div>
+                        <BodyShort>Søker…</BodyShort>
+                    </HStack>
                 )}
                 {(samhandlerPersonFn.error?.message || searchErrorMessage) && (
                     <Alert variant="warning" inline size="small" className="!mb-0 mt-1">
                         {samhandlerPersonFn.error?.message || searchErrorMessage}
                     </Alert>
                 )}
-            </div>
-        </div>
+            </Box>
+        </HStack>
     );
 }
