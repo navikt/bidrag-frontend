@@ -1,7 +1,6 @@
 import { BIDRAG_RESKONTRO_API } from "@bidrag/api";
-import { SecureLoggerService } from "@bidrag/common";
+import { SecureLoggerService, withQueryErrorHandling, withQueryErrorHandlingV2 } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
-import { withQueryErrorHandling, withQueryErrorHandlingV2 } from "./withQueryErrorHandling.ts";
 
 export function hentReskontroTransaksjonerForBruker(ident: string) {
     return queryOptions({

@@ -41,10 +41,6 @@
         "axios": "catalog:"
     },
 
-    "peerDependencies": {
-        "@tanstack/react-query": "catalog:"
-    },
-
     "devDependencies": {
         "@types/node": "^25",
         "typescript": "catalog:",
