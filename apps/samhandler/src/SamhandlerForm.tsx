@@ -8,6 +8,7 @@ import {
     ErrorSummary,
     Heading,
     HGrid,
+    HStack,
     InfoCard,
     Modal,
     Select,
@@ -20,6 +21,7 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import styles from "./SamhandlerForm.module.css";
 import type { Samhandler } from "./SamhandlerSøk";
 import { sortInAlphabeticOrder } from "./utils/sorting";
 import { useHentLandkoder, useHentVisningsnavn } from "./utils/useApiData";
@@ -282,8 +284,8 @@ export default function SamhandlerForm({
     );
 
     const formBody = (
-        <form onSubmit={formMethods.handleSubmit(onSave, onError)} id={formId} className="mb-0">
-            <VStack gap={"space-16"}>
+        <form onSubmit={formMethods.handleSubmit(onSave, onError)} id={formId}>
+            <VStack gap={"space-16"} marginBlock={"space-16"}>
                 {mutation.error && (
                     <ErrorSummary ref={errorRef}>
                         {Array.isArray(errorMessage) ? (
@@ -306,13 +308,7 @@ export default function SamhandlerForm({
                             },
                         }}
                         render={({ field, fieldState }) => (
-                            <TextField
-                                {...field}
-                                label="Navn"
-                                size="small"
-                                error={fieldState.error?.message}
-                                className="h-max"
-                            />
+                            <TextField {...field} label="Navn" size="small" error={fieldState.error?.message} />
                         )}
                     />
                     <Controller
@@ -325,13 +321,7 @@ export default function SamhandlerForm({
                             },
                         }}
                         render={({ field, fieldState }) => (
-                            <Select
-                                {...field}
-                                label="Språk"
-                                size="small"
-                                error={fieldState.error?.message}
-                                className="h-max"
-                            >
+                            <Select {...field} label="Språk" size="small" error={fieldState.error?.message}>
                                 <option value="">- Velg språk -</option>
                                 {Object.values(Sprak)
                                     .map((sprak) => ({
@@ -358,13 +348,7 @@ export default function SamhandlerForm({
                             },
                         }}
                         render={({ field, fieldState }) => (
-                            <TextField
-                                {...field}
-                                label="OffentligId"
-                                size="small"
-                                error={fieldState.error?.message}
-                                className="h-max"
-                            />
+                            <TextField {...field} label="OffentligId" size="small" error={fieldState.error?.message} />
                         )}
                     />
                     <Controller
@@ -382,7 +366,6 @@ export default function SamhandlerForm({
                                 label="OffentligId - type"
                                 size="small"
                                 error={fieldState.error?.message}
-                                className="h-max"
                             >
                                 <option value="">- Velg OffentligId type -</option>
                                 {Object.values(OffentligIDType)
@@ -413,13 +396,7 @@ export default function SamhandlerForm({
                             },
                         }}
                         render={({ field, fieldState }) => (
-                            <Select
-                                {...field}
-                                label="Kreditortype"
-                                size="small"
-                                error={fieldState.error?.message}
-                                className="h-max"
-                            >
+                            <Select {...field} label="Kreditortype" size="small" error={fieldState.error?.message}>
                                 <option value="">- Velg kreditortype -</option>
                                 {Object.values(SamhandlerDtoOmradekodeEnum)
                                     .map((omradekode) => ({
@@ -458,23 +435,17 @@ export default function SamhandlerForm({
                                 <Controller
                                     name="kontaktperson"
                                     control={formMethods.control}
-                                    render={({ field }) => (
-                                        <TextField {...field} label="Kontaktperson" size="small" className="h-max" />
-                                    )}
+                                    render={({ field }) => <TextField {...field} label="Kontaktperson" size="small" />}
                                 />
                                 <Controller
                                     name="kontaktTelefon"
                                     control={formMethods.control}
-                                    render={({ field }) => (
-                                        <TextField {...field} label="Telefon" size="small" className="h-max" />
-                                    )}
+                                    render={({ field }) => <TextField {...field} label="Telefon" size="small" />}
                                 />
                                 <Controller
                                     name="kontaktEpost"
                                     control={formMethods.control}
-                                    render={({ field }) => (
-                                        <TextField {...field} label="Epost" size="small" className="h-max" />
-                                    )}
+                                    render={({ field }) => <TextField {...field} label="Epost" size="small" />}
                                 />
                             </HGrid>
                             <Controller
@@ -512,7 +483,6 @@ export default function SamhandlerForm({
                                         label="Adresselinje 1"
                                         size="small"
                                         error={fieldState.error?.message}
-                                        className="h-max"
                                         onChange={(e) => {
                                             field.onChange(e);
                                             formMethods.trigger(["adresse.postnummer", "adresse.land"]);
@@ -528,7 +498,6 @@ export default function SamhandlerForm({
                                         {...field}
                                         label="Adresselinje 2"
                                         size="small"
-                                        className="h-max"
                                         onChange={(e) => {
                                             field.onChange(e);
                                             formMethods.trigger("adresse.adresselinje1");
@@ -544,7 +513,6 @@ export default function SamhandlerForm({
                                         {...field}
                                         label="Adresselinje 3"
                                         size="small"
-                                        className="h-max"
                                         onChange={(e) => {
                                             field.onChange(e);
                                             formMethods.trigger("adresse.adresselinje1");
@@ -573,16 +541,13 @@ export default function SamhandlerForm({
                                         label="Postnummer"
                                         size="small"
                                         error={fieldState.error?.message}
-                                        className="h-max"
                                     />
                                 )}
                             />
                             <Controller
                                 name="adresse.poststed"
                                 control={formMethods.control}
-                                render={({ field }) => (
-                                    <TextField {...field} label="Poststed" size="small" className="h-max" />
-                                )}
+                                render={({ field }) => <TextField {...field} label="Poststed" size="small" />}
                             />
                             <Controller
                                 name="adresse.land"
@@ -603,7 +568,6 @@ export default function SamhandlerForm({
                                         label="Landkode"
                                         size="small"
                                         error={fieldState.error?.message}
-                                        className="h-max"
                                         onChange={(e) => {
                                             field.onChange(e);
                                             formMethods.trigger("adresse.postnummer");
@@ -626,9 +590,11 @@ export default function SamhandlerForm({
                         Kontoopplysninger
                     </Heading>
                     {formMethods.formState.errors?.root?.kontoopplysninger && (
-                        <ErrorMessage size="small" showIcon className="mb-2">
-                            {formMethods.formState.errors.root.kontoopplysninger.message}
-                        </ErrorMessage>
+                        <Box marginBlock={"space-0 space-8"}>
+                            <ErrorMessage size="small" showIcon>
+                                {formMethods.formState.errors.root.kontoopplysninger.message}
+                            </ErrorMessage>
+                        </Box>
                     )}
                     <Box
                         borderColor={`${formMethods.formState.errors?.root?.kontoopplysninger ? "warning" : "info"}`}
@@ -687,13 +653,7 @@ export default function SamhandlerForm({
                                 name="kontonummer.landkodeBank"
                                 control={formMethods.control}
                                 render={({ field, fieldState }) => (
-                                    <Select
-                                        {...field}
-                                        label="Landkode"
-                                        size="small"
-                                        error={fieldState.error?.message}
-                                        className="h-max"
-                                    >
+                                    <Select {...field} label="Landkode" size="small" error={fieldState.error?.message}>
                                         <option value="">- Velg landkode -</option>
                                         {visningsnavnLandkoder.map((landkode) => (
                                             <option key={landkode.landkode} value={landkode.landkode}>
@@ -741,7 +701,6 @@ export default function SamhandlerForm({
                                         label="Valutakode"
                                         size="small"
                                         error={fieldState.error?.message}
-                                        className="h-max"
                                     >
                                         <option value="">- Velg valuta -</option>
                                         {Object.values(Valutakode)
@@ -783,20 +742,21 @@ export default function SamhandlerForm({
                             <InfoCard.Title>Du må bekrefte endringene</InfoCard.Title>
                         </InfoCard.Header>
                         <InfoCard.Content>
-                            <BodyShort size="small">
-                                Endringene vil påvirke alle saker hvor samhandler-identen benyttes. Hvis du ikke ønsker
-                                at endringene skal gjelde i alle saker hvor samhandler-identen er benyttet, må du
-                                opprette ny samhandler.
-                            </BodyShort>
-                            <Checkbox
-                                className="mt-4"
-                                value={erBekreftet}
-                                checked={erBekreftet}
-                                onChange={() => setBekreftet((x) => !x)}
-                                size="small"
-                            >
-                                Jeg bekrefter at jeg vil endre opplysninger på samhandler-identen.
-                            </Checkbox>
+                            <VStack gap={"space-16"}>
+                                <BodyShort size="small">
+                                    Endringene vil påvirke alle saker hvor samhandler-identen benyttes. Hvis du ikke
+                                    ønsker at endringene skal gjelde i alle saker hvor samhandler-identen er benyttet,
+                                    må du opprette ny samhandler.
+                                </BodyShort>
+                                <Checkbox
+                                    value={erBekreftet}
+                                    checked={erBekreftet}
+                                    onChange={() => setBekreftet((x) => !x)}
+                                    size="small"
+                                >
+                                    Jeg bekrefter at jeg vil endre opplysninger på samhandler-identen.
+                                </Checkbox>
+                            </VStack>
                         </InfoCard.Content>
                     </InfoCard>
                 )}
@@ -808,13 +768,15 @@ export default function SamhandlerForm({
         <FormProvider {...formMethods} key={defaultValues.samhandlerId}>
             {inModal ? (
                 <>
-                    <Modal.Body className="pb-0">{formBody}</Modal.Body>
+                    <Modal.Body className={styles.modalForm}>{formBody}</Modal.Body>
                     <Modal.Footer>{actionButtons}</Modal.Footer>
                 </>
             ) : (
                 <>
                     {formBody}
-                    <div className="flex gap-2 mt-4">{actionButtons}</div>
+                    <HStack gap={"space-8"} marginBlock={"space-16 space-0"}>
+                        {actionButtons}
+                    </HStack>
                 </>
             )}
         </FormProvider>

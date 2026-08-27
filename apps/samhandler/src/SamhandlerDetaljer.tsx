@@ -1,8 +1,22 @@
 import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
 import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, BodyShort, Box, Button, Heading, HGrid, Label, Loader, Tag, VStack } from "@navikt/ds-react";
+import {
+    Alert,
+    BodyLong,
+    BodyShort,
+    Box,
+    Button,
+    Heading,
+    HGrid,
+    HStack,
+    Label,
+    Loader,
+    Tag,
+    VStack,
+} from "@navikt/ds-react";
 import { memo, Suspense, useState } from "react";
 import { QueryErrorWrapper } from "./QueryErrorBoundary";
+import styles from "./SamhandlerDetaljer.module.css";
 import SamhandlerForm from "./SamhandlerForm";
 import type { Samhandler } from "./SamhandlerSøk";
 import {
@@ -17,12 +31,12 @@ type InfoRowProps = { label: string; value: React.ReactNode };
 
 function InfoRow({ label, value }: InfoRowProps) {
     return (
-        <div>
-            <Label size="small" className="text-ax-neutral-600 uppercase tracking-wide text-xs">
+        <VStack gap={"space-2"}>
+            <Label size="small" textColor={"subtle"} className={styles.infoRowLabel}>
                 {label}
             </Label>
-            <BodyShort className="mt-0.5">{value}</BodyShort>
-        </div>
+            <BodyShort>{value}</BodyShort>
+        </VStack>
     );
 }
 
@@ -39,7 +53,7 @@ const SamhandlerDetaljerContent = memo(
         };
 
         return (
-            <VStack gap="space-6">
+            <VStack gap="space-6" width={"100%"}>
                 {!isEditing && (
                     <>
                         {/* Header card */}
@@ -51,9 +65,9 @@ const SamhandlerDetaljerContent = memo(
                             padding="space-6"
                             shadow="dialog"
                         >
-                            <div className="flex items-start justify-between flex-wrap gap-4">
-                                <div>
-                                    <div className="flex items-center gap-3 flex-wrap">
+                            <HStack justify={"space-between"} align={"start"}>
+                                <VStack gap={"space-16"}>
+                                    <HStack gap={"space-24"}>
                                         <Heading level="2" size="medium">
                                             {samhandlerData.navn}
                                         </Heading>
@@ -62,11 +76,11 @@ const SamhandlerDetaljerContent = memo(
                                                 Opphørt
                                             </Tag>
                                         )}
-                                    </div>
-                                    <BodyShort size="small" className="text-ax-neutral-600 mt-1">
+                                    </HStack>
+                                    <BodyShort size="small" textColor="subtle">
                                         ID: {samhandlerData.samhandlerId}
                                     </BodyShort>
-                                </div>
+                                </VStack>
                                 <Button
                                     size="small"
                                     variant="secondary"
@@ -75,9 +89,14 @@ const SamhandlerDetaljerContent = memo(
                                 >
                                     Rediger
                                 </Button>
-                            </div>
+                            </HStack>
 
-                            <div className="border-t border-ax-neutral-300 mt-4 pt-4">
+                            <Box
+                                borderWidth={"1 0 0 0"}
+                                borderColor="neutral"
+                                paddingBlock={"space-16 space-0"}
+                                marginBlock={"space-16 space-0"}
+                            >
                                 <HGrid gap="space-4" columns={{ xs: 1, sm: 2, md: 3 }}>
                                     {samhandlerData.områdekode && (
                                         <InfoRow
@@ -107,7 +126,7 @@ const SamhandlerDetaljerContent = memo(
                                         <InfoRow label="E-post" value={samhandlerData.kontaktEpost} />
                                     )}
                                 </HGrid>
-                            </div>
+                            </Box>
                         </Box>
 
                         {/* Adresse */}
@@ -218,7 +237,7 @@ const SamhandlerDetaljerContent = memo(
                         padding="space-6"
                         shadow="dialog"
                     >
-                        <div className="flex items-center justify-between mb-4">
+                        <HStack justify={"space-between"}>
                             <Heading level="3" size="small">
                                 Rediger samhandler
                             </Heading>
@@ -230,7 +249,7 @@ const SamhandlerDetaljerContent = memo(
                             >
                                 Lukk
                             </Button>
-                        </div>
+                        </HStack>
                         <SamhandlerForm
                             mutation={oppdaterSamhandler}
                             samhandler={samhandlerData}
@@ -253,24 +272,27 @@ export default function SamhandlerDetaljer({ samhandlerId: id }: { samhandlerId?
     }
 
     return (
-        <VStack className="flex justify-center py-96">
-            <div className="w-full max-w-4xl">
-                <VStack gap="space-6">
-                    <div>
-                        <Heading level="1" size="xlarge">
-                            Samhandler
-                        </Heading>
-                        <BodyShort size="small" className="text-ax-neutral-600 mt-1">
-                            ID: {id}
-                        </BodyShort>
-                    </div>
-                    <QueryErrorWrapper>
-                        <Suspense fallback={<Loader size="medium" title="Laster samhandler..." />}>
-                            <SamhandlerDetaljerLoader samhandlerId={id} />
-                        </Suspense>
-                    </QueryErrorWrapper>
-                </VStack>
-            </div>
+        <VStack
+            gap="space-24"
+            maxWidth={"56rem"}
+            width={"100%"}
+            align={"center"}
+            marginInline={"auto"}
+            paddingBlock={"space-32"}
+        >
+            <VStack width={"100%"} gap={"space-1"}>
+                <Heading level="1" size="xlarge">
+                    Samhandler
+                </Heading>
+                <BodyShort size="small" textColor={"subtle"}>
+                    ID: {id}
+                </BodyShort>
+            </VStack>
+            <QueryErrorWrapper>
+                <Suspense fallback={<Loader size="medium" title="Laster samhandler..." />}>
+                    <SamhandlerDetaljerLoader samhandlerId={id} />
+                </Suspense>
+            </QueryErrorWrapper>
         </VStack>
     );
 }
