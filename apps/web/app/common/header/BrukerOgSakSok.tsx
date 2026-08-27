@@ -54,6 +54,7 @@ export function BrukerOgSakSok() {
                 variant="simple"
                 placeholder="Finn person eller sak"
                 value={search}
+                autoComplete={"off"}
                 onChange={setSearch}
                 error={searchError}
             />
