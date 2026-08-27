@@ -7,7 +7,7 @@ import {
 import { PersonNavnIdent } from "@bidrag/common";
 import { Alert, Heading } from "@navikt/ds-react";
 import type React from "react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { MenuButton, SideMenu } from "../../common/components/SideMenu/SideMenu";
 import behandlingQueryKeys, {
@@ -20,18 +20,23 @@ import { useBehandlingProvider } from "../../common/context/BehandlingContext";
 import {
     checkForValidationErrors,
     checkIfRolleHasValideringsfeil,
+    erDelAvValgtSaksnummer,
     getSaksnummerForIdent,
     inntektPageHasValideringsFeil,
 } from "../../common/helpers/inntektFormHelpers";
 import { shouldShowGrunnlagLoadingProgressbar } from "../../common/helpers/shouldShowGrunnlagProgressbar";
 import { useGetBehandlingV2 } from "../../common/hooks/useApiData";
-import useFeatureToogle from "../../common/hooks/useFeatureToggle";
 import { STEPS } from "../constants/steps";
 import { BarnebidragStepper } from "../enum/BarnebidragStepper";
 
 const VirkingstidspunktMenuButton = ({ activeButton, step }: { activeButton: string; step: string }) => {
-    const { onStepChange, vurderSeparatVirkningstidspunkt, isGrunnlagLoading } = useBehandlingProvider();
+    const { onStepChange, vurderSeparatVirkningstidspunkt, isGrunnlagLoading, selectedSaksnummer } =
+        useBehandlingProvider();
     const { virkningstidspunktV3: virkningstidspunkt, lesemodus } = useGetBehandlingV2();
+
+    const barnIValgtSak = virkningstidspunkt.barn.filter((b) =>
+        erDelAvValgtSaksnummer(b.rolle.saksnummer, selectedSaksnummer, b.rolle.rolletype),
+    );
 
     const checkForValidationErrorInVirkningstidspunkt = (valideringsfeil: VirkningstidspunktFeilV2Dto) => {
         return (
@@ -46,7 +51,7 @@ const VirkingstidspunktMenuButton = ({ activeButton, step }: { activeButton: str
         );
     };
 
-    const displaySubmenu = vurderSeparatVirkningstidspunkt && virkningstidspunkt.barn.length > 1;
+    const displaySubmenu = vurderSeparatVirkningstidspunkt && barnIValgtSak.length > 1;
 
     return (
         <MenuButton
@@ -61,7 +66,7 @@ const VirkingstidspunktMenuButton = ({ activeButton, step }: { activeButton: str
             }
             subMenu={
                 displaySubmenu &&
-                [...virkningstidspunkt.barn]
+                [...barnIValgtSak]
                     .sort((a, b) => (a.rolle.saksnummer ?? "").localeCompare(b.rolle.saksnummer ?? ""))
                     .map((b) => (
                         <Fragment key={b.rolle.id}>
@@ -165,10 +170,13 @@ const UnderholdskostnadMenuButton = ({
     step: string;
     interactive: boolean;
 }) => {
-    const { onStepChange, lesemodus, isGrunnlagLoading } = useBehandlingProvider();
+    const { onStepChange, lesemodus, isGrunnlagLoading, selectedSaksnummer } = useBehandlingProvider();
     const { underholdskostnader, roller } = useGetBehandlingV2();
     const underholdskostnaderMedBarnMedIBehandling = underholdskostnader
         .filter((underhold) => underhold.gjelderBarn.medIBehandlingen)
+        .filter((underhold) =>
+            erDelAvValgtSaksnummer(getSaksnummerForIdent(roller, underhold.gjelderBarn.ident), selectedSaksnummer),
+        )
         .sort((a, b) =>
             getSaksnummerForIdent(roller, a.gjelderBarn.ident).localeCompare(
                 getSaksnummerForIdent(roller, b.gjelderBarn.ident),
@@ -389,22 +397,26 @@ const InntektMenuButton = ({
     step: string;
     interactive: boolean;
 }) => {
-    const { onStepChange, lesemodus, isGrunnlagLoading } = useBehandlingProvider();
+    const { onStepChange, lesemodus, isGrunnlagLoading, selectedSaksnummer } = useBehandlingProvider();
     const { inntekterV2: inntekter, ikkeAktiverteEndringerIGrunnlagsdata, roller } = useGetBehandlingV2();
 
     const inntekterIkkeAktiverteEndringer =
         !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter &&
         Object.values(ikkeAktiverteEndringerIGrunnlagsdata.inntekter).some((inntekt) => !!inntekt.length);
 
-    const sortedInntekter = [...inntekter].sort((a, b) => {
-        const rolleTypeWeight = (rolletype: Rolletype) =>
-            rolletype === Rolletype.BM ? 0 : rolletype === Rolletype.BP ? 1 : 2;
-        const weightDiff = rolleTypeWeight(a.gjelder.rolletype) - rolleTypeWeight(b.gjelder.rolletype);
-        if (weightDiff !== 0) return weightDiff;
-        return getSaksnummerForIdent(roller, a.gjelder.ident).localeCompare(
-            getSaksnummerForIdent(roller, b.gjelder.ident),
-        );
-    });
+    const sortedInntekter = [...inntekter]
+        .filter((inntektRolle) =>
+            erDelAvValgtSaksnummer(inntektRolle.gjelder.saksnummer, selectedSaksnummer, inntektRolle.gjelder.rolletype),
+        )
+        .sort((a, b) => {
+            const rolleTypeWeight = (rolletype: Rolletype) =>
+                rolletype === Rolletype.BM ? 0 : rolletype === Rolletype.BP ? 1 : 2;
+            const weightDiff = rolleTypeWeight(a.gjelder.rolletype) - rolleTypeWeight(b.gjelder.rolletype);
+            if (weightDiff !== 0) return weightDiff;
+            return getSaksnummerForIdent(roller, a.gjelder.ident).localeCompare(
+                getSaksnummerForIdent(roller, b.gjelder.ident),
+            );
+        });
 
     return (
         <MenuButton
@@ -771,8 +783,14 @@ const SamværMenuButton = ({
     step: string;
     interactive: boolean;
 }) => {
-    const { onStepChange, lesemodus, vurderSeparatSamvær, isGrunnlagLoading, setSelectedSaksnummer } =
-        useBehandlingProvider();
+    const {
+        onStepChange,
+        lesemodus,
+        vurderSeparatSamvær,
+        isGrunnlagLoading,
+        selectedSaksnummer,
+        setSelectedSaksnummer,
+    } = useBehandlingProvider();
     const { samværV2: samvær, roller } = useGetBehandlingV2();
 
     const checkForValidationErrorInSamvær = ({ valideringsfeil }: { valideringsfeil?: SamvaerValideringsfeilDto }) => {
@@ -786,7 +804,10 @@ const SamværMenuButton = ({
         );
     };
     const samværValideringsFeil = samvær.barn?.some(checkForValidationErrorInSamvær);
-    const displaySubmenu = vurderSeparatSamvær && samvær.barn.length > 1;
+    const barnIValgtSak = samvær.barn.filter((barn) =>
+        erDelAvValgtSaksnummer(getSaksnummerForIdent(roller, barn.gjelderBarn), selectedSaksnummer),
+    );
+    const displaySubmenu = vurderSeparatSamvær && barnIValgtSak.length > 1;
 
     return (
         <MenuButton
@@ -799,7 +820,7 @@ const SamværMenuButton = ({
             valideringsfeil={!lesemodus && samværValideringsFeil}
             subMenu={
                 displaySubmenu &&
-                [...samvær.barn]
+                [...barnIValgtSak]
                     .sort((a, b) =>
                         getSaksnummerForIdent(roller, a.gjelderBarn).localeCompare(
                             getSaksnummerForIdent(roller, b.gjelderBarn),
@@ -849,37 +870,36 @@ const menuButtonMap = {
 } satisfies Record<string, React.ComponentType<never>>;
 
 export const BarnebidragSideMenu = () => {
-    const { sideMenu, selectedSaksnummer, setSelectedSaksnummer } = useBehandlingProvider();
-    const { erVedtakFattet, lesemodus, roller } = useGetBehandlingV2();
-    const { nyBehandlingHeader } = useFeatureToogle();
+    const { sideMenu, setSelectedSaksnummer } = useBehandlingProvider();
+    const { erVedtakFattet, lesemodus } = useGetBehandlingV2();
 
     const [searchParams] = useSearchParams();
-    const getActiveButtonFromParams = () => {
+    // Beregnes direkte under render (ikke via useState+useEffect) slik at den alltid er i
+    // synk med URL-en umiddelbart - uten en ekstra render-runde via en effekt som kan komme
+    // ut av fase når `searchParams` endres i rask rekkefølge (f.eks. rett etter en navigasjon
+    // utløst av en feilmelding i ErrorSummary/VedtakWrapper).
+    const activeButton = useMemo(() => {
         const step = searchParams.get(behandlingQueryKeys.steg);
         if (!step) return BarnebidragStepper.VIRKNINGSTIDSPUNKT;
         const tab = searchParams.get(behandlingQueryKeys.tab);
         return `${step}${tab ? `.${tab}` : ""}`;
-    };
-    const [activeButton, setActiveButton] = useState<string>(getActiveButtonFromParams());
+    }, [searchParams]);
 
+    // Synkroniserer `selectedSaksnummer` fra URL-en (brukt f.eks. når man klikker en feilmelding i
+    // `ErrorSummary` (VedtakWrapper) som navigerer til et annet steg for en spesifikk rolle/barn i
+    // en annen sak). Kilden (VedtakWrapper) sender saksnummeret direkte via `saksnummer`-parameteren,
+    // så vi trenger ikke slå opp rollen selv basert på `tab`-verdien (som varierer i format per steg).
+    // Skal kun trigges når selve `saksnummer`-parameteren endres - ikke når `selectedSaksnummer`
+    // endres av andre årsaker (f.eks. når brukeren klikker en annen sak i `SakHeader`), ellers vil
+    // effekten umiddelbart overstyre valget tilbake til saken som (fortsatt utdaterte)
+    // `saksnummer`-parameteren peker på, slik at man ikke får byttet sak i headeren.
+    const forrigeSaksnummerRef = useRef<string | null>(null);
     useEffect(() => {
-        const activeButton = getActiveButtonFromParams();
-        setActiveButton(activeButton);
-    }, [searchParams, location]);
-
-    useEffect(() => {
-        if (!nyBehandlingHeader) return;
-        const tab = searchParams.get(behandlingQueryKeys.tab);
-        if (!tab) return;
-
-        const tabId = parseInt(tab, 10);
-        if (Number.isNaN(tabId)) return;
-
-        const rolle = roller.find((r) => r.id === tabId && r.rolletype === Rolletype.BA);
-        if (!rolle?.saksnummer || rolle.saksnummer === selectedSaksnummer) return;
-
-        setSelectedSaksnummer(rolle.saksnummer);
-    }, [searchParams, roller, selectedSaksnummer, nyBehandlingHeader, setSelectedSaksnummer]);
+        const saksnummer = searchParams.get(behandlingQueryKeys.saksnummer);
+        if (saksnummer === forrigeSaksnummerRef.current) return;
+        forrigeSaksnummerRef.current = saksnummer;
+        if (saksnummer) setSelectedSaksnummer(saksnummer);
+    }, [searchParams, setSelectedSaksnummer]);
 
     return (
         <div className="flex flex-col">
