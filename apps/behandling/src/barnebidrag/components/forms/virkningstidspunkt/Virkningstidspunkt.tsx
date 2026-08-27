@@ -1409,7 +1409,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
 
 const VirkningstidspunktForm = () => {
     const { virkningstidspunktV3: virkningstidspunkt, stønadstype, vedtakstype } = useGetBehandlingV2();
-    const { setPageErrorsOrUnsavedState, selectedSaksnummer } = useBehandlingProvider();
+    const { setPageErrorsOrUnsavedState } = useBehandlingProvider();
     const initialValues = useMemo(
         () => createInitialValues(virkningstidspunkt, stønadstype, vedtakstype),
         [virkningstidspunkt, stønadstype, vedtakstype],

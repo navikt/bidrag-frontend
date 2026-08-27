@@ -1,10 +1,9 @@
-import {useMemo} from "react";
-import {useFormContext} from "react-hook-form";
-import {useSearchParams} from "react-router";
-import behandlingQueryKeys, {toUnderholdskostnadTabQueryParameter} from "../../common/constants/behandlingQueryKeys";
-import {useBehandlingProvider} from "../../common/context/BehandlingContext";
+import { useMemo } from "react";
+import { useFormContext } from "react-hook-form";
+import { useSearchParams } from "react-router";
+import behandlingQueryKeys, { toUnderholdskostnadTabQueryParameter } from "../../common/constants/behandlingQueryKeys";
 
-import type {UnderholdskostnadFormValues} from "../types/underholdskostnadFormValues";
+import type { UnderholdskostnadFormValues } from "../types/underholdskostnadFormValues";
 
 type UnderholdTabCandidate = {
     id: number;
@@ -36,9 +35,7 @@ export const useGetActiveAndDefaultUnderholdskostnadTab = (visibleUnderholdskost
         return toUnderholdskostnadTabQueryParameter(firstTab?.gjelderBarn?.id, firstTab?.id, true);
     }, [selectedTab, visibleTabs]);
 
-
     const activeTab = defaultTab;
-
 
     return [activeTab, defaultTab];
 };

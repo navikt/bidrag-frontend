@@ -429,7 +429,7 @@ const Side = () => {
 };
 
 const PrivatAvtaleForm = () => {
-    const { setPageErrorsOrUnsavedState, selectedSaksnummer } = useBehandlingProvider();
+    const { setPageErrorsOrUnsavedState } = useBehandlingProvider();
     const { privatAvtaleV3: privatAvtale } = useGetBehandlingV2();
     const privatAvtaleRef = useRef<PrivatAvtaleDtoV3>(privatAvtale);
 
@@ -440,7 +440,6 @@ const PrivatAvtaleForm = () => {
 
     const {
         setError,
-        reset,
         formState: { errors },
     } = useFormMethods;
 
@@ -464,13 +463,6 @@ const PrivatAvtaleForm = () => {
             setBegrunnelseError("andreBarnBegrunnelse");
         }
     }, []);
-
-
-    // useEffect(() => {
-    //     privatAvtaleRef.current = privatAvtale;
-    //     reset(createInitialValues(privatAvtale));
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [selectedSaksnummer]);
 
     useEffect(() => {
         setPageErrorsOrUnsavedState((prevState) => ({

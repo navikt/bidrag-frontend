@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { useSearchParams } from "react-router";
 import behandlingQueryKeys from "../../common/constants/behandlingQueryKeys";
@@ -26,12 +26,10 @@ export const useGetActiveAndDefaultVirkningstidspunktTab = () => {
         return rollerForValgtSak?.[0]?.rolle?.id?.toString();
     }, [rollerForValgtSak]);
 
-
     const activeTab = useMemo(() => {
         const matchesCurrentRoller = rollerForValgtSak?.some(({ rolle }) => rolle?.id?.toString() === selectedTab);
         return matchesCurrentRoller ? selectedTab : defaultTab;
     }, [selectedTab, rollerForValgtSak, defaultTab]);
-
 
     return [activeTab, defaultTab];
 };
