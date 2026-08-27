@@ -11,10 +11,9 @@ interface AktivPeriodeOptions {
     saksnummer: string;
     ident: string;
     periodeFilter: PeriodeFilter;
-    inkluderForskudd?: boolean;
 }
 
-export function useAktivPeriode({ saksnummer, ident, periodeFilter, inkluderForskudd = false }: AktivPeriodeOptions) {
+export function useAktivPeriode({ saksnummer, ident, periodeFilter }: AktivPeriodeOptions) {
     const { perioder } = useBeløphistorikk(saksnummer);
     const aktivePerioder = useMemo(
         () =>
@@ -29,9 +28,7 @@ export function useAktivPeriode({ saksnummer, ident, periodeFilter, inkluderFors
         .filter((p) => p[periodeFilter] === ident)
         .filter((p) => p.type === "BIDRAG" || p.type === "BIDRAG18AAR");
 
-    const forskudd = inkluderForskudd
-        ? aktivePerioder.filter((p) => p.mottaker === ident).filter((p) => p.type === "FORSKUDD")
-        : [];
+    const forskudd = aktivePerioder.filter((p) => p.mottaker === ident).filter((p) => p.type === "FORSKUDD");
 
     const sumBidragPerValuta = sumPerValuta(bidrag);
     const sumForskuddPerValuta = sumPerValuta(forskudd);

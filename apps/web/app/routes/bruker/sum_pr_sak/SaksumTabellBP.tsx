@@ -23,11 +23,10 @@ interface Props {
 }
 
 export function SaksumTabellBP({ bidragSak, saksnummer, ident, sak }: Props) {
-    const { bidrag, sumBidragPerValuta, getBidragForBarn, reellMottakerIdent } = useAktivPeriode({
+    const { sumBidragPerValuta, getBidragForBarn, reellMottakerIdent } = useAktivPeriode({
         saksnummer,
         ident,
         periodeFilter: "skyldner",
-        inkluderForskudd: false,
     });
     const roller = sak?.roller ?? [];
     const barn = bidragSak?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
