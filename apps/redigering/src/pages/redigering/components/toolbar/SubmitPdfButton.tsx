@@ -1,8 +1,7 @@
+import { LoggerService } from "@bidrag/common";
 import { FileCheckmarkIcon } from "@navikt/aksel-icons";
-import { LoggerService } from "@navikt/bidrag-ui-common";
 import { Alert, BodyShort, Button, Modal } from "@navikt/ds-react";
-import { useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 
 import { usePdfEditorContext } from "../PdfEditorContext";
 import ProduceDocumentStateIndicator from "./ProduceDocumentStateIndicator";
@@ -85,7 +84,7 @@ export default function SubmitPdfButton() {
             .catch((error) => {
                 LoggerService.error(
                     `Det skjedde en feil ved produsering av dokument ${dokumentreferanse} i forsendelse ${forsendelseId}`,
-                    error
+                    error,
                 );
                 if (typeof error == "string") {
                     setSubmitError(error ?? "ukjent feil");

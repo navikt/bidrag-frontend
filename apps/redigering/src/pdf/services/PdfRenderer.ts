@@ -1,6 +1,6 @@
-import { LoggerService } from "@navikt/bidrag-ui-common";
+import { LoggerService } from "@bidrag/common";
 
-import pdf2Image, { IPdfRenderedPage } from "../Pdf2Image";
+import pdf2Image, { type IPdfRenderedPage } from "../Pdf2Image";
 
 /**
  * Stateless wrapper around pdf2Image that renders every page of a PDF (given as bytes) to a
@@ -43,7 +43,7 @@ async function fetchRenderedPageBlob(renderedPage: IPdfRenderedPage): Promise<Ui
 export async function renderPdfPagesToImages(
     pdfBytes: Uint8Array,
     shouldRenderPage?: PageRenderFilter,
-    onPageRendered?: (pageIndex: number, imageMap: Map<number, IRenderedPdfPage>) => void
+    onPageRendered?: (pageIndex: number, imageMap: Map<number, IRenderedPdfPage>) => void,
 ): Promise<IRenderedPdfPages> {
     const images = new Map<number, IRenderedPdfPage>();
 
@@ -59,7 +59,7 @@ export async function renderPdfPagesToImages(
     }).catch((error) => {
         LoggerService.error(
             `renderPdfPagesToImages: pdfjs rendering failed: ${error instanceof Error ? error.message : String(error)}`,
-            error
+            error,
         );
         throw error;
     });

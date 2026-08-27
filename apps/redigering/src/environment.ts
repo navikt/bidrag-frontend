@@ -1,21 +1,16 @@
-// @ts-nocheck
+// Redigering-appen kjører som en del av bidrag-frontend (React Router). Alle
+// backend-kall går via /proxy/<app> og alle eksterne systemer nås via
+// redirect-ruter i apps/web. Derfor trengs ingen byggtids-miljøvariabler her.
 const system = {
-    isTest: process.env.NODE_ENV === "TEST",
-    isDevelopment: process.env.NODE_ENV === "development",
-    isProduction: process.env.NODE_ENV === "production",
-    environment: process.env.ENVIRONMENT,
-    legacyEnvironment: process.env.LEGACY_ENVIRONMENT,
+    isDevelopment: import.meta.env.DEV,
+    isProduction: import.meta.env.PROD,
 };
 
 const feature = {
-    validatePDF: process.env.VALIDATE_PDF == "true" || window.localStorage.getItem("validate_pdf") == "true",
-    debugPage: process.env.ENABLE_DEBUG_PAGE == "true",
+    validatePDF: typeof window !== "undefined" && window.localStorage.getItem("validate_pdf") === "true",
+    debugPage: typeof window !== "undefined" && window.localStorage.getItem("ENABLE_DEBUG_PAGE") === "true",
 };
 
-const url = {
-    static_url: process.env.STATIC_FILES_URL,
-    bidragDokument: process.env.BIDRAG_DOKUMENT_URL,
-    bidragDokumentForsendelse: process.env.BIDRAG_DOKUMENT_FORSENDELSE_URL,
-};
+const url = {};
 
 export default { url, system, feature };

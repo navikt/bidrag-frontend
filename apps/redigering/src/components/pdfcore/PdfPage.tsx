@@ -1,8 +1,15 @@
-import { RenderTask } from "pdfjs-dist";
-import { PDFPageProxy } from "pdfjs-dist/types/web/pdf_viewer";
-import React, { CSSProperties, MutableRefObject, PropsWithChildren, useEffect, useRef, useState } from "react";
+import type { RenderTask } from "pdfjs-dist";
+import type { PDFPageProxy } from "pdfjs-dist/types/web/pdf_viewer";
+import React, {
+    type CSSProperties,
+    type MutableRefObject,
+    type PropsWithChildren,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 
-import { PdfDocumentContextProps, usePdfDocumentContext } from "./PdfDocumentContext";
+import { type PdfDocumentContextProps, usePdfDocumentContext } from "./PdfDocumentContext";
 export type PageRenderedFn = (containerElement: HTMLDivElement) => void;
 
 interface PdfPageProps {
@@ -105,7 +112,7 @@ const PdfPageMemo = React.memo(
         prevProps.scale == nextProps.scale &&
         prevProps.rotation == nextProps.rotation &&
         prevProps.children == nextProps.children &&
-        nextProps.renderPageIndexes.includes(nextProps.index)
+        nextProps.renderPageIndexes.includes(nextProps.index),
 );
 
 interface PDFCanvasProps {
@@ -115,10 +122,10 @@ interface PDFCanvasProps {
     rotation: number;
 }
 function PDFCanvas({ pdfPage, scale, pageNumber, rotation, children }: PropsWithChildren<PDFCanvasProps>) {
-    const pageRenderTask = useRef<RenderTask>();
-    const pageRenderNextScale = useRef<number>();
-    const timeoutId = useRef<NodeJS.Timeout>();
-    const canvasRef = useRef<HTMLDivElement>();
+    const pageRenderTask = useRef<RenderTask>(undefined);
+    const pageRenderNextScale = useRef<number>(undefined);
+    const timeoutId = useRef<NodeJS.Timeout>(undefined);
+    const canvasRef = useRef<HTMLDivElement>(undefined);
 
     useEffect(() => {
         pageRenderNextScale.current = scale;

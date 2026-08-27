@@ -1,7 +1,6 @@
-import { CheckmarkCircleFillIcon } from "@navikt/aksel-icons";
-import { XMarkOctagonIcon } from "@navikt/aksel-icons";
+import { CheckmarkCircleFillIcon, XMarkOctagonIcon } from "@navikt/aksel-icons";
 import { Heading, Loader } from "@navikt/ds-react";
-import { CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 import { usePdfEditorContext } from "../PdfEditorContext";
 export default function DocumentStateIndicator() {

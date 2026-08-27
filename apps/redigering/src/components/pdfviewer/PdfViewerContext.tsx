@@ -1,9 +1,8 @@
-import { MutableRefObject, PropsWithChildren, useContext, useRef, useState } from "react";
-import React from "react";
+import React, { type MutableRefObject, type PropsWithChildren, useContext, useRef, useState } from "react";
 import { useControls, useTransformContext, useTransformEffect, useTransformInit } from "react-zoom-pan-pinch";
 
-import { PdfDocumentRef } from "../pdfcore/PdfDocument";
-import { PdfDocumentType } from "../utils/types";
+import type { PdfDocumentRef } from "../pdfcore/PdfDocument";
+import type { PdfDocumentType } from "../utils/types";
 
 export interface PdfViewerContextProps {
     file: PdfDocumentType;
@@ -51,7 +50,7 @@ export default function PdfViewerContextProvider({
     const [pageRefs, setPageRefs] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [scale, setScale] = useState(1);
-    const dokumentRef = useRef<PdfDocumentRef>();
+    const dokumentRef = useRef<PdfDocumentRef>(undefined);
     const { getContext, setTransformState } = useTransformContext();
     const { zoomIn, zoomOut, zoomToElement } = useControls();
     useTransformInit((ref) => {

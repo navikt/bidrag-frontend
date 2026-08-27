@@ -1,6 +1,7 @@
 import "./Toolbar.css";
 
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
+
 const Toolbar: React.FC<PropsWithChildren<unknown>> = ({ children }) => {
     return (
         <div

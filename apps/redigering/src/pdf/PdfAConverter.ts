@@ -1,24 +1,37 @@
+import { LoggerService } from "@bidrag/common";
 import {
     PDFDict,
     PDFDocument,
     PDFHexString,
     PDFName,
-    PDFObject,
-    PDFPage,
+    type PDFObject,
+    type PDFPage,
     PDFPageLeaf,
     PDFRawStream,
-    PDFRef,
+    type PDFRef,
     PDFStream,
     PDFString,
     StandardFonts,
 } from "@cantoo/pdf-lib";
-import { LoggerService } from "@navikt/bidrag-ui-common";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
-import { PdfDocumentType } from "../components/utils/types";
-//@ts-ignore
-import colorProfile from "./files/sRGB2014.icc";
+import type { PdfDocumentType } from "../components/utils/types";
+// Vite (i motsetning til webpack) krever eksplisitt `?url` for at binærfiler
+// skal håndteres som assets. Filen er liten nok til at Vite inliner den som
+// en base64 data-URI, tilsvarende webpacks tidligere `asset/inline`-regel.
+import colorProfileUrl from "./files/sRGB2014.icc?url";
 import { PDF_EDITOR_CREATOR, PDF_EDITOR_PRODUCER, PdfProducerHelpers } from "./PdfHelpers";
+
+function dataUriToUint8Array(dataUri: string): Uint8Array {
+    const base64 = dataUri.slice(dataUri.indexOf(",") + 1);
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+}
+
 export class PdfAConverter {
     private origDoc: PDFDocument;
     private copyPDF: boolean = false;
@@ -51,7 +64,7 @@ export class PdfAConverter {
             const reloaded = await PDFDocument.load(savedBytes);
             if (reloaded.getPageCount() !== this.pdfDoc.getPageCount()) {
                 LoggerService.warn(
-                    `PdfAConverter.convertAndSave verify-reload page count mismatch expected=${this.pdfDoc.getPageCount()} actual=${reloaded.getPageCount()}`
+                    `PdfAConverter.convertAndSave verify-reload page count mismatch expected=${this.pdfDoc.getPageCount()} actual=${reloaded.getPageCount()}`,
                 );
             }
         } catch (e) {
@@ -72,7 +85,7 @@ export class PdfAConverter {
         return Promise.resolve(originalDoc);
     }
     addColorProfile(doc: PDFDocument) {
-        const profile = colorProfile;
+        const profile = dataUriToUint8Array(colorProfileUrl);
         const profileStream = doc.context.stream(profile, {
             Length: profile.length,
         });
@@ -254,7 +267,7 @@ export const reparerPDF = async (documentFile: PdfDocumentType): Promise<File> =
     try {
         LoggerService.info("Reparerer korrupt PDF");
         const response = await BIDRAG_FORSENDELSE_API.api.reparerPdf(
-            new File([documentFile], "", {
+            new File([documentFile as unknown as BlobPart], "", {
                 type: "application/pdf",
             }),
             {
@@ -265,7 +278,7 @@ export const reparerPDF = async (documentFile: PdfDocumentType): Promise<File> =
                 paramsSerializer: {
                     indexes: null,
                 },
-            }
+            },
         );
         return response.data;
     } catch (e) {
@@ -276,10 +289,10 @@ export const validatePDFBytes = async (documentFile: Uint8Array): Promise<void> 
     try {
         console.log("Validerer PDF/A kompatibilitet");
         const pdfAResult = await BIDRAG_FORSENDELSE_API.api.validerPdf(
-            new File([documentFile], "", {
+            new File([documentFile as unknown as BlobPart], "", {
                 type: "application/pdf",
             }),
-            { headers: { "Content-Type": "application/pdf" } }
+            { headers: { "Content-Type": "application/pdf" } },
         );
         console.log("Validering resultat", pdfAResult.data);
     } catch (e) {
@@ -291,10 +304,10 @@ export const convertTOPDFA = async (documentFile: Uint8Array): Promise<string> =
     try {
         console.log("Konverterer til PDF/A");
         const pdfAResult = await BIDRAG_FORSENDELSE_API.api.convertToPdfa2(
-            new File([documentFile], "", {
+            new File([documentFile as unknown as BlobPart], "", {
                 type: "application/pdf",
             }),
-            { headers: { "Content-Type": "application/pdf" } }
+            { headers: { "Content-Type": "application/pdf" } },
         );
         return pdfAResult.data;
     } catch (e) {

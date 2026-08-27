@@ -1,18 +1,18 @@
+import { LoggerService } from "@bidrag/common";
 import {
     PDFArray,
     PDFDict,
     PDFDocument,
     PDFName,
-    PDFObject,
-    PDFPage,
+    type PDFObject,
+    type PDFPage,
     PDFPageLeaf,
     PDFRawStream,
     PDFRef,
     PDFStream,
 } from "@cantoo/pdf-lib";
-import { LoggerService } from "@navikt/bidrag-ui-common";
 
-import { PdfDocumentType } from "../components/utils/types";
+import type { PdfDocumentType } from "../components/utils/types";
 export const PDF_EDITOR_PRODUCER = "bidrag-dokument-redigering-ui";
 export const PDF_EDITOR_CREATOR = "NAV - Arbeids- og velferdsetaten";
 
@@ -113,7 +113,7 @@ export function repairBrokenParentChain(pdfDoc: PDFDocument): void {
 
         if (repairedCount > 0) {
             LoggerService.warn(
-                `repairBrokenParentChain: Fixed ${repairedCount} page leaf(s) with broken Parent reference`
+                `repairBrokenParentChain: Fixed ${repairedCount} page leaf(s) with broken Parent reference`,
             );
         }
     } catch (e) {
@@ -138,7 +138,7 @@ function preserveInheritedPageAttributes(pageLeaf: PDFPageLeaf, pdfDoc: PDFDocum
 function findAttributeInParentChain(
     pageLeaf: PDFPageLeaf,
     attribute: PDFName,
-    pdfDoc: PDFDocument
+    pdfDoc: PDFDocument,
 ): PDFObject | undefined {
     let parent = pageLeaf.get(PDFName.of("Parent"));
     const visitedParentRefs = new Set<string>();
@@ -235,7 +235,7 @@ export async function flattenForm(pdfDoc: PDFDocument, onError: () => void, igno
         if (ignoreError) {
             LoggerService.error(
                 "Det skjedde en feil ved 'flatning' av form felter i PDF. Gjør om feltene read-only fordi det er noen sider som er maskert",
-                e
+                e,
             );
             flattenFormV2(pdfDoc);
             makeFieldsReadOnly(pdfDoc);
@@ -245,7 +245,7 @@ export async function flattenForm(pdfDoc: PDFDocument, onError: () => void, igno
             } catch {
                 LoggerService.error(
                     "Det skjedde en feil ved 'flatning' av form felter i PDF. Laster PDF på nytt uten å flatne form for å unngå korrupt PDF",
-                    e
+                    e,
                 );
                 await onError();
             }
@@ -322,7 +322,7 @@ export async function getPrintableWarning(pdfBytearray: PdfDocumentType): Promis
         const affectedPages = new Set<number>();
         if (hasEncryptionMarker) {
             warnings.push(
-                "Dokumentet ser ut til å være kryptert eller ha utskriftsbegrensninger og kan feile ved natív utskrift i enkelte PDF-visere."
+                "Dokumentet ser ut til å være kryptert eller ha utskriftsbegrensninger og kan feile ved natív utskrift i enkelte PDF-visere.",
             );
         }
         if (pageLeafCount > pages.length) {
@@ -476,7 +476,7 @@ function isArrayOfNames(pdfDoc: PDFDocument, value: PDFObject): boolean {
 export async function fixMissingPages(
     pdfDoc: PDFDocument,
     ignoredPageRefs: Set<string> | string[] = [],
-    maxPageCountAfterRecovery?: number
+    maxPageCountAfterRecovery?: number,
 ) {
     // Corrupt PDFs can contain valid /Page leaf objects that are no longer reachable from the
     // page tree. We scan indirect objects for those leaves and stitch back only the ones that
@@ -488,8 +488,8 @@ export async function fixMissingPages(
 
     LoggerService.info(
         `fixMissingPages start totalPageLeafs=${pageLeafRefs.length} ignoredRefs=${Array.from(ignoredPageRefs).join(
-            "|"
-        )} maxPageCountAfterRecovery=${maxPageCountAfterRecovery ?? "none"}`
+            "|",
+        )} maxPageCountAfterRecovery=${maxPageCountAfterRecovery ?? "none"}`,
     );
 
     if (pageLeafRefs.length === 0) {
@@ -517,7 +517,7 @@ export async function fixMissingPages(
     }
 
     LoggerService.warn(
-        `Fant ${missingPageRefs.length} manglende sider i page tree av totalt ${pageLeafRefs.length} page leafs`
+        `Fant ${missingPageRefs.length} manglende sider i page tree av totalt ${pageLeafRefs.length} page leafs`,
     );
 
     const getRefNumber = (ref: PDFRef) => Number(ref.toString().split(" ")[0]);
@@ -557,7 +557,7 @@ export async function fixMissingPages(
                 0,
                 // Reinsert according to the natural leaf/ref order so the repaired render order
                 // matches the original document structure as closely as possible.
-                currentOrder.filter((ref) => sortedAllLeafRefs.indexOf(ref) < desiredIndex).length
+                currentOrder.filter((ref) => sortedAllLeafRefs.indexOf(ref) < desiredIndex).length,
             );
 
             pdfDoc.catalog.insertLeafNode(missingRef, insertIndex);
@@ -569,7 +569,7 @@ export async function fixMissingPages(
     }
 
     LoggerService.info(
-        `fixMissingPages done recoveredCount=${recoveredCount} skippedNotPageLeaf=${skippedNotPageLeaf} skippedNotRecoverable=${skippedNotRecoverable} brokenByMaxCap=${brokenByMaxCap} finalPageCount=${currentOrder.length}`
+        `fixMissingPages done recoveredCount=${recoveredCount} skippedNotPageLeaf=${skippedNotPageLeaf} skippedNotRecoverable=${skippedNotRecoverable} brokenByMaxCap=${brokenByMaxCap} finalPageCount=${currentOrder.length}`,
     );
 }
 

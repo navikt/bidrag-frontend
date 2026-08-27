@@ -1,8 +1,7 @@
 import { PadlockUnlockedIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 
 import { DokumentQueryKeys, RedigeringQueries } from "../../api/queries";
 import { useSkjemaUtfyllingContext } from "./SkjemaUtfyllingPage";

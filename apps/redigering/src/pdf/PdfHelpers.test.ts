@@ -1,4 +1,4 @@
-import { PDFDict, PDFDocument, PDFName, PDFPageLeaf, PDFRef, RotationTypes } from "@cantoo/pdf-lib";
+import { type PDFDict, PDFDocument, PDFName, type PDFPageLeaf, PDFRef, RotationTypes } from "@cantoo/pdf-lib";
 import { describe, expect, it } from "vitest";
 
 import { hasInvalidXObject, repairBrokenParentChain } from "./PdfHelpers";

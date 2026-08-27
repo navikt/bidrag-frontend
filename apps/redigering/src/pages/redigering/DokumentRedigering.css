@@ -1,39 +1,39 @@
 :root {
-  --editor-height: calc(100vh - 90px);
-  --editor-background-color: var(--ax-bg-default);
+    --editor-height: calc(100vh - 90px);
+    --editor-background-color: var(--ax-bg-default);
 }
 
 .page_decorator.deleted .page {
-  height: 0 !important;
-  margin-bottom: 0 !important;
+    height: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .page_decorator .deleted .maskingitem {
-  display: none;
+    display: none;
 }
 
 .page_decorator.deleted .maskingitem {
-  display: none;
+    display: none;
 }
 
 body {
-  overflow-x: hidden;
-  overflow: hidden;
+    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .dokumentredigering .editor .pdfviewer_container .pdfrenderer_container {
-  background-color: var(--editor-background-color);
+    background-color: var(--editor-background-color);
 }
 
 .dokumentredigering .editor .pdfviewer .pdfrenderer_container {
-  height: var(--editor-height);
-  padding-top: 10px;
+    height: var(--editor-height);
+    padding-top: 10px;
 }
 
 .dokumentredigering .editor {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 .navds-skeleton {
-  background-color: var(--ax-neutral-600);
+    background-color: var(--ax-neutral-600);
 }

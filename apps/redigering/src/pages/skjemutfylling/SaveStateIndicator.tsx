@@ -1,9 +1,8 @@
-import { CheckmarkCircleFillIcon } from "@navikt/aksel-icons";
-import { XMarkOctagonIcon } from "@navikt/aksel-icons";
-import { useRQMutationState } from "@navikt/bidrag-ui-common";
+import { useRQMutationState } from "@bidrag/common";
+import { CheckmarkCircleFillIcon, XMarkOctagonIcon } from "@navikt/aksel-icons";
 import { Heading, Loader } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 import { DokumentQueryKeys } from "../../api/queries";
 import { useSkjemaUtfyllingContext } from "./SkjemaUtfyllingPage";
@@ -12,7 +11,7 @@ export default function SaveStateIndicator() {
     const queryClient = useQueryClient();
     const saveState = useRQMutationState(
         DokumentQueryKeys.lagreDokumentMetadata(forsendelseId, dokumentreferanse),
-        queryClient
+        queryClient,
     );
 
     const getStyle = (): CSSProperties => ({
@@ -24,14 +23,14 @@ export default function SaveStateIndicator() {
     });
 
     function renderSaveState() {
-        if (saveState == "pending") {
+        if (saveState.status == "pending") {
             return (
                 <>
                     <Loader title={"Lagrer..."} size={"xsmall"} variant="inverted" />
                     <Heading size={"xsmall"}>Lagrer...</Heading>
                 </>
             );
-        } else if (saveState == "error") {
+        } else if (saveState.status == "error") {
             return (
                 <>
                     <XMarkOctagonIcon color="white" />

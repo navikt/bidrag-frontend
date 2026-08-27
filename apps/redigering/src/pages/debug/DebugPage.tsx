@@ -1,8 +1,8 @@
 import { PDFArray, PDFDict, PDFDocument, PDFName, PDFPage, PDFPageLeaf, PDFRawStream } from "@cantoo/pdf-lib";
 import { Button, Checkbox, Heading } from "@navikt/ds-react";
-import { ChangeEvent, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 
-import { PdfDocumentType } from "../../components/utils/types";
+import type { PdfDocumentType } from "../../components/utils/types";
 import { convertTOPDFA } from "../../pdf/PdfAConverter";
 import { debugRepairPDF, fixMissingPages, lastGyldigPDF, repairPDF } from "../../pdf/PdfHelpers";
 import DokumentMaskering from "../dokumentmaskering/DokumentMaskering";
@@ -27,7 +27,7 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
     async function openFile(ev: ChangeEvent<HTMLInputElement>) {
         const fileBuffer = await readFile(ev);
 
-        //@ts-ignore
+        //@ts-expect-error
         setPdfdocument(new Blob([fileBuffer]));
     }
     function _base64ToArrayBuffer(base64) {
@@ -86,7 +86,7 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
         const pdfdoc = await loadFileAndRepairPDF(ev);
         const savedUpdatedPdfUint8Array = await pdfdoc.save();
 
-        //@ts-ignore
+        //@ts-expect-error
         setPdfdocument(new Blob([savedUpdatedPdfUint8Array]));
     }
 
@@ -120,7 +120,7 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
         }
         const savedUpdatedPdfUint8Array = await pdfRecovered.save();
 
-        //@ts-ignore
+        //@ts-expect-error
         setPdfdocument(new Blob([savedUpdatedPdfUint8Array]));
     }
 
@@ -302,7 +302,13 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
 
     return (
         <PageWrapper name={"dokumentredigering_debug"}>
-            <DokumentMaskering documentFile={pdfdocument} isLoading={false} mode="edit" />
+            <DokumentMaskering
+                documentFile={pdfdocument}
+                isLoading={false}
+                mode="edit"
+                forsendelseId={forsendelseId}
+                dokumentreferanse={dokumentreferanse}
+            />
         </PageWrapper>
     );
 }

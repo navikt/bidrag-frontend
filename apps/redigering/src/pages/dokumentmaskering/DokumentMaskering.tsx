@@ -1,14 +1,14 @@
-import { Broadcast, BroadcastMessage, BroadcastNames, FileUtils, queryParams } from "@navikt/bidrag-ui-common";
+import { Broadcast, type BroadcastMessage, BroadcastNames, FileUtils, queryParams } from "@bidrag/common";
 import { Alert, Heading } from "@navikt/ds-react";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 import { useEffect } from "react";
 
 import { RedigeringQueries } from "../../api/queries";
-import { PdfDocumentType } from "../../components/utils/types";
+import type { PdfDocumentType } from "../../components/utils/types";
 import environment from "../../environment";
-import { EditDocumentMetadata } from "../../types/EditorTypes";
+import type { EditDocumentMetadata } from "../../types/EditorTypes";
 import { parseErrorMessageFromAxiosError } from "../../types/ErrorUtils";
-import PdfEditorContextProvider, { PdfEditorMode } from "../redigering/components/PdfEditorContext";
+import PdfEditorContextProvider, { type PdfEditorMode } from "../redigering/components/PdfEditorContext";
 import DokumentRedigering from "../redigering/DokumentRedigering";
 
 type DokumentMaskeringProps = {
@@ -27,7 +27,7 @@ export default function DokumentMaskering({
 }: DokumentMaskeringProps) {
     const { data: dokumentMetadata } = RedigeringQueries.hentRedigeringmetadata<EditDocumentMetadata>(
         forsendelseId,
-        dokumentreferanse
+        dokumentreferanse,
     );
     const lagreEndringerFn = RedigeringQueries.lagreEndringer(forsendelseId, dokumentreferanse);
     const ferdigstillDokumentFn = RedigeringQueries.ferdigstillDokument(forsendelseId, dokumentreferanse);
@@ -84,7 +84,9 @@ export default function DokumentMaskering({
         return new Promise<boolean>((resolve, reject) => {
             ferdigstillDokumentFn.mutate(
                 {
-                    fysiskDokument: FileUtils._arrayBufferToBase64(fysiskDokument),
+                    // Genererte typer sier `File` (pga. `@format binary` i swagger-spec),
+                    // men API-et forventer faktisk en base64-streng i JSON-body.
+                    fysiskDokument: FileUtils._arrayBufferToBase64(fysiskDokument) as unknown as File,
                     redigeringMetadata: JSON.stringify(config),
                 },
                 {
@@ -95,7 +97,7 @@ export default function DokumentMaskering({
                     onError: (error: AxiosError) => {
                         reject(parseErrorMessageFromAxiosError(error));
                     },
-                }
+                },
             );
         });
     }

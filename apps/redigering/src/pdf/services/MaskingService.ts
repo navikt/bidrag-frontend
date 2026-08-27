@@ -1,6 +1,6 @@
-import { PDFFont, PDFPage, PDFPageDrawRectangleOptions, rgb, RotationTypes } from "@cantoo/pdf-lib";
+import { type PDFFont, type PDFPage, type PDFPageDrawRectangleOptions, RotationTypes, rgb } from "@cantoo/pdf-lib";
 
-import { ICoordinates, IMaskingItemProps } from "../../components/masking/MaskingItem";
+import type { ICoordinates, IMaskingItemProps } from "../../components/masking/MaskingItem";
 
 /**
  * Stateless masking geometry and drawing helpers. These take the page/font/coordinates they
@@ -95,7 +95,7 @@ export function calculateTextCoordinates(
     font: PDFFont,
     coordinates: PDFPageDrawRectangleOptions,
     itemCoordinates: ICoordinates,
-    text: string
+    text: string,
 ) {
     const shouldRotateText = itemCoordinates.height > itemCoordinates.width;
     const fontSize = getFontsize(coordinates.width, coordinates.height);

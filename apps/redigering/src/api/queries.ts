@@ -1,12 +1,9 @@
-import { LoggerService } from "@navikt/bidrag-ui-common";
-import { useMutation } from "@tanstack/react-query";
-import { useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query";
-
-import { PdfDocumentType } from "../components/utils/types";
-import { IDocumentMetadata } from "../types/EditorTypes";
-import { BIDRAG_DOKUMENT_API } from "./api";
-import { BIDRAG_FORSENDELSE_API } from "./api";
-import { DokumentStatusTo, FerdigstillDokumentRequest } from "./BidragDokumentForsendelseApi";
+import { DokumentStatusTo, type FerdigstillDokumentRequest } from "@bidrag/api/BidragForsendelseApi";
+import { LoggerService } from "@bidrag/common";
+import { type UseSuspenseQueryResult, useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import type { PdfDocumentType } from "../components/utils/types";
+import type { IDocumentMetadata } from "../types/EditorTypes";
+import { BIDRAG_DOKUMENT_API, BIDRAG_FORSENDELSE_API } from "./api";
 
 export const DokumentQueryKeys = {
     dokument: ["dokument"],
@@ -45,7 +42,7 @@ export const lastDokumenter = (
     dokumentId?: string,
     dokumenter?: string[],
     resizeToA4?: boolean,
-    optimizeForPrint = true
+    optimizeForPrint = true,
 ): UseSuspenseQueryResult<PdfDocumentType> => {
     return useSuspenseQuery({
         queryKey: DokumentQueryKeys.hentDokument(dokumentId, dokumenter),
@@ -54,7 +51,10 @@ export const lastDokumenter = (
                 if (dokumenter && dokumenter.length > 0) {
                     return BIDRAG_DOKUMENT_API.dokument.hentDokumenter(
                         {
-                            dokument: dokumenter,
+                            // Genererte typer sier `string`, men endepunktet forventer
+                            // flere `dokument`-query-parametre (serialisert via paramsSerializer
+                            // under). Runtime-oppførsel er uendret fra den frittstående appen.
+                            dokument: dokumenter as unknown as string,
                             resizeToA4,
                             optimizeForPrint,
                         },
@@ -63,7 +63,7 @@ export const lastDokumenter = (
                             paramsSerializer: {
                                 indexes: null,
                             },
-                        }
+                        },
                     );
                 }
                 if (dokumentId) {
@@ -79,7 +79,7 @@ export const lastDokumenter = (
                             paramsSerializer: {
                                 indexes: null,
                             },
-                        }
+                        },
                     );
                 }
                 return BIDRAG_DOKUMENT_API.dokument.hentDokument(
@@ -93,11 +93,11 @@ export const lastDokumenter = (
                         paramsSerializer: {
                             indexes: null,
                         },
-                    }
+                    },
                 );
             } catch (e) {
                 LoggerService.warn(
-                    `Fant ikke dokument ${dokumentId} eller dokumenter ${dokumenter} for forsendelse/journalpost ${journalpostId}`
+                    `Fant ikke dokument ${dokumentId} eller dokumenter ${dokumenter} for forsendelse/journalpost ${journalpostId}`,
                 );
                 throw e;
             }
@@ -145,7 +145,7 @@ export const RedigeringQueries = {
                 return BIDRAG_FORSENDELSE_API.api.oppdaterDokumentRedigeringmetadata(
                     forsendelseId,
                     dokumentId,
-                    JSON.stringify(config)
+                    JSON.stringify(config),
                 );
             },
         });

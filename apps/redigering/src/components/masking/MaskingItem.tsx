@@ -1,13 +1,11 @@
 import "./MaskinItem.css";
 
-import { DragEndEvent, useDndMonitor, useDraggable } from "@dnd-kit/core";
-import { TrashIcon } from "@navikt/aksel-icons";
-import { FilesIcon } from "@navikt/aksel-icons";
+import { type DragEndEvent, useDndMonitor, useDraggable } from "@dnd-kit/core";
+import { FilesIcon, TrashIcon } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
 import { Resizable } from "re-resizable";
-import React, { CSSProperties, useMemo, useState } from "react";
-import { useEffect } from "react";
-import { useRef } from "react";
+import type React from "react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 
 import DomUtils from "../utils/DomUtils";
 import { useMaskingContainer } from "./MaskingContainer";
@@ -37,7 +35,7 @@ export interface IMaskingItemProps {
 const getStyle = (coordinatesScaled: ICoordinates, transform?: { x: number; y: number }): CSSProperties => ({
     position: "relative",
     backgroundColor: "white",
-    //@ts-ignore
+    //@ts-expect-error
     "--masking-top": `${coordinatesScaled.y}px`,
     "--masking-left": `${coordinatesScaled.x}px`,
     top: transform ? `calc(var(--masking-top) + ${transform.y}px/var(--scale-factor))` : `var(--masking-top)`,
@@ -72,7 +70,7 @@ export default function MaskingItem(props: IMaskingItemProps) {
             width: currentCoordinates.width == 0 ? _coordinates.width : currentCoordinates.width,
             height: currentCoordinates.height == 0 ? _coordinates.height : currentCoordinates.height,
         }),
-        [currentCoordinates, _coordinates]
+        [currentCoordinates, _coordinates],
     );
 
     useDndMonitor({
@@ -140,9 +138,8 @@ export default function MaskingItem(props: IMaskingItemProps) {
             <Resizable
                 className={`maskingitem ${isSelected ? "highlighted" : ""} ${isDragging ? "dragging" : ""}`}
                 {...listeners}
-                //@ts-ignore
+                //@ts-expect-error
                 id={id}
-                //@ts-ignore
                 tabIndex={isSelected ? 0 : 10000}
                 data-page-number={props.pageNumber}
                 {...attributes}
@@ -189,11 +186,11 @@ function DuplicatedMaskingItem({ id, coordinates: _coordinates, parentId, scale 
         const deltaY = yRelative - currentCoordinates.y;
         const newX = Math.min(
             parentElement.clientWidth - currentCoordinates.width,
-            Math.max(0, currentCoordinates.x + deltaX - currentCoordinates.width / 2)
+            Math.max(0, currentCoordinates.x + deltaX - currentCoordinates.width / 2),
         );
         const newY = Math.min(
             -currentCoordinates.height,
-            Math.max(-parentElement.clientHeight, currentCoordinates.y + deltaY - currentCoordinates.height / 2)
+            Math.max(-parentElement.clientHeight, currentCoordinates.y + deltaY - currentCoordinates.height / 2),
         );
         return { x: newX, y: newY };
     }

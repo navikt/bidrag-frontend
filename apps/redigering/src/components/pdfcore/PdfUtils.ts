@@ -7,7 +7,7 @@ export default class PdfUtils {
     }
     static getPdfPagesElement() {
         return document.querySelector(
-            ".pdfviewer_container .pdfrenderer_container #pdf_document_pages"
+            ".pdfviewer_container .pdfrenderer_container #pdf_document_pages",
         ) as HTMLDivElement;
     }
     static getCanvasSize(containerElement: HTMLElement): {
@@ -50,8 +50,8 @@ export default class PdfUtils {
         };
     }
     static isPageVisible(parentElement: HTMLDivElement, pageElement: HTMLDivElement) {
-        const { top, bottom, left, right } = this.getBoundingCoordinates(parentElement);
-        const { viewBottom, currentHeight, viewRight, currentWidth } = this.getElementDimensions(pageElement);
+        const { top, bottom, left, right } = PdfUtils.getBoundingCoordinates(parentElement);
+        const { viewBottom, currentHeight, viewRight, currentWidth } = PdfUtils.getElementDimensions(pageElement);
 
         return !(viewBottom <= top || currentHeight >= bottom || viewRight <= left || currentWidth >= right);
     }
@@ -68,7 +68,7 @@ export default class PdfUtils {
     }
 
     static getFirsVisiblePageElement(parentElement: HTMLDivElement, pageElements: Element[]) {
-        const visiblePageIndexes = this.getVisiblePageIndexes(parentElement, pageElements);
+        const visiblePageIndexes = PdfUtils.getVisiblePageIndexes(parentElement, pageElements);
         return pageElements[visiblePageIndexes[0]];
     }
     static getVisiblePageIndexes(parentElement: HTMLDivElement, pageElements: Element[]) {
@@ -77,11 +77,11 @@ export default class PdfUtils {
                 pageIndex,
                 pageElement: pageElement as HTMLDivElement,
             }))
-            .filter(({ pageElement }) => this.isPageVisible(parentElement, pageElement))
+            .filter(({ pageElement }) => PdfUtils.isPageVisible(parentElement, pageElement))
             .map(({ pageIndex, pageElement }) => {
-                const { top, bottom, left, right } = this.getBoundingCoordinates(parentElement);
+                const { top, bottom, left, right } = PdfUtils.getBoundingCoordinates(parentElement);
                 const { viewBottom, currentHeight, viewRight, currentWidth, viewHeight, viewWidth } =
-                    this.getElementDimensions(pageElement);
+                    PdfUtils.getElementDimensions(pageElement);
 
                 const hiddenHeight = Math.max(0, top - currentHeight) + Math.max(0, viewBottom - bottom);
                 const hiddenWidth = Math.max(0, left - currentWidth) + Math.max(0, viewRight - right);
@@ -93,7 +93,7 @@ export default class PdfUtils {
                     percent,
                 };
             })
-            .sort(function (a, b) {
+            .sort((a, b) => {
                 const pc = a.percent - b.percent;
 
                 if (Math.abs(pc) > 0.001) {

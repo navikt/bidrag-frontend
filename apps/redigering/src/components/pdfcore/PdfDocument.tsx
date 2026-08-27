@@ -1,22 +1,18 @@
 import "./pdf_viewer.css";
 
-import { LoggerService } from "@navikt/bidrag-ui-common";
+import { LoggerService } from "@bidrag/common";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 import * as pdfjsLib from "pdfjs-dist";
-import { PDFDocumentProxy } from "pdfjs-dist";
 // import pdfdoc from "pdfjs-dist/build/pdf.worker.js";
-import { MutableRefObject, useRef } from "react";
-import React from "react";
-import { useEffect } from "react";
-import { PropsWithChildren } from "react";
-import { useState } from "react";
+import React, { type MutableRefObject, type PropsWithChildren, useEffect, useRef, useState } from "react";
 import { TransformComponent, useTransformContext, useTransformEffect } from "react-zoom-pan-pinch";
 
 import { createArrayWithLength, removeDuplicates } from "../utils/ObjectUtils";
 import { TimerUtils } from "../utils/TimerUtils";
-import { PdfDocumentType } from "../utils/types";
+import type { PdfDocumentType } from "../utils/types";
 import { PdfDocumentContext } from "./PdfDocumentContext";
+import PdfUtils, { type ScrollDirection } from "./PdfUtils";
 import { getVisibleElements } from "./pdfjslib/ui_utils";
-import PdfUtils, { ScrollDirection } from "./PdfUtils";
 
 // pdfjsLib.GlobalWorkerOptions.workerSrc = `${environment.url.static_url}/pdf.worker.js`;
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
@@ -62,15 +58,15 @@ export default function PdfDocument({
     const [renderPageIndexes, setRenderPageIndexes] = useState<number[]>([]);
     const [currentScale, setCurrentScale] = useState(scale);
     const isMouseOver = useRef(false);
-    const pdfDocumentRef = useRef<PDFDocumentProxy>();
+    const pdfDocumentRef = useRef<PDFDocumentProxy>(undefined);
     const isRendering = useRef<boolean>(false);
     const pageElements = useRef<Element[]>([]);
     const lastKnownScrollPosition = useRef(0);
     const currentPageNumberRef = useRef(1);
     const onScrollThrottler = useRef(
         TimerUtils.throttleByAnimation((pageNumber: number, scrollDirection: ScrollDirection) =>
-            onScroll?.(pageNumber, scrollDirection)
-        )
+            onScroll?.(pageNumber, scrollDirection),
+        ),
     );
 
     const onScrollHandlerThrottler = useRef(TimerUtils.throttleByAnimation(onScrollHandler));
@@ -122,7 +118,7 @@ export default function PdfDocument({
             })
             .then((pdfDoc) => {
                 const currentVisiblePageIndexes = createArrayWithLength(
-                    Math.min(Math.max(3, overscanCount), pdfDoc.numPages - 1)
+                    Math.min(Math.max(3, overscanCount), pdfDoc.numPages - 1),
                 );
                 updateRenderPages(currentVisiblePageIndexes, 0);
                 return pdfDoc;
@@ -148,10 +144,10 @@ export default function PdfDocument({
                 onDocumentLoaded?.(
                     pdfDoc.numPages,
                     createArrayWithLength(pdfDoc.numPages).map((i) => i + 1),
-                    pageRefs
+                    pageRefs,
                 );
             })
-            .catch(function (reason) {
+            .catch((reason) => {
                 LoggerService.error(`Error loading PDF document`, reason);
             });
     }
@@ -160,12 +156,12 @@ export default function PdfDocument({
         try {
             const pages = await Promise.all(createArrayWithLength(pdfDoc.numPages).map((i) => pdfDoc.getPage(i + 1)));
             const refsIncludingMissing = pages.map((page) =>
-                page.ref ? `${page.ref.num} ${page.ref.gen} R` : "MISSING"
+                page.ref ? `${page.ref.num} ${page.ref.gen} R` : "MISSING",
             );
             LoggerService.info(
                 `getPageRefOrder pdfjs resolved numPages=${pdfDoc.numPages} refsIncludingMissing=${refsIncludingMissing.join(
-                    "|"
-                )}`
+                    "|",
+                )}`,
             );
             return refsIncludingMissing.filter((ref) => ref !== "MISSING");
         } catch (e) {
@@ -207,11 +203,11 @@ export default function PdfDocument({
     function updateRenderPages(visiblePages: number[], currentPageIndex: number) {
         const nextPagesByOverscan = removeDuplicates(
             createArrayWithLength(overscanCount).map((index) =>
-                Math.min(currentPageIndex + index, pdfDocumentRef.current!.numPages - 1)
-            )
+                Math.min(currentPageIndex + index, pdfDocumentRef.current!.numPages - 1),
+            ),
         );
         const prevPagesByOverscan = removeDuplicates(
-            createArrayWithLength(overscanCount).map((_, index) => Math.max(currentPageIndex - index, 0))
+            createArrayWithLength(overscanCount).map((_, index) => Math.max(currentPageIndex - index, 0)),
         );
 
         const updatedRenderPages = removeDuplicates([...visiblePages, ...nextPagesByOverscan, ...prevPagesByOverscan]);
@@ -238,7 +234,7 @@ export default function PdfDocument({
             const currentScrollHeight = divRef.current.firstElementChild.scrollTop;
             onScrollThrottler.current(
                 currentPageNumber,
-                currentScrollHeight < lastKnownScrollPosition.current ? "up" : "down"
+                currentScrollHeight < lastKnownScrollPosition.current ? "up" : "down",
             );
             lastKnownScrollPosition.current = currentScrollHeight;
         }

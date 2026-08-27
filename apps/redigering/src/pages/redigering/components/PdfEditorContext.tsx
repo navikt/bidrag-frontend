@@ -1,13 +1,12 @@
-import { EditorConfigStorage, FileUtils, LoggerService, objectsDeepEqual, queryParams } from "@navikt/bidrag-ui-common";
-import { PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
-import React from "react";
+import { EditorConfigStorage, FileUtils, LoggerService, objectsDeepEqual, queryParams } from "@bidrag/common";
+import React, { type PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
 
 import StateHistory from "../../../components/history/StateHistory";
 import { MaskingContainer, useMaskingContainer } from "../../../components/masking/MaskingContainer";
 import { TimerUtils } from "../../../components/utils/TimerUtils";
-import { PdfDocumentType } from "../../../components/utils/types";
-import { IProducerProgress, PdfProducer } from "../../../pdf/PdfProducer";
-import { ClosingWindow, EditDocumentMetadata, IDocumentMetadata } from "../../../types/EditorTypes";
+import type { PdfDocumentType } from "../../../components/utils/types";
+import { type IProducerProgress, PdfProducer } from "../../../pdf/PdfProducer";
+import type { ClosingWindow, EditDocumentMetadata, IDocumentMetadata } from "../../../types/EditorTypes";
 
 export type PdfEditorMode = "view_only_unlockable" | "edit" | "remove_pages_only" | "view_only_locked";
 
@@ -105,7 +104,7 @@ function PdfEditorContextProviderWithMasking({
     const allowWindowCloseRef = useRef(false);
     const savingDocumentTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const inFlightProcessedPdf = useRef<Promise<{ documentFile: Uint8Array; config: EditDocumentMetadata }> | null>(
-        null
+        null,
     );
 
     useEffect(() => divRef.current.focus(), []);
@@ -131,7 +130,7 @@ function PdfEditorContextProviderWithMasking({
             acc[item.pageNumber] = (acc[item.pageNumber] ?? 0) + 1;
             return acc;
         },
-        {} as Record<number, number>
+        {} as Record<number, number>,
     );
     const maskedPageNumbers = Object.keys(maskItemsByPage)
         .map(Number)
@@ -281,7 +280,7 @@ function PdfEditorContextProviderWithMasking({
 
     async function buildProcessedPdf(
         config: EditDocumentMetadata,
-        onProgressUpdate?: (process: IProducerProgress) => void
+        onProgressUpdate?: (process: IProducerProgress) => void,
     ): Promise<{ documentFile: Uint8Array; config: EditDocumentMetadata }> {
         const existingPdfBytes = await resolveDocumentBytes();
 
@@ -329,7 +328,7 @@ function PdfEditorContextProviderWithMasking({
     async function savePdf(
         saveEditDocumentData: EditDocumentMetadata,
         closeAfterSave?: boolean,
-        submit?: boolean
+        submit?: boolean,
     ): Promise<ClosingWindow> {
         setIsSavingDocumentConfig(true);
         setLastSavedData(saveEditDocumentData);
@@ -376,7 +375,7 @@ function PdfEditorContextProviderWithMasking({
 
                 return acc;
             },
-            {} as Record<number, number>
+            {} as Record<number, number>,
         );
     }
 
@@ -393,7 +392,7 @@ function PdfEditorContextProviderWithMasking({
                     currentRotation,
                     nextRotation,
                     pageRotationsBefore: prev,
-                })}`
+                })}`,
             );
 
             if (nextRotation === 0) {
@@ -404,7 +403,7 @@ function PdfEditorContextProviderWithMasking({
                         pageNumber,
                         direction,
                         pageRotationsAfter: next,
-                    })}`
+                    })}`,
                 );
                 return next;
             }
@@ -418,7 +417,7 @@ function PdfEditorContextProviderWithMasking({
                     pageNumber,
                     direction,
                     pageRotationsAfter: nextState,
-                })}`
+                })}`,
             );
             return nextState;
         });

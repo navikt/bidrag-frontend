@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { type PropsWithChildren } from "react";
 
 import PdfDocument from "../pdfcore/PdfDocument";
 import { usePdfViewerContext } from "./PdfViewerContext";

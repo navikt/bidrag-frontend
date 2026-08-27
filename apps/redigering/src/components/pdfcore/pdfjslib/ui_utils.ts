@@ -100,10 +100,8 @@ function parseQueryString(query: string) {
     return params;
 }
 
-//@ts-ignore
 // eslint-disable-next-line no-control-regex
 const NullCharactersRegExp = /\x00/g;
-//@ts-ignore
 // eslint-disable-next-line no-control-regex
 const InvisibleCharactersRegExp = /[\x01-\x1F]/g;
 
@@ -181,7 +179,6 @@ function approximateFraction(x: number) {
         c = 1,
         d = 1;
     // Limiting search to order 8.
-    //@ts-ignore
 
     while (true) {
         // Generating next term in sequence (order of q).
@@ -410,7 +407,7 @@ function getVisibleElements({
         numViews = views.length;
     let firstVisibleElementInd = binarySearchFirstItem(
         views,
-        horizontal ? isElementNextAfterViewHorizontally : isElementBottomAfterViewTop
+        horizontal ? isElementNextAfterViewHorizontally : isElementBottomAfterViewTop,
     );
 
     // Please note the return value of the `binarySearchFirstItem` function when
@@ -482,7 +479,7 @@ function getVisibleElements({
         last = visible.at(-1);
 
     if (sortByVisibility) {
-        visible.sort(function (a, b) {
+        visible.sort((a, b) => {
             const pc = a.percent - b.percent;
             if (Math.abs(pc) > 0.001) {
                 return -pc;
@@ -537,7 +534,7 @@ function isPortraitOrientation(size: { width: number; height: number }) {
 /**
  * Promise that is resolved when DOM window becomes visible.
  */
-const animationStarted = new Promise(function (resolve) {
+const animationStarted = new Promise((resolve) => {
     window.requestAnimationFrame(resolve);
 });
 
@@ -660,13 +657,13 @@ export {
     noContextMenuHandler,
     normalizeWheelEventDelta,
     normalizeWheelEventDirection,
-    parseQueryString,
     ProgressBar,
-    removeNullCharacters,
+    parseQueryString,
     RenderingStates,
+    removeNullCharacters,
     roundToDivide,
-    scrollIntoView,
     SidebarView,
+    scrollIntoView,
     TextLayerMode,
 };
 

@@ -1,19 +1,24 @@
 import "./FloatingToolbar.css";
 
-import { DndContext, DragEndEvent, useDndMonitor, useDraggable } from "@dnd-kit/core";
+import { DndContext, type DragEndEvent, useDndMonitor, useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { EraserIcon, MinusIcon } from "@navikt/aksel-icons";
-import { DragHorizontalIcon } from "@navikt/aksel-icons";
-import { ShrinkIcon } from "@navikt/aksel-icons";
-import { FileXMarkIcon } from "@navikt/aksel-icons";
-import { ArrowRedoIcon, ArrowUndoIcon } from "@navikt/aksel-icons";
-import { Add } from "@navikt/ds-icons";
+import {
+    ArrowRedoIcon,
+    ArrowUndoIcon,
+    DragHorizontalIcon,
+    EraserIcon,
+    FileXMarkIcon,
+    MinusIcon,
+    PlusIcon,
+    ShrinkIcon,
+} from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
 import React, { useEffect, useRef, useState } from "react";
 
 import { useMaskingContainer } from "../../../../components/masking/MaskingContainer";
 import { usePdfViewerContext } from "../../../../components/pdfviewer/PdfViewerContext";
 import { usePdfEditorContext } from "../PdfEditorContext";
+
 const id = "floating-toolbar";
 const getInitialPosition = () => {
     const height = window.innerHeight / 2;
@@ -103,7 +108,12 @@ function FloatingToolbarContainer() {
                         variant={"tertiary-neutral"}
                         icon={<MinusIcon />}
                     />
-                    <Button onClick={() => onZoomIn()} size={"xsmall"} variant={"tertiary-neutral"} icon={<Add />} />
+                    <Button
+                        onClick={() => onZoomIn()}
+                        size={"xsmall"}
+                        variant={"tertiary-neutral"}
+                        icon={<PlusIcon />}
+                    />
                 </div>
                 <div className={"divider"}></div>
                 <div style={{ marginLeft: "10px", marginRight: "10px" }}>

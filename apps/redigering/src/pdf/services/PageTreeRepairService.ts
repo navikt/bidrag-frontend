@@ -1,7 +1,7 @@
-import { PDFDocument, PDFPage } from "@cantoo/pdf-lib";
-import { LoggerService } from "@navikt/bidrag-ui-common";
+import { LoggerService } from "@bidrag/common";
+import type { PDFDocument, PDFPage } from "@cantoo/pdf-lib";
 
-import { EditDocumentMetadata } from "../../types/EditorTypes";
+import type { EditDocumentMetadata } from "../../types/EditorTypes";
 
 /**
  * Stateless helpers for reconciling a pdf-lib page tree against the page order the editor
@@ -40,7 +40,7 @@ export function restoreEditorVisiblePageOrder(pdfDocument: PDFDocument, editorVi
 
     if (orderedPages.length !== currentPages.length) {
         LoggerService.warn(
-            `restoreEditorVisiblePageOrder: Could not resolve all pages currentPageCount=${currentPages.length} orderedPageCount=${orderedPages.length}`
+            `restoreEditorVisiblePageOrder: Could not resolve all pages currentPageCount=${currentPages.length} orderedPageCount=${orderedPages.length}`,
         );
         return false;
     }
@@ -73,7 +73,7 @@ export function restoreEditorVisiblePageOrder(pdfDocument: PDFDocument, editorVi
 export function remapConfigAfterPageOrderChange(
     config: EditDocumentMetadata,
     pageRefsBeforeFix: string[],
-    pageRefsAfterFix: string[]
+    pageRefsAfterFix: string[],
 ): EditDocumentMetadata {
     if (pageRefsBeforeFix.length === 0 || pageRefsAfterFix.length === 0) {
         return config;

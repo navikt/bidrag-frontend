@@ -1,14 +1,12 @@
-import { PDFCheckBox, PDFDocument, PDFField, PDFName } from "@cantoo/pdf-lib";
-import { PDFFont } from "@cantoo/pdf-lib";
-import { StandardFonts } from "@cantoo/pdf-lib";
-import { FileUtils, LoggerService, SecureLoggerService } from "@navikt/bidrag-ui-common";
-import { PDFDocumentProxy } from "pdfjs-dist";
+import { FileUtils, LoggerService, SecureLoggerService } from "@bidrag/common";
+import { PDFCheckBox, PDFDocument, type PDFField, type PDFFont, PDFName, StandardFonts } from "@cantoo/pdf-lib";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 
-import { PdfDocumentType } from "../../components/utils/types";
+import type { PdfDocumentType } from "../../components/utils/types";
 import { PdfAConverter } from "../../pdf/PdfAConverter";
 import { deleteGroupobjectWithSKey, flattenForm, repairPDF } from "../../pdf/PdfHelpers";
 import { getFormValues } from "./FormHelper";
-import { PageFormProps, SingleFormProps } from "./types";
+import type { PageFormProps, SingleFormProps } from "./types";
 
 type ProgressState = "MASK_PAGE" | "CONVERT_PAGE_TO_IMAGE" | "REMOVE_PAGE" | "SAVE_PDF";
 export interface IProducerProgress {
@@ -82,7 +80,7 @@ export class FormPdfProducer {
     private async fillFormForPage(pageNumber: number, formProps: SingleFormProps[]) {
         for (const formProp of formProps) {
             console.debug(
-                `Processing annotation in page ${pageNumber} with name ${formProp.name} and type ${formProp.type} and value ${formProp?.value}`
+                `Processing annotation in page ${pageNumber} with name ${formProp.name} and type ${formProp.type} and value ${formProp?.value}`,
             );
             this.fillFormField(formProp);
         }
@@ -121,7 +119,7 @@ export class FormPdfProducer {
             LoggerService.error(`Det skjedde en feil ved prosessering av skjemautfylling`, e);
             SecureLoggerService.error(
                 `Det skjedde en feil ved prosessering av skjemautfylling: ${JSON.stringify(props)}`,
-                e
+                e,
             );
         }
     }

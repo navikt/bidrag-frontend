@@ -2,7 +2,8 @@ import "./InfoKnapp.css";
 
 import { QuestionmarkIcon } from "@navikt/aksel-icons";
 import { Button, Modal } from "@navikt/ds-react";
-import { PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useState } from "react";
+
 type InfoKnappProps = {
     buttonClassName?: string;
     className?: string;
@@ -37,7 +38,13 @@ export default function InfoKnapp({
                 {buttonText}
             </Button>
 
-            <Modal open={modalOpen} closeOnBackdropClick onClose={closeModal} className={`max-w-[1000px] ${className}`}>
+            <Modal
+                open={modalOpen}
+                closeOnBackdropClick
+                onClose={closeModal}
+                className={`max-w-[1000px] ${className}`}
+                aria-label={title ?? buttonText ?? "Informasjon"}
+            >
                 <Modal.Body>
                     <div className="max-h-[800px] mdx-content">{children}</div>
                 </Modal.Body>

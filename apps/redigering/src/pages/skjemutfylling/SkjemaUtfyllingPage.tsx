@@ -1,33 +1,35 @@
-//@ts-ignore
-import styles from "./pdfviewer.lazy.css";
-styles.use();
+import "./pdfviewer.lazy.css";
+
+import {
+    Broadcast,
+    type BroadcastMessage,
+    BroadcastNames,
+    FileUtils,
+    LoggerService,
+    queryParams,
+} from "@bidrag/common";
 import { EyeIcon } from "@navikt/aksel-icons";
-import { LoggerService, queryParams } from "@navikt/bidrag-ui-common";
-import { BroadcastMessage } from "@navikt/bidrag-ui-common";
-import { Broadcast } from "@navikt/bidrag-ui-common";
-import { FileUtils } from "@navikt/bidrag-ui-common";
-import { BroadcastNames } from "@navikt/bidrag-ui-common";
 import { Button, Loader } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import * as pdfjsLib from "pdfjs-dist";
-import { AnnotationMode, PDFDocumentProxy } from "pdfjs-dist";
+import { AnnotationMode, type PDFDocumentProxy } from "pdfjs-dist";
 import { EventBus, PDFPageView } from "pdfjs-dist/web/pdf_viewer";
-import React, { PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
+import React, { type PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
 
 import { lastDokumenter, RedigeringQueries } from "../../api/queries";
 import { useDebounce } from "../../components/hooks/useDebounce";
 import Toolbar from "../../components/toolbar/Toolbar";
 import { createArrayWithLength } from "../../components/utils/ObjectUtils";
-import { PdfDocumentType } from "../../components/utils/types";
+import type { PdfDocumentType } from "../../components/utils/types";
 import environment from "../../environment";
 import { validatePDFBytes } from "../../pdf/PdfAConverter";
-import { IDocumentMetadata } from "../../types/EditorTypes";
+import type { IDocumentMetadata } from "../../types/EditorTypes";
 import PageWrapper from "../PageWrapper";
 import FerdigstillButton from "./FerdigstillButton";
 import { getFormValues, setAnnotationValue } from "./FormHelper";
 import { FormPdfProducer } from "./FormPdfProducer";
 import SaveStateIndicator from "./SaveStateIndicator";
-import { SkjemautfyllingMetadata } from "./types";
+import type { SkjemautfyllingMetadata } from "./types";
 import UnlockSkjemaButton from "./UnlockSkjemaButton";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url).toString();
@@ -53,7 +55,7 @@ export const useSkjemaUtfyllingContext = () => {
     return context;
 };
 export const SkjemaUtfyllingContext = React.createContext<SkjemaUtfyllingContextProps>(
-    {} as SkjemaUtfyllingContextProps
+    {} as SkjemaUtfyllingContextProps,
 );
 
 export default function SkjemaUtfyllingPage(props: SkjemaUtfyllingPageProps) {
@@ -70,7 +72,7 @@ function SkjemaUtfyllingContainer({ forsendelseId, dokumentreferanse, dokumenter
     const { data: documentFile, isLoading } = lastDokumenter(forsendelseId, dokumentreferanse, dokumenter, true, false);
     const { data: dokumentMetadata } = RedigeringQueries.hentRedigeringmetadata<SkjemautfyllingMetadata>(
         forsendelseId,
-        dokumentreferanse
+        dokumentreferanse,
     );
     if (!isLoading && !documentFile) {
         return <div>Det skjedde en feil ved lasting av dokument</div>;
@@ -171,10 +173,10 @@ function DocumentView({ file, dokumentreferanse, forsendelseId, dokumentMetadata
             .then((pdfDoc) => {
                 setPdfDocument(pdfDoc);
             })
-            .catch(function (reason) {
+            .catch((reason) => {
                 LoggerService.error(
                     `Det skjedde en feil ved lasting av dokument ${forsendelseId} - ${dokumentreferanse}`,
-                    reason
+                    reason,
                 );
             });
     }

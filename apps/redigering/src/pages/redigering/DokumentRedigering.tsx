@@ -1,10 +1,8 @@
 import "./DokumentRedigering.css";
 
 import { useDroppable } from "@dnd-kit/core";
-import React, { CSSProperties, useEffect } from "react";
-import { useState } from "react";
-import { useRef } from "react";
-import { ReactZoomPanPinchRef, TransformWrapper } from "react-zoom-pan-pinch";
+import React, { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type ReactZoomPanPinchRef, TransformWrapper } from "react-zoom-pan-pinch";
 
 import KeyboardShortcuts from "../../components/KeyboardShortcuts";
 import { useMaskingContainer } from "../../components/masking/MaskingContainer";
@@ -13,7 +11,7 @@ import PdfPage from "../../components/pdfcore/PdfPage";
 import PdfViewer from "../../components/pdfviewer/PdfViewer";
 import PdfViewerContextProvider, { usePdfViewerContext } from "../../components/pdfviewer/PdfViewerContext";
 import DomUtils from "../../components/utils/DomUtils";
-import { PdfDocumentType } from "../../components/utils/types";
+import type { PdfDocumentType } from "../../components/utils/types";
 import RedigeringInfoKnapp from "../../docs/RedigeringInfoKnapp";
 import { LoadingIndicatorSkeletonDocuments } from "../PageWrapper";
 import { usePdfEditorContext } from "./components/PdfEditorContext";
@@ -137,7 +135,7 @@ interface IPageDecoratorProps {
 function PageDecorator({ pageNumber }: IPageDecoratorProps) {
     const id = `droppable_page_${pageNumber}`;
     const divRef = useRef<HTMLDivElement>(null);
-    const pageRef = useRef<HTMLDivElement>();
+    const pageRef = useRef<HTMLDivElement>(undefined);
     const { isAddNewElementMode, addItem } = useMaskingContainer();
     const { scale } = usePdfViewerContext();
     const { removedPages, pageRotations } = usePdfEditorContext();

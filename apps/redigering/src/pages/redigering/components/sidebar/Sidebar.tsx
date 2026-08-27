@@ -3,11 +3,12 @@ import "./Sidebar.css";
 import { BodyShort, Checkbox, Detail, Popover } from "@navikt/ds-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import PdfDocument, { PdfDocumentRef } from "../../../../components/pdfcore/PdfDocument";
+import PdfDocument, { type PdfDocumentRef } from "../../../../components/pdfcore/PdfDocument";
 import { usePdfViewerContext } from "../../../../components/pdfviewer/PdfViewerContext";
 import { createArrayWithLength } from "../../../../components/utils/ObjectUtils";
 import { usePdfEditorContext } from "../PdfEditorContext";
 import ThumbnailPageDecorator from "./ThumbnailPageDecorator";
+
 type PAGE_SIZE = "large" | "medium" | "small";
 
 interface PageRangeDetails {
@@ -19,7 +20,7 @@ interface SidebarProps {
 }
 export default function Sidebar({ onDocumentLoaded }: SidebarProps) {
     const { sidebarHidden, dokumentMetadata, hideSidebar, pageRotations } = usePdfEditorContext();
-    const containerRef = useRef<HTMLDivElement>();
+    const containerRef = useRef<HTMLDivElement>(undefined);
     const documentRef = useRef<PdfDocumentRef>(null);
     const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
     const { pages, currentPage, file: documentFile } = usePdfViewerContext();

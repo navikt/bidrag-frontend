@@ -1,13 +1,18 @@
 import "./PopoverToolbar.css";
 
-import { EraserIcon, MinusIcon } from "@navikt/aksel-icons";
-import { ExpandIcon, ShrinkIcon } from "@navikt/aksel-icons";
-import { FileXMarkIcon } from "@navikt/aksel-icons";
-import { ArrowsCirclepathIcon } from "@navikt/aksel-icons";
-import { ArrowRedoIcon, ArrowUndoIcon } from "@navikt/aksel-icons";
-import { Add } from "@navikt/ds-icons";
+import {
+    ArrowRedoIcon,
+    ArrowsCirclepathIcon,
+    ArrowUndoIcon,
+    EraserIcon,
+    ExpandIcon,
+    FileXMarkIcon,
+    MinusIcon,
+    PlusIcon,
+    ShrinkIcon,
+} from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
-import React from "react";
+import type React from "react";
 
 import { useMaskingContainer } from "../../../../components/masking/MaskingContainer";
 import { usePdfViewerContext } from "../../../../components/pdfviewer/PdfViewerContext";
@@ -72,7 +77,7 @@ export default function PopoverToolbar() {
                         onClick={() => onZoomIn()}
                         size={"xsmall"}
                         variant={"tertiary-neutral"}
-                        icon={<Add />}
+                        icon={<PlusIcon />}
                         title="Zoom inn"
                     />
                 </div>

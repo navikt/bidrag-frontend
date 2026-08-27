@@ -1,7 +1,7 @@
 import { PDFDocument } from "@cantoo/pdf-lib";
 import { describe, expect, it } from "vitest";
 
-import { EditDocumentMetadata } from "../../../types/EditorTypes";
+import type { EditDocumentMetadata } from "../../../types/EditorTypes";
 import {
     getCurrentPageRefOrder,
     remapConfigAfterPageOrderChange,

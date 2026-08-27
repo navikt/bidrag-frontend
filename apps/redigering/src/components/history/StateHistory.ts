@@ -16,7 +16,7 @@ const DEFAULTS = <T>() => ({
 
     maxUndos: MAX_UNDOS,
 });
-//@ts-ignore
+//@ts-expect-error
 export default class StateHistory<T> extends Record(DEFAULTS<T>()) {
     private maxUndos = 100;
     private currentValue: T;

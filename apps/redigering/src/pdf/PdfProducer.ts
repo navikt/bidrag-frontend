@@ -1,13 +1,18 @@
-import { PDFDocument, PDFPage } from "@cantoo/pdf-lib";
-import { PDFDict, PDFFont, PDFName } from "@cantoo/pdf-lib";
-import { PDFPageLeaf } from "@cantoo/pdf-lib";
-import { RotationTypes } from "@cantoo/pdf-lib";
-import { StandardFonts } from "@cantoo/pdf-lib";
-import { FileUtils, LoggerService } from "@navikt/bidrag-ui-common";
+import { FileUtils, LoggerService } from "@bidrag/common";
+import {
+    type PDFDict,
+    PDFDocument,
+    type PDFFont,
+    PDFName,
+    type PDFPage,
+    PDFPageLeaf,
+    RotationTypes,
+    StandardFonts,
+} from "@cantoo/pdf-lib";
 
-import { IMaskingItemProps } from "../components/masking/MaskingItem";
-import { PdfDocumentType } from "../components/utils/types";
-import { EditDocumentMetadata } from "../types/EditorTypes";
+import type { IMaskingItemProps } from "../components/masking/MaskingItem";
+import type { PdfDocumentType } from "../components/utils/types";
+import type { EditDocumentMetadata } from "../types/EditorTypes";
 import { PdfAConverter } from "./PdfAConverter";
 import { getErrorMessage, isPageTreeCorruptionError } from "./PdfErrorUtils";
 import {
@@ -25,7 +30,7 @@ import {
     remapConfigAfterPageOrderChange as remapConfigAfterPageOrderChangeOf,
     restoreEditorVisiblePageOrder as restoreEditorVisiblePageOrderOf,
 } from "./services/PageTreeRepairService";
-import { IRenderedPdfPage, renderPdfPagesToImages } from "./services/PdfRenderer";
+import { type IRenderedPdfPage, renderPdfPagesToImages } from "./services/PdfRenderer";
 
 type ProgressState = "MASK_PAGE" | "CONVERT_PAGE_TO_IMAGE" | "REMOVE_PAGE" | "SAVE_PDF";
 export interface IProducerProgress {
@@ -56,7 +61,7 @@ export class PdfProducer {
         config: EditDocumentMetadata,
         title?: string,
         onProgressUpdate?: (process: IProducerProgress) => void,
-        editorPageRefOrder?: string[]
+        editorPageRefOrder?: string[],
     ): Promise<PdfProducer> {
         this.title = title ?? "Dokument";
         this.config = config;
@@ -89,7 +94,7 @@ export class PdfProducer {
                 // Real consistency issue worth flagging: the editor's ground-truth ref order and
                 // pdf-lib's post-recovery page tree disagree on which pages exist.
                 LoggerService.warn(
-                    `PdfProducer init editorPageRefOrder mismatch missingFromDocumentCount=${missingFromDocument.length} missingFromEditorCount=${missingFromEditor.length}`
+                    `PdfProducer init editorPageRefOrder mismatch missingFromDocumentCount=${missingFromDocument.length} missingFromEditorCount=${missingFromEditor.length}`,
                 );
             }
         }
@@ -331,7 +336,7 @@ export class PdfProducer {
         // Skip if copyPages is already known to be broken on this PDF
         if (this.copyPagesUnavailable) {
             LoggerService.warn(
-                `reorderPagesToPreserveOriginalOrder: copyPages already detected as unavailable. Skipping reordering.`
+                `reorderPagesToPreserveOriginalOrder: copyPages already detected as unavailable. Skipping reordering.`,
             );
             return this.getCurrentPageRefOrder();
         }
@@ -345,7 +350,7 @@ export class PdfProducer {
             this.font = await this.pdfDocument.embedFont(StandardFonts.TimesRoman);
         } catch (error) {
             LoggerService.warn(
-                `reorderPagesToPreserveOriginalOrder: Rebuild failed: ${getErrorMessage(error)}. Keeping current page order.`
+                `reorderPagesToPreserveOriginalOrder: Rebuild failed: ${getErrorMessage(error)}. Keeping current page order.`,
             );
             // If reordering fails, keep the current document order
             return this.getCurrentPageRefOrder();
@@ -360,7 +365,7 @@ export class PdfProducer {
     private async safeCopyPages(
         targetDoc: PDFDocument,
         origDoc: PDFDocument,
-        pageIndices: number[]
+        pageIndices: number[],
     ): Promise<PDFPage[]> {
         try {
             return await targetDoc.copyPages(origDoc, pageIndices);
@@ -405,7 +410,7 @@ export class PdfProducer {
 
         const pageCount = this.pdfDocument.getPageCount();
         const maskedPages = Array.from(
-            new Set(items.map((p) => p.pageNumber - 1).filter((pageIndex) => pageIndex >= 0 && pageIndex < pageCount))
+            new Set(items.map((p) => p.pageNumber - 1).filter((pageIndex) => pageIndex >= 0 && pageIndex < pageCount)),
         ).sort((a, b) => a - b);
         if (maskedPages.length === 0) {
             return;
@@ -426,7 +431,7 @@ export class PdfProducer {
             this.copyPagesUnavailable = true;
             LoggerService.warn(
                 "convertMaskedPagesToImage: copyPages failed on corrupt PDF. Rebuilding with pdfjs.",
-                error
+                error,
             );
             await this.rebuildCorruptPdfViaPdfjs();
         }
@@ -444,7 +449,7 @@ export class PdfProducer {
         let imageMap: Map<number, IRenderedPdfPage>;
         try {
             const rendered = await renderPdfPagesToImages(pdfBytes, undefined, (renderedIndex, images) =>
-                this.onProgressUpdated("CONVERT_PAGE_TO_IMAGE", renderedIndex + 1, images.size / maskedPages.length)
+                this.onProgressUpdated("CONVERT_PAGE_TO_IMAGE", renderedIndex + 1, images.size / maskedPages.length),
             );
             // pdf2Image reports 1-based page numbers relative to tempDoc (only the masked
             // pages), so remap those indices back to the original document's page indices.
@@ -455,7 +460,7 @@ export class PdfProducer {
                         throw new Error("Fant ikke forventet sideindeks under maskert bildegenerering");
                     }
                     return [pageIndex, image];
-                })
+                }),
             );
         } catch (error) {
             LoggerService.warn(`convertMaskedPagesToImage: pdfjs rendering failed: ${getErrorMessage(error)}.`, error);
@@ -489,7 +494,7 @@ export class PdfProducer {
         this.font = await this.pdfDocument.embedFont(StandardFonts.TimesRoman);
 
         LoggerService.info(
-            `convertMaskedPagesToImage: Konverterte ${imageMap.size} maskerte sider til bilder, pageCount=${this.pdfDocument.getPageCount()}`
+            `convertMaskedPagesToImage: Konverterte ${imageMap.size} maskerte sider til bilder, pageCount=${this.pdfDocument.getPageCount()}`,
         );
     }
 
@@ -510,7 +515,7 @@ export class PdfProducer {
     private async rebuildOriginalPdfAndMask(items: IMaskingItemProps[]): Promise<boolean> {
         if (!(await this.rebuildDocumentViaPdfjs(this.getOriginalPdfBytes()))) {
             LoggerService.warn(
-                "rebuildOriginalPdfAndMask: Could not rebuild the original PDF. Using legacy masking path."
+                "rebuildOriginalPdfAndMask: Could not rebuild the original PDF. Using legacy masking path.",
             );
             return false;
         }
@@ -541,7 +546,7 @@ export class PdfProducer {
 
         if (imageMap.size !== renderedPageCount) {
             LoggerService.warn(
-                `rebuildDocumentViaPdfjs: Rendered ${imageMap.size}/${renderedPageCount} pages. Document not rebuilt.`
+                `rebuildDocumentViaPdfjs: Rendered ${imageMap.size}/${renderedPageCount} pages. Document not rebuilt.`,
             );
             return false;
         }
@@ -569,7 +574,7 @@ export class PdfProducer {
         } catch (error) {
             LoggerService.error(
                 `rebuildDocumentViaPdfjs: Failed to rebuild document from images: ${getErrorMessage(error)}`,
-                error
+                error,
             );
             return false;
         }
@@ -584,7 +589,7 @@ export class PdfProducer {
         const removedPageSet = new Set(removePages);
         const totalPages = this.pdfDocument.getPageCount();
         return items.filter(
-            (item) => item.pageNumber >= 1 && item.pageNumber <= totalPages && !removedPageSet.has(item.pageNumber)
+            (item) => item.pageNumber >= 1 && item.pageNumber <= totalPages && !removedPageSet.has(item.pageNumber),
         );
     }
 
@@ -658,7 +663,7 @@ export class PdfProducer {
 
         const hasInconsistentPageTree = this.hasInconsistentPageTree();
         LoggerService.info(
-            `removePages: removing pages=${normalizedRemovePages.join("|")} hasInconsistentPageTree=${hasInconsistentPageTree}`
+            `removePages: removing pages=${normalizedRemovePages.join("|")} hasInconsistentPageTree=${hasInconsistentPageTree}`,
         );
         try {
             // Copy-based removal is safer for healthy PDFs, but can permanently drop
@@ -728,7 +733,7 @@ export class PdfProducer {
             } catch (testError) {
                 const errorMsg = testError instanceof Error ? testError.message : String(testError);
                 LoggerService.warn(
-                    `removePagesByCopy: copyPages not available (${errorMsg}). Falling back to removePagesInPlace.`
+                    `removePagesByCopy: copyPages not available (${errorMsg}). Falling back to removePagesInPlace.`,
                 );
                 this.copyPagesUnavailable = true;
                 // copyPages won't work, use direct removal API
@@ -741,7 +746,7 @@ export class PdfProducer {
             const contentPages = await this.safeCopyPages(pdfCopy, origDoc, includePages);
             if (contentPages.length !== includePages.length) {
                 LoggerService.warn(
-                    `Expected to copy ${includePages.length} pages, but copied ${contentPages.length}. Continuing with available pages.`
+                    `Expected to copy ${includePages.length} pages, but copied ${contentPages.length}. Continuing with available pages.`,
                 );
             }
 
@@ -759,7 +764,7 @@ export class PdfProducer {
         } catch (error) {
             LoggerService.warn(
                 `removePagesByCopy failed: ${getErrorMessage(error)}. Falling back to removePagesInPlace.`,
-                error
+                error,
             );
             this.copyPagesUnavailable = true;
             // If copying fails, fall back to direct removal
@@ -806,7 +811,7 @@ export class PdfProducer {
                         this.copyPagesUnavailable = true;
                         corruptionDetected = true;
                         LoggerService.warn(
-                            `syncDetectPageTreeCorruption: PDF page tree corrupted on page ${i + 1} (Parent chain broken). copyPages will be skipped for this document.`
+                            `syncDetectPageTreeCorruption: PDF page tree corrupted on page ${i + 1} (Parent chain broken). copyPages will be skipped for this document.`,
                         );
                     }
                     // Repair this page by setting Resources directly, so drawText/drawRectangle

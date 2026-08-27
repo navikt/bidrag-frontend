@@ -1,18 +1,12 @@
-import "../index.css";
-
+import { bidragMDXTheme } from "@bidrag/common";
 import { MDXProvider, useMDXComponents } from "@mdx-js/react";
-import { bidragMDXTheme } from "@navikt/bidrag-ui-common";
 import { BodyShort, Heading, Skeleton } from "@navikt/ds-react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useThemedStylesWithMdx } from "@theme-ui/mdx";
-import React, { PropsWithChildren } from "react";
+import React, { type PropsWithChildren } from "react";
 import { ThemeUIProvider } from "theme-ui";
 
-import { initMock } from "../mock";
-
 const mdxComponents = { Heading, BodyShort };
-await initMock();
 const initReactQuery = () =>
     new QueryClient({
         defaultOptions: {

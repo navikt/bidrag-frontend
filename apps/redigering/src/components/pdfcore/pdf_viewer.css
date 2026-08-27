@@ -1,6 +1,6 @@
 :root {
-  --main-color: rgba(249, 249, 250, 1);
-  --body-bg-color: rgba(42, 42, 46, 1);
+    --main-color: rgba(249, 249, 250, 1);
+    --body-bg-color: rgba(42, 42, 46, 1);
 }
 
 /* * {
@@ -10,101 +10,101 @@
 
 html,
 body {
-  height: 100%;
-  width: 100%;
-  background-color: var(--body-bg-color);
-  scrollbar-color: var(--scrollbar-color) var(--scrollbar-bg-color);
+    height: 100%;
+    width: 100%;
+    background-color: var(--body-bg-color);
+    scrollbar-color: var(--scrollbar-color) var(--scrollbar-bg-color);
 }
 
 .pdfViewer.content {
-  display: initial;
+    display: initial;
 }
 
 .pdfViewer .canvasWrapper {
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
 }
 
 .pdfViewer .page {
-  direction: ltr;
-  width: 816px;
-  height: 1056px;
-  margin: var(--page-margin);
-  position: relative;
-  overflow: visible;
-  border: var(--page-border);
-  background-clip: content-box;
-  background-color: rgba(255, 255, 255, 1);
+    direction: ltr;
+    width: 816px;
+    height: 1056px;
+    margin: var(--page-margin);
+    position: relative;
+    overflow: visible;
+    border: var(--page-border);
+    background-clip: content-box;
+    background-color: rgba(255, 255, 255, 1);
 }
 
 .pdfViewer .page canvas {
-  margin: 0;
-  display: block;
+    margin: 0;
+    display: block;
 }
 
 .pdfViewer .page.loadingIcon::after {
-  position: absolute;
-  top: 0;
-  left: 0;
-  content: "";
-  width: 100%;
-  height: 100%;
-  /* background: url("images/loading-icon.gif") center no-repeat; */
-  display: none;
-  /* Using a delay with background-image doesn't work,
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    width: 100%;
+    height: 100%;
+    /* background: url("images/loading-icon.gif") center no-repeat; */
+    display: none;
+    /* Using a delay with background-image doesn't work,
      consequently we use the display. */
-  transition-property: display;
-  transition-delay: var(--loading-icon-delay);
-  z-index: 5;
-  contain: strict;
+    transition-property: display;
+    transition-delay: var(--loading-icon-delay);
+    z-index: 5;
+    contain: strict;
 }
 
 .pdfViewer .page.loading::after {
-  display: block;
+    display: block;
 }
 
 .pdfViewer .page:not(.loading)::after {
-  transition-property: none;
-  display: none;
+    transition-property: none;
+    display: none;
 }
 
 .pdfrenderer_container {
-  --scale-factor: 1;
+    --scale-factor: 1;
 
-  padding-bottom: var(--pdfViewer-padding-bottom);
-  width: 100%;
-  overflow-y: hidden;
+    padding-bottom: var(--pdfViewer-padding-bottom);
+    width: 100%;
+    overflow-y: hidden;
 
-  /* background-color: var(--navds-semantic-color-canvas-background-light); */
-  position: absolute;
-  overflow-x: hidden;
-  height: 100%;
-  z-index: 1;
+    /* background-color: var(--navds-semantic-color-canvas-background-light); */
+    position: absolute;
+    overflow-x: hidden;
+    height: 100%;
+    z-index: 1;
 }
 
 .pdfrenderer_container .pdfViewer-content {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .pdfrenderer_container .pdfViewer-wrapper {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .pdfrenderer_container .pdfViewer {
-  margin: auto;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .pdfrenderer_container .pdfViewer .page {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .pdfrenderer_container .pdfViewer .page .canvasWrapper {
-  border: 1px var(--navds-semantic-color-border-inverted) solid;
+    border: 1px var(--navds-semantic-color-border-inverted) solid;
 }

@@ -1,6 +1,6 @@
-import { DragEndEvent } from "@dnd-kit/core";
+import type { DragEndEvent } from "@dnd-kit/core";
 
-import { ICoordinates } from "./MaskingItem";
+import type { ICoordinates } from "./MaskingItem";
 
 export default class MaskingUtils {
     static getDragEndCoordinates(event: DragEndEvent, currentCoordinates: ICoordinates, scale: number): ICoordinates {

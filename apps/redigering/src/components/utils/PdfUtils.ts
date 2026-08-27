@@ -1,4 +1,4 @@
-import { PDFViewer } from "pdfjs-dist/web/pdf_viewer";
+import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer";
 
 export type ScrollDirection = "up" | "down";
 export interface PageChangedEvent {
@@ -45,7 +45,7 @@ export default class PdfUtils {
         window.dispatchEvent(
             new CustomEvent(PdfUtils.FOCUS_PAGE_EVENT, {
                 detail: { pageNumber: pageNumber } as FocusPageEvent,
-            })
+            }),
         );
     }
 
@@ -137,8 +137,8 @@ export default class PdfUtils {
         };
     }
     static isPageVisible(parentElement: HTMLDivElement, pageElement: HTMLDivElement) {
-        const { top, bottom, left, right } = this.getBoundingCoordinates(parentElement);
-        const { viewBottom, currentHeight, viewRight, currentWidth } = this.getElementDimensions(pageElement);
+        const { top, bottom, left, right } = PdfUtils.getBoundingCoordinates(parentElement);
+        const { viewBottom, currentHeight, viewRight, currentWidth } = PdfUtils.getElementDimensions(pageElement);
 
         return !(viewBottom <= top || currentHeight >= bottom || viewRight <= left || currentWidth >= right);
     }
@@ -160,11 +160,11 @@ export default class PdfUtils {
                 pageIndex,
                 pageElement: pageElement as HTMLDivElement,
             }))
-            .filter(({ pageElement }) => this.isPageVisible(parentElement, pageElement))
+            .filter(({ pageElement }) => PdfUtils.isPageVisible(parentElement, pageElement))
             .map(({ pageIndex, pageElement }) => {
-                const { top, bottom, left, right } = this.getBoundingCoordinates(parentElement);
+                const { top, bottom, left, right } = PdfUtils.getBoundingCoordinates(parentElement);
                 const { viewBottom, currentHeight, viewRight, currentWidth, viewHeight, viewWidth } =
-                    this.getElementDimensions(pageElement);
+                    PdfUtils.getElementDimensions(pageElement);
 
                 const hiddenHeight = Math.max(0, top - currentHeight) + Math.max(0, viewBottom - bottom);
                 const hiddenWidth = Math.max(0, left - currentWidth) + Math.max(0, viewRight - right);
@@ -176,7 +176,7 @@ export default class PdfUtils {
                     percent,
                 };
             })
-            .sort(function (a, b) {
+            .sort((a, b) => {
                 const pc = a.percent - b.percent;
 
                 if (Math.abs(pc) > 0.001) {

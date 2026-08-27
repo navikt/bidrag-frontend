@@ -71,7 +71,7 @@ describe("maskPages", () => {
             maskPages((pageNumber) => pdfDoc.getPage(pageNumber - 1), font, [
                 { pageNumber: 1, coordinates: { x: 10, y: 10, width: 50, height: 20 } } as never,
                 { pageNumber: 2, coordinates: { x: 5, y: 5, width: 30, height: 60 } } as never,
-            ])
+            ]),
         ).not.toThrow();
     });
 });

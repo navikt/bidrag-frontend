@@ -1,7 +1,7 @@
-import { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 
 import { createArrayWithLength } from "../../components/utils/ObjectUtils";
-import { PageFormProps, SingleFormProps } from "./types";
+import type { PageFormProps, SingleFormProps } from "./types";
 export async function getFormValues(formDocument: PDFDocumentProxy): Promise<PageFormProps> {
     if (!formDocument) return new Map();
     const numpages = formDocument.numPages;
@@ -19,7 +19,7 @@ async function getFormValuesForPage(domPage: PDFPageProxy, annotations: any[]) {
     for (const annotation of annotations) {
         const result = await getAnnotationValue(annotation);
         console.debug(
-            `Processing annotation in page ${domPage.pageNumber} with name ${annotation.fieldName} and type ${annotation.fieldType} and value ${result?.value}`
+            `Processing annotation in page ${domPage.pageNumber} with name ${annotation.fieldName} and type ${annotation.fieldType} and value ${result?.value}`,
         );
         result && formValues.push(result);
     }

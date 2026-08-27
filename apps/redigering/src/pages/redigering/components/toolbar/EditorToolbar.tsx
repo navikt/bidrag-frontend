@@ -1,4 +1,4 @@
-import { Hamburger } from "@navikt/ds-icons";
+import { MenuHamburgerIcon } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
 import React from "react";
 
@@ -20,7 +20,7 @@ export default function EditorToolbar() {
         <Toolbar>
             <div className={"buttons_left"}>
                 <Button onClick={onToggleSidebar} size={"small"} variant={"tertiary"}>
-                    <Hamburger />
+                    <MenuHamburgerIcon />
                 </Button>
                 {dokumentMetadata?.title && (
                     <div className={"pl-2 document-title text-[white] m-auto"}>{dokumentMetadata.title}</div>

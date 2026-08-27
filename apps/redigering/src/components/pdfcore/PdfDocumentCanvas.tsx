@@ -1,5 +1,5 @@
+import type * as React from "react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import * as React from "react";
 
 type CanvasProps = {
     canvasWidth: number;
@@ -69,7 +69,7 @@ export default function PdfDocumentCanvas(props: React.PropsWithChildren<CanvasP
                 isResetRef.current = true;
             }
         },
-        [props.canvasWidth, props.canvasHeight]
+        [props.canvasWidth, props.canvasHeight],
     );
 
     // functions for panning
@@ -82,7 +82,7 @@ export default function PdfDocumentCanvas(props: React.PropsWithChildren<CanvasP
             const mouseDiff = diffPoints(currentMousePos, lastMousePos);
             setOffset((prevOffset) => addPoints(prevOffset, mouseDiff));
         },
-        [context]
+        [context],
     );
 
     const mouseUp = useCallback(() => {
@@ -96,7 +96,7 @@ export default function PdfDocumentCanvas(props: React.PropsWithChildren<CanvasP
             document.addEventListener("mouseup", mouseUp);
             lastMousePosRef.current = { x: event.pageX, y: event.pageY };
         },
-        [mouseMove, mouseUp]
+        [mouseMove, mouseUp],
     );
 
     // setup canvas and set context

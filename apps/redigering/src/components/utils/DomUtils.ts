@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 export default class DomUtils {
     static getMousePosition(id: string, e: MouseEvent | React.MouseEvent) {

@@ -1,5 +1,5 @@
 import * as pdfjs from "pdfjs-dist";
-import { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
+import type { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
 
 const PDF_RENDER_SCALE = 3;
 
@@ -12,7 +12,7 @@ export interface IPdfRenderedPage {
 // Copied from https://github.com/ol-th/pdf-img-convert.js/blob/master/pdf-img-convert.js
 export default async function pdf2Image(
     pdfData: Uint8Array,
-    onPageProcessed: (pageNumber: number, page: IPdfRenderedPage) => Promise<void>
+    onPageProcessed: (pageNumber: number, page: IPdfRenderedPage) => Promise<void>,
 ): Promise<number> {
     const loadingTask = pdfjs.getDocument({ data: pdfData.slice(), disableFontFace: false, verbosity: 0 });
 

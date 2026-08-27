@@ -1,7 +1,7 @@
 import "./ThumbnailPageDecorator.css";
 
-import { AddCircleFilled, DeleteFilled } from "@navikt/ds-icons";
-import React, { CSSProperties, PropsWithChildren, useRef, useState } from "react";
+import { PlusCircleFillIcon, TrashFillIcon } from "@navikt/aksel-icons";
+import React, { type CSSProperties, type PropsWithChildren, useRef, useState } from "react";
 
 import { useMaskingContainer } from "../../../../components/masking/MaskingContainer";
 import MaskingItem from "../../../../components/masking/MaskingItem";
@@ -102,7 +102,7 @@ function ThumbnailPageToolbar({ hidden, isDeleted, onToggleDelete }: ThumbnailPa
                             className={"rounded-md text-ax-bg-danger-strong hover:text-ax-bg-danger-strong-hover"}
                             position={"center"}
                         >
-                            <DeleteFilled />
+                            <TrashFillIcon />
                         </ToolbarButton>
                     </>
                 )}
@@ -112,7 +112,7 @@ function ThumbnailPageToolbar({ hidden, isDeleted, onToggleDelete }: ThumbnailPa
                         className="text-ax-bg-success-strong hover:text-ax-bg-success-strong-hover"
                         position={"center"}
                     >
-                        <AddCircleFilled />
+                        <PlusCircleFillIcon />
                     </ToolbarButton>
                 )}
             </div>

@@ -3,16 +3,16 @@ import {
     PDFDict,
     PDFDocument,
     PDFName,
-    PDFPage,
+    type PDFPage,
     PDFRawStream,
     RotationTypes,
     StandardFonts,
 } from "@cantoo/pdf-lib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { IMaskingItemProps } from "../components/masking/MaskingItem";
+import type { IMaskingItemProps } from "../components/masking/MaskingItem";
 import { PdfProducer } from "./PdfProducer";
-import { IRenderedPdfPage } from "./services/PdfRenderer";
+import type { IRenderedPdfPage } from "./services/PdfRenderer";
 
 // pdf2Image (the real implementation behind renderPdfPagesToImages) rasterizes via
 // pdfjs-dist + <canvas>, which requires the "canvas" native module that isn't installed for

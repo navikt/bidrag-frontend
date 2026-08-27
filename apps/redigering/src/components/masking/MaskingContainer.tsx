@@ -1,15 +1,11 @@
-import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { DragEndEvent } from "@dnd-kit/core";
-import { Active } from "@dnd-kit/core/dist/store";
+import { DndContext, type DragEndEvent, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
+import type { Active } from "@dnd-kit/core/dist/store";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
-import { Transform } from "@dnd-kit/utilities";
-import React, { useRef } from "react";
-import { PropsWithChildren } from "react";
-import { useContext } from "react";
-import { useState } from "react";
+import type { Transform } from "@dnd-kit/utilities";
+import React, { type PropsWithChildren, useContext, useRef, useState } from "react";
 import { v4 as uuidV4 } from "uuid";
 
-import { IMaskingItemProps } from "./MaskingItem";
+import type { IMaskingItemProps } from "./MaskingItem";
 import MaskingUtils from "./MaskinUtils";
 export interface MaskingContainerContextProps {
     enabled?: boolean;
@@ -30,7 +26,7 @@ export interface MaskingContainerContextProps {
 }
 
 export const MaskingContainerContext = React.createContext<MaskingContainerContextProps>(
-    {} as MaskingContainerContextProps
+    {} as MaskingContainerContextProps,
 );
 function useMaskingContainer() {
     const context = useContext(MaskingContainerContext);

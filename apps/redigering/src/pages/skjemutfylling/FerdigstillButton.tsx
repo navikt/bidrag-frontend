@@ -1,8 +1,8 @@
+import { FileUtils } from "@bidrag/common";
 import { FileCheckmarkIcon } from "@navikt/aksel-icons";
-import { FileUtils } from "@navikt/bidrag-ui-common";
 import { Alert, BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 import { useState } from "react";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
@@ -21,8 +21,10 @@ export default function FerdigstillButton() {
         mutationFn: () =>
             getPdfWithFilledForm().then(async (fysiskDokument) =>
                 BIDRAG_FORSENDELSE_API.api.ferdigstillDokument(forsendelseId, dokumentreferanse, {
-                    fysiskDokument: FileUtils._arrayBufferToBase64(fysiskDokument),
-                })
+                    // Genererte typer sier `File` (pga. `@format binary` i swagger-spec),
+                    // men API-et forventer faktisk en base64-streng i JSON-body.
+                    fysiskDokument: FileUtils._arrayBufferToBase64(fysiskDokument) as unknown as File,
+                }),
             ),
         onSuccess: () => {
             broadcastAndCloseWindow();

@@ -1,5 +1,5 @@
-import { DokumentDetaljer } from "../api/BidragDokumentForsendelseApi";
-import { IMaskingItemProps } from "../components/masking/MaskingItem";
+import type { DokumentDetaljer } from "@bidrag/api/BidragForsendelseApi";
+import type { IMaskingItemProps } from "../components/masking/MaskingItem";
 
 export interface IDocumentMetadata<T> {
     editorMetadata?: T;

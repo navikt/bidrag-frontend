@@ -33,7 +33,7 @@ export default function KeyboardShortcuts() {
                 duplicateItem(activeId);
             }
         },
-        false
+        false,
     );
 
     useWindowListener("keyup", () => {

@@ -1,20 +1,13 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": false,
-    "skipLibCheck": true,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
-  },
-  "include": ["src"]
+    "extends": "../../tsconfig.packages.json",
+    "include": ["src"],
+    "compilerOptions": {
+        "types": ["node", "vite/client"],
+        "lib": ["ES2023", "DOM", "DOM.Iterable"],
+        // Migrert fra den frittstående bidrag-redigering-ui som kjørte uten strict mode.
+        // TODO: skru på strict gradvis.
+        "strict": false,
+        "noUncheckedIndexedAccess": false,
+        "noImplicitOverride": false
+    }
 }

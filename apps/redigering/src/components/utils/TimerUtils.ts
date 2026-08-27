@@ -7,7 +7,7 @@ export class TimerUtils {
             throttleTimedOut = false;
             clearTimeout(timer);
             timer = setTimeout(() => {
-                func.apply(this, args);
+                func.apply(TimerUtils, args);
                 throttleTimedOut = true;
             }, delay);
         };
@@ -19,7 +19,7 @@ export class TimerUtils {
             if (!throttleTimedOut) return;
             throttleTimedOut = false;
             window.requestAnimationFrame(() => {
-                func.apply(this, args);
+                func.apply(TimerUtils, args);
                 throttleTimedOut = true;
             });
         };

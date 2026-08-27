@@ -1,14 +1,16 @@
-import { queryParams } from "@navikt/bidrag-ui-common";
-import { BroadcastMessage } from "@navikt/bidrag-ui-common";
-import { EditDocumentBroadcastMessage } from "@navikt/bidrag-ui-common";
-import { Broadcast } from "@navikt/bidrag-ui-common";
-import { FileUtils } from "@navikt/bidrag-ui-common";
-import { BroadcastNames } from "@navikt/bidrag-ui-common";
+import {
+    Broadcast,
+    type BroadcastMessage,
+    BroadcastNames,
+    type EditDocumentBroadcastMessage,
+    FileUtils,
+    queryParams,
+} from "@bidrag/common";
 import { Loader } from "@navikt/ds-react";
 import React from "react";
 
 import { lastDokumenter } from "../../api/queries";
-import { EditDocumentMetadata } from "../../types/EditorTypes";
+import type { EditDocumentMetadata } from "../../types/EditorTypes";
 import PageWrapper from "../PageWrapper";
 import PdfEditorContextProvider from "../redigering/components/PdfEditorContext";
 import DokumentRedigering from "../redigering/DokumentRedigering";
