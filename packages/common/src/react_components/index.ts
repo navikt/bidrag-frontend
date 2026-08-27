@@ -19,3 +19,5 @@ export { default as RolleDetaljer } from "./roller/RolleDetaljer";
 export { default as RolleTag } from "./roller/RolleTag";
 export { default as SaveStatusIndicator } from "./SaveStatusIndicator";
 export { default as SamhandlerSokButton } from "./samhandler/SamhandlerSokButton";
+export {TilgangSakSjekker} from "./tilgang/TilgangSakSjekker";
+export {TilgangBrukerSjekker} from "./tilgang/TilgangBrukerSjekker";
