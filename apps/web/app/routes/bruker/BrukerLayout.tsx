@@ -1,9 +1,10 @@
-import { BrukerHeader } from "@bidrag/common";
-import { Page, VStack } from "@navikt/ds-react";
+import { HStack, Page, VStack } from "@navikt/ds-react";
 import { Outlet } from "react-router";
-import { useHentPersoninformasjon } from "~/api/useApi.ts";
-import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
+import { useHentPersoninformasjon } from "~/api/useApi";
+import { useObfuscateFnr } from "~/common/person/useObfuscateFnr";
+import BrukerMeny from "~/routes/bruker/BrukerMeny";
 import type { Route } from "./+types/BrukerLayout";
+import { BrukerHeader } from "./BrukerHeader";
 
 export default function BrukerLayout({ params }: Route.ComponentProps) {
     const { decodeFnr } = useObfuscateFnr();
@@ -22,9 +23,12 @@ export default function BrukerLayout({ params }: Route.ComponentProps) {
     return (
         <VStack gap={"space-32"}>
             <BrukerHeader bruker={bruker} />
-            <Page.Block width="xl">
-                <Outlet />
-            </Page.Block>
+            <HStack gap={"space-32"} wrap={false}>
+                <BrukerMeny brukerId={brukerId} />
+                <Page.Block width="2xl" style={{ flex: "1 1 auto", minWidth: 0 }}>
+                    <Outlet />
+                </Page.Block>
+            </HStack>
         </VStack>
     );
 }

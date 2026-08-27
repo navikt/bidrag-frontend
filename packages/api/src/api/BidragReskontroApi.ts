@@ -1,5 +1,3 @@
-/* eslint-disable */
-/* tslint:disable */
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -110,6 +108,7 @@ export interface Transaksjon {
   valutakode?: string | null;
   /** Saksnummer for bidragssaken. */
   saksnummer?: string | null;
+  /** Periode for transaksjonen. */
   periode?: Datoperiode | null;
   /** Ident til barn. */
   barn?: string | null;
@@ -146,7 +145,7 @@ export interface Bidragssak {
 /** Inneholder informasjon om bidragssaken fra skatt med skyldner */
 export interface BidragssakMedSkyldner {
   skyldner?: Skyldner | null;
-  bidragssaker?: any[] | null;
+  bidragssaker?: Bidragssak[] | null;
 }
 
 /** Liste over alle barn i bidragssaken med tilhørende innkrevingsinformasjon. */
@@ -167,6 +166,7 @@ export interface SaksinformasjonBarn {
   sumUtbetaltAndel?: number | null;
   /** Sum av restbeløp på forskudd (A1). Beregnes ikke for kall på saksnummer. */
   sumForskuddUtbetaltAndel?: number | null;
+  /** Periode for B1, D1 eller F1. Angitt som første dato i måneden. Beregnes ikke for kall på personIdent. */
   periode?: Datoperiode | null;
   /** Angir om det er stopp i utbetaling. Beregnes ikke for kall på personIdent. */
   erStoppIUtbetaling?: boolean | null;
@@ -235,11 +235,12 @@ export interface Innkrevingssaksinformasjon {
   skyldnerinformasjon?: Skyldnerinformasjon | null;
   gjeldendeBetalingsordning?: GjeldendeBetalingsordning | null;
   nyBetalingsordning?: NyBetalingsordning | null;
-  innkrevingssakshistorikk?: any[] | null;
+  innkrevingssakshistorikk?: Innkrevingssakshistorikk[] | null;
 }
 
 /** Inneholder informasjon om ny betalingsordning. */
 export interface NyBetalingsordning {
+  /** Dato når ny betalingsordning gjelder fra. */
   dato?: Datoperiode | null;
   /** Nytt beløp. */
   beløp?: number | null;
@@ -292,12 +293,19 @@ export interface TransaksjonskodeDto {
   beskrivelse: string;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -312,9 +320,13 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -324,6 +336,7 @@ export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequest
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -336,10 +349,16 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "https://bidrag-reskontro-q2.intern.dev.nav.no",
+      baseURL:
+        axiosConfig.baseURL || "https://bidrag-reskontro-q2.intern.dev.nav.no",
     });
     this.secure = secure;
     this.format = format;
@@ -350,7 +369,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -358,7 +380,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -379,11 +405,15 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
       }
 
       return formData;
@@ -407,11 +437,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -434,7 +474,9 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version v1
  * @baseUrl https://bidrag-reskontro-q2.intern.dev.nav.no
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
   transaksjoner = {
     /**
      * @description Henter alle transaksjoner fra ELIN som er knyttet til en persons fødselsnummer eller D-nummer. Transaksjonene inkluderer beløp, transaksjonskode, periode og involvert skyldner/mottaker.
@@ -445,7 +487,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/transaksjoner/person
      * @secure
      */
-    hentTransaksjonerPaPerson: (data: PersonRequest, params: RequestParams = {}) =>
+    hentTransaksjonerPaPerson: (
+      data: PersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Transaksjoner, void>({
         path: `/transaksjoner/person`,
         method: "POST",
@@ -465,7 +510,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/transaksjoner/bidragssak
      * @secure
      */
-    hentTransaksjonerPaBidragssak: (data: SaksnummerRequest, params: RequestParams = {}) =>
+    hentTransaksjonerPaBidragssak: (
+      data: SaksnummerRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Transaksjoner, void>({
         path: `/transaksjoner/bidragssak`,
         method: "POST",
@@ -515,7 +563,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/innkrevningssak/person
      * @secure
      */
-    hentInnkrevingssakPaPerson: (data: PersonRequest, params: RequestParams = {}) =>
+    hentInnkrevingssakPaPerson: (
+      data: PersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<BidragssakMedSkyldner, void>({
         path: `/innkrevningssak/person`,
         method: "POST",
@@ -535,7 +586,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/innkrevningssak/bidragssak
      * @secure
      */
-    hentInnkrevingssakPaBidragssak: (data: SaksnummerRequest, params: RequestParams = {}) =>
+    hentInnkrevingssakPaBidragssak: (
+      data: SaksnummerRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Bidragssak, void>({
         path: `/innkrevningssak/bidragssak`,
         method: "POST",
@@ -556,7 +610,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/innkrevingsinformasjon
      * @secure
      */
-    hentInformasjonOmInnkrevingssaken: (data: PersonRequest, params: RequestParams = {}) =>
+    hentInformasjonOmInnkrevingssaken: (
+      data: PersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Innkrevingssaksinformasjon, void>({
         path: `/innkrevingsinformasjon`,
         method: "POST",

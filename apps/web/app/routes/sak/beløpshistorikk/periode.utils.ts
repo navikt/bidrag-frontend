@@ -1,19 +1,25 @@
 import type { TypeArManedsperiode } from "@bidrag/api/BelopshistorikkApi";
-import { differenceInMonths, endOfMonth, format, isBefore, lastDayOfMonth, max, min, subMonths } from "date-fns";
+import {
+    differenceInMonths,
+    endOfMonth,
+    format,
+    isAfter,
+    isBefore,
+    lastDayOfMonth,
+    max,
+    min,
+    subMonths,
+} from "date-fns";
 
 export function sisteDagIMnd(dato: Date): Date {
     return lastDayOfMonth(dato);
 }
 
-export function erDatoInnenforPeriode(dato: Date, fom: string, tom?: string | null): boolean {
-    const datoManed = format(dato, "yyyy-MM");
-    const tomManed = tom ?? format(new Date(), "yyyy-MM");
+export function erDatoInnenforPeriode(dato: Date, periode: TypeArManedsperiode): boolean {
+    const periodeFom = new Date(periode.fom);
+    const periodeTom = periode.til ? endOfMonth(subMonths(new Date(periode.til), 1)) : new Date("9999-12-31");
 
-    if (datoManed < fom) {
-        return false;
-    }
-
-    return datoManed <= tomManed;
+    return !isAfter(dato, periodeTom) && !isBefore(dato, periodeFom);
 }
 
 export function erInnenforPeriode(fra: Date | undefined, til: Date | undefined, periode: TypeArManedsperiode): boolean {
