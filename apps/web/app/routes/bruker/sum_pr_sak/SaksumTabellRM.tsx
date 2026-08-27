@@ -9,7 +9,7 @@ import {
     beregnTotalPrivatRestGjeld,
 } from "~/common/reskontro/gjeldsberegninger.ts";
 import { SumPerValutaCell } from "~/routes/bruker/sum_pr_sak/SumPerValutaCell.tsx";
-import { useSaksumTabell } from "~/routes/bruker/sum_pr_sak/useSaksumTabell.ts";
+import { useAktivPeriode } from "~/routes/bruker/sum_pr_sak/useAktivPeriode.ts";
 
 interface Props {
     ident: string;
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export function SaksumTabellRM({ bidragSak, saksnummer, ident, sak }: Props) {
-    const { sumBidragPerValuta, sumForskuddPerValuta, getBidragForBarn, getForskuddForBarn } = useSaksumTabell({
+    const { sumBidragPerValuta, sumForskuddPerValuta, getBidragForBarn, getForskuddForBarn } = useAktivPeriode({
         saksnummer,
         ident,
         periodeFilter: "mottaker",

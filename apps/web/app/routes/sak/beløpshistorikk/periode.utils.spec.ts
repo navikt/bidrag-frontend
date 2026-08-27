@@ -1,7 +1,7 @@
 import type {TypeArManedsperiode} from "@bidrag/api/BelopshistorikkApi";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
-import {beregnAntallMåneder, erDatoInnenforPeriode, erInnenforPeriode} from "./periode.utils";
+import { beregnAntallMåneder, erDatoInnenforPeriode, erInnenforPeriode } from "./periode.utils";
 
 class Filter {
     constructor(
@@ -28,32 +28,49 @@ describe("periodeFilterUtils", () => {
         vi.useRealTimers();
     });
 
-    describe("erDatoInnenforPeriode", () => {
-        it("returnerer true når dato er innenfor lukket periode", () => {
-            expect(erDatoInnenforPeriode(new Date("2024-03-10"), "2024-01", "2024-06")).toBe(true);
+    describe("erDatoInnenforPeriode lukket periode", () => {
+        const periode: TypeArManedsperiode = {
+            fom: "2024-01",
+            til: "2024-06",
+        };
+        const tabell: Array<[string, Date, boolean]> = [
+            ["Før periode", new Date("2023-10-31"), false],
+            ["Rett før start", new Date("2023-12-31"), false],
+            ["Rett etter start", new Date("2024-01-01"), true],
+            ["I periode", new Date("2024-03-12"), true],
+            ["Siste dag i periode", new Date("2024-05-31"), true],
+            ["Rett etter dag i periode", new Date("2024-06-01"), false],
+            ["Etter periode", new Date("2025-06-01"), false],
+        ];
+
+        it.each(tabell)("%s", (_beskrivelse, dato, forventet) => {
+            expect(erDatoInnenforPeriode(dato, periode)).toBe(forventet);
         });
 
-        it("returnerer false når dato er før fom", () => {
-            expect(erDatoInnenforPeriode(new Date("2023-12-10"), "2024-01", "2024-06")).toBe(false);
-        });
-
-        it("returnerer true når dato er innen tom", () => {
-            expect(erDatoInnenforPeriode(new Date("2023-12-10"), "2024-01", "2024-06")).toBe(false);
-        });
-
-        it("returnerer false når dato er etter tom", () => {
-            expect(erDatoInnenforPeriode(new Date("2024-07-01"), "2024-01", "2024-06")).toBe(false);
-        });
-
-        it("returnerer true for åpen periode når dato er etter fom og før nå", () => {
-            expect(erDatoInnenforPeriode(new Date("2024-08-01"), "2024-01", null)).toBe(true);
-        });
-
-        it("returnerer false for åpen periode når dato er etter nå", () => {
-            expect(erDatoInnenforPeriode(new Date("2024-11-01"), "2024-01", null)).toBe(false);
-        });
     });
-    describe("erInnenforPeriode", () => {
+
+    describe("erDatoInnenforPeriode åpen periode", () => {
+        const periode: TypeArManedsperiode = {
+            fom: "2024-01",
+        };
+        const tabell: Array<[string, Date, boolean]> = [
+            ["Før periode", new Date("2023-10-31"), false],
+            ["Rett før start", new Date("2023-12-31"), false],
+            ["Rett etter start", new Date("2024-01-01"), true],
+            ["I periode", new Date("2024-03-12"), true],
+            ["Siste dag i periode", new Date("2024-05-31"), true],
+            ["Rett etter dag i periode", new Date("2024-06-01"), true],
+            ["Etter periode", new Date("2025-06-01"), true],
+        ];
+
+        it.each(tabell)("%s", (_beskrivelse, dato, forventet) => {
+            expect(erDatoInnenforPeriode(dato, periode)).toBe(forventet);
+        });
+
+    });
+
+
+    describe("erInnenforPeriode lukket periode", () => {
         const periode: TypeArManedsperiode = {
             fom: "2024-01",
             til: "2024-06",
@@ -78,6 +95,45 @@ describe("periodeFilterUtils", () => {
             ["fra tidenes morgen og til er før periode", new Filter(null, "2023-12-01"), false],
             ["fra tidenes morgen og til er etter periode", new Filter(null, "2025-12-01"), true],
             ["fra tidenes morgen og til er første måned i perioden", new Filter(null, "2024-01-01"), true],
+            ["fra  og til er lik innen perioden", new Filter("2024-04-12", "2024-04-12"), true],
+            ["fra  og til er lik sist i perioden", new Filter("2024-05-31", "2024-05-31"), true],
+            ["fra  og til er lik etter perioden", new Filter("2024-06-01", "2024-06-01"), false],
+            ["fra  og til er lik før perioden", new Filter("2023-12-31", "2023-12-31"), false],
+        ];
+
+        it.each(tabell)("%s", (_beskrivelse, filter, forventet) => {
+            expect(erInnenforPeriode(filter.fraDato(), filter.tilDato(), periode)).toBe(forventet);
+        });
+    });
+
+    describe("erInnenforPeriode åpen periode", () => {
+        const periode: TypeArManedsperiode = {
+            fom: "2024-01",
+        };
+
+        const tabell: Array<[string, Filter, boolean]> = [
+            ["fra er åpen, til er åpen", new Filter(), true],
+            ["fra er før periode, til er åpen", new Filter("2023-01-01"), true],
+            ["fra er innenfor periode, til er åpen", new Filter("2024-03-10"), true],
+            ["fra er etter periode, til er åpen", new Filter("2025-03-10"), false],
+            ["fra er siste i periode, til er åpen", new Filter("2024-05-01"), true],
+            ["fra er åpen, til er før periode", new Filter(null, "2024-05-10"), true],
+            ["fra er åpen, til er innen periode", new Filter(null, "2024-05-10"), true],
+            ["fra er åpen, til er etter periode", new Filter(null, "2025-01-01"), true],
+            ["fra er åpen, til er siste periode", new Filter(null, "2024-06-01"), true],
+            ["fra er før, til er etter", new Filter("2023-12-10", "2025-05-10"), true],
+            ["fra er før, til er innen", new Filter("2023-12-10", "2024-05-01"), true],
+            ["intervall er helt før periode", new Filter("2023-10-10", "2023-12-10"), false],
+            ["intervall er helt etter periode", new Filter("2025-10-10", "2025-12-10"), false],
+            ["intervall er kun en måned på slutten", new Filter("2024-05-01", "2024-05-30"), true],
+            ["fra tidenes morgen og til er innen intervall", new Filter(null, "2024-02-01"), true],
+            ["fra tidenes morgen og til er før periode", new Filter(null, "2023-12-01"), false],
+            ["fra tidenes morgen og til er etter periode", new Filter(null, "2025-12-01"), true],
+            ["fra tidenes morgen og til er første måned i perioden", new Filter(null, "2024-01-01"), true],
+            ["fra og til er lik innen perioden", new Filter("2024-04-12", "2024-04-12"), true],
+            ["fra og til er lik sist i perioden", new Filter("2024-05-31", "2024-05-31"), true],
+            ["fra og til er lik etter perioden", new Filter("2024-06-01", "2024-06-01"), true],
+            ["fra og til er lik før perioden", new Filter("2023-12-31", "2023-12-31"), false],
         ];
 
         it.each(tabell)("%s", (_beskrivelse, filter, forventet) => {

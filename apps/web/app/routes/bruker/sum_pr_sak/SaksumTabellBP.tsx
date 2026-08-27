@@ -11,7 +11,7 @@ import {
 } from "~/common/reskontro/gjeldsberegninger.ts";
 import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
 import { SumPerValutaCell } from "~/routes/bruker/sum_pr_sak/SumPerValutaCell.tsx";
-import { useSaksumTabell } from "~/routes/bruker/sum_pr_sak/useSaksumTabell.ts";
+import { useAktivPeriode } from "~/routes/bruker/sum_pr_sak/useAktivPeriode.ts";
 
 const gjeld = (barn: SaksinformasjonBarn) => beregnBarnGjeld(barn);
 
@@ -23,10 +23,11 @@ interface Props {
 }
 
 export function SaksumTabellBP({ bidragSak, saksnummer, ident, sak }: Props) {
-    const { sumBidragPerValuta, getBidragForBarn, reellMottakerIdent } = useSaksumTabell({
+    const { bidrag, sumBidragPerValuta, getBidragForBarn, reellMottakerIdent } = useAktivPeriode({
         saksnummer,
         ident,
         periodeFilter: "skyldner",
+        inkluderForskudd: false,
     });
     const roller = sak?.roller ?? [];
     const barn = bidragSak?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];

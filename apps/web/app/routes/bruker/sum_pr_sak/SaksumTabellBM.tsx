@@ -10,7 +10,7 @@ import {
 } from "~/common/reskontro/gjeldsberegninger.ts";
 import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
 import { SumPerValutaCell } from "~/routes/bruker/sum_pr_sak/SumPerValutaCell.tsx";
-import { useSaksumTabell } from "~/routes/bruker/sum_pr_sak/useSaksumTabell.ts";
+import { useAktivPeriode } from "~/routes/bruker/sum_pr_sak/useAktivPeriode.ts";
 
 interface Props {
     ident: string;
@@ -21,7 +21,7 @@ interface Props {
 
 export function SaksumTabellBM({ saksnummer, bidragSak, ident, sak }: Props) {
     const { sumBidragPerValuta, sumForskuddPerValuta, getBidragForBarn, getForskuddForBarn, reellMottakerIdent } =
-        useSaksumTabell({ saksnummer: saksnummer, ident, periodeFilter: "mottaker" });
+        useAktivPeriode({ saksnummer: saksnummer, ident, periodeFilter: "mottaker" });
 
     const roller = sak?.roller ?? [];
     const barn = bidragSak?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
