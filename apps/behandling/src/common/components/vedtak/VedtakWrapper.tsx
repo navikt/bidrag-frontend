@@ -40,7 +40,12 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
     const { onStepChange: onStepChangeFn } = useBehandlingProvider();
     const onStepChange = (step: number, query?: Record<string, string>, hash?: string) =>
         onStepChangeFn(step, { navigertFra: "vedtak", ...query }, hash);
-    const { type } = useGetBehandlingV2();
+    const { type, roller } = useGetBehandlingV2();
+    // Legger `saksnummer` direkte på query-en (kjent her, siden vi har rollen/RolleDto-en
+    // tilgjengelig), slik at sidemenyen kan synkronisere `selectedSaksnummer` uten å måtte slå
+    // opp rollen selv basert på `tab`-verdien.
+    const medSaksnummer = (query: Record<string, string>, saksnummer?: string | null) =>
+        saksnummer ? { ...query, [behandlingQueryKeys.saksnummer]: saksnummer } : query;
     function renderFeilmeldinger() {
         if (!feil?.detaljer) return null;
         const feilInnhold = feil?.detaljer;
@@ -49,35 +54,55 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             feilInnhold.privatAvtale.forEach((value) => {
                 if (value?.manglerBegrunnelse === true) {
                     feilliste.push(
-                        <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Begrunnelse må fylles ut for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.ingenLøpendePeriode === true) {
                     feilliste.push(
-                        <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Det må legges til løpende periode for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.manglerAvtaledato === true) {
                     feilliste.push(
-                        <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Avtaledato mangler for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.måVelgeVedtakHvisAvtaletypeErVedtakFraNav === true) {
                     feilliste.push(
-                        <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Innkreving: Vedtak må velges når "Vedtak fra Nav" er valgt for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
                 }
                 if (value?.harPeriodiseringsfeil) {
                     feilliste.push(
-                        <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.privat_avtale)}>
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(steps.privat_avtale, medSaksnummer({}, value.gjelderPerson?.saksnummer))
+                            }
+                        >
                             Privat avtale: Perioder for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
                     );
@@ -90,8 +115,12 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (virkningstidspunkt?.manglerBegrunnelse === true) {
                     feilliste.push(
                         <ErrorSummary.Item
-                            href="#"
-                            onClick={() => onStepChange(steps.virkningstidspunkt, { tab: rolle.id?.toString() })}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.virkningstidspunkt,
+                                    medSaksnummer({ tab: rolle.id?.toString() }, rolle.saksnummer),
+                                )
+                            }
                         >
                             Virkningstidspunkt: Begrunnelse må fylles ut ved opphør
                         </ErrorSummary.Item>,
@@ -100,8 +129,12 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (virkningstidspunkt?.kanIkkeSetteOpphørsdatoEtterEtterfølgendeVedtak === true) {
                     feilliste.push(
                         <ErrorSummary.Item
-                            href="#"
-                            onClick={() => onStepChange(steps.virkningstidspunkt, { tab: rolle.id?.toString() })}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.virkningstidspunkt,
+                                    medSaksnummer({ tab: rolle.id?.toString() }, rolle.saksnummer),
+                                )
+                            }
                         >
                             Virkningstidspunkt: Kan ikke sette opphørsdato etter etterfølgende vedtak for barn{" "}
                             {rolle.navn}
@@ -111,8 +144,12 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (virkningstidspunkt?.manglerVurderingAvSkolegang === true) {
                     feilliste.push(
                         <ErrorSummary.Item
-                            href="#"
-                            onClick={() => onStepChange(steps.virkningstidspunkt, { tab: rolle.id?.toString() })}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.virkningstidspunkt,
+                                    medSaksnummer({ tab: rolle.id?.toString() }, rolle.saksnummer),
+                                )
+                            }
                         >
                             Virkningstidspunkt: Vurdering av skolegang må fylles ut ved 18 års bidrag
                         </ErrorSummary.Item>,
@@ -121,8 +158,12 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (virkningstidspunkt?.manglerOpphørsdato === true) {
                     feilliste.push(
                         <ErrorSummary.Item
-                            href="#"
-                            onClick={() => onStepChange(steps.virkningstidspunkt, { tab: rolle.id?.toString() })}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.virkningstidspunkt,
+                                    medSaksnummer({ tab: rolle.id?.toString() }, rolle.saksnummer),
+                                )
+                            }
                         >
                             Virkningstidspunkt: Opphørsdato må settes for {rolle.navn} ved 18 års bidrag
                         </ErrorSummary.Item>,
@@ -131,8 +172,12 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (virkningstidspunkt?.måVelgeVedtakForBeregning === true) {
                     feilliste.push(
                         <ErrorSummary.Item
-                            href="#"
-                            onClick={() => onStepChange(steps.virkningstidspunkt, { tab: rolle.id?.toString() })}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.virkningstidspunkt,
+                                    medSaksnummer({ tab: rolle.id?.toString() }, rolle.saksnummer),
+                                )
+                            }
                         >
                             Virkningstidspunkt: Vedtak må velges for {rolle.navn}
                         </ErrorSummary.Item>,
@@ -144,30 +189,28 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             const feillisteUtgifter = [];
             if (feilInnhold.utgift.manglerUtgifter) {
                 feillisteUtgifter.push(
-                    <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.utgift)}>
+                    <ErrorSummary.Item onClick={() => onStepChange(steps.utgift)}>
                         Utgift: Minst en utgift må legges til
                     </ErrorSummary.Item>,
                 );
             }
             if (feilInnhold.utgift.maksGodkjentBeløp?.manglerBeløp === true) {
                 feillisteUtgifter.push(
-                    <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.utgift)}>
+                    <ErrorSummary.Item onClick={() => onStepChange(steps.utgift)}>
                         Utgift: Maks godkjent beløp må fylles ut når godkjent beløp skal skjønnsjusteres
                     </ErrorSummary.Item>,
                 );
             }
             if (feilInnhold.utgift.maksGodkjentBeløp?.manglerBegrunnelse === true) {
                 feillisteUtgifter.push(
-                    <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.utgift)}>
+                    <ErrorSummary.Item onClick={() => onStepChange(steps.utgift)}>
                         Utgift: Begrunnelse på maks godkjent beløp må fylles ut når godkjent beløp skal skjønnsjusteres
                     </ErrorSummary.Item>,
                 );
             }
             if (feillisteUtgifter.length === 0) {
                 feillisteUtgifter.push(
-                    <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.utgift)}>
-                        Utgift
-                    </ErrorSummary.Item>,
+                    <ErrorSummary.Item onClick={() => onStepChange(steps.utgift)}>Utgift</ErrorSummary.Item>,
                 );
             }
             feilliste.push(...feillisteUtgifter);
@@ -175,11 +218,23 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
 
         if (feilInnhold.samvær != null && "samvær" in steps) {
             feilInnhold.samvær.forEach((value) => {
+                // `tab` må være samvær-barnets egen id (matcher `useActiveSamværTab`/sidemenyens
+                // aktiv-sjekk). `saksnummer` slås opp via barnets ident, brukes til å synkronisere
+                // `selectedSaksnummer` til riktig sak (relevant ved forholdsmessig fordeling).
+                const samværTabQuery = medSaksnummer(
+                    { [behandlingQueryKeys.tab]: value.samværId?.toString() },
+                    value.gjelderRolle?.saksnummer,
+                );
                 if (value.harPeriodiseringsfeil)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementIds.seksjon_samvær}_${value.samværId}`}
-                            onClick={() => onStepChange(steps.samvær)}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.samvær,
+                                    samværTabQuery,
+                                    `${elementIds.seksjon_samvær}_${value.samværId}`,
+                                )
+                            }
                         >
                             Samvær: Perioder for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
@@ -187,8 +242,13 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (value.manglerBegrunnelse)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementIds.seksjon_samvær}_${value.samværId}`}
-                            onClick={() => onStepChange(steps.samvær)}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.samvær,
+                                    samværTabQuery,
+                                    `${elementIds.seksjon_samvær}_${value.samværId}`,
+                                )
+                            }
                         >
                             Samvær: Mangler begrunnelse for barn {value.gjelderBarnNavn}
                         </ErrorSummary.Item>,
@@ -202,7 +262,6 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             if (manglerBegrunnelseForAndreBarn)
                 feilliste.push(
                     <ErrorSummary.Item
-                        href={"#"}
                         onClick={() =>
                             onStepChange(steps.underholdskostnad, {
                                 [behandlingQueryKeys.tab]: toUnderholdskostnadTabQueryParameter(),
@@ -213,14 +272,21 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                     </ErrorSummary.Item>,
                 );
             feilInnhold.underholdskostnad.forEach((value) => {
+                const underholdSaksnummer = roller.find((r) => r.id === value.gjelderBarn.rolleId)?.saksnummer;
                 if (value.manglerPerioderForTilsynsordning)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={""}
                             onClick={() =>
-                                onStepChange(steps.underholdskostnad, {
-                                    [behandlingQueryKeys.tab]: toUnderholdskostnadTabQueryParameterForUnderhold(value),
-                                })
+                                onStepChange(
+                                    steps.underholdskostnad,
+                                    medSaksnummer(
+                                        {
+                                            [behandlingQueryKeys.tab]:
+                                                toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                        },
+                                        underholdSaksnummer,
+                                    ),
+                                )
                             }
                         >
                             Underholdskostnad: Mangler perioder for tilsynsordning for barn {value.gjelderBarn.navn}
@@ -229,11 +295,18 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (value.tilleggsstønad)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementIds.seksjon_underholdskostnad_tilleggstønad}`}
                             onClick={() =>
-                                onStepChange(steps.underholdskostnad, {
-                                    [behandlingQueryKeys.tab]: toUnderholdskostnadTabQueryParameterForUnderhold(value),
-                                })
+                                onStepChange(
+                                    steps.underholdskostnad,
+                                    medSaksnummer(
+                                        {
+                                            [behandlingQueryKeys.tab]:
+                                                toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                        },
+                                        underholdSaksnummer,
+                                    ),
+                                    `${elementIds.seksjon_underholdskostnad_tilleggstønad}`,
+                                )
                             }
                         >
                             Underholdskostnad: Ugyldig perioder i tilleggsstønad for barn {value.gjelderBarn.navn}
@@ -242,11 +315,18 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (value.stønadTilBarnetilsyn)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementIds.seksjon_underholdskostnad_barnetilsyn}`}
                             onClick={() =>
-                                onStepChange(steps.underholdskostnad, {
-                                    [behandlingQueryKeys.tab]: toUnderholdskostnadTabQueryParameterForUnderhold(value),
-                                })
+                                onStepChange(
+                                    steps.underholdskostnad,
+                                    medSaksnummer(
+                                        {
+                                            [behandlingQueryKeys.tab]:
+                                                toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                        },
+                                        underholdSaksnummer,
+                                    ),
+                                    `${elementIds.seksjon_underholdskostnad_barnetilsyn}`,
+                                )
                             }
                         >
                             Underholdskostnad: Ugyldig perioder i stønad til barnetilsyn for barn{" "}
@@ -257,11 +337,18 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (value.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length > 0)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementIds.seksjon_underholdskostnad_tilleggstønad}`}
                             onClick={() =>
-                                onStepChange(steps.underholdskostnad, {
-                                    [behandlingQueryKeys.tab]: toUnderholdskostnadTabQueryParameterForUnderhold(value),
-                                })
+                                onStepChange(
+                                    steps.underholdskostnad,
+                                    medSaksnummer(
+                                        {
+                                            [behandlingQueryKeys.tab]:
+                                                toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                        },
+                                        underholdSaksnummer,
+                                    ),
+                                    `${elementIds.seksjon_underholdskostnad_tilleggstønad}`,
+                                )
                             }
                         >
                             Underholdskostnad: Tilleggsstønad uten faktisk tilsynsutgift for barn{" "}
@@ -271,11 +358,18 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (value.faktiskTilsynsutgift)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementIds.seksjon_underholdskostnad_tilysnsutgifter}`}
                             onClick={() =>
-                                onStepChange(steps.underholdskostnad, {
-                                    [behandlingQueryKeys.tab]: toUnderholdskostnadTabQueryParameterForUnderhold(value),
-                                })
+                                onStepChange(
+                                    steps.underholdskostnad,
+                                    medSaksnummer(
+                                        {
+                                            [behandlingQueryKeys.tab]:
+                                                toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                        },
+                                        underholdSaksnummer,
+                                    ),
+                                    `${elementIds.seksjon_underholdskostnad_tilysnsutgifter}`,
+                                )
                             }
                         >
                             Underholdskostnad: Ugyldig perioder i faktiske tilsynsutgifter for barn{" "}
@@ -286,11 +380,17 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (value.manglerBegrunnelse && value.gjelderBarn.medIBehandlingen)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={"#"}
                             onClick={() =>
-                                onStepChange(steps.underholdskostnad, {
-                                    [behandlingQueryKeys.tab]: toUnderholdskostnadTabQueryParameterForUnderhold(value),
-                                })
+                                onStepChange(
+                                    steps.underholdskostnad,
+                                    medSaksnummer(
+                                        {
+                                            [behandlingQueryKeys.tab]:
+                                                toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                        },
+                                        underholdSaksnummer,
+                                    ),
+                                )
                             }
                         >
                             Underholdskostnad: Mangler begrunnelse for barn {value.gjelderBarn.navn}
@@ -303,8 +403,15 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (value.manglerBegrunnelse)
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementIds.seksjon_gebyr}_${value.gjelder.id}`}
-                            onClick={() => onStepChange(steps.gebyr)}
+                            onClick={() =>
+                                onStepChange(
+                                    steps.gebyr,
+                                    medSaksnummer(
+                                        { [behandlingQueryKeys.tab]: value.gjelder.id?.toString() },
+                                        value.gjelder.saksnummer,
+                                    ),
+                                )
+                            }
                         >
                             Gebyr: Begrunnelse må fylles ut når gebyrvalget er manuelt overstyrt (
                             {rolletypeTilVisningsnavn(value.gjelder)})
@@ -315,10 +422,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
         if (feilInnhold.husstandsmedlem != null) {
             feilInnhold.husstandsmedlem.forEach((value) => {
                 feilliste.push(
-                    <ErrorSummary.Item
-                        href={`#${elementIds.seksjon_boforhold}_${value.barn.husstandsmedlemId}`}
-                        onClick={() => onStepChange(steps.boforhold)}
-                    >
+                    <ErrorSummary.Item onClick={() => onStepChange(steps.boforhold)}>
                         Boforhold: Perioder for barn {value.barn.navn}
                     </ErrorSummary.Item>,
                 );
@@ -327,10 +431,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
 
         if (feilInnhold.andreVoksneIHusstanden != null) {
             feilliste.push(
-                <ErrorSummary.Item
-                    href={`#${elementIds.seksjon_andreVoksneIHusstand}`}
-                    onClick={() => onStepChange(steps.boforhold)}
-                >
+                <ErrorSummary.Item onClick={() => onStepChange(steps.boforhold)}>
                     {feilInnhold.andreVoksneIHusstanden.manglerPerioder
                         ? "Mangler perioder for andre voksne i husstanden"
                         : "Andre voksne i husstanden har ugyldige perioder"}
@@ -339,10 +440,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
         }
         if (feilInnhold.sivilstand != null) {
             feilliste.push(
-                <ErrorSummary.Item
-                    href={`#${elementIds.seksjon_sivilstand}`}
-                    onClick={() => onStepChange(steps.boforhold)}
-                >
+                <ErrorSummary.Item onClick={() => onStepChange(steps.boforhold, null, elementIds.seksjon_sivilstand)}>
                     Sivilstand har ugyldige perioder
                 </ErrorSummary.Item>,
             );
@@ -383,18 +481,24 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             ?.forEach((value) => {
                 feilliste.push(
                     <ErrorSummary.Item
-                        href={`#${opplysningTilElementId(value)}`}
                         onClick={() =>
-                            onStepChange(opplysningTilStep(value, steps), {
-                                [behandlingQueryKeys.tab]:
-                                    value.type === OpplysningerType.BARNETILSYN
-                                        ? toUnderholdskostnadTabQueryParameter(
-                                              value.gjelderBarn?.husstandsmedlemId,
-                                              value.underholdskostnadId,
-                                              true,
-                                          )
-                                        : value.rolle?.id?.toString(),
-                            })
+                            onStepChange(
+                                opplysningTilStep(value, steps),
+                                medSaksnummer(
+                                    {
+                                        [behandlingQueryKeys.tab]:
+                                            value.type === OpplysningerType.BARNETILSYN
+                                                ? toUnderholdskostnadTabQueryParameter(
+                                                      value.gjelderBarn?.husstandsmedlemId,
+                                                      value.underholdskostnadId,
+                                                      true,
+                                                  )
+                                                : value.rolle?.id?.toString(),
+                                    },
+                                    value.rolle?.saksnummer,
+                                ),
+                                opplysningTilElementId(value),
+                            )
                         }
                     >
                         {mapOpplysningtypeSomMåBekreftesTilFeilmelding(value, type)}
@@ -414,7 +518,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                           .map((key) => capitalizeFirstLetter(key));
 
             feilliste.push(
-                <ErrorSummary.Item href="#" onClick={() => onStepChange(steps.vedtak)}>
+                <ErrorSummary.Item onClick={() => onStepChange(steps.vedtak)}>
                     {feil.melding}
                     {feilInnhold.length > 0 && (
                         <>
@@ -459,11 +563,15 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 if (valideringsfeil) {
                     feilliste.push(
                         <ErrorSummary.Item
-                            href={`#${elementId}`}
                             onClick={() =>
-                                onStepChange(steps.inntekt, {
-                                    [behandlingQueryKeys.tab]: valideringsfeil.rolle?.id?.toString(),
-                                })
+                                onStepChange(
+                                    steps.inntekt,
+                                    medSaksnummer(
+                                        { [behandlingQueryKeys.tab]: valideringsfeil.rolle?.id?.toString() },
+                                        valideringsfeil.rolle?.saksnummer,
+                                    ),
+                                    elementId,
+                                )
                             }
                         >
                             Inntekter: Perioder i {tekst.toLowerCase()}{" "}
@@ -477,11 +585,15 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
         } else {
             feilliste.push(
                 <ErrorSummary.Item
-                    href={`#${elementId}`}
                     onClick={() =>
-                        onStepChange(steps.inntekt, {
-                            [behandlingQueryKeys.tab]: inntektvalideringsfeil.rolle?.id?.toString(),
-                        })
+                        onStepChange(
+                            steps.inntekt,
+                            medSaksnummer(
+                                { [behandlingQueryKeys.tab]: inntektvalideringsfeil.rolle?.id?.toString() },
+                                inntektvalideringsfeil.rolle?.saksnummer,
+                            ),
+                            elementId,
+                        )
                     }
                 >
                     Inntekter: Perioder i {tekst.toLowerCase()}{" "}

@@ -10,7 +10,6 @@ import { useFlag } from "@unleash/proxy-client-react";
 export default function useFeatureToogle() {
     return {
         nyToolbar: useFlag("frontend.toolbar"),
-        nyBehandlingHeader: useFlag("frontend.behandling_ny_header"),
         tilgangOppretteFF: useFlag("behandling.opprette_ff"),
         bidragBeregningV2: useFlag("behandling.bidrag_beregning_v2"),
         bidragFlereBarn: useFlag("behandling.behandle_bidrag_flere_barn"),
