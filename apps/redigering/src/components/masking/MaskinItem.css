@@ -12,12 +12,13 @@
     user-select: none;
     display: flex;
     align-items: center;
-    height: 30px;
+    height: 40px;
     width: max-content;
-    background-color: var(--ax-bg-neutral-strong);
+    background-color: white;
+    border: 1px solid var(--ax-border-neutral);
     padding: 4px;
-    border-radius: 4px;
-    margin-bottom: -30px;
+    border-radius: 6px;
+    margin-bottom: -40px;
     right: 0;
     box-shadow:
         0px 4.8px 10.8px rgba(0, 0, 0, 0.25569638034578496),
@@ -31,7 +32,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid var(--ax-neutral-100);
+    border-right: 1px solid var(--ax-border-neutral);
     height: 100%;
 }
 
@@ -39,5 +40,8 @@
     box-shadow: none;
 }
 .toolbar .toolbar-item svg {
-    color: white;
+    color: var(--ax-text-neutral);
+}
+.toolbar .toolbar-item.delete svg {
+    color: var(--ax-bg-danger-strong);
 }

@@ -142,7 +142,7 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
     {
         label: "Sakshistorikk",
         id: ({ saksnummer }) => saksnummer,
-        undersider: ["behandling", "vedtak"],
+        undersider: ["behandling", "vedtak", "forsendelse", "rediger"],
         undersideSti: sakSti,
         destinasjon: bisysSakshistorikkDestinasjon,
     },

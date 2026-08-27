@@ -88,7 +88,9 @@ interface OpenDokumentIframeProps {
 function OpenDokumentIframe({ path, id }: OpenDokumentIframeProps) {
     return (
         <>
+            {/** biome-ignore lint/a11y/useIframeTitle: ddd> */}
             <iframe name="bidragui" style={{ display: "none" }}></iframe>
+            {/** biome-ignore lint/a11y/useAnchorContent: <ddd> */}
             <a id={id} style={{ display: "none" }} href={path} target="bidragui"></a>
         </>
     );

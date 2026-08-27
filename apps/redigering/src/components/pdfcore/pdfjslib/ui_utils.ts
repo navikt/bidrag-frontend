@@ -533,12 +533,19 @@ function isPortraitOrientation(size: { width: number; height: number }) {
 
 /**
  * Promise that is resolved when DOM window becomes visible.
+ *
+ * Guarded for SSR: this module is imported by route components that are
+ * also evaluated on the server (React Router v8 SSR), where `window`/`document`
+ * don't exist.
  */
-const animationStarted = new Promise((resolve) => {
-    window.requestAnimationFrame(resolve);
-});
+const animationStarted =
+    typeof window !== "undefined"
+        ? new Promise((resolve) => {
+              window.requestAnimationFrame(resolve);
+          })
+        : Promise.resolve();
 
-const docStyle = document.documentElement.style;
+const docStyle = typeof document !== "undefined" ? document.documentElement.style : ({} as CSSStyleDeclaration);
 
 function clamp(v: number, min: number, max: number) {
     return Math.min(Math.max(v, min), max);

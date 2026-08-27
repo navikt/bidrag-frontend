@@ -47,11 +47,11 @@ export default function PopoverToolbar() {
             onPointerDown={stopSidebarClose}
         >
             <div className={"buttons_row"}>
-                <div className={"zoom_buttons flex flex-row gap-2 text-[white]"}>
+                <div className={"zoom_buttons flex flex-row gap-2 text-[var(--ax-text-neutral)]"}>
                     {scale > 1 ? (
                         <Button
                             onClick={resetZoom}
-                            size={"xsmall"}
+                            size={"small"}
                             variant={"tertiary-neutral"}
                             icon={<ShrinkIcon />}
                             title="Tilpass til siden"
@@ -59,7 +59,7 @@ export default function PopoverToolbar() {
                     ) : (
                         <Button
                             onClick={zoomToFit}
-                            size={"xsmall"}
+                            size={"small"}
                             variant={"tertiary-neutral"}
                             icon={<ExpandIcon />}
                             title="Tilpass til bredde"
@@ -67,7 +67,7 @@ export default function PopoverToolbar() {
                     )}
                     <Button
                         onClick={() => onZoomOut()}
-                        size={"xsmall"}
+                        size={"small"}
                         variant={"tertiary-neutral"}
                         icon={<MinusIcon />}
                         title="Zoom ut"
@@ -75,14 +75,17 @@ export default function PopoverToolbar() {
                     <div>{Math.round(scale * 100)}%</div>
                     <Button
                         onClick={() => onZoomIn()}
-                        size={"xsmall"}
+                        size={"small"}
                         variant={"tertiary-neutral"}
                         icon={<PlusIcon />}
                         title="Zoom inn"
                     />
                 </div>
                 <div className={"divider"}></div>
-                <div style={{ marginLeft: "6px", marginRight: "6px" }} className="flex flex-row gap-2 text-[white]">
+                <div
+                    style={{ marginLeft: "6px", marginRight: "6px" }}
+                    className="flex flex-row gap-2 text-[var(--ax-text-neutral)]"
+                >
                     <div>{currentPageNotIncludingRemoved}</div> <div>av</div> <div>{editedPagesCount}</div>
                 </div>
                 <div className={"divider"}></div>
@@ -91,7 +94,7 @@ export default function PopoverToolbar() {
                         {isEditMode && (
                             <Button
                                 onClick={initAddItem}
-                                size={"xsmall"}
+                                size={"small"}
                                 variant={"tertiary-neutral"}
                                 icon={<EraserIcon />}
                                 iconPosition={"left"}
@@ -103,7 +106,7 @@ export default function PopoverToolbar() {
 
                         <Button
                             onClick={() => rotatePage(currentPage, "LEFT")}
-                            size={"xsmall"}
+                            size={"small"}
                             variant={"tertiary-neutral"}
                             icon={<ArrowsCirclepathIcon />}
                             title="Roter side mot venstre"
@@ -114,7 +117,7 @@ export default function PopoverToolbar() {
 
                         <Button
                             onClick={() => rotatePage(currentPage, "RIGHT")}
-                            size={"xsmall"}
+                            size={"small"}
                             variant={"tertiary-neutral"}
                             icon={<ArrowsCirclepathIcon />}
                             title="Roter side mot høyre"
@@ -127,7 +130,7 @@ export default function PopoverToolbar() {
                                 toggleDeletedPage(currentPage);
                             }}
                             disabled={!isAllowedToDeletePage()}
-                            size={"xsmall"}
+                            size={"small"}
                             variant={"tertiary-neutral"}
                             icon={<FileXMarkIcon />}
                             iconPosition={"left"}
@@ -150,7 +153,7 @@ function UndoRedoButtons() {
         <div className={"undo_redo_buttons"}>
             <Button
                 onClick={onUndo}
-                size={"xsmall"}
+                size={"small"}
                 title="Angre"
                 disabled={!history.canUndo}
                 variant={"tertiary-neutral"}
@@ -160,7 +163,7 @@ function UndoRedoButtons() {
             <Button
                 onClick={onRedo}
                 disabled={!history.canRedo}
-                size={"xsmall"}
+                size={"small"}
                 title="Gjør om"
                 variant={"tertiary-neutral"}
                 icon={<ArrowRedoIcon />}

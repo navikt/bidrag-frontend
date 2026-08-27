@@ -28,6 +28,7 @@ export default defineConfig(({ command, mode }) => {
         ],
         resolve: {
             tsconfigPaths: true,
+            dedupe: ["react", "react-dom"],
             alias: [
                 // tsconfig peker @bidrag/behandling-app til en type-deklarasjon for å slippe
                 // strict typesjekk av pakkens kildekode. Vite må fortsatt bruke kildekoden.
@@ -53,6 +54,15 @@ export default defineConfig(({ command, mode }) => {
         },
         optimizeDeps: {
             exclude: ["@bidrag/common", "@bidrag/api", "@bidrag/utils"],
+            // @bidrag/redigering lastes via React.lazy (for å unngå at SSR evaluerer
+            // pdfjs-dist/web/pdf_viewer, som krasjer uten `window`/`document`). Fordi
+            // react-zoom-pan-pinch kun brukes inne i den lazy-lastede pakken, blir den
+            // ikke oppdaget av Vites innledende avhengighetsskann, som kan gi en
+            // midlertidig duplisert React-instans ("Invalid hook call") ved første
+            // navigering til /rediger. Ved å inkludere den eksplisitt her (og som
+            // devDependency i package.json, slik at Vite kan resolve den) blir den
+            // forhåndsbundlet sammen med resten av appen fra start.
+            include: ["react-zoom-pan-pinch"],
         },
     };
 });

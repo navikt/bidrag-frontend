@@ -298,7 +298,7 @@ function Toolbar({ id, coordinates, scale }: IToolbarProps) {
                 id={`toolbar_${id}`}
                 style={{
                     position: "relative",
-                    top: `calc(${coordinates.y}px - calc(35px/var(--scale-factor))`,
+                    top: `calc(${coordinates.y}px - calc(45px/var(--scale-factor))`,
                     left: `${coordinates.x}px`,
                     transform: "scale(calc(1/var(--scale-factor)))",
                     transformOrigin: "0px 0px",
@@ -309,17 +309,17 @@ function Toolbar({ id, coordinates, scale }: IToolbarProps) {
                         removeItem(id);
                     }}
                     title={"Slett"}
-                    icon={<TrashIcon fontSize="1.5rem" />}
-                    className={"toolbar-item"}
-                    size={"xsmall"}
+                    icon={<TrashIcon fontSize="1.75rem" />}
+                    className={"toolbar-item delete"}
+                    size={"small"}
                     variant={"tertiary-neutral"}
                 />
                 <div className={"separator"} />
                 <Button
                     title={"Kopier"}
-                    icon={<FilesIcon fontSize="1.5rem" />}
+                    icon={<FilesIcon fontSize="1.75rem" />}
                     className={"toolbar-item"}
-                    size={"xsmall"}
+                    size={"small"}
                     variant={"tertiary-neutral"}
                     onClick={(e) => {
                         duplicateItem(id);

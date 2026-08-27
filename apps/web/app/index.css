@@ -9,3 +9,4 @@
 @source "../../../packages/common/src/**/*.{tsx,ts}";
 @source "../../behandling/src/**/*.{tsx,ts,mdx}";
 @source "../../forsendelse/src/**/*.{tsx,ts,mdx}";
+@source "../../redigering/src/**/*.{tsx,ts,mdx}";

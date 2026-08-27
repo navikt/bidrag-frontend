@@ -34,13 +34,13 @@ export default function DokumenterTable() {
     const { dokumenter, toggleDeleteMode, deleteMode } = useDokumenterForm();
     return (
         <div className={"w-max"}>
-            <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw] gap-[20px]"}>
+            <div className={"flex flex-row mt-[10px]  w-full flex-wrap max-w-[95vw] gap-[20px]"}>
                 <LeggTilDokumentButton />
                 <LeggTilFraMalKnapp />
                 <LeggTilVedleggKnapp />
             </div>
 
-            <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw]"}>
+            <div className={"flex flex-row mt-[10px] w-full flex-wrap max-w-[95vw]"}>
                 <div>Antall dokumenter: {dokumenter.length}</div>
                 <div style={{ marginLeft: "auto" }}>
                     <Switch

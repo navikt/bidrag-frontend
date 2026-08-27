@@ -18,13 +18,18 @@
     position: sticky;
     top: 0;
     z-index: 100000;
-    background-color: #4a4a4a;
+    background-color: var(--ax-neutral-900);
+    padding: 8px 0;
+}
+.sidebar_viewer .title,
+.sidebar_viewer .title.navds-detail {
+    color: white;
 }
 
 .sidebar_viewer .pagesection {
     position: sticky;
     z-index: 100000;
-    background-color: #4a4a4a;
+    background-color: var(--ax-neutral-900);
     border-bottom: 2px solid var(--ax-border-neutral-strong);
 }
 
