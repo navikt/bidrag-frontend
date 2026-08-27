@@ -7,9 +7,9 @@ interface Props {
     tilgangResultat: TilgangskontrollResponse;
 }
 
-export function TilgangAlert({tilgangResultat, title}: Props) {
+export function TilgangLocalAlert({tilgangResultat, title}: Props) {
     return (
-        <LocalAlert status={"warning"}>
+        <LocalAlert status={"warning"} size={"small"}>
             <LocalAlert.Header>
                 <LocalAlert.Title>
                     {title}

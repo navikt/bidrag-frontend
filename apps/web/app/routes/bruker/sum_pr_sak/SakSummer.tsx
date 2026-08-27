@@ -1,5 +1,5 @@
 import type { Bidragssak } from "@bidrag/api/BidragReskontroApi";
-import { RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
+import {RolleTag, type RolleTypeAbbreviation, useTilgangssjekkSak} from "@bidrag/common";
 import { Alert, Box, Detail, HStack, Label, Link, VStack } from "@navikt/ds-react";
 import { Link as RouterLink } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
@@ -18,6 +18,7 @@ export function SakSummer({ bidragSak, ident }: SakSummerProps) {
         return <Alert variant={"warning"}>Saksnummer mangler for bidragssak</Alert>;
     }
     const saksnummer = bidragSak.saksnummer;
+    const {harTilgang, TilgangAlert} = useTilgangssjekkSak(saksnummer);
     const { data: sak } = useHentSak(bidragSak.saksnummer);
 
     const rolle = sak?.roller.find((rolle) => rolle.fodselsnummer === ident);
@@ -25,6 +26,9 @@ export function SakSummer({ bidragSak, ident }: SakSummerProps) {
     const rolleType = isRMForSegSelv ? "RM" : rolle?.type;
 
     function renderTabell() {
+        if (!harTilgang && TilgangAlert) {
+            return <TilgangAlert />;
+        }
         switch (rolleType) {
             case "BP":
                 return <SaksumTabellBP ident={ident} saksnummer={saksnummer} bidragSak={bidragSak} sak={sak} />;
