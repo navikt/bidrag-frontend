@@ -13,6 +13,7 @@
         "@bidrag/api": "workspace:*",
         "@bidrag/behandling": "workspace:*",
         "@bidrag/forsendelse": "workspace:*",
+        "@bidrag/redigering": "workspace:*",
         "@bidrag/common": "workspace:*",
         "@bidrag/utils": "workspace:*",
         "@bidrag/admin-app": "workspace:*",

@@ -1,6 +1,7 @@
 import adminroutes from "@bidrag/admin-app/routes";
 import behandlingroutes, { sakRoutes as behandlingSakRoutes } from "@bidrag/behandling/routes";
 import forsendelseroutes, { sakRoutes as forsendelseSakRoutes } from "@bidrag/forsendelse/routes";
+import redigeringroutes from "@bidrag/redigering/routes";
 import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
@@ -25,6 +26,9 @@ export default [
 
     // Forsendelse (migrert fra den frittstående bidrag-forsendelse-ui)
     ...forsendelseroutes,
+
+    // Redigering (migrert fra den frittstående bidrag-redigering-ui)
+    ...redigeringroutes,
 
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),
