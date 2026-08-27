@@ -1419,11 +1419,6 @@ const VirkningstidspunktForm = () => {
         defaultValues: initialValues,
     });
 
-    // useEffect(() => {
-    //     useFormMethods.reset(initialValues);
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [selectedSaksnummer]);
-
     useEffect(() => {
         const hasSignificantErrors = () => {
             const errors = useFormMethods.formState.errors;

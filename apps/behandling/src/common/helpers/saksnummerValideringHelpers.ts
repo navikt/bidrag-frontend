@@ -4,6 +4,7 @@ import type {
     UnderholdskostnadValideringsfeil,
     VirkningstidspunktFeilV2Dto,
 } from "@bidrag/api/BidragBehandlingApiV1";
+import { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
 import { checkIfRolleHasValideringsfeil, getSaksnummerForIdent } from "./inntektFormHelpers";
 
 const harVirkningstidspunktValideringsfeil = (valideringsfeil?: VirkningstidspunktFeilV2Dto | null) =>
@@ -95,4 +96,90 @@ export const getSaksnummerMedValideringsfeil = (behandling: BehandlingDtoV2): Se
     });
 
     return saksnummerMedFeil;
+};
+
+type RolleMedSaksnummer = { ident?: string | null; saksnummer?: string | null; rolletype: Rolletype };
+
+/**
+ * Finner saksnummer(ene) en person er knyttet til via rollene. BP (bidragspliktig) er del av alle
+ * sakene i en forholdsmessig fordeling, men finnes bare én gang i `roller` - opplysninger knyttet
+ * til BP markerer derfor alle sakene.
+ */
+const finnSaksnummerForIdent = (
+    roller: RolleMedSaksnummer[],
+    ident: string | null | undefined,
+    alleSaksnummer: string[],
+    fallbackSaksnummer?: string | null,
+): string[] => {
+    if (!ident) {
+        return [];
+    }
+    const matchendeRoller = roller.filter((rolle) => rolle.ident === ident);
+    if (matchendeRoller.some((rolle) => rolle.rolletype === Rolletype.BP)) {
+        return alleSaksnummer;
+    }
+    return matchendeRoller.map((rolle) => rolle.saksnummer ?? fallbackSaksnummer ?? "");
+};
+
+/**
+ * Samler alle saksnummer som har nye opplysninger (ikke-aktiverte endringer i grunnlagsdata)
+ * på tvers av inntekt, boforhold og underhold. Brukes til å markere saksfaner i `SakHeader`
+ * på samme måte som `BarnebidragSideMenu` markerer stegene med et oppdateringsikon.
+ *
+ * Opplysninger knyttet til en konkret person (inntekt, husstandsmedlem, arbeidsforhold,
+ * stønad til barnetilsyn) knyttes til saken(e) personen tilhører via rollene. Opplysninger som
+ * gjelder bidragsmottaker på tvers av saker (andre voksne i husstanden, sivilstand) markerer alle
+ * sakene i behandlingen.
+ */
+export const getSaksnummerMedNyeOpplysninger = (behandling: BehandlingDtoV2): Set<string> => {
+    const { roller, saksnummer: behandlingSaksnummer, ikkeAktiverteEndringerIGrunnlagsdata: endringer } = behandling;
+    const saksnummerMedOpplysninger = new Set<string>();
+    const alleSaksnummer = Array.from(
+        new Set(roller.map((rolle) => rolle.saksnummer ?? behandlingSaksnummer).filter((s): s is string => !!s)),
+    );
+    const leggTil = (saksnummer?: string | null) => {
+        if (saksnummer) {
+            saksnummerMedOpplysninger.add(saksnummer);
+        }
+    };
+    const leggTilForIdent = (ident?: string | null) => {
+        finnSaksnummerForIdent(roller, ident, alleSaksnummer, behandlingSaksnummer).forEach(leggTil);
+    };
+    const leggTilAlleSaker = () => {
+        alleSaksnummer.forEach(leggTil);
+    };
+
+    if (endringer) {
+        Object.values(endringer.inntekter).forEach((liste) => {
+            liste.forEach((inntekt) => {
+                leggTilForIdent(inntekt.ident);
+            });
+        });
+
+        [
+            endringer.husstandsmedlem,
+            endringer.husstandsmedlemBM,
+            endringer.husstandsmedlemBMV2,
+            endringer.husstandsbarn,
+        ].forEach((liste) => {
+            liste?.forEach((medlem) => {
+                leggTilForIdent(medlem.ident);
+            });
+        });
+
+        endringer.arbeidsforhold?.forEach((arbeidsforhold) => {
+            leggTilForIdent(arbeidsforhold.partPersonId);
+        });
+
+        if (endringer.stønadTilBarnetilsyn) {
+            Object.keys(endringer.stønadTilBarnetilsyn.stønadTilBarnetilsyn ?? {}).forEach(leggTilForIdent);
+            Object.keys(endringer.stønadTilBarnetilsyn.grunnlag ?? {}).forEach(leggTilForIdent);
+        }
+
+        if (endringer.andreVoksneIHusstanden || endringer.sivilstand) {
+            leggTilAlleSaker();
+        }
+    }
+
+    return saksnummerMedOpplysninger;
 };

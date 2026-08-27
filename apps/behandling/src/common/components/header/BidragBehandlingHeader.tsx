@@ -6,7 +6,10 @@ import { memo, useEffect, useMemo } from "react";
 import { updateUrlSearchParam } from "../../../utils/window-utils";
 import text from "../../constants/texts";
 import { toRolleDetaljer, useBehandlingProvider } from "../../context/BehandlingContext";
-import { getSaksnummerMedValideringsfeil } from "../../helpers/saksnummerValideringHelpers";
+import {
+    getSaksnummerMedNyeOpplysninger,
+    getSaksnummerMedValideringsfeil,
+} from "../../helpers/saksnummerValideringHelpers";
 import { useGetBehandlingV2, usePersonsQueries } from "../../hooks/useApiData";
 
 const behandlingTypeTextMapper = {
@@ -41,6 +44,7 @@ export const Header = memo(() => {
     const personsQueries = usePersonsQueries(roller);
 
     const saksnummerMedValideringsfeil = useMemo(() => getSaksnummerMedValideringsfeil(behandling), [behandling]);
+    const saksnummerMedNyeOpplysninger = useMemo(() => getSaksnummerMedNyeOpplysninger(behandling), [behandling]);
 
     const rollerMedPersonNavn: HeaderRolle[] = useMemo(
         () =>
@@ -75,6 +79,7 @@ export const Header = memo(() => {
             setSelectedRoller={(valgteRoller: HeaderRolle[]) => setSelectedRoller(valgteRoller.map(toRolleDetaljer))}
             HeaderTittel={HeaderTittel}
             saksnummerMedValideringsfeil={saksnummerMedValideringsfeil}
+            saksnummerMedNyeOpplysninger={saksnummerMedNyeOpplysninger}
         />
     );
 });

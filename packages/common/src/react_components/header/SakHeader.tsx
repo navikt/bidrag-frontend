@@ -1,6 +1,6 @@
 import type {RolleDto} from "@bidrag/api/BidragBehandlingApiV1";
 import {Rolletype, Stonadstype} from "@bidrag/api/BidragBehandlingApiV1";
-import {ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon} from "@navikt/aksel-icons";
+import {ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon} from "@navikt/aksel-icons";
 import {Box, CopyButton, Skeleton} from "@navikt/ds-react";
 import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useHentFodselsdatoer} from "../../api/useApiData";
@@ -31,6 +31,8 @@ interface ISakHeaderNewProps {
     HeaderTittel: React.ComponentType<{ type: TypeBehandling; style?: React.CSSProperties }>;
     /** Saksnummer som har minst én valideringsfeil - fanen markeres da med et varselikon. */
     saksnummerMedValideringsfeil?: Set<string>;
+    /** Saksnummer som har nye opplysninger (ikke-aktiverte endringer) - fanen markeres da med et oppdateringsikon. */
+    saksnummerMedNyeOpplysninger?: Set<string>;
 }
 
 /** Legacy props for backwards compatibility */
@@ -161,6 +163,7 @@ interface SaksnummerTabProps {
     isExpanded: boolean;
     harFlereSaksnummer: boolean;
     harValideringsfeil: boolean;
+    harNyeOpplysninger: boolean;
     onSelect: (saksnummer: string) => void;
     onToggleExpand: (saksnummer: string) => void;
 }
@@ -171,6 +174,7 @@ const SaksnummerTab = ({
     isExpanded,
     harFlereSaksnummer,
     harValideringsfeil,
+    harNyeOpplysninger,
     onSelect,
     onToggleExpand,
 }: SaksnummerTabProps) => {
@@ -208,6 +212,7 @@ const SaksnummerTab = ({
                         // style={{ color: "var(--ax-text-danger)" }}
                     />
                 )}
+                {harNyeOpplysninger && <ArrowsCirclepathIcon title="Saken har nye opplysninger" />}
                 Saksnr {item.saksnummer}
             </button>
             <CopyButton size="small" copyText={item.saksnummer} title="Kopier saksnummer" style={COPY_BUTTON_STYLE} />
@@ -418,6 +423,7 @@ function HeaderRenderer({
     setSelectedRoller,
     HeaderTittel,
     saksnummerMedValideringsfeil,
+    saksnummerMedNyeOpplysninger,
 }: HeaderRendererProps) {
     // Henter fødselsdatoer for barnerollene fra BIDRAG_PERSON, slik at sorteringen under kan
     // bruke reell alder i stedet for å parse fødselsnummeret. Faller tilbake til ident-parsing
@@ -537,6 +543,7 @@ function HeaderRenderer({
                                     isExpanded={expandedSaksnummer === item.saksnummer}
                                     harFlereSaksnummer={harFlereSaksnummer}
                                     harValideringsfeil={saksnummerMedValideringsfeil?.has(item.saksnummer) ?? false}
+                                    harNyeOpplysninger={saksnummerMedNyeOpplysninger?.has(item.saksnummer) ?? false}
                                     onSelect={onSelectSaksnummer}
                                     onToggleExpand={onToggleExpanded}
                                 />
