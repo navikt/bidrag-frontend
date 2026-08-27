@@ -1,4 +1,5 @@
 import {
+    type PrivatAvtaleValideringsfeilDto,
     Rolletype,
     type SamvaerValideringsfeilDto,
     Vedtakstype,
@@ -138,6 +139,19 @@ const VedtakMenuButton = ({ activeButton, step }: { activeButton: string; step: 
     );
 };
 
+const checkForValidationErrorInPrivatAvtale = (valideringsfeil?: PrivatAvtaleValideringsfeilDto | null) =>
+    !!(
+        valideringsfeil?.manglerBegrunnelse ||
+        valideringsfeil?.manglerAvtaledato ||
+        valideringsfeil?.manglerAvtaletype ||
+        valideringsfeil?.finnesPerioderFør18Årsdag ||
+        valideringsfeil?.finnesPerioderEtter18Årsdag ||
+        valideringsfeil?.måVelgeVedtakHvisAvtaletypeErVedtakFraNav ||
+        valideringsfeil?.ingenLøpendePeriode ||
+        valideringsfeil?.harPeriodiseringsfeil ||
+        (valideringsfeil?.overlappendePerioder?.length ?? 0) > 0
+    );
+
 const PrivatAvtaleMenuButton = ({
     activeButton,
     step,
@@ -147,8 +161,20 @@ const PrivatAvtaleMenuButton = ({
     step: string;
     interactive: boolean;
 }) => {
-    const { onStepChange, isGrunnlagLoading } = useBehandlingProvider();
-    const { vedtakstype } = useGetBehandlingV2();
+    const { onStepChange, lesemodus, isGrunnlagLoading, selectedSaksnummer } = useBehandlingProvider();
+    const { vedtakstype, privatAvtaleV3, roller } = useGetBehandlingV2();
+
+    const privatAvtaleHasValideringsFeil = !!privatAvtaleV3?.søknadsbarn
+        ?.filter((søknadsbarn) =>
+            erDelAvValgtSaksnummer(
+                søknadsbarn.privatAvtale?.valideringsfeil?.gjelderPerson?.saksnummer ??
+                    getSaksnummerForIdent(roller, søknadsbarn.gjelderBarn.ident),
+                selectedSaksnummer,
+                Rolletype.BA,
+            ),
+        )
+        .some((søknadsbarn) => checkForValidationErrorInPrivatAvtale(søknadsbarn.privatAvtale?.valideringsfeil));
+
     return (
         <MenuButton
             step={step}
@@ -157,6 +183,7 @@ const PrivatAvtaleMenuButton = ({
             onStepChange={() => onStepChange(STEPS[BarnebidragStepper.PRIVAT_AVTALE])}
             active={activeButton === BarnebidragStepper.PRIVAT_AVTALE}
             loading={isGrunnlagLoading && shouldShowGrunnlagLoadingProgressbar(BarnebidragStepper.PRIVAT_AVTALE)}
+            valideringsfeil={!lesemodus && privatAvtaleHasValideringsFeil}
         />
     );
 };
@@ -426,7 +453,7 @@ const InntektMenuButton = ({
             interactive={interactive}
             active={activeButton?.includes(BarnebidragStepper.INNTEKT)}
             loading={isGrunnlagLoading && shouldShowGrunnlagLoadingProgressbar(BarnebidragStepper.INNTEKT)}
-            valideringsfeil={!lesemodus && inntektPageHasValideringsFeil(inntekter)}
+            valideringsfeil={!lesemodus && inntektPageHasValideringsFeil(sortedInntekter)}
             unconfirmedUpdates={!lesemodus && inntekterIkkeAktiverteEndringer}
             subMenu={sortedInntekter.map((inntektRolle) => (
                 <Fragment key={inntektRolle.gjelder.id}>
