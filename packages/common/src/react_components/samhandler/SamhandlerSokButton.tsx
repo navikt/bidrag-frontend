@@ -1,91 +1,35 @@
-import { Button, type ButtonProps, Modal } from "@navikt/ds-react";
-import { type ReactNode, useRef } from "react";
+import type { ButtonProps } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 
-import { Broadcast, BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
+import { BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
+import PopupSøkButton from "../PopupSøkButton";
 
 type SamhandlerSokProps = {
     onResult: (data: SamhandlerBroadcastMessage | null) => void;
     onError?: (errorMessage: string) => void;
 };
 
-export default function SamhandlerSokButton({
+export default function SamhandlerSøkButton({
     onResult,
     onError,
     ...buttonProps
-}: SamhandlerSokProps & Exclude<ButtonProps, "children">): ReactNode {
-    const ref = useRef<HTMLDialogElement>(null);
-    const windowId = crypto.randomUUID();
-
-    const closeModal = () => {
-        searchCanceled.current = true;
-        ref.current?.close();
-    };
-    const openModal = () => ref.current?.showModal();
-    const searchCanceled = useRef<boolean>(false);
-
-    function openSamhandlerSearch() {
-        openModal();
-        searchCanceled.current = false;
-
-        const width = Math.min(1500, screen.width);
-        const height = Math.min(1200, screen.height);
-
-        const openedWindow = window.open(
-            `/samhandler/søk/?windowId=${windowId}`,
-            "_blank",
-            `location=yes,height=${height},width=${width},scrollbars=yes,status=yes`,
-        );
-
-        Broadcast.waitForBroadcast<SamhandlerBroadcastMessage>(BroadcastNames.SAMHANDLERSOK_RESULT_EVENT, windowId)
-            .then((res) => {
-                if (searchCanceled.current) {
-                    return;
-                }
-                onResult(res.payload);
-            })
-            .catch((error) => {
-                onError?.(error instanceof Error ? error.message : "Samhandlersøk feilet");
-            })
-            .finally(() => {
-                closeModal();
-                window.focus();
-                openedWindow?.close();
-            });
-    }
-
+}: SamhandlerSokProps & Omit<ButtonProps, "children" | "onError">): ReactNode {
     return (
-        <>
-            <Modal
-                ref={ref}
-                aria-label={"samhandlersok"}
-                onClose={closeModal}
-                onCancel={(e) => {
-                    e.preventDefault();
-                }}
-                closeOnBackdropClick={false}
-                header={{
-                    heading: "Venter på resultat fra samhandlersøk ...",
-                    closeButton: false,
-                }}
-            >
-                <Modal.Footer>
-                    <Button size="medium" type={"button"} title="Avbryt" onClick={closeModal}>
-                        Avbryt
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            <div className={"pdlSearchButton whitespace-nowrap self-center h-full"}>
-                <Button
-                    {...buttonProps}
-                    variant={buttonProps.variant ?? "secondary"}
-                    size={buttonProps.size ?? "small"}
-                    type={"button"}
-                    title="Åpne samhandlersøk"
-                    onClick={openSamhandlerSearch}
-                >
-                    Samhandlersøk
-                </Button>
-            </div>
-        </>
+        <PopupSøkButton<SamhandlerBroadcastMessage>
+            {...buttonProps}
+            channelName={BroadcastNames.SAMHANDLERSOK_RESULT_EVENT}
+            søkPath="/samhandler/søk/"
+            tekst="Samhandlersøk"
+            parseResultat={(data) => {
+                const resultat = data as { id?: string; payload?: SamhandlerBroadcastMessage | null };
+                if (resultat.payload === undefined) {
+                    return null;
+                }
+
+                return resultat.payload;
+            }}
+            onResult={onResult}
+            onError={onError}
+        />
     );
 }

@@ -147,6 +147,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
     return {
         årsinntekter: inntekter.reduce(
             (acc, inntektRolle) => ({
+                // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.årsinntekter.map(transformFn),
             }),
@@ -154,6 +155,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
         ),
         barnetillegg: inntekter.reduce(
             (acc, inntektRolle) => ({
+                // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.barnetillegg.reduce((acc, inntektBarn) => {
                     const barnetillegFraSammeSak =
@@ -161,6 +163,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
 
                     if (barnetillegFraSammeSak) {
                         return {
+                            // biome-ignore lint/performance/noAccumulatingSpread: false positive
                             ...acc,
                             [inntektBarn.gjelderBarn.id]: inntektBarn.inntekter.map(transformFn),
                         };
@@ -172,6 +175,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
         ),
         kontantstøtte: inntekter.reduce(
             (acc, inntektRolle) => ({
+                // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.kontantstøtte.reduce((acc, inntektBarn) => {
                     const kontantstøtteFraSammeSak =
@@ -179,6 +183,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
 
                     if (kontantstøtteFraSammeSak) {
                         return {
+                            // biome-ignore lint/performance/noAccumulatingSpread: false positive
                             ...acc,
                             [inntektBarn.gjelderBarn.id]: inntektBarn.inntekter.map(transformFn),
                         };
@@ -190,6 +195,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
         ),
         småbarnstillegg: inntekter.reduce(
             (acc, inntektRolle) => ({
+                // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.småbarnstillegg.map(transformFn),
             }),
@@ -197,6 +203,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
         ),
         utvidetBarnetrygd: inntekter.reduce(
             (acc, inntektRolle) => ({
+                // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.utvidetBarnetrygd.map(transformFn),
             }),
@@ -204,6 +211,7 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
         ),
         begrunnelser: inntekter.reduce(
             (acc, inntektRolle) => ({
+                // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.begrunnelse?.innhold ?? "",
             }),
@@ -270,6 +278,19 @@ export const getSaksnummerForIdent = (
     roller: { ident?: string; rolletype: Rolletype; saksnummer?: string }[],
     ident: string,
 ) => roller.find((r) => r.ident === ident && r.rolletype === Rolletype.BA)?.saksnummer ?? "";
+
+/**
+ * Brukes til å filtrere bort personer/roller som ikke tilhører aktivt valgt saksnummer i
+ * `BarnebidragSideMenu` (relevant for forholdsmessig fordeling, hvor en behandling kan
+ * dekke flere saksnummer samtidig). Dersom `selectedSaksnummer` ikke er satt ennå
+ * (f.eks. før `SakHeader` har rukket å synkronisere valgt sak), vises alle.
+ * BP (bidragspliktig) er alltid del av alle saker i behandlingen, og filtreres derfor aldri bort.
+ */
+export const erDelAvValgtSaksnummer = (
+    saksnummer: string | undefined | null,
+    selectedSaksnummer?: string,
+    rolletype?: Rolletype,
+) => rolletype === Rolletype.BP || !selectedSaksnummer || saksnummer === selectedSaksnummer;
 
 export const checkIfRolleHasValideringsfeil = (valideringsfeil?: InntektValideringsfeilV2Dto) => {
     return (

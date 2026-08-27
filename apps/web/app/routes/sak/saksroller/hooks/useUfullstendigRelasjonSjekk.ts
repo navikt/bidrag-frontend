@@ -4,9 +4,6 @@ import { SecureLoggerService } from "@bidrag/common";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-/**
- * Sjekker om barn i saken har ufullstendig/manglende relasjon til begge foreldrene.
- */
 export function useUfullstendigRelasjonSjekk() {
     const queryClient = useQueryClient();
 
@@ -24,35 +21,43 @@ export function useUfullstendigRelasjonSjekk() {
         [queryClient],
     );
 
-    const harUfullstendigRelasjon = useCallback(
-        async (barn: string[], bidragsmottaker?: string, bidragspliktig?: string): Promise<boolean> => {
-            if (!bidragsmottaker || !bidragspliktig) {
-                return true;
-            }
-
-            const resultat = await Promise.all(
-                barn.map(async (barnIdent) => {
-                    const relasjon = await hentForelderBarnRelasjon(barnIdent);
-
-                    const foreldreIdent = relasjon.forelderBarnRelasjon
-                        .filter((i) => i.minRolleForPerson === "BARN")
-                        .map((i) => i.relatertPersonsIdent);
-
-                    if (foreldreIdent.length < 2) {
-                        return true;
-                    }
-
-                    const harBidragsmottaker = foreldreIdent.includes(bidragsmottaker);
-                    const harBidragspliktig = foreldreIdent.includes(bidragspliktig);
-
-                    return !harBidragsmottaker || !harBidragspliktig;
-                }),
-            );
-
-            return resultat.some((erUfullstendig) => erUfullstendig);
+    const finnBarnMedUfullstendigRelasjon = useCallback(
+        async (barn: string[], bidragsmottaker?: string, bidragspliktig?: string): Promise<string[]> => {
+            return beregnBarnMedUfullstendigRelasjon(barn, bidragsmottaker, bidragspliktig, hentForelderBarnRelasjon);
         },
         [hentForelderBarnRelasjon],
     );
 
-    return { harUfullstendigRelasjon };
+    return { finnBarnMedUfullstendigRelasjon };
+}
+
+export async function beregnBarnMedUfullstendigRelasjon(
+    barn: string[],
+    bidragsmottaker: string | undefined,
+    bidragspliktig: string | undefined,
+    hentRelasjon: (ident: string) => Promise<ForelderBarnRelasjonDto>,
+): Promise<string[]> {
+    if (!bidragsmottaker || !bidragspliktig) {
+        return barn;
+    }
+
+    const resultat = await Promise.all(
+        barn.map(async (barnIdent) => {
+            const relasjon = await hentRelasjon(barnIdent);
+
+            const foreldreIdent = relasjon.forelderBarnRelasjon
+                .filter((i) => i.minRolleForPerson === "BARN")
+                .map((i) => i.relatertPersonsIdent);
+
+            if (foreldreIdent.length < 2) {
+                return barnIdent;
+            }
+
+            const manglerPart = !foreldreIdent.includes(bidragsmottaker) || !foreldreIdent.includes(bidragspliktig);
+
+            return manglerPart ? barnIdent : null;
+        }),
+    );
+
+    return resultat.filter((ident): ident is string => ident !== null);
 }

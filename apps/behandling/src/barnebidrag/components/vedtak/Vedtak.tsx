@@ -6,7 +6,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, BodyShort, Heading, HStack, Skeleton, Table, VStack } from "@navikt/ds-react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import InnkrevingIkon from "../../../assets/Innkreving";
 import { QueryErrorWrapper } from "../../../common/components/query-error-boundary/QueryErrorWrapper";
@@ -47,18 +47,14 @@ const Vedtak = () => {
     const beregning = useGetBeregningBidrag(false).data;
     const isBeregningError = queryClient.getQueryState(QueryKeys.beregnBarnebidrag(false))?.status === "error";
     const isFetching = useIsFetching({ queryKey: ["beregning_barnebidrag"] }) > 0;
-    const lastetFørstegang = useRef(false);
     const [fatteVedtakRevurderingsbarn, setFatteVedtakRevurderingsbarn] = React.useState<FatteVedtakRevurderingsbarn>();
     const [erRevurderingsbarnOverstyringUgyldig, setErRevurderingsbarnOverstyringUgyldig] = React.useState(false);
 
     const kanViseFatteVedtakKnapp =
         !beregning?.feil && beregning?.resultat && beregning.resultat.kanFatteVedtak && !beregning?.ugyldigBeregning;
     useEffect(() => {
-        if (lastetFørstegang.current) {
-            queryClient.refetchQueries({ queryKey: QueryKeys.behandlingV2(behandlingId) });
-            queryClient.refetchQueries({ queryKey: QueryKeys.beregnBarnebidrag(false) });
-        }
-        lastetFørstegang.current = true;
+        queryClient.refetchQueries({ queryKey: QueryKeys.behandlingV2(behandlingId) });
+        queryClient.refetchQueries({ queryKey: QueryKeys.beregnBarnebidrag(false) });
         if (lesemodusBehandling?.erOrkestrertVedtak || (vedtakstype === Vedtakstype.KLAGE && !lesemodus)) {
             const searchParams = new URLSearchParams(location.search);
 

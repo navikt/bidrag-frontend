@@ -13,6 +13,7 @@ export default [
     route("unleash/proxy/*", "./server/unleash/unleashProxyRoute.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
     route("samhandler/*", "./routes/samhandler/SamhandlerRedirect.ts"),
+    route("personsok", "./routes/personsok/PersonSøkPage.tsx"),
     route("modia/person", "./routes/modia/ModiaRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
@@ -33,6 +34,7 @@ export default [
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
+        route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
     ]),
 
     route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),

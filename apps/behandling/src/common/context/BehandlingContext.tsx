@@ -254,24 +254,36 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     const setActiveStep = useCallback(
         (x: number, query?: Record<string, string>, hash?: string) => {
             const stepKey = Object.keys(steps).find((k) => steps[k] === x);
-            const updatedSearchParams = [
-                [behandlingQueryKeys.steg, stepKey],
-                ...getAllSearchParamsExcludingKeys(behandlingQueryKeys.steg, behandlingQueryKeys.tab).entries(),
-                ...(query ? Object.entries(query) : []),
-            ];
 
-            const updatedSearchParamsString = Object.entries(updatedSearchParams)
-                .map(([, [key, value]]) => `&${key}=${value}`)
-                .join("");
-
-            const url = `?${updatedSearchParamsString}${hash ? `#${hash}` : ""}`;
+            // Bruker `URLSearchParams` sitt `set`/`delete` fremfor manuell streng-bygging - den
+            // gamle løsningen produserte f.eks. den ugyldige verdien "undefined" (som streng) i
+            // URL-en når et query-felt (som `tab`/`saksnummer`) var `undefined`, noe som kunne
+            // hindre sidemenyen/SakHeader fra å synkronisere seg korrekt mot riktig steg/sak.
+            const params = getAllSearchParamsExcludingKeys(
+                behandlingQueryKeys.steg,
+                behandlingQueryKeys.tab,
+                behandlingQueryKeys.saksnummer,
+            );
+            if (stepKey) {
+                params.set(behandlingQueryKeys.steg, stepKey);
+            }
+            if (query) {
+                Object.entries(query).forEach(([key, value]) => {
+                    if (value === undefined || value === null) {
+                        params.delete(key);
+                    } else {
+                        params.set(key, value);
+                    }
+                });
+            }
 
             // Update state immediately for responsive UI
             if (stepKey) {
                 setActiveStepState(stepKey as stepDef);
             }
             trackTabNavigation(query?.tab);
-            navigate(`${location.pathname + url}`);
+            const searchString = params.toString();
+            navigate({ pathname: location.pathname, search: searchString ? `?${searchString}` : "", hash: hash ?? "" });
         },
         [location, steps],
     );
@@ -290,6 +302,11 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
     const queryLesemodus = searchParams.get(behandlingQueryKeys.lesemodus) === "true";
     const [nextStep, setNextStep] = useState<number>(undefined);
+    // Beholder `query`/`hash` fra det opprinnelige `onStepChange`-kallet slik at de ikke går tapt
+    // når selve navigeringen utsettes (f.eks. mens en mutasjon pågår eller brukeren må bekrefte
+    // ulagrede endringer) - uten dette hoppet man til riktig steg, men mistet `tab`/`saksnummer`.
+    const [nextQuery, setNextQuery] = useState<Record<string, string>>(undefined);
+    const [nextHash, setNextHash] = useState<string>(undefined);
     const [nextTab, setNextTab] = useState<string>(undefined);
     const ref = useRef<HTMLDialogElement>(null);
     const erVirkningstidspunktNåværendeMånedEllerFramITid = isAfterEqualsDate(
@@ -299,7 +316,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
     const onConfirm = () => {
         ref.current?.close();
-        setActiveStep(nextStep);
+        setActiveStep(nextStep, nextQuery, nextHash);
         setPageErrorsOrUnsavedState({ ...pageErrorsOrUnsavedState, [activeStep]: { error: false } });
     };
 
@@ -340,13 +357,6 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     }, [behandling.roller]);
 
     useEffect(() => {
-        console.log(
-            "Mutation status changed",
-            mutationStatus,
-            mutationStatusDerived,
-            navigatingToNextPage,
-            navigatingToNextTab,
-        );
         if (mutating) {
             setMutationStatusDerived("pending");
         } else if (mutating === false && mutationStatus === "success") {
@@ -377,7 +387,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
         if (navigatingToNextPage) {
             if (mutationStatusDerived !== "error") {
-                setActiveStep(nextStep);
+                setActiveStep(nextStep, nextQuery, nextHash);
             }
             setNavigatingToNextPage(false);
         }
@@ -395,6 +405,8 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         navigatingToNextPage,
         navigatingToNextTab,
         nextStep,
+        nextQuery,
+        nextHash,
         nextTab,
         setNavigatingToNextTab,
         setNavigatingToNextPage,
@@ -500,10 +512,14 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
                     (currentPageErrors.openFields && Object.values(currentPageErrors.openFields).some((open) => open)))
             ) {
                 setNextStep(x);
+                setNextQuery(query);
+                setNextHash(hash);
                 ref.current?.showModal();
             } else if (mutating || mutationStatusDerived === "pending" || debouncingRef.current) {
                 setNavigatingToNextPage(true);
                 setNextStep(x);
+                setNextQuery(query);
+                setNextHash(hash);
             } else {
                 setActiveStep(x, query, hash);
             }
@@ -518,6 +534,8 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             setPageTabs,
             setActiveStep,
             setNextStep,
+            setNextQuery,
+            setNextHash,
             setNavigatingToNextPage,
             setNextStep,
             activeStep,

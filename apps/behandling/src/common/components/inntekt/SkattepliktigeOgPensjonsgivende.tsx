@@ -1,5 +1,5 @@
 import { Inntektstype, Kilde } from "@bidrag/api/BidragBehandlingApiV1";
-import { ObjectUtils } from "@bidrag/common";
+import { ModiaLink, ObjectUtils } from "@bidrag/common";
 import { HourglassBottomFilledIcon, SackKronerFillIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, Checkbox, Heading, HStack, Table } from "@navikt/ds-react";
 import { type BaseSyntheticEvent, useState } from "react";
@@ -15,7 +15,6 @@ import AinntektLink from "./AinntektLink";
 import { ExpandableContent } from "./ExpandableContent";
 import { EditOrSaveButton, InntektTabel, KildeIcon, Periode, TaMed, Totalt } from "./InntektTable";
 import { useInntektTableProvider } from "./InntektTableContext";
-import ModiaLink from "./ModiaLink";
 import { Opplysninger } from "./Opplysninger";
 
 const Beskrivelse = ({ item, field, alert }: { item: InntektFormPeriode; field: string; alert?: string }) => {

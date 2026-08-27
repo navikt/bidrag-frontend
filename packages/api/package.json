@@ -42,6 +42,7 @@
         "@types/node": "^25"
     },
     "devDependencies": {
+        "typescript": "catalog:",
         "swagger-typescript-api": "13.12.2"
     }
 }

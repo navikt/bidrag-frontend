@@ -1,7 +1,7 @@
-import { BodyLong, Button, Heading } from "@navikt/ds-react";
-import type { ReactNode } from "react";
-
 import type { PersonDto } from "@bidrag/api/PersonApi";
+import { BodyLong, Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react";
+import type { ReactNode } from "react";
+import { useParams } from "react-router";
 import SøkPerson from "./components/SøkPerson.tsx";
 
 interface PersonSøkWrapperProps {
@@ -10,6 +10,7 @@ interface PersonSøkWrapperProps {
     søkeLabel: string;
     onPersonValgt: (person: PersonDto) => void;
     onAvbryt: () => void;
+    ikon?: ReactNode;
     children?: ReactNode;
 }
 
@@ -19,26 +20,40 @@ export default function PersonSøkWrapper({
     søkeLabel,
     onPersonValgt,
     onAvbryt,
+    ikon,
     children,
 }: PersonSøkWrapperProps) {
+    const { saksnummer } = useParams();
+
     return (
-        <div className="mt-3 p-4 bg-ax-accent-100 rounded-lg border border-ax-accent-300">
-            <Heading level="3" size="small" spacing>
-                {tittel}
-            </Heading>
-            <BodyLong size="small" className="text-ax-neutral-800" spacing>
-                {beskrivelse}
-            </BodyLong>
+        <Modal open onClose={onAvbryt} width="medium" aria-label={tittel}>
+            <Modal.Header>
+                <VStack gap="space-2">
+                    {saksnummer && <Detail>Sak {saksnummer}</Detail>}
+                    <HStack gap="space-4" align="center" wrap={false}>
+                        {ikon}
+                        <Heading level="2" size="medium">
+                            {tittel}
+                        </Heading>
+                    </HStack>
+                </VStack>
+            </Modal.Header>
 
-            {children}
+            <Modal.Body>
+                <VStack gap="space-16">
+                    <BodyLong size="medium">{beskrivelse}</BodyLong>
 
-            <SøkPerson label={søkeLabel} personInformasjon={(person) => onPersonValgt(person)} />
+                    {children}
 
-            <div className="mt-3">
-                <Button size="small" type="button" variant="tertiary" onClick={onAvbryt}>
+                    <SøkPerson label={søkeLabel} personInformasjon={(person) => onPersonValgt(person)} compact />
+                </VStack>
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button type="button" variant="secondary" onClick={onAvbryt}>
                     Avbryt
                 </Button>
-            </div>
-        </div>
+            </Modal.Footer>
+        </Modal>
     );
 }

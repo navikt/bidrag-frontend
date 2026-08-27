@@ -21,7 +21,8 @@
         "axios": "^1.18.0",
         "echarts": "^6.1",
         "lodash.debounce": "^4.0.8",
-        "uuid": "^14"
+        "uuid": "^14",
+        "zod": "catalog:"
     },
     "peerDependencies": {
         "@bidrag/api": "workspace:",

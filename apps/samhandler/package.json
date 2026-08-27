@@ -14,10 +14,8 @@
         "@navikt/aksel-icons": "catalog:",
         "@navikt/ds-react": "catalog:",
         "react-hook-form": "^7.85.0",
-        "tailwindcss": "catalog:",
         "axios": "^1.18.0"
     },
-
     "peerDependencies": {
         "@tanstack/react-query": "catalog:",
         "react": "catalog:",
