@@ -1,9 +1,10 @@
-import { useMemo } from "react";
-import { useFormContext } from "react-hook-form";
-import { useSearchParams } from "react-router";
-import behandlingQueryKeys, { toUnderholdskostnadTabQueryParameter } from "../../common/constants/behandlingQueryKeys";
+import {useMemo} from "react";
+import {useFormContext} from "react-hook-form";
+import {useSearchParams} from "react-router";
+import behandlingQueryKeys, {toUnderholdskostnadTabQueryParameter} from "../../common/constants/behandlingQueryKeys";
+import {useBehandlingProvider} from "../../common/context/BehandlingContext";
 
-import type { UnderholdskostnadFormValues } from "../types/underholdskostnadFormValues";
+import type {UnderholdskostnadFormValues} from "../types/underholdskostnadFormValues";
 
 type UnderholdTabCandidate = {
     id: number;
@@ -35,12 +36,9 @@ export const useGetActiveAndDefaultUnderholdskostnadTab = (visibleUnderholdskost
         return toUnderholdskostnadTabQueryParameter(firstTab?.gjelderBarn?.id, firstTab?.id, true);
     }, [selectedTab, visibleTabs]);
 
-    // `selectedTab` (fra URL) kan peke på en fane som ikke lenger er gyldig for den synlige
-    // (evt. saksnummer-filtrerte) listen - f.eks. dersom man navigerer inn fra et annet steg som
-    // satt `tab`-parameteren til en helt annen rolle-id. `defaultTab` har allerede validert dette
-    // og faller tilbake til første synlige barn, så `activeTab` skal alltid bruke den - ikke den
-    // rå (potensielt ugyldige) `selectedTab`-verdien direkte.
+
     const activeTab = defaultTab;
+
 
     return [activeTab, defaultTab];
 };

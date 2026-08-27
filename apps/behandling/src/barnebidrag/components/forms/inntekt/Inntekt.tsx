@@ -228,6 +228,7 @@ const Side = () => {
 
 const InntektForm = () => {
     const { erBisysVedtak, inntekterV2: inntektRoller } = useGetBehandlingV2();
+    const { selectedSaksnummer } = useBehandlingProvider();
     const virkningsdato = useVirkningsdato();
     const initialValues = useMemo(() => {
         return createInitialValues(inntektRoller, virkningsdato);
@@ -235,6 +236,15 @@ const InntektForm = () => {
     const useFormMethods = useForm({
         defaultValues: initialValues,
     });
+
+    // Skjemaet forblir montert når man bytter valgt sak i `SakHeader` (React Router
+    // gjenbruker komponenten), og `useForm`s `defaultValues` brukes kun ved første render. Uten
+    // denne resetten vil derfor begrunnelse (og andre felt) fra forrige sak henge igjen når man
+    // bytter til en annen sak i behandlingen.
+    // useEffect(() => {
+    //     useFormMethods.reset(initialValues);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [selectedSaksnummer]);
 
     return (
         <FormProvider {...useFormMethods}>
