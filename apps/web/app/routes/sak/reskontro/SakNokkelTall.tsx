@@ -1,24 +1,25 @@
-import type { SaksinformasjonBarn } from "@bidrag/api/BidragReskontroApi";
 import { PersonNavnIdent } from "@bidrag/common";
-import { formaterBelop, sumNullable } from "@bidrag/utils/belopUtils";
+import { formaterBelop } from "@bidrag/utils/belopUtils";
 import { Box, HStack, Label, Link, Table, VStack } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { hentInnkrevingForSaksnummer } from "~/api/query/reskontro.query";
 import { useHentSak } from "~/api/useApi.ts";
 import { medReturMål } from "~/common/navigation/returLink.ts";
 import { ObfuscateFnrLink } from "~/common/person/ObfuscateFnrLink.tsx";
+import {
+    beregnBarnGjeld,
+    beregnBarnTilUtbetaling,
+    beregnBmGjeld,
+    beregnTotalGjeld,
+    beregnTotalOffentligGjeld,
+    beregnTotalPrivatGjeld,
+    beregnTotaltTilUtbetaling,
+} from "~/common/reskontro/gjeldsberegninger.ts";
 import { DUMMY_BARN } from "~/common/reskontro/konstanter.ts";
 
 interface SakNokkelTallProps {
     saksnummer: string;
 }
-
-const gjeld = (barn: SaksinformasjonBarn) => {
-    return sumNullable(barn.restGjeldOffentlig, barn.restGjeldPrivat);
-};
-const tilUtbetaling = (barn: SaksinformasjonBarn) => {
-    return sumNullable(barn.sumForskuddUtbetalt, barn.sumIkkeUtbetalt);
-};
 
 export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
     const { data } = useSuspenseQuery(hentInnkrevingForSaksnummer(saksnummer));
@@ -27,11 +28,11 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
     /**ELIN returnerer noen ganger et "ekstra" barn med fødselsnr 444444 44441. */
 
     const barn = data?.barn?.filter((barn) => barn.personident !== DUMMY_BARN) ?? [];
-    const totalGjeld = barn.reduce((acc, barn) => acc + gjeld(barn), 0);
-    const totalPrivatGjeld = barn.reduce((acc, barn) => sumNullable(acc, barn.restGjeldPrivat), 0);
-    const totalOffGjeld = barn.reduce((acc, barn) => sumNullable(acc, barn.restGjeldOffentlig), 0);
-    const totaltTilUtbetaling = barn.reduce((acc, barn) => acc + tilUtbetaling(barn), 0);
-    const bmGjeld = sumNullable(data?.bmGjeldRest, data?.bmGjeldFastsettelsesgebyr);
+    const totalGjeld = beregnTotalGjeld(barn);
+    const totalPrivatGjeld = beregnTotalPrivatGjeld(barn);
+    const totalOffGjeld = beregnTotalOffentligGjeld(barn);
+    const totaltTilUtbetaling = beregnTotaltTilUtbetaling(barn);
+    const bmGjeld = beregnBmGjeld(data?.bmGjeldRest, data?.bmGjeldFastsettelsesgebyr);
 
     const bpFnr = sak?.roller.find((rolle) => rolle.type === "BP")?.fodselsnummer;
     const bmFnr = sak?.roller.find((rolle) => rolle.type === "BM")?.fodselsnummer;
@@ -77,10 +78,12 @@ export function SakNokkelTall({ saksnummer }: SakNokkelTallProps) {
                                 <Table.DataCell>
                                     <PersonNavnIdent ident={b.personident} bareFornavn />
                                 </Table.DataCell>
-                                <Table.DataCell align={"right"}>{formaterBelop(gjeld(b))}</Table.DataCell>
+                                <Table.DataCell align={"right"}>{formaterBelop(beregnBarnGjeld(b))}</Table.DataCell>
                                 <Table.DataCell align={"right"}>{formaterBelop(b.restGjeldPrivat)}</Table.DataCell>
                                 <Table.DataCell align={"right"}>{formaterBelop(b.restGjeldOffentlig)}</Table.DataCell>
-                                <Table.DataCell align={"right"}>{formaterBelop(tilUtbetaling(b))}</Table.DataCell>
+                                <Table.DataCell align={"right"}>
+                                    {formaterBelop(beregnBarnTilUtbetaling(b))}
+                                </Table.DataCell>
                                 <Table.DataCell align={"center"}>{b.erStoppIUtbetaling ? "Ja" : "-"}</Table.DataCell>
                             </Table.Row>
                         ))}

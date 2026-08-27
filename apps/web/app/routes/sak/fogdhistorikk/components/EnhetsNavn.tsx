@@ -2,7 +2,7 @@ import { Skeleton } from "@navikt/ds-react";
 import { useHentEnhetInfomasjon } from "~/api/useApi.ts";
 
 interface EnhetsNavn {
-    enhetsnummer: string;
+    enhetsnummer: string | null;
 }
 
 export function EnhetsNavn({ enhetsnummer }: EnhetsNavn) {

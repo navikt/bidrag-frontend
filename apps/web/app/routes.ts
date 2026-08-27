@@ -26,6 +26,7 @@ export default [
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
+        route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
     ]),
 
     route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),
