@@ -1,5 +1,4 @@
 import type { TilgangskontrollResponse } from "@bidrag/api/TilgangskontrollApi";
-import { Loader } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { type PartialAlertProps, TilgangLocalAlert } from "./TilgangLocalAlert.tsx";
 
