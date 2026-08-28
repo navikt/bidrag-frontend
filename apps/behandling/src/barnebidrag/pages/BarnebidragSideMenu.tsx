@@ -5,7 +5,7 @@ import {
     Vedtakstype,
     type VirkningstidspunktFeilV2Dto,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import { PersonNavnIdent } from "@bidrag/common";
+import { PersonNavnIdent, StringUtils } from "@bidrag/common";
 import { Alert, Heading } from "@navikt/ds-react";
 import type React from "react";
 import { Fragment, useEffect, useMemo, useRef } from "react";
@@ -429,7 +429,13 @@ const InntektMenuButton = ({
 
     const inntekterIkkeAktiverteEndringer =
         !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter &&
-        Object.values(ikkeAktiverteEndringerIGrunnlagsdata.inntekter).some((inntekt) => !!inntekt.length);
+        Object.values(ikkeAktiverteEndringerIGrunnlagsdata.inntekter).some((inntekt) =>
+            inntekt.some((endring) => {
+                const gjelderBarnNotEmpty = StringUtils.isEmpty(inntekt.gjelderBarn) ? null : inntekt.gjelderBarn;
+                const rolle = roller.find((r) => r.ident === (gjelderBarnNotEmpty ?? endring.ident));
+                return erDelAvValgtSaksnummer(rolle?.saksnummer, selectedSaksnummer, rolle?.rolletype);
+            }),
+        );
 
     const sortedInntekter = [...inntekter]
         .filter((inntektRolle) =>
