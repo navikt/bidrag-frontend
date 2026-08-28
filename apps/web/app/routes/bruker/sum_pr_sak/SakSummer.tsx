@@ -50,10 +50,9 @@ export function SakSummer({ bidragSak, ident }: SakSummerProps) {
                 <HStack gap={"space-8"}>
                     {rolleType && <RolleTag rolleType={rolleType as unknown as RolleTypeAbbreviation} />}
                     <Label>
-                        Sak{" "}
                         <Link as={RouterLink} to={`/sak/${bidragSak.saksnummer}/reskontro`}>
                             {bidragSak.saksnummer}
-                        </Link>{" "}
+                        </Link>
                     </Label>
                     <Detail as={"span"}>
                         Enhet: {sak?.eierfogd} <EnhetsNavn enhetsnummer={sak?.eierfogd ?? null} />
