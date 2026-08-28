@@ -154,7 +154,7 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
     }
     if (
         lesemodus ||
-        (inntektType === "årsinntekter" && ident && ikkeAktiverteEndringer[ident].length < 1) ||
+        (inntektType === "årsinntekter" && ident && ikkeAktiverteEndringer[ident]?.length < 1) ||
         Object.values(ikkeAktiverteEndringer).every((ikkeAktiverteEndring) => ikkeAktiverteEndring.length < 1)
     )
         return null;
