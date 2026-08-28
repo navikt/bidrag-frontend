@@ -1,8 +1,9 @@
-import { useTilgangssjekkSak } from "./useTilgangssjekkSak.tsx";
+import type { ReactNode } from "react";
+import { useTilgangssjekkSak } from "./useTilgangssjekkSak";
 
 interface Props {
     saksnummer: string;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 export function TilgangSakSjekker({ saksnummer, children }: Props) {

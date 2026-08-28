@@ -23,7 +23,7 @@ export default function SakBaseLayout({ params }: Route.ComponentProps) {
         setBisysLinkTarget("sak", { saksnr: saksnummer });
     }, [saksnummer]);
 
-    const { data: sak } = useHentSak(saksnummer, harTilgang);
+    const { data: sak } = useHentSak(saksnummer, false, harTilgang);
 
     // Standardtittel hentes fra `handle.sakSideTittel` på den dypeste matchende ruten
     // (f.eks. eksportert fra SakshistorikkPage.tsx). Sider kan overstyre denne dynamisk

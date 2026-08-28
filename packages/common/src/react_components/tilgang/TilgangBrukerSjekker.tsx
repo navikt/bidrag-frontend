@@ -1,8 +1,9 @@
-import { useTilgangssjekkBruker } from "./useTilgangSjekkBruker.tsx";
+import type { ReactNode } from "react";
+import { useTilgangssjekkBruker } from "./useTilgangSjekkBruker";
 
 interface Props {
     personIdent: string;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 export function TilgangBrukerSjekker({ personIdent, children }: Props) {
