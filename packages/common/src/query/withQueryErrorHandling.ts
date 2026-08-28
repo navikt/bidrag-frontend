@@ -1,7 +1,7 @@
 import { type ProblemDetail, TilgangsFeilError } from "@bidrag/api";
 import axios, { type AxiosError } from "axios";
-import {SecureLoggerService} from "../logging";
-import {ApiError} from "../types";
+import { SecureLoggerService } from "../logging";
+import { ApiError } from "../types";
 
 interface WithQueryErrorHandlingOptions<T> {
     context?: Record<string, string | number | undefined>;

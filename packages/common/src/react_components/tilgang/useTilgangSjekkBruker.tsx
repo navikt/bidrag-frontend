@@ -1,7 +1,6 @@
-import {sjekkTilgangPerson} from "../../api";
-import {tilgangssjekkResultat} from "./tilgangsjekkResultat.tsx";
-import {useQuery} from "@tanstack/react-query";
-
+import { useQuery } from "@tanstack/react-query";
+import { sjekkTilgangPerson } from "../../api";
+import { tilgangssjekkResultat } from "./tilgangsjekkResultat.tsx";
 
 export function useTilgangssjekkBruker(personIdent: string) {
     const tilgangsResultat = useQuery(sjekkTilgangPerson(personIdent));
@@ -11,4 +10,3 @@ export function useTilgangssjekkBruker(personIdent: string) {
         `Du har ikke tilgang til person med id ${personIdent}`,
     );
 }
-

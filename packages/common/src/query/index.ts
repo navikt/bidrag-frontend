@@ -1,1 +1,1 @@
-export * from "./withQueryErrorHandling"
+export * from "./withQueryErrorHandling";

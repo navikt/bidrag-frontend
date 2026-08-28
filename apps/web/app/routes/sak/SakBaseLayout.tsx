@@ -1,29 +1,29 @@
 // routes/sak/SakBaseLayout.tsx
-import type {RolleDto} from "@bidrag/api/SakApi";
+import type { RolleDto } from "@bidrag/api/SakApi";
 import {
     type IRolleDetaljer,
     type RolleTypeAbbreviation,
     SakHeader,
     useBisysLink,
-    useTilgangssjekkSak
+    useTilgangssjekkSak,
 } from "@bidrag/common";
-import {Page, VStack} from "@navikt/ds-react";
-import {useEffect, useMemo} from "react";
-import {Outlet, useMatches} from "react-router";
-import {useHentSak} from "~/api/useApi.ts";
-import type {Route} from "./+types/SakBaseLayout.ts"; // Merk navnebyttet!
-import {type SakSideTittelHandle, SakSideTittelProvider} from "./sakSideTittel";
+import { Page, VStack } from "@navikt/ds-react";
+import { useEffect, useMemo } from "react";
+import { Outlet, useMatches } from "react-router";
+import { useHentSak } from "~/api/useApi.ts";
+import type { Route } from "./+types/SakBaseLayout.ts"; // Merk navnebyttet!
+import { type SakSideTittelHandle, SakSideTittelProvider } from "./sakSideTittel";
 
-export default function SakBaseLayout({params}: Route.ComponentProps) {
+export default function SakBaseLayout({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;
-    const {setBisysLinkTarget} = useBisysLink();
-    const {harTilgang, TilgangAlert} = useTilgangssjekkSak(saksnummer);
+    const { setBisysLinkTarget } = useBisysLink();
+    const { harTilgang, TilgangAlert } = useTilgangssjekkSak(saksnummer);
 
     useEffect(() => {
-        setBisysLinkTarget("sak", {saksnr: saksnummer});
+        setBisysLinkTarget("sak", { saksnr: saksnummer });
     }, [saksnummer]);
 
-    const {data: sak} = useHentSak(saksnummer, harTilgang);
+    const { data: sak } = useHentSak(saksnummer, harTilgang);
 
     // Standardtittel hentes fra `handle.sakSideTittel` på den dypeste matchende ruten
     // (f.eks. eksportert fra SakshistorikkPage.tsx). Sider kan overstyre denne dynamisk
@@ -45,14 +45,14 @@ export default function SakBaseLayout({params}: Route.ComponentProps) {
         return (
             <Page.Block gutters>
                 <VStack justify={"center"} margin={"space-64"}>
-                    <TilgangAlert size={"medium"}/>
+                    <TilgangAlert size={"medium"} />
                 </VStack>
             </Page.Block>
-        )
+        );
     }
 
     if (rendersOwnHeader) {
-        return <Outlet/>;
+        return <Outlet />;
     }
 
     const mapToRolleDetalj = (rolle: RolleDto, index: number): IRolleDetaljer => {
@@ -66,8 +66,6 @@ export default function SakBaseLayout({params}: Route.ComponentProps) {
     };
     const roller: Array<IRolleDetaljer> = sak?.roller.map((r, index) => mapToRolleDetalj(r, index)) ?? [];
 
-
-
     return (
         <SakSideTittelProvider>
             {(overstyrtTittel) => {
@@ -77,9 +75,9 @@ export default function SakBaseLayout({params}: Route.ComponentProps) {
                         <SakHeader
                             saksnummer={saksnummer}
                             roller={roller}
-                            skjermbilde={tittel ? {navn: tittel, referanse: saksnummer} : undefined}
+                            skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
                         />
-                        <Outlet/>
+                        <Outlet />
                     </VStack>
                 );
             }}

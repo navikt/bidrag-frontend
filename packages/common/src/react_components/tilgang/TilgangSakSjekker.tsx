@@ -1,17 +1,16 @@
-import {useTilgangssjekkSak} from "./useTilgangssjekkSak.tsx";
+import { useTilgangssjekkSak } from "./useTilgangssjekkSak.tsx";
 
 interface Props {
     saksnummer: string;
     children: React.ReactNode;
 }
 
-export function TilgangSakSjekker({saksnummer, children}: Props) {
-    const {harTilgang, TilgangAlert} = useTilgangssjekkSak(saksnummer)
+export function TilgangSakSjekker({ saksnummer, children }: Props) {
+    const { harTilgang, TilgangAlert } = useTilgangssjekkSak(saksnummer);
 
     if (!harTilgang) {
-        return <TilgangAlert/>
+        return <TilgangAlert />;
     }
 
-    return children
+    return children;
 }
-

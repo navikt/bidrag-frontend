@@ -2,6 +2,6 @@
     "extends": "../../tsconfig.packages.json",
     "include": ["src"],
     "compilerOptions": {
-        "types": ["node", "react", "react-dom"],
+        "types": ["node", "react", "react-dom"]
     }
 }
