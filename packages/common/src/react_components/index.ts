@@ -21,4 +21,5 @@ export {default as SaveStatusIndicator} from "./SaveStatusIndicator";
 export {default as SamhandlerSokButton} from "./samhandler/SamhandlerSokButton";
 export {TilgangSakSjekker} from "./tilgang/TilgangSakSjekker";
 export {TilgangBrukerSjekker} from "./tilgang/TilgangBrukerSjekker";
-export {useTilgangssjekkSak, useTilgangssjekkBruker} from "./tilgang/useTilgangSjekk";
+export {useTilgangssjekkBruker} from "./tilgang/useTilgangSjekkBruker";
+export {useTilgangssjekkSak} from "./tilgang/useTilgangssjekkSak";

@@ -15,8 +15,8 @@ import {
     type JournalpostDto,
     type JournalpostResponse,
 } from "@bidrag/api/BidragDokumentApi";
-import type { EnhetDto, HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
-import type { ForelderBarnRelasjonDto, MotpartBarnRelasjonDto, PersonDto, PersonRequest } from "@bidrag/api/PersonApi";
+import type {EnhetDto, HentEnhetRequest} from "@bidrag/api/OrganisasjonApi";
+import type {ForelderBarnRelasjonDto, MotpartBarnRelasjonDto, PersonDto, PersonRequest} from "@bidrag/api/PersonApi";
 import type {
     BidragssakDto,
     FogdhistorikkDto,
@@ -25,7 +25,7 @@ import type {
     OpprettSakRequest,
     SakshendelseDto,
 } from "@bidrag/api/SakApi";
-import { IdentUtils, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
+import {IdentUtils, ObjectUtils, SecureLoggerService, StringUtils} from "@bidrag/common";
 import {
     useMutation,
     useQueries,
@@ -34,9 +34,9 @@ import {
     useSuspenseQueries,
     useSuspenseQuery,
 } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { hentSamhandlerQuery } from "~/api/query/samhandler.query.ts";
-import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
+import {AxiosError} from "axios";
+import {hentSamhandlerQuery} from "~/api/query/samhandler.query.ts";
+import type {ISamhandlerPersonInfo} from "~/api/types/person.ts";
 
 // ==================== SAK ====================
 
@@ -50,8 +50,8 @@ export const useHentPersonData = (ident?: string) => {
     return useQuery({
         queryKey: QueryKeys.hentPersoninfo(ident ?? ""),
         queryFn: async (): Promise<PersonDto> => {
-            if (!ident || StringUtils.isEmpty(ident)) return { ident: "", visningsnavn: "Ukjent" };
-            const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident: ident });
+            if (!ident || StringUtils.isEmpty(ident)) return {ident: "", visningsnavn: "Ukjent"};
+            const {data} = await BIDRAG_PERSON_API.informasjon.hentPersonPost({ident: ident});
             return data;
         },
         enabled: !!ident && !StringUtils.isEmpty(ident),
@@ -66,21 +66,21 @@ export function useKanOppretteSakUtenBm() {
         queryFn: async () => {
             try {
                 const response = await BIDRAG_TILGANGSKONTROLL_API.v2.sjekkTilgangOpprettSakUtenBm();
-                return { data: response.data.harTilgang };
+                return {data: response.data.harTilgang};
             } catch (e) {
                 SecureLoggerService.error(
                     "Kunne ikke hente informasjon om saksbehandler kan opprette sak uten BM",
                     e instanceof Error ? e : new Error(String(e)),
                 );
-                return { data: false };
+                return {data: false};
             }
         },
         select: (data) => data.data,
         initialData:
             import.meta.env.MODE === "test"
                 ? () => ({
-                      data: false,
-                  })
+                    data: false,
+                })
                 : undefined,
     });
 }
@@ -198,12 +198,12 @@ export function useHentSakForPerson(ident: string, enabled: boolean = true) {
     });
 }
 
-export function useHentSak(saksnummer: string, rollehistorikk: boolean = false, enabled: boolean = true) {
+export function useHentSak(saksnummer: string | undefined, rollehistorikk: boolean = false, enabled: boolean = true) {
     return useQuery<BidragssakDto, AxiosError | TilgangsFeilError>({
         queryKey: ["hent_sak", saksnummer, rollehistorikk],
         queryFn: async () => {
             try {
-                const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer, {
+                const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer ?? "", {
                     "vis-rollehistorikk": rollehistorikk,
                 });
                 await SecureLoggerService.info(`Hentet sak ${saksnummer}`);
@@ -224,7 +224,7 @@ export function useHentSak(saksnummer: string, rollehistorikk: boolean = false, 
                 throw e;
             }
         },
-        enabled: enabled &&!!saksnummer,
+        enabled: enabled && !!saksnummer,
         retry: (failureCount, error) => {
             if (error instanceof TilgangsFeilError) {
                 return false;
@@ -306,8 +306,8 @@ export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = 
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ ident }: { ident: string }): Promise<ISamhandlerPersonInfo> => {
-            if (ObjectUtils.isEmpty(ident)) return { ident, visningsnavn: "", isValid: false };
+        mutationFn: async ({ident}: { ident: string }): Promise<ISamhandlerPersonInfo> => {
+            if (ObjectUtils.isEmpty(ident)) return {ident, visningsnavn: "", isValid: false};
 
             const queryKey = ["hent_samhandler_eller_person", ident];
 
@@ -345,7 +345,7 @@ export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = 
                         isValid: true,
                     };
                 } else {
-                    result = { ident, visningsnavn: "", isValid: false };
+                    result = {ident, visningsnavn: "", isValid: false};
                 }
             } catch (e) {
                 await SecureLoggerService.warn(
@@ -380,7 +380,7 @@ export function useHentPersoninformasjon(request: PersonRequest | null, enabled:
         queryFn: async () => {
             if (!request) throw new Error("Request is required");
             try {
-                const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost(request);
+                const {data} = await BIDRAG_PERSON_API.informasjon.hentPersonPost(request);
                 await SecureLoggerService.info(`Hentet personinformasjon for ident ${request.ident}`);
                 return data;
             } catch (e) {
@@ -411,7 +411,7 @@ export function useHentPersoninformasjonMutation() {
     return useMutation<PersonDto, AxiosError | TilgangsFeilError, PersonRequest>({
         mutationFn: async (request) => {
             try {
-                const { data, status } = await BIDRAG_PERSON_API.informasjon.hentPersonPost(request);
+                const {data, status} = await BIDRAG_PERSON_API.informasjon.hentPersonPost(request);
                 await SecureLoggerService.info(`Hentet personinformasjon for ident ${request.ident}`);
                 if (status !== 200) {
                     throw new Error(`Fant ikke person med ident ${request.ident}`);
@@ -439,7 +439,7 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
             queryKey: ["hent_personinformasjon", ident],
             queryFn: async () => {
                 try {
-                    const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({
+                    const {data} = await BIDRAG_PERSON_API.informasjon.hentPersonPost({
                         ident,
                     });
                     await SecureLoggerService.info(`Hentet personinformasjon for ident ${ident}`);
@@ -474,7 +474,7 @@ export function useHentFlerePersoninformasjon(identer: string[], enabled: boolea
             queryKey: ["hent_personinformasjon", ident],
             queryFn: async () => {
                 try {
-                    const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({
+                    const {data} = await BIDRAG_PERSON_API.informasjon.hentPersonPost({
                         ident,
                     });
                     await SecureLoggerService.info(`Hentet personinformasjon for ident ${ident}`);
@@ -508,7 +508,7 @@ function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
             if (!request || enabled === false) return undefined;
             try {
-                const { data } = await BIDRAG_PERSON_API.motpartbarnrelasjon.getPersonensMotpartBarnRelasjon(request);
+                const {data} = await BIDRAG_PERSON_API.motpartbarnrelasjon.getPersonensMotpartBarnRelasjon(request);
                 await SecureLoggerService.info(`Hentet personen motpart-barn relasjon for ident ${request.ident}`);
                 return data;
             } catch (e) {
@@ -553,7 +553,7 @@ export function useHentForelderBarnRelasjon(request: PersonRequest | null, enabl
         queryFn: async (): Promise<ForelderBarnRelasjonDto | undefined> => {
             if (!request || !enabled) return undefined;
             try {
-                const { data } = await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(request);
+                const {data} = await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(request);
                 await SecureLoggerService.info(`Hentet forelder-barn relasjon for ident ${request.ident}`);
                 return data;
             } catch (e) {
@@ -587,7 +587,7 @@ function hentForeldreinformasjonForBarnQueryOptions(request: PersonRequest | nul
             if (!request?.ident || enabled === false) return [];
 
             try {
-                const { data } = await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(request);
+                const {data} = await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(request);
 
                 const foreldreIdenter = data.forelderBarnRelasjon
                     .filter((relasjon) => relasjon.minRolleForPerson === "BARN")
@@ -603,7 +603,7 @@ function hentForeldreinformasjonForBarnQueryOptions(request: PersonRequest | nul
                 ).catch(console.error);
 
                 const foreldreResponses = await Promise.all(
-                    foreldreIdenter.map((ident) => BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident })),
+                    foreldreIdenter.map((ident) => BIDRAG_PERSON_API.informasjon.hentPersonPost({ident})),
                 );
 
                 return foreldreResponses.map((response) => response.data);
@@ -651,7 +651,7 @@ export function hentPersonGeografiskEnhetQueryOptions(request: HentEnhetRequest 
         queryFn: async () => {
             if (!request) throw new Error("Request is required");
             try {
-                const { data } =
+                const {data} =
                     await BIDRAG_ORGANISASJON_API.arbeidsfordeling.hentArbeidsfordelingGeografiskTilknytningEnhet(
                         request,
                     );
@@ -693,7 +693,7 @@ export function useHentEnhetInfomasjon(enhetnummer: string | null, enabled: bool
         queryFn: async () => {
             if (!enhetnummer) throw new Error("Enhetnummer is required");
             try {
-                const { data } = await BIDRAG_ORGANISASJON_API.enhet.hentEnhetInfo(enhetnummer);
+                const {data} = await BIDRAG_ORGANISASJON_API.enhet.hentEnhetInfo(enhetnummer);
                 await SecureLoggerService.info(`Hentet enhetsinformasjon for enhet ${enhetnummer}`);
                 return data;
             } catch (e) {
@@ -783,12 +783,12 @@ function useHentJournalpostQuery(saksnummer: string, bareFarskapUtelukket: boole
     const beskrivelse = bareFarskapUtelukket ? "farskapsutelukkede journalposter" : "journalposter";
 
     return useQuery<JournalpostDto[], AxiosError | TilgangsFeilError>({
-        queryKey: ["hent_journalposter", saksnummer, { bareFarskapUtelukket }],
+        queryKey: ["hent_journalposter", saksnummer, {bareFarskapUtelukket}],
         queryFn: async () => {
             try {
                 const response = await BIDRAG_DOKUMENT_API.sak.hentJournal(
                     saksnummer,
-                    { fagomrade: ["BID", "FAR"], bareFarskapUtelukket },
+                    {fagomrade: ["BID", "FAR"], bareFarskapUtelukket},
                     {
                         validateStatus: (status) => {
                             return status === 200 || status === 404;
@@ -854,11 +854,11 @@ export function useHentDokumentMetadata(journalpostId: string, dokumentreferanse
             try {
                 const response = dokumentreferanse
                     ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata1(journalpostId, dokumentreferanse, {
-                          validateStatus: (status) => status === 200 || status === 204 || status === 404,
-                      })
+                        validateStatus: (status) => status === 200 || status === 204 || status === 404,
+                    })
                     : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata(journalpostId, {
-                          validateStatus: (status) => status === 200 || status === 204 || status === 404,
-                      });
+                        validateStatus: (status) => status === 200 || status === 204 || status === 404,
+                    });
 
                 if (response.status === 404 || response.status === 204) {
                     await SecureLoggerService.info(
@@ -886,11 +886,11 @@ export function useHentDokumentMetadata(journalpostId: string, dokumentreferanse
 }
 
 export async function hentDokumentApi({
-    journalpostId,
-    dokumentreferanse,
-    resizeToA4,
-    optimizeForPrint,
-}: HentDokumentRequest): Promise<ArrayBuffer> {
+                                          journalpostId,
+                                          dokumentreferanse,
+                                          resizeToA4,
+                                          optimizeForPrint,
+                                      }: HentDokumentRequest): Promise<ArrayBuffer> {
     try {
         const queryParams = new URLSearchParams();
         queryParams.set("resizeToA4", String(Boolean(resizeToA4)));
@@ -915,9 +915,9 @@ export async function hentDokumentApi({
 }
 
 export async function hentDokumentUrlApi({
-    journalpostId,
-    dokumentreferanse,
-}: HentDokumentUrlRequest): Promise<string> {
+                                             journalpostId,
+                                             dokumentreferanse,
+                                         }: HentDokumentUrlRequest): Promise<string> {
     try {
         const response = await BIDRAG_DOKUMENT_API.tilgang.giTilgangTilDokument(journalpostId, dokumentreferanse);
         return response.data.dokumentUrl;
@@ -942,7 +942,7 @@ export function useHentDokument() {
 export function useHentDokumenter() {
     return useMutation<ArrayBuffer, AxiosError | TilgangsFeilError, HentDokumenterRequest>({
         mutationKey: ["hent_dokumenter"],
-        mutationFn: async ({ dokumenter, resizeToA4, optimizeForPrint }) => {
+        mutationFn: async ({dokumenter, resizeToA4, optimizeForPrint}) => {
             try {
                 const queryParams = new URLSearchParams();
                 dokumenter.forEach((dokument) => {
@@ -995,7 +995,7 @@ export function useHentSaksdokumentPdf(journalpostId?: string, dokumentreferanse
                     journalpostId: journalpostId,
                     dokumentreferanse: dokumentreferanse ?? "",
                 });
-                return { type: "URL", payload: url };
+                return {type: "URL", payload: url};
             }
 
             const arrayBuffer = await hentDokumentApi({
@@ -1003,7 +1003,7 @@ export function useHentSaksdokumentPdf(journalpostId?: string, dokumentreferanse
                 dokumentreferanse: dokumentreferanse,
             });
 
-            return { type: "RAW", payload: arrayBuffer };
+            return {type: "RAW", payload: arrayBuffer};
         },
     });
 }
@@ -1058,7 +1058,7 @@ export function useHarSkrivetilgang(saksnummer: string, enhet: string | null) {
         queryKey: ["har_skrivetilgang", saksnummer, enhet],
         queryFn: async () => {
             try {
-                const response = await BIDRAG_SAK_API.sak.harSkrivetilgang(saksnummer, { enhet: enhet ?? "" });
+                const response = await BIDRAG_SAK_API.sak.harSkrivetilgang(saksnummer, {enhet: enhet ?? ""});
                 return response.data;
             } catch (e) {
                 return handleApiError(e, `sjekke skrivetilgang for saksnummer ${saksnummer} og enhet ${enhet}`);

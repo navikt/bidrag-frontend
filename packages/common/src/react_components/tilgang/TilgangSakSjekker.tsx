@@ -1,4 +1,4 @@
-import {useTilgangssjekkSak} from "./useTilgangSjekk.tsx";
+import {useTilgangssjekkSak} from "./useTilgangssjekkSak.tsx";
 
 interface Props {
     saksnummer: string;

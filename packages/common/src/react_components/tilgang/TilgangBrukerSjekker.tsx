@@ -1,4 +1,4 @@
-import {useTilgangssjekkBruker} from "./useTilgangSjekk.tsx";
+import {useTilgangssjekkBruker} from "./useTilgangSjekkBruker.tsx";
 
 interface Props {
     personIdent: string;

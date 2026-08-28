@@ -14,28 +14,31 @@ interface SakSummerProps {
 }
 
 export function SakSummer({ bidragSak, ident }: SakSummerProps) {
-    if (!bidragSak.saksnummer) {
+
+    const saksnummer = bidragSak.saksnummer ?? undefined;
+    const {harTilgang, TilgangAlert} = useTilgangssjekkSak(saksnummer);
+    const { data: sak } = useHentSak(saksnummer, harTilgang);
+
+    if (!saksnummer) {
         return <Alert variant={"warning"}>Saksnummer mangler for bidragssak</Alert>;
     }
-    const saksnummer = bidragSak.saksnummer;
-    const {harTilgang, TilgangAlert} = useTilgangssjekkSak(saksnummer);
-    const { data: sak } = useHentSak(bidragSak.saksnummer);
 
+    const nullsafeSaknummer= saksnummer
     const rolle = sak?.roller.find((rolle) => rolle.fodselsnummer === ident);
     const isRMForSegSelv = ident === rolle?.reellMottaker?.ident;
     const rolleType = isRMForSegSelv ? "RM" : rolle?.type;
 
     function renderTabell() {
         if (!harTilgang && TilgangAlert) {
-            return <TilgangAlert />;
+            return <TilgangAlert/>;
         }
         switch (rolleType) {
             case "BP":
-                return <SaksumTabellBP ident={ident} saksnummer={saksnummer} bidragSak={bidragSak} sak={sak} />;
+                return <SaksumTabellBP ident={ident} saksnummer={nullsafeSaknummer} bidragSak={bidragSak} sak={sak} />;
             case "BM":
-                return <SaksumTabellBM ident={ident} saksnummer={saksnummer} bidragSak={bidragSak} sak={sak} />;
+                return <SaksumTabellBM ident={ident} saksnummer={nullsafeSaknummer} bidragSak={bidragSak} sak={sak} />;
             case "RM":
-                return <SaksumTabellRM ident={ident} saksnummer={saksnummer} bidragSak={bidragSak} sak={sak} />;
+                return <SaksumTabellRM ident={ident} saksnummer={nullsafeSaknummer} bidragSak={bidragSak} sak={sak} />;
             case "BA":
             case "FR":
                 return <Alert variant={"info"}>Visning for rolle {rolleType} er ikke støttet</Alert>;

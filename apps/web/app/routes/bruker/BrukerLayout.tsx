@@ -17,7 +17,7 @@ export default function BrukerLayout({params}: Route.ComponentProps) {
     if (!harTilgang && TilgangAlert) return (
         <Page.Block gutters>
             <VStack justify={"center"} margin={"space-64"}>
-                <TilgangAlert/>
+                <TilgangAlert size={"medium"}/>
             </VStack>
         </Page.Block>
     )
