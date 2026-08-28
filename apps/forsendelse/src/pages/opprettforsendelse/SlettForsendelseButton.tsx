@@ -11,6 +11,7 @@ export default function SlettForsendelseButton() {
     const { forsendelseIdMedPrefix, enhet, saksnummer } = useSession();
     const bidragForsendelseApi = useBidragForsendelseApi();
     const openModal = () => ref.current?.showModal();
+    // biome-ignore lint/suspicious/noExplicitAny: Migrering
     const closeModal = (e: React.MouseEvent<any>) => {
         e.preventDefault();
         ref.current?.close();

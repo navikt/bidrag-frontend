@@ -41,14 +41,14 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
     }
     async function readFileAsText(ev: ChangeEvent<HTMLInputElement>) {
         const files = ev.target.files;
-        if (files.length == 0) return;
+        if (files.length === 0) return;
         const file = ev.target.files[0];
         const fileBuffer = await file.text();
         return fileBuffer;
     }
     async function readFile(ev: ChangeEvent<HTMLInputElement>) {
         const files = ev.target.files;
-        if (files.length == 0) return;
+        if (files.length === 0) return;
         const file = ev.target.files[0];
         const fileBuffer = await file.arrayBuffer();
         return fileBuffer;
@@ -92,7 +92,7 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
 
     async function convertPDF(ev: ChangeEvent<HTMLInputElement>) {
         const fileBuffer = await readFile(ev);
-        const pdfdoc = await PDFDocument.load(fileBuffer);
+        const _pdfdoc = await PDFDocument.load(fileBuffer);
 
         const pdfa = convertTOPDFA(new Uint8Array(fileBuffer));
         console.log(pdfa);
@@ -112,10 +112,10 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
         console.log("PDF has", pdfRecovered.getPageIndices(), "page indices");
         console.log("PDF has", pdfRecovered.getPages(), "pages");
 
-        if (removeImages == "all") {
+        if (removeImages === "all") {
             removeImagesFromPDF(pdfRecovered);
         }
-        if (removeImages == "masked") {
+        if (removeImages === "masked") {
             removeImagesFromPDFV2(pdfRecovered);
         }
         const savedUpdatedPdfUint8Array = await pdfRecovered.save();
@@ -127,18 +127,18 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
     async function recoverPages(pdfdoc: PDFDocument): Promise<PDFDocument> {
         const existingPages = pdfdoc.getPages();
         let pagenumber = existingPages.length;
-        const pageLeafs = pdfdoc.context.enumerateIndirectObjects().filter(([ref, obj]) => obj instanceof PDFPageLeaf);
+        const pageLeafs = pdfdoc.context.enumerateIndirectObjects().filter(([_ref, obj]) => obj instanceof PDFPageLeaf);
         console.log("PDF has", existingPages.length, "pages", pagenumber);
         console.log("PDF has actually", pageLeafs.length, "pages");
-        if (pageLeafs.length != existingPages.length) {
+        if (pageLeafs.length !== existingPages.length) {
             const blankPage = PDFPage.create(pdfdoc);
             pdfdoc.addPage(blankPage);
             blankPage.drawText("Gjenopprettet sider", { size: 30, x: 100, y: 500 });
             pagenumber += 1;
         }
 
-        pageLeafs.forEach(([ref, obj], i) => {
-            if (!existingPages.some((ep) => ep.ref == ref)) {
+        pageLeafs.forEach(([ref, obj], _i) => {
+            if (!existingPages.some((ep) => ep.ref === ref)) {
                 console.log("Recovered page", pagenumber, ref.toString(), obj, obj.toString());
                 pdfdoc.catalog.insertLeafNode(ref, pagenumber);
                 pagenumber += 1;
@@ -155,7 +155,7 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
             // console.log("Element", ref.toString(), obj.toString(), obj);
             if (obj instanceof PDFRawStream) {
                 const subtype = obj.dict.get(PDFName.of("Subtype"));
-                if (subtype?.toString() == "/Image") {
+                if (subtype?.toString() === "/Image") {
                     console.log("Removing image", ref.toString());
                     pdfdoc.context.delete(ref);
                 }

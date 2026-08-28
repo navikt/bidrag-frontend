@@ -13,7 +13,7 @@ import {
     ShrinkIcon,
 } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useMaskingContainer } from "../../../../components/masking/MaskingContainer";
 import { usePdfViewerContext } from "../../../../components/pdfviewer/PdfViewerContext";
@@ -48,7 +48,7 @@ function FloatingToolbarContainer() {
     });
     useDndMonitor({
         onDragEnd(event: DragEndEvent) {
-            if (event.active.id == id) {
+            if (event.active.id === id) {
                 setPosition((preValue) => ({
                     ...preValue,
                     left: preValue.left + event.delta.x,
@@ -85,9 +85,9 @@ function FloatingToolbarContainer() {
         transform: CSS.Translate.toString(transform),
     };
     const currentPageNotIncludingRemoved = currentPage - removedPagesBefore(currentPage).length;
-    const isEditMode = mode == "edit";
+    const isEditMode = mode === "edit";
 
-    const isEditable = dokumentMetadata?.state == "EDITABLE" || mode == "remove_pages_only";
+    const isEditable = dokumentMetadata?.state === "EDITABLE" || mode === "remove_pages_only";
     const editedPagesCount = pagesCount - removedPages.length;
     return (
         <div ref={setNodeRef} className={"floating-toolbar"} style={{ ...style, ...position }}>

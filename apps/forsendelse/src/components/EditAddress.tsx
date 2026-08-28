@@ -280,7 +280,7 @@ function PostnummerInput({ onChange, defaultValue, inputRef, name, error }: Sele
 interface SelectableCountry {
     defaultValue: string;
     onChange: (landkode: string, land: string) => void;
-    inputRef?: (instance: any) => void;
+    inputRef?: (instance: unknown) => void;
     name?: string;
     error?: string;
 }

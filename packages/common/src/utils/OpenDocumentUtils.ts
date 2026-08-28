@@ -16,25 +16,43 @@ export class OpenDocumentUtils {
         );
     }
 
+    /**
+     * Bygger lenke til enkeltdokumentvisningen (`JournalpostPage`/`/dokument/...`) i bidrag-frontend,
+     * i stedet for den gamle `/aapnedokument`-ruten som viderekoblet til bidrag-ui.
+     */
     static getÅpneDokumentLenke(
         journalpostid: string,
         dokumentreferanse?: string,
         optimizeForPrint?: boolean,
         openInNewWindow = false,
     ): string {
-        const opimizeForPrintQuery = optimizeForPrint != null ? `&optimizeForPrint=${optimizeForPrint}` : "";
-        const openInNewWindowQuery = `openInNewWindow=${openInNewWindow ? "true" : "false"}`;
-        const dokumentReferanseParam = dokumentreferanse ? `/${dokumentreferanse}` : "";
-        return `/aapnedokument/${journalpostid}${dokumentReferanseParam}?${openInNewWindowQuery}${opimizeForPrintQuery}`;
+        const params = new URLSearchParams();
+        params.set("openInNewTab", openInNewWindow ? "true" : "false");
+        if (optimizeForPrint != null) {
+            params.set("optimizeForPrint", optimizeForPrint ? "true" : "false");
+        }
+        const dokumentReferansePath = dokumentreferanse ? `/${dokumentreferanse}` : "";
+        return `/dokument/${journalpostid}${dokumentReferansePath}?${params.toString()}`;
     }
 
+    /**
+     * Åpner flere dokumenter i egne faner, ett og ett, via enkeltdokumentvisningen. Erstatter den
+     * gamle `/aapnedokument?dokument=...`-ruten (bidrag-ui) som viste flere dokumenter i én visning.
+     * Hvert element i `dokumenter` kan enten være kun en journalpostid, eller
+     * `journalpostid:dokumentreferanse`.
+     */
     static åpneDokumenter(dokumenter: string[], openInNewWindow = false) {
-        window.open(OpenDocumentUtils.getÅpneDokumenterLenke(dokumenter, openInNewWindow));
+        for (const lenke of OpenDocumentUtils.getÅpneDokumenterLenker(dokumenter, openInNewWindow)) {
+            window.open(lenke);
+        }
     }
 
-    static getÅpneDokumenterLenke(dokumenter: string[], openInNewWindow = false) {
-        const openInNewWindowQuery = `openInNewWindow=${openInNewWindow ? "true" : "false"}`;
-        return `/aapnedokument?${dokumenter.map((d) => `dokument=${d}`).join("&")}&${openInNewWindowQuery}`;
+    static getÅpneDokumenterLenker(dokumenter: string[], openInNewWindow = false): string[] {
+        return dokumenter.map((dokument) => {
+            const [journalpostid, ...rest] = dokument.split(":");
+            const dokumentreferanse = rest.length > 0 ? rest.join(":") : undefined;
+            return OpenDocumentUtils.getÅpneDokumentLenke(journalpostid ?? "", dokumentreferanse, undefined, openInNewWindow);
+        });
     }
 
     static openDocumentEditorWithDocuments(dokumenter: string[], editDocumentConfig?: EditDocumentConfig, id?: string) {

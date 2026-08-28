@@ -1,7 +1,9 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: sidebar container only stops click propagation, no interactive semantics */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: sidebar container only stops click propagation, no interactive semantics */
 import "./Sidebar.css";
 
 import { BodyShort, Checkbox, Detail, Popover } from "@navikt/ds-react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import PdfDocument, { type PdfDocumentRef } from "../../../../components/pdfcore/PdfDocument";
 import { usePdfViewerContext } from "../../../../components/pdfviewer/PdfViewerContext";
@@ -39,7 +41,7 @@ export default function Sidebar({ onDocumentLoaded }: SidebarProps) {
 
     function getPageRanges(): PageRangeDetails[] {
         const totalPages = documentDetails.reduce((prev, current) => prev + current.antallSider, 0);
-        if (documentDetails.length == 0 || totalPages != pages.length) {
+        if (documentDetails.length === 0 || totalPages !== pages.length) {
             return [{ range: [1, pages.length + 1] }];
         }
         const pageRanges: PageRangeDetails[] = [];
@@ -98,7 +100,7 @@ function PageSection({ title, pageRange, index }: IPageSectionProps) {
     const getDeletedPages = () => pagesInSection.filter((pageNumber) => removedPages.includes(pageNumber));
     const getNotDeletedPages = () => pagesInSection.filter((pageNumber) => !removedPages.includes(pageNumber));
 
-    const isAllPagesDeleted = pagesInSection.length == getDeletedPages().length;
+    const isAllPagesDeleted = pagesInSection.length === getDeletedPages().length;
     const isSomePagesDeleted = getDeletedPages().length > 0 && pagesInSection.length > getDeletedPages().length;
     function toggleDeletePages() {
         // if (!isAllowedToDeletePage()) return;
@@ -114,13 +116,11 @@ function PageSection({ title, pageRange, index }: IPageSectionProps) {
                 <div className={"pl-3 pagesection flex flex-row gap-1"} style={{ top: `${30 * index * 0 + 20}px` }}>
                     <Checkbox
                         onClick={toggleDeletePages}
-                        checked={getDeletedPages().length == 0}
+                        checked={getDeletedPages().length === 0}
                         indeterminate={isSomePagesDeleted}
                         size={"small"}
                         className={"checkbox"}
-                    >
-                        <></>
-                    </Checkbox>
+                    ></Checkbox>
                     <BodyShort
                         size="small"
                         as="div"
@@ -133,7 +133,7 @@ function PageSection({ title, pageRange, index }: IPageSectionProps) {
             )}
             <div className={"pt-2"}>
                 {pagesInSection.map((pagenumber) => (
-                    <ThumbnailPageDecorator pageNumber={pagenumber} key={"ThumbnailPageDecorator_" + pagenumber} />
+                    <ThumbnailPageDecorator pageNumber={pagenumber} key={`ThumbnailPageDecorator_${pagenumber}`} />
                 ))}
             </div>
         </>
@@ -150,6 +150,8 @@ function DocumentTitlePopover({ title }: { title: string }) {
                 className="truncate"
                 onMouseOver={() => setOpenState(true)}
                 onMouseLeave={() => setOpenState(false)}
+                onFocus={() => setOpenState(true)}
+                onBlur={() => setOpenState(false)}
             >
                 {title}
             </span>

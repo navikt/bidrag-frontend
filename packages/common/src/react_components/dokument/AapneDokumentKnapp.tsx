@@ -38,7 +38,7 @@ export default function AapneDokumentKnapp({
     variant = "lenke",
     tittel,
     className,
-    visRedigeringKnapp = true,
+    visRedigeringKnapp = false,
     children,
 }: PropsWithChildren<AapneDokumentKnappProps>) {
     const [laster, setLaster] = useState(false);

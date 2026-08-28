@@ -114,7 +114,7 @@ export const RedigeringQueries = {
         return useSuspenseQuery({
             queryKey: DokumentQueryKeys.hentDokumentMetadata(forsendelseId, dokumentId),
             queryFn: () => {
-                if (forsendelseId == undefined && dokumentId == undefined) return { data: null };
+                if (forsendelseId === undefined && dokumentId === undefined) return { data: null };
                 return BIDRAG_FORSENDELSE_API.api.hentDokumentRedigeringMetadata(forsendelseId, dokumentId);
             },
             select: (data): IDocumentMetadata<T> => {
@@ -124,7 +124,7 @@ export const RedigeringQueries = {
                     return {
                         documentDetails: response.dokumenter,
                         title: response.tittel,
-                        forsendelseState: response.forsendelseStatus == "UNDER_PRODUKSJON" ? "EDITABLE" : "LOCKED",
+                        forsendelseState: response.forsendelseStatus === "UNDER_PRODUKSJON" ? "EDITABLE" : "LOCKED",
                         state: "LOCKED",
                     };
                 }
@@ -132,7 +132,7 @@ export const RedigeringQueries = {
                     editorMetadata: response.redigeringMetadata ? (JSON.parse(response.redigeringMetadata) as T) : null,
                     documentDetails: response.dokumenter,
                     title: response.tittel,
-                    forsendelseState: response.forsendelseStatus == "UNDER_PRODUKSJON" ? "EDITABLE" : "LOCKED",
+                    forsendelseState: response.forsendelseStatus === "UNDER_PRODUKSJON" ? "EDITABLE" : "LOCKED",
                     state: "EDITABLE",
                 };
             },

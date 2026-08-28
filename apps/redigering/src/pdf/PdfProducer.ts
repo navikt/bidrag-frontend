@@ -344,7 +344,9 @@ export class PdfProducer {
         const reorderedPdf = await PDFDocument.create();
         try {
             const copiedPages = await this.safeCopyPages(reorderedPdf, this.pdfDocument, orderedIndexes);
-            copiedPages.forEach((page) => reorderedPdf.addPage(page));
+            copiedPages.forEach((page) => {
+                reorderedPdf.addPage(page);
+            });
             this.copyDocumentMetadata(this.pdfDocument, reorderedPdf);
             this.pdfDocument = reorderedPdf;
             this.font = await this.pdfDocument.embedFont(StandardFonts.TimesRoman);
@@ -634,7 +636,7 @@ export class PdfProducer {
         try {
             const form = this.pdfDocument.getForm();
             for (const field of form.getFields()) {
-                if (field.getName() == "nullstill") {
+                if (field.getName() === "nullstill") {
                     try {
                         form.removeField(field);
                     } catch (e) {

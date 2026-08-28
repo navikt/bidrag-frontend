@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 const SkjemaUtfyllingPage = lazy(() => import("../pages/skjemutfylling/SkjemaUtfyllingPage"));
@@ -29,6 +29,7 @@ export default function SkjemaUtfyllingRoute() {
 
     return (
         <Suspense fallback={null}>
+            {/** biome-ignore lint/style/noNonNullAssertion:  Migrering */}
             <SkjemaUtfyllingPage forsendelseId={forsendelseId!} dokumentreferanse={dokumentreferanse!} />
         </Suspense>
     );

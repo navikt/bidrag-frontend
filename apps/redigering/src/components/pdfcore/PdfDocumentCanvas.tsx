@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: canvas pan container is not interactive for keyboard users, only used for mouse-driven panning */
 import type * as React from "react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -48,7 +49,7 @@ export default function PdfDocumentCanvas(props: React.PropsWithChildren<CanvasP
     }, [offset]);
 
     // reset
-    const reset = useCallback(
+    const _reset = useCallback(
         (context: CanvasRenderingContext2D) => {
             if (context && !isResetRef.current) {
                 // adjust for device pixel density

@@ -3,7 +3,6 @@ import { dateToDDMMYYYYString, LoggerService } from "@bidrag/common";
 import { Button, ErrorSummary, Heading, Page, VStack } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import { useEffect } from "react";
 import { type FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useBidragForsendelseApi } from "../../api/api";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
@@ -13,10 +12,10 @@ import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import { useHentRoller } from "../../hooks/useForsendelseApi";
+import { useUpdatePageTitleParam } from "../../hooks/useUpdatePageTitleParam";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { parseErrorMessageFromAxiosError } from "../../utils/ErrorUtils";
-import { updateUrlSearchParam } from "../../utils/window-utils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import AvbrytOpprettForsendelseButton from "../opprettforsendelse/AvbrytOpprettForsendelseButton";
 import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
@@ -92,9 +91,7 @@ export default function OpprettNotatPage() {
         opprettForsendelseFn.mutate(data);
     }
     const isLoading = opprettForsendelseFn.isPending || opprettForsendelseFn.isSuccess;
-    useEffect(() => {
-        updateUrlSearchParam("page", `Opprett notat`);
-    }, []);
+    useUpdatePageTitleParam("Opprett notat");
 
     return (
         <Page className="pt-4">
@@ -142,6 +139,7 @@ function OpprettNotatValidationErrorSummary() {
             const errorsValue = errors[key];
             if (errorsValue && !errorsValue.ref) {
                 const errorMessages = getAllErrors(errorsValue);
+                // biome-ignore lint/suspicious/useIterableCallbackReturn: Migrering
                 errorMessages.forEach((d) => allErrors.push(d));
             } else {
                 const message = errors[key].message;

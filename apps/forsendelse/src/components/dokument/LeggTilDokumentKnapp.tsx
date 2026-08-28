@@ -387,12 +387,14 @@ function JournalpostDokumenterRowMultiDoc({
         if (jpForsendelseRelasjoner.erJournalpostDokumenterLagtTilIForsendelse() || journalpost.erForsendelse) {
             journalpost.dokumenter
                 .filter((d) => !jpForsendelseRelasjoner.erLagtTilIForsendelse(d))
-                .forEach((d) => onDocumentSelected(d));
+                .forEach((d) => {
+                    onDocumentSelected(d);
+                });
             return;
         }
 
         if (jpForsendelseRelasjoner.erAlleDokumenterValgt(false) && !jpForsendelseRelasjoner.isJournalpostSelected()) {
-            journalpost.dokumenter.forEach((dok) =>
+            journalpost.dokumenter.forEach((dok) => {
                 unselectDocument({
                     journalpostId: journalpost.journalpostId,
                     dokumentreferanse: dok.dokumentreferanse,
@@ -400,8 +402,8 @@ function JournalpostDokumenterRowMultiDoc({
                     index: -1,
                     tittel: "",
                     metadata: null,
-                }),
-            );
+                });
+            });
         }
         const leggTilDokument: IDokument = {
             fraSaksnummer: saksnummer,
@@ -428,7 +430,9 @@ function JournalpostDokumenterRowMultiDoc({
                 tittel: "",
                 metadata: null,
             });
-            journalpost.dokumenter.forEach((d) => onDocumentSelected(d, false, true));
+            journalpost.dokumenter.forEach((d) => {
+                onDocumentSelected(d, false, true);
+            });
         }
         const leggTilDokument: IDokument = {
             fraSaksnummer: saksnummer,

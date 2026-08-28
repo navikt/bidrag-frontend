@@ -4,7 +4,7 @@ import { LoggerService } from "@bidrag/common";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import * as pdfjsLib from "pdfjs-dist";
 // import pdfdoc from "pdfjs-dist/build/pdf.worker.js";
-import React, { type MutableRefObject, type PropsWithChildren, useEffect, useRef, useState } from "react";
+import { type MutableRefObject, type PropsWithChildren, useEffect, useRef, useState } from "react";
 import { TransformComponent, useTransformContext, useTransformEffect } from "react-zoom-pan-pinch";
 
 import { createArrayWithLength, removeDuplicates } from "../utils/ObjectUtils";
@@ -86,7 +86,7 @@ export default function PdfDocument({
 
     function resyncVisiblePagesOnMutation(mutationList: MutationRecord[]) {
         for (const mutation of mutationList) {
-            const isPageVisibilityChange = mutation.type === "attributes" && mutation.attributeName == "class";
+            const isPageVisibilityChange = mutation.type === "attributes" && mutation.attributeName === "class";
             if (isPageVisibilityChange) {
                 onScrollHandler();
             }
@@ -94,9 +94,9 @@ export default function PdfDocument({
     }
     function getPageElements() {
         if (!divRef.current || !pdfDocumentRef.current) return [];
-        if (pageElements.current.length != pdfDocumentRef.current.numPages) {
+        if (pageElements.current.length !== pdfDocumentRef.current.numPages) {
             pageElements.current = createArrayWithLength(pdfDocumentRef.current.numPages).map((i) => {
-                return divRef.current!.querySelector(`[data-index="${i}"]`) as HTMLDivElement;
+                return divRef.current?.querySelector(`[data-index="${i}"]`) as HTMLDivElement;
             });
         }
         return pageElements.current;
@@ -183,7 +183,7 @@ export default function PdfDocument({
             sortByVisibility,
             rtl: true,
         });
-        return Array.from(visiblePages.ids).map((id) => parseInt(id as string));
+        return Array.from(visiblePages.ids).map((id) => parseInt(id as string, 10));
     }
 
     function _getVisibleElements() {
@@ -191,7 +191,7 @@ export default function PdfDocument({
             .filter((elem) => elem != null)
             .map((elem) => ({
                 div: elem as HTMLElement,
-                id: parseInt(elem.getAttribute("data-index")),
+                id: parseInt(elem.getAttribute("data-index"), 10),
             }));
         return getVisibleElements({
             scrollEl: getScrollElement() as HTMLElement,
@@ -203,7 +203,7 @@ export default function PdfDocument({
     function updateRenderPages(visiblePages: number[], currentPageIndex: number) {
         const nextPagesByOverscan = removeDuplicates(
             createArrayWithLength(overscanCount).map((index) =>
-                Math.min(currentPageIndex + index, pdfDocumentRef.current!.numPages - 1),
+                Math.min(currentPageIndex + index, pdfDocumentRef.current?.numPages - 1),
             ),
         );
         const prevPagesByOverscan = removeDuplicates(
@@ -216,7 +216,7 @@ export default function PdfDocument({
     }
 
     function updateCurrentPage(currentPageNumber: number) {
-        if (currentPageNumberRef.current != currentPageNumber) {
+        if (currentPageNumberRef.current !== currentPageNumber) {
             onPageChange?.(currentPageNumber, currentPageNumberRef.current);
             currentPageNumberRef.current = currentPageNumber;
         }

@@ -1,7 +1,7 @@
 import { PadlockUnlockedIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { DokumentQueryKeys, RedigeringQueries } from "../../../../api/queries";
 import { usePdfEditorContext } from "../PdfEditorContext";
@@ -29,7 +29,7 @@ export default function UnlockPdfButton() {
     }
     function renderModal() {
         if (!modalOpen) return null;
-        if (dokumentMetadata.forsendelseState == "EDITABLE") {
+        if (dokumentMetadata.forsendelseState === "EDITABLE") {
             return (
                 <Modal
                     open

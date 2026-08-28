@@ -96,7 +96,7 @@ interface DocumentViewProps extends PropsWithChildren<unknown> {
 function DocumentView({ file, dokumentreferanse, forsendelseId, dokumentMetadata }: DocumentViewProps) {
     const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy>();
     const [pagesLoaded, setPagesLoaded] = useState([]);
-    const [scale, setScale] = useState(1.3);
+    const [scale, _setScale] = useState(1.3);
     const pdfDocumentRef = useRef<PDFDocumentProxy>(null);
     const pdfViewerDivRef = useRef<HTMLDivElement>(null);
     const isRendering = useRef<boolean>(false);
@@ -110,7 +110,7 @@ function DocumentView({ file, dokumentreferanse, forsendelseId, dokumentMetadata
         Broadcast.sendBroadcast(BroadcastNames.EDIT_DOCUMENT_RESULT, message);
     }
 
-    function onWindowClose(e) {
+    function onWindowClose(_e) {
         return broadcast();
     }
 
@@ -224,7 +224,7 @@ function EditorToolbar() {
     });
 
     function renderToolbarButtons() {
-        if (dokumentMetadata.state == "LOCKED") {
+        if (dokumentMetadata.state === "LOCKED") {
             return <UnlockSkjemaButton />;
         }
         return (

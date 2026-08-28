@@ -24,7 +24,7 @@ export default function InfoKnapp({
         setModalOpen(false);
     };
     const openModal = () => setModalOpen(true);
-    const onlyIcon = buttonText == undefined;
+    const onlyIcon = buttonText === undefined;
     return (
         <>
             <Button

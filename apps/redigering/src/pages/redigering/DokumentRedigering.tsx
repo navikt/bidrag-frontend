@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: page/editor containers only handle mouse-driven masking and sidebar interactions */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: page/editor containers only handle mouse-driven masking and sidebar interactions */
 import "./DokumentRedigering.css";
 
 import { useDroppable } from "@dnd-kit/core";
@@ -119,7 +121,7 @@ export default function DokumentRedigering({ documentFile }: DokumentRedigeringC
                         <Sidebar />
                         <PdfViewer>
                             {pages.map((pageNumber) => (
-                                <PageDecorator pageNumber={pageNumber} key={"page_decorator_" + pageNumber} />
+                                <PageDecorator pageNumber={pageNumber} key={`page_decorator_${pageNumber}`} />
                             ))}
                         </PdfViewer>
                     </div>
@@ -176,7 +178,7 @@ function PageDecorator({ pageNumber }: IPageDecoratorProps) {
                 pageNumber={pageNumber}
                 index={index}
                 rotation={pageRotation}
-                key={"doc_page_index_" + index}
+                key={`doc_page_index_${index}`}
             >
                 <MaskinItemPortal scale={scale} id={id} />
             </PdfPage>
@@ -194,9 +196,9 @@ const MaskinItemPortal = React.memo(({ scale, id }: IMaskinItemPortalProps) => {
     return (
         <>
             {items
-                .filter((item) => item.parentId == id)
+                .filter((item) => item.parentId === id)
                 .map((item, index) => (
-                    <MaskingItem {...item} scale={scale} key={"page_" + id + "_index" + index} />
+                    <MaskingItem {...item} scale={scale} key={`page_${id}_index${index}`} />
                 ))}
         </>
     );

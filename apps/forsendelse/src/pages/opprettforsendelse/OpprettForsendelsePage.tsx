@@ -10,12 +10,12 @@ import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import { UseForsendelseApiKeys, useHentForsendelseQuery, useHentRoller } from "../../hooks/useForsendelseApi";
+import { useUpdatePageTitleParam } from "../../hooks/useUpdatePageTitleParam";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { countryCodeIso2ToIso3 } from "../../utils/AdresseUtils";
 import { parseErrorMessageFromAxiosError } from "../../utils/ErrorUtils";
 import { hasOnlyNullValues } from "../../utils/ObjectUtils";
-import { updateUrlSearchParam } from "../../utils/window-utils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import AvbrytOpprettForsendelseButton from "./AvbrytOpprettForsendelseButton";
 import DokumentValgOpprett from "./DokumentValgOpprett";
@@ -239,8 +239,8 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
     const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
     useEffect(() => {
         SecureLoggerService.info("Dette er test av sikkerlogg");
-        updateUrlSearchParam("page", `Opprett forsendelse`);
     }, []);
+    useUpdatePageTitleParam("Opprett forsendelse");
     return (
         <Page className="pt-4">
             <Page.Block width="xl" gutters>
@@ -290,6 +290,7 @@ function OpprettForsendelsValidationErrorSummary() {
             const errorsValue = errors[key];
             if (errorsValue && !errorsValue.ref) {
                 const errorMessages = getAllErrors(errorsValue);
+                // biome-ignore lint/suspicious/useIterableCallbackReturn: Migrering
                 errorMessages.forEach((d) => allErrors.push(d));
             } else {
                 const message = errors[key].message;

@@ -14,7 +14,7 @@ import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentTableInfo from "../../docs/DokumentTable.mdx";
 import useIsDebugMode from "../../hooks/useDebugMode";
 import { useHentForsendelseQuery } from "../../hooks/useForsendelseApi";
-import { updateUrlSearchParam } from "../../utils/window-utils";
+import { useUpdatePageTitleParam } from "../../hooks/useUpdatePageTitleParam";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
 import AvvikshandteringButton from "./avvik/AvvikshandteringButton";
@@ -146,9 +146,7 @@ export default function ForsendelsePage({
     enhet,
     saksnummer,
 }: PropsWithChildren<ForsendelsePageProps>) {
-    useEffect(() => {
-        updateUrlSearchParam("page", `Forsendelse ${forsendelseId}`);
-    }, []);
+    useUpdatePageTitleParam(`Forsendelse ${forsendelseId}`);
     return (
         <PageWrapper name={"forsendelse-page"}>
             <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>

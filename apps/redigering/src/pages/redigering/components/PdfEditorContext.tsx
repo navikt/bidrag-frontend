@@ -63,7 +63,7 @@ interface IPdfEditorContextProviderProps {
 
 export default function PdfEditorContextProvider(props: PropsWithChildren<IPdfEditorContextProviderProps>) {
     const items = props.dokumentMetadata?.editorMetadata?.items ?? [];
-    const isEditMode = props.mode == "edit";
+    const isEditMode = props.mode === "edit";
     return (
         <MaskingContainer items={isEditMode ? items : []} enabled={isEditMode}>
             <PdfEditorContextProviderWithMasking {...props} />
@@ -124,7 +124,7 @@ function PdfEditorContextProviderWithMasking({
     }, [items, removedPages, pageRotations]);
 
     const hasUnsavedChanges = !objectsDeepEqual(lastSavedData, getEditDocumentMetadata());
-    const persistedMaskItems = items.filter((item) => item.state == "ITEM" || item.state == undefined);
+    const persistedMaskItems = items.filter((item) => item.state === "ITEM" || item.state === undefined);
     const maskItemsByPage = persistedMaskItems.reduce(
         (acc, item) => {
             acc[item.pageNumber] = (acc[item.pageNumber] ?? 0) + 1;
@@ -208,7 +208,7 @@ function PdfEditorContextProviderWithMasking({
     function getEditDocumentMetadata(): EditDocumentMetadata {
         return {
             removedPages: removedPages,
-            items: items.filter((item) => item.state == "ITEM" || item.state == undefined),
+            items: items.filter((item) => item.state === "ITEM" || item.state === undefined),
             pageRotations,
         };
     }
@@ -258,7 +258,7 @@ function PdfEditorContextProviderWithMasking({
         updateSaveState("PRODUCING", process.progress);
     }
     async function resolveDocumentBytes(): Promise<ArrayBuffer | Uint8Array> {
-        if (typeof documentFile == "string") {
+        if (typeof documentFile === "string") {
             return await fetch(documentFile).then((res) => res.arrayBuffer());
         }
 

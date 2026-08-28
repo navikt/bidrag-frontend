@@ -54,7 +54,9 @@ export function restoreEditorVisiblePageOrder(pdfDocument: PDFDocument, editorVi
     for (let index = 0; index < currentPages.length; index++) {
         pdfDocument.catalog.removeLeafNode(0);
     }
-    orderedPages.forEach((page, index) => pdfDocument.catalog.insertLeafNode(page.ref, index));
+    orderedPages.forEach((page, index) => {
+        pdfDocument.catalog.insertLeafNode(page.ref, index);
+    });
 
     LoggerService.info(`restoreEditorVisiblePageOrder: Reordered ${orderedPages.length} page(s) to editor order`);
     return true;

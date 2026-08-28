@@ -23,6 +23,7 @@ export default class StateHistory<T> extends Record(DEFAULTS<T>()) {
     constructor(currentValue: T) {
         super();
         this.currentValue = currentValue;
+        // biome-ignore lint/correctness/noConstructorReturn: Migrering
         return this.push(currentValue);
     }
     get current(): T {
@@ -119,6 +120,6 @@ export default class StateHistory<T> extends Record(DEFAULTS<T>()) {
     }
 }
 
-function snapshot(value, merged = 1) {
+function _snapshot(value, merged = 1) {
     return { value, merged };
 }

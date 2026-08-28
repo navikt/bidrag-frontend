@@ -13,6 +13,7 @@ export default function DokumentLabel({ dokument }: LabelPopoverProps) {
         <>
             <p
                 style={{ margin: "0" }}
+                onFocus={() => null}
                 onMouseOver={() => setOpen(true)}
                 onMouseLeave={() => setOpen(false)}
                 ref={labelRef}

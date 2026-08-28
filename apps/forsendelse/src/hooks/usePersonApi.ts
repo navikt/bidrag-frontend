@@ -14,7 +14,7 @@ const PersonApiQueryKeys = {
     hentAktorForIdent: (ident: string) => [PersonApiQueryKeys.person, "aktor", ident],
 };
 
-function getPersonAdresse(postAdresseResult: AxiosResponse<PersonAdresseDto, any>) {
+function getPersonAdresse(postAdresseResult: AxiosResponse<PersonAdresseDto>) {
     if (postAdresseResult.status === 201) return null;
     return postAdresseResult.data;
 }

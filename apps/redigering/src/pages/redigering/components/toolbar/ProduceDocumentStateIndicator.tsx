@@ -1,20 +1,19 @@
 import { BodyLong, BodyShort } from "@navikt/ds-react";
-import React from "react";
 
 import { usePdfEditorContext } from "../PdfEditorContext";
 
 export default function ProduceDocumentStateIndicator() {
     const { produceAndSaveProgress } = usePdfEditorContext();
 
-    if (produceAndSaveProgress.state == "IDLE" || produceAndSaveProgress.state == "ERROR") {
+    if (produceAndSaveProgress.state === "IDLE" || produceAndSaveProgress.state === "ERROR") {
         return null;
     }
     function renderText() {
-        if (produceAndSaveProgress.state == "PRODUCING") {
+        if (produceAndSaveProgress.state === "PRODUCING") {
             return "Klargjør dokumentet. Vennligst vent (ikke lukk vinduet/fanen).";
-        } else if (produceAndSaveProgress.state == "SAVING_DOCUMENT") {
+        } else if (produceAndSaveProgress.state === "SAVING_DOCUMENT") {
             return "Lagrer dokumentet. Vennligst vent (ikke lukk vinduet/fanen).";
-        } else if (produceAndSaveProgress.state == "CLOSING_WINDOW") {
+        } else if (produceAndSaveProgress.state === "CLOSING_WINDOW") {
             return "Lukker vinduet/fanen...";
         }
     }

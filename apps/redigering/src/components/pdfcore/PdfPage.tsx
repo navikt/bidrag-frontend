@@ -61,7 +61,7 @@ const PdfPageMemo = React.memo(
         }, [pdfDocument, pageNumber]);
 
         function hasPageNumberChanged() {
-            return renderedPageNumber != pageNumber && isDrawed.current;
+            return renderedPageNumber !== pageNumber && isDrawed.current;
         }
 
         function shouldRenderPage(renderPageIndexes: number[]) {
@@ -108,10 +108,10 @@ const PdfPageMemo = React.memo(
     },
     (prevProps, nextProps) =>
         !shouldRerenderPage(prevProps.renderPageIndexes, nextProps.renderPageIndexes, nextProps.index) &&
-        prevProps.pdfDocument == nextProps.pdfDocument &&
-        prevProps.scale == nextProps.scale &&
-        prevProps.rotation == nextProps.rotation &&
-        prevProps.children == nextProps.children &&
+        prevProps.pdfDocument === nextProps.pdfDocument &&
+        prevProps.scale === nextProps.scale &&
+        prevProps.rotation === nextProps.rotation &&
+        prevProps.children === nextProps.children &&
         nextProps.renderPageIndexes.includes(nextProps.index),
 );
 
@@ -178,7 +178,7 @@ function PDFCanvas({ pdfPage, scale, pageNumber, rotation, children }: PropsWith
             })
             .finally(() => {
                 pageRenderTask.current = null;
-                if (pageRenderNextScale.current !== null && pageRenderNextScale.current != scale) {
+                if (pageRenderNextScale.current !== null && pageRenderNextScale.current !== scale) {
                     drawPage(pageRenderNextScale.current);
                     pageRenderNextScale.current = null;
                 }

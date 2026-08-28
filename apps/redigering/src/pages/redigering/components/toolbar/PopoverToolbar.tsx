@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: wrapper only stops event propagation to keep the popover open, no interactive semantics */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: wrapper only stops event propagation to keep the popover open, no interactive semantics */
 import "./PopoverToolbar.css";
 
 import {

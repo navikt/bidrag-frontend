@@ -1,7 +1,8 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: hover wrapper only toggles toolbar visibility, not a keyboard-operable control */
 import "./ThumbnailPageDecorator.css";
 
 import { PlusCircleFillIcon, TrashFillIcon } from "@navikt/aksel-icons";
-import React, { type CSSProperties, type PropsWithChildren, useRef, useState } from "react";
+import { type CSSProperties, type PropsWithChildren, useRef, useState } from "react";
 
 import { useMaskingContainer } from "../../../../components/masking/MaskingContainer";
 import MaskingItem from "../../../../components/masking/MaskingItem";
@@ -19,11 +20,13 @@ export default function ThumbnailPageDecorator({ pageNumber }: ThumbnailPageDeco
     const { currentPage, goToPage } = usePdfViewerContext();
     const isDeleted = removedPages.includes(pageNumber);
     const [mouseOver, setMouseOver] = useState(false);
-    const isEnabled = mode == "remove_pages_only" || mode == "edit";
+    const isEnabled = mode === "remove_pages_only" || mode === "edit";
     return (
         <div
             onMouseOver={() => setMouseOver(true)}
             onMouseLeave={() => setMouseOver(false)}
+            onFocus={() => setMouseOver(true)}
+            onBlur={() => setMouseOver(false)}
             ref={decoratorRef}
             className={`thumbnail_decorator ${isDeleted ? "deleted" : ""}`}
         >
@@ -31,7 +34,7 @@ export default function ThumbnailPageDecorator({ pageNumber }: ThumbnailPageDeco
                 pageNumber={pageNumber}
                 currentPage={currentPage}
                 index={pageNumber - 1}
-                key={"pagesection_" + (pageNumber - 1)}
+                key={`pagesection_${pageNumber - 1}`}
                 onPageClick={goToPage}
             />
 
@@ -58,25 +61,27 @@ const PageContainer = ({ pageNumber, onPageClick, index, currentPage }: PdfPageC
     const id = `thumbnail_page_${pageNumber}`;
     const pageRotation = pageRotations[pageNumber] ?? 0;
     return (
-        <div
+        <button
+            type="button"
             onClick={() => onPageClick(pageNumber)}
-            className={`thumbnail_page_container ${currentPage == pageNumber ? "infocus" : ""}`}
+            aria-label={`Gå til side ${pageNumber}`}
+            className={`thumbnail_page_container ${currentPage === pageNumber ? "infocus" : ""}`}
         >
-            <PdfPage pageNumber={pageNumber} index={index} rotation={pageRotation} key={"tpage_index_" + index}>
+            <PdfPage pageNumber={pageNumber} index={index} rotation={pageRotation} key={`tpage_index_${index}`}>
                 {items
-                    .filter((item) => item.pageNumber == pageNumber)
+                    .filter((item) => item.pageNumber === pageNumber)
                     .map((item, index) => (
                         <MaskingItem
                             disabled
                             {...item}
-                            id={id + "_" + item.id}
+                            id={`${id}_${item.id}`}
                             scale={0.3}
-                            key={id + "_" + item.id + index}
+                            key={`${id}_${item.id}${index}`}
                         />
                     ))}
             </PdfPage>
             <div className={"pagenumber"}>{pageNumber}</div>
-        </div>
+        </button>
     );
 };
 
@@ -93,18 +98,15 @@ function ThumbnailPageToolbar({ hidden, isDeleted, onToggleDelete }: ThumbnailPa
                 className={
                     "bg-[white] border-solid border border-ax-border-neutral inline-flex rounded-md shadow-sm hover:border-ax-border-neutral-strong"
                 }
-                role={"group"}
             >
                 {!isDeleted && isAllowedToDeletePage() && (
-                    <>
-                        <ToolbarButton
-                            onClick={onToggleDelete}
-                            className={"rounded-md text-ax-bg-danger-strong hover:text-ax-bg-danger-strong-hover"}
-                            position={"center"}
-                        >
-                            <TrashFillIcon />
-                        </ToolbarButton>
-                    </>
+                    <ToolbarButton
+                        onClick={onToggleDelete}
+                        className={"rounded-md text-ax-bg-danger-strong hover:text-ax-bg-danger-strong-hover"}
+                        position={"center"}
+                    >
+                        <TrashFillIcon />
+                    </ToolbarButton>
                 )}
                 {isDeleted && (
                     <ToolbarButton

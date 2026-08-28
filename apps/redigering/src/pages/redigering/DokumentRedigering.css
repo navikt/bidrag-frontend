@@ -4,8 +4,8 @@
 }
 
 .page_decorator.deleted .page {
-    height: 0 !important;
-    margin-bottom: 0 !important;
+    height: 0;
+    margin-bottom: 0;
 }
 
 .page_decorator .deleted .maskingitem {
@@ -18,7 +18,7 @@
 
 body {
     overflow-x: hidden;
-    overflow: hidden;
+    overflow-y: hidden;
 }
 
 .dokumentredigering .editor .pdfviewer_container .pdfrenderer_container {

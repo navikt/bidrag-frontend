@@ -44,7 +44,7 @@ function AvvikshandteringButton() {
                 Avvikshåndtering
             </Button>
             {isModalOpen && (
-                <React.Suspense fallback={<></>}>
+                <React.Suspense fallback={<div></div>}>
                     <AvvikModalContext.Provider
                         value={{
                             onCancel: closeModal,

@@ -1,6 +1,5 @@
 import { MenuHamburgerIcon } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
-import React from "react";
 
 import Toolbar from "../../../../components/toolbar/Toolbar";
 import { usePdfEditorContext } from "../PdfEditorContext";
@@ -13,8 +12,8 @@ import UnlockPdfButton from "./UnlockPdfButton";
 export default function EditorToolbar() {
     const { onToggleSidebar, mode, dokumentMetadata } = usePdfEditorContext();
 
-    const isEditable = dokumentMetadata?.state == "EDITABLE" || mode == "remove_pages_only";
-    const isEditMode = mode == "edit";
+    const isEditable = dokumentMetadata?.state === "EDITABLE" || mode === "remove_pages_only";
+    const isEditMode = mode === "edit";
 
     return (
         <Toolbar>

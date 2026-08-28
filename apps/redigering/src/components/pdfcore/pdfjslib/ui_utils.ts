@@ -159,7 +159,7 @@ function binarySearchFirstItem(items: any[], condition: (item: any) => boolean, 
  *  @returns {Array} Estimated fraction: the first array item is a numerator,
  *                   the second one is a denominator.
  */
-function approximateFraction(x: number) {
+function _approximateFraction(x: number) {
     // Fast paths for int numbers or their inversions.
     if (Math.floor(x) === x) {
         return [x, 1];
@@ -574,7 +574,7 @@ class ProgressBar {
     set percent(val) {
         this.#percent = clamp(val, 0, 100);
 
-        if (isNaN(val)) {
+        if (Number.isNaN(val)) {
             this.#classList?.add("indeterminate");
             return;
         }
@@ -595,7 +595,7 @@ class ProgressBar {
     }
 
     setDisableAutoFetch(delay = /* ms = */ 5000) {
-        if (isNaN(this.#percent)) {
+        if (Number.isNaN(this.#percent)) {
             return;
         }
         if (this.#disableAutoFetchTimeout) {

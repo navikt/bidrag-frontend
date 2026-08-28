@@ -257,7 +257,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const hasChanged =
         isDirty &&
         dirtyFields.dokumenter?.filter((dok) => {
-            return !(dok.tittel && Object.keys(dok).length === 1);
+            return !(dok?.tittel && Object.keys(dok).length === 1);
         }).length > 0;
     return (
         <DokumenterFormContext.Provider

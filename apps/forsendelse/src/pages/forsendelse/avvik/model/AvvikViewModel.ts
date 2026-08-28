@@ -3,12 +3,12 @@ import type { ForwardRefExoticComponent } from "react";
 
 import { AvvikType } from "../../../../types/AvvikTypes";
 
-type TitleSelectorFn = (metadata?: any) => string;
+type TitleSelectorFn = (metadata?: { tema: string }) => string;
 export interface AvvikViewModel {
     IconComponent: ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
     title: string | TitleSelectorFn;
     description?: string;
-    metadata?: any;
+    metadata?: { tema: string };
     type: AvvikType;
     stepIndicators: string[] | TitleSelectorFn[];
 }
@@ -21,14 +21,14 @@ export const avvikViewModels: AvvikViewModel[] = [
         stepIndicators: ["Overfør enhet"],
     },
     {
-        title: (metadata: any) => {
+        title: (metadata: { tema: string }) => {
             if (!metadata) return "Endre fagområde";
             return metadata?.tema === "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
         },
         IconComponent: ArrowRightLeftIcon,
         type: AvvikType.ENDRE_FAGOMRADE,
         stepIndicators: [
-            (metadata: any) => {
+            (metadata: { tema: string }) => {
                 if (!metadata) return "Endre fagområde";
                 return metadata?.tema === "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
             },

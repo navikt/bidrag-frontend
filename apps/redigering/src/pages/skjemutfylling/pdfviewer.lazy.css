@@ -516,7 +516,7 @@
 }
 
 :is(:is(.dialog .mainContainer) button:not(:is(.toggle-button, .closeButton, .clearInputButton))):disabled {
-    color: var(--button-disabled-fg-color) !important;
+    color: var(--button-disabled-fg-color);
     background-color: var(--button-disabled-bg-color);
     border-color: var(--button-disabled-bg-color);
     pointer-events: none;
@@ -783,15 +783,15 @@
     }
 
     :is(.annotationLayer .linkAnnotation) > a:hover {
-        opacity: 0 !important;
-        background: none !important;
+        opacity: 0;
+        background: none;
         box-shadow: none;
     }
 
     .annotationLayer .popupAnnotation .popup {
-        outline: calc(1.5px * var(--total-scale-factor)) solid CanvasText !important;
-        background-color: ButtonFace !important;
-        color: ButtonText !important;
+        outline: calc(1.5px * var(--total-scale-factor)) solid CanvasText;
+        background-color: ButtonFace;
+        color: ButtonText;
     }
 
     .annotationLayer .highlightArea:hover::after {
@@ -807,7 +807,7 @@
     }
 
     .annotationLayer .popupAnnotation.focused .popup {
-        outline: calc(3px * var(--total-scale-factor)) solid Highlight !important;
+        outline: calc(3px * var(--total-scale-factor)) solid Highlight;
     }
 }
 
@@ -2949,8 +2949,8 @@
 }
 
 .editDescription.altText::before {
-    width: 16px !important;
-    height: 16px !important;
+    width: 16px;
+    height: 16px;
 }
 
 :root {
@@ -3003,7 +3003,7 @@
 }
 
 :is(#viewerContainer.pdfPresentationMode:fullscreen, .annotationEditorLayer.disabled) .noAltTextBadge {
-    display: none !important;
+    display: none;
 }
 
 @media screen and (forced-colors: active) {
@@ -3038,11 +3038,11 @@
 }
 
 .annotationEditorLayer .selectedEditor {
-    z-index: 100000 !important;
+    z-index: 100000;
 }
 
 .annotationEditorLayer.drawing * {
-    pointer-events: none !important;
+    pointer-events: none;
 }
 
 .annotationEditorLayer.waiting {
@@ -4552,27 +4552,27 @@
 
 .dialog.newAltText.noAi #newAltTextDisclaimer,
 .dialog.newAltText.noAi #newAltTextCreateAutomatically {
-    display: none !important;
+    display: none;
 }
 
 .dialog.newAltText.aiInstalling #newAltTextCreateAutomatically {
-    display: none !important;
+    display: none;
 }
 
 .dialog.newAltText.aiInstalling #newAltTextDownloadModel {
-    display: flex !important;
+    display: flex;
 }
 
 .dialog.newAltText.error #newAltTextNotNow {
-    display: none !important;
+    display: none;
 }
 
 .dialog.newAltText.error #newAltTextCancel {
-    display: inline-block !important;
+    display: inline-block;
 }
 
 .dialog.newAltText:not(.error) #newAltTextError {
-    display: none !important;
+    display: none;
 }
 
 .dialog.newAltText #newAltTextContainer {
@@ -4850,7 +4850,7 @@
 }
 
 :is(.annotationEditorLayer .highlightEditor) .editToolbar {
-    transform-origin: center !important;
+    transform-origin: center;
 }
 
 :is(:is(:is(.annotationEditorLayer .highlightEditor) .editToolbar) .buttons) .colorPicker {
@@ -5587,7 +5587,7 @@ body.wait::before {
 
 .hidden,
 [hidden] {
-    display: none !important;
+    display: none;
 }
 
 #viewerContainer.pdfPresentationMode:fullscreen {
@@ -6117,7 +6117,7 @@ a:focus > .thumbnail,
 }
 
 .thumbnail.selected {
-    border-color: var(--thumbnail-selected-color) !important;
+    border-color: var(--thumbnail-selected-color);
 }
 
 .thumbnailImage {
@@ -6132,7 +6132,7 @@ a:focus > .thumbnail > .thumbnailImage,
 }
 
 .thumbnail.selected > .thumbnailImage {
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 .thumbnail:not([data-loaded]) > .thumbnailImage {
@@ -6227,11 +6227,11 @@ a:focus > .thumbnail > .thumbnailImage,
 
 .dialogButton {
     width: auto;
-    margin: 3px 4px 2px !important;
+    margin: 3px 4px 2px;
     padding: 2px 11px;
     color: var(--main-color);
     background-color: var(--dialog-button-bg-color);
-    border: var(--dialog-button-border) !important;
+    border: var(--dialog-button-border);
 }
 
 dialog {
@@ -6314,16 +6314,16 @@ dialog :link {
 }
 
 .grab-to-pan-grab {
-    cursor: grab !important;
+    cursor: grab;
 }
 
 .grab-to-pan-grab *:not(input):not(textarea):not(button):not(select):not(:link) {
-    cursor: inherit !important;
+    cursor: inherit;
 }
 
 .grab-to-pan-grab:active,
 .grab-to-pan-grabbing {
-    cursor: grabbing !important;
+    cursor: grabbing;
 }
 
 .grab-to-pan-grabbing {
@@ -6383,7 +6383,7 @@ dialog :link {
 }
 
 .toolbarButton.toggled:hover {
-    outline: var(--toggled-hover-btn-outline) !important;
+    outline: var(--toggled-hover-btn-outline);
 }
 
 .toolbarButton.toggled:hover:active {
@@ -6836,7 +6836,7 @@ dialog :link {
 }
 
 .visibleMediumView {
-    display: none !important;
+    display: none;
 }
 
 .toolbarLabel {
@@ -7122,23 +7122,23 @@ dialog :link {
         background-color: var(--sidebar-narrow-bg-color);
     }
     #outerContainer.sidebarOpen #viewerContainer {
-        inset-inline-start: 0 !important;
+        inset-inline-start: 0;
     }
 }
 
 @media all and (max-width: 750px) {
     #outerContainer .hiddenMediumView {
-        display: none !important;
+        display: none;
     }
     #outerContainer .visibleMediumView:not(.hidden, [hidden]) {
-        display: inline-block !important;
+        display: inline-block;
     }
 }
 
 @media all and (max-width: 690px) {
     .hiddenSmallView,
     .hiddenSmallView * {
-        display: none !important;
+        display: none;
     }
 
     #toolbarContainer #toolbarViewer .toolbarButtonSpacer {

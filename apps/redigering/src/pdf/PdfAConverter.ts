@@ -1,18 +1,5 @@
 import { LoggerService } from "@bidrag/common";
-import {
-    PDFDict,
-    PDFDocument,
-    PDFHexString,
-    PDFName,
-    type PDFObject,
-    type PDFPage,
-    PDFPageLeaf,
-    PDFRawStream,
-    type PDFRef,
-    PDFStream,
-    PDFString,
-    StandardFonts,
-} from "@cantoo/pdf-lib";
+import { PDFDict, PDFDocument, PDFHexString, PDFName, type PDFObject, PDFString } from "@cantoo/pdf-lib";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
 import type { PdfDocumentType } from "../components/utils/types";
@@ -34,7 +21,6 @@ function dataUriToUint8Array(dataUri: string): Uint8Array {
 
 export class PdfAConverter {
     private origDoc: PDFDocument;
-    private copyPDF: boolean = false;
     private title: string;
     private pdfDoc: PDFDocument;
     async convertAndSave(origDoc: PDFDocument, title: string, copyPDF = false): Promise<Uint8Array> {
@@ -72,11 +58,6 @@ export class PdfAConverter {
         }
         return savedBytes;
     }
-
-    private async loadPDF(copyPDF: boolean) {
-        this.pdfDoc = await this.copyPdfDocument(this.origDoc, copyPDF);
-        //this.pdfDoc.registerFontkit(fontkit);
-    }
     private copyPdfDocument(originalDoc: PDFDocument, copyPDF = false): Promise<PDFDocument> {
         if (copyPDF) {
             console.debug("Copying PDF file");
@@ -103,11 +84,6 @@ export class PdfAConverter {
         const outputIntentRef = doc.context.register(outputIntent);
         doc.catalog.set(PDFName.of("OutputIntents"), doc.context.obj([outputIntentRef]));
     }
-
-    private async addFont(pdfDoc: PDFDocument) {
-        await pdfDoc.embedFont(StandardFonts.TimesRoman);
-        await pdfDoc.embedStandardFont(StandardFonts.TimesRoman);
-    }
     private addDocumentId(pdfDoc: PDFDocument, documentId: string) {
         const id = PDFHexString.of(documentId);
         pdfDoc.context.trailerInfo.ID = pdfDoc.context.obj([id, id]);
@@ -130,57 +106,7 @@ export class PdfAConverter {
         });
     }
 
-    private removeInvalidXobjects(pdfdoc: PDFDocument) {
-        pdfdoc.getPages().forEach((page, index) => {
-            console.log("Page number", index, page.node.toString(), page.node.Resources());
-            this.removeInvalidXobject(page, pdfdoc);
-        });
-    }
-
-    private removeInvalidXobject(page: PDFPage, pdfdoc: PDFDocument) {
-        // obj.Resources().delete(PDFName.of("XObject"));
-        const xObject = page.node.Resources().get(PDFName.of("XObject")) as PDFDict;
-        if (xObject) {
-            const xMap = xObject.asMap();
-            return Array.from(xMap.keys()).some((key) => {
-                const stream = pdfdoc.context.lookupMaybe(xMap.get(key), PDFStream);
-
-                const ref = xMap.get(key) as PDFRef;
-                const type = stream.dict.get(PDFName.of("Type"));
-                if (type == undefined && key.toString().includes("FlatWidget")) {
-                    LoggerService.warn("Fjerner ugyldig XObject fra PDF " + key + " - " + stream.dict.toString());
-                    console.log(stream, xMap.get(key), stream.getContentsString());
-                    console.log(pdfdoc.context.delete(ref));
-
-                    // console.log(obj.toString());
-                    return true;
-                }
-            });
-        }
-        return false;
-    }
-
-    // Copied from https://github.com/Hopding/pdf-lib/issues/1183#issuecomment-1685078941
-    private _addMetadata(pdfDoc: PDFDocument, date: Date, title: string, author: string) {
-        pdfDoc.setTitle(title);
-        pdfDoc.setAuthor(pdfDoc.getAuthor() ?? author);
-        pdfDoc.setProducer(PDF_EDITOR_PRODUCER);
-        pdfDoc.setCreator(pdfDoc.getCreator() ?? PDF_EDITOR_CREATOR);
-        pdfDoc.setModificationDate(date);
-    }
-
-    // remove millisecond from date
-    private _formatDate(date) {
-        return date.toISOString().split(".")[0] + "Z";
-    }
-
-    private removeColorspace(obj: PDFObject) {
-        if (obj instanceof PDFPageLeaf) {
-            obj.Resources().delete(PDFName.of("ColorSpace"));
-        }
-    }
-
-    private addMetadata(originalDoc: PDFDocument, pdfDoc: PDFDocument, date: Date, documentId: string, title: string) {
+    private addMetadata(originalDoc: PDFDocument, pdfDoc: PDFDocument, date: Date, _documentId: string, title: string) {
         const originalAuthor = PdfProducerHelpers.getAuthor(originalDoc);
         const originalCreationDate = PdfProducerHelpers.getCreationDate(originalDoc);
         const producer = PDF_EDITOR_PRODUCER;
@@ -239,21 +165,6 @@ export class PdfAConverter {
         // const metadataStreamRef = pdfDoc.context.register(metadataStream);
 
         // pdfDoc.catalog.set(PDFName.of("Metadata"), metadataStreamRef);
-    }
-
-    private deleteExistingMetadata(pdfDoc: PDFDocument) {
-        pdfDoc.context.enumerateIndirectObjects().forEach(([ref, obj]) => {
-            if (this.isPdfObjectMetadata(obj)) {
-                const isDeleted = pdfDoc.context.delete(ref);
-                console.log("Deleted Metadata", obj.toString(), isDeleted);
-            }
-        });
-    }
-    private isPdfObjectMetadata(obj: PDFObject) {
-        if (obj instanceof PDFRawStream) {
-            return obj.dict.values().some((v) => v.toString() == "/Metadata");
-        }
-        return false;
     }
 
     private isPdfObjectJavascript(obj: PDFObject) {

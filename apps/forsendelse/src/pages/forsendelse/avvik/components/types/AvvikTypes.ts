@@ -9,6 +9,7 @@ export interface AvvikTypeCommonProps {
     initialAvvik?: Avvik;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: Migrering
 export function registerToSelectProps(formName: string, register: UseFormRegister<any>) {
     const { ref, ...otherProps } = register(formName);
     return {

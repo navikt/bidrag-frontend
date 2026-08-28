@@ -15,7 +15,7 @@ import PageWrapper from "../PageWrapper";
 import PdfEditorContextProvider from "../redigering/components/PdfEditorContext";
 import DokumentRedigering from "../redigering/DokumentRedigering";
 
-const url = "http://localhost:5173/test4.pdf";
+const _url = "http://localhost:5173/test4.pdf";
 
 interface DokumentRedigeringPageProps {
     journalpostId: string;

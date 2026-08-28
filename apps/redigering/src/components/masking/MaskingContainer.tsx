@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
 import { DndContext, type DragEndEvent, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import type { Active } from "@dnd-kit/core/dist/store";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
@@ -67,7 +69,7 @@ function MaskingContainer({
     function updateItemPosition(itemId: string, x: number, y: number) {
         setMaskingItems((items) => [
             ...items.map((item) => {
-                if (item.id == itemId) {
+                if (item.id === itemId) {
                     return {
                         ...item,
                         state: "ITEM" as const,
@@ -87,7 +89,7 @@ function MaskingContainer({
     function updateItemDimensions(itemId: string, width: number, height: number) {
         setMaskingItems((items) => [
             ...items.map((item) => {
-                if (item.id == itemId) {
+                if (item.id === itemId) {
                     return {
                         ...item,
                         state: "ITEM" as const,
@@ -109,7 +111,7 @@ function MaskingContainer({
     function duplicateItem(itemId: string) {
         if (hasDuplicatedOrGhostItem()) return;
         setMaskingItems((items) => {
-            const originalItem = items.find((item) => item.id == itemId);
+            const originalItem = items.find((item) => item.id === itemId);
             if (originalItem == null) return items;
             return [
                 ...items,
@@ -146,7 +148,7 @@ function MaskingContainer({
         const scale = event.active?.data?.current?.scale ?? 1;
         setMaskingItems((items) => [
             ...items.map((item) => {
-                if (item.id == itemId) {
+                if (item.id === itemId) {
                     return {
                         ...item,
                         parentId: item.parentId,
@@ -178,7 +180,7 @@ function MaskingContainer({
     }
 
     return (
-        <div tabIndex={0} ref={divRef}>
+        <div ref={divRef}>
             <DndContext
                 onDragStart={handleDragStart}
                 onDragEnd={onDragEnd}

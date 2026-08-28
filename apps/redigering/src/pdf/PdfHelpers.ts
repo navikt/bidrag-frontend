@@ -188,6 +188,7 @@ export function deleteGroupobjectWithSKey(pdfdoc: PDFDocument) {
                 page.node.delete(PDFName.of("Group"));
             }
         }
+        return false;
     });
 }
 
@@ -208,10 +209,11 @@ function pageHasInvalidXObject(page: PDFPage, pdfdoc: PDFDocument, pageNumber: n
                 return true;
             }
             const type = stream.dict.get(PDFName.of("Type"));
-            if (type == undefined && key.toString().includes("FlatWidget")) {
+            if (type === undefined && key.toString().includes("FlatWidget")) {
                 LoggerService.warn(`Side ${pageNumber} har ugyldig XObject fra PDF ${key}`);
                 return true;
             }
+            return false;
         });
     }
     return false;
@@ -282,7 +284,9 @@ export async function debugRepairPDF(pdfDoc: PDFDocument) {
         pdfDoc
             .getForm()
             .acroForm.getAllFields()
-            .forEach((field) => console.log(field[1].toString(), field));
+            .forEach((field) => {
+                console.log(field[1].toString(), field);
+            });
     } catch (e) {
         LoggerService.warn("Det skjedde en feil i debugRepairPDF funksjonen", e);
     }
@@ -333,11 +337,15 @@ export async function getPrintableWarning(pdfBytearray: PdfDocumentType): Promis
         }
         if (invalidXObjectPages.length > 0) {
             warnings.push("Dokumentet inneholder ugyldige skjema- eller XObject-ressurser som kan hindre utskrift.");
-            invalidXObjectPages.forEach((pageNumber) => affectedPages.add(pageNumber));
+            invalidXObjectPages.forEach((pageNumber) => {
+                affectedPages.add(pageNumber);
+            });
         }
         if (invalidNamePages.length > 0) {
             warnings.push("Dokumentet inneholder ugyldige PDF-objekter der en navneverdi er forventet.");
-            invalidNamePages.forEach((pageNumber) => affectedPages.add(pageNumber));
+            invalidNamePages.forEach((pageNumber) => {
+                affectedPages.add(pageNumber);
+            });
         }
 
         if (warnings.length === 0) {
@@ -663,12 +671,12 @@ async function removeUnlinkedAnnots(pdfdoc: PDFDocument) {
     for (const page of pdfdoc.getPages()) {
         try {
             const annots = page.node.get(PDFName.of("Annots")) as PDFArray;
-            if (annots == undefined) continue;
+            if (annots === undefined) continue;
             for (const annot of annots.asArray()) {
                 try {
                     const annotDict = pdfdoc.context.lookupMaybe(annot, PDFDict);
-                    if (annotDict == undefined) {
-                        LoggerService.warn("Fjerner annotasjon som ikke har noe kilde fra side: " + annot.toString());
+                    if (annotDict === undefined) {
+                        LoggerService.warn(`Fjerner annotasjon som ikke har noe kilde fra side: ${annot.toString()}`);
                         // page.node.removeAnnot(annotRef);
                         page.node.delete(PDFName.of("Annots"));
                     }

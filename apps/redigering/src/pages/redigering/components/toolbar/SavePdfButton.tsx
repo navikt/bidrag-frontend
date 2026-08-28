@@ -1,6 +1,6 @@
 import { FloppydiskIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Modal } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { usePdfEditorContext } from "../PdfEditorContext";
 

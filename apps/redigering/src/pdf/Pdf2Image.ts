@@ -31,7 +31,7 @@ export default async function pdf2Image(
 async function doc_render(pdfDocument: PDFDocumentProxy, pageNo) {
     // Page number sanity check
     if (pageNo < 1 || pageNo > pdfDocument.numPages) {
-        console.error("Invalid page number " + pageNo);
+        console.error(`Invalid page number ${pageNo}`);
         return;
     }
     const page = await pdfDocument.getPage(pageNo);

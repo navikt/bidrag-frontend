@@ -23,14 +23,14 @@ export default function SaveStateIndicator() {
     });
 
     function renderSaveState() {
-        if (saveState.status == "pending") {
+        if (saveState.status === "pending") {
             return (
                 <>
                     <Loader title={"Lagrer..."} size={"xsmall"} variant="inverted" />
                     <Heading size={"xsmall"}>Lagrer...</Heading>
                 </>
             );
-        } else if (saveState.status == "error") {
+        } else if (saveState.status === "error") {
             return (
                 <>
                     <XMarkOctagonIcon color="white" />

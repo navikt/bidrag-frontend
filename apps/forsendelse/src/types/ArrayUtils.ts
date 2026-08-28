@@ -1,4 +1,4 @@
-export function arraysDeepEqual(arr1: any[], arr2: any[]): boolean {
+export function arraysDeepEqual(arr1: unknown[], arr2: unknown[]): boolean {
     if (arr1.length !== arr2.length) {
         return false;
     }
@@ -44,7 +44,7 @@ function objectsDeepEqual(obj1: object, obj2: object): boolean {
     return true;
 }
 
-export function arrayMove(array: any[], oldIndex: number, newIndex: number) {
+export function arrayMove(array: unknown[], oldIndex: number, newIndex: number) {
     const updatedArray = [...array];
     const [element] = updatedArray.splice(oldIndex, 1);
 

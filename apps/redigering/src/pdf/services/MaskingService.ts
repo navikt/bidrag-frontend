@@ -105,18 +105,18 @@ export function calculateTextCoordinates(
     } catch {
         /* corrupted parent chain */
     }
-    const textRotation = rotation == 180 ? 180 : rotation == 90 ? 90 : rotation == 270 ? -90 : 0;
+    const textRotation = rotation === 180 ? 180 : rotation === 90 ? 90 : rotation === 270 ? -90 : 0;
     const textLenght = font.widthOfTextAtSize(text, fontSize);
     const textHeight = font.heightAtSize(fontSize);
     let x = coordinates.x + coordinates.width / 2;
     let y = coordinates.y + coordinates.height / 2;
-    if (rotation == 90) {
+    if (rotation === 90) {
         x -= shouldRotateText ? -textLenght / 2 : textHeight / 2;
         y -= shouldRotateText ? -textHeight / 2 : textLenght / 2;
-    } else if (rotation == 270) {
+    } else if (rotation === 270) {
         x -= shouldRotateText ? textLenght / 2 : textHeight / 2;
         y -= shouldRotateText ? textHeight / 2 : -textLenght / 2;
-    } else if (rotation == 180) {
+    } else if (rotation === 180) {
         x -= shouldRotateText ? textHeight / 2 : -textLenght / 2;
         y -= shouldRotateText ? -textLenght / 2 : -textHeight / 2;
     } else {

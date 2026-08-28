@@ -70,7 +70,7 @@ export class FormPdfProducer {
         const form = this.pdfDocument.getForm();
         for (const [_, annotations] of formValues.entries()) {
             annotations.forEach((props) => {
-                if (props.type == "Btn" && props.name == "nullstill") {
+                if (props.type === "Btn" && props.name === "nullstill") {
                     const field = form.getFieldMaybe(props.name);
                     form.removeField(field);
                 }
@@ -89,10 +89,10 @@ export class FormPdfProducer {
     private fillFormField(props: SingleFormProps) {
         const form = this.pdfDocument.getForm();
         try {
-            if (typeof props.value == "string") {
+            if (typeof props.value === "string") {
                 const field = form.getTextField(props.name);
                 field.updateAppearances(this.font);
-                if (props.name == "saksnummer") {
+                if (props.name === "saksnummer") {
                     field.setFontSize(13);
                 } else {
                     field.setFontSize(9);
@@ -109,7 +109,7 @@ export class FormPdfProducer {
                     widget?.setAppearanceState(onValue);
 
                     for (const otherWidget of widgets) {
-                        if (otherWidget.getOnValue() != onValue) {
+                        if (otherWidget.getOnValue() !== onValue) {
                             otherWidget?.setAppearanceState(PDFName.of("Off"));
                         }
                     }
@@ -127,7 +127,7 @@ export class FormPdfProducer {
     private getWidget(field: PDFField, fieldWidgetName: string, fieldName?: string) {
         const widget = field.acroField
             .getWidgets()
-            .find((w) => w.getOnValue()?.asString()?.substring(1)?.replaceAll("#20", " ") == fieldWidgetName);
+            .find((w) => w.getOnValue()?.asString()?.substring(1)?.replaceAll("#20", " ") === fieldWidgetName);
         console.debug("WIDGET", fieldName, fieldWidgetName, widget, widget.getAppearances());
         return widget;
     }

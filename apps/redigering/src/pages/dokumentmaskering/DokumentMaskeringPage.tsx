@@ -2,7 +2,7 @@ import { lastDokumenter } from "../../api/queries";
 import PageWrapper from "../PageWrapper";
 import DokumentMaskering from "./DokumentMaskering";
 
-const url = "http://localhost:5173/test4.pdf";
+const _url = "http://localhost:5173/test4.pdf";
 
 interface DokumentMaskeringPageProps {
     forsendelseId: string;

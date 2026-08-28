@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 
 const DokumentRedigeringPage = lazy(() => import("../pages/dokumentredigering/DokumentRedigeringPage"));
@@ -31,7 +31,7 @@ export default function DokumentRedigeringRoute() {
     return (
         <Suspense fallback={null}>
             <DokumentRedigeringPage
-                journalpostId={journalpostId!}
+                journalpostId={journalpostId}
                 dokumentreferanse={dokumentreferanse}
                 dokumenter={searchParams.getAll("dokument")}
             />

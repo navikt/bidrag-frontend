@@ -1,4 +1,4 @@
-import { BIDRAG_SAK_API, BIDRAG_SAMHANDLER_API, BIDRAG_KODEVERK_API } from "@bidrag/api";
+import { BIDRAG_KODEVERK_API, BIDRAG_SAK_API, BIDRAG_SAMHANDLER_API } from "@bidrag/api";
 import type { SamhandlerSakerDto } from "@bidrag/api/SakApi";
 import type { SamhandlerDto, SamhandlerSok, SamhandlersokeresultatDto } from "@bidrag/api/SamhandlerApi";
 import { LoggerService } from "@bidrag/common";

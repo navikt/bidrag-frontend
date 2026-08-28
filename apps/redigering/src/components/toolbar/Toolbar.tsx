@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: wrapper only stops click propagation and has no interactive semantics of its own */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: wrapper only stops click propagation and has no interactive semantics of its own */
 import "./Toolbar.css";
 
 import type { PropsWithChildren } from "react";

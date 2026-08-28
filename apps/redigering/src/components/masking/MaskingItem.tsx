@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: mask overlay is positioned via mouse drag only, not a keyboard-operable control */
 import "./MaskinItem.css";
 
 import { type DragEndEvent, useDndMonitor, useDraggable } from "@dnd-kit/core";
@@ -67,8 +68,8 @@ export default function MaskingItem(props: IMaskingItemProps) {
     const coordinates = useMemo(
         () => ({
             ...currentCoordinates,
-            width: currentCoordinates.width == 0 ? _coordinates.width : currentCoordinates.width,
-            height: currentCoordinates.height == 0 ? _coordinates.height : currentCoordinates.height,
+            width: currentCoordinates.width === 0 ? _coordinates.width : currentCoordinates.width,
+            height: currentCoordinates.height === 0 ? _coordinates.height : currentCoordinates.height,
         }),
         [currentCoordinates, _coordinates],
     );
@@ -76,7 +77,7 @@ export default function MaskingItem(props: IMaskingItemProps) {
     useDndMonitor({
         onDragEnd(event: DragEndEvent) {
             const itemId = event.active.id;
-            if (itemId == id) {
+            if (itemId === id) {
                 setCurrentCoordinates((prev) => MaskingUtils.getDragEndCoordinates(event, prev, scale));
             }
         },
@@ -116,7 +117,7 @@ export default function MaskingItem(props: IMaskingItemProps) {
         };
     };
 
-    const isSelected = activeId == id;
+    const isSelected = activeId === id;
 
     if (disabled || !isMaskingEnabled) {
         return (
@@ -127,9 +128,9 @@ export default function MaskingItem(props: IMaskingItemProps) {
             ></div>
         );
     }
-    if (state == "GHOSTED") {
+    if (state === "GHOSTED") {
         return <GhostedMaskingItem {...props} />;
-    } else if (state == "DUPLICATED") {
+    } else if (state === "DUPLICATED") {
         return <DuplicatedMaskingItem {...props} />;
     }
     return (
@@ -148,7 +149,7 @@ export default function MaskingItem(props: IMaskingItemProps) {
                     transform: undefined,
                     scale: "calc(1/var(--scale-factor))",
                 }}
-                onResize={(e, direction, ref, d) => {
+                onResize={(_e, _direction, _ref, d) => {
                     const coordinates = getCoordinatesAfterResize(d);
                     setCurrentCoordinates((prevState) => ({
                         ...prevState,
@@ -163,7 +164,7 @@ export default function MaskingItem(props: IMaskingItemProps) {
                     disableDrag();
                     setCoordinatesResizeStart(coordinates);
                 }}
-                onResizeStop={(e, direction, ref, d) => {
+                onResizeStop={(_e, _direction, _ref, d) => {
                     const coordinates = getCoordinatesAfterResize(d);
                     updateItemDimensions(id, coordinates.width, coordinates.height);
                     disabledRef.current = false;
@@ -251,7 +252,7 @@ function GhostedMaskingItem({ id, coordinates: _coordinates, parentId, scale }: 
     }
 
     function onMouseUp(e: MouseEvent) {
-        if (hasMouseMoved.current == false) {
+        if (hasMouseMoved.current === false) {
             removeItem(id);
             return;
         }
@@ -261,7 +262,7 @@ function GhostedMaskingItem({ id, coordinates: _coordinates, parentId, scale }: 
             width,
             height,
         }));
-        if (width == 0 || height == 0) {
+        if (width === 0 || height === 0) {
             removeItem(id);
         } else {
             updateItemDimensions(id, width, height);
@@ -292,40 +293,38 @@ function Toolbar({ id, coordinates, scale }: IToolbarProps) {
     const { removeItem, duplicateItem } = useMaskingContainer();
 
     return (
-        <>
-            <div
-                className={"toolbar"}
-                id={`toolbar_${id}`}
-                style={{
-                    position: "relative",
-                    top: `calc(${coordinates.y}px - calc(45px/var(--scale-factor))`,
-                    left: `${coordinates.x}px`,
-                    transform: "scale(calc(1/var(--scale-factor)))",
-                    transformOrigin: "0px 0px",
+        <div
+            className={"toolbar"}
+            id={`toolbar_${id}`}
+            style={{
+                position: "relative",
+                top: `calc(${coordinates.y}px - calc(45px/var(--scale-factor))`,
+                left: `${coordinates.x}px`,
+                transform: "scale(calc(1/var(--scale-factor)))",
+                transformOrigin: "0px 0px",
+            }}
+        >
+            <Button
+                onClick={(_e) => {
+                    removeItem(id);
                 }}
-            >
-                <Button
-                    onClick={(e) => {
-                        removeItem(id);
-                    }}
-                    title={"Slett"}
-                    icon={<TrashIcon fontSize="1.75rem" />}
-                    className={"toolbar-item delete"}
-                    size={"small"}
-                    variant={"tertiary-neutral"}
-                />
-                <div className={"separator"} />
-                <Button
-                    title={"Kopier"}
-                    icon={<FilesIcon fontSize="1.75rem" />}
-                    className={"toolbar-item"}
-                    size={"small"}
-                    variant={"tertiary-neutral"}
-                    onClick={(e) => {
-                        duplicateItem(id);
-                    }}
-                />
-            </div>
-        </>
+                title={"Slett"}
+                icon={<TrashIcon fontSize="1.75rem" />}
+                className={"toolbar-item delete"}
+                size={"small"}
+                variant={"tertiary-neutral"}
+            />
+            <div className={"separator"} />
+            <Button
+                title={"Kopier"}
+                icon={<FilesIcon fontSize="1.75rem" />}
+                className={"toolbar-item"}
+                size={"small"}
+                variant={"tertiary-neutral"}
+                onClick={(_e) => {
+                    duplicateItem(id);
+                }}
+            />
+        </div>
     );
 }

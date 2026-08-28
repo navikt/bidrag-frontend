@@ -24,11 +24,11 @@ export default function KeyboardShortcuts() {
             onRedoUndoEvent(e);
             keyDownHandler(e);
             if (!activeId) return;
-            const isDeleteButtonPressed = e.code.toLowerCase() == "delete";
+            const isDeleteButtonPressed = e.code.toLowerCase() === "delete";
             if (isDeleteButtonPressed) {
                 //e.preventDefault();
                 removeItem(activeId);
-            } else if ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() == "d") {
+            } else if ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "d") {
                 e.preventDefault();
                 duplicateItem(activeId);
             }
@@ -49,9 +49,9 @@ export default function KeyboardShortcuts() {
     }
 
     function keyDownHandler(e: KeyboardEvent) {
-        if (e.key == "Escape") {
+        if (e.key === "Escape") {
             exitAddItemMode(true);
-        } else if (e.key == "+" || e.ctrlKey) {
+        } else if (e.key === "+" || e.ctrlKey) {
             initAddItem();
         }
     }
