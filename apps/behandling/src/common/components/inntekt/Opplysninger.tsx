@@ -65,7 +65,7 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
     const { ikkeAktiverteEndringerIGrunnlagsdata, roller } = useGetBehandlingV2();
     const aktiverGrunnlagFn = useAktiveGrunnlagsdata();
     const virkningsdato = useVirkningsdato();
-    const { lesemodus, setSaveErrorState } = useBehandlingProvider();
+    const { lesemodus, setSaveErrorState, selectedRoller } = useBehandlingProvider();
     const { resetField, setValue } = useFormContext<InntektFormValues>();
     const [inntektType, gjelderRolleId] = fieldName.split(".");
     const gjelderRolleIdNumber = Number(gjelderRolleId);
@@ -73,7 +73,7 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
 
     if (ikkeAktiverteEndringerIGrunnlagsdata.inntekter[inntektType].length === 0) return null;
 
-    const ikkeAktiverteEndringer: { [p: string]: IkkeAktivInntektDto[] } = roller.reduce(
+    const ikkeAktiverteEndringer: { [p: string]: IkkeAktivInntektDto[] } = selectedRoller.reduce(
         (acc, rolle) => ({
             ...acc,
             [rolle.ident]: ikkeAktiverteEndringerIGrunnlagsdata.inntekter[inntektType]?.filter((v) => {
