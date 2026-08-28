@@ -1,25 +1,18 @@
-import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
-import { Bleed, Box, CopyButton, Skeleton } from "@navikt/ds-react";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Bleed, Box, CopyButton } from "@navikt/ds-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHentFodselsdatoer } from "../../api/useApiData";
 import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
 import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
-import RolleCard from "../roller/RolleCard";
+import { ExpandedRoles, type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 type TypeBehandling = string;
-type HeaderRolle = RolleDto & { visningsnavn?: string };
 
 interface ISkjermbildeDetaljer {
     navn: string;
     referanse: string | number;
 }
-
-type SaksnummerRoller = {
-    saksnummer: string;
-    roller: HeaderRolle[];
-};
 
 /** New props for full featured header */
 interface ISakHeaderNewProps {
@@ -69,13 +62,6 @@ const CHEVRON_BUTTON_STYLE: React.CSSProperties = {
     background: "transparent",
     border: 0,
     cursor: "pointer",
-};
-
-const ROLE_CARD_CONTAINER_STYLE: React.CSSProperties = {
-    border: "1px solid var(--ax-border-neutral-subtle)",
-    borderRadius: "0.375rem",
-    background: "var(--ax-bg-default)",
-    margin: "0.125rem 0.375rem",
 };
 
 // Helpers
@@ -224,44 +210,6 @@ const SaksnummerTab = ({
                     }}
                 />
             )}
-        </Box>
-    );
-};
-
-interface ExpandedRolesProps {
-    saksnummerRoller: SaksnummerRoller | undefined;
-}
-
-const RolleCardSkeleton = () => (
-    <Skeleton
-        variant="text" width={"220px"} height={"54px"}
-    />
-);
-
-const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
-    if (!saksnummerRoller) return null;
-
-    return (
-        <Box
-            style={{
-                padding: "0.75rem",
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.5rem",
-                background: "white",
-            }}
-            shadow="dialog"
-        >
-            {saksnummerRoller.roller.map((rolle) => (
-                <Box key={rolle.id} style={ROLE_CARD_CONTAINER_STYLE}>
-                    {/* Suspense skoperes rundt kun rollekortet (person-navn-oppslaget), ikke hele
-                    SakHeader, slik at tittel/faner alltid rendres umiddelbart og kun selve
-                    navnevisningen viser en liten skjelett-boks mens personoppslaget laster. */}
-                    <Suspense fallback={<RolleCardSkeleton />}>
-                        <RolleCard rolle={rolle} />
-                    </Suspense>
-                </Box>
-            ))}
         </Box>
     );
 };

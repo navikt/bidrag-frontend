@@ -12,6 +12,7 @@ interface LeggTilForelderProps {
     rolleType: "BP" | "BM";
     rolleNavn: string;
     muligeAndreForeldre?: PersonDto[];
+    saksnummer?: string;
 }
 
 export default function LeggTilForelder({
@@ -19,6 +20,7 @@ export default function LeggTilForelder({
     rolleType,
     rolleNavn,
     muligeAndreForeldre = [],
+    saksnummer,
 }: LeggTilForelderProps) {
     const [visSøk, setVisSøk] = useState(false);
     const roller = form.watch("roller") || [];
@@ -90,6 +92,7 @@ export default function LeggTilForelder({
             søkeLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
             onPersonValgt={handlePersonValgt}
             onAvbryt={() => setVisSøk(false)}
+            saksnummer={saksnummer}
         >
             {muligeAndreForeldre.length > 0 && (
                 <Box

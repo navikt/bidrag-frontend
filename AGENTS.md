@@ -42,6 +42,25 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 - Ruter registreres i `apps/web/app/routes.ts`
 - Health-endepunkter: `GET /internal/health/liveness` og `/readiness`
 
+### Component-testing (Playwright CT — PoC)
+- `apps/web` og `packages/common` deler ETT story-galleri (servert fra
+  apps/web, se README) med felles venstremeny — som alternativ til Storybook.
+- Mount via `await mount("mappe/Fil/EksportNavn")`, kjør alt med `pnpm test:ct`
+  (felles `playwright.config.ts` i repo-roten), eller kun én pakke med
+  `pnpm test:ct -- --project=web`/`--project=common`. Manuell utforsking i
+  nettleser: `pnpm test:ct:gallery`.
+- Bruk ALDRI appens ekte `QueryClientWrapper` uskodd i en story — komponenter
+  som leser `useHentPersonData` via `BidragCommonsContext` er
+  suspense-baserte og henger evig uten mock. Bruk en mocket provider per
+  story (se `apps/web/playwright/testing/CtProviders.tsx`).
+- To mock-nivåer: **context-mocking** (`CtProviders`, for kall via
+  `BidragCommonsContext`) og **nettverksmocking** (`page.route()`, for alt
+  annet — f.eks. apps/web sin egen `useHentPersonData` i `~/api/useApi.ts`,
+  en annen funksjon enn i `@bidrag/common`). Registrer `page.route()` FØR
+  `mount()`. Se `ForelderRolleVisning.ct.spec.ts` for eksempel.
+- Foreløpig begrenset PoC-omfang (én story-fil per pakke) — ikke utvid uten
+  at teamet har besluttet å ta mønsteret i bruk bredere.
+
 ## Kommandoer
 
 ```bash
