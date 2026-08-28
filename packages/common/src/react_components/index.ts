@@ -6,6 +6,7 @@ export { useBisysLink } from "./bisys/useBisysLink";
 export { default as BidragCell } from "./grid/BidragCell";
 export { default as BidragContainer } from "./grid/BidragContainer";
 export { default as BidragGrid } from "./grid/BidragGrid";
+export { default as AapneDokumentKnapp } from "./dokument/AapneDokumentKnapp";
 export { default as SakHeader } from "./header/SakHeader";
 export * from "./hooks";
 export { default as PopupSokButton } from "./PopupSøkButton";

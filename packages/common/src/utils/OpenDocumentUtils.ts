@@ -54,6 +54,17 @@ export class OpenDocumentUtils {
         window.open(`/rediger/${journalpostId}?id=${id}`);
     }
 
+    /**
+     * Åpner dokumentet i redigeringsvisningen (`@bidrag/redigering`) i en ny fane, uten å gå via
+     * masking-/skjemaflyten. Brukes som en ekstra måte å åpne et allerede ferdigstilt dokument på,
+     * i tillegg til den vanlige visningen.
+     */
+    static openDocumentRedigering(journalpostId: string, dokumentreferanse?: string) {
+        LoggerService.info(`Åpner redigering for journalpost ${journalpostId}/${dokumentreferanse ?? ""}`);
+        const dokumentreferansePath = dokumentreferanse ? `/${dokumentreferanse}` : "";
+        window.open(`/rediger/${journalpostId}${dokumentreferansePath}`, "_blank");
+    }
+
     static openDocumentMaskingEditor(
         forsendelseId: string,
         dokumentreferanse: string,

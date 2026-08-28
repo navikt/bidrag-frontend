@@ -1,7 +1,7 @@
 import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { OpenDocumentUtils, useBisysLink } from "@bidrag/common";
+import { AapneDokumentKnapp, useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
 import {
     ArrowCirclepathIcon,
@@ -19,7 +19,6 @@ import {
     Heading,
     HStack,
     Link,
-    Loader,
     Modal,
     Popover,
     Tag,
@@ -122,7 +121,6 @@ export default function JournalpostTabell({
     const [kunVedtak, setKunVedtak] = useState(false);
     const [expandedRowIds, setExpandedRowIds] = useState<string[]>([]);
     const [filterÅpen, setFilterÅpen] = useState(false);
-    const [mbdokLaster, setMbdokLaster] = useState<Set<string>>(new Set());
     const filterKnappRef = useRef<HTMLButtonElement>(null);
 
     const visKunFarskapUtelukket = !kunVedtak && visFarskapUtelukket;
@@ -170,36 +168,6 @@ export default function JournalpostTabell({
             ...(sessionState && { sessionState }),
         });
 
-    const åpneDokumentHref = (jp: JournalpostDto): string | undefined => {
-        if (!jp.journalpostId) return undefined;
-        const journalpostId = jp.journalpostId;
-        if (jp.status === JournalpostStatus.UNDER_PRODUKSJON) return undefined;
-        const hoveddokRef = jp.dokumenter?.[0]?.dokumentreferanse;
-        return hoveddokRef ? `/dokument/${journalpostId}/${hoveddokRef}` : undefined;
-    };
-
-    const MBDOK_SPINNER_VARIGHET_MS = 5000;
-
-    const mbdokNøkkel = (journalpostId: string, dokumentreferanse: string) => `${journalpostId}-${dokumentreferanse}`;
-
-    const åpneMbdokDokument = (journalpostId: string, dokumentreferanse: string) => {
-        const nøkkel = mbdokNøkkel(journalpostId, dokumentreferanse);
-        if (mbdokLaster.has(nøkkel)) return;
-
-        setMbdokLaster((prev) => new Set(prev).add(nøkkel));
-        window.setTimeout(() => {
-            setMbdokLaster((prev) => {
-                const neste = new Set(prev);
-                neste.delete(nøkkel);
-                return neste;
-            });
-        }, MBDOK_SPINNER_VARIGHET_MS);
-
-        OpenDocumentUtils.openMbdokDocument(journalpostId, dokumentreferanse).catch((error: unknown) => {
-            window.alert(error instanceof Error ? error.message : "Kunne ikke åpne dokumentet");
-        });
-    };
-
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
 
     const toggleExpandedRad = (id: string) => {
@@ -211,95 +179,54 @@ export default function JournalpostTabell({
     const beskrivelseCelle = (rad: JournalpostRad) => {
         if (rad.erVedlegg && rad.dok) {
             const dok = rad.dok;
-            const kanÅpnes = Boolean(
-                dok.status === DokumentStatus.FERDIGSTILT && dok.dokumentreferanse && rad.jp.journalpostId,
-            );
-            const kanÅpnesMedMbdok = Boolean(
-                dok.status === DokumentStatus.UNDER_PRODUKSJON && dok.dokumentreferanse && rad.jp.journalpostId,
-            );
-            const mbdokLasterForDok =
-                kanÅpnesMedMbdok &&
-                mbdokLaster.has(mbdokNøkkel(rad.jp.journalpostId as string, dok.dokumentreferanse as string));
+            const journalpostId = rad.jp.journalpostId;
+            const tekst = dok.tittel ?? dok.dokumentreferanse ?? "";
+
+            if (!journalpostId || !dok.dokumentreferanse) {
+                return (
+                    <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
+                        <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
+                        <span className="min-w-0 truncate">{dok.tittel ?? "-"}</span>
+                    </HStack>
+                );
+            }
 
             return (
                 <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
-                    {kanÅpnes ? (
-                        <Link
-                            className="min-w-0 truncate"
-                            target="_blank"
-                            title={dok.tittel ?? dok.dokumentreferanse ?? ""}
-                            href={`/dokument/${rad.jp.journalpostId}/${dok.dokumentreferanse}?dok=${dok.dokumentreferanse}`}
-                        >
-                            {dok.tittel ?? dok.dokumentreferanse}
-                        </Link>
-                    ) : kanÅpnesMedMbdok ? (
-                        <>
-                            <Link
-                                className="min-w-0 truncate"
-                                href="#"
-                                aria-disabled={mbdokLasterForDok}
-                                title={dok.tittel ?? dok.dokumentreferanse ?? ""}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    if (mbdokLasterForDok) return;
-                                    åpneMbdokDokument(rad.jp.journalpostId as string, dok.dokumentreferanse as string);
-                                }}
-                            >
-                                {dok.tittel ?? dok.dokumentreferanse}
-                            </Link>
-                            {mbdokLasterForDok && <Loader size="xsmall" title="Åpner dokument …" />}
-                        </>
-                    ) : (
-                        <span className="min-w-0 truncate">{dok.tittel ?? "-"}</span>
-                    )}
+                    <AapneDokumentKnapp
+                        journalpostId={journalpostId}
+                        dokumentreferanse={dok.dokumentreferanse}
+                        status={dok.status ?? undefined}
+                        className="min-w-0 truncate"
+                        tittel={tekst}
+                    >
+                        {tekst}
+                    </AapneDokumentKnapp>
                 </HStack>
             );
         }
 
         const antall = rad.jp.dokumenter?.length ?? 0;
         const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
-        const href = åpneDokumentHref(rad.jp);
+        const journalpostId = rad.jp.journalpostId;
         const hoveddokRef = rad.jp.dokumenter?.[0]?.dokumentreferanse;
+        const erUnderProduksjon = rad.jp.status === JournalpostStatus.UNDER_PRODUKSJON;
 
-        if (href) {
+        if (journalpostId && hoveddokRef) {
+            const status = erUnderProduksjon ? DokumentStatus.UNDER_PRODUKSJON : DokumentStatus.FERDIGSTILT;
             return (
                 <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
-                    <Link
+                    <AapneDokumentKnapp
+                        journalpostId={journalpostId}
+                        dokumentreferanse={hoveddokRef}
+                        status={status}
                         className="min-w-0 truncate"
-                        target="_blank"
-                        href={href}
-                        title={tekst}
-                        aria-label="Åpne dokument"
+                        tittel={tekst}
                     >
                         {tekst}
-                    </Link>
-                </HStack>
-            );
-        }
-
-        if (rad.jp.status === JournalpostStatus.UNDER_PRODUKSJON && rad.jp.journalpostId && hoveddokRef) {
-            const journalpostId = rad.jp.journalpostId;
-            const mbdokLasterForJp = mbdokLaster.has(mbdokNøkkel(journalpostId, hoveddokRef));
-            return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
-                    <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
-                    <Link
-                        className="min-w-0 truncate"
-                        href="#"
-                        aria-disabled={mbdokLasterForJp}
-                        title={tekst}
-                        aria-label="Åpne dokument"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            if (mbdokLasterForJp) return;
-                            åpneMbdokDokument(journalpostId, hoveddokRef);
-                        }}
-                    >
-                        {tekst}
-                    </Link>
-                    {mbdokLasterForJp && <Loader size="xsmall" title="Åpner dokument …" />}
+                    </AapneDokumentKnapp>
                 </HStack>
             );
         }
