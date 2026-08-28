@@ -32,43 +32,42 @@ paastaa_inneholder() {
   fi
 }
 
-# Bygger et minimalt repo som speiler strukturen i bidrag-backend.
+# Bygger et minimalt repo som speiler strukturen i bidrag-frontend.
 lag_fikstur() {
   local rot
   rot="$(mktemp -d)"
-  mkdir -p "$rot/apps/bidrag-sak/src/main/kotlin"
-  mkdir -p "$rot/apps/bidrag-dokumenthåndtering/bidrag-dokument/src"
-  mkdir -p "$rot/libs/bidrag-oppgave-dto/src"
-  mkdir -p "$rot/.nais/bidrag-sak" "$rot/nais" "$rot/.github/workflows"
-  touch "$rot/pom.xml"
-  touch "$rot/apps/bidrag-sak/pom.xml"
-  touch "$rot/apps/bidrag-dokumenthåndtering/pom.xml"
-  touch "$rot/apps/bidrag-dokumenthåndtering/bidrag-dokument/pom.xml"
-  touch "$rot/libs/bidrag-oppgave-dto/pom.xml"
+  mkdir -p "$rot/apps/web/app"
+  mkdir -p "$rot/apps/behandling/src"
+  mkdir -p "$rot/packages/api/src"
+  mkdir -p "$rot/.nais/web" "$rot/nais" "$rot/.github/workflows"
+  touch "$rot/package.json"
+  touch "$rot/apps/web/package.json"
+  touch "$rot/apps/behandling/package.json"
+  touch "$rot/packages/api/package.json"
   printf '%s\n' "$rot"
 }
 
 ROT="$(lag_fikstur)"
 trap 'rm -rf "$ROT"' EXIT
 
-paastaa_lik "apps/bidrag-sak" \
-  "$(finn_modul "apps/bidrag-sak/src/main/kotlin/App.kt" "$ROT")" \
+paastaa_lik "apps/web" \
+  "$(finn_modul "apps/web/app/root.tsx" "$ROT")" \
   "finn_modul finner nærmeste app-modul"
 
-paastaa_lik "apps/bidrag-dokumenthåndtering/bidrag-dokument" \
-  "$(finn_modul "apps/bidrag-dokumenthåndtering/bidrag-dokument/src/App.kt" "$ROT")" \
-  "finn_modul velger nøstet modul framfor foreldremodul"
+paastaa_lik "apps/behandling" \
+  "$(finn_modul "apps/behandling/src/App.tsx" "$ROT")" \
+  "finn_modul finner behandling-appen"
 
-paastaa_lik "apps/bidrag-dokumenthåndtering" \
-  "$(finn_modul "apps/bidrag-dokumenthåndtering/pom.xml" "$ROT")" \
-  "finn_modul plasserer modulens egen pom i modulen"
+paastaa_lik "packages/api" \
+  "$(finn_modul "packages/api/package.json" "$ROT")" \
+  "finn_modul plasserer modulens egen package.json i modulen"
 
-paastaa_lik "libs/bidrag-oppgave-dto" \
-  "$(finn_modul "libs/bidrag-oppgave-dto/src/Dto.kt" "$ROT")" \
-  "finn_modul håndterer libs"
+paastaa_lik "packages/api" \
+  "$(finn_modul "packages/api/src/index.ts" "$ROT")" \
+  "finn_modul håndterer packages"
 
 paastaa_lik "$KATEGORI_NAIS" \
-  "$(finn_modul ".nais/bidrag-sak/nais.yaml" "$ROT")" \
+  "$(finn_modul ".nais/web/nais.yaml" "$ROT")" \
   "finn_modul kategoriserer .nais"
 
 paastaa_lik "$KATEGORI_NAIS" \
@@ -76,12 +75,12 @@ paastaa_lik "$KATEGORI_NAIS" \
   "finn_modul kategoriserer nais"
 
 paastaa_lik "$KATEGORI_WORKFLOW" \
-  "$(finn_modul ".github/workflows/bidrag-sak.yaml" "$ROT")" \
+  "$(finn_modul ".github/workflows/deploy.yaml" "$ROT")" \
   "finn_modul kategoriserer workflows"
 
 paastaa_lik "$KATEGORI_ROT" \
-  "$(finn_modul "pom.xml" "$ROT")" \
-  "finn_modul kategoriserer rot-pom"
+  "$(finn_modul "package.json" "$ROT")" \
+  "finn_modul kategoriserer rot-package.json"
 
 paastaa_lik "$KATEGORI_ANNET" \
   "$(finn_modul "README.md" "$ROT")" \
@@ -97,19 +96,19 @@ trap 'rm -rf "$ROT" "$GIT_ROT"' EXIT
   git config user.name "Test"
   git config commit.gpgsign false
   git config gpg.format openpgp
-  mkdir -p apps/bidrag-sak/src .nais/bidrag-sak
-  touch pom.xml apps/bidrag-sak/pom.xml
-  printf 'linje1\n' > apps/bidrag-sak/src/App.kt
+  mkdir -p apps/web/src .nais/web
+  touch package.json apps/web/package.json
+  printf 'linje1\n' > apps/web/src/App.tsx
   git add -A && git commit --quiet -m "start"
 
-  printf 'linje1\nlinje2\nlinje3\n' > apps/bidrag-sak/src/App.kt
-  printf 'image: test\n' > .nais/bidrag-sak/nais.yaml
-  printf 'data class Samvær(val id: Long)\n' > apps/bidrag-sak/src/Samvær.kt
+  printf 'linje1\nlinje2\nlinje3\n' > apps/web/src/App.tsx
+  printf 'image: test\n' > .nais/web/nais.yaml
+  printf 'export const samvær = { id: 1 }\n' > apps/web/src/Samvær.tsx
   git add -A && git commit --quiet -m "endring"
 )
 
 TABELL="$(cd "$GIT_ROT" && bygg_tabell HEAD~1 HEAD .)"
-paastaa_inneholder "| \`apps/bidrag-sak\` | 2 | +3 / -0 |" "$TABELL" \
+paastaa_inneholder "| \`apps/web\` | 2 | +3 / -0 |" "$TABELL" \
   "bygg_tabell teller filer og linjer per modul"
 paastaa_inneholder "| \`$KATEGORI_NAIS\` | 1 | +1 / -0 |" "$TABELL" \
   "bygg_tabell tar med nais-endringer"
