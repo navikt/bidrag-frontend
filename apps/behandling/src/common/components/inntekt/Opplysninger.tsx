@@ -75,6 +75,7 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
 
     const ikkeAktiverteEndringer: { [p: string]: IkkeAktivInntektDto[] } = selectedRoller.reduce(
         (acc, rolle) => ({
+            // biome-ignore lint/performance/noAccumulatingSpread: Ignorer for nå
             ...acc,
             [rolle.ident]: ikkeAktiverteEndringerIGrunnlagsdata.inntekter[inntektType]?.filter((v) => {
                 if (["barnetillegg", "kontantstøtte"].includes(inntektType)) {
