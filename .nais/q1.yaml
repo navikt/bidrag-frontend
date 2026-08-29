@@ -106,9 +106,11 @@ outbound:
     - application: bidrag-dokument-forsendelse-feature
     - application: bidrag-admin
     - application: bidrag-behandling-q1
+    - application: bidrag-kodeverk
     - application: bidrag-dokument-produksjon
   external:
     - bidrag-sak-q1.dev-fss-pub.nais.io
     - bidrag-organisasjon-feature.dev-fss-pub.nais.io
     - bidrag-person-q1.dev-fss-pub.nais.io
     - bidrag-dokument-feature.dev-fss-pub.nais.io
+    - bidrag-dokument-arkiv-feature.dev-fss-pub.nais.io
