@@ -468,49 +468,51 @@ export const BpsPrivatAvtalerTabellIkkeTilFordeling = ({
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {bidragIkkeTilFordeling.map(({ beregnetBidragPerBarn: row, personidentBarn, personnavn }, rowIndex) => (
-                        <React.Fragment key={rowIndex}>
-                            <Table.Row className="cursor-pointer">
-                                <Table.DataCell align="left" textSize="small">
-                                    <PersonNavn ident={personidentBarn} navn={personnavn} />
-                                </Table.DataCell>
-                                {finnesIndeksregulering && (
-                                    <Table.DataCell align="right" textSize="small">
-                                        {row.indeksreguleringFaktor
-                                            ? formatterProsent(row.indeksreguleringFaktor)
-                                            : "-"}
+                    {bidragIkkeTilFordeling.map(
+                        ({ beregnetBidragPerBarn: row, personidentBarn, personnavn }, rowIndex) => (
+                            <React.Fragment key={rowIndex}>
+                                <Table.Row className="cursor-pointer">
+                                    <Table.DataCell align="left" textSize="small">
+                                        <PersonNavn ident={personidentBarn} navn={personnavn} />
                                     </Table.DataCell>
-                                )}
-                                {inneholderUtenlandsk && (
-                                    <Table.DataCell align="right" textSize="small">
-                                        {row.valutakode === "NOK"
-                                            ? formatterBeløp(row.løpendeBeløp)
-                                            : `${formatterBeløp(row.løpendeBeløp)} (${row.valutakode})`}
-                                    </Table.DataCell>
-                                )}
-                                {løperIUtlandskValuta && (
-                                    <Table.DataCell align="right" textSize="small">
-                                        {formatterBeløp(row.valutakurs)}
-                                    </Table.DataCell>
-                                )}
-                                {løperIUtlandskValuta && (
-                                    <Table.DataCell align="right" textSize="small">
-                                        {formatterBeløp(row.beregnetBeløp)}
-                                    </Table.DataCell>
-                                )}
+                                    {finnesIndeksregulering && (
+                                        <Table.DataCell align="right" textSize="small">
+                                            {row.indeksreguleringFaktor
+                                                ? formatterProsent(row.indeksreguleringFaktor)
+                                                : "-"}
+                                        </Table.DataCell>
+                                    )}
+                                    {inneholderUtenlandsk && (
+                                        <Table.DataCell align="right" textSize="small">
+                                            {row.valutakode === "NOK"
+                                                ? formatterBeløp(row.løpendeBeløp)
+                                                : `${formatterBeløp(row.løpendeBeløp)} (${row.valutakode})`}
+                                        </Table.DataCell>
+                                    )}
+                                    {løperIUtlandskValuta && (
+                                        <Table.DataCell align="right" textSize="small">
+                                            {formatterBeløp(row.valutakurs)}
+                                        </Table.DataCell>
+                                    )}
+                                    {løperIUtlandskValuta && (
+                                        <Table.DataCell align="right" textSize="small">
+                                            {formatterBeløp(row.beregnetBeløp)}
+                                        </Table.DataCell>
+                                    )}
 
-                                {inneholderUtenlandsk && (
-                                    <Table.DataCell align="right" textSize="small">
-                                        {formatterBeløpForBeregning(row.samværsfradrag)}
-                                    </Table.DataCell>
-                                )}
+                                    {inneholderUtenlandsk && (
+                                        <Table.DataCell align="right" textSize="small">
+                                            {formatterBeløpForBeregning(row.samværsfradrag)}
+                                        </Table.DataCell>
+                                    )}
 
-                                <Table.DataCell align="right" textSize="small">
-                                    {formatterBeløpForBeregning(row.beregnetBidrag, true)}
-                                </Table.DataCell>
-                            </Table.Row>
-                        </React.Fragment>
-                    ))}
+                                    <Table.DataCell align="right" textSize="small">
+                                        {formatterBeløpForBeregning(row.beregnetBidrag, true)}
+                                    </Table.DataCell>
+                                </Table.Row>
+                            </React.Fragment>
+                        ),
+                    )}
                     <Table.Row className="!bg-inherit">
                         <Table.DataCell colSpan={7} align="right" textSize="small">
                             <div className="flex flex-row gap-[28px] justify-end">

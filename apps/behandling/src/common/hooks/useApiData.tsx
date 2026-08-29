@@ -670,16 +670,16 @@ export const useHarTilgangSak = (saksnummer: string): boolean => {
         queryFn: async () => {
             try {
                 const response = await BIDRAG_TILGANGSKONTROLL_API.v2.sjekkTilgangSakV2({ saksnummer });
-                return response.data.harTilgang
+                return response.data.harTilgang;
             } catch (e) {
                 console.log(e);
-                return false
+                return false;
             }
         },
         staleTime: Infinity,
     });
     return response;
-}
+};
 export const useGetBehandlingV2 = (): BehandlingDtoV2 => {
     const { behandlingId, vedtakId } = useBehandlingProvider();
     return useBehandlingV2(behandlingId, vedtakId);
@@ -766,7 +766,7 @@ export const useHentPersonData = (ident?: string) =>
             try {
                 const { data } = await PERSON_API.informasjon.hentPersonPost({ ident: ident });
                 return data;
-            } catch (e) {
+            } catch (_e) {
                 return { ident: "", visningsnavn: "Ingen tilgang", diskresjonskode: "SPSF" };
             }
         },
