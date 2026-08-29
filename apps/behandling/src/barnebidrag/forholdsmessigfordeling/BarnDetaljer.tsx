@@ -5,7 +5,11 @@ import BehandlingLenke from "../../common/components/BehandlingLenke";
 import { PopoverMonthPicker } from "../../common/components/date-picker/PopoverMonthPicker";
 import SakLenke from "../../common/components/SakLenke";
 import Søknadslenke from "../../common/components/Søknadslenke";
-import { useGetBehandlingV2, useGetForholdsmessigFordelingDetaljer } from "../../common/hooks/useApiData";
+import {
+    useGetBehandlingV2,
+    useGetForholdsmessigFordelingDetaljer,
+    useHarTilgangSak,
+} from "../../common/hooks/useApiData";
 import { hentVisningsnavn } from "../../common/hooks/useVisningsnavn";
 import {
     addMonthsIgnoreDay,
@@ -90,6 +94,7 @@ export function BarnDetaljerOpprettFF({
     const alleBarnErISøknaden = barn.every((b) =>
         roller.some((rb) => rb.ident === b.ident && rb.stønadstype === b.stønadstype),
     );
+    const harTilgangSak = useHarTilgangSak(saksnr);
     function renderInnkreving(barn: ForholdsmessigFordelingBarnDto) {
         const medInnkreving = barn.åpneBehandlinger.some((b) => b.medInnkreving);
         if (medInnkreving && !barn.innkrevesFraDato) {
@@ -157,7 +162,7 @@ export function BarnDetaljerOpprettFF({
                                 </BodyShort>
                             </div>
                         )}
-                        {bidragsmottaker.ident && (
+                        {harTilgangSak && bidragsmottaker.ident && (
                             <div>
                                 <Label size="small">Bidragsmottaker</Label>
                                 <BodyShort size="small">
@@ -168,40 +173,41 @@ export function BarnDetaljerOpprettFF({
                     </HStack>
                 </Box>
             )}
-            {barn.map((barn, index) => {
-                const beregningBarn = detaljer.løpendeBidragBarn?.find(
-                    (b) => b.gjelderBarnIdent === barn.ident && b.gjelderStønadstype === barn.stønadstype,
-                );
-                return (
-                    <Box
-                        key={barn.ident + index}
-                        padding="space-1"
-                        className={!alleBarnErISøknaden ? "border-t border-ax-border-neutral-subtle" : ""}
-                    >
-                        {!alleBarnErISøknaden && index > 0 && (
-                            <hr className="my-1 border-t border-ax-border-neutral-subtle" />
-                        )}
-                        <BodyShort size="small" className="ml-[-2px] font-semibold">
-                            <PersonNavnIdent ident={barn.ident} variant="compact" />
-                        </BodyShort>
-                        {!alleBarnErISøknaden &&
-                            renderIkkeAlleBarnISøknaden(stønadstype, barn, renderInnkreving, renderÅpenBehandling)}
-                        {barn.erRevurdering && (
-                            <BarnRevurderingsMonthPicker
-                                ident={`${barn.ident}|${barn.stønadstype}`}
-                                selectedDato={
-                                    manueltOverstyrteRevurderingsdatoer?.[`${barn.ident}|${barn.stønadstype}`]
-                                }
-                                onChange={onManueltOverstyrtRevurderingsdatoChange}
+            {harTilgangSak &&
+                barn.map((barn, index) => {
+                    const beregningBarn = detaljer.løpendeBidragBarn?.find(
+                        (b) => b.gjelderBarnIdent === barn.ident && b.gjelderStønadstype === barn.stønadstype,
+                    );
+                    return (
+                        <Box
+                            key={barn.ident + index}
+                            padding="space-1"
+                            className={!alleBarnErISøknaden ? "border-t border-ax-border-neutral-subtle" : ""}
+                        >
+                            {!alleBarnErISøknaden && index > 0 && (
+                                <hr className="my-1 border-t border-ax-border-neutral-subtle" />
+                            )}
+                            <BodyShort size="small" className="ml-[-2px] font-semibold">
+                                <PersonNavnIdent ident={barn.ident} variant="compact" />
+                            </BodyShort>
+                            {!alleBarnErISøknaden &&
+                                renderIkkeAlleBarnISøknaden(stønadstype, barn, renderInnkreving, renderÅpenBehandling)}
+                            {barn.erRevurdering && (
+                                <BarnRevurderingsMonthPicker
+                                    ident={`${barn.ident}|${barn.stønadstype}`}
+                                    selectedDato={
+                                        manueltOverstyrteRevurderingsdatoer?.[`${barn.ident}|${barn.stønadstype}`]
+                                    }
+                                    onChange={onManueltOverstyrtRevurderingsdatoChange}
+                                />
+                            )}
+                            <LøpendeBidragListe
+                                løpendeBidrag={beregningBarn?.løpendeBidragPerioder ?? []}
+                                harOpprettetFF={false}
                             />
-                        )}
-                        <LøpendeBidragListe
-                            løpendeBidrag={beregningBarn?.løpendeBidragPerioder ?? []}
-                            harOpprettetFF={false}
-                        />
-                    </Box>
-                );
-            })}
+                        </Box>
+                    );
+                })}
         </Box>
     );
 }

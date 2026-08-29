@@ -13,6 +13,7 @@ import { CalculationTabell } from "./CalculationTable";
 export interface BeregnetBidragPerBarnDtoInternal {
     beregnetBidragPerBarn: BeregnetBidragBarnDto;
     personidentBarn: string;
+    personnavn: string;
 }
 
 export type BeregnetBidragPerBarnDtoAdjusted = BeregnetBidragPerBarnDtoInternal & {
@@ -115,7 +116,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
                 <Table.Body>
                     {beregning
                         .filter((b) => !b.privatAvtale)
-                        .map(({ beregnetBidragPerBarn: row, personidentBarn }, rowIndex) => {
+                        .map(({ beregnetBidragPerBarn: row, personidentBarn, personnavn }, rowIndex) => {
                             const erVedtakKildeBBM =
                                 row.erVedtakKildeBBM === undefined || row.erVedtakKildeBBM === true;
                             return (
@@ -174,7 +175,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
                                         }
                                     >
                                         <Table.DataCell align="left" textSize="small">
-                                            <PersonNavn ident={personidentBarn} />
+                                            <PersonNavn ident={personidentBarn} navn={personnavn} />
                                         </Table.DataCell>
                                         <Table.DataCell align="left" textSize="small">
                                             <SakLenke saksnummer={row.saksnummer} />
@@ -467,11 +468,11 @@ export const BpsPrivatAvtalerTabellIkkeTilFordeling = ({
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {bidragIkkeTilFordeling.map(({ beregnetBidragPerBarn: row, personidentBarn }, rowIndex) => (
+                    {bidragIkkeTilFordeling.map(({ beregnetBidragPerBarn: row, personidentBarn, personnavn }, rowIndex) => (
                         <React.Fragment key={rowIndex}>
                             <Table.Row className="cursor-pointer">
                                 <Table.DataCell align="left" textSize="small">
-                                    <PersonNavn ident={personidentBarn} />
+                                    <PersonNavn ident={personidentBarn} navn={personnavn} />
                                 </Table.DataCell>
                                 {finnesIndeksregulering && (
                                     <Table.DataCell align="right" textSize="small">

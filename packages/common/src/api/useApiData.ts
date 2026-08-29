@@ -10,8 +10,13 @@ export const useHentPersonData = (ident?: string) => {
         queryKey: getKey(ident),
         queryFn: async (): Promise<PersonDto> => {
             if (!ident || StringUtils.isEmpty(ident)) return { ident: "", visningsnavn: "Ukjent" };
-            const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident: ident });
-            return data;
+            try {
+                const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident: ident });
+                return data;
+            } catch (error) {
+                return { ident: "", visningsnavn: "Ingen tilgang", diskresjonskode: "SPSF" };
+            }
+
         },
         staleTime: Infinity,
     });
