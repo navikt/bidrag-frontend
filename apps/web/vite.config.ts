@@ -60,7 +60,8 @@ export default defineConfig(({ command, mode }) => {
             // ikke oppdaget av Vites innledende avhengighetsskann, som kan gi en
             // midlertidig duplisert React-instans ("Invalid hook call") ved første
             // navigering til /rediger. Ved å inkludere den eksplisitt her (og som
-            // devDependency i package.json, slik at Vite kan resolve den) blir den
+            // ordinær dependency i package.json, slik at den også følger med i
+            // produksjonsutrullingen via `pnpm deploy --prod`) blir den
             // forhåndsbundlet sammen med resten av appen fra start.
             include: ["react-zoom-pan-pinch"],
         },
