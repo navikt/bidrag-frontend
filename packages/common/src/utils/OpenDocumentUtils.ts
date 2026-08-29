@@ -120,6 +120,7 @@ export class OpenDocumentUtils {
             `Åpner dokument ${journalpostId}/${dokumentreferanse} med format ${dokumentMetadata?.format} og status ${dokumentMetadata?.status}`,
         );
 
+        console.log(dokumentMetadataResponse)
         // Dokumenter under produksjon er ikke arkivert enda, og metadata kan derfor komme litt forsinket
         if (dokumentMetadata?.status === DokumentStatusDto.UNDER_PRODUKSJON) {
             const currentRetryCount = retryCount ?? 0;

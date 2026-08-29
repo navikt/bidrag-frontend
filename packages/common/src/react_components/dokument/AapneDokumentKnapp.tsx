@@ -44,10 +44,11 @@ export default function AapneDokumentKnapp({
     const [laster, setLaster] = useState(false);
 
     const kanÅpnesDirekte = status === DokumentStatusDto.FERDIGSTILT && Boolean(dokumentreferanse);
-    const kanÅpnesMedMbdok = status === DokumentStatusDto.UNDER_PRODUKSJON && Boolean(dokumentreferanse);
+    const kanÅpnesMedMbdok = status === DokumentStatusDto.UNDER_REDIGERING && Boolean(dokumentreferanse);
     const dokumentHref = `/dokument/${journalpostId}/${dokumentreferanse}?dok=${dokumentreferanse}`;
 
     function åpneMedMbdok() {
+        console.log(laster, dokumentreferanse)
         if (laster || !dokumentreferanse) return;
         setLaster(true);
         window.setTimeout(() => setLaster(false), MBDOK_SPINNER_VARIGHET_MS);

@@ -51,7 +51,7 @@ export default function FerdigstillButton() {
             {modalOpen && (
                 <Modal
                     open
-                    style={{background: "black"}}
+                    style={{ background: "black" }}
                     portal
                     onClose={closeModal}
                     closeOnBackdropClick
@@ -60,7 +60,7 @@ export default function FerdigstillButton() {
                         closeButton: true,
                     }}
                 >
-                    <Modal.Body style={{background: "black"}}>
+                    <Modal.Body style={{ background: "black" }}>
                         <BodyShort size={"small"}>
                             Etter skjemaet er ferdigstilt vil den bli låst for endringer og være klar for distribusjon.
                             Du kan senere låse opp skjemaet og endre innholdet før forsendelsen er distribuert.
