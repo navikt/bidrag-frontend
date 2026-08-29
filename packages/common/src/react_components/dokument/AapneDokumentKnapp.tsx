@@ -131,7 +131,6 @@ export default function AapneDokumentKnapp({
     return (
         <>
             {renderÅpneknapp()}
-            {variant === "ikon" && kanÅpnesMedMbdok && laster && <Loader size="xsmall" title="Åpner dokument …" />}
             {visRedigering && (
                 <Button
                     size="small"
