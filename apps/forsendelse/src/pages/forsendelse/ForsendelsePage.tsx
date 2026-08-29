@@ -58,11 +58,11 @@ function ForsendelseView() {
                 <div className={"leading-ax-xlarge tracking-wide"}>
                     <ForsendelseTittel />
                     <div className={"w-max"}>
-                        <VStack gap={{ xs: "space-12", md: "space-12", lg: "space-4" }}>
+                        <VStack gap={{ xs: "space-16", md: "space-16", lg: "space-12" }}>
                             <Gjelder />
                             <Mottaker />
                         </VStack>
-                        <VStack gap={{ xs: "space-12", md: "space-12", lg: "space-4" }}>
+                        <VStack gap={{ xs: "space-16", md: "space-16", lg: "space-8" }}>
                             <ForsendelseDetaljer />
                         </VStack>
                     </div>

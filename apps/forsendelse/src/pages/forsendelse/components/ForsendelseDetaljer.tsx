@@ -12,7 +12,7 @@ export default function ForsendelseDetaljer() {
     return (
         <div>
             {/* <Heading size="small">Andre detaljer</Heading> */}
-            <div className="h-px w-full bg-ax-border-neutral-subtle mt-2 mb-2" />
+            <div className="h-px w-full bg-ax-border-neutral-subtle mt-4 mb-3" />
             <div className="flex flex-row static_data">
                 <DetailsGrid
                     rows={[
