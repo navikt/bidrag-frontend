@@ -38,6 +38,10 @@
     justify-content: space-between;
     padding: 0px;
 }
+.editor_toolbar div button {
+    margin: 5px 10px;
+    color: black;
+}
 .editor_toolbar div .buttons_left {
     justify-content: flex-end;
     align-items: flex-end;
@@ -51,10 +55,7 @@
     color: white;
     justify-content: center;
 }
-.editor_toolbar div button {
-    margin: 5px 10px;
-    color: black;
-}
+
 /*.editor_toolbar .save-state-indicator circle.navds-loader__background {*/
 /*  stroke: white;*/
 /*}*/

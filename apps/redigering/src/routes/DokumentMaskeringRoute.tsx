@@ -15,5 +15,5 @@ export default function DokumentMaskeringRoute() {
         document.title = `Dokumentmaskering - ${forsendelseId}`;
     }, [forsendelseId]);
 
-    return <DokumentMaskeringPage forsendelseId={forsendelseId!} dokumentreferanse={dokumentreferanse!} />;
+    return <DokumentMaskeringPage forsendelseId={forsendelseId} dokumentreferanse={dokumentreferanse!} />;
 }

@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: sidebar container only stops click propagation, no interactive semantics */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: sidebar container only stops click propagation, no interactive semantics */
 import "./Sidebar.css";
 
 import { BodyShort, Checkbox, Detail, Popover } from "@navikt/ds-react";
@@ -120,7 +118,7 @@ function PageSection({ title, pageRange, index }: IPageSectionProps) {
                         indeterminate={isSomePagesDeleted}
                         size={"small"}
                         className={"checkbox"}
-                    ></Checkbox>
+                    >.</Checkbox>
                     <BodyShort
                         size="small"
                         as="div"
@@ -150,8 +148,6 @@ function DocumentTitlePopover({ title }: { title: string }) {
                 className="truncate"
                 onMouseOver={() => setOpenState(true)}
                 onMouseLeave={() => setOpenState(false)}
-                onFocus={() => setOpenState(true)}
-                onBlur={() => setOpenState(false)}
             >
                 {title}
             </span>

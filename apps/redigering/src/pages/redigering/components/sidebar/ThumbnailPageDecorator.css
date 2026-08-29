@@ -1,5 +1,5 @@
 .pagesize_minimized .thumbnail_toolbar {
-    visibility: hidden;
+    visibility: hidden !important;
 }
 
 .thumbnail_toolbar {
@@ -20,11 +20,11 @@
 }
 
 .thumbnail_decorator.deleted .thumbnail_page_container .pagecontainer .page {
-    opacity: 4%;
+    opacity: 4% !important;
 }
 
 .thumbnail_decorator.deleted .thumbnail_page_container .pagecontainer .page.infocus {
-    opacity: 10%;
+    opacity: 10% !important;
 }
 
 .thumbnail_decorator .button {

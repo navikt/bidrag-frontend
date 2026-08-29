@@ -151,11 +151,11 @@ export default function SubmitPdfButton() {
                                     ? `${remainingPages} sider gjenstår av ${totalPages}.`
                                     : "Antall sider er ikke lastet enda."}
                             </BodyShort>
-                            <BodyShort spacing>Fjernede sider: {removedPages.length}</BodyShort>
-                            <BodyShort spacing>Maskerte sider: {maskedPagesCount}</BodyShort>
-                            <BodyShort spacing>Roterte sider: {rotatedPagesCount}</BodyShort>
-                            <div className="mt-3 grid gap-1">
-                                <BodyShort spacing>Følgende sider har blitt endret eller fjernet:</BodyShort>
+                            <BodyShort size="small">Fjernede sider: {removedPages.length}</BodyShort>
+                            <BodyShort size="small">Maskerte sider: {maskedPagesCount}</BodyShort>
+                            <BodyShort size="small">Roterte sider: {rotatedPagesCount}</BodyShort>
+                            <div className="mt-3 grid gap-0">
+                                <BodyShort>Følgende sider har blitt endret eller fjernet:</BodyShort>
                                 <BodyShort size="small">
                                     <span className="font-semibold">Fjernede sider:</span>{" "}
                                     {formatPageNumbers(sortedRemovedPages)}

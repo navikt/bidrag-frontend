@@ -1,5 +1,5 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: Migrering */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Migrering */
 import { DndContext, type DragEndEvent, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import type { Active } from "@dnd-kit/core/dist/store";
 import { restrictToParentElement } from "@dnd-kit/modifiers";

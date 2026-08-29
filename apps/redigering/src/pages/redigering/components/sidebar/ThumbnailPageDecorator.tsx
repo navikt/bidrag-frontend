@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: hover wrapper only toggles toolbar visibility, not a keyboard-operable control */
 import "./ThumbnailPageDecorator.css";
 
 import { PlusCircleFillIcon, TrashFillIcon } from "@navikt/aksel-icons";
@@ -25,8 +24,6 @@ export default function ThumbnailPageDecorator({ pageNumber }: ThumbnailPageDeco
         <div
             onMouseOver={() => setMouseOver(true)}
             onMouseLeave={() => setMouseOver(false)}
-            onFocus={() => setMouseOver(true)}
-            onBlur={() => setMouseOver(false)}
             ref={decoratorRef}
             className={`thumbnail_decorator ${isDeleted ? "deleted" : ""}`}
         >
@@ -61,10 +58,8 @@ const PageContainer = ({ pageNumber, onPageClick, index, currentPage }: PdfPageC
     const id = `thumbnail_page_${pageNumber}`;
     const pageRotation = pageRotations[pageNumber] ?? 0;
     return (
-        <button
-            type="button"
+        <div
             onClick={() => onPageClick(pageNumber)}
-            aria-label={`Gå til side ${pageNumber}`}
             className={`thumbnail_page_container ${currentPage === pageNumber ? "infocus" : ""}`}
         >
             <PdfPage pageNumber={pageNumber} index={index} rotation={pageRotation} key={`tpage_index_${index}`}>
@@ -81,7 +76,7 @@ const PageContainer = ({ pageNumber, onPageClick, index, currentPage }: PdfPageC
                     ))}
             </PdfPage>
             <div className={"pagenumber"}>{pageNumber}</div>
-        </button>
+        </div>
     );
 };
 
@@ -98,6 +93,7 @@ function ThumbnailPageToolbar({ hidden, isDeleted, onToggleDelete }: ThumbnailPa
                 className={
                     "bg-[white] border-solid border border-ax-border-neutral inline-flex rounded-md shadow-sm hover:border-ax-border-neutral-strong"
                 }
+                role={"group"}
             >
                 {!isDeleted && isAllowedToDeletePage() && (
                     <ToolbarButton

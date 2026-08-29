@@ -87,6 +87,11 @@ env:
   - name: KODEVERK_URL_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-kodeverk/.default
 
+  - name: BIDRAG_DOKUMENT_ARKIV_URL
+    value: https://bidrag-dokument-arkiv-feature.dev-fss-pub.nais.io/bidrag-dokument-arkiv
+  - name: BIDRAG_DOKUMENT_ARKIV_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-dokument-arkiv-feature/.default
+
 unleash:
   host: bidrag-unleash-api.nav.cloud.nais.io
   environment: development

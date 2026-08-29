@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -8,6 +9,305 @@
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
+
+/** Journalposten ble mottatt/sendt ut i kanal */
+export enum Kanal {
+  NAV_NO = "NAV_NO",
+  NAV_NO_BID = "NAV_NO_BID",
+  SKAN_BID = "SKAN_BID",
+  SKAN_NETS = "SKAN_NETS",
+  SKAN_IM = "SKAN_IM",
+  LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
+  SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
+  SDP = "SDP",
+  INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
+  INNSENDT_NAV_ANSATT = "INNSENDT_NAV_ANSATT",
+  NAV_NO_UINNLOGGET = "NAV_NO_UINNLOGGET",
+  NAV_NO_CHAT = "NAV_NO_CHAT",
+}
+
+export enum JournalpostStatus {
+  AVVIK_ENDRE_FAGOMRADE = "AVVIK_ENDRE_FAGOMRADE",
+  AVVIK_BESTILL_RESKANNING = "AVVIK_BESTILL_RESKANNING",
+  AVVIK_BESTILL_SPLITTING = "AVVIK_BESTILL_SPLITTING",
+  MOTTATT = "MOTTATT",
+  JOURNALFORT = "JOURNALFØRT",
+  EKSPEDERT = "EKSPEDERT",
+  EKSPEDERT_JOARK = "EKSPEDERT_JOARK",
+  MOTTAKSREGISTRERT = "MOTTAKSREGISTRERT",
+  UKJENT = "UKJENT",
+  DISTRIBUERT = "DISTRIBUERT",
+  AVBRUTT = "AVBRUTT",
+  KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
+  DOKUMENT_SLETTET = "DOKUMENT_SLETTET",
+  RETUR = "RETUR",
+  FERDIGSTILT = "FERDIGSTILT",
+  FEILREGISTRERT = "FEILREGISTRERT",
+  RESERVERT = "RESERVERT",
+  UTGAR = "UTGÅR",
+  SLETTET = "SLETTET",
+  UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
+  TIL_LAGRING = "TIL_LAGRING",
+  OPPRETTET = "OPPRETTET",
+  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+}
+
+export enum AvsenderMottakerDtoIdType {
+  FNR = "FNR",
+  SAMHANDLER = "SAMHANDLER",
+  ORGNR = "ORGNR",
+  UTENLANDSK_ORGNR = "UTENLANDSK_ORGNR",
+  UKJENT = "UKJENT",
+}
+
+/** Status på forsendelsen */
+export enum ForsendelseStatusTo {
+  UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
+  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+  FERDIGSTILT = "FERDIGSTILT",
+  SLETTET = "SLETTET",
+  DISTRIBUERT = "DISTRIBUERT",
+  DISTRIBUERT_LOKALT = "DISTRIBUERT_LOKALT",
+}
+
+export enum DokumentFormatDto {
+  PDF = "PDF",
+  MBDOK = "MBDOK",
+  HTML = "HTML",
+}
+
+/** Identtypene til en aktør */
+export enum IdentType {
+  AKTOERID = "AKTOERID",
+  FNR = "FNR",
+  ORGNR = "ORGNR",
+}
+
+export enum Sprak {
+  NB = "NB",
+  NN = "NN",
+  AR = "AR",
+  DA = "DA",
+  DE = "DE",
+  EN = "EN",
+  EL = "EL",
+  ET = "ET",
+  ES = "ES",
+  FI = "FI",
+  FR = "FR",
+  IS = "IS",
+  IT = "IT",
+  JA = "JA",
+  HR = "HR",
+  LV = "LV",
+  LT = "LT",
+  NL = "NL",
+  PL = "PL",
+  PT = "PT",
+  RO = "RO",
+  RU = "RU",
+  SR = "SR",
+  SL = "SL",
+  SK = "SK",
+  SV = "SV",
+  TH = "TH",
+  TR = "TR",
+  UK = "UK",
+  HU = "HU",
+  VI = "VI",
+}
+
+export enum DokumentStatusDto {
+  IKKE_BESTILT = "IKKE_BESTILT",
+  BESTILLING_FEILET = "BESTILLING_FEILET",
+  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+  UNDER_REDIGERING = "UNDER_REDIGERING",
+  FERDIGSTILT = "FERDIGSTILT",
+  AVBRUTT = "AVBRUTT",
+}
+
+/** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
+export enum ForsendelseTypeTo {
+  UTGAENDE = "UTGÅENDE",
+  NOTAT = "NOTAT",
+}
+
+/** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
+export enum DokumentStatusTo {
+  IKKE_BESTILT = "IKKE_BESTILT",
+  BESTILLING_FEILET = "BESTILLING_FEILET",
+  AVBRUTT = "AVBRUTT",
+  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+  UNDER_REDIGERING = "UNDER_REDIGERING",
+  FERDIGSTILT = "FERDIGSTILT",
+  MAKONTROLLERES = "MÅ_KONTROLLERES",
+  KONTROLLERT = "KONTROLLERT",
+}
+
+export enum HttpStatus {
+  Value100CONTINUE = "100 CONTINUE",
+  Value101SWITCHINGPROTOCOLS = "101 SWITCHING_PROTOCOLS",
+  Value102PROCESSING = "102 PROCESSING",
+  Value103EARLYHINTS = "103 EARLY_HINTS",
+  Value200OK = "200 OK",
+  Value201CREATED = "201 CREATED",
+  Value202ACCEPTED = "202 ACCEPTED",
+  Value203NONAUTHORITATIVEINFORMATION = "203 NON_AUTHORITATIVE_INFORMATION",
+  Value204NOCONTENT = "204 NO_CONTENT",
+  Value205RESETCONTENT = "205 RESET_CONTENT",
+  Value206PARTIALCONTENT = "206 PARTIAL_CONTENT",
+  Value207MULTISTATUS = "207 MULTI_STATUS",
+  Value208ALREADYREPORTED = "208 ALREADY_REPORTED",
+  Value226IMUSED = "226 IM_USED",
+  Value300MULTIPLECHOICES = "300 MULTIPLE_CHOICES",
+  Value301MOVEDPERMANENTLY = "301 MOVED_PERMANENTLY",
+  Value302FOUND = "302 FOUND",
+  Value303SEEOTHER = "303 SEE_OTHER",
+  Value304NOTMODIFIED = "304 NOT_MODIFIED",
+  Value307TEMPORARYREDIRECT = "307 TEMPORARY_REDIRECT",
+  Value308PERMANENTREDIRECT = "308 PERMANENT_REDIRECT",
+  Value400BADREQUEST = "400 BAD_REQUEST",
+  Value401UNAUTHORIZED = "401 UNAUTHORIZED",
+  Value402PAYMENTREQUIRED = "402 PAYMENT_REQUIRED",
+  Value403FORBIDDEN = "403 FORBIDDEN",
+  Value404NOTFOUND = "404 NOT_FOUND",
+  Value405METHODNOTALLOWED = "405 METHOD_NOT_ALLOWED",
+  Value406NOTACCEPTABLE = "406 NOT_ACCEPTABLE",
+  Value407PROXYAUTHENTICATIONREQUIRED = "407 PROXY_AUTHENTICATION_REQUIRED",
+  Value408REQUESTTIMEOUT = "408 REQUEST_TIMEOUT",
+  Value409CONFLICT = "409 CONFLICT",
+  Value410GONE = "410 GONE",
+  Value411LENGTHREQUIRED = "411 LENGTH_REQUIRED",
+  Value412PRECONDITIONFAILED = "412 PRECONDITION_FAILED",
+  Value413CONTENTTOOLARGE = "413 CONTENT_TOO_LARGE",
+  Value413PAYLOADTOOLARGE = "413 PAYLOAD_TOO_LARGE",
+  Value414URITOOLONG = "414 URI_TOO_LONG",
+  Value415UNSUPPORTEDMEDIATYPE = "415 UNSUPPORTED_MEDIA_TYPE",
+  Value416REQUESTEDRANGENOTSATISFIABLE = "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+  Value417EXPECTATIONFAILED = "417 EXPECTATION_FAILED",
+  Value418IAMATEAPOT = "418 I_AM_A_TEAPOT",
+  Value421MISDIRECTEDREQUEST = "421 MISDIRECTED_REQUEST",
+  Value422UNPROCESSABLECONTENT = "422 UNPROCESSABLE_CONTENT",
+  Value422UNPROCESSABLEENTITY = "422 UNPROCESSABLE_ENTITY",
+  Value423LOCKED = "423 LOCKED",
+  Value424FAILEDDEPENDENCY = "424 FAILED_DEPENDENCY",
+  Value425TOOEARLY = "425 TOO_EARLY",
+  Value426UPGRADEREQUIRED = "426 UPGRADE_REQUIRED",
+  Value428PRECONDITIONREQUIRED = "428 PRECONDITION_REQUIRED",
+  Value429TOOMANYREQUESTS = "429 TOO_MANY_REQUESTS",
+  Value431REQUESTHEADERFIELDSTOOLARGE = "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+  Value451UNAVAILABLEFORLEGALREASONS = "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+  Value500INTERNALSERVERERROR = "500 INTERNAL_SERVER_ERROR",
+  Value501NOTIMPLEMENTED = "501 NOT_IMPLEMENTED",
+  Value502BADGATEWAY = "502 BAD_GATEWAY",
+  Value503SERVICEUNAVAILABLE = "503 SERVICE_UNAVAILABLE",
+  Value504GATEWAYTIMEOUT = "504 GATEWAY_TIMEOUT",
+  Value505HTTPVERSIONNOTSUPPORTED = "505 HTTP_VERSION_NOT_SUPPORTED",
+  Value506VARIANTALSONEGOTIATES = "506 VARIANT_ALSO_NEGOTIATES",
+  Value507INSUFFICIENTSTORAGE = "507 INSUFFICIENT_STORAGE",
+  Value508LOOPDETECTED = "508 LOOP_DETECTED",
+  Value509BANDWIDTHLIMITEXCEEDED = "509 BANDWIDTH_LIMIT_EXCEEDED",
+  Value510NOTEXTENDED = "510 NOT_EXTENDED",
+  Value511NETWORKAUTHENTICATIONREQUIRED = "511 NETWORK_AUTHENTICATION_REQUIRED",
+}
+
+export enum Vedtakstype {
+  INDEKSREGULERING = "INDEKSREGULERING",
+  ALDERSJUSTERING = "ALDERSJUSTERING",
+  OPPHOR = "OPPHØR",
+  ALDERSOPPHOR = "ALDERSOPPHØR",
+  REVURDERING = "REVURDERING",
+  FASTSETTELSE = "FASTSETTELSE",
+  INNKREVING = "INNKREVING",
+  KLAGE = "KLAGE",
+  ENDRING = "ENDRING",
+  ENDRING_MOTTAKER = "ENDRING_MOTTAKER",
+}
+
+export enum SoktAvType {
+  BIDRAGSMOTTAKER = "BIDRAGSMOTTAKER",
+  BIDRAGSPLIKTIG = "BIDRAGSPLIKTIG",
+  BARN18AR = "BARN_18_ÅR",
+  BM_I_ANNEN_SAK = "BM_I_ANNEN_SAK",
+  NAV_BIDRAG = "NAV_BIDRAG",
+  FYLKESNEMDA = "FYLKESNEMDA",
+  NAV_INTERNASJONALT = "NAV_INTERNASJONALT",
+  KOMMUNE = "KOMMUNE",
+  NORSKE_MYNDIGHET = "NORSKE_MYNDIGHET",
+  UTENLANDSKE_MYNDIGHET = "UTENLANDSKE_MYNDIGHET",
+  VERGE = "VERGE",
+  TRYGDEETATEN_INNKREVING = "TRYGDEETATEN_INNKREVING",
+  KLAGE_ANKE = "KLAGE_ANKE",
+  KONVERTERING = "KONVERTERING",
+}
+
+export enum Stonadstype {
+  BIDRAG = "BIDRAG",
+  FORSKUDD = "FORSKUDD",
+  BIDRAG18AAR = "BIDRAG18AAR",
+  EKTEFELLEBIDRAG = "EKTEFELLEBIDRAG",
+  MOTREGNING = "MOTREGNING",
+  OPPFOSTRINGSBIDRAG = "OPPFOSTRINGSBIDRAG",
+}
+
+export enum MottakerIdentTypeTo {
+  FNR = "FNR",
+  SAMHANDLER = "SAMHANDLER",
+}
+
+export enum JournalTema {
+  BID = "BID",
+  FAR = "FAR",
+}
+
+export enum Engangsbeloptype {
+  DIREKTE_OPPGJOR = "DIREKTE_OPPGJOR",
+  DIREKTEOPPGJOR = "DIREKTE_OPPGJØR",
+  ETTERGIVELSE = "ETTERGIVELSE",
+  ETTERGIVELSE_TILBAKEKREVING = "ETTERGIVELSE_TILBAKEKREVING",
+  GEBYR_MOTTAKER = "GEBYR_MOTTAKER",
+  GEBYR_SKYLDNER = "GEBYR_SKYLDNER",
+  INNKREVING_GJELD = "INNKREVING_GJELD",
+  TILBAKEKREVING = "TILBAKEKREVING",
+  TILBAKEKREVING_BIDRAG = "TILBAKEKREVING_BIDRAG",
+  SAERTILSKUDD = "SAERTILSKUDD",
+  SAeRTILSKUDD = "SÆRTILSKUDD",
+  SAeRBIDRAG = "SÆRBIDRAG",
+}
+
+export enum DokumentArkivSystemDto {
+  JOARK = "JOARK",
+  MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+  UKJENT = "UKJENT",
+  BIDRAG = "BIDRAG",
+  FORSENDELSE = "FORSENDELSE",
+}
+
+export interface DokumentMalDetaljer {
+  malId: string;
+  tittel: string;
+  type: "UTGÅENDE" | "NOTAT";
+  kanBestilles: boolean;
+  redigerbar: boolean;
+  beskrivelse: string;
+  nyDokumentProduksjon: boolean;
+  statiskInnhold: boolean;
+  kreverVedtak: boolean;
+  kreverBehandling: boolean;
+  innholdType?:
+    | "NOTAT"
+    | "VARSEL_STANDARD"
+    | "VARSEL"
+    | "VEDTAK"
+    | "VEDLEGG_VEDTAK"
+    | "VEDLEGG_VARSEL"
+    | "VEDLEGG"
+    | "SKJEMA";
+  gruppeVisningsnavn?: string | null;
+  språk: string[];
+  tilhorerEnheter: string[];
+  alternativeTitler: string[];
+}
 
 export interface OppdaterEttersendelseDokumentRequest {
   /** @format int64 */
@@ -61,34 +361,6 @@ export interface BehandlingInfoDto {
   barnIBehandling: string[];
 }
 
-export enum DokumentArkivSystemDto {
-  JOARK = "JOARK",
-  MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
-  UKJENT = "UKJENT",
-  BIDRAG = "BIDRAG",
-  FORSENDELSE = "FORSENDELSE",
-}
-
-export enum Engangsbeloptype {
-  DIREKTE_OPPGJOR = "DIREKTE_OPPGJOR",
-  DIREKTEOPPGJOR = "DIREKTE_OPPGJØR",
-  ETTERGIVELSE = "ETTERGIVELSE",
-  ETTERGIVELSE_TILBAKEKREVING = "ETTERGIVELSE_TILBAKEKREVING",
-  GEBYR_MOTTAKER = "GEBYR_MOTTAKER",
-  GEBYR_SKYLDNER = "GEBYR_SKYLDNER",
-  INNKREVING_GJELD = "INNKREVING_GJELD",
-  TILBAKEKREVING = "TILBAKEKREVING",
-  TILBAKEKREVING_BIDRAG = "TILBAKEKREVING_BIDRAG",
-  SAERTILSKUDD = "SAERTILSKUDD",
-  SAeRTILSKUDD = "SÆRTILSKUDD",
-  SAeRBIDRAG = "SÆRBIDRAG",
-}
-
-export enum JournalTema {
-  BID = "BID",
-  FAR = "FAR",
-}
-
 export interface MottakerAdresseTo {
   adresselinje1: string;
   adresselinje2?: string | null;
@@ -102,16 +374,12 @@ export interface MottakerAdresseTo {
   poststed?: string | null;
 }
 
-export enum MottakerIdentTypeTo {
-  FNR = "FNR",
-  SAMHANDLER = "SAMHANDLER",
-}
-
 export interface MottakerTo {
   ident?: string | null;
   språk?: string | null;
   navn?: string | null;
   identType?: MottakerIdentTypeTo | null;
+  /** Adresse til mottaker hvis dokumentet sendes som brev */
   adresse?: MottakerAdresseTo | null;
 }
 
@@ -121,6 +389,7 @@ export interface OpprettDokumentForesporsel {
   tittel: string;
   /** Språket på inneholdet i dokumentet. */
   språk?: string | null;
+  /** Arkivsystem hvor dokument er lagret */
   arkivsystem?: DokumentArkivSystemDto | null;
   /**
    * Dato dokument ble opprettet
@@ -155,9 +424,11 @@ export interface OpprettForsendelseForesporsel {
   saksnummer: string;
   /** NAV-enheten som oppretter forsendelsen */
   enhet: string;
+  /** Detaljer om behandling hvis forsendelsen inneholder brev for en behandling eller vedtak */
   behandlingInfo?: BehandlingInfoDto | null;
   /** Identifikator til batch kjøring forsendelsen ble opprettet av */
   batchId?: string | null;
+  /** Tema forsendelsen skal opprettes med */
   tema?: JournalTema | null;
   /** Språk forsendelsen skal være på */
   språk?: string | null;
@@ -168,45 +439,6 @@ export interface OpprettForsendelseForesporsel {
   unikReferanse?: string | null;
   /** Distribuer forsendelse automatisk etter ferdigstilling. Dette kan brukes hvis det er opprettet av batch eller en vedtaksbrev som skal automatisk distribueres etter fattet vedtak (feks manuell aldersjustering) */
   distribuerAutomatiskEtterFerdigstilling: boolean;
-}
-
-export enum Stonadstype {
-  BIDRAG = "BIDRAG",
-  FORSKUDD = "FORSKUDD",
-  BIDRAG18AAR = "BIDRAG18AAR",
-  EKTEFELLEBIDRAG = "EKTEFELLEBIDRAG",
-  MOTREGNING = "MOTREGNING",
-  OPPFOSTRINGSBIDRAG = "OPPFOSTRINGSBIDRAG",
-}
-
-export enum SoktAvType {
-  BIDRAGSMOTTAKER = "BIDRAGSMOTTAKER",
-  BIDRAGSPLIKTIG = "BIDRAGSPLIKTIG",
-  BARN18AR = "BARN_18_ÅR",
-  BM_I_ANNEN_SAK = "BM_I_ANNEN_SAK",
-  NAV_BIDRAG = "NAV_BIDRAG",
-  FYLKESNEMDA = "FYLKESNEMDA",
-  NAV_INTERNASJONALT = "NAV_INTERNASJONALT",
-  KOMMUNE = "KOMMUNE",
-  NORSKE_MYNDIGHET = "NORSKE_MYNDIGHET",
-  UTENLANDSKE_MYNDIGHET = "UTENLANDSKE_MYNDIGHET",
-  VERGE = "VERGE",
-  TRYGDEETATEN_INNKREVING = "TRYGDEETATEN_INNKREVING",
-  KLAGE_ANKE = "KLAGE_ANKE",
-  KONVERTERING = "KONVERTERING",
-}
-
-export enum Vedtakstype {
-  INDEKSREGULERING = "INDEKSREGULERING",
-  ALDERSJUSTERING = "ALDERSJUSTERING",
-  OPPHOR = "OPPHØR",
-  ALDERSOPPHOR = "ALDERSOPPHØR",
-  REVURDERING = "REVURDERING",
-  FASTSETTELSE = "FASTSETTELSE",
-  INNKREVING = "INNKREVING",
-  KLAGE = "KLAGE",
-  ENDRING = "ENDRING",
-  ENDRING_MOTTAKER = "ENDRING_MOTTAKER",
 }
 
 export interface ConflictException {
@@ -256,10 +488,10 @@ export interface ConflictException {
   statusCode?: DefaultHttpStatusCode | HttpStatus;
   statusText?: string;
   responseHeaders?: HttpHeaders;
-  responseBodyAsString?: string;
   /** @format byte */
-  responseBodyAsByteArray?: string;
+  responseBodyAsByteArray?: Blob;
   bodyConvertFunction?: any;
+  responseBodyAsString?: string;
   rootCause?: {
     cause?: {
       stackTrace?: {
@@ -411,13 +643,44 @@ export interface ContentDisposition {
 export type DefaultHttpStatusCode = HttpStatusCode;
 
 export interface HttpHeaders {
+  acceptLanguage?: {
+    range?: string;
+    /** @format double */
+    weight?: number;
+  }[];
+  basicAuth?: string;
+  accept?: MediaType[];
+  acceptLanguageAsLocales?: string[];
+  acceptPatch?: MediaType[];
+  accessControlAllowCredentials?: boolean;
+  accessControlAllowHeaders?: string[];
+  accessControlAllowMethods?: HttpMethod[];
+  accessControlAllowOrigin?: string;
+  accessControlExposeHeaders?: string[];
+  /** @format int64 */
+  accessControlMaxAge?: number;
+  accessControlRequestHeaders?: string[];
+  accessControlRequestMethod?: HttpMethod;
   acceptCharset?: string[];
+  /** @uniqueItems true */
+  allow?: HttpMethod[];
   contentDisposition?: ContentDisposition;
+  contentLanguage?: string;
+  etag?: string;
+  /** @format int64 */
+  expires?: number;
+  ifMatch?: string[];
+  ifNoneMatch?: string[];
+  /** @format int64 */
+  ifUnmodifiedSince?: number;
+  pragma?: string;
+  upgrade?: string;
+  vary?: string[];
   host?: {
     address?: {
       hostAddress?: string;
       /** @format byte */
-      address?: string;
+      address?: Blob;
       hostName?: string;
       linkLocalAddress?: boolean;
       multicastAddress?: boolean;
@@ -448,41 +711,10 @@ export interface HttpHeaders {
   /** @format int64 */
   contentLength?: number;
   range?: HttpRange[];
-  etag?: string;
   connection?: string[];
   origin?: string;
-  /** @format int64 */
-  expires?: number;
-  vary?: string[];
-  /** @uniqueItems true */
-  allow?: HttpMethod[];
-  upgrade?: string;
-  accept?: MediaType[];
-  ifMatch?: string[];
-  accessControlAllowMethods?: HttpMethod[];
-  accessControlExposeHeaders?: string[];
-  pragma?: string;
-  acceptLanguageAsLocales?: string[];
-  acceptPatch?: MediaType[];
-  accessControlAllowOrigin?: string;
-  /** @format int64 */
-  accessControlMaxAge?: number;
-  contentLanguage?: string;
-  ifNoneMatch?: string[];
-  /** @format int64 */
-  ifUnmodifiedSince?: number;
-  acceptLanguage?: {
-    range?: string;
-    /** @format double */
-    weight?: number;
-  }[];
-  basicAuth?: string;
   bearerAuth?: string;
   cacheControl?: string;
-  accessControlRequestMethod?: HttpMethod;
-  accessControlRequestHeaders?: string[];
-  accessControlAllowHeaders?: string[];
-  accessControlAllowCredentials?: boolean;
   contentType?: MediaType;
   /** @format int64 */
   ifModifiedSince?: number;
@@ -491,73 +723,6 @@ export interface HttpHeaders {
 export type HttpMethod = any;
 
 export type HttpRange = any;
-
-export enum HttpStatus {
-  Value100CONTINUE = "100 CONTINUE",
-  Value101SWITCHINGPROTOCOLS = "101 SWITCHING_PROTOCOLS",
-  Value102PROCESSING = "102 PROCESSING",
-  Value103EARLYHINTS = "103 EARLY_HINTS",
-  Value200OK = "200 OK",
-  Value201CREATED = "201 CREATED",
-  Value202ACCEPTED = "202 ACCEPTED",
-  Value203NONAUTHORITATIVEINFORMATION = "203 NON_AUTHORITATIVE_INFORMATION",
-  Value204NOCONTENT = "204 NO_CONTENT",
-  Value205RESETCONTENT = "205 RESET_CONTENT",
-  Value206PARTIALCONTENT = "206 PARTIAL_CONTENT",
-  Value207MULTISTATUS = "207 MULTI_STATUS",
-  Value208ALREADYREPORTED = "208 ALREADY_REPORTED",
-  Value226IMUSED = "226 IM_USED",
-  Value300MULTIPLECHOICES = "300 MULTIPLE_CHOICES",
-  Value301MOVEDPERMANENTLY = "301 MOVED_PERMANENTLY",
-  Value302FOUND = "302 FOUND",
-  Value303SEEOTHER = "303 SEE_OTHER",
-  Value304NOTMODIFIED = "304 NOT_MODIFIED",
-  Value307TEMPORARYREDIRECT = "307 TEMPORARY_REDIRECT",
-  Value308PERMANENTREDIRECT = "308 PERMANENT_REDIRECT",
-  Value400BADREQUEST = "400 BAD_REQUEST",
-  Value401UNAUTHORIZED = "401 UNAUTHORIZED",
-  Value402PAYMENTREQUIRED = "402 PAYMENT_REQUIRED",
-  Value403FORBIDDEN = "403 FORBIDDEN",
-  Value404NOTFOUND = "404 NOT_FOUND",
-  Value405METHODNOTALLOWED = "405 METHOD_NOT_ALLOWED",
-  Value406NOTACCEPTABLE = "406 NOT_ACCEPTABLE",
-  Value407PROXYAUTHENTICATIONREQUIRED = "407 PROXY_AUTHENTICATION_REQUIRED",
-  Value408REQUESTTIMEOUT = "408 REQUEST_TIMEOUT",
-  Value409CONFLICT = "409 CONFLICT",
-  Value410GONE = "410 GONE",
-  Value411LENGTHREQUIRED = "411 LENGTH_REQUIRED",
-  Value412PRECONDITIONFAILED = "412 PRECONDITION_FAILED",
-  Value413CONTENTTOOLARGE = "413 CONTENT_TOO_LARGE",
-  Value413PAYLOADTOOLARGE = "413 PAYLOAD_TOO_LARGE",
-  Value414URITOOLONG = "414 URI_TOO_LONG",
-  Value415UNSUPPORTEDMEDIATYPE = "415 UNSUPPORTED_MEDIA_TYPE",
-  Value416REQUESTEDRANGENOTSATISFIABLE = "416 REQUESTED_RANGE_NOT_SATISFIABLE",
-  Value417EXPECTATIONFAILED = "417 EXPECTATION_FAILED",
-  Value418IAMATEAPOT = "418 I_AM_A_TEAPOT",
-  Value421MISDIRECTEDREQUEST = "421 MISDIRECTED_REQUEST",
-  Value422UNPROCESSABLECONTENT = "422 UNPROCESSABLE_CONTENT",
-  Value422UNPROCESSABLEENTITY = "422 UNPROCESSABLE_ENTITY",
-  Value423LOCKED = "423 LOCKED",
-  Value424FAILEDDEPENDENCY = "424 FAILED_DEPENDENCY",
-  Value425TOOEARLY = "425 TOO_EARLY",
-  Value426UPGRADEREQUIRED = "426 UPGRADE_REQUIRED",
-  Value428PRECONDITIONREQUIRED = "428 PRECONDITION_REQUIRED",
-  Value429TOOMANYREQUESTS = "429 TOO_MANY_REQUESTS",
-  Value431REQUESTHEADERFIELDSTOOLARGE = "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
-  Value451UNAVAILABLEFORLEGALREASONS = "451 UNAVAILABLE_FOR_LEGAL_REASONS",
-  Value500INTERNALSERVERERROR = "500 INTERNAL_SERVER_ERROR",
-  Value501NOTIMPLEMENTED = "501 NOT_IMPLEMENTED",
-  Value502BADGATEWAY = "502 BAD_GATEWAY",
-  Value503SERVICEUNAVAILABLE = "503 SERVICE_UNAVAILABLE",
-  Value504GATEWAYTIMEOUT = "504 GATEWAY_TIMEOUT",
-  Value505HTTPVERSIONNOTSUPPORTED = "505 HTTP_VERSION_NOT_SUPPORTED",
-  Value506VARIANTALSONEGOTIATES = "506 VARIANT_ALSO_NEGOTIATES",
-  Value507INSUFFICIENTSTORAGE = "507 INSUFFICIENT_STORAGE",
-  Value508LOOPDETECTED = "508 LOOP_DETECTED",
-  Value509BANDWIDTHLIMITEXCEEDED = "509 BANDWIDTH_LIMIT_EXCEEDED",
-  Value510NOTEXTENDED = "510 NOT_EXTENDED",
-  Value511NETWORKAUTHENTICATIONREQUIRED = "511 NETWORK_AUTHENTICATION_REQUIRED",
-}
 
 export interface HttpStatusCode {
   error?: boolean;
@@ -600,24 +765,6 @@ export interface DokumentRespons {
   arkivsystem?: DokumentArkivSystemDto | null;
 }
 
-/** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-export enum DokumentStatusTo {
-  IKKE_BESTILT = "IKKE_BESTILT",
-  BESTILLING_FEILET = "BESTILLING_FEILET",
-  AVBRUTT = "AVBRUTT",
-  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-  UNDER_REDIGERING = "UNDER_REDIGERING",
-  FERDIGSTILT = "FERDIGSTILT",
-  MAKONTROLLERES = "MÅ_KONTROLLERES",
-  KONTROLLERT = "KONTROLLERT",
-}
-
-/** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
-export enum ForsendelseTypeTo {
-  UTGAENDE = "UTGÅENDE",
-  NOTAT = "NOTAT",
-}
-
 /** Metadata til en respons etter forsendelse ble opprettet */
 export interface OpprettForsendelseRespons {
   /**
@@ -640,9 +787,10 @@ export interface Avvikshendelse {
   detaljer: Record<string, string>;
   /** Saksnummer til sak når journalpost er journalført */
   saksnummer?: string | null;
+  /** Addresse som skal brukes ved bestilling av ny distribusjon av utgående journalpost. Benyttes ved avvik BESTILL_NY_DISTRIBUSJON */
   adresse?: DistribuerTilAdresse | null;
   /** Dokumenter som brukes ved kopiering ny journalpost. Benyttes ved avvik KOPIER_FRA_ANNEN_FAGOMRADE */
-  dokumenter?: any[] | null;
+  dokumenter?: DokumentDto[] | null;
 }
 
 /** Adresse for hvor brev sendes ved sentral print */
@@ -678,19 +826,12 @@ export interface DokumentDto {
   brevkode?: string | null;
   /** Typen dokument. Dokumentmal sier noe om dokumentets innhold og oppbygning. */
   dokumentmalId?: string | null;
+  /** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
   status?: DokumentStatusDto | null;
+  /** Arkivsystem hvor dokumentet er produsert og lagret */
   arkivSystem?: DokumentArkivSystemDto | null;
   /** Metadata om dokumentet */
   metadata: Record<string, string>;
-}
-
-export enum DokumentStatusDto {
-  IKKE_BESTILT = "IKKE_BESTILT",
-  BESTILLING_FEILET = "BESTILLING_FEILET",
-  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-  UNDER_REDIGERING = "UNDER_REDIGERING",
-  FERDIGSTILT = "FERDIGSTILT",
-  AVBRUTT = "AVBRUTT",
 }
 
 /** Bestill distribusjon av journalpost */
@@ -699,6 +840,7 @@ export interface DistribuerJournalpostRequest {
   batchId?: string | null;
   /** Forsendelsen er skrevet ut og distribuert lokalt. Distribusjon registreres men ingen distribusjon bestilles. */
   lokalUtskrift: boolean;
+  /** Adresse for hvor brev sendes ved sentral print */
   adresse?: DistribuerTilAdresse | null;
   ettersendingsoppgave?: OpprettEttersendingsppgaveDto | null;
 }
@@ -716,40 +858,6 @@ export interface OpprettEttersendingsppgaveDto {
   /** @format int32 */
   innsendingsFristDager: number;
   vedleggsliste: OpprettEttersendingsoppgaveVedleggDto[];
-}
-
-export enum Sprak {
-  NB = "NB",
-  NN = "NN",
-  AR = "AR",
-  DA = "DA",
-  DE = "DE",
-  EN = "EN",
-  EL = "EL",
-  ET = "ET",
-  ES = "ES",
-  FI = "FI",
-  FR = "FR",
-  IS = "IS",
-  IT = "IT",
-  JA = "JA",
-  HR = "HR",
-  LV = "LV",
-  LT = "LT",
-  NL = "NL",
-  PL = "PL",
-  PT = "PT",
-  RO = "RO",
-  RU = "RU",
-  SR = "SR",
-  SL = "SL",
-  SK = "SK",
-  SV = "SV",
-  TH = "TH",
-  TR = "TR",
-  UK = "UK",
-  HU = "HU",
-  VI = "VI",
 }
 
 /** Respons etter bestilt distribusjon */
@@ -793,32 +901,6 @@ export interface HentDokumentValgRequest {
   behandlingtypeKonvertert?: string | null;
 }
 
-export interface DokumentMalDetaljer {
-  malId: string;
-  tittel: string;
-  type: "UTGÅENDE" | "NOTAT";
-  kanBestilles: boolean;
-  redigerbar: boolean;
-  beskrivelse: string;
-  nyDokumentProduksjon: boolean;
-  statiskInnhold: boolean;
-  kreverVedtak: boolean;
-  kreverBehandling: boolean;
-  innholdType?:
-    | "NOTAT"
-    | "VARSEL_STANDARD"
-    | "VARSEL"
-    | "VEDTAK"
-    | "VEDLEGG_VEDTAK"
-    | "VEDLEGG_VARSEL"
-    | "VEDLEGG"
-    | "SKJEMA";
-  gruppeVisningsnavn?: string | null;
-  språk: string[];
-  tilhorerEnheter: string[];
-  alternativeTitler: string[];
-}
-
 export interface ForsendelseBarnIBehandlingDto {
   ident: string;
   erRevurderingsbarn: boolean;
@@ -841,8 +923,12 @@ export interface OppdaterDokumentForesporsel {
   språk?: string | null;
   tittel?: string | null;
   fjernTilknytning?: boolean | null;
-  /** @format date-time */
+  /**
+   * Dato dokument ble opprettet
+   * @format date-time
+   */
   dokumentDato?: string | null;
+  /** Arkivsystem hvor dokument er lagret */
   arkivsystem?: DokumentArkivSystemDto | null;
 }
 
@@ -860,6 +946,7 @@ export interface OppdaterForsendelseForesporsel {
   mottaker?: MottakerTo | null;
   /** NAV-enheten som oppretter forsendelsen. Kan bare oppdateres hvis status = UNDER_OPPRETTELSE */
   enhet?: string | null;
+  /** Tema forsendelsen skal opprettes med */
   tema?: JournalTema | null;
   /** Språk forsendelsen skal være på */
   språk?: string | null;
@@ -934,6 +1021,7 @@ export interface EndreJournalpostCommand {
   behandlingstema?: string | null;
   /** Endre fagområde */
   fagomrade?: string | null;
+  /** Type ident for gjelder: FNR, ORGNR, AKTOERID */
   gjelderType?: IdentType | null;
   /** Tittel på journalposten */
   tittel?: string | null;
@@ -959,19 +1047,6 @@ export interface EndreReturDetaljer {
   beskrivelse: string;
 }
 
-/** Identtypene til en aktør */
-export enum IdentType {
-  AKTOERID = "AKTOERID",
-  FNR = "FNR",
-  ORGNR = "ORGNR",
-}
-
-export enum DokumentFormatDto {
-  PDF = "PDF",
-  MBDOK = "MBDOK",
-  HTML = "HTML",
-}
-
 export interface DokumentMetadata {
   /** Journalpostid med arkiv prefiks som skal benyttes når dokumentet hentes */
   journalpostId?: string | null;
@@ -992,7 +1067,7 @@ export interface BehandlingInfoResponseDto {
   soknadId?: string | null;
   behandlingType?: string | null;
   erFattet?: boolean | null;
-  barnIBehandling?: any[] | null;
+  barnIBehandling?: string[] | null;
   barnIBehandlingDetaljer: ForsendelseBarnIBehandlingDto[];
 }
 
@@ -1011,7 +1086,9 @@ export interface ForsendelseResponsTo {
   enhet?: string | null;
   /** Tema på forsendelsen */
   tema?: string | null;
+  /** Detaljer om behandling forsendelse er knyttet til */
   behandlingInfo?: BehandlingInfoResponseDto | null;
+  /** Detaljer om varsel ettersendelse */
   ettersendingsoppgave?: EttersendingsoppgaveDto | null;
   /** Ident på saksbehandler eller applikasjon som opprettet forsendelsen */
   opprettetAvIdent?: string | null;
@@ -1021,6 +1098,7 @@ export interface ForsendelseResponsTo {
   tittel?: string | null;
   /** Journalpostid som forsendelsen ble arkivert på. Dette vil bli satt hvis status er FERDIGSTILT */
   arkivJournalpostId?: string | null;
+  /** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
   forsendelseType?: ForsendelseTypeTo | null;
   status?: ForsendelseStatusTo | null;
   /**
@@ -1041,20 +1119,11 @@ export interface ForsendelseResponsTo {
   unikReferanse?: string | null;
 }
 
-/** Status på forsendelsen */
-export enum ForsendelseStatusTo {
-  UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
-  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-  FERDIGSTILT = "FERDIGSTILT",
-  SLETTET = "SLETTET",
-  DISTRIBUERT = "DISTRIBUERT",
-  DISTRIBUERT_LOKALT = "DISTRIBUERT_LOKALT",
-}
-
 /** Metadata om en aktør */
 export interface AktorDto {
   /** Identifaktor til aktøren */
   ident: string;
+  /** Hvilken identtype som skal brukes */
   type?: IdentType | null;
 }
 
@@ -1070,15 +1139,8 @@ export interface AvsenderMottakerDto {
   ident?: string | null;
   /** Identtype */
   type: AvsenderMottakerDtoIdType;
+  /** Adresse til mottaker hvis dokumentet skal sendes/er sendt gjennom sentral print */
   adresse?: MottakerAdresseTo | null;
-}
-
-export enum AvsenderMottakerDtoIdType {
-  FNR = "FNR",
-  SAMHANDLER = "SAMHANDLER",
-  ORGNR = "ORGNR",
-  UTENLANDSK_ORGNR = "UTENLANDSK_ORGNR",
-  UKJENT = "UKJENT",
 }
 
 export interface EttersendingsppgaveDto {
@@ -1110,6 +1172,7 @@ export interface JournalpostDto {
    * @deprecated
    */
   avsenderNavn?: string | null;
+  /** Informasjon om avsender eller mottaker */
   avsenderMottaker?: AvsenderMottakerDto | null;
   /** Dokumentene som følger journalposten */
   dokumenter: DokumentDto[];
@@ -1132,6 +1195,7 @@ export interface JournalpostDto {
   fagomrade?: string | null;
   /** Ident for hvem/hva dokumente(t/ne) gjelder */
   gjelderIdent?: string | null;
+  /** Aktøren for hvem/hva dokumente(t/ne) gjelder */
   gjelderAktor?: AktorDto | null;
   /** Kort oppsummert av journalført innhold */
   innhold?: string | null;
@@ -1146,7 +1210,12 @@ export interface JournalpostDto {
   journalfortDato?: string | null;
   /** Identifikator av journalpost i midlertidig brevlager eller fra joark på formatet [BID|JOARK]-<journalpostId> */
   journalpostId?: string | null;
+  /**
+   * Kanalen som er kilden til at journalposten ble registrert
+   * @deprecated
+   */
   kilde?: Kanal | null;
+  /** Kanalen journalposten ble mottatt i eller sendt ut på */
   kanal?: Kanal | null;
   /**
    * Dato for når dokument er mottat, dvs. dato for journalføring eller skanning
@@ -1160,13 +1229,17 @@ export interface JournalpostDto {
    * @deprecated
    */
   journalstatus?: string | null;
+  /** Journalpostens status */
   status?: JournalpostStatus | null;
   /** Om journalposten er feilført på bidragssak */
   feilfort?: boolean | null;
+  /** Brevkoden til en journalpost */
   brevkode?: KodeDto | null;
+  /** Informasjon om returdetaljer til journalpost */
   returDetaljer?: ReturDetaljer | null;
   /** Joark journalpostid for bidrag journalpost som er arkivert i Joark */
   joarkJournalpostId?: string | null;
+  /** Adresse som utgående journalpost var distribuert til ved sentral print */
   distribuertTilAdresse?: DistribuerTilAdresse | null;
   /** Informasjon om returdetaljer til journalpost */
   sakstilknytninger: string[];
@@ -1177,48 +1250,6 @@ export interface JournalpostDto {
   /** Referanse til originale kilden til journalposten. Kan være referanse til forsendelse eller bidrag journalpost med prefiks. Feks BID_12323 eller BIF_123213 */
   eksternReferanseId?: string | null;
   ettersendingsppgave?: EttersendingsppgaveDto | null;
-}
-
-export enum JournalpostStatus {
-  AVVIK_ENDRE_FAGOMRADE = "AVVIK_ENDRE_FAGOMRADE",
-  AVVIK_BESTILL_RESKANNING = "AVVIK_BESTILL_RESKANNING",
-  AVVIK_BESTILL_SPLITTING = "AVVIK_BESTILL_SPLITTING",
-  MOTTATT = "MOTTATT",
-  JOURNALFORT = "JOURNALFØRT",
-  EKSPEDERT = "EKSPEDERT",
-  EKSPEDERT_JOARK = "EKSPEDERT_JOARK",
-  MOTTAKSREGISTRERT = "MOTTAKSREGISTRERT",
-  UKJENT = "UKJENT",
-  DISTRIBUERT = "DISTRIBUERT",
-  AVBRUTT = "AVBRUTT",
-  KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
-  DOKUMENT_SLETTET = "DOKUMENT_SLETTET",
-  RETUR = "RETUR",
-  FERDIGSTILT = "FERDIGSTILT",
-  FEILREGISTRERT = "FEILREGISTRERT",
-  RESERVERT = "RESERVERT",
-  UTGAR = "UTGÅR",
-  SLETTET = "SLETTET",
-  UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
-  TIL_LAGRING = "TIL_LAGRING",
-  OPPRETTET = "OPPRETTET",
-  UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-}
-
-/** Journalposten ble mottatt/sendt ut i kanal */
-export enum Kanal {
-  NAV_NO = "NAV_NO",
-  NAV_NO_BID = "NAV_NO_BID",
-  SKAN_BID = "SKAN_BID",
-  SKAN_NETS = "SKAN_NETS",
-  SKAN_IM = "SKAN_IM",
-  LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
-  SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
-  SDP = "SDP",
-  INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
-  INNSENDT_NAV_ANSATT = "INNSENDT_NAV_ANSATT",
-  NAV_NO_UINNLOGGET = "NAV_NO_UINNLOGGET",
-  NAV_NO_CHAT = "NAV_NO_CHAT",
 }
 
 /** Metadata for kode vs dekode i et kodeobjekt */
@@ -1279,6 +1310,7 @@ export interface DokumentRedigeringMetadataResponsDto {
 
 /** Metadata til en respons etter journalpost med tilhørende data */
 export interface JournalpostResponse {
+  /** journalposten som er etterspurt */
   journalpost?: JournalpostDto | null;
   /** alle saker som journalposten er tilknyttet */
   sakstilknytninger: string[];
@@ -1306,7 +1338,12 @@ export interface DokumentSoknadDto {
   skjemanr: string;
   tittel: string;
   tema: string;
-  status: "Opprettet" | "Utfylt" | "Innsendt" | "SlettetAvBruker" | "AutomatiskSlettet";
+  status:
+    | "Opprettet"
+    | "Utfylt"
+    | "Innsendt"
+    | "SlettetAvBruker"
+    | "AutomatiskSlettet";
   /** @format date-time */
   opprettetDato: string;
   vedleggsListe: VedleggDto[];
@@ -1365,9 +1402,14 @@ export interface VedleggDto {
   vedleggsnr?: string | null;
   beskrivelse?: string | null;
   uuid?: string | null;
-  mimetype?: "application/pdf" | "application/json" | "image/png" | "image/jpeg" | "application/xml";
+  mimetype?:
+    | "application/pdf"
+    | "application/json"
+    | "image/png"
+    | "image/jpeg"
+    | "application/xml";
   /** @format byte */
-  document?: string | null;
+  document?: Blob | null;
   skjemaurl?: string | null;
   /** @format date-time */
   innsendtdato?: string | null;
@@ -1388,12 +1430,19 @@ export interface SlettEttersendingsoppgaveVedleggRequest {
   id: number;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -1408,9 +1457,13 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -1420,6 +1473,7 @@ export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequest
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -1432,10 +1486,17 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "https://bidrag-dokument-forsendelse.intern.dev.nav.no",
+      baseURL:
+        axiosConfig.baseURL ||
+        "https://bidrag-dokument-forsendelse.intern.dev.nav.no",
     });
     this.secure = secure;
     this.format = format;
@@ -1446,7 +1507,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -1454,7 +1518,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -1475,11 +1543,15 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
       }
 
       return formData;
@@ -1503,11 +1575,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -1530,8 +1612,74 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version v1
  * @baseUrl https://bidrag-dokument-forsendelse.intern.dev.nav.no
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
   api = {
+    /**
+     * @description Henter dokumentmaler som er støttet av applikasjonen
+     *
+     * @tags forsendelse-innsyn-kontroller
+     * @name StottedeDokumentmaler
+     * @request GET:/api/forsendelse/dokumentmaler
+     * @secure
+     */
+    stottedeDokumentmaler: (params: RequestParams = {}) =>
+      this.request<string[], any>({
+        path: `/api/forsendelse/dokumentmaler`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Henter dokumentmaler som er støttet av applikasjonen
+     *
+     * @tags forsendelse-innsyn-kontroller
+     * @name StottedeDokumentmaler1
+     * @request OPTIONS:/api/forsendelse/dokumentmaler
+     * @secure
+     */
+    stottedeDokumentmaler1: (params: RequestParams = {}) =>
+      this.request<string[], any>({
+        path: `/api/forsendelse/dokumentmaler`,
+        method: "OPTIONS",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Henter dokumentmaler som er støttet av applikasjonen
+     *
+     * @tags forsendelse-innsyn-kontroller
+     * @name StottedeDokumentmalDetaljer
+     * @request GET:/api/forsendelse/dokumentmaler/detaljer
+     * @secure
+     */
+    stottedeDokumentmalDetaljer: (params: RequestParams = {}) =>
+      this.request<Record<string, DokumentMalDetaljer>, any>({
+        path: `/api/forsendelse/dokumentmaler/detaljer`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Henter dokumentmaler som er støttet av applikasjonen
+     *
+     * @tags forsendelse-innsyn-kontroller
+     * @name StottedeDokumentmalDetaljer1
+     * @request OPTIONS:/api/forsendelse/dokumentmaler/detaljer
+     * @secure
+     */
+    stottedeDokumentmalDetaljer1: (params: RequestParams = {}) =>
+      this.request<Record<string, DokumentMalDetaljer>, any>({
+        path: `/api/forsendelse/dokumentmaler/detaljer`,
+        method: "OPTIONS",
+        secure: true,
+        ...params,
+      }),
+
     /**
      * No description
      *
@@ -1541,7 +1689,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PUT:/api/forsendelse/ettersendingsoppgave
      * @secure
      */
-    oppdaterEttesendingsoppgave: (data: OppdaterEttersendingsoppgaveRequest, params: RequestParams = {}) =>
+    oppdaterEttesendingsoppgave: (
+      data: OppdaterEttersendingsoppgaveRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<EttersendingsoppgaveDto, any>({
         path: `/api/forsendelse/ettersendingsoppgave`,
         method: "PUT",
@@ -1560,7 +1711,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/ettersendingsoppgave
      * @secure
      */
-    opprettEttersendingsoppgave: (data: OpprettEttersendingsoppgaveRequest, params: RequestParams = {}) =>
+    opprettEttersendingsoppgave: (
+      data: OpprettEttersendingsoppgaveRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<EttersendingsoppgaveDto, any>({
         path: `/api/forsendelse/ettersendingsoppgave`,
         method: "POST",
@@ -1579,7 +1733,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request DELETE:/api/forsendelse/ettersendingsoppgave
      * @secure
      */
-    slettEttersendingsoppgave: (data: SlettEttersendingsoppgave, params: RequestParams = {}) =>
+    slettEttersendingsoppgave: (
+      data: SlettEttersendingsoppgave,
+      params: RequestParams = {},
+    ) =>
       this.request<void, void>({
         path: `/api/forsendelse/ettersendingsoppgave`,
         method: "DELETE",
@@ -1598,8 +1755,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse
      * @secure
      */
-    opprettForsendelse: (data: OpprettForsendelseForesporsel, params: RequestParams = {}) =>
-      this.request<OpprettForsendelseRespons, OpprettForsendelseRespons | ConflictException>({
+    opprettForsendelse: (
+      data: OpprettForsendelseForesporsel,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        OpprettForsendelseRespons,
+        OpprettForsendelseRespons | ConflictException
+      >({
         path: `/api/forsendelse`,
         method: "POST",
         body: data,
@@ -1617,7 +1780,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/{forsendelseIdMedPrefix}/dokument
      * @secure
      */
-    knyttTilDokument: (forsendelseIdMedPrefix: string, data: OpprettDokumentForesporsel, params: RequestParams = {}) =>
+    knyttTilDokument: (
+      forsendelseIdMedPrefix: string,
+      data: OpprettDokumentForesporsel,
+      params: RequestParams = {},
+    ) =>
       this.request<DokumentRespons, any>({
         path: `/api/forsendelse/${forsendelseIdMedPrefix}/dokument`,
         method: "POST",
@@ -1655,7 +1822,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     reparerPdf: (data: File, params: RequestParams = {}) =>
-      this.request<any, File>({
+      this.request<Blob, File>({
         path: `/api/forsendelse/redigering/reparerPDF`,
         method: "POST",
         body: data,
@@ -1672,8 +1839,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/redigering/reparerPDFBase64
      * @secure
      */
-    reparerPdfBase64: (data: string, params: RequestParams = {}) =>
-      this.request<any, File>({
+    reparerPdfBase64: (data: Blob, params: RequestParams = {}) =>
+      this.request<Blob, File>({
         path: `/api/forsendelse/redigering/reparerPDFBase64`,
         method: "POST",
         body: data,
@@ -1691,7 +1858,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     convertToPdfa2: (data: File, params: RequestParams = {}) =>
-      this.request<string, any>({
+      this.request<Blob, any>({
         path: `/api/forsendelse/redigering/convertToPDFA`,
         method: "POST",
         body: data,
@@ -1763,7 +1930,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/journal/{forsendelseIdMedPrefix}/avvik
      * @secure
      */
-    utforAvvik: (forsendelseIdMedPrefix: string, data: Avvikshendelse, params: RequestParams = {}) =>
+    utforAvvik: (
+      forsendelseIdMedPrefix: string,
+      data: Avvikshendelse,
+      params: RequestParams = {},
+    ) =>
       this.request<any, void>({
         path: `/api/forsendelse/journal/${forsendelseIdMedPrefix}/avvik`,
         method: "POST",
@@ -1790,7 +1961,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       },
       params: RequestParams = {},
     ) =>
-      this.request<DistribuerJournalpostResponse, DistribuerJournalpostResponse>({
+      this.request<
+        DistribuerJournalpostResponse,
+        DistribuerJournalpostResponse
+      >({
         path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}`,
         method: "POST",
         query: query,
@@ -1826,7 +2000,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/internal/synkForsendelseDistribusjonStatus/{forsendelseId}
      * @secure
      */
-    synkForsendelseDistribusjonStatus: (forsendelseId: string, params: RequestParams = {}) =>
+    synkForsendelseDistribusjonStatus: (
+      forsendelseId: string,
+      params: RequestParams = {},
+    ) =>
       this.request<any, void>({
         path: `/api/forsendelse/internal/synkForsendelseDistribusjonStatus/${forsendelseId}`,
         method: "POST",
@@ -1966,7 +2143,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/dokumentvalg
      * @secure
      */
-    hentDokumentValg: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
+    hentDokumentValg: (
+      data: HentDokumentValgRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Record<string, DokumentMalDetaljer>, any>({
         path: `/api/forsendelse/dokumentvalg`,
         method: "POST",
@@ -1984,7 +2164,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/dokumentvalgV2
      * @secure
      */
-    hentDokumentValgV2: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
+    hentDokumentValgV2: (
+      data: HentDokumentValgRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<HentDokumentValgResponse, any>({
         path: `/api/forsendelse/dokumentvalgV2`,
         method: "POST",
@@ -2019,7 +2202,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/forsendelse/dokumentvalg/notat
      * @secure
      */
-    hentDokumentValgNotater: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
+    hentDokumentValgNotater: (
+      data: HentDokumentValgRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Record<string, DokumentMalDetaljer>, any>({
         path: `/api/forsendelse/dokumentvalg/notat`,
         method: "POST",
@@ -2114,7 +2300,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       dokumentreferanse: string,
       params: RequestParams = {},
     ) =>
-      this.request<DokumentRedigeringMetadataResponsDto, DokumentRedigeringMetadataResponsDto>({
+      this.request<
+        DokumentRedigeringMetadataResponsDto,
+        DokumentRedigeringMetadataResponsDto
+      >({
         path: `/api/forsendelse/redigering/${forsendelseIdMedPrefix}/${dokumentreferanse}`,
         method: "GET",
         secure: true,
@@ -2246,8 +2435,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/forsendelse/dokumentreferanse/{dokumentreferanse}
      * @secure
      */
-    hentDokumentForReferanse: (dokumentreferanse: string, params: RequestParams = {}) =>
-      this.request<string, any>({
+    hentDokumentForReferanse: (
+      dokumentreferanse: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<Blob, any>({
         path: `/api/forsendelse/dokumentreferanse/${dokumentreferanse}`,
         method: "GET",
         secure: true,
@@ -2263,41 +2455,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request OPTIONS:/api/forsendelse/dokumentreferanse/{dokumentreferanse}
      * @secure
      */
-    hentDokumentMetadataForReferanse: (dokumentreferanse: string, params: RequestParams = {}) =>
+    hentDokumentMetadataForReferanse: (
+      dokumentreferanse: string,
+      params: RequestParams = {},
+    ) =>
       this.request<DokumentMetadata[], any>({
         path: `/api/forsendelse/dokumentreferanse/${dokumentreferanse}`,
-        method: "OPTIONS",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Henter dokumentmaler som er støttet av applikasjonen
-     *
-     * @tags forsendelse-innsyn-kontroller
-     * @name StottedeDokumentmaler
-     * @request OPTIONS:/api/forsendelse/dokumentmaler
-     * @secure
-     */
-    stottedeDokumentmaler: (params: RequestParams = {}) =>
-      this.request<string[], any>({
-        path: `/api/forsendelse/dokumentmaler`,
-        method: "OPTIONS",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Henter dokumentmaler som er støttet av applikasjonen
-     *
-     * @tags forsendelse-innsyn-kontroller
-     * @name StottedeDokumentmalDetaljer
-     * @request OPTIONS:/api/forsendelse/dokumentmaler/detaljer
-     * @secure
-     */
-    stottedeDokumentmalDetaljer: (params: RequestParams = {}) =>
-      this.request<Record<string, DokumentMalDetaljer>, any>({
-        path: `/api/forsendelse/dokumentmaler/detaljer`,
         method: "OPTIONS",
         secure: true,
         ...params,
@@ -2312,7 +2475,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request OPTIONS:/api/forsendelse/dokument/{forsendelseIdMedPrefix}
      * @secure
      */
-    hentDokumentMetadata: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+    hentDokumentMetadata: (
+      forsendelseIdMedPrefix: string,
+      params: RequestParams = {},
+    ) =>
       this.request<DokumentMetadata[], any>({
         path: `/api/forsendelse/dokument/${forsendelseIdMedPrefix}`,
         method: "OPTIONS",
@@ -2329,8 +2495,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/forsendelse/dokument/{forsendelseIdMedPrefix}/{dokumentreferanse}
      * @secure
      */
-    hentDokument: (forsendelseIdMedPrefix: string, dokumentreferanse: string, params: RequestParams = {}) =>
-      this.request<string, any>({
+    hentDokument: (
+      forsendelseIdMedPrefix: string,
+      dokumentreferanse: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<Blob, any>({
         path: `/api/forsendelse/dokument/${forsendelseIdMedPrefix}/${dokumentreferanse}`,
         method: "GET",
         secure: true,
@@ -2346,7 +2516,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request OPTIONS:/api/forsendelse/dokument/{forsendelseIdMedPrefix}/{dokumentreferanse}
      * @secure
      */
-    hentDokumentMetadata1: (forsendelseIdMedPrefix: string, dokumentreferanse: string, params: RequestParams = {}) =>
+    hentDokumentMetadata1: (
+      forsendelseIdMedPrefix: string,
+      dokumentreferanse: string,
+      params: RequestParams = {},
+    ) =>
       this.request<DokumentMetadata[], any>({
         path: `/api/forsendelse/dokument/${forsendelseIdMedPrefix}/${dokumentreferanse}`,
         method: "OPTIONS",
@@ -2418,7 +2592,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/forsendelse/journal/distribuer/{forsendelseIdMedPrefix}/size
      * @secure
      */
-    henStorrelsePaDokumenter: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+    henStorrelsePaDokumenter: (
+      forsendelseIdMedPrefix: string,
+      params: RequestParams = {},
+    ) =>
       this.request<number, any>({
         path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}/size`,
         method: "GET",
@@ -2435,7 +2612,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/forsendelse/journal/distribuer/{forsendelseIdMedPrefix}/enabled
      * @secure
      */
-    kanDistribuere: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+    kanDistribuere: (
+      forsendelseIdMedPrefix: string,
+      params: RequestParams = {},
+    ) =>
       this.request<string, string>({
         path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}/enabled`,
         method: "GET",
@@ -2469,7 +2649,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/forsendelse/ettersendingsoppgave/oppgaver/{forsendelseId}
      * @secure
      */
-    hentEksisterendeEttersendingsoppgaverForsendelse: (forsendelseId: string, params: RequestParams = {}) =>
+    hentEksisterendeEttersendingsoppgaverForsendelse: (
+      forsendelseId: string,
+      params: RequestParams = {},
+    ) =>
       this.request<Record<string, DokumentSoknadDto[]>, any>({
         path: `/api/forsendelse/ettersendingsoppgave/oppgaver/${forsendelseId}`,
         method: "GET",
@@ -2485,7 +2668,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/forsendelse/dokumentvalg/forsendelseV2/{forsendelseIdMedPrefix}
      * @secure
      */
-    hentDokumentValgForForsendelseV2: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+    hentDokumentValgForForsendelseV2: (
+      forsendelseIdMedPrefix: string,
+      params: RequestParams = {},
+    ) =>
       this.request<HentDokumentValgResponse, any>({
         path: `/api/forsendelse/dokumentvalg/forsendelseV2/${forsendelseIdMedPrefix}`,
         method: "GET",
@@ -2501,7 +2687,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/forsendelse/dokumentvalg/forsendelse/{forsendelseIdMedPrefix}
      * @secure
      */
-    hentDokumentValgForForsendelse: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+    hentDokumentValgForForsendelse: (
+      forsendelseIdMedPrefix: string,
+      params: RequestParams = {},
+    ) =>
       this.request<Record<string, DokumentMalDetaljer>, any>({
         path: `/api/forsendelse/dokumentvalg/forsendelse/${forsendelseIdMedPrefix}`,
         method: "GET",
@@ -2539,7 +2728,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request DELETE:/api/forsendelse/ettersendingsoppgave/dokument
      * @secure
      */
-    slettEttersendingsoppgaveVedlegg: (data: SlettEttersendingsoppgaveVedleggRequest, params: RequestParams = {}) =>
+    slettEttersendingsoppgaveVedlegg: (
+      data: SlettEttersendingsoppgaveVedleggRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<EttersendingsoppgaveDto, EttersendingsoppgaveDto>({
         path: `/api/forsendelse/ettersendingsoppgave/dokument`,
         method: "DELETE",
