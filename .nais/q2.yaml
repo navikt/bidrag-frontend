@@ -83,7 +83,7 @@ env:
     value: api://dev-gcp.bidrag.bidrag-dokument-forsendelse/.default
     
   - name: KODEVERK_URL
-    value: https://bidrag-kodeverk.intern.dev.nav.no
+    value: http://bidrag-kodeverk
   - name: KODEVERK_URL_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-kodeverk/.default
 
