@@ -1273,12 +1273,15 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
     }, [controlledFields, selectedRoller]);
 
     const defaultTab = useMemo(() => {
-        const barnId = visibleControlledFields
-            .find(({ rolle }) => rolle.id?.toString() === searchParams.get(urlSearchParams.tab))
-            ?.rolle?.id?.toString();
-        return barnId ?? visibleControlledFields[0].rolle.id?.toString();
-    }, [searchParams, visibleControlledFields]);
-    const selectedTab = searchParams.get(urlSearchParams.tab)?.toString() ?? defaultTab?.toString();
+        return visibleControlledFields[0].rolle.id?.toString();
+    }, [visibleControlledFields]);
+
+    // Fall tilbake til første barn hvis ingen er valgt, eller hvis tab-verdien i URL-en peker
+    // på et barn som ikke lenger er synlig (f.eks. etter bytte av sak i `SakHeader`).
+    const selectedTabParam = searchParams.get(urlSearchParams.tab)?.toString();
+    const selectedTab = visibleControlledFields.some(({ rolle }) => rolle.id?.toString() === selectedTabParam)
+        ? selectedTabParam
+        : defaultTab?.toString();
 
     const onChangeVurderSeparat = () => {
         mergeVirkningstidspunkterMutation.mutation.mutate(undefined, {

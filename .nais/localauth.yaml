@@ -5,7 +5,7 @@ metadata:
   name: "bidrag-localauth"
   namespace: "bidrag"
 spec:
-  image: "europe-north1-docker.pkg.dev/nais-management-233d/nais/localauth:v1.0.0"
+  image: "europe-north1-docker.pkg.dev/nais-management-233d/nais/localauth:v1.0.2"
   port: 8080
   replicas:
     min: 1

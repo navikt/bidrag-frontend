@@ -291,7 +291,10 @@ const Side = () => {
 const UnderholdskostnadForm = () => {
     const { underholdskostnader } = useGetBehandlingV2();
     const underholdskostnaderRef = useRef<UnderholdDto[]>(underholdskostnader);
-    const initialValues = useMemo(() => createInitialValues(underholdskostnaderRef.current), [underholdskostnaderRef]);
+    const initialValues = useMemo(
+        () => createInitialValues(underholdskostnaderRef.current),
+        [underholdskostnaderRef.current],
+    );
     const useFormMethods = useForm({
         defaultValues: initialValues,
         mode: "onChange",
