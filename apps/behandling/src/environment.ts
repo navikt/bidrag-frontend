@@ -10,7 +10,7 @@ const system = {
 const url = {
     /** Redirect-rute i apps/web som slår opp BISYS_URL på serveren */
     bisysSak: "/bisys/sak",
-    bisysSakshistorikk: "/bisys/sakshistorikk",
+        bisysSakshistorikk: "/bisys/sakshistorikk",
     forskuddBrukerveiledning: "/behandling/brukerveiledning/forskudd",
     bidragBrukerveiledning: "/behandling/brukerveiledning/bidrag",
     bidragBrukerveiledningKlage: "/behandling/brukerveiledning/bidrag?klage=true",
