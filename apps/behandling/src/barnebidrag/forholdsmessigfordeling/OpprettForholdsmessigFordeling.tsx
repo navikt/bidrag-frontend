@@ -148,7 +148,13 @@ export function OpprettForholdsmessigFordelingPanelContent({
                             onClick={handleOpprett}
                             loading={opprettFFFn.isPending}
                         >
-                            {!kanOppretteFF ? "Opprett FF er deaktivert" : harOpprettetFF ? "Oppdater" :behandlesAvAnnenEnhet ? "Opprett og gå tilbake til sakshistorikk" : "Opprett"}
+                            {!kanOppretteFF
+                                ? "Opprett FF er deaktivert"
+                                : harOpprettetFF
+                                  ? "Oppdater"
+                                  : behandlesAvAnnenEnhet
+                                    ? "Opprett og gå tilbake til sakshistorikk"
+                                    : "Opprett"}
                         </Button>
                     </HStack>
                 </Dialog.Footer>
