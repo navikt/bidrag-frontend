@@ -65,7 +65,7 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
     const { ikkeAktiverteEndringerIGrunnlagsdata, roller } = useGetBehandlingV2();
     const aktiverGrunnlagFn = useAktiveGrunnlagsdata();
     const virkningsdato = useVirkningsdato();
-    const { lesemodus, setSaveErrorState } = useBehandlingProvider();
+    const { lesemodus, setSaveErrorState, selectedRoller } = useBehandlingProvider();
     const { resetField, setValue } = useFormContext<InntektFormValues>();
     const [inntektType, gjelderRolleId] = fieldName.split(".");
     const gjelderRolleIdNumber = Number(gjelderRolleId);
@@ -73,8 +73,9 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
 
     if (ikkeAktiverteEndringerIGrunnlagsdata.inntekter[inntektType].length === 0) return null;
 
-    const ikkeAktiverteEndringer: { [p: string]: IkkeAktivInntektDto[] } = roller.reduce(
+    const ikkeAktiverteEndringer: { [p: string]: IkkeAktivInntektDto[] } = selectedRoller.reduce(
         (acc, rolle) => ({
+            // biome-ignore lint/performance/noAccumulatingSpread: Ignorer for nå
             ...acc,
             [rolle.ident]: ikkeAktiverteEndringerIGrunnlagsdata.inntekter[inntektType]?.filter((v) => {
                 if (["barnetillegg", "kontantstøtte"].includes(inntektType)) {
@@ -153,7 +154,7 @@ export const IkkeAktiverteOpplysninger = ({ fieldName }: { fieldName: FieldName 
     }
     if (
         lesemodus ||
-        (inntektType === "årsinntekter" && ident && ikkeAktiverteEndringer[ident].length < 1) ||
+        (inntektType === "årsinntekter" && ident && ikkeAktiverteEndringer[ident]?.length < 1) ||
         Object.values(ikkeAktiverteEndringer).every((ikkeAktiverteEndring) => ikkeAktiverteEndring.length < 1)
     )
         return null;

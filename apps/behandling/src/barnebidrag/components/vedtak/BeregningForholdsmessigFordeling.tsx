@@ -341,6 +341,7 @@ const ForholdsmessigFordelingBeregningAndreBarn = ({
     const beregningBarn = sumFordeling?.bidragTilFordelingAlle.flatMap((b) => ({
         beregnetBidragPerBarn: { ...b.beregnetBidrag, gjelderBarn: b.barn.ident },
         personidentBarn: b.barn.ident,
+        personnavn: b.barn.navn,
         erRevurderingsbarn: b.barn.erRevurderingsbarn,
         erSøknadsbarn: b.erSøknadsbarn,
         privatAvtale: b.privatAvtale,

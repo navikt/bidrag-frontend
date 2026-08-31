@@ -18,6 +18,7 @@ import {
 import useFeatureToogle from "../../common/hooks/useFeatureToggle";
 import { useQueryParams } from "../../common/hooks/useQueryParams";
 import { hentVisningsnavn } from "../../common/hooks/useVisningsnavn";
+import environment from "../../environment.ts";
 import { formatterBeløpForBeregning } from "../../utils/number-utils";
 import { BarnListeOpprettFF } from "./BarnListe";
 import { EgetTiltakNavBidragVarsel } from "./ForholdsmessigFordelingInfo";
@@ -31,7 +32,8 @@ export function OpprettForholdsmessigFordelingPanelContent({
     showAlert?: boolean;
     isModal?: boolean;
 }) {
-    const { forholdsmessigFordeling, roller, feilOppståttVedSisteGrunnlagsinnhenting, id } = useGetBehandlingV2();
+    const { forholdsmessigFordeling, roller, feilOppståttVedSisteGrunnlagsinnhenting, id, saksnummer } =
+        useGetBehandlingV2();
     const { tilgangOppretteFF } = useFeatureToogle();
     const refetchFF = useRefetchFFInfoFn(true);
     const detaljer = useGetForholdsmessigFordelingDetaljer();
@@ -42,6 +44,7 @@ export function OpprettForholdsmessigFordelingPanelContent({
     const revurderingssøknaderErDelAvFF = detaljer.søknaderRevurdering.some((s) => s.erDelAvFF);
     const kanOppretteFF = tilgangOppretteFF && !harRevurderingssoknader;
     const enhet = useQueryParams().get("enhet");
+    const behandlesAvAnnenEnhet = enhet !== detaljer.skalBehandlesAvEnhet;
 
     const opprettFFFn = useMutation({
         retry: false,
@@ -65,7 +68,11 @@ export function OpprettForholdsmessigFordelingPanelContent({
             return BEHANDLING_API_V1.api.opprettForholdsmessigFordeling(id, requestBody);
         },
         onSuccess: () => {
-            refetchFF();
+            if (behandlesAvAnnenEnhet) {
+                window.location.href = `${environment.url.bisysSakshistorikk}?saksnr=${saksnummer}`;
+            } else {
+                refetchFF();
+            }
         },
     });
 
@@ -141,7 +148,13 @@ export function OpprettForholdsmessigFordelingPanelContent({
                             onClick={handleOpprett}
                             loading={opprettFFFn.isPending}
                         >
-                            {!kanOppretteFF ? "Opprett FF er deaktivert" : harOpprettetFF ? "Oppdater" : "Opprett"}
+                            {!kanOppretteFF
+                                ? "Opprett FF er deaktivert"
+                                : harOpprettetFF
+                                  ? "Oppdater"
+                                  : behandlesAvAnnenEnhet
+                                    ? "Opprett og gå tilbake til sakshistorikk"
+                                    : "Opprett"}
                         </Button>
                     </HStack>
                 </Dialog.Footer>

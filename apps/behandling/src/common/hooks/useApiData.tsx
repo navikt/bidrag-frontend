@@ -1,3 +1,4 @@
+import { BIDRAG_TILGANGSKONTROLL_API } from "@bidrag/api";
 import {
     type AktivereGrunnlagRequestV2,
     type AktivereGrunnlagResponseV2,
@@ -132,6 +133,7 @@ export const QueryKeys = {
         vedtakId === undefined ? null : vedtakId,
     ],
     sjekkFF: (behandlingId: string) => ["behandlingV2", "FF", QueryKeys.behandlingVersion, behandlingId],
+    sjekkTilgangSak: (saksnummer: string) => ["behandlingV2", "tilgangSak", saksnummer],
     hentSakerForIdent: (ident: string, barn: string) => ["saker", ident, barn],
     grunnlag: () => ["grunnlag", QueryKeys.behandlingVersion],
     arbeidsforhold: (behandlingId: string) => ["arbeidsforhold", behandlingId, QueryKeys.behandlingVersion],
@@ -662,7 +664,22 @@ export const useHentRevurderingsbarn = (ident: string, stønad18År: boolean): b
             rolle.stønadstype === (stønad18År ? Stonadstype.BIDRAG18AAR : Stonadstype.BIDRAG),
     );
 };
-
+export const useHarTilgangSak = (saksnummer: string): boolean => {
+    const { data: response } = useSuspenseQuery({
+        queryKey: QueryKeys.sjekkTilgangSak(saksnummer),
+        queryFn: async () => {
+            try {
+                const response = await BIDRAG_TILGANGSKONTROLL_API.v2.sjekkTilgangSakV2({ saksnummer });
+                return response.data.harTilgang;
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
+        },
+        staleTime: Infinity,
+    });
+    return response;
+};
 export const useGetBehandlingV2 = (): BehandlingDtoV2 => {
     const { behandlingId, vedtakId } = useBehandlingProvider();
     return useBehandlingV2(behandlingId, vedtakId);
@@ -746,8 +763,12 @@ export const useHentPersonData = (ident?: string) =>
         queryKey: ["persons", ident],
         queryFn: async (): Promise<PersonDto> => {
             if (!ident) return { ident: "", visningsnavn: "Ukjent" };
-            const { data } = await PERSON_API.informasjon.hentPersonPost({ ident: ident });
-            return data;
+            try {
+                const { data } = await PERSON_API.informasjon.hentPersonPost({ ident: ident });
+                return data;
+            } catch (_e) {
+                return { ident: "", visningsnavn: "Ingen tilgang", diskresjonskode: "SPSF" };
+            }
         },
         staleTime: Infinity,
     });
