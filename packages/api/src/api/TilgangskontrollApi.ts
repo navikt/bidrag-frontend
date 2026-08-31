@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -8,32 +9,6 @@
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
-
-export interface TilgangTilTemaRequest {
-  tema: string;
-  navIdent?: string | null;
-}
-
-export interface TilgangskontrollResponse {
-  /** Indikerer om brukeren har tilgang. Hvis tilgang er avslått, vil detaljer inneholde mer informasjon. */
-  harTilgang: boolean;
-  /** Liste over detaljer om tilgangsbeslutninger, inkludert opprinnelse og begrunnelse. Vil kun settes om tilgang avslås. */
-  detaljer: TilgangskontrollResponseDetaljer[];
-}
-
-export interface TilgangskontrollResponseDetaljer {
-  harTilgang: boolean;
-  begrunnelse: string;
-  opprinnelseTilgangsbeslutning: "TILGANGSMASKIN" | "GRAPH" | "BIDRAG_SAK_PIP" | "BIDRAG_TILGANGSKONTROLL";
-}
-
-export interface TilgangTilSakRequest {
-  saksnummer: string;
-}
-
-export interface TilgangTilPersonRequest {
-  personident: string;
-}
 
 export enum Behandlingstema {
   AVSKRIVNING = "AVSKRIVNING",
@@ -61,6 +36,36 @@ export enum Behandlingstema {
   BIDRAG18ARPLUSSTILLEGGSBIDRAG = "BIDRAG_18_ÅR_PLUSS_TILLEGGSBIDRAG",
   BIDRAG18AR = "BIDRAG_18_ÅR",
   REISEKOSTNADER = "REISEKOSTNADER",
+}
+
+export interface TilgangTilTemaRequest {
+  tema: string;
+  navIdent?: string | null;
+}
+
+export interface TilgangskontrollResponse {
+  /** Indikerer om brukeren har tilgang. Hvis tilgang er avslått, vil detaljer inneholde mer informasjon. */
+  harTilgang: boolean;
+  /** Liste over detaljer om tilgangsbeslutninger, inkludert opprinnelse og begrunnelse. Vil kun settes om tilgang avslås. */
+  detaljer: TilgangskontrollResponseDetaljer[];
+}
+
+export interface TilgangskontrollResponseDetaljer {
+  harTilgang: boolean;
+  begrunnelse: string;
+  opprinnelseTilgangsbeslutning:
+    | "TILGANGSMASKIN"
+    | "GRAPH"
+    | "BIDRAG_SAK_PIP"
+    | "BIDRAG_TILGANGSKONTROLL";
+}
+
+export interface TilgangTilSakRequest {
+  saksnummer: string;
+}
+
+export interface TilgangTilPersonRequest {
+  personident: string;
 }
 
 /** Brukertilganger for en bruker */
@@ -125,11 +130,11 @@ export interface Brukerinformasjon {
 
 export interface BrukerinformasjonResponse {
   "@odata.nextLink"?: string;
-  value?: any[] | null;
+  value?: Brukerinformasjon[] | null;
 }
 
 export interface BrukerGrupperResponse {
-  value?: any[] | null;
+  value?: Gruppe[] | null;
 }
 
 export interface Gruppe {
@@ -138,12 +143,19 @@ export interface Gruppe {
   displayName?: string;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -158,9 +170,13 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -170,6 +186,7 @@ export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequest
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -182,10 +199,17 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "https://bidrag-tilgangskontroll.intern.dev.nav.no",
+      baseURL:
+        axiosConfig.baseURL ||
+        "https://bidrag-tilgangskontroll.intern.dev.nav.no",
     });
     this.secure = secure;
     this.format = format;
@@ -196,7 +220,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -204,7 +231,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -225,11 +256,15 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
       }
 
       return formData;
@@ -253,11 +288,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -280,7 +325,9 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version v1
  * @baseUrl https://bidrag-tilgangskontroll.intern.dev.nav.no
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
   v2 = {
     /**
      * @description Kontrollerer om saksbehandler har tilgang til et spesifikt fagtema (f.eks. BID, FAR). Validerer at brukerens AD-grupper gir rettigheter til det angitte temaet.
@@ -291,7 +338,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/v2/api/tilgang/tema
      * @secure
      */
-    sjekkTilgangTema: (data: TilgangTilTemaRequest, params: RequestParams = {}) =>
+    sjekkTilgangTema: (
+      data: TilgangTilTemaRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TilgangskontrollResponse, void>({
         path: `/v2/api/tilgang/tema`,
         method: "POST",
@@ -313,7 +363,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     sjekkTilgangSoknadsgrupper: (
       query: {
         /** Søknadsgruppe det skal sjekkes tilgang for */
-        søknadsgruppe: "BARNEBORTFØRING" | "EKTEFELLEBIDRAG" | "OPPFOSTRINGSBIDRAG" | "REISEUTGIFTER";
+        søknadsgruppe:
+          | "BARNEBORTFØRING"
+          | "EKTEFELLEBIDRAG"
+          | "OPPFOSTRINGSBIDRAG"
+          | "REISEUTGIFTER";
         /**
          * NAV-ident. Valgfri — utledes fra token om ikke oppgitt.
          * @example "Z999999"
@@ -339,7 +393,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/v2/api/tilgang/sak
      * @secure
      */
-    sjekkTilgangSakV2: (data: TilgangTilSakRequest, params: RequestParams = {}) =>
+    sjekkTilgangSakV2: (
+      data: TilgangTilSakRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TilgangskontrollResponse, void>({
         path: `/v2/api/tilgang/sak`,
         method: "POST",
@@ -358,7 +415,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/v2/api/tilgang/person
      * @secure
      */
-    sjekkTilgangPerson: (data: TilgangTilPersonRequest, params: RequestParams = {}) =>
+    sjekkTilgangPerson: (
+      data: TilgangTilPersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TilgangskontrollResponse, void>({
         path: `/v2/api/tilgang/person`,
         method: "POST",
@@ -411,7 +471,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/v2/api/sporingsdata/sak
      * @secure
      */
-    hentSakSporingsdata: (data: SporingsdataSakRequest, params: RequestParams = {}) =>
+    hentSakSporingsdata: (
+      data: SporingsdataSakRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Sporingsdata, void>({
         path: `/v2/api/sporingsdata/sak`,
         method: "POST",
@@ -430,7 +493,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/v2/api/sporingsdata/person
      * @secure
      */
-    hentPersonSporingsdata: (data: SporingsdataPersonRequest, params: RequestParams = {}) =>
+    hentPersonSporingsdata: (
+      data: SporingsdataPersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<Sporingsdata, void>({
         path: `/v2/api/sporingsdata/person`,
         method: "POST",
@@ -449,7 +515,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/v2/api/behandlingstilgang/skriv
      * @secure
      */
-    sjekkbehandlingstilgangBehandlingstema: (data: BehandlingstemaRequest, params: RequestParams = {}) =>
+    sjekkbehandlingstilgangBehandlingstema: (
+      data: BehandlingstemaRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TilgangskontrollResponse, void>({
         path: `/v2/api/behandlingstilgang/skriv`,
         method: "POST",
@@ -468,7 +537,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/v2/api/behandlingstilgang/les
      * @secure
      */
-    sjekkLesetilgangBehandlingstema: (data: BehandlingstemaRequest, params: RequestParams = {}) =>
+    sjekkLesetilgangBehandlingstema: (
+      data: BehandlingstemaRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TilgangskontrollResponse, void>({
         path: `/v2/api/behandlingstilgang/les`,
         method: "POST",

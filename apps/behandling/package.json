@@ -23,7 +23,7 @@
         "@navikt/ds-tailwind": "catalog:",
         "@theme-ui/mdx": "^0.17.1",
         "@uiw/react-json-view": "^2.0.0-alpha.40",
-        "axios": "^1.18.0",
+        "axios": "catalog:",
         "date-fns": "^4.4.0",
         "echarts": "^6.1.0",
         "lodash": "^4.17.21",
