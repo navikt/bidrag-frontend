@@ -1,5 +1,6 @@
 import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
-import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
+import { JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
+import { DokumentStatusDto } from "@bidrag/api/BidragForsendelseApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { AapneDokumentKnapp, useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
@@ -184,7 +185,7 @@ export default function JournalpostTabell({
 
             if (!journalpostId || !dok.dokumentreferanse) {
                 return (
-                    <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
+                    <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                         <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                         <span className="min-w-0 truncate">{dok.tittel ?? "-"}</span>
                     </HStack>
@@ -192,7 +193,7 @@ export default function JournalpostTabell({
             }
 
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <AapneDokumentKnapp
                         journalpostId={journalpostId}
@@ -211,12 +212,12 @@ export default function JournalpostTabell({
         const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
         const journalpostId = rad.jp.journalpostId;
         const hoveddokRef = rad.jp.dokumenter?.[0]?.dokumentreferanse;
-        const erUnderProduksjon = rad.jp.status === JournalpostStatus.UNDER_PRODUKSJON;
+        const erUnderProduksjon = rad.jp.dokumenter?.[0]?.status === DokumentStatusDto.UNDER_PRODUKSJON;
 
         if (journalpostId && hoveddokRef) {
-            const status = erUnderProduksjon ? DokumentStatus.UNDER_PRODUKSJON : DokumentStatus.FERDIGSTILT;
+            const status = erUnderProduksjon ? DokumentStatusDto.UNDER_PRODUKSJON : DokumentStatusDto.FERDIGSTILT;
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <AapneDokumentKnapp
                         journalpostId={journalpostId}
@@ -232,7 +233,7 @@ export default function JournalpostTabell({
         }
 
         return (
-            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(720), display: "inline-block" }}>
+            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(390), display: "inline-block" }}>
                 {tekst}
             </span>
         );
@@ -344,7 +345,7 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { resizable: false, autoResizeOnce: true, value: scaledPx(500) },
+            width: { resizable: false, autoResizeOnce: true, value: scaledPx(419) },
             bodyCell: beskrivelseCelle,
         },
     ];
