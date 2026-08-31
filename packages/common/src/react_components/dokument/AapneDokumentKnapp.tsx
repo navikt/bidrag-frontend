@@ -48,7 +48,6 @@ export default function AapneDokumentKnapp({
     const dokumentHref = `/dokument/${journalpostId}/${dokumentreferanse}?dok=${dokumentreferanse}`;
 
     function åpneMedMbdok() {
-        console.log(laster, dokumentreferanse)
         if (laster || !dokumentreferanse) return;
         setLaster(true);
         window.setTimeout(() => setLaster(false), MBDOK_SPINNER_VARIGHET_MS);
