@@ -1,0 +1,35 @@
+## Forklaring av dokumentstatuser
+
+-   <div className="flex flex-row gap-[5px]">
+        <DokumentStatusTag status="UNDER_PRODUKSJON" />
+        <ArrowRightIcon className="self-center" />
+        <DokumentStatusTag status="UNDER_REDIGERING" />
+        <ArrowRightIcon className="self-center" />
+        <DokumentStatusTag status="FERDIGSTILT" />
+    </div>
+    Når det bestilles ett nytt dokument fra mal så vil dokumentet ha status "Under produksjon" i en kort periode. Det betyr
+    at dokumentet er i ferd med å produseres og er ikke klar for å åpnes og redigeres enda.
+
+    Etter dokumentet er ferdigprodusert vil den få status "Under redigering". Det vil si at dokumentet er klar for å åpnes (feks i WORD) og redigeres.
+
+    Etter dokumentet er redigert ferdig og ferdigstilt så vil dokumentet få status "Ferdigstilt". Da er dokumentet låst for redigering er klar for å distribueres.
+
+-   <div className="flex flex-row gap-[5px]">
+        <DokumentStatusTag status="MÅ_KONTROLLERES" /> <ArrowRightIcon className="self-center" />
+        <DokumentStatusTag status="KONTROLLERT" />
+    </div>
+    Dokument som er importert fra en annen kilde vil få status "Må kontrolleres". Det betyr at dokumentet må åpnes og skjermes
+    informasjon som mottaker av forsendelsen ikke skal få innsyn på. Etter dokumentet er kontrollert og skjermet ferdig vil
+    dokumentet få status "Kontrollert". Da er dokumentet klar for å distribueres til mottaker.
+-   <div className="flex flex-row gap-[5px]">
+        <DokumentStatusTag status="UNDER_REDIGERING" /> <DokumentLinkedTag />
+        <div className="ml-2"></div>
+        <DokumentStatusTag status="FERDIGSTILT" /> <DokumentLinkedTag />
+    </div>
+    Et dokument kan gjelde i flere saker / forsendelser. Dette kaller vi lenking og symboliseres med  <DokumentLinkedTag />
+    Når det redigeres i et dokument vil dette automatisk gi de samme endringene i alle dokumentene som er lenket sammen. 
+    Lenking av dokumenter vil i denne versjonen kun gjelde for dokumentet "Innstilling til klageinstans" for nasjonale saker. I senere versjoner av løsningen vil det åpnes for flere. 
+    <i>
+        Det er bare innholdet i dokumentet som er lenket sammen. Tittelen på dokumentet vil være unikt for hver
+        forsendelse.
+    </i>

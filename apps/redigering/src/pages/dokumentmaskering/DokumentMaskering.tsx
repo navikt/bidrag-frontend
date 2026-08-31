@@ -1,0 +1,125 @@
+import { Broadcast, type BroadcastMessage, BroadcastNames, FileUtils, queryParams } from "@bidrag/common";
+import { Alert, Heading } from "@navikt/ds-react";
+import type { AxiosError } from "axios";
+import { useEffect } from "react";
+
+import { RedigeringQueries } from "../../api/queries";
+import type { PdfDocumentType } from "../../components/utils/types";
+import environment from "../../environment";
+import type { EditDocumentMetadata } from "../../types/EditorTypes";
+import { parseErrorMessageFromAxiosError } from "../../types/ErrorUtils";
+import PdfEditorContextProvider, { type PdfEditorMode } from "../redigering/components/PdfEditorContext";
+import DokumentRedigering from "../redigering/DokumentRedigering";
+
+type DokumentMaskeringProps = {
+    documentFile: PdfDocumentType;
+    forsendelseId: string;
+    dokumentreferanse: string;
+    isLoading: boolean;
+    mode?: PdfEditorMode;
+};
+export default function DokumentMaskering({
+    documentFile,
+    forsendelseId,
+    dokumentreferanse,
+    isLoading,
+    mode,
+}: DokumentMaskeringProps) {
+    const { data: dokumentMetadata } = RedigeringQueries.hentRedigeringmetadata<EditDocumentMetadata>(
+        forsendelseId,
+        dokumentreferanse,
+    );
+    const lagreEndringerFn = RedigeringQueries.lagreEndringer(forsendelseId, dokumentreferanse);
+    const ferdigstillDokumentFn = RedigeringQueries.ferdigstillDokument(forsendelseId, dokumentreferanse);
+    function onWindowClose() {
+        return broadcast();
+    }
+
+    useEffect(() => {
+        window.addEventListener("beforeunload", onWindowClose);
+        return () => window.removeEventListener("beforeunload", onWindowClose);
+    }, []);
+
+    if (!isLoading && !documentFile) {
+        return (
+            <Alert variant="error" size={"small"} style={{ margin: "0 auto", width: "50%" }}>
+                <Heading spacing size="small" level="3">
+                    Det skjedde en feil ved lasting av dokument
+                </Heading>
+                Fant ingen dokument {dokumentreferanse} i forsendelse #{forsendelseId}
+            </Alert>
+        );
+    }
+    function broadcast() {
+        const params = queryParams();
+        if (!params.id) return;
+        const message: BroadcastMessage<unknown> = Broadcast.convertToBroadcastMessage(params.id, {});
+        Broadcast.sendBroadcast(BroadcastNames.EDIT_DOCUMENT_RESULT, message);
+    }
+    function broadcastAndCloseWindow() {
+        broadcast();
+        if (environment.system.isProduction) {
+            window.close();
+        }
+    }
+
+    function saveDocument(config: EditDocumentMetadata): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            lagreEndringerFn.mutate(config, {
+                onSuccess: () => resolve(true),
+                onError: (error: AxiosError) => {
+                    reject(parseErrorMessageFromAxiosError(error));
+                },
+            });
+        });
+    }
+    function saveDocumentAndClose(config: EditDocumentMetadata) {
+        return saveDocument(config).then(() => {
+            broadcastAndCloseWindow();
+            return true;
+        });
+    }
+
+    function saveAndFinishDocument(config: EditDocumentMetadata, fysiskDokument: Uint8Array): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            ferdigstillDokumentFn.mutate(
+                {
+                    // Genererte typer sier `File` (pga. `@format binary` i swagger-spec),
+                    // men API-et forventer faktisk en base64-streng i JSON-body.
+                    fysiskDokument: FileUtils._arrayBufferToBase64(fysiskDokument) as unknown as File,
+                    redigeringMetadata: JSON.stringify(config),
+                },
+                {
+                    onSuccess: () => {
+                        resolve(true);
+                        broadcastAndCloseWindow();
+                    },
+                    onError: (error: AxiosError) => {
+                        reject(parseErrorMessageFromAxiosError(error));
+                    },
+                },
+            );
+        });
+    }
+
+    const getPdfEditorMode = (): PdfEditorMode => {
+        if (dokumentMetadata?.forsendelseState === "LOCKED") return "view_only_unlockable";
+        if (dokumentMetadata?.state === "LOCKED") return "view_only_unlockable";
+        return mode ?? "edit";
+    };
+
+    return (
+        <PdfEditorContextProvider
+            mode={getPdfEditorMode()}
+            journalpostId={forsendelseId}
+            dokumentreferanse={dokumentreferanse}
+            documentFile={documentFile}
+            onSave={saveDocument}
+            onSaveAndClose={saveDocumentAndClose}
+            onSubmit={saveAndFinishDocument}
+            dokumentMetadata={dokumentMetadata}
+        >
+            <DokumentRedigering documentFile={documentFile} />
+        </PdfEditorContextProvider>
+    );
+}

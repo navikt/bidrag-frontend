@@ -1,0 +1,154 @@
+import sakshistorikk_under_produksjon from "./files/sakshistorikk_under_produksjon.png";
+import opprett_forsendelse from "./files/opprett_forsendelse.png";
+import forsendelse_bildet from "./files/forsendelse_bildet_vedtak.png";
+import forsendelse_dokumentliste_full from "./files/forsendelse_dokumentliste_full.png";
+import modia_dokumentliste from "./files/modia_dokumentliste.png";
+import navno_dokumentliste from "./files/navno_dokumentliste.png";
+import brevmaler_foreldreskap from "./files/brevmaler_foreldreskap.png";
+import brevmaler_alle from "./files/brevmaler_alle.png";
+import åpne_dokument_brevmal from "./files/åpne_dokument_brevmal.png";
+import brevmal_lastned from "./files/brevmal_lastned.png";
+
+# Brukerveiledning forsendelse
+
+### Hva er en forsendelse?
+
+En forsendelse er et digitalt brev med dokumenter som sendes til partene i en bidragssak. Som hovedregel vil partene være BM og BP, samt bidragsbarn over 18 år. Men, det kan også være at en forsendelse skal til andre parter, eller til en myndighet.
+
+Brevet blir sendt med mottakers navn og adresse, og inneholder
+
+-   hoveddokument
+-   eventuelle vedlegg
+
+### Å opprette en forsendelse automatisk
+
+Når du registrerer en søknad, eller fatter et vedtak, blir det automatisk opprettet en tom forsendelse. I forsendelsen kan du sende et varsel-, orienterings- eller vedtaksbrev. Du ser dette som en gul rad med status «Under opprettelse» i journalen i «Sakshistorikk».
+
+Det vil i tillegg bli opprettet en forsendelse for alle parter som skal motta den.
+
+<figure className="w-[55rem]">
+    <img src={sakshistorikk_under_produksjon} />
+    <figcaption>Automatisk opprettet forsendelser i journalen</figcaption>
+</figure>
+
+### Opprett forsendelse (erstatter Brevmeny)
+
+Når du åpner den tomme forsendelsen, vil skjermbildet "Opprett forsendelse" bli åpnet. Her må du velge
+
+-   hvem forsendelsen gjelder
+-   hvem som er mottaker av forsendelsen
+-   dokument(er) som du skal sende med forsendelsen.
+
+<figure className="w-[35rem]">
+    <img src={opprett_forsendelse} />
+    <figcaption>Opprett forsendelse</figcaption>
+</figure>
+
+### Bygg forsendelse
+
+Etter at du har valgt mottaker og dokument(er), blir du sendt videre til skjermbildet «Forsendelse».
+
+<figure className="w-[35rem]">
+    <img src={forsendelse_bildet} />
+    <figcaption>Bygg forsendelse</figcaption>
+</figure>
+
+#### Å legge til et inn- eller utgående dokument
+
+Når du legger til et dokument i forsendelsen, vil dokumentet få status "Må kontrolleres" i dokumenttabellen.
+
+Når dokumentet har status «Må kontrolleres», må du kontrollere dokumentet i «Redigeringsklienten». Her må du gå nøye gjennom dokumentet for å sjekke om det er noen sider, eller tekst som ikke skal sendes til mottakeren. Du kan fjerne hele sider, og/eller legge inn skjerming av sensitiv informasjon.
+
+Etter at du har kontrollert, må du ferdigstille dokumentet. Da endrer status seg til «Kontrollert».
+
+#### Legg til inngående eller distribuert dokument
+
+Hvis du legger til et inngående eller utgående dokument som er distribuert til et av partene vil dokumentet få status "Må kontrolleres" i dokumenttabellen. <br/>
+
+Hvis dokumentet har status "Må kontrolleres" så skal dokumentet kontrolleres og skjermes informasjon som mottaker av forsendelsen ikke skal få innsyn på.
+Kontrollering og skjerming gjør du i "Redigeringsklienten" skjermbildet. Når du kontrollert og skjermet dokumentet ferdig for sensitiv informasjon kan du ferdigstille dokumentet. Da vil dokumentet få status "Kontrollert"
+
+#### Lenking av dokumenter
+
+Et dokument kan gjelde i flere saker / forsendelser. Dette kaller vi lenking og symboliseres med <DokumentLinkedTag />.
+Når det redigeres i et dokument vil dette automatisk gi de samme endringene i alle dokumentene som er lenket sammen. Lenking av dokumenter vil i denne versjonen kun gjelde for dokumentet "Innstilling til klageinstans" for nasjonale saker.
+I senere versjoner av løsningen vil det åpnes for flere.
+
+#### Tittel og dokument-titler
+
+Tittel er en viktig del av en forsendelse. Den vil ligge i journalen, og være nyttig for å senere finne fram til riktig dokument. I tillegg vil mottaker se titlene på både forsendelsen og vedleggene.
+
+Derfor bør du skrive en tittel som godt beskriver innholdet i forsendelsen. Du må unngå forkortelser, eller kommentarer som kan være vanskelig for mottaker å forstå.
+
+#### Forsendelse tittel
+
+Forsendelsestittel er en beskrivelse av hele innholdet i forsendelsen, og vil bli den samme som tittelen på hoveddokumentet. Tittelen vil vises i beskrivelsesfeltet i journalen på skjermbildet "Sakshistorikk» i Bisys.
+
+#### Dokument tittel
+
+Dokument-tittel er en beskrivelse av innholdet i det enkelte dokument. Tittelen vil vises i utvidet visning av beskrivelsesfeltet i journalen på skjermbildet "Sakshistorikk" i Bisys. I tillegg vil tittelen vises for mottaker i listen for dokumenter når de mottar forsendelsen.
+
+#### Visning av titler på ulike flater
+
+<div className="flex flex-row flex-wrap">
+    <figure className="w-[33rem] flex flex-col justify-between">
+        <img src={forsendelse_dokumentliste_full} />
+        <figcaption>Forsendelse</figcaption>
+    </figure>
+    <figure className="w-[33rem]">
+        <img src={modia_dokumentliste} />
+        <figcaption>Modia</figcaption>
+    </figure>
+    <figure className="w-[33rem]">
+        <img src={navno_dokumentliste} />
+        <figcaption>Nav.no</figcaption>
+    </figure>
+</div>
+
+## Distribusjon av forsendelsen
+Etter at du har kontrollert og ferdigstilt alle dokumentene, er du nå klar til å bestille distribusjon av forsendelsen til mottaker.
+#### Distribusjonskanal
+Før du bestiller distribusjon vil du se informasjon om hvilken kanal forsendelsen vil bli distribuert på.<br/>
+Forsendelsen kan bli distribuert digitalt eller fysisk:
+##### Digitalt via nav.no eller digital postkasse
+Hvis bruker ikke har åpnet det digitale dokumentet sendt via Nav.no etter 40 timer, vil forsendelsen bli sendt fysisk via sentral print.
+##### Fysisk via sentral print
+Når du sender forsendelsen fysisk via sentra print, vil du få mulighet til å endre hvilken postadresse forsendelsen blir sendt til. Adressen kan derfor være ulik det som står på hoveddokumentet til forsendelsen.
+
+#### Hva er synlig for bruker?
+
+Dette kan bruker se via Nav.no:
+
+-   Utgående brev sendt digitalt eller per post til bruker
+-   Dokumenter bruker sender inn digitalt i saken
+-   Tittel på brev/dokument som sendes ut til tredjepart (for eksempel en advokat). Bruker får ikke åpnet brevet/dokumentet, men kan se tittel på dokumentet.
+
+Bruker kan ikke se
+
+-   dokumenter som bruker selv har sendt inn via post, eller
+-   brev/dokumenter til eller fra andre parter.
+
+
+## Lenker til brevmalene på Navet
+Nederst til høyre på skjermbildet finner du lenker til brevmaler for varsel og vedtak på <strong>Navet</strong>:
+<div className="flex flex-row">
+    <figure className="w-[35rem] flex flex-col justify-between">
+        <img src={brevmaler_alle} />
+        <figcaption>Brevmaler</figcaption>
+    </figure>
+    <figure className="w-[35rem]">
+        <img src={brevmaler_foreldreskap} />
+        <figcaption>Brevmaler når tema er foreldreskap</figcaption>
+    </figure>
+</div>
+
+Hvis du åpner dokument for et brevmal via skjermbildet vil ikke knappen "Åpne i skrivebordsprogram" fungere. Da må du istedenfor gjøre følgende for å åpne dokumentet:
+* Trykk på tre dottene i høyre hjørnet på dokumentene
+ <figure className="w-[35rem]">
+        <img src={åpne_dokument_brevmal} />
+</figure>
+* Trykk på "last ned" knappen på menyen som dukker opp
+ <figure className="w-[35rem]">
+        <img src={brevmal_lastned} />
+</figure>
+* Åpne dokumentet som blir lastet ned

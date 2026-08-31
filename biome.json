@@ -1,6 +1,12 @@
 {
     "files": {
-        "includes": ["**", "!!**/packages/api/src/api"]
+        "includes": [
+            "**",
+            "!!**/packages/api/src/api",
+            "!!apps/redigering/src/components/pdfcore/pdfjslib",
+            "!!apps/redigering/src/pages/skjemutfylling/pdfviewer.lazy.css",
+            "!!apps/redigering/src/pages/redigering/components/sidebar"
+        ]
     },
     "vcs": {
         "enabled": true,

@@ -6,6 +6,7 @@ export { useBisysLink } from "./bisys/useBisysLink";
 export { default as BidragCell } from "./grid/BidragCell";
 export { default as BidragContainer } from "./grid/BidragContainer";
 export { default as BidragGrid } from "./grid/BidragGrid";
+export { default as AapneDokumentKnapp } from "./dokument/AapneDokumentKnapp";
 export { default as SakHeader } from "./header/SakHeader";
 export * from "./hooks";
 export { default as PopupSokButton } from "./PopupSøkButton";
@@ -19,5 +20,12 @@ export { default as RolleDetaljer } from "./roller/RolleDetaljer";
 export { default as RolleTag } from "./roller/RolleTag";
 export { default as SaveStatusIndicator } from "./SaveStatusIndicator";
 export { default as SamhandlerSokButton } from "./samhandler/SamhandlerSokButton";
+export { default as OpprettSakSkjema } from "./sak/opprett-sak/OpprettSakSkjema";
+export { RolleType as OpprettSakRolleType } from "./sak/opprett-sak/RolleType";
+export {
+    type IOpprettSakPageProps,
+    SakProvider as OpprettSakProvider,
+    useSakContext as useOpprettSakContext,
+} from "./sak/opprett-sak/OpprettSakContext";
 export { useTilgangssjekkBruker } from "./tilgang/useTilgangSjekkBruker";
 export { useTilgangssjekkSak } from "./tilgang/useTilgangssjekkSak";
