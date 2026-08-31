@@ -16,7 +16,7 @@ interface SakSummerProps {
 export function SakSummer({ bidragSak, ident }: SakSummerProps) {
     const saksnummer = bidragSak.saksnummer ?? undefined;
     const { harTilgang, TilgangAlert } = useTilgangssjekkSak(saksnummer);
-    const { data: sak } = useHentSak(saksnummer, false, harTilgang);
+    const { data: sak } = useHentSak(saksnummer);
 
     if (!saksnummer) {
         return <Alert variant={"warning"}>Saksnummer mangler for bidragssak</Alert>;
