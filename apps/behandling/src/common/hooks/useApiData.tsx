@@ -686,7 +686,7 @@ export const useGetBehandlingV2 = (): BehandlingDtoV2 => {
 };
 
 export const useGetForholdsmessigFordelingDetaljer = (): SjekkForholdmessigFordelingResponse => {
-    const { behandlingId } = useBehandlingProvider();
+    const { behandlingId, enhet} = useBehandlingProvider();
     const bidragFlereBarn = useFlag("behandling.behandle_bidrag_flere_barn");
     const { løpendeBidragBarn } = useGetBehandlingV2();
     const { data: response } = useSuspenseQuery({
@@ -699,7 +699,7 @@ export const useGetForholdsmessigFordelingDetaljer = (): SjekkForholdmessigForde
                         løpendeBidragBarn,
                     } as SjekkForholdmessigFordelingResponse;
                 }
-                return (await BEHANDLING_API_V1.api.kanOppretteForholdsmessigFordeling(Number(behandlingId))).data;
+                return (await BEHANDLING_API_V1.api.kanOppretteForholdsmessigFordeling(Number(behandlingId), {opprettetAvEnhet: enhet, detaljerBarn: []})).data;
             } catch (e) {
                 console.log(e);
                 return { kanOppretteForholdsmessigFordeling: false } as SjekkForholdmessigFordelingResponse;
