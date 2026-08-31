@@ -20,3 +20,10 @@ export { default as RolleDetaljer } from "./roller/RolleDetaljer";
 export { default as RolleTag } from "./roller/RolleTag";
 export { default as SaveStatusIndicator } from "./SaveStatusIndicator";
 export { default as SamhandlerSokButton } from "./samhandler/SamhandlerSokButton";
+export { default as OpprettSakSkjema } from "./sak/opprett-sak/OpprettSakSkjema";
+export { RolleType as OpprettSakRolleType } from "./sak/opprett-sak/RolleType";
+export {
+    type IOpprettSakPageProps,
+    SakProvider as OpprettSakProvider,
+    useSakContext as useOpprettSakContext,
+} from "./sak/opprett-sak/OpprettSakContext";
