@@ -1,0 +1,59 @@
+.popover-toolbar {
+    position: absolute;
+    left: 50%;
+    bottom: 35px;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background-color: white;
+    border: 1px solid var(--ax-border-neutral);
+    box-shadow:
+        0px 4.8px 10.8px rgba(0, 0, 0, 0.16),
+        0px 0px 4.7px rgba(0, 0, 0, 0.14);
+    border-radius: 10px;
+}
+.popover-toolbar .navds-label {
+    color: var(--ax-text-neutral);
+}
+.popover-toolbar .navds-button__icon {
+    color: var(--ax-text-neutral);
+}
+.popover-toolbar .handle {
+    align-self: center;
+}
+.popover-toolbar .handle:focus {
+    box-shadow: none;
+}
+
+.popover-toolbar .buttons_row {
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+.popover-toolbar .buttons_row button:focus {
+    box-shadow: none;
+}
+.popover-toolbar .buttons_row .undo_redo_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+.popover-toolbar .buttons_row .editor_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.popover-toolbar .divider {
+    height: 100%;
+    margin-right: 4px;
+    border-right: 2px solid var(--ax-border-neutral);
+}
+
+.editor_buttons {
+    color: var(--ax-text-neutral);
+}

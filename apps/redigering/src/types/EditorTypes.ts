@@ -1,0 +1,20 @@
+import type { DokumentDetaljer } from "@bidrag/api/BidragForsendelseApi";
+import type { IMaskingItemProps } from "../components/masking/MaskingItem";
+
+export interface IDocumentMetadata<T> {
+    editorMetadata?: T;
+    state: "EDITABLE" | "LOCKED";
+    forsendelseState: "EDITABLE" | "LOCKED";
+    title: string;
+    documentDetails: DocumentDetails[];
+}
+
+export type DocumentDetails = DokumentDetaljer;
+
+export interface EditDocumentMetadata {
+    items: IMaskingItemProps[];
+    removedPages: number[];
+    pageRotations?: Record<number, number>;
+}
+
+export type ClosingWindow = boolean;

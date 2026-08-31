@@ -28,6 +28,7 @@ export default defineConfig(({ command, mode }) => {
         ],
         resolve: {
             tsconfigPaths: true,
+            dedupe: ["react", "react-dom"],
             alias: [
                 // tsconfig peker @bidrag/behandling-app til en type-deklarasjon for å slippe
                 // strict typesjekk av pakkens kildekode. Vite må fortsatt bruke kildekoden.

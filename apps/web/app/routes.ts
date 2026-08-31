@@ -1,5 +1,7 @@
 import adminroutes from "@bidrag/admin-app/routes";
 import behandlingroutes, { sakRoutes as behandlingSakRoutes } from "@bidrag/behandling/routes";
+import forsendelseroutes, { sakRoutes as forsendelseSakRoutes } from "@bidrag/forsendelse/routes";
+import redigeringroutes from "@bidrag/redigering/routes";
 import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
@@ -12,6 +14,10 @@ export default [
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
     route("samhandler/*", "./routes/samhandler/SamhandlerRedirect.ts"),
     route("personsok", "./routes/personsok/PersonSøkPage.tsx"),
+    // Ny sak opprettes uten kjent saksnummer, så ruten kan ikke ligge nestet
+    // under "sak/:saksnummer" selv om filene ligger under saksroller-mappen.
+    route("sak/opprett", "./routes/sak/saksroller/opprett-sak/OpprettSakPage.tsx"),
+    route("opprettsakmodal", "./routes/sak/saksroller/opprett-sak/OpprettSakLegacyRedirect.ts"),
     route("modia/person", "./routes/modia/ModiaRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
@@ -22,6 +28,12 @@ export default [
 
     // Behandling (migrert fra den frittstående bidrag-behandling-ui)
     ...behandlingroutes,
+
+    // Forsendelse (migrert fra den frittstående bidrag-forsendelse-ui)
+    ...forsendelseroutes,
+
+    // Redigering (migrert fra den frittstående bidrag-redigering-ui)
+    ...redigeringroutes,
 
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
         index("./routes/bruker/index.tsx"),
@@ -34,6 +46,7 @@ export default [
 
     route("sak/:saksnummer", "routes/sak/SakBaseLayout.tsx", [
         ...behandlingSakRoutes,
+        ...forsendelseSakRoutes,
         route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),
 
         layout("routes/sak/SakStandardLayout.tsx", [
@@ -44,8 +57,6 @@ export default [
         ]),
 
         route("journal/:journalpostId", "routes/dokument/JournalRedirect.ts"),
-        route("notat", "routes/forsendelse/NotatRedirect.ts"),
-        route("forsendelse/*", "routes/forsendelse/ForsendelseRedirect.ts"),
         route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
     ]),
 ] satisfies RouteConfig;
