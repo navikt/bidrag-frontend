@@ -13,15 +13,7 @@ export function InnkrevingsseksjonKort({ title, children }: Props) {
                 <Heading size="small" level="2">
                     {title}
                 </Heading>
-                <Box
-                    background="default"
-                    borderColor="neutral-subtle"
-                    padding="space-16"
-                    borderWidth="1"
-                    borderRadius="4"
-                >
-                    {children}
-                </Box>
+                {children}
             </VStack>
         </Box>
     );

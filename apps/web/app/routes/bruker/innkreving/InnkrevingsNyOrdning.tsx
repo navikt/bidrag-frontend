@@ -1,5 +1,5 @@
 import type { NyBetalingsordning } from "@bidrag/api/BidragReskontroApi";
-import { Table } from "@navikt/ds-react";
+import { Box, Table } from "@navikt/ds-react";
 import { InnkrevingsseksjonKort } from "./InnkrevingsseksjonKort";
 import { belopEllerStrek, datoEllerStrek } from "./innkrevingsformattering";
 
@@ -12,20 +12,30 @@ export function InnkrevingsNyOrdning({ nyBetalingsordning }: Props) {
 
     return (
         <InnkrevingsseksjonKort title="Planlagt fremtidig ordning">
-            <Table size="small">
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Gjelder FOM dato</Table.HeaderCell>
-                        <Table.HeaderCell align="right">Beløp</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    <Table.Row>
-                        <Table.DataCell>{datoEllerStrek(nyBetalingsordning.dato?.fom)}</Table.DataCell>
-                        <Table.DataCell align="right">{belopEllerStrek(nyBetalingsordning.beløp)}</Table.DataCell>
-                    </Table.Row>
-                </Table.Body>
-            </Table>
+            <Box
+                asChild
+                background="default"
+                borderColor="neutral-subtle"
+                padding="space-16"
+                borderWidth="1"
+                borderRadius="4"
+                width="fit-content"
+            >
+                <Table size="small">
+                    <Table.Body>
+                        <Table.Row>
+                            <Table.DataCell>Gjelder FOM dato</Table.DataCell>
+                            <Table.DataCell align="right">
+                                {datoEllerStrek(nyBetalingsordning.dato?.fom)}
+                            </Table.DataCell>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.DataCell>Beløp</Table.DataCell>
+                            <Table.DataCell align="right">{belopEllerStrek(nyBetalingsordning.beløp)}</Table.DataCell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
+            </Box>
         </InnkrevingsseksjonKort>
     );
 }
