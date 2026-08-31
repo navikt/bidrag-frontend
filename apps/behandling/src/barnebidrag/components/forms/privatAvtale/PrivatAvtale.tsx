@@ -131,8 +131,12 @@ const Main = ({ initialValues }: { initialValues: PrivatAvtaleFormValues }) => {
             return controlledFields;
         }
 
-        const filtered = controlledFields.filter(({ gjelderBarn }) => visibleIds.has(gjelderBarn.id));
-        return filtered.length > 0 ? filtered : controlledFields;
+        // NB: Faller ikke tilbake til den ufiltrerte (alle-saker) listen når filteret gir 0
+        // treff. Gjorde man det, kunne en gjenværende `tab`-parameter i URL-en (fra forrige
+        // sak) feilaktig matche et barn i en HELT ANNEN sak - noe som fikk begrunnelse-feltet
+        // til å bli bundet til feil barn, og lagringen ble da avvist av backend uten synlig
+        // feilmelding ("sender ikke oppdatering").
+        return controlledFields.filter(({ gjelderBarn }) => visibleIds.has(gjelderBarn.id));
     }, [controlledFields, selectedRoller]);
 
     const defaultTab = useMemo(() => {
@@ -142,7 +146,9 @@ const Main = ({ initialValues }: { initialValues: PrivatAvtaleFormValues }) => {
         const barnId = visibleControlledFields.find(
             ({ gjelderBarn }) => gjelderBarn.id === Number(searchParams.get(urlSearchParams.tab)),
         )?.gjelderBarn?.id;
-        return barnId?.toString() ?? visibleControlledFields[0]?.gjelderBarn.id.toString();
+        // Faller tilbake til "andrebarn" (i stedet for å krasje) dersom den valgte saken ikke
+        // har noen søknadsbarn i denne behandlingen (kun barn under "Andre barn").
+        return barnId?.toString() ?? visibleControlledFields[0]?.gjelderBarn?.id?.toString() ?? "andrebarn";
     }, [searchParams, visibleControlledFields]);
     const selectedTab = defaultTab.toString();
 
@@ -315,9 +321,17 @@ const Side = () => {
     const { erBisysVedtak, privatAvtaleV3, vedtakstype } = useGetBehandlingV2();
     const { onStepChange, getNextStep, setSaveErrorState, selectedRoller } = useBehandlingProvider();
     const updatePrivatAvtaleBegrunnelseMutation = useOnUpdatePrivatAvtaleBegrunnelse();
-    const { getValues, watch } = useFormContext<PrivatAvtaleFormValues>();
+    const { getValues, watch, control } = useFormContext<PrivatAvtaleFormValues>();
     const tabBarnIdent = searchParams.get(urlSearchParams.tab);
-    const privatAvtaleRoller = getValues("roller").map((rolle, index) => ({
+    // Bruker `useWatch` (reaktiv) i stedet for `getValues` (et engangs-snapshot) for `roller`.
+    // Uten dette rendres `Side` kun på nytt når egne props/context (f.eks. `selectedRoller`)
+    // endres - typisk EN gang, rett før `reset()` (som kjøres i en effekt i `PrivatAvtaleForm`
+    // etter saksbytte) faktisk har oppdatert skjemaverdiene. `visgtRolle` ble da beregnet mot
+    // gamle (forrige saks) roller filtrert med det NYE `selectedRoller`, som ofte ga tomt
+    // resultat, og siden ingenting trigget et nytt render etterpå, forble `valgtRolle` feil/tomt
+    // for alltid etter et saksbytte.
+    const watchedRoller = useWatch({ control, name: "roller" });
+    const privatAvtaleRoller = (watchedRoller ?? getValues("roller")).map((rolle, index) => ({
         ...rolle,
         originalIndex: index,
     }));
@@ -328,8 +342,7 @@ const Side = () => {
             return privatAvtaleRoller;
         }
 
-        const filtered = privatAvtaleRoller.filter((rolle) => visibleIds.has(rolle.gjelderBarn.id));
-        return filtered.length > 0 ? filtered : privatAvtaleRoller;
+        return privatAvtaleRoller.filter((rolle) => visibleIds.has(rolle.gjelderBarn.id));
     }, [privatAvtaleRoller, selectedRoller]);
     const valgtRolle =
         tabBarnIdent === "andrebarn"
@@ -343,7 +356,6 @@ const Side = () => {
     const erAldersjusteringsVedtakstype = vedtakstype === Vedtakstype.ALDERSJUSTERING;
     const begrunnelseName =
         tabBarnIdent === "andrebarn" ? "andreBarnBegrunnelse" : (`roller.${rolleIndex}.begrunnelse` as const);
-    const prevValue = useRef(getValues(begrunnelseName));
     const fieldMutationState = useFieldMutationStatus(updatePrivatAvtaleBegrunnelseMutation.mutation, begrunnelseName);
 
     const updatePrivatAvtaleBegrunnelse = useCallback(
@@ -365,6 +377,13 @@ const Side = () => {
 
     const debouncedOnSave = useDebounce(updatePrivatAvtaleBegrunnelse);
 
+    // NB: Ingen "prevValue"-basert deduplisering her (i motsetning til en tidligere versjon).
+    // `reset()` (kalt ved saksbytte) trigger IKKE `watch`-callbacken med `type === "change"`, så
+    // filteret under er allerede tilstrekkelig for å skille faktiske brukerendringer fra
+    // reset/saksbytte. Et `prevValue`-basert sammenligningsfilter viste seg ustabilt her: en
+    // `ref` initialisert ved mount blir ikke automatisk holdt i sync med hvilket barn/felt som
+    // faktisk er valgt etter et sak-/fanebytte, og kunne dermed feilaktig blokkere den første
+    // lagringen for det nye barnet.
     useEffect(() => {
         const subscription = watch((value, { name, type }) => {
             if (name?.includes(begrunnelseName) && type === "change") {
@@ -372,8 +391,7 @@ const Side = () => {
                     ? value.roller[rolleIndex]?.begrunnelse
                     : value.andreBarnBegrunnelse;
 
-                if (begrunnelseValue !== undefined && begrunnelseValue !== prevValue.current) {
-                    prevValue.current = begrunnelseValue;
+                if (begrunnelseValue !== undefined) {
                     const payload: OppdaterePrivatAvtaleBegrunnelseRequest = {
                         barnIdent: tabBarnIdent === "andrebarn" ? null : rolle?.gjelderBarn?.ident,
                         barnId: tabBarnIdent === "andrebarn" ? null : selectedBarnId,
@@ -384,10 +402,10 @@ const Side = () => {
             }
         });
         return () => subscription.unsubscribe();
-    }, [watch, tabBarnIdent, selectedBarnId, begrunnelseName, debouncedOnSave, prevValue]);
+    }, [watch, tabBarnIdent, selectedBarnId, begrunnelseName, debouncedOnSave, rolleIndex, rolle]);
 
     return (
-        <Fragment key={tabBarnIdent}>
+        <Fragment key={begrunnelseName}>
             {!erBisysVedtak && !erAldersjusteringsVedtakstype && (
                 <BegrunnelseSidemeny
                     name={begrunnelseName}
@@ -414,14 +432,14 @@ const PrivatAvtaleForm = () => {
     const { setPageErrorsOrUnsavedState } = useBehandlingProvider();
     const { privatAvtaleV3: privatAvtale } = useGetBehandlingV2();
     const privatAvtaleRef = useRef<PrivatAvtaleDtoV3>(privatAvtale);
-    const initialValues = useMemo(() => createInitialValues(privatAvtaleRef.current), [privatAvtaleRef]);
+
+    const initialValues = useMemo(() => createInitialValues(privatAvtaleRef.current), [privatAvtaleRef.current]);
     const useFormMethods = useForm({
         defaultValues: initialValues,
     });
 
     const {
         setError,
-        reset,
         formState: { errors },
     } = useFormMethods;
 
@@ -445,10 +463,6 @@ const PrivatAvtaleForm = () => {
             setBegrunnelseError("andreBarnBegrunnelse");
         }
     }, []);
-
-    useEffect(() => {
-        reset(initialValues);
-    }, [initialValues]);
 
     useEffect(() => {
         setPageErrorsOrUnsavedState((prevState) => ({

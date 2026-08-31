@@ -6,6 +6,10 @@ import { memo, useEffect, useMemo } from "react";
 import { updateUrlSearchParam } from "../../../utils/window-utils";
 import text from "../../constants/texts";
 import { toRolleDetaljer, useBehandlingProvider } from "../../context/BehandlingContext";
+import {
+    getSaksnummerMedNyeOpplysninger,
+    getSaksnummerMedValideringsfeil,
+} from "../../helpers/saksnummerValideringHelpers";
 import { useGetBehandlingV2, usePersonsQueries } from "../../hooks/useApiData";
 
 const behandlingTypeTextMapper = {
@@ -35,8 +39,12 @@ const HeaderTittel = ({ type, style }: { type: TypeBehandling; style?: React.CSS
 export const Header = memo(() => {
     const { behandlingId, vedtakId, selectedSaksnummer, setSelectedSaksnummer, setSelectedRoller } =
         useBehandlingProvider();
-    const { roller, type, saksnummer } = useGetBehandlingV2();
+    const behandling = useGetBehandlingV2();
+    const { roller, type, saksnummer } = behandling;
     const personsQueries = usePersonsQueries(roller);
+
+    const saksnummerMedValideringsfeil = useMemo(() => getSaksnummerMedValideringsfeil(behandling), [behandling]);
+    const saksnummerMedNyeOpplysninger = useMemo(() => getSaksnummerMedNyeOpplysninger(behandling), [behandling]);
 
     const rollerMedPersonNavn: HeaderRolle[] = useMemo(
         () =>
@@ -70,6 +78,8 @@ export const Header = memo(() => {
             setSelectedSaksnummer={setSelectedSaksnummer}
             setSelectedRoller={(valgteRoller: HeaderRolle[]) => setSelectedRoller(valgteRoller.map(toRolleDetaljer))}
             HeaderTittel={HeaderTittel}
+            saksnummerMedValideringsfeil={saksnummerMedValideringsfeil}
+            saksnummerMedNyeOpplysninger={saksnummerMedNyeOpplysninger}
         />
     );
 });

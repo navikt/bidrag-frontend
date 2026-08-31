@@ -20,14 +20,13 @@ readonly DIFF_FILNAVN="diff.txt"
 
 # Filer som ikke gir modellen nyttig kontekst, men spiser mye plass.
 readonly EKSKLUDERTE_STIER=(
-  ':(exclude)**/target/**'
-  ':(exclude)**/*.lock'
-  ':(exclude)**/package-lock.json'
-  ':(exclude)**/yarn.lock'
-  ':(exclude)**/*.jar'
+  ':(exclude)**/scripts/**'
+  ':(exclude)pnpm-lock.yaml'
   ':(exclude)**/*.png'
   ':(exclude)**/*.jpg'
+  ':(exclude)**/*.svg'
   ':(exclude)**/*.pdf'
+  ':(exclude)**/*.woff2'
 )
 
 # kategoriser <filsti>
@@ -37,15 +36,17 @@ kategoriser() {
   case "$fil" in
     .nais/* | nais/*) printf '%s\n' "$KATEGORI_NAIS" ;;
     .github/*) printf '%s\n' "$KATEGORI_WORKFLOW" ;;
-    pom.xml | Dockerfile | CODEOWNERS | .gitignore) printf '%s\n' "$KATEGORI_ROT" ;;
+    package.json | pnpm-workspace.yaml | pnpm-lock.yaml | tsconfig*.json | biome.json | Dockerfile | compose.yml | CODEOWNERS | .gitignore | .npmrc | .editorconfig)
+      printf '%s\n' "$KATEGORI_ROT" ;;
     *) printf '%s\n' "$KATEGORI_ANNET" ;;
   esac
 }
 
 # finn_modul <filsti> [repo-rot]
 # Går oppover i katalogtreet fra filen og returnerer nærmeste katalog som
-# inneholder en pom.xml. Håndterer dermed både apps/<app> og nøstede moduler
-# som apps/bidrag-dokumenthåndtering/<app>. Filer uten modul kategoriseres.
+# inneholder en package.json. Håndterer dermed både apps/<app> og packages/<pakke>
+# i pnpm-workspacet. Rot-package.json regnes ikke som modul, slik at
+# rot-filer kategoriseres. Filer uten modul kategoriseres.
 finn_modul() {
   local fil="$1"
   local rot="${2:-.}"
@@ -53,7 +54,7 @@ finn_modul() {
   katalog="$(dirname "$fil")"
 
   while [[ "$katalog" != "." && "$katalog" != "/" ]]; do
-    if [[ -f "$rot/$katalog/pom.xml" ]]; then
+    if [[ -f "$rot/$katalog/package.json" ]]; then
       printf '%s\n' "$katalog"
       return 0
     fi

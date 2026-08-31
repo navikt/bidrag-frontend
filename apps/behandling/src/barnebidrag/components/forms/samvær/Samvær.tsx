@@ -92,12 +92,22 @@ const Side = () => {
         setSaveErrorState,
         getNextStep,
         vurderSeparatSamvær: vurderSeparat,
+        selectedRoller,
     } = useBehandlingProvider();
     const vurderSeparatRef = useRef(vurderSeparat);
     const samvær = useGetSamværMedBarn();
     const saveSamværFn = useOnSaveSamvær();
     const { watch, getValues, setValue, setError, clearErrors } = useFormContext<SamværBarnformvalues>();
-    const { selectedBarn: oppdaterSamvær } = useActiveSamværTab(samvær.barn);
+
+    const visibleSamværBarn = useMemo(() => {
+        const visibleIds = new Set(selectedRoller.map((rolle) => rolle.id));
+        if (visibleIds.size === 0) {
+            return samvær.barn;
+        }
+        const filtered = samvær.barn.filter((barn) => visibleIds.has(barn.barn.id));
+        return filtered.length > 0 ? filtered : samvær.barn;
+    }, [samvær.barn, selectedRoller]);
+    const { selectedBarn: oppdaterSamvær } = useActiveSamværTab(visibleSamværBarn);
     const mutationState = useFieldMutationStatus(saveSamværFn.mutation, `${oppdaterSamvær?.barn.id}.begrunnelse`);
 
     const [previousValues, setPreviousValues] = useState<string>(
