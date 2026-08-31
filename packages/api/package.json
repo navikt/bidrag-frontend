@@ -37,11 +37,13 @@
         "api:forsendelse": "swagger-typescript-api generate -p https://bidrag-dokument-forsendelse.intern.dev.nav.no/v3/api-docs --axios -n BidragForsendelseApi.ts -o src/api",
         "api:kodeverk": "swagger-typescript-api generate -p https://bidrag-kodeverk.intern.dev.nav.no/v3/api-docs --axios -n BidragKodeverkApi.ts -o src/api"
     },
+
     "dependencies": {
-        "axios": "^1.18.0",
-        "@types/node": "^25"
+        "axios": "catalog:"
     },
+
     "devDependencies": {
+        "@types/node": "^25",
         "typescript": "catalog:",
         "swagger-typescript-api": "13.12.2"
     }

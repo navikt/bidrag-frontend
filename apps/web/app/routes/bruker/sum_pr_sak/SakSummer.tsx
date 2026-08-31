@@ -1,5 +1,5 @@
 import type { Bidragssak } from "@bidrag/api/BidragReskontroApi";
-import { RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
+import { RolleTag, type RolleTypeAbbreviation, useTilgangssjekkSak } from "@bidrag/common";
 import { Alert, Box, Detail, HStack, Label, Link, VStack } from "@navikt/ds-react";
 import { Link as RouterLink } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
@@ -14,24 +14,30 @@ interface SakSummerProps {
 }
 
 export function SakSummer({ bidragSak, ident }: SakSummerProps) {
-    if (!bidragSak.saksnummer) {
+    const saksnummer = bidragSak.saksnummer ?? undefined;
+    const { harTilgang, TilgangAlert } = useTilgangssjekkSak(saksnummer);
+    const { data: sak } = useHentSak(saksnummer);
+
+    if (!saksnummer) {
         return <Alert variant={"warning"}>Saksnummer mangler for bidragssak</Alert>;
     }
-    const saksnummer = bidragSak.saksnummer;
-    const { data: sak } = useHentSak(bidragSak.saksnummer);
 
+    const nullsafeSaknummer = saksnummer;
     const rolle = sak?.roller.find((rolle) => rolle.fodselsnummer === ident);
     const isRMForSegSelv = ident === rolle?.reellMottaker?.ident;
     const rolleType = isRMForSegSelv ? "RM" : rolle?.type;
 
     function renderTabell() {
+        if (!harTilgang && TilgangAlert) {
+            return <TilgangAlert />;
+        }
         switch (rolleType) {
             case "BP":
-                return <SaksumTabellBP ident={ident} saksnummer={saksnummer} bidragSak={bidragSak} sak={sak} />;
+                return <SaksumTabellBP ident={ident} saksnummer={nullsafeSaknummer} bidragSak={bidragSak} sak={sak} />;
             case "BM":
-                return <SaksumTabellBM ident={ident} saksnummer={saksnummer} bidragSak={bidragSak} sak={sak} />;
+                return <SaksumTabellBM ident={ident} saksnummer={nullsafeSaknummer} bidragSak={bidragSak} sak={sak} />;
             case "RM":
-                return <SaksumTabellRM ident={ident} saksnummer={saksnummer} bidragSak={bidragSak} sak={sak} />;
+                return <SaksumTabellRM ident={ident} saksnummer={nullsafeSaknummer} bidragSak={bidragSak} sak={sak} />;
             case "BA":
             case "FR":
                 return <Alert variant={"info"}>Visning for rolle {rolleType} er ikke støttet</Alert>;
@@ -44,10 +50,9 @@ export function SakSummer({ bidragSak, ident }: SakSummerProps) {
                 <HStack gap={"space-8"}>
                     {rolleType && <RolleTag rolleType={rolleType as unknown as RolleTypeAbbreviation} />}
                     <Label>
-                        Sak{" "}
                         <Link as={RouterLink} to={`/sak/${bidragSak.saksnummer}/reskontro`}>
                             {bidragSak.saksnummer}
-                        </Link>{" "}
+                        </Link>
                     </Label>
                     <Detail as={"span"}>
                         Enhet: {sak?.eierfogd} <EnhetsNavn enhetsnummer={sak?.eierfogd ?? null} />
