@@ -39,6 +39,7 @@ export default [
         index("./routes/bruker/index.tsx"),
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
         route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
+        route("innkreving", "./routes/bruker/innkreving/InnkrevingPage.tsx"),
     ]),
 
     route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),
