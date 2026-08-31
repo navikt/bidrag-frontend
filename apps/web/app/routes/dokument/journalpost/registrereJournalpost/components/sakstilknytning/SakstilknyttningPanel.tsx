@@ -1,14 +1,13 @@
 import { Heading, Loader } from "@navikt/ds-react";
-import React, { type ReactElement, useEffect, useRef, useState } from "react";
-
+import { type ReactElement, useEffect, useRef, useState } from "react";
+import { useHentGjelder } from "~/routes/dokument/utils/usePersonApi.ts";
+import { useHentSakerPerson, useRefreshSakerPersonQuery } from "~/routes/dokument/utils/useSakApi.ts";
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";
 import OpprettSakModal from "../../../../common/components/modal/opprett-sak-modal/OpprettSakModal";
 import RolleTag from "../../../../common/components/person/RolleTag";
 import SakTableMotsattRolle from "../../../../common/components/SakTableMotsattRolle";
 import SakstilknytningTable from "../../../../common/components/table/SakstilknytningTable";
 import type { ColumnData, RowData } from "../../../../common/components/table/Table";
-import { useHentGjelder } from "../../../../servicesV2/usePersonApi";
-import { useHentSakerPerson, useRefreshSakerPersonQuery } from "../../../../servicesV2/useSakApi";
 import { useAppContext } from "../../../../store/AppContext";
 import { KategoriNavnDisplayValue, type Sak, SakStatusDisplayValue } from "../../../../types/sak";
 import type { JournalpostToRegister } from "../types/JournalpostToRegister";

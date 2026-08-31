@@ -1,9 +1,9 @@
 import React, { createContext, type ReactNode, useContext, useEffect } from "react";
-
-import { useHentJournalpost } from "../servicesV2/useDokumentApi";
+import { useHentJournalpost } from "~/api/useApi.ts";
 import type { Sak } from "../types/sak";
 
 type SearchState = "pending" | "success" | "error" | "idle";
+
 interface SearchContextType {
     searchValue: string;
     searchState: SearchState;

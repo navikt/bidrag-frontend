@@ -12,7 +12,10 @@ export default [
 
     //route("sak/:saksnummer/journal/:journalpostid", "./routes/dokument/journalpost/VisJournalpostPage.tsx"),
     //route("journal/:journalpostid", "./routes/dokument/journalpost/VisJournalpostPage.tsx"),
-    route("journalpost/:journalpostid", "./routes/dokument/journalpost/registrereJournalpost/index.tsx"),
+    route(
+        "journalpost/:journalpostid",
+        "./routes/dokument/journalpost/registrereJournalpost/RegistrereJournalpostContainer.tsx",
+    ),
 
     index("routes/_index.tsx"),
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [

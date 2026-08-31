@@ -1,9 +1,8 @@
-import { PersonNavnIdent } from "@navikt/bidrag-ui-common";
+import { Rolletype } from "@bidrag/api/SakApi";
+import { PersonNavnIdent } from "@bidrag/common";
 import { Add } from "@navikt/ds-icons/cjs";
 import { Alert, CheckboxGroup, Heading, HGrid } from "@navikt/ds-react";
 import React from "react";
-
-import { Rolletype } from "../../../api/BidragSakApi";
 import { NY_SAK_SAKSNUMMER, type Sak } from "../../../types/sak";
 import IkonKnapp from "../icons/IkonKnapp";
 import RolleTag from "../person/RolleTag";

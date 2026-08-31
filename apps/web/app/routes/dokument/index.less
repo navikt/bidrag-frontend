@@ -1,0 +1,451 @@
+@import "@navikt/ds-css";
+@import "@navikt/bidrag-ui-common/styles/index.css";
+
+
+.grid-border {
+    border-top: 1px solid #337C9B;
+    margin: 24px 0 12px 0;
+}
+
+.grid-panel {
+    .typo-innholdstittel {
+        margin-bottom: 16px ;
+    }
+}
+
+div#app-root {
+    height: calc(100vh - 83px);
+    width: 100%;
+}
+.margin--M {
+    margin: 16px;
+}
+
+.margin--L {
+    margin: 24px;
+}
+/* Move to its own journalpost element .less file and import it here*/
+ul.pagination{
+    margin:0;
+    padding:0;
+}
+
+button {margin:0 1em 0 0;}
+
+
+.searchedSaksRolleRadio{
+    margin: 0 0.7em 0 0;
+}
+.registrer-bildet-panel .skjemaelement{
+    margin-bottom: 0;
+}
+
+.brevKodeWrapper{
+    color:darkgray;
+}
+.iframeWrapper{
+    display:none;
+}
+
+.pageheader {
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+    display: block;
+    width: 100%;
+    justify-self: stretch;
+    box-sizing: border-box;
+    margin: 0px 0px 0px 0px;
+    background-color: #e9e7e7;
+    padding: 1rem 1rem 1.25rem 1rem;
+}
+.pagesubheader {
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+    display: block;
+    box-sizing: border-box;
+    margin: 0px 0px 0px 0px;
+    background-color: #e9e7e7;
+    padding-left: 1rem;
+}
+
+.smallHeader {
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin: 0;
+    text-transform: uppercase;
+    position: relative;
+}
+
+.typoSidetittel {
+    margin: 0;
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+    font-size: 1.875rem;
+    line-height: 2.125rem;
+    font-weight: 600;
+}
+
+.journalposter-element .card{
+    border:none;
+    box-shadow: none;
+}
+
+.bisys-header, .card-cascade .card-header {
+    background-color: #3e3832;
+    color: #fffdfb;
+    height: 68px;
+}
+
+.bisys-headline-main {
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 0.9px;
+    padding-left: 19px;
+    color: #fffdfb;
+}
+
+.bisys-headline-screen {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.17;
+    color: #ffffff;
+    padding-left: 26px;
+    margin-right:5em;
+}
+
+.lenke.bisys-headline-link {
+    color: #fff;
+    padding-right: 26px;
+    text-align: end;
+}
+
+.bisys-panel .h1, .registrer-bildet-panel .h1{
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.25;
+    color: #3e3832;
+    margin-bottom: 16px;
+}
+
+.bisys-panel .h2, .registrer-bildet-panel .h2 {
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.43;
+    color: #3e3832;
+    letter-spacing: 0.4px;
+}
+
+.bisys-panel .h3, .registrer-bildet-panel .h3 {
+    margin-top: 24px;
+    margin-bottom: 3px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.56;
+    color: #3e3832;
+    letter-spacing: normal;
+}
+
+.bisys-panel .h4, .registrer-bildet-panel .h4 {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.29;
+    color: #3e3832;
+    letter-spacing: 0.4px;
+}
+
+.bisys-label {
+    color: #3e3832;
+    padding: 4px 9px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: normal;
+    display: inline-block;
+}
+
+.bisys-tjeneste-label {
+    margin-right: 8px;
+    padding: 4px 9px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: normal;
+    display: inline-block;
+    color: #3e3832;
+    background-color: #e9e7e7;
+}
+.bisys-parkinglot {
+    background-color: #e9e7e7;
+}
+.avsenderMottakerWrapper{
+  margin:0.5em 0 0 0;
+}
+
+#avsenderInput{
+    margin:0 0.5em 0 0 ;
+}
+.registrer-bildet-panel{
+    background: #ffffff;
+    padding: 16px;
+    margin:0;
+}
+.bisys-panel {
+    background: #ffffff;
+    padding: 16px 24px;
+    margin: 24px;
+}
+.hovedDokumentKnapp{
+    margin: 0 0 0.5em 0;
+}
+.column .row{
+    margin:0.5em 0;
+    width: 560px;
+    min-height: 31px;
+}
+
+.checkboxForSammeSomGjelder{
+    padding-top:1em;
+    display: inline;
+}
+
+.enhetWarning{
+    border-radius: 2em;
+    padding:0.3em;
+    margin:0 0 0 1em;
+    font-size: 0.7em;
+    vertical-align: top;
+    background-color: #FFF2E0;
+}
+@rolleTag_BA_color: #E0DAE7;
+@rolleTag_BP_color: #FFF2E0;
+@rolleTag_BM_color: #CDE7D8;
+@rolleTag_RM_color: #d0f5df;
+.rolleTag{
+    padding: 0.2em 0.6em !important;
+    margin:0 0 0 1em;
+    font-size: 0.7em !important;
+    vertical-align: top;
+    border-radius: 2px;
+}
+span.rolleTag.RM{
+    background-color: @rolleTag_RM_color;
+    border: 1px solid darken(@rolleTag_RM_color, 40%)
+}
+span.rolleTag.BA{
+    background-color: @rolleTag_BA_color;
+    border: 1px solid darken(@rolleTag_BA_color, 40%)
+}
+span.rolleTag.BP{
+    background-color: @rolleTag_BP_color;
+    border: 1px solid darken(@rolleTag_BP_color, 40%)
+}
+span.rolleTag.BM{
+    background-color: @rolleTag_BM_color;
+    border: 1px solid darken(@rolleTag_BM_color, 40%)
+}
+ul.sakstilknyttningInformasjon li{
+  margin:0;
+}
+ul.sakstilknyttningInformasjon li.sakstilknyttningElement{
+    margin:1em 0;
+}
+ul.sakstilknyttningInformasjon{
+    list-style: none;
+    margin:0 0 1em 0;
+    padding:0;
+}
+.sakstilknyttningInformasjon p {
+    margin:0;
+}
+.bisys-bottom-buttons {
+    display: flex;
+    justify-content: flex-start;
+    padding-bottom: 24px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+h2.typo-systemtittel {
+    margin-bottom: 10px;
+}
+.registrer-bildet-panel.gjelderBrukereWrapper{
+    margin-top:1em;
+}
+.bisys-field-headline {
+    font-size: 14px;
+    line-height: 1.29;
+    letter-spacing: 0.4px;
+    color: #3e3832;
+}
+.selectedSearchedSaksRolleWrapper .bisys-field-content,
+.selectedSearchedSaksRolleWrapper .skjemaelement{
+    margin: 0.5em 0;
+}
+.bisys-field-content {
+    font-size: 16px;
+    line-height: 1.38;
+    letter-spacing: normal;
+    color: #3e3832;
+}
+
+.bisys-linktext {
+    font-size: 16px;
+    line-height: 1.38;
+    letter-spacing: 0.2px;
+    color: #0067c5;
+}
+
+.tilknyttetSakHeader:hover {
+    cursor: pointer;
+}
+.tilknyttSakTilJournalpostCheckbox{
+    margin:0 0.8em 0 0;
+}
+.registrerJournalpostCheckboxLabels:hover{
+    cursor: pointer;
+}
+.errorMessage h2, .errorMessage p{
+    color:red
+}
+.errorMessage {
+  margin:0 auto;
+    padding: 1em;
+    width:500px;
+}
+
+.bisys-fullspace {
+    width: 100%;
+}
+
+/* The actual timeline (the vertical ruler) */
+.timeline {
+    position: relative;
+    max-width: 1200px;
+}
+
+.timelineFilter {
+    padding: 10px 0 0 0;
+}
+
+p.error-text {
+    color:red;
+}
+
+/* The actual timeline (the vertical ruler) */
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+  background-color: lightgrey;
+    top: 0;
+    bottom: 0;
+    left: 13%;
+    margin-left: 0;
+}
+
+/* Container around content */
+.container {
+    padding: 10px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 91.5%;
+}
+
+.container .meny {
+    font-size: 2em;
+    float: right;
+    padding: 0.1em;
+    border-radius: 1em;
+}
+
+.container .meny:hover {
+    font-size: 2em;
+    color: ghostwhite;
+    background-color: darkgrey;
+    cursor: pointer;
+    padding: 0.1em;
+    border-radius: 1em;
+}
+
+/* The circles on the timeline */
+.container.right::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    right: -17px;
+    background-color: grey;
+    border: 4px solid grey;
+    top: 15px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Place the container to the left */
+.left {
+    left: 0;
+}
+
+/* Place the container to the right */
+.right {
+    left: 13%;
+}
+
+
+/* Add arrows to the right container (pointing left) */
+.right::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    left: 30px;
+    border: medium solid white;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent white transparent transparent;
+}
+
+/* Fix the circle for containers on the right side */
+.right::after {
+    left: -12px;
+}
+
+.date {
+    left: -83px;
+    top: -4px;
+    position: absolute;
+}
+
+/* The actual content */
+.content {
+    padding: 10px 5px 20px 30px;
+    background-color: white;
+    position: relative;
+}
+
+
+.document_button_editable_title {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 25rem;
+
+    p:not(.typo-feilmelding) {
+        margin-bottom: initial !important;
+        align-self: center;
+    }
+    .view-document-button {
+        position: relative;
+        align-self: center;
+
+        :hover {
+            cursor: pointer;
+        }
+
+        svg {
+            height: 20px;
+            width: 20px;
+        }
+    }
+}

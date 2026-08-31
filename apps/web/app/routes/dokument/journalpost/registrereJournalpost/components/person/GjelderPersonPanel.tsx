@@ -2,11 +2,10 @@ import { Alert, Heading, Loader } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
 import _ from "lodash";
 import React, { type MutableRefObject, type ReactElement, useCallback, useEffect, useRef } from "react";
-
+import { useHentJournalpost } from "~/api/useApi.ts";
+import { hentPerson, PersonApiQueryKeys, useHentGjelder } from "~/routes/dokument/utils/usePersonApi.ts";
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";
 import Gjelder from "../../../../common/components/person/Gjelder";
-import { useHentJournalpost } from "../../../../servicesV2/useDokumentApi";
-import { hentPerson, PersonApiQueryKeys, useHentGjelder } from "../../../../servicesV2/usePersonApi";
 import { useSearch } from "../../../../store/SearchContext";
 import type { Person } from "../../../../types/person";
 import type { JournalpostToRegister } from "../types/JournalpostToRegister";

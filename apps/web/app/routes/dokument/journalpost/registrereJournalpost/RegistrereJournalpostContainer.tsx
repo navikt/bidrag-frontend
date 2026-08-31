@@ -3,13 +3,12 @@ import "./RegistrereJournalpostContainer.less";
 import { Button, HGrid, Page, VStack } from "@navikt/ds-react";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-
+import { useHentJournalpost, useRegistrerJournalpostMutation } from "~/routes/dokument/utils/useDokumentApi.ts";
 import Avvikshandtering from "../../common/components/avvik/Avvikshandtering";
 import ErrorSummary from "../../common/components/form/ErrorSummary";
-import environment from "../../environment";
-import { useHentJournalpost, useRegistrerJournalpostMutation } from "../../servicesV2/useDokumentApi";
 import { useAppContext } from "../../store/AppContext";
 import { getErrorMessageWhenJournalpostStatusIsNotMottatt } from "../../types/journalpost";
+import type { Route } from "./+types/RegistrereJournalpostContainer";
 import JournalpostDetaljer from "./components/journalpostdetaljer/JournalpostDetaljer";
 import GjelderPersonPanel from "./components/person/GjelderPersonPanel";
 import RegistrereJournalpostHeader from "./components/RegistrereJournalpostHeader";
@@ -18,10 +17,12 @@ import SearchSakOrPersonPanel from "./components/search/SearchSakOrPersonPanel";
 import type { JournalpostToRegister } from "./components/types/JournalpostToRegister";
 import { mapToReqistrerJournalpostRequest } from "./components/types/RequestMapper";
 
-function RegistrereJournalpostContainer() {
+function RegistrereJournalpostContainer({ params }: Route.ComponentProps) {
     const {
         appState: { journalpostId, påloggetEnhet },
     } = useAppContext();
+    const journalpostid = params.journalpostid;
+
     const journalpost = useHentJournalpost();
     const { setError } = useAppContext();
     const registrerJournalpost = useRegistrerJournalpostMutation();
@@ -38,7 +39,7 @@ function RegistrereJournalpostContainer() {
     });
 
     useEffect(() => {
-        setError(undefined);
+        setError(null);
         const errorMessage = getErrorMessageWhenJournalpostStatusIsNotMottatt(journalpost);
         errorMessage && setError(errorMessage, "Beklager, journalposten kan ikke journalføres");
     }, [journalpost]);
@@ -67,6 +68,7 @@ function RegistrereJournalpostContainer() {
             className="registrere-journalpost-container"
             onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
         >
+            test
             <RegistrereJournalpostHeader />
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -106,6 +108,7 @@ function RegistrereJournalpostContainer() {
                     </Page>
                 </form>
             </FormProvider>
+            test
         </div>
     );
 }

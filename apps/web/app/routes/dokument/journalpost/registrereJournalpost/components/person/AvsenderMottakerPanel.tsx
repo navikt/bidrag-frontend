@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useRef } from "react";
-
+import { useHentJournalpost } from "~/api/useApi.ts";
+import { useHentGjelder } from "~/routes/dokument/utils/usePersonApi.ts";
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";
 import AvsenderMottaker, { AvsenderMottakerChoices } from "../../../../common/components/person/AvsenderMottaker";
 import { isEmpty } from "../../../../common/utils/ObjectUtils";
-import { useHentJournalpost } from "../../../../servicesV2/useDokumentApi";
-import { useHentGjelder } from "../../../../servicesV2/usePersonApi";
 import { useJournalpost } from "../../../../store/JournalpostContext";
 import { useSearch } from "../../../../store/SearchContext";
 import { DokumentType } from "../../../../types/api/JournalpostTypes";
@@ -36,6 +35,7 @@ export default function AvsenderMottakerPanel() {
     function updateFormValue(value?: string) {
         onUpdate(value);
     }
+
     function getAvsenderMottakerInfo() {
         if (isAvsenderEditable) {
             return {

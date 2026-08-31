@@ -1,0 +1,6 @@
+@import "tailwindcss/base";
+@import "@navikt/ds-css";
+@import "@navikt/bidrag-ui-common/styles/index.css";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+

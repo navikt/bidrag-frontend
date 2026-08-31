@@ -1,4 +1,3 @@
-import environment from "../../environment";
 import { getParamFromUrl } from "./WindowUtils";
 
 export function getSessionStateFromParam() {
@@ -6,6 +5,7 @@ export function getSessionStateFromParam() {
     return sessionState ? `sessionState=${getParamFromUrl("sessionState")}` : "";
 }
 
+//TODO NGHI
 export const RedirectTo = {
     oppgaveListe: () => {
         window.location.href = `${environment.url.bisys}Oppgaveliste.do?${getSessionStateFromParam()}`;

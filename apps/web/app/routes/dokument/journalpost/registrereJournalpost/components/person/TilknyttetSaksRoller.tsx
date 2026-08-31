@@ -1,8 +1,6 @@
+import { Rolletype } from "@bidrag/api/SakApi";
 import { RadioGroup } from "@navikt/ds-react";
 import _ from "lodash";
-import React from "react";
-
-import { Rolletype } from "../../../../api/BidragSakApi";
 import { useSearch } from "../../../../store/SearchContext";
 import type { Sak } from "../../../../types/sak";
 import PersonRadioButton from "./PersonRadioButton";
@@ -14,6 +12,7 @@ interface TilknyttetSaksRollerProps {
 
 export default function TilknyttetSaksRoller(props: TilknyttetSaksRollerProps) {
     const { enkelSak } = useSearch();
+
     function setSelectedSearchedSaksRolle(selectedRolleFnr: string) {
         if (!_.isEmpty(selectedRolleFnr)) {
             props.onPersonSelected(selectedRolleFnr);
