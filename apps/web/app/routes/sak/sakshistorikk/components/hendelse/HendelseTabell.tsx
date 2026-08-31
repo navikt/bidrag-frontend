@@ -1,7 +1,7 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
 import { useBisysLink } from "@bidrag/common";
-import { formaterDato, sortByDateAsc } from "@bidrag/utils";
-import { Box, Heading, VStack } from "@navikt/ds-react";
+import { formaterDato } from "@bidrag/utils";
+import { Heading, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
 import { useSort } from "../useSort";
@@ -47,7 +47,7 @@ export default function HendelseTabell({
                         rowDensity: "tight",
                         textSize: "small",
                         truncateContent: true,
-                        stickyColumns: {start: 1, end: 1}
+                        stickyColumns: { start: 1, end: 1 },
                     }}
                     columns={[
                         {

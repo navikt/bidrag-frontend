@@ -1,5 +1,6 @@
 import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
-import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
+import { JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
+import { DokumentStatusDto } from "@bidrag/api/BidragForsendelseApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { AapneDokumentKnapp, useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
@@ -34,7 +35,6 @@ import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
 import { journalstatusDisplayVerdi, standardSort } from "./journalpostUtils";
 import PersonIdentMedRolle from "./PersonIdentMedRolle";
-import {DokumentStatusDto} from "@bidrag/api/BidragForsendelseApi";
 
 const scaledPx = (value: number) => `${value}px`;
 
@@ -193,7 +193,7 @@ export default function JournalpostTabell({
             }
 
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0  }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <AapneDokumentKnapp
                         journalpostId={journalpostId}
@@ -217,7 +217,7 @@ export default function JournalpostTabell({
         if (journalpostId && hoveddokRef) {
             const status = erUnderProduksjon ? DokumentStatusDto.UNDER_PRODUKSJON : DokumentStatusDto.FERDIGSTILT;
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0  }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <AapneDokumentKnapp
                         journalpostId={journalpostId}
@@ -233,7 +233,7 @@ export default function JournalpostTabell({
         }
 
         return (
-            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(390), display: "inline-block"}}>
+            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(390), display: "inline-block" }}>
                 {tekst}
             </span>
         );

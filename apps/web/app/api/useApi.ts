@@ -1059,7 +1059,7 @@ export function useHarSkrivetilgang(saksnummer: string, enhet: string | null) {
         queryFn: async () => {
             try {
                 const response = await BIDRAG_SAK_API.sak.harSkrivetilgang(saksnummer, { enhet: enhet ?? "" });
-                console.log(response)
+                console.log(response);
                 return response.data;
             } catch (e) {
                 return handleApiError(e, `sjekke skrivetilgang for saksnummer ${saksnummer} og enhet ${enhet}`);
