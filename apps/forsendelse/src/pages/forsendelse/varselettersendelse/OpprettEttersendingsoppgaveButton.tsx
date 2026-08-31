@@ -125,7 +125,13 @@ function OpprettEttersendelseOppgaveModal({
     }
     return (
         <form onSubmit={form.handleSubmit(opprett)}>
-            <Modal aria-label={"modal"} open={isOpen} closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
+            <Modal
+                aria-label={"modal"}
+                open={isOpen}
+                closeOnBackdropClick
+                onClose={() => setIsOpen(false)}
+                className="w-full"
+            >
                 <Modal.Header closeButton>
                     <Heading size="medium">Opprett ettersendingsoppgave</Heading>
                 </Modal.Header>
