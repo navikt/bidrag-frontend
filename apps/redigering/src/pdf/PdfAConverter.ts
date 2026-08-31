@@ -25,7 +25,6 @@ export class PdfAConverter {
     private pdfDoc: PDFDocument;
     async convertAndSave(origDoc: PDFDocument, title: string, copyPDF = false): Promise<Uint8Array> {
         this.origDoc = origDoc;
-        this.copyPDF = copyPDF;
         this.title = title;
         this.pdfDoc = await this.copyPdfDocument(this.origDoc, copyPDF);
         const documentDate = new Date();
@@ -174,7 +173,7 @@ export class PdfAConverter {
         return false;
     }
 }
-export const reparerPDF = async (documentFile: PdfDocumentType): Promise<File> => {
+export const reparerPDF = async (documentFile: PdfDocumentType): Promise<Blob> => {
     try {
         LoggerService.info("Reparerer korrupt PDF");
         const response = await BIDRAG_FORSENDELSE_API.api.reparerPdf(
@@ -211,7 +210,7 @@ export const validatePDFBytes = async (documentFile: Uint8Array): Promise<void> 
     }
 };
 
-export const convertTOPDFA = async (documentFile: Uint8Array): Promise<string> => {
+export const convertTOPDFA = async (documentFile: Uint8Array): Promise<Blob> => {
     try {
         console.log("Konverterer til PDF/A");
         const pdfAResult = await BIDRAG_FORSENDELSE_API.api.convertToPdfa2(

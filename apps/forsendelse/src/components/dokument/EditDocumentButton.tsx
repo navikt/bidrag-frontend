@@ -11,6 +11,7 @@ import { XMarkIcon as Close, ExternalLinkIcon as ExternalLink } from "@navikt/ak
 import { Button } from "@navikt/ds-react";
 import { type PropsWithChildren, useState } from "react";
 import { v4 as uuidV4 } from "uuid";
+import { z } from "zod";
 
 import type { IDokument } from "../../types/Dokument";
 
@@ -50,7 +51,7 @@ async function editDocument(
 }
 
 function waitForDocumentEditFinished(id: string): Promise<BroadcastMessage<EditDocumentBroadcastMessage>> {
-    return Broadcast.waitForBroadcast(BroadcastNames.EDIT_DOCUMENT_RESULT, id);
+    return Broadcast.waitForBroadcast(BroadcastNames.EDIT_DOCUMENT_RESULT, z.any(), id);
 }
 
 export default function EditDocumentButton({

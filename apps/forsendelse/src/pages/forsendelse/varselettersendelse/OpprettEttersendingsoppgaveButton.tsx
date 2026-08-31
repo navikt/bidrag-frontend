@@ -125,7 +125,7 @@ function OpprettEttersendelseOppgaveModal({
     }
     return (
         <form onSubmit={form.handleSubmit(opprett)}>
-            <Modal open={isOpen} closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
+            <Modal aria-label={"modal"} open={isOpen} closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
                 <Modal.Header closeButton>
                     <Heading size="medium">Opprett ettersendingsoppgave</Heading>
                 </Modal.Header>
@@ -203,7 +203,7 @@ function SlettOppgaveButton() {
             >
                 Slett
             </Button>
-            <Modal open={open} onClose={() => setOpen(false)}>
+            <Modal aria-label={"modal"} open={open} onClose={() => setOpen(false)}>
                 <Modal.Header closeButton>
                     <Heading size="medium">Slett oppgave</Heading>
                 </Modal.Header>
@@ -394,7 +394,7 @@ function EksisterendeOppgaveVarsel() {
     if (eksisterendeOppgaver.length === 0) return null;
 
     return (
-        <ExpansionCard size="small" className="subtle-card w-[500px] mb-2">
+        <ExpansionCard aria-label={"modal"} size="small" className="subtle-card w-[500px] mb-2">
             <ExpansionCard.Header>
                 <HStack wrap={false} gap="space-2" align="center">
                     <div>
@@ -532,5 +532,5 @@ function convertSkjemaBeskrivelse(skjema: KodeBeskrivelse | VarselEttersendelseV
         return skjema.beskrivelse;
     }
 
-    return skjema.tittel ?? skjema.beskrivelse;
+    return skjema.tittel ?? (skjema as unknown as KodeBeskrivelse).beskrivelse;
 }
