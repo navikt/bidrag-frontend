@@ -39,6 +39,9 @@ catalogs:
     '@types/react-dom':
       specifier: ^19.2.3
       version: 19.2.3
+    axios:
+      specifier: ^1.6.5
+      version: 1.18.1
     react:
       specifier: ^19.2.7
       version: 19.2.8
@@ -98,6 +101,9 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.101.4(react@19.2.8)
+      axios:
+        specifier: 'catalog:'
+        version: 1.18.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       dompurify:
         specifier: ^3.4.13
         version: 3.4.13
@@ -181,7 +187,7 @@ importers:
         specifier: ^5.0.1
         version: 5.1.0(unleash-proxy-client@3.8.0)
       axios:
-        specifier: ^1.18.0
+        specifier: 'catalog:'
         version: 1.18.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       date-fns:
         specifier: ^4.4.0
@@ -472,7 +478,7 @@ importers:
         specifier: 'catalog:'
         version: 5.101.4(react@19.2.8)
       axios:
-        specifier: ^1.18.0
+        specifier: 'catalog:'
         version: 1.18.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       react:
         specifier: 'catalog:'
@@ -486,6 +492,9 @@ importers:
       react-router:
         specifier: 'catalog:'
         version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
 
   apps/web:
     dependencies:
@@ -556,7 +565,7 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(unleash-proxy-client@3.8.0)
       axios:
-        specifier: ^1.18.0
+        specifier: 'catalog:'
         version: 1.18.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       date-fns:
         specifier: ^4.4.0
@@ -631,13 +640,13 @@ importers:
 
   packages/api:
     dependencies:
+      axios:
+        specifier: 'catalog:'
+        version: 1.18.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
+    devDependencies:
       '@types/node':
         specifier: ^25
         version: 25.9.5
-      axios:
-        specifier: ^1.18.0
-        version: 1.18.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
-    devDependencies:
       swagger-typescript-api:
         specifier: 13.12.2
         version: 13.12.2(react@19.2.8)
@@ -666,7 +675,7 @@ importers:
         specifier: ^6.1.3
         version: 6.1.3(openapi-types@12.1.3)
       axios:
-        specifier: ^1.18.0
+        specifier: 'catalog:'
         version: 1.18.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       echarts:
         specifier: ^6.1
@@ -674,6 +683,9 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
       react-router:
         specifier: 'catalog:'
         version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -693,6 +705,12 @@ importers:
       '@types/node':
         specifier: ^25
         version: 25.9.5
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.17)
       '@types/react-modal':
         specifier: 3.16.3
         version: 3.16.3
