@@ -1,4 +1,5 @@
-import { HStack, Page, VStack } from "@navikt/ds-react";
+import { useTilgangssjekkBruker } from "@bidrag/common";
+import { HStack, Loader, Page, VStack } from "@navikt/ds-react";
 import { Outlet } from "react-router";
 import { useHentPersoninformasjon } from "~/api/useApi";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr";
@@ -10,10 +11,20 @@ export default function BrukerLayout({ params }: Route.ComponentProps) {
     const { decodeFnr } = useObfuscateFnr();
     const brukerId = params.brukerid;
     const ident = decodeFnr(brukerId);
-    const { data: bruker, isLoading, error } = useHentPersoninformasjon({ ident });
+    const { harTilgang, TilgangAlert } = useTilgangssjekkBruker(ident);
+    const { data: bruker, isLoading, error } = useHentPersoninformasjon({ ident }, harTilgang);
+
+    if (!harTilgang && TilgangAlert)
+        return (
+            <Page.Block gutters>
+                <VStack justify={"center"} margin={"space-64"}>
+                    <TilgangAlert size={"medium"} />
+                </VStack>
+            </Page.Block>
+        );
 
     if (isLoading || bruker === undefined) {
-        return "loading...";
+        return <Loader />;
     }
 
     if (error) {

@@ -1,6 +1,7 @@
 export * from "./api";
 export * from "./docs";
 export * from "./logging";
+export * from "./query";
 export * from "./react_components";
 export * from "./service/DefaultRestService";
 export * from "./types";

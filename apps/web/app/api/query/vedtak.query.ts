@@ -1,7 +1,6 @@
 import { BIDRAG_VEDTAK_API } from "@bidrag/api";
-import { SecureLoggerService } from "@bidrag/common";
+import { SecureLoggerService, withQueryErrorHandling } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
-import { withQueryErrorHandling } from "./withQueryErrorHandling.ts";
 
 export function hentVedtakQuery(vedtaksId: number) {
     return queryOptions({

@@ -1,7 +1,6 @@
 import { BIDRAG_FORSENDELSE_API } from "@bidrag/api";
-import { SecureLoggerService } from "@bidrag/common";
+import { SecureLoggerService, withQueryErrorHandling } from "@bidrag/common";
 import { mutationOptions } from "@tanstack/react-query";
-import { withQueryErrorHandling } from "~/api/query/withQueryErrorHandling.ts";
 
 export async function utførSlettForsendelseMutationFn(forsendelseId: string) {
     return withQueryErrorHandling(

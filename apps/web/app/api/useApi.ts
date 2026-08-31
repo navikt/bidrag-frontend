@@ -198,12 +198,12 @@ export function useHentSakForPerson(ident: string, enabled: boolean = true) {
     });
 }
 
-export function useHentSak(saksnummer: string, rollehistorikk: boolean = false) {
+export function useHentSak(saksnummer: string | undefined, rollehistorikk: boolean = false, enabled: boolean = true) {
     return useQuery<BidragssakDto, AxiosError | TilgangsFeilError>({
         queryKey: ["hent_sak", saksnummer, rollehistorikk],
         queryFn: async () => {
             try {
-                const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer, {
+                const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer ?? "", {
                     "vis-rollehistorikk": rollehistorikk,
                 });
                 await SecureLoggerService.info(`Hentet sak ${saksnummer}`);
@@ -224,7 +224,7 @@ export function useHentSak(saksnummer: string, rollehistorikk: boolean = false) 
                 throw e;
             }
         },
-        enabled: !!saksnummer,
+        enabled: enabled && !!saksnummer,
         retry: (failureCount, error) => {
             if (error instanceof TilgangsFeilError) {
                 return false;
