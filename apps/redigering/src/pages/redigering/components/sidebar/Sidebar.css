@@ -83,7 +83,7 @@
     margin: auto;
 }
 
-.sidebar_viewer .thumbnail_page_container .maskingItem {
+.sidebar_viewer .thumbnail_page_container .maskingitem {
     z-index: 0 !important;
     top: calc(var(--masking-top) * var(--scale-factor)) !important;
     left: calc(var(--masking-left) * var(--scale-factor)) !important;
