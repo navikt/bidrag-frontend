@@ -10,6 +10,7 @@ import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";
 import { NotatLink } from "./NotatLink";
 import { ResultatLink } from "./ResultatLink";
+import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
 
 export default function HendelseTabell({
     saksnummer,
@@ -106,7 +107,7 @@ export default function HendelseTabell({
                         id: "søknadsgruppeBeskrivelse",
                         header: "Søknadsgrupper",
                         isSortable: true,
-                        bodyCell: (h) => h.søknadsgruppeBeskrivelse,
+                        bodyCell: (h) => <SøknadsgruppeBeskrivelseCelle beskrivelse={h.søknadsgruppeBeskrivelse} />,
                     },
                     {
                         id: "typeBeskrivelse",
