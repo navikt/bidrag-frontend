@@ -123,7 +123,7 @@ export default function AapneDokumentKnapp({
                 </>
             );
         }
-        return <span className={className}>{children}</span>;
+        return <span className={`${className} whitespace-pre-wrap`}>{children}</span>;
     }
 
     const visRedigering = visRedigeringKnapp && dokumentreferanse && (kanÅpnesDirekte || kanÅpnesMedMbdok);
