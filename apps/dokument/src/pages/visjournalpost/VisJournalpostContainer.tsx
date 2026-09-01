@@ -74,7 +74,7 @@ function RedigereButtons() {
     const { getValues } = useFormContext<UpdateJournalpostFormValues>();
     const isAddedNySak = () => {
         const saker = getValues("tilknyttSaker");
-        return saker && saker.includes(NY_SAK_SAKSNUMMER);
+        return saker?.includes(NY_SAK_SAKSNUMMER);
     };
 
     if (!journalpost.isTemaBidrag || (journalpost.isForsendelse && journalpost.feilfort)) {

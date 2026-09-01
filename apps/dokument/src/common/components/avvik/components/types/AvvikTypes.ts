@@ -31,7 +31,7 @@ export function skalOverføreTilFarskapEnhet(
     journalpost: Journalpost,
 ) {
     const erInngåendeMottatt = journalpost.isStatusMottatt && journalpost.isInngående;
-    return erInngåendeMottatt && nyFagområde == FAGOMRADE.FAR && !erFarskapBehandledeEnhet(eksisterendeEnhetsnummer);
+    return erInngåendeMottatt && nyFagområde === FAGOMRADE.FAR && !erFarskapBehandledeEnhet(eksisterendeEnhetsnummer);
 }
 
 export const joarkOverforFagomraderOptions = [

@@ -1,7 +1,6 @@
 import { BodyShort, Label, Textarea } from "@navikt/ds-react";
 import dayjs from "dayjs";
-import React, { useState } from "react";
-import { Matcher } from "react-day-picker";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";

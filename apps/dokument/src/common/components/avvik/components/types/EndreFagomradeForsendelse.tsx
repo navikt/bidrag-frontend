@@ -1,5 +1,5 @@
 import { BodyShort } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { AvvikType } from "../../../../../types/api/AvvikTypes";
 import type { Journalpost } from "../../../../../types/journalpost";
@@ -48,10 +48,10 @@ interface EndreFagomradeFirstStepValues {
 }
 
 function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
-    const erFagområdeBidrag = props.journalpost?.fagomrade == "BID";
+    const erFagområdeBidrag = props.journalpost?.fagomrade === "BID";
 
     const nyFagområde = erFagområdeBidrag ? "FAR" : "BID";
-    const fagomradeBeskrivelse = fagomradeOptions.find((option) => option.value == nyFagområde);
+    const fagomradeBeskrivelse = fagomradeOptions.find((option) => option.value === nyFagområde);
     if (!props.isActive) {
         return null;
     }
@@ -81,7 +81,7 @@ interface EndreFagomradeBekreftelseProps {
 }
 
 function EndreFagomradeBekreftelse(props: EndreFagomradeBekreftelseProps) {
-    const fagomradeOption = fagomradeOptions.find((option) => option.value == props.fagomrade);
+    const fagomradeOption = fagomradeOptions.find((option) => option.value === props.fagomrade);
 
     return (
         <Bekreftelse>
@@ -89,7 +89,7 @@ function EndreFagomradeBekreftelse(props: EndreFagomradeBekreftelseProps) {
                 {" "}
                 Fagområdet på journalposten er nå endret til {props.fagomrade} ({fagomradeOption.label}).
                 <br />
-                {props.fagomrade == "FAR"
+                {props.fagomrade === "FAR"
                     ? "Bare de som har tilgang til Farskap vil kunne se dokumentet i journalen."
                     : ""}
             </BodyShort>

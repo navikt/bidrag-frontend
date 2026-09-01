@@ -1,5 +1,5 @@
 import { BodyShort } from "@navikt/ds-react";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import NoAccessModal, { type NoAccessModalProps } from "../../../../common/components/modal/NoAccessModal";
 import { isEmpty } from "../../../../common/utils/ObjectUtils";

@@ -1,6 +1,6 @@
 import type { JournalforendeEnhetDto } from "@bidrag/api/OrganisasjonApi";
 import { Alert, BodyShort, Checkbox, Select } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";
 import { useHentJournalforendeEnheter } from "../../../../../hooks/useOrganisasjonApi";
@@ -21,7 +21,7 @@ import {
 } from "./AvvikTypes";
 
 function overførFarskapTekst(journalpost: Journalpost, påloggetEnhet: string, farskapEnhet: JournalforendeEnhetDto) {
-    if (journalpost.fagomrade == FAGOMRADE.FAR) return null;
+    if (journalpost.fagomrade === FAGOMRADE.FAR) return null;
     return skalOverføreTilFarskapEnhet(påloggetEnhet, FAGOMRADE.FAR, journalpost) ? (
         <>
             <br />
@@ -71,7 +71,7 @@ function EndreFagomrade(props: EndreFagomradeProps) {
         if (values.fagomrade === FAGOMRADE.FAR || values.fagomrade === FAGOMRADE.BID) {
             if (
                 skalOverføreTilFarskapEnhet(påloggetEnhet, values.fagomrade, journalpost) &&
-                BidragEnhet.FARSKAP != påloggetEnhet
+                BidragEnhet.FARSKAP !== påloggetEnhet
             ) {
                 await props.sendAvvik({
                     type: AvvikType.OVERFOR_TIL_ANNEN_ENHET,
@@ -80,7 +80,7 @@ function EndreFagomrade(props: EndreFagomradeProps) {
                 });
             } else if (
                 journalpostEnhet != null &&
-                påloggetEnhet != journalpostEnhet &&
+                påloggetEnhet !== journalpostEnhet &&
                 erFarskapBehandledeEnhet(påloggetEnhet)
             ) {
                 await props.sendAvvik({
@@ -149,7 +149,7 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
     }
 
     function getBeskrivelse() {
-        const farskapEnhet = journalforendeEnhetList.find((e) => e.enhetIdent == BidragEnhet.FARSKAP);
+        const farskapEnhet = journalforendeEnhetList.find((e) => e.enhetIdent === BidragEnhet.FARSKAP);
 
         return <BodyShort spacing>{overførOppgaveTekst(journalpost, påloggetEnhet, farskapEnhet)}</BodyShort>;
     }
@@ -165,7 +165,7 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
                 {...register("fagomrade")}
             >
                 {fagomradeOptions
-                    .filter((b) => b.value != journalpost.fagomrade)
+                    .filter((b) => b.value !== journalpost.fagomrade)
                     .sort((a, b) => {
                         if (a.label < b.label) {
                             return -1;

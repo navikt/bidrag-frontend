@@ -15,7 +15,7 @@ export default function SearchSakOrPersonPanel(): ReactElement {
     const startSearch = useRef(
         lodash.debounce((searchValue: string) => {
             startPersonOrSakSearch(searchValue).then((success) => {
-                if (success == false) {
+                if (success === false) {
                     setFailedSearchValue(searchValue);
                 }
             });

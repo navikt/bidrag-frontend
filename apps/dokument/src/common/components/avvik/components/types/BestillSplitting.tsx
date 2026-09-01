@@ -1,5 +1,4 @@
 import { BodyLong, BodyShort, Textarea } from "@navikt/ds-react";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";
@@ -22,7 +21,7 @@ function BestillSplitting(props: AvvikTypeCommonProps) {
     function renderJoarkDescription() {
         return (
             <BodyLong>
-                {journalpost.journalstatus == JournalStatus.JOURNALFOERT
+                {journalpost.journalstatus === JournalStatus.JOURNALFOERT
                     ? "Oppgave er opprettet til Fagpost og dokumentet er feilført. Etter splitting er utført vil dokumentet settes til utgår og bli fjernet fra sakshistorikken."
                     : "Journalføringsoppgaven er overført til Fagpost."}
                 <br />
@@ -85,7 +84,7 @@ function BestillSplittingFirstStep(props: BestillSplittingFirstStepProps) {
     function renderJoarkDescription() {
         return (
             <BodyLong>
-                {journalpost.journalstatus == JournalStatus.JOURNALFOERT
+                {journalpost.journalstatus === JournalStatus.JOURNALFOERT
                     ? "Dette vil opprette oppgave til Fagpost og feilføre dokumentet. Etter splitting er utført vil dokumentet settes til utgår og bli fjernet fra sakshistorikken."
                     : "Dette vil overføre journalføringsoppgaven til fagpost."}
                 <br />
@@ -102,7 +101,7 @@ function BestillSplittingFirstStep(props: BestillSplittingFirstStepProps) {
         return (
             <BodyLong>
                 Dette vil opprette oppgave til skanningsenheten og sette dokumentet til utgår.
-                {journalpost.journalstatus == JournalStatus.JOURNALFOERT
+                {journalpost.journalstatus === JournalStatus.JOURNALFOERT
                     ? "Dokumentet vil utgå."
                     : "Journalføringsoppgaven vil utgå."}
                 <br />

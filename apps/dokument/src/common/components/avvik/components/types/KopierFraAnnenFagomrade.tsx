@@ -1,7 +1,7 @@
 import type { EditDocumentBroadcastMessage } from "@bidrag/common";
 import { AapneDokumentKnapp, FileUtils, LoggerService } from "@bidrag/common";
 import { Alert, BodyShort, Checkbox, CheckboxGroup, Heading, Label, Link } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { SAK_API } from "../../../../../api/api";
@@ -81,10 +81,10 @@ function KopierFraAnnenFagomrade(props: KopierFraAnnenFagomradeProps) {
             const oppdatertKnyttTilSaker = knyttTilSaker
                 .reduce(
                     (list, saksnummer) =>
-                        list.concat([saksnummer == NY_SAK_SAKSNUMMER ? nySak.saksnummer : saksnummer]),
+                        list.concat([saksnummer === NY_SAK_SAKSNUMMER ? nySak.saksnummer : saksnummer]),
                     [],
                 )
-                .sort((a, b) => (b === nySak.saksnummer ? 1 : -1));
+                .sort((_a, b) => (b === nySak.saksnummer ? 1 : -1));
             setKnyttTilSaker(oppdatertKnyttTilSaker);
             return oppdatertKnyttTilSaker;
         }
@@ -205,7 +205,7 @@ function KopierFraAnnenFagomradeFirstStep(props: SendTilFagomradeFirstStepProps)
     function renderDocumentSelect() {
         const dokumenter = [...props.journalpost.dokumenter];
 
-        if (dokumenter.length == 1) {
+        if (dokumenter.length === 1) {
             const dokument = dokumenter[0];
             return (
                 <div>
@@ -226,47 +226,45 @@ function KopierFraAnnenFagomradeFirstStep(props: SendTilFagomradeFirstStepProps)
         }
 
         return (
-            <>
-                <CheckboxGroup
-                    //@ts-ignore
-                    error={errors.relevanteDokumenter?.message}
-                    legend={"Velg dokumenter som inneholder relevant informasjon for bidrag:"}
+            <CheckboxGroup
+                //@ts-expect-error
+                error={errors.relevanteDokumenter?.message}
+                legend={"Velg dokumenter som inneholder relevant informasjon for bidrag:"}
+            >
+                <Checkbox
+                    size={"small"}
+                    id={"dokument_alle"}
+                    onClick={toggleSelecAllDocuments}
+                    defaultChecked={isAllSelected()}
+                    checked={isAllSelected()}
                 >
-                    <Checkbox
-                        size={"small"}
-                        id={"dokument_alle"}
-                        onClick={toggleSelecAllDocuments}
-                        defaultChecked={isAllSelected()}
-                        checked={isAllSelected()}
-                    >
-                        <strong>Velg alle</strong>
-                    </Checkbox>
-                    {[...dokumenter].map((dokument, index) => (
-                        <div className={"flex flex-row min-w-[20px]"} key={index}>
-                            <Checkbox
-                                size={"small"}
-                                id={"dokument_" + dokument.dokumentreferanse}
-                                onClick={() => {
-                                    toggleSelectedDocument(dokument);
-                                }}
-                                defaultChecked={isDocumentSelected(dokument)}
-                                checked={isDocumentSelected(dokument)}
-                                value={isDocumentSelected(dokument)}
-                            >
-                                <DokumentLabel dokument={dokument} />
-                            </Checkbox>
-                            <AapneDokumentKnapp
-                                variant="ikon"
-                                journalpostId={dokument.journalpostId ?? props.journalpost.journalpostId}
-                                dokumentreferanse={dokument.dokumentreferanse}
-                                status={dokument.status}
-                            >
-                                <ExternalLink />
-                            </AapneDokumentKnapp>
-                        </div>
-                    ))}
-                </CheckboxGroup>
-            </>
+                    <strong>Velg alle</strong>
+                </Checkbox>
+                {[...dokumenter].map((dokument, index) => (
+                    <div className={"flex flex-row min-w-[20px]"} key={index}>
+                        <Checkbox
+                            size={"small"}
+                            id={`dokument_${dokument.dokumentreferanse}`}
+                            onClick={() => {
+                                toggleSelectedDocument(dokument);
+                            }}
+                            defaultChecked={isDocumentSelected(dokument)}
+                            checked={isDocumentSelected(dokument)}
+                            value={isDocumentSelected(dokument)}
+                        >
+                            <DokumentLabel dokument={dokument} />
+                        </Checkbox>
+                        <AapneDokumentKnapp
+                            variant="ikon"
+                            journalpostId={dokument.journalpostId ?? props.journalpost.journalpostId}
+                            dokumentreferanse={dokument.dokumentreferanse}
+                            status={dokument.status}
+                        >
+                            <ExternalLink />
+                        </AapneDokumentKnapp>
+                    </div>
+                ))}
+            </CheckboxGroup>
         );
     }
 
@@ -428,7 +426,7 @@ function KopierFraAnnenFagomradeThirdStep(props: KopierFraAnnenFagomradeThirdSte
 
     function submit() {
         setHasFormHasFormError(false);
-        if (valgteSaker.length == 0) {
+        if (valgteSaker.length === 0) {
             setHasFormHasFormError(true);
             return;
         }
@@ -468,13 +466,11 @@ function KopierFraAnnenFagomradeFourthStep(props: KopierFraAnnenFagomradeForuthS
                 Sammendrag
             </Heading>
             <BodyShort spacing>
-                <>
-                    Du er i ferd med å kopiere journalpost{" "}
-                    <i>
-                        {journalpost.innhold} ({journalpost.journalpostIdNoPrefix})
-                    </i>{" "}
-                    fra {getFagomradeLabel(journalpost.fagomrade)} til Bidrag
-                </>
+                Du er i ferd med å kopiere journalpost{" "}
+                <i>
+                    {journalpost.innhold} ({journalpost.journalpostIdNoPrefix})
+                </i>{" "}
+                fra {getFagomradeLabel(journalpost.fagomrade)} til Bidrag
             </BodyShort>
             <div className={"flex flex-col pb-2"}>
                 <Label>Med følgende dokumenter:</Label>
@@ -493,33 +489,31 @@ function KopierFraAnnenFagomradeFourthStep(props: KopierFraAnnenFagomradeForuthS
                                 </Link>
                             </li>
                         ) : (
-                            <>
-                                {props.relevanteDokumenter.map((dokument) => (
-                                    <li key={dokument.dokumentreferanse}>
-                                        <AapneDokumentKnapp
-                                            journalpostId={journalpost.journalpostId}
-                                            dokumentreferanse={dokument.dokumentreferanse}
-                                            status={dokument.status}
-                                        >
-                                            <DokumentLabel dokument={dokument} />
-                                        </AapneDokumentKnapp>
-                                    </li>
-                                ))}
-                            </>
+                            props.relevanteDokumenter.map((dokument) => (
+                                <li key={dokument.dokumentreferanse}>
+                                    <AapneDokumentKnapp
+                                        journalpostId={journalpost.journalpostId}
+                                        dokumentreferanse={dokument.dokumentreferanse}
+                                        status={dokument.status}
+                                    >
+                                        <DokumentLabel dokument={dokument} />
+                                    </AapneDokumentKnapp>
+                                </li>
+                            ))
                         )}
                     </ul>
                 </div>
             </div>
-            <Label>Knyttet til {props.valgteSaker.length == 1 ? "sak" : "saker"}:</Label>
+            <Label>Knyttet til {props.valgteSaker.length === 1 ? "sak" : "saker"}:</Label>
             <div>
                 <ul>
                     {props.valgteSaker.map((sak) => (
-                        <li>{sak == NY_SAK_SAKSNUMMER ? "Ny sak (opprettes etter bekreftelse)" : sak}</li>
+                        <li>{sak === NY_SAK_SAKSNUMMER ? "Ny sak (opprettes etter bekreftelse)" : sak}</li>
                     ))}
                 </ul>
             </div>
             <AvvikModalButtons
-                loading={avvikState == "pending"}
+                loading={avvikState === "pending"}
                 submitButtonLabel={`Bekreft og åpne ${opprettetNySak ? "sak" : "sakshistorikk"}`}
                 onSubmit={props.onSubmit}
             />
@@ -532,7 +526,7 @@ interface KopierFraAnnenFagomradeBekreftelseProps {
     journalpost: Journalpost;
 }
 
-function KopierFraAnnenFagomradeBekreftelse(props: KopierFraAnnenFagomradeBekreftelseProps) {
+function KopierFraAnnenFagomradeBekreftelse(_props: KopierFraAnnenFagomradeBekreftelseProps) {
     return (
         <Bekreftelse>
             <BodyShort>Journalpost er kopiert</BodyShort>

@@ -77,7 +77,7 @@ export class UpdateJournalpost {
 
     private getHoveddokumentTittel() {
         const hoveddokId = this.journalpost.dokumenter?.[0]?.dokumentreferanse;
-        const hoveddok = this.updateJournalpostFormValues.endreDokumenter?.find((dok) => dok.dokId == hoveddokId);
+        const hoveddok = this.updateJournalpostFormValues.endreDokumenter?.find((dok) => dok.dokId === hoveddokId);
         return hoveddok?.tittel;
     }
 

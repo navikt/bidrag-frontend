@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";
 import AvsenderMottaker, { AvsenderMottakerChoices } from "../../../../common/components/person/AvsenderMottaker";

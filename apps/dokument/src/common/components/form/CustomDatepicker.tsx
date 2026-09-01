@@ -1,6 +1,6 @@
 import { toISODateString } from "@bidrag/common";
 import { DatePicker, useDatepicker } from "@navikt/ds-react";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import type { Matcher } from "react-day-picker";
 
 import { parseDateFromDDMMYYYY } from "../../utils/DateUtils";

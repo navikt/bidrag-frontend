@@ -1,5 +1,3 @@
-import React from "react";
-
 import VisJournalpostProvider from "./context/VisJournalpostProvider";
 import VisJournalpostContainer from "./VisJournalpostContainer";
 

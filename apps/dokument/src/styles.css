@@ -212,9 +212,9 @@
     background-color: #fff2e0;
 }
 .bidrag-dokument-ui .rolleTag {
-    padding: 0.2em 0.6em !important;
+    padding: 0.2em 0.6em;
     margin: 0 0 0 1em;
-    font-size: 0.7em !important;
+    font-size: 0.7em;
     vertical-align: top;
     border-radius: 2px;
 }
@@ -394,7 +394,7 @@
     width: 25rem;
 }
 .bidrag-dokument-ui .document_button_editable_title p:not(.typo-feilmelding) {
-    margin-bottom: initial !important;
+    margin-bottom: initial;
     align-self: center;
 }
 .bidrag-dokument-ui .document_button_editable_title .view-document-button {

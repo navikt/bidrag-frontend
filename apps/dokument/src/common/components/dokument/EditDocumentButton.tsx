@@ -8,7 +8,7 @@ import {
 } from "@bidrag/common";
 import { PencilIcon as Edit, ExternalLinkIcon as ExternalLink } from "@navikt/aksel-icons";
 import { Button, Link } from "@navikt/ds-react";
-import React, { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useState } from "react";
 import { v4 as uuidV4 } from "uuid";
 import { z } from "zod";
 
@@ -144,7 +144,7 @@ function EditDocumentLink({
     onEditFinished,
     onEditStarted,
 }: PropsWithChildren<EditDocumentButtonProps>) {
-    const [isWaiting, setIsWaiting] = useState(false);
+    const [_isWaiting, setIsWaiting] = useState(false);
     function _editDocument() {
         onEditStarted?.();
         setIsWaiting(true);

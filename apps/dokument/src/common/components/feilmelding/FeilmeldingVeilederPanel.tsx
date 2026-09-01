@@ -1,5 +1,5 @@
 import { BodyShort, Box, Heading, Page } from "@navikt/ds-react";
-import React, { type PropsWithChildren, type ReactElement } from "react";
+import type { PropsWithChildren, ReactElement } from "react";
 
 import RegistrereJournalpostHeader from "../../../pages/registrereJournalpost/components/RegistrereJournalpostHeader";
 import { useAppContext } from "../../../store/AppContext";

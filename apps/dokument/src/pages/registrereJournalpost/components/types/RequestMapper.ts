@@ -18,7 +18,7 @@ export function mapToReqistrerJournalpostRequest(
     registrerJournalpostRequest.journaldato = journalfortDato;
     registrerJournalpostRequest.endreDokumenter = endreDokumenter;
     registrerJournalpostRequest.fagomrade =
-        fagomrade == FAGOMRADE.BID || fagomrade == FAGOMRADE.FAR ? fagomrade : FAGOMRADE.BID;
+        fagomrade === FAGOMRADE.BID || fagomrade === FAGOMRADE.FAR ? fagomrade : FAGOMRADE.BID;
     registrerJournalpostRequest.gjelder = journalpostToRegister.gjelderIdent;
     registrerJournalpostRequest.avsenderNavn = journalpostToRegister.avsenderNavn?.trim();
     return registrerJournalpostRequest;

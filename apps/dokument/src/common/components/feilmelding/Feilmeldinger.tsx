@@ -1,6 +1,6 @@
 import { Alert, Button } from "@navikt/ds-react";
 import _ from "lodash";
-import React, { type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import { useAppContext } from "../../../store/AppContext";
 

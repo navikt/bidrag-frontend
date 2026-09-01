@@ -1,7 +1,6 @@
 import { Rolletype } from "@bidrag/api/SakApi";
 import { RadioGroup } from "@navikt/ds-react";
 import _ from "lodash";
-import React from "react";
 import { useSearch } from "../../../../store/SearchContext";
 import type { Sak } from "../../../../types/sak";
 import PersonRadioButton from "./PersonRadioButton";
@@ -24,24 +23,22 @@ export default function TilknyttetSaksRoller(props: TilknyttetSaksRollerProps) {
     }
 
     return (
-        <>
-            <RadioGroup
-                id={"selectedSearchedSaksRolleRadioGroup"}
-                legend={"Velg personen saken gjelder"}
-                onChange={setSelectedSearchedSaksRolle}
-            >
-                {enkelSak?.roller
-                    ?.filter((rolle) => rolle.rolleType !== Rolletype.RM && rolle.rolleType !== Rolletype.FR)
-                    .map((rolle) => (
-                        <PersonRadioButton
-                            name={"selectSakRadio"}
-                            key={rolle.foedselsnummer + rolle.rolleType}
-                            foedselsnummer={rolle.foedselsnummer}
-                            rolleType={rolle.rolleType}
-                            navn={rolle.visningsnavn}
-                        />
-                    ))}
-            </RadioGroup>
-        </>
+        <RadioGroup
+            id={"selectedSearchedSaksRolleRadioGroup"}
+            legend={"Velg personen saken gjelder"}
+            onChange={setSelectedSearchedSaksRolle}
+        >
+            {enkelSak?.roller
+                ?.filter((rolle) => rolle.rolleType !== Rolletype.RM && rolle.rolleType !== Rolletype.FR)
+                .map((rolle) => (
+                    <PersonRadioButton
+                        name={"selectSakRadio"}
+                        key={rolle.foedselsnummer + rolle.rolleType}
+                        foedselsnummer={rolle.foedselsnummer}
+                        rolleType={rolle.rolleType}
+                        navn={rolle.visningsnavn}
+                    />
+                ))}
+        </RadioGroup>
     );
 }

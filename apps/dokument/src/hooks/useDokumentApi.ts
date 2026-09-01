@@ -31,7 +31,7 @@ import { type Journalpost, JournalpostMapper } from "../types/journalpost";
 import { hentPerson } from "./usePersonApi";
 export const DokumentQueryKeys = {
     dokument: "dokument",
-    hentJournalpost: (journalpostId: string, saksummer?: string) => ["hentJournalpost", journalpostId],
+    hentJournalpost: (journalpostId: string, _saksummer?: string) => ["hentJournalpost", journalpostId],
     hentJournalpostSak: (saksnummer: string) => ["hentJournalpostSak", saksnummer],
     tilgangDokument: (jpId: string, dokref: string) => ["tilgang", jpId, dokref],
     hentAvvikListe: (journalpostId: string, saksnummer?: string) => ["hentAvvikListe", journalpostId, saksnummer],
@@ -164,13 +164,13 @@ export const useLagreJournalpost = () => {
                     },
                 );
                 return true;
-            } catch (e) {
+            } catch (_e) {
                 showErrorMessage(["Det skjedde en feil ved lagring av journalpost. Vennligst prøv på nytt."]);
                 return false;
             }
         },
         onSuccess: (_, { refresh }) => {
-            if (refresh == true) {
+            if (refresh === true) {
                 queryClient.invalidateQueries({ queryKey: DokumentQueryKeys.hentJournalpost(journalpostId) });
             }
         },

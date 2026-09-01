@@ -1,5 +1,5 @@
 import { AapneDokumentKnapp } from "@bidrag/common";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import EndreDokumentTittel from "../../../../common/components/dokument/EndreDokumentTittel";
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";

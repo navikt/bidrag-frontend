@@ -1,7 +1,5 @@
 import "./Dokumenter.css";
 
-import React from "react";
-
 import type { Dokument } from "../../../types/journalpost";
 import DokumentView from "./DokumentView";
 

@@ -1,5 +1,3 @@
-import React from "react";
-
 import type { Journalpost } from "../../../types/journalpost";
 import SimpleTextField from "../fields/SimpleTextField";
 

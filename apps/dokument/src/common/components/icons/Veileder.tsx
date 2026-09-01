@@ -1,5 +1,3 @@
-import React from "react";
-
 function Veileder() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 93" className="h-[150px] w-[150px]">

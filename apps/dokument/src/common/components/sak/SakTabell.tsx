@@ -1,5 +1,5 @@
 import { Heading, Loader } from "@navikt/ds-react";
-import React, { type ReactElement, useEffect, useRef, useState } from "react";
+import { type ReactElement, useEffect, useRef, useState } from "react";
 import { useHentSakerPerson } from "../../../hooks/useSakApi";
 import SelectSakCheckbox from "../../../pages/registrereJournalpost/components/sakstilknytning/SelectSakCheckbox";
 import {

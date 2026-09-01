@@ -1,5 +1,4 @@
 import { Heading, Modal } from "@navikt/ds-react";
-import React from "react";
 
 import type { DistribuerTilAdresse } from "../../../types/api/JournalpostTypes";
 import AdresseInfo from "./AdresseInfo";

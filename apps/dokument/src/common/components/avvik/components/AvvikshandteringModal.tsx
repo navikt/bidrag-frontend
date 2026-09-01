@@ -99,7 +99,7 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                 paloggetEnhet: props.paloggetEnhet,
                 saksnummer: props.saksnummer,
             });
-            const enhet = avvik["nyttEnhetsnummer"] ?? props.paloggetEnhet;
+            const enhet = avvik.nyttEnhetsnummer ?? props.paloggetEnhet;
             const lagreJournalpostSuccess =
                 sendAvvikSuccess &&
                 (await lagreJournalpost.mutateAsync({ journalpost, journalpostId: journalpost.journalpostId, enhet }));
@@ -117,8 +117,8 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
         }
 
         if (
-            avvik.type == AvvikType.ENDRE_FAGOMRADE &&
-            (avvik.fagomrade == FAGOMRADE.FAR || avvik.fagomrade == FAGOMRADE.BID) &&
+            avvik.type === AvvikType.ENDRE_FAGOMRADE &&
+            (avvik.fagomrade === FAGOMRADE.FAR || avvik.fagomrade === FAGOMRADE.BID) &&
             erFarskapBehandledeEnhet(props.paloggetEnhet)
         ) {
             setAvvikState("success_continue");
@@ -129,11 +129,11 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     };
 
     const shouldBeAbleToReturnToMainPage = () => {
-        const isSuccess = avvikState == "success_continue" || avvikState == "success_lock";
+        const isSuccess = avvikState === "success_continue" || avvikState === "success_lock";
         if (!avvikConfirmed || !selectedAvvik || !isSuccess) {
             return true;
         }
-        return avvikState == "success_continue";
+        return avvikState === "success_continue";
     };
 
     const selectAvvik = (selectedAvvik: AvvikViewModel) => {
@@ -149,7 +149,7 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     return (
         <AvvikModalContext.Provider value={{ onCancel: props.closeModal }}>
             <Modal
-                aria-label=""
+                aria-label="Avvikshåndtering"
                 open={true}
                 className="!max-w-[900px] min-w-[600px]"
                 onClose={props.closeModal}
@@ -162,43 +162,41 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                 </Modal.Header>
                 <Modal.Body className="w-full">
                     <React.Suspense fallback={<Loader />}>
-                        <>
-                            {selectedAvvik ? (
-                                <>
-                                    <StepIndicator
-                                        disableAvvikMeny={!shouldBeAbleToReturnToMainPage()}
-                                        activeStep={activeStep}
-                                        onChange={changeStep}
+                        {selectedAvvik ? (
+                            <>
+                                <StepIndicator
+                                    disableAvvikMeny={!shouldBeAbleToReturnToMainPage()}
+                                    activeStep={activeStep}
+                                    onChange={changeStep}
+                                    selectedAvvik={selectedAvvik}
+                                />
+                                {selectedAvvik && (
+                                    <Heading level={"3"} size={"medium"} spacing>
+                                        {selectedAvvik.title}
+                                    </Heading>
+                                )}
+                                <React.Suspense fallback={<Loader />}>
+                                    {activeStep > 0 && avvikConfirmed === false && (
+                                        <PreviousStepButton onPrevious={onPrevious} />
+                                    )}
+                                    <AvvikStep
                                         selectedAvvik={selectedAvvik}
+                                        activeStep={activeStep}
+                                        setActiveStep={setActiveStep}
+                                        journalpost={journalpostState}
+                                        sendAvvik={performSendAvvik}
+                                        {...props}
                                     />
-                                    {selectedAvvik && (
-                                        <Heading level={"3"} size={"medium"} spacing>
-                                            {selectedAvvik.title}
-                                        </Heading>
-                                    )}
-                                    <React.Suspense fallback={<Loader />}>
-                                        {activeStep > 0 && avvikConfirmed == false && (
-                                            <PreviousStepButton onPrevious={onPrevious} />
-                                        )}
-                                        <AvvikStep
-                                            selectedAvvik={selectedAvvik}
-                                            activeStep={activeStep}
-                                            setActiveStep={setActiveStep}
-                                            journalpost={journalpostState}
-                                            sendAvvik={performSendAvvik}
-                                            {...props}
-                                        />
-                                    </React.Suspense>
-                                    {!shouldBeAbleToReturnToMainPage() && (
-                                        <div className="pt-2">
-                                            <BisysLink />
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <MainMenu avvikViewModels={avvikStateValue} onClick={selectAvvik} />
-                            )}
-                        </>
+                                </React.Suspense>
+                                {!shouldBeAbleToReturnToMainPage() && (
+                                    <div className="pt-2">
+                                        <BisysLink />
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <MainMenu avvikViewModels={avvikStateValue} onClick={selectAvvik} />
+                        )}
                     </React.Suspense>
                 </Modal.Body>
             </Modal>

@@ -1,5 +1,5 @@
 import { Alert, BodyShort } from "@navikt/ds-react";
-import React, { type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import { isEmpty, isTrue } from "../../../../common/utils/ObjectUtils";
 import { useHentGjelder } from "../../../../hooks/usePersonApi";
@@ -16,7 +16,7 @@ export default function SearchFailurePanel(props: SearchFailureProps): ReactElem
     const { enkelSak } = useSearch();
 
     const searchFailed =
-        enkelSak?.begrensetTilgang || person?.begrensetTilgang == true || !isEmpty(props.failedSearchValue);
+        enkelSak?.begrensetTilgang || person?.begrensetTilgang === true || !isEmpty(props.failedSearchValue);
 
     if (!searchFailed) {
         return null;

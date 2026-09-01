@@ -11,7 +11,7 @@ export function removeNonPrintableCharachters(s: string) {
 export function convertStringToNumber(value: string | number): number {
     if (typeof value === "string") {
         const result = parseInt(value, 10);
-        return isNaN(result) ? 0 : result;
+        return Number.isNaN(result) ? 0 : result;
     }
     return value;
 }

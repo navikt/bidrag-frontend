@@ -5,6 +5,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* biome-ignore lint/a11y/useGenericFontNames: Migrering*/
     font-family: Source Sans Pro;
 }
 .container-header .title {

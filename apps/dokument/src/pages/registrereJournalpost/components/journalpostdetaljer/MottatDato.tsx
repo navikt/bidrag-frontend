@@ -1,6 +1,6 @@
 import { Label } from "@navikt/ds-react";
 import dayjs from "dayjs";
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 import CustomDatepicker from "../../../../common/components/form/CustomDatepicker";
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";

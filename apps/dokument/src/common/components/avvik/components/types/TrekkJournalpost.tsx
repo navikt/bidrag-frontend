@@ -1,5 +1,4 @@
 import { BodyShort, Textarea } from "@navikt/ds-react";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";

@@ -1,5 +1,4 @@
 import { BodyShort, Panel } from "@navikt/ds-react";
-import React from "react";
 
 import { AvvikType } from "../../../../../types/api/AvvikTypes";
 import AvvikModalButtons from "../AvvikModalButtons";

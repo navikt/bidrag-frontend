@@ -1,4 +1,4 @@
-import React, { type MutableRefObject, type ReactElement } from "react";
+import type { MutableRefObject, ReactElement } from "react";
 
 import AutoSuggest from "../autosuggest/AutoSuggest";
 import AutoCompleteTeksterAsList from "./beskrivelse_autocomplete_tekster.json";

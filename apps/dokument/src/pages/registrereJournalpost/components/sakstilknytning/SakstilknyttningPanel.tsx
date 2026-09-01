@@ -1,5 +1,5 @@
 import { Heading, Loader } from "@navikt/ds-react";
-import React, { type ReactElement, useEffect, useRef, useState } from "react";
+import { type ReactElement, useEffect, useRef, useState } from "react";
 
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";
 import OpprettSakModal from "../../../../common/components/modal/opprett-sak-modal/OpprettSakModal";

@@ -23,7 +23,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         const gjelderAktor = journalpost.gjelderAktor;
-        if (gjelderAktor && gjelderAktor.ident) {
+        if (gjelderAktor?.ident) {
             setSearchValue(gjelderAktor.ident);
         }
     }, [journalpost]);

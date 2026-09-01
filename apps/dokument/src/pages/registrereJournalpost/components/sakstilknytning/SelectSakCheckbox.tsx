@@ -1,5 +1,5 @@
 import { Checkbox } from "@navikt/ds-react";
-import React, { type ReactElement, useState } from "react";
+import { type ReactElement, useState } from "react";
 
 import type { Sak } from "../../../../types/sak";
 import PersonSakNoAccessWarning from "../modal/PersonSakNoAccessWarning";

@@ -1,5 +1,4 @@
 import { BodyLong, BodyShort, Textarea } from "@navikt/ds-react";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";
@@ -22,7 +21,7 @@ function BestillReskanning(props: AvvikTypeCommonProps) {
     function renderJoarkDescription() {
         return (
             <BodyLong>
-                {journalpost.journalstatus == JournalStatus.JOURNALFOERT
+                {journalpost.journalstatus === JournalStatus.JOURNALFOERT
                     ? "Oppgave er opprettet til Fagpost og dokumentet er feilført. Etter reskanning er utført vil dokumentet settes til utgår og bli fjernet fra sakshistorikken."
                     : "Journalføringsoppgaven er overført til fagpost."}
                 <br />
@@ -87,7 +86,7 @@ function BestillReskanningFirstStep(props: BestillReskanningFirstStepProps) {
             <BodyLong>
                 Dersom et skannet dokument er uleselig, eller er av dårlig kvalitet, kan det bestilles en reskanning.
                 <br />
-                {journalpost.journalstatus == JournalStatus.JOURNALFOERT
+                {journalpost.journalstatus === JournalStatus.JOURNALFOERT
                     ? "Dette vil opprette oppgave til Fagpost og feilføre dokumentet. Etter reskanning er utført vil dokumentet settes til utgår og bli fjernet fra sakshistorikken."
                     : "Dette vil overføre journalføringsoppgaven til Fagpost."}
                 <br />
@@ -102,7 +101,7 @@ function BestillReskanningFirstStep(props: BestillReskanningFirstStepProps) {
             <BodyLong>
                 Dersom et skannet dokument er uleselig, eller er av dårlig kvalitet, kan det bestilles en reskanning.
                 <br />
-                {journalpost.journalstatus == JournalStatus.JOURNALFOERT
+                {journalpost.journalstatus === JournalStatus.JOURNALFOERT
                     ? "Dokumentet vil utgå."
                     : "Journalføringsoppgaven vil utgå."}
                 <br />

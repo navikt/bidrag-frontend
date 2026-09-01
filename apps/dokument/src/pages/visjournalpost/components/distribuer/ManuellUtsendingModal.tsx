@@ -1,5 +1,5 @@
 import { Alert, BodyShort, Button, Heading, Modal } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import DokumentView from "../../../../common/components/dokument/DokumentView";
 import { RedirectTo } from "../../../../common/utils/RedirectUtils";
@@ -60,7 +60,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                                 <DokumentView journalpostId={journalpost.journalpostId} dokument={hoveddokument} />
                             )}
                         </div>
-                        {journalpost.isForsendelse && journalpost.fagomrade != "FAR" && (
+                        {journalpost.isForsendelse && journalpost.fagomrade !== "FAR" && (
                             <BodyShort className="pt-4">
                                 Etter bekreftelse vil dokumentet bli tilgjengelig på mottakerens "Min side", og tittelen
                                 bli markert med <i>dokumentet er sendt per post med vedlegg</i>.

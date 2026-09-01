@@ -1,5 +1,4 @@
 import { Button, Modal } from "@navikt/ds-react";
-import React from "react";
 
 import { useJournalpost } from "../../../../store/JournalpostContext";
 import { useAvvikModalContext } from "./AvvikshandteringModal";
@@ -25,8 +24,8 @@ export default function AvvikModalButtons({
                 size="xsmall"
                 onClick={onSubmit}
                 id={"avvik-confirm-button"}
-                disabled={disabled || avvikState == "pending"}
-                loading={loading || avvikState == "pending"}
+                disabled={disabled || avvikState === "pending"}
+                loading={loading || avvikState === "pending"}
             >
                 {submitButtonLabel}
             </Button>

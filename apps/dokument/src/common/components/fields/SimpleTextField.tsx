@@ -1,5 +1,5 @@
 import { BodyShort } from "@navikt/ds-react";
-import React, { type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 interface LabeledText {
     label: string;

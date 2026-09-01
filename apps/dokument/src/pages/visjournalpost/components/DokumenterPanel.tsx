@@ -1,5 +1,5 @@
 import { BodyShort, Heading } from "@navikt/ds-react";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import DokumentView from "../../../common/components/dokument/DokumentView";
 import JournalpostKilde from "../../../common/components/dokument/JournalpostKilde";

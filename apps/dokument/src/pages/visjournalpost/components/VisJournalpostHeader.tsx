@@ -1,5 +1,3 @@
-import React from "react";
-
 import Header from "../../../common/components/Header";
 import { useAppContext } from "../../../store/AppContext";
 

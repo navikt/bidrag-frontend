@@ -1,5 +1,5 @@
 import { BodyShort, Label, Textarea, TextField } from "@navikt/ds-react";
-import React, { type CSSProperties, type MutableRefObject } from "react";
+import type { CSSProperties, MutableRefObject } from "react";
 
 interface EditableTextProps {
     id?: string;
@@ -25,29 +25,27 @@ export default function EditableTextField(props: EditableTextProps) {
             className={"pb-2"}
         >
             {editable ? (
-                <>
-                    {props.textArea ? (
-                        <Textarea
-                            id={id}
-                            error={error}
-                            label={label}
-                            maxLength={props.maxLength}
-                            value={value}
-                            disabled={!editable}
-                            onChange={(event) => onChange?.(event.target.value)}
-                        />
-                    ) : (
-                        <TextField
-                            label={label}
-                            type="text"
-                            id={id}
-                            defaultValue={value}
-                            error={error}
-                            disabled={!editable}
-                            onBlur={(event) => onChange?.(event.target.value)}
-                        />
-                    )}
-                </>
+                props.textArea ? (
+                    <Textarea
+                        id={id}
+                        error={error}
+                        label={label}
+                        maxLength={props.maxLength}
+                        value={value}
+                        disabled={!editable}
+                        onChange={(event) => onChange?.(event.target.value)}
+                    />
+                ) : (
+                    <TextField
+                        label={label}
+                        type="text"
+                        id={id}
+                        defaultValue={value}
+                        error={error}
+                        disabled={!editable}
+                        onBlur={(event) => onChange?.(event.target.value)}
+                    />
+                )
             ) : (
                 <div className={props.className}>
                     <Label spacing size={"small"}>

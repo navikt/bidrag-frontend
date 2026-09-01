@@ -1,5 +1,4 @@
 import _ from "lodash";
-import React from "react";
 
 import { formatDate } from "./DateUtils";
 
@@ -15,7 +14,7 @@ export default class JournalpostUtils {
         sanifiedJournalpost.beskrivelse = sanifiedJournalpost.innhold;
         sanifiedJournalpost.journaldato = formatDate(sanifiedJournalpost.journalfortDato, "YYYY-MM-DD");
         sanifiedJournalpost.dokumentDato = formatDate(sanifiedJournalpost.dokumentDato, "YYYY-MM-DD");
-        sanifiedJournalpost.journalpostId = parseInt(sanifiedJournalpost.journalpostId.match(/\d+/));
+        sanifiedJournalpost.journalpostId = parseInt(sanifiedJournalpost.journalpostId.match(/\d+/), 10);
         sanifiedJournalpost.saksnummer = {
             erTilknyttetNySak: false,
             saksnummer: sanifiedJournalpost.saksnummer,
@@ -41,7 +40,7 @@ export default class JournalpostUtils {
         if (!rolle) {
             return null;
         }
-        return <span className={"rolleTag " + rolle.rolleType}>{rolle.rolleType}</span>;
+        return <span className={`rolleTag ${rolle.rolleType}`}>{rolle.rolleType}</span>;
     }
 
     static tellAntallVedleggForEnkeljournalpost(dokumenter) {
@@ -51,9 +50,9 @@ export default class JournalpostUtils {
     static hentLinkTilJournalpost(jid, saksnummer, paloggetenhet) {
         if (jid && jid.length > 7) {
             if (jid.substring(0, 4) !== "BID-" && jid.charAt(0) >= "0" && jid.charAt(0) <= "9") {
-                jid = "BID-" + jid;
+                jid = `BID-${jid}`;
             }
-            return "/sak/" + saksnummer + "/journal/" + jid + "/?enhet=" + paloggetenhet;
+            return `/sak/${saksnummer}/journal/${jid}/?enhet=${paloggetenhet}`;
         }
         return "";
     }

@@ -1,6 +1,6 @@
 import { Heading } from "@navikt/ds-react";
 import dayjs from "dayjs";
-import React, { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Matcher } from "react-day-picker";
 import { useFormContext } from "react-hook-form";
 
@@ -84,11 +84,11 @@ function ReturDetaljerLog({ logg, index, journalpost }: ReturDetaljerLogProps) {
     const { isEditMode } = useVisJournalpostContext();
     const ref = useRef<HTMLDivElement>(null);
     const { setValue } = useFormContext<UpdateJournalpostFormValues>();
-    const isEditable = useMemo(() => logg.locked != true, [journalpost, logg]);
+    const isEditable = useMemo(() => logg.locked !== true, [journalpost, logg]);
     function getInvalidDates(): Matcher[] {
         return (
             journalpost.returDetaljer?.logg
-                .filter((rLogg) => rLogg.dato != logg.dato)
+                .filter((rLogg) => rLogg.dato !== logg.dato)
                 .map((rLogg) => ({
                     from: parseDateFromDDMMYYYY(rLogg.dato),
                     to: parseDateFromDDMMYYYY(rLogg.dato),

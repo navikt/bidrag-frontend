@@ -1,5 +1,5 @@
 import { BodyShort, Checkbox, Loader, Select } from "@navikt/ds-react";
-import React, { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";
@@ -159,7 +159,7 @@ function OverforTilAnnenEnhetFirstStep(props: OverforTilAnnenEnhetFirstStepProps
         );
     };
     const renderInfoText = () => {
-        const erFagomradeFAR = journalpost.fagomrade == FAGOMRADE.FAR;
+        const erFagomradeFAR = journalpost.fagomrade === FAGOMRADE.FAR;
         if (personIdentExists()) {
             return (
                 <BodyShort>

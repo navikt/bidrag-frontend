@@ -1,5 +1,5 @@
 import { Button } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import AvvikshandteringModal from "../../../common/components/avvik/components/AvvikshandteringModal";
 import { useHentJournalpost } from "../../../hooks/useDokumentApi";

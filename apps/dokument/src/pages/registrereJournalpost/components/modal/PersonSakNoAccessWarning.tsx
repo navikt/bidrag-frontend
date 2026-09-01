@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import AvvikshandteringModal from "../../../../common/components/avvik/components/AvvikshandteringModal";
 import { RedirectTo } from "../../../../common/utils/RedirectUtils";

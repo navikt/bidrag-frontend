@@ -48,8 +48,8 @@ export const parseDateFromDDMMYYYY = (dateString: string): Date => {
         return new Date(year, month - 1, day);
     }
     return new Date(
-        parseInt(dateString.slice(0, 1)),
-        parseInt(dateString.slice(1, 2)) - 1,
-        parseInt(dateString.slice(2, 3)),
+        parseInt(dateString.slice(0, 1), 10),
+        parseInt(dateString.slice(1, 2), 10) - 1,
+        parseInt(dateString.slice(2, 3), 10),
     );
 };

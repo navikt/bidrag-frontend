@@ -1,7 +1,7 @@
 import "./JournalpostTitle.css";
 
 import { Heading } from "@navikt/ds-react";
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 import EndreDokumentTittel from "../../../common/components/dokument/EndreDokumentTittel";
 import useRegisterField from "../../../common/components/form/hooks/useRegisterField";

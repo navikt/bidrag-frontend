@@ -250,10 +250,6 @@ export class JournalpostMapper extends BaseDtoMapper<Journalpost> {
                 return JournalStatus.UNDER_PRODUKSJON;
             case "RESERVERT":
                 return JournalStatus.RESERVERT;
-            case "OPPLASTING_DOKUMENT":
-            case "EKSPEDERT":
-            case "UKJENT_BRUKER":
-            case "FEILREGISTRERT":
             default:
                 return joarkJournalStatus as JournalStatus;
         }
@@ -295,7 +291,7 @@ export class DokumentMapper extends BaseDtoMapper<Dokument> {
     dokumentLabelShort() {
         const maxLength = 40;
         const tittel = this.tittelDisplayValue();
-        return `${tittel.length > maxLength ? tittel.substring(0, maxLength) + "..." : tittel} (${
+        return `${tittel.length > maxLength ? `${tittel.substring(0, maxLength)}...` : tittel} (${
             this.dokumentDto.dokumentreferanse
         })`;
     }
@@ -352,5 +348,5 @@ export function getErrorMessageWhenJournalpostStatusIsNotMottatt(journalpost: Jo
         default:
             message += `Journalpost har status ${journalpost.journalstatus}`;
     }
-    return message + ".";
+    return `${message}.`;
 }

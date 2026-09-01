@@ -1,5 +1,5 @@
 import { Alert, Loader } from "@navikt/ds-react";
-import React, { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { useJournalpost } from "../../../../store/JournalpostContext";
 
@@ -10,7 +10,7 @@ interface BekreftelseProps {
 function Bekreftelse(props: BekreftelseProps) {
     const { avvikState } = useJournalpost();
 
-    if (avvikState == "pending") {
+    if (avvikState === "pending") {
         return (
             <div className="AvvikshandteringModal__spinner-wrapper">
                 <Loader transparent={true} type="XL" aria-label="Sender avvik" />

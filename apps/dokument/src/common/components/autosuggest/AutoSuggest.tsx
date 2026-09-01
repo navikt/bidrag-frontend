@@ -150,6 +150,7 @@ export default function AutoSuggest(props: AutoSuggestProps) {
     }
 
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: Migrering
         <div className={"autosuggest"} onBlur={onBlur}>
             <div
                 className={`w-full autosuggest-input ${props.label ? "has-label" : ""} ${
@@ -170,7 +171,7 @@ export default function AutoSuggest(props: AutoSuggestProps) {
                     className="w-full"
                     style={{ marginBottom: props.error ? "0px" : "30px", width: "100%" }}
                     error={props.error}
-                    id={"autogsuggest_" + props.label}
+                    id={`autogsuggest_${props.label}`}
                     value={userInput}
                 />
                 <i className={"chevron--ned"} />
@@ -210,6 +211,7 @@ function SelectableOptions({ show, options, activeOption, onSelect, avoidBlur }:
                             key={optionName}
                             onClick={onSelect}
                             onMouseDown={avoidBlur}
+                            onKeyDown={null}
                             onFocus={avoidBlur}
                         >
                             {optionName}

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 import DateField from "../../../common/components/fields/DateField";
 import EditableTextField from "../../../common/components/fields/EditableTextField";

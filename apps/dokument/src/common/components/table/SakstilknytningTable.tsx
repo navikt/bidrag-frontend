@@ -2,7 +2,6 @@ import { Rolletype } from "@bidrag/api/SakApi";
 import { PersonNavnIdent } from "@bidrag/common";
 import { PlusIcon as Add } from "@navikt/aksel-icons";
 import { Alert, CheckboxGroup, Heading, HGrid } from "@navikt/ds-react";
-import React from "react";
 import { NY_SAK_SAKSNUMMER, type Sak } from "../../../types/sak";
 import IkonKnapp from "../icons/IkonKnapp";
 import RolleTag from "../person/RolleTag";
@@ -77,12 +76,12 @@ function RollerExpandableContent(sak: Sak) {
             </Heading>
             <HGrid className="w-max" gap={"space-6"} columns={2}>
                 {sak.roller
-                    .filter((rolle) => rolle.rolleType != Rolletype.FR && rolle.rolleType != Rolletype.RM)
+                    .filter((rolle) => rolle.rolleType !== Rolletype.FR && rolle.rolleType !== Rolletype.RM)
                     .sort((a, b) => {
-                        if (a.rolleType == Rolletype.BA && b.rolleType != Rolletype.BA) {
+                        if (a.rolleType === Rolletype.BA && b.rolleType !== Rolletype.BA) {
                             return 1;
                         }
-                        if (a.rolleType == Rolletype.BA && b.rolleType == Rolletype.BA) {
+                        if (a.rolleType === Rolletype.BA && b.rolleType === Rolletype.BA) {
                             return b.foedselsnummer.localeCompare(a.foedselsnummer);
                         }
                         return -1;
@@ -95,7 +94,7 @@ function RollerExpandableContent(sak: Sak) {
                                     ident={rolle.foedselsnummer}
                                 />
                             </div>
-                            {finnesRm && rolle.rolleType == Rolletype.BA ? (
+                            {finnesRm && rolle.rolleType === Rolletype.BA ? (
                                 rolle.reellMottaker ? (
                                     <div className="ml-[0.5em] text-slate-500">
                                         <PersonNavnIdent

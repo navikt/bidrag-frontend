@@ -5,7 +5,7 @@
     width: 25rem;
 }
 .dokument-item p:not(.typo-feilmelding) {
-    margin-bottom: initial !important;
+    margin-bottom: initial;
     align-self: center;
 }
 .dokument-item .view-document-button {

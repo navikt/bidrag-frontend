@@ -1,7 +1,7 @@
 import type { Rolletype } from "@bidrag/api/SakApi";
 import { PersonNavnIdent } from "@bidrag/common";
 import { Radio } from "@navikt/ds-react";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";
 import type { JournalpostToRegister } from "../types/JournalpostToRegister";
 
@@ -18,7 +18,7 @@ export default function PersonRadioButton({ foedselsnummer, name, rolleType, nav
     useRegisterField<JournalpostToRegister>("gjelderIdent", { required: "Du må velge person" }, () => radioRef.current);
     return (
         <div
-            key={foedselsnummer + "_" + rolleType}
+            key={`${foedselsnummer}_${rolleType}`}
             style={{
                 display: "flex",
                 flexDirection: "row",
@@ -28,7 +28,7 @@ export default function PersonRadioButton({ foedselsnummer, name, rolleType, nav
             <Radio
                 name={name}
                 disabled={disabled}
-                id={rolleType + "_" + foedselsnummer}
+                id={`${rolleType}_${foedselsnummer}`}
                 value={foedselsnummer}
                 ref={(ref) => {
                     radioRef.current = ref;

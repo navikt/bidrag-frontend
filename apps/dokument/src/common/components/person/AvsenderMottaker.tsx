@@ -107,7 +107,7 @@ export default function AvsenderMottaker(props: AvsenderMottakerProps) {
                             defaultValue={gjelder ? avsenderMottakerInfo.navn : undefined}
                             onChange={handleAvsenderChange}
                         />
-                        <AvansertSok onResult={(data) => onNameChange(data.navn["fullNavn"] ?? data.navn)} />
+                        <AvansertSok onResult={(data) => onNameChange(data.navn.fullNavn ?? data.navn)} />
                     </div>
                 </RadioWithChildren>
             </RadioGroup>

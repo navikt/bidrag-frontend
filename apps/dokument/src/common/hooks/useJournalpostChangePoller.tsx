@@ -26,8 +26,8 @@ export default function useJournalpostChangePoller() {
 
         return (
             journalpost.isKlarTilPrint ||
-            journalpost.journalstatus == JournalStatus.UNDER_PRODUKSJON ||
-            journalpost.journalstatus == JournalStatus.OPPRETTET ||
+            journalpost.journalstatus === JournalStatus.UNDER_PRODUKSJON ||
+            journalpost.journalstatus === JournalStatus.OPPRETTET ||
             (journalpost.isForsendelse && journalpost.isNotat)
         );
     }
@@ -43,7 +43,7 @@ export default function useJournalpostChangePoller() {
     }
 
     function erJournalpostEndret(hentetJournalpost: JournalpostDto) {
-        const statusEndret = journalpost.journalstatus != hentetJournalpost.journalstatus;
+        const statusEndret = journalpost.journalstatus !== hentetJournalpost.journalstatus;
         return statusEndret;
     }
 }

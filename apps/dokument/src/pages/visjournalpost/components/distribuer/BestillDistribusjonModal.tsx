@@ -30,7 +30,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
     useEffect(() => {
         if (mottaker.adresse) {
             const adresse = { ...mottaker.adresse, land: mottaker.adresse.landkode };
-            const manglerPoststed = adresse.landkode == "NO" && adresse.postnummer && !adresse.poststed;
+            const manglerPoststed = adresse.landkode === "NO" && adresse.postnummer && !adresse.poststed;
             if (manglerPoststed) {
                 adresse.poststed = getPoststedByPostnummer(adresse.postnummer);
             }

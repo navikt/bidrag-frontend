@@ -1,7 +1,7 @@
 import type { DistribuerTilAdresse } from "@bidrag/api/BidragDokumentApi";
 import { XMarkIcon as Cancel, PadlockLockedIcon as Locked } from "@navikt/aksel-icons";
 import { Button, Select, TextField } from "@navikt/ds-react";
-import React, { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import { Controller, FormProvider, useForm, useFormContext, useWatch } from "react-hook-form";
 import { isCountryCodeNorway } from "../../../../common/utils/AdresseUtils";
 import { useHentLandkoder, useHentPostnummer } from "../../../../hooks/useKodeverkApi";
@@ -74,7 +74,7 @@ function EditPostcodeAndState() {
                         name="postnummer"
                         rules={{
                             required: "Postnummer påkrevd norske adresser",
-                            validate: (value: string) => (value.length != 4 ? "Postnummer må ha 4 tegn" : true),
+                            validate: (value: string) => (value.length !== 4 ? "Postnummer må ha 4 tegn" : true),
                         }}
                         render={({ field: { name, onChange, value, ref }, fieldState: { error } }) => (
                             <PostnummerInput

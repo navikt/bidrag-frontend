@@ -1,5 +1,5 @@
 import { Button, Checkbox, Heading, Loader } from "@navikt/ds-react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import useRegisterField from "../../../common/components/form/hooks/useRegisterField";
 import NoAccessModal from "../../../common/components/modal/NoAccessModal";
@@ -149,18 +149,16 @@ export default function TilknyttetSak() {
                 },
                 {
                     content: !isSakInEditMode && !sak.erIkkeBidragSak && (
-                        <>
-                            <Button
-                                variant={"tertiary"}
-                                size={"small"}
-                                className={"aapne-sak-button w-full whitespace-nowrap"}
-                                onClick={(e) => {
-                                    RedirectTo.behandleSak(sak.saksnummer, e.shiftKey);
-                                }}
-                            >
-                                Åpne sak
-                            </Button>
-                        </>
+                        <Button
+                            variant={"tertiary"}
+                            size={"small"}
+                            className={"aapne-sak-button w-full whitespace-nowrap"}
+                            onClick={(e) => {
+                                RedirectTo.behandleSak(sak.saksnummer, e.shiftKey);
+                            }}
+                        >
+                            Åpne sak
+                        </Button>
                     ),
                     width: "1",
                 },

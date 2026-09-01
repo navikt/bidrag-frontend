@@ -1,5 +1,3 @@
-import React from "react";
-
 import type { Person } from "../../../types/person";
 import { isEmpty } from "../../utils/ObjectUtils";
 import PersonInfo from "./PersonInfo";

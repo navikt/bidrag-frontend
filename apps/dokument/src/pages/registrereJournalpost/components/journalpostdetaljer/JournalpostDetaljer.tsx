@@ -1,5 +1,5 @@
 import { BodyShort, Heading } from "@navikt/ds-react";
-import React, { type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import JournalpostKilde from "../../../../common/components/dokument/JournalpostKilde";
 import JournalpostTema from "../../../../common/components/dokument/JournalpostTema";

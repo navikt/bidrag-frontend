@@ -1,6 +1,5 @@
 import type { DistribuerTilAdresse } from "@bidrag/api/BidragDokumentApi";
 import { BodyShort } from "@navikt/ds-react";
-import React from "react";
 import { countryCodeToName } from "../../../common/utils/AdresseUtils";
 
 interface AdresseInfoProps {

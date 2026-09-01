@@ -1,5 +1,4 @@
 import { BodyLong, BodyShort } from "@navikt/ds-react";
-import React from "react";
 
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";
 import { AvvikType } from "../../../../../types/api/AvvikTypes";

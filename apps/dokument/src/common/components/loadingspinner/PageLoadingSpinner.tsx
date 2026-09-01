@@ -1,5 +1,4 @@
 import { Heading, Loader } from "@navikt/ds-react";
-import React from "react";
 
 interface PageLoadingSpinnerProps {
     text?: string;

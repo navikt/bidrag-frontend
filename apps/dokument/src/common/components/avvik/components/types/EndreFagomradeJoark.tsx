@@ -1,5 +1,5 @@
 import { BodyShort, Select } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";
@@ -35,7 +35,7 @@ function EndreFagomradeJoark(props: EndreFagomradeProps) {
         const journalpostEnhet = props.journalpost.journalforendeEnhet;
         if (
             skalOverføreTilFarskapEnhet(påloggetEnhet, values.fagomrade, journalpost) &&
-            BidragEnhet.FARSKAP != påloggetEnhet
+            BidragEnhet.FARSKAP !== påloggetEnhet
         ) {
             await props.sendAvvik({
                 type: AvvikType.OVERFOR_TIL_ANNEN_ENHET,
@@ -44,7 +44,7 @@ function EndreFagomradeJoark(props: EndreFagomradeProps) {
             });
         } else if (
             journalpostEnhet != null &&
-            påloggetEnhet != journalpostEnhet &&
+            påloggetEnhet !== journalpostEnhet &&
             erFarskapBehandledeEnhet(påloggetEnhet)
         ) {
             await props.sendAvvik({
@@ -106,7 +106,7 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
             return;
         }
         if (props.journalpost.isStatusMottatt) {
-            const farskapEnhet = journalforendeEnhetList.find((e) => e.enhetIdent == BidragEnhet.FARSKAP);
+            const farskapEnhet = journalforendeEnhetList.find((e) => e.enhetIdent === BidragEnhet.FARSKAP);
 
             return <BodyShort spacing>{overførOppgaveTekst(journalpost, påloggetEnhet, farskapEnhet)}</BodyShort>;
         } else {
@@ -132,7 +132,7 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
                     {...register("fagomrade")}
                 >
                     {joarkOverforFagomraderOptions
-                        .filter((b) => b.value != props.journalpost.fagomrade)
+                        .filter((b) => b.value !== props.journalpost.fagomrade)
                         .sort((a, b) => {
                             if (a.label < b.label) {
                                 return -1;
@@ -163,13 +163,13 @@ function EndreFagomradeBekreftelse(props: EndreFagomradeBekreftelseProps) {
     const { saksnummer } = useAppContext().appState;
     let message;
     if (props.journalpost.isStatusMottatt) {
-        const fagomradeOption = joarkOverforFagomraderOptions.find((option) => option.value == props.fagomrade);
+        const fagomradeOption = joarkOverforFagomraderOptions.find((option) => option.value === props.fagomrade);
         const isFarskapOrBidrag = props.fagomrade === FAGOMRADE.BID || props.fagomrade === FAGOMRADE.FAR;
         message = isFarskapOrBidrag
-            ? "Fagområdet er endret til " + fagomradeOption.label
-            : "Fagområdet er endret og dokumentet er sendt til " + fagomradeOption.label;
+            ? `Fagområdet er endret til ${fagomradeOption.label}`
+            : `Fagområdet er endret og dokumentet er sendt til ${fagomradeOption.label}`;
     } else {
-        const fagomradeOption = joarkOverforFagomraderOptions.find((option) => option.value == props.fagomrade);
+        const fagomradeOption = joarkOverforFagomraderOptions.find((option) => option.value === props.fagomrade);
         message = (
             <>
                 Journalposten er kopiert og sendt over til fagområdet {fagomradeOption.label}.<br />

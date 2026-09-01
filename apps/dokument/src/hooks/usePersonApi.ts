@@ -55,7 +55,7 @@ export const useHentGjelder = (): Person => {
     const { data: personData } = useSuspenseQuery({
         queryKey: PersonApiQueryKeys.hentGjelder(journalpostId),
         queryFn: async () => {
-            if (jp?.gjelderAktor?.ident == undefined) return { ident: "", visningsnavn: "", begrensetTilgang: false };
+            if (jp?.gjelderAktor?.ident === undefined) return { ident: "", visningsnavn: "", begrensetTilgang: false };
 
             return hentPerson(jp?.gjelderAktor?.ident);
         },
@@ -133,7 +133,7 @@ export async function hentSamhandler(samhandlerId: string): Promise<SamhandlerDt
         if (response.status === HTTPStatus.NO_CONTENT) {
             return { ...defaultValue };
         }
-        if (response.status == HTTPStatus.FORBIDDEN) {
+        if (response.status === HTTPStatus.FORBIDDEN) {
             return { samhandlerId, navn: "", offentligId: null, offentligIdType: null };
         }
         return response.data;
@@ -142,7 +142,7 @@ export async function hentSamhandler(samhandlerId: string): Promise<SamhandlerDt
             if (error.status === HTTPStatus.NO_CONTENT) {
                 return { ...defaultValue, navn: "Samhandler ikke funnet" };
             }
-            if (error.status == HTTPStatus.FORBIDDEN) {
+            if (error.status === HTTPStatus.FORBIDDEN) {
                 return { ...defaultValue, navn: "Ingen tilgang" };
             }
         }
@@ -160,7 +160,7 @@ export async function hentPerson(ident: string): Promise<Person> {
         if (personResponse.status === HTTPStatus.NO_CONTENT) {
             return { ...defaultValue, feil: true };
         }
-        if (personResponse.status == HTTPStatus.FORBIDDEN) {
+        if (personResponse.status === HTTPStatus.FORBIDDEN) {
             return { ident: ident, begrensetTilgang: true, feil: true, visningsnavn: "" };
         }
         return personResponse.data;
@@ -169,7 +169,7 @@ export async function hentPerson(ident: string): Promise<Person> {
             if (error.status === HTTPStatus.NO_CONTENT) {
                 return { ...defaultValue, feil: true, visningsnavn: "Person ikke funnet" };
             }
-            if (error.status == HTTPStatus.FORBIDDEN) {
+            if (error.status === HTTPStatus.FORBIDDEN) {
                 return { ident: ident, begrensetTilgang: true, feil: true, visningsnavn: "Ingen tilgang" };
             }
         }
@@ -177,10 +177,10 @@ export async function hentPerson(ident: string): Promise<Person> {
     }
 }
 
-async function useHentPersonAdresse(ident: string): Promise<PersonAdresseDto | null> {
+async function _useHentPersonAdresse(ident: string): Promise<PersonAdresseDto | null> {
     const postAdresseResult = await PERSON_API.adresse.hentPersonPostadresse(null, {
         ident,
     });
-    if (postAdresseResult.status == 201) return null;
+    if (postAdresseResult.status === 201) return null;
     return postAdresseResult.data;
 }

@@ -1,7 +1,6 @@
 import "./MainMenu.css";
 
 import { HGrid, LinkPanel } from "@navikt/ds-react";
-import React from "react";
 
 import { useGetAvvik } from "../../../../hooks/useDokumentApi";
 import type { AvvikViewModel } from "../model/AvvikViewModel";

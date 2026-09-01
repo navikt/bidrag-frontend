@@ -1,6 +1,6 @@
 import { AapneDokumentKnapp, FileUtils, OpenDocumentUtils } from "@bidrag/common";
 import { Alert, BodyShort, Button, Checkbox, CheckboxGroup, Label, Link, Select } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import environment from "../../../../../environment";
@@ -155,7 +155,7 @@ function SendTilFagomradeFirstStep(props: SendTilFagomradeFirstStepProps) {
     function renderDocumentSelect() {
         const dokumenter = [...props.journalpost.dokumenter];
 
-        if (dokumenter.length == 1) {
+        if (dokumenter.length === 1) {
             const dokument = dokumenter[0];
             return (
                 <div>
@@ -176,47 +176,45 @@ function SendTilFagomradeFirstStep(props: SendTilFagomradeFirstStepProps) {
         }
 
         return (
-            <>
-                <CheckboxGroup
-                    //@ts-ignore
-                    error={errors.relevanteDokumenter?.message}
-                    legend={"Velg dokumenter som inneholder relevant informasjon for fagområdet:"}
+            <CheckboxGroup
+                //@ts-expect-error
+                error={errors.relevanteDokumenter?.message}
+                legend={"Velg dokumenter som inneholder relevant informasjon for fagområdet:"}
+            >
+                <Checkbox
+                    size={"small"}
+                    id={"dokument_alle"}
+                    onClick={toggleSelecAllDocuments}
+                    defaultChecked={isAllSelected()}
+                    checked={isAllSelected()}
                 >
-                    <Checkbox
-                        size={"small"}
-                        id={"dokument_alle"}
-                        onClick={toggleSelecAllDocuments}
-                        defaultChecked={isAllSelected()}
-                        checked={isAllSelected()}
-                    >
-                        <strong>Velg alle</strong>
-                    </Checkbox>
-                    {[...dokumenter].map((dokument, index) => (
-                        <div className={"flex flex-row min-w-[20px]"} key={index}>
-                            <Checkbox
-                                size={"small"}
-                                id={"dokument_" + dokument.dokumentreferanse}
-                                onClick={() => {
-                                    toggleSelectedDocument(dokument);
-                                }}
-                                defaultChecked={isDocumentSelected(dokument)}
-                                checked={isDocumentSelected(dokument)}
-                                value={isDocumentSelected(dokument)}
-                            >
-                                <DokumentLabel dokument={dokument} />
-                            </Checkbox>
-                            <AapneDokumentKnapp
-                                variant="ikon"
-                                journalpostId={dokument.journalpostId ?? props.journalpost.journalpostId}
-                                dokumentreferanse={dokument.dokumentreferanse}
-                                status={dokument.status}
-                            >
-                                <ExternalLink />
-                            </AapneDokumentKnapp>
-                        </div>
-                    ))}
-                </CheckboxGroup>
-            </>
+                    <strong>Velg alle</strong>
+                </Checkbox>
+                {[...dokumenter].map((dokument, index) => (
+                    <div className={"flex flex-row min-w-[20px]"} key={index}>
+                        <Checkbox
+                            size={"small"}
+                            id={`dokument_${dokument.dokumentreferanse}`}
+                            onClick={() => {
+                                toggleSelectedDocument(dokument);
+                            }}
+                            defaultChecked={isDocumentSelected(dokument)}
+                            checked={isDocumentSelected(dokument)}
+                            value={isDocumentSelected(dokument)}
+                        >
+                            <DokumentLabel dokument={dokument} />
+                        </Checkbox>
+                        <AapneDokumentKnapp
+                            variant="ikon"
+                            journalpostId={dokument.journalpostId ?? props.journalpost.journalpostId}
+                            dokumentreferanse={dokument.dokumentreferanse}
+                            status={dokument.status}
+                        >
+                            <ExternalLink />
+                        </AapneDokumentKnapp>
+                    </div>
+                ))}
+            </CheckboxGroup>
         );
     }
 
@@ -383,7 +381,7 @@ interface SendTilFagomradeBekreftelseProps {
     journalpost: Journalpost;
 }
 
-function SendTilFagomradeBekreftelse(props: SendTilFagomradeBekreftelseProps) {
+function SendTilFagomradeBekreftelse(_props: SendTilFagomradeBekreftelseProps) {
     const message = <>Husk å sende utskriften med forside til skanning i Gosys.</>;
 
     return (
@@ -414,7 +412,7 @@ function LagFoerstesideButton({ fagomrade }: LagFoerstesideButtonProps) {
         new FoerstesideGeneratorService()
             .opprettFoersteside(request)
             .then((response) => FileUtils.openFile(FileUtils._base64ToArrayBuffer(response.foersteside)))
-            .catch((e) => setError("Kunne ikke lage førsteside. Vennligst prøv på nytt."))
+            .catch((_e) => setError("Kunne ikke lage førsteside. Vennligst prøv på nytt."))
             .finally(() => setLoading(false));
     }
 

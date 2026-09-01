@@ -1,7 +1,6 @@
 import "./StepIndicator.css";
 
 import { Stepper } from "@navikt/ds-react";
-import React from "react";
 
 import type { AvvikViewModel } from "../model/AvvikViewModel";
 

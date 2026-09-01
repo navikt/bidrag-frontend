@@ -1,7 +1,7 @@
 import "./NoAccessModal.css";
 
 import { Alert, Button, Heading, Loader, Modal } from "@navikt/ds-react";
-import React, { type ReactElement, useState } from "react";
+import { type ReactElement, useState } from "react";
 
 export interface NoAccessModalProps {
     alertContent: ReactElement | string;

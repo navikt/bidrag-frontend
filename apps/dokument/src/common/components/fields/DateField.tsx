@@ -1,5 +1,5 @@
 import { BodyShort, Label } from "@navikt/ds-react";
-import React, { type CSSProperties, type MutableRefObject, useState } from "react";
+import { type CSSProperties, type MutableRefObject, useState } from "react";
 import type { Matcher } from "react-day-picker";
 import { formatDate, isValidDate } from "../../utils/DateUtils";
 import CustomDatepicker from "../form/CustomDatepicker";

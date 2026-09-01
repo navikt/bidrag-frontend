@@ -1,5 +1,3 @@
-import React from "react";
-
 import { PageType } from "../../store/AppContext";
 import PageWrapper from "../PageWrapper";
 import VisJournalpostPage from "./VisJournalpostPage";

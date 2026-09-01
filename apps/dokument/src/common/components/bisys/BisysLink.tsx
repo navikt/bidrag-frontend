@@ -1,5 +1,5 @@
 import { Link } from "@navikt/ds-react";
-import React, { type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import environment from "../../../environment";
 import { PageType, useAppContext } from "../../../store/AppContext";

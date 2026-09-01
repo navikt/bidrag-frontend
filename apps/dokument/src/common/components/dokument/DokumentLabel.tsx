@@ -1,5 +1,5 @@
 import { Popover } from "@navikt/ds-react";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import type { Dokument } from "../../../types/journalpost";
 
@@ -16,6 +16,7 @@ export default function DokumentLabel({ dokument }: LabelPopoverProps) {
         <>
             <span
                 style={{ margin: "0" }}
+                onFocus={() => null}
                 onMouseOver={() => setOpen(true)}
                 onMouseLeave={() => setOpen(false)}
                 ref={labelRef}

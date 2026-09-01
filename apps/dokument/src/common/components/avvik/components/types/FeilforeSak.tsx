@@ -1,5 +1,5 @@
 import { BodyShort } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { useAppContext } from "../../../../../store/AppContext";
 import { AvvikType } from "../../../../../types/api/AvvikTypes";

@@ -1,6 +1,6 @@
 import { Kanal } from "@bidrag/api/BidragDokumentApi";
 import { Link } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import AdresseViewModal from "../../../pages/visjournalpost/components/AdresseViewModal";
 import type { Journalpost } from "../../../types/journalpost";
 import { isEmpty } from "../../utils/ObjectUtils";

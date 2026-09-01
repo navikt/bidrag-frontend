@@ -1,7 +1,7 @@
 import "./Header.css";
 
 import { Box, Heading } from "@navikt/ds-react";
-import React, { type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import Feilmeldinger from "./feilmelding/Feilmeldinger";
 

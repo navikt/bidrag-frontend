@@ -44,7 +44,7 @@ export const useSendAvvikMutation = () => {
                 }
 
                 return true;
-            } catch (e) {
+            } catch (_e) {
                 setAvvikState("failure");
                 return false;
             }
@@ -80,7 +80,7 @@ const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse =
         case AvvikType.ENDRE_FAGOMRADE:
             return {
                 ...baseBody,
-                /// @ts-ignore
+                /// @ts-expect-error
                 detaljer: { fagomrade: avvik.fagomrade, bekreftetSendtScanning: avvik.bekreftetSendtScanning },
             };
         case AvvikType.SEND_TIL_FAGOMRADE:
@@ -103,7 +103,7 @@ const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse =
                 detaljer: { returDato: avvik.returDato },
             };
         case AvvikType.OVERFOR_TIL_ANNEN_ENHET:
-            /// @ts-ignore
+            /// @ts-expect-error
             return { ...baseBody, detaljer: { ...otherValues } };
         case AvvikType.FARSKAP_UTELUKKET:
             return baseBody;
@@ -114,7 +114,7 @@ const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse =
         case AvvikType.KOPIER_FRA_ANNEN_FAGOMRADE:
             return {
                 ...baseBody,
-                /// @ts-ignore
+                /// @ts-expect-error
 
                 dokumenter: avvik.relevanteDokumenter,
                 detaljer: { knyttTilSaker: avvik.knyttTilSaker.join(",") },

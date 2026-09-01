@@ -2,7 +2,6 @@ import "./DokumentView.css";
 
 import { AapneDokumentKnapp } from "@bidrag/common";
 import { BodyShort } from "@navikt/ds-react";
-import React from "react";
 
 import type { Dokument } from "../../../types/journalpost";
 import ExternalLink from "../icons/ExternalLink";

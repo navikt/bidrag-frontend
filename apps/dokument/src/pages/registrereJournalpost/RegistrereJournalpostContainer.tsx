@@ -1,7 +1,7 @@
 import "./RegistrereJournalpostContainer.css";
 
 import { Button, HGrid, Page, VStack } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import Avvikshandtering from "../../common/components/avvik/Avvikshandtering";

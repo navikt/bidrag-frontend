@@ -1,5 +1,4 @@
 import { BodyShort, Select } from "@navikt/ds-react";
-import React from "react";
 import { useForm } from "react-hook-form";
 
 import { useHentSaksbehandlerEnhetsliste } from "../../../../../hooks/useOrganisasjonApi";

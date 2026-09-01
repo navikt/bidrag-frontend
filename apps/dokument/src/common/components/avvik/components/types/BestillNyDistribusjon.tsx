@@ -1,6 +1,6 @@
 import type { DistribuerTilAdresse } from "@bidrag/api/BidragDokumentApi";
 import { Alert, BodyShort, Heading, Loader } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useHentJournalpost } from "../../../../../hooks/useDokumentApi";
 import { hentMottakerAdresse } from "../../../../../hooks/usePersonApi";
 import BestillDistribusjonInfo from "../../../../../pages/visjournalpost/components/distribuer/BestillDistribusjonInfo";
@@ -50,7 +50,7 @@ function BestillNyDistribusjonFirstStep(props: BestillOriginalFirstStepProps) {
     const [loadingData, setLoadingData] = useState<boolean>(true);
     const [error, setError] = useState<string>();
 
-    const adresseFromJp = journalpost.distribuertTilAdresse;
+    const _adresseFromJp = journalpost.distribuertTilAdresse;
     const missingAdresse = !adresse && !loadingData;
     const returdatoMissing =
         journalpost.returDetaljer?.dato == null && journalpost.returDetaljer?.logg.some((logg) => logg.dato == null);

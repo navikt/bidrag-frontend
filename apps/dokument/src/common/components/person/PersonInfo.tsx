@@ -3,7 +3,6 @@ import "./PersonInfo.css";
 import type { Rolletype } from "@bidrag/api/SakApi";
 import { PersonNavnIdent } from "@bidrag/common";
 import { BodyShort } from "@navikt/ds-react";
-import React from "react";
 import AccountCircle from "../icons/AccountCircle";
 
 interface PersonInfoProps {

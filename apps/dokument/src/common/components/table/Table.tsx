@@ -70,7 +70,7 @@ interface TableHeadProps {
     columns: ColumnData[];
 }
 
-function TableHead(props: TableHeadProps) {
+function _TableHead(props: TableHeadProps) {
     return (
         <thead>
             <tr>
@@ -93,7 +93,7 @@ function TableRow({ row }: TableRowProps) {
             {components.map((component, index) => {
                 const { content, ...tdProps } = component;
                 return (
-                    <td key={"row_" + index} {...tdProps}>
+                    <td key={`row_${index}`} {...tdProps}>
                         {content}
                     </td>
                 );
@@ -107,7 +107,7 @@ interface TableBodyProps<T> {
     data: T[];
 }
 
-function TableBody<T>(props: TableBodyProps<T>) {
+function _TableBody<T>(props: TableBodyProps<T>) {
     return (
         <tbody>
             {props.data.map((data, index) => (
