@@ -1,0 +1,6 @@
+.copy-button:hover {
+    cursor: pointer;
+}
+.copy-to-clipboard.popover {
+    z-index: 1000000;
+}

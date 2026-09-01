@@ -3,10 +3,12 @@
 @import "@navikt/ds-tailwind/v4";
 @import "@bidrag/common/styles.css";
 @import "@bidrag/behandling/styles.css";
+@import "@bidrag/dokument/styles.css";
 @import "@bidrag/forsendelse/styles.css";
 
 /*Flytte til common styles.css? */
 @source "../../../packages/common/src/**/*.{tsx,ts}";
 @source "../../behandling/src/**/*.{tsx,ts,mdx}";
+@source "../../dokument/src/**/*.{tsx,ts,mdx}";
 @source "../../forsendelse/src/**/*.{tsx,ts,mdx}";
 @source "../../redigering/src/**/*.{tsx,ts,mdx}";

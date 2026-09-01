@@ -1,0 +1,410 @@
+/* Bibliotek-stilark for @bidrag/dokument. Importeres av apps/web/app/index.css.
+   Migrert fra .less-filene i den frittstående bidrag-dokument-ui og kompilert til
+   vanlig CSS. Alt er scopet under .bidrag-dokument-ui (settes av PageWrapper) slik
+   at de generiske legacy-selektorene ikke lekker ut i resten av bidrag-frontend.
+   Skal IKKE importere "tailwindcss" selv - da får vi to Tailwind-instanser. */
+
+.bidrag-dokument-ui {
+    /* Move to its own journalpost element .less file and import it here*/
+    /* The actual timeline (the vertical ruler) */
+    /* The actual timeline (the vertical ruler) */
+    /* Container around content */
+    /* The circles on the timeline */
+    /* Place the container to the left */
+    /* Place the container to the right */
+    /* Add arrows to the right container (pointing left) */
+    /* Fix the circle for containers on the right side */
+    /* The actual content */
+}
+.bidrag-dokument-ui .grid-border {
+    border-top: 1px solid #337c9b;
+    margin: 24px 0 12px 0;
+}
+.bidrag-dokument-ui .grid-panel .typo-innholdstittel {
+    margin-bottom: 16px;
+}
+.bidrag-dokument-ui div#app-root {
+    height: calc(100vh - 83px);
+    width: 100%;
+}
+.bidrag-dokument-ui .margin--M {
+    margin: 16px;
+}
+.bidrag-dokument-ui .margin--L {
+    margin: 24px;
+}
+.bidrag-dokument-ui ul.pagination {
+    margin: 0;
+    padding: 0;
+}
+.bidrag-dokument-ui button {
+    margin: 0 1em 0 0;
+}
+.bidrag-dokument-ui .searchedSaksRolleRadio {
+    margin: 0 0.7em 0 0;
+}
+.bidrag-dokument-ui .registrer-bildet-panel .skjemaelement {
+    margin-bottom: 0;
+}
+.bidrag-dokument-ui .brevKodeWrapper {
+    color: darkgray;
+}
+.bidrag-dokument-ui .iframeWrapper {
+    display: none;
+}
+.bidrag-dokument-ui .pageheader {
+    font-family: "Source Sans Pro", Arial, sans-serif;
+    display: block;
+    width: 100%;
+    justify-self: stretch;
+    box-sizing: border-box;
+    margin: 0px 0px 0px 0px;
+    background-color: #e9e7e7;
+    padding: 1rem 1rem 1.25rem 1rem;
+}
+.bidrag-dokument-ui .pagesubheader {
+    font-family: "Source Sans Pro", Arial, sans-serif;
+    display: block;
+    box-sizing: border-box;
+    margin: 0px 0px 0px 0px;
+    background-color: #e9e7e7;
+    padding-left: 1rem;
+}
+.bidrag-dokument-ui .smallHeader {
+    font-family: "Source Sans Pro", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin: 0;
+    text-transform: uppercase;
+    position: relative;
+}
+.bidrag-dokument-ui .typoSidetittel {
+    margin: 0;
+    font-family: "Source Sans Pro", Arial, sans-serif;
+    font-size: 1.875rem;
+    line-height: 2.125rem;
+    font-weight: 600;
+}
+.bidrag-dokument-ui .journalposter-element .card {
+    border: none;
+    box-shadow: none;
+}
+.bidrag-dokument-ui .bisys-header,
+.bidrag-dokument-ui .card-cascade .card-header {
+    background-color: #3e3832;
+    color: #fffdfb;
+    height: 68px;
+}
+.bidrag-dokument-ui .bisys-headline-main {
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 0.9px;
+    padding-left: 19px;
+    color: #fffdfb;
+}
+.bidrag-dokument-ui .bisys-headline-screen {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.17;
+    color: #ffffff;
+    padding-left: 26px;
+    margin-right: 5em;
+}
+.bidrag-dokument-ui .lenke.bisys-headline-link {
+    color: #fff;
+    padding-right: 26px;
+    text-align: end;
+}
+.bidrag-dokument-ui .bisys-panel .h1,
+.bidrag-dokument-ui .registrer-bildet-panel .h1 {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.25;
+    color: #3e3832;
+    margin-bottom: 16px;
+}
+.bidrag-dokument-ui .bisys-panel .h2,
+.bidrag-dokument-ui .registrer-bildet-panel .h2 {
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.43;
+    color: #3e3832;
+    letter-spacing: 0.4px;
+}
+.bidrag-dokument-ui .bisys-panel .h3,
+.bidrag-dokument-ui .registrer-bildet-panel .h3 {
+    margin-top: 24px;
+    margin-bottom: 3px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.56;
+    color: #3e3832;
+    letter-spacing: normal;
+}
+.bidrag-dokument-ui .bisys-panel .h4,
+.bidrag-dokument-ui .registrer-bildet-panel .h4 {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.29;
+    color: #3e3832;
+    letter-spacing: 0.4px;
+}
+.bidrag-dokument-ui .bisys-label {
+    color: #3e3832;
+    padding: 4px 9px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: normal;
+    display: inline-block;
+}
+.bidrag-dokument-ui .bisys-tjeneste-label {
+    margin-right: 8px;
+    padding: 4px 9px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: normal;
+    display: inline-block;
+    color: #3e3832;
+    background-color: #e9e7e7;
+}
+.bidrag-dokument-ui .bisys-parkinglot {
+    background-color: #e9e7e7;
+}
+.bidrag-dokument-ui .avsenderMottakerWrapper {
+    margin: 0.5em 0 0 0;
+}
+.bidrag-dokument-ui #avsenderInput {
+    margin: 0 0.5em 0 0;
+}
+.bidrag-dokument-ui .registrer-bildet-panel {
+    background: #ffffff;
+    padding: 16px;
+    margin: 0;
+}
+.bidrag-dokument-ui .bisys-panel {
+    background: #ffffff;
+    padding: 16px 24px;
+    margin: 24px;
+}
+.bidrag-dokument-ui .hovedDokumentKnapp {
+    margin: 0 0 0.5em 0;
+}
+.bidrag-dokument-ui .column .row {
+    margin: 0.5em 0;
+    width: 560px;
+    min-height: 31px;
+}
+.bidrag-dokument-ui .checkboxForSammeSomGjelder {
+    padding-top: 1em;
+    display: inline;
+}
+.bidrag-dokument-ui .enhetWarning {
+    border-radius: 2em;
+    padding: 0.3em;
+    margin: 0 0 0 1em;
+    font-size: 0.7em;
+    vertical-align: top;
+    background-color: #fff2e0;
+}
+.bidrag-dokument-ui .rolleTag {
+    padding: 0.2em 0.6em !important;
+    margin: 0 0 0 1em;
+    font-size: 0.7em !important;
+    vertical-align: top;
+    border-radius: 2px;
+}
+.bidrag-dokument-ui span.rolleTag.RM {
+    background-color: #d0f5df;
+    border: 1px solid #2ccd6d;
+}
+.bidrag-dokument-ui span.rolleTag.BA {
+    background-color: #e0dae7;
+    border: 1px solid #786095;
+}
+.bidrag-dokument-ui span.rolleTag.BP {
+    background-color: #fff2e0;
+    border: 1px solid #ff9c14;
+}
+.bidrag-dokument-ui span.rolleTag.BM {
+    background-color: #cde7d8;
+    border: 1px solid #4b9d6e;
+}
+.bidrag-dokument-ui ul.sakstilknyttningInformasjon li {
+    margin: 0;
+}
+.bidrag-dokument-ui ul.sakstilknyttningInformasjon li.sakstilknyttningElement {
+    margin: 1em 0;
+}
+.bidrag-dokument-ui ul.sakstilknyttningInformasjon {
+    list-style: none;
+    margin: 0 0 1em 0;
+    padding: 0;
+}
+.bidrag-dokument-ui .sakstilknyttningInformasjon p {
+    margin: 0;
+}
+.bidrag-dokument-ui .bisys-bottom-buttons {
+    display: flex;
+    justify-content: flex-start;
+    padding-bottom: 24px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+.bidrag-dokument-ui h2.typo-systemtittel {
+    margin-bottom: 10px;
+}
+.bidrag-dokument-ui .registrer-bildet-panel.gjelderBrukereWrapper {
+    margin-top: 1em;
+}
+.bidrag-dokument-ui .bisys-field-headline {
+    font-size: 14px;
+    line-height: 1.29;
+    letter-spacing: 0.4px;
+    color: #3e3832;
+}
+.bidrag-dokument-ui .selectedSearchedSaksRolleWrapper .bisys-field-content,
+.bidrag-dokument-ui .selectedSearchedSaksRolleWrapper .skjemaelement {
+    margin: 0.5em 0;
+}
+.bidrag-dokument-ui .bisys-field-content {
+    font-size: 16px;
+    line-height: 1.38;
+    letter-spacing: normal;
+    color: #3e3832;
+}
+.bidrag-dokument-ui .bisys-linktext {
+    font-size: 16px;
+    line-height: 1.38;
+    letter-spacing: 0.2px;
+    color: #0067c5;
+}
+.bidrag-dokument-ui .tilknyttetSakHeader:hover {
+    cursor: pointer;
+}
+.bidrag-dokument-ui .tilknyttSakTilJournalpostCheckbox {
+    margin: 0 0.8em 0 0;
+}
+.bidrag-dokument-ui .registrerJournalpostCheckboxLabels:hover {
+    cursor: pointer;
+}
+.bidrag-dokument-ui .errorMessage h2,
+.bidrag-dokument-ui .errorMessage p {
+    color: red;
+}
+.bidrag-dokument-ui .errorMessage {
+    margin: 0 auto;
+    padding: 1em;
+    width: 500px;
+}
+.bidrag-dokument-ui .bisys-fullspace {
+    width: 100%;
+}
+.bidrag-dokument-ui .timeline {
+    position: relative;
+    max-width: 1200px;
+}
+.bidrag-dokument-ui .timelineFilter {
+    padding: 10px 0 0 0;
+}
+.bidrag-dokument-ui p.error-text {
+    color: red;
+}
+.bidrag-dokument-ui .timeline::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    background-color: lightgrey;
+    top: 0;
+    bottom: 0;
+    left: 13%;
+    margin-left: 0;
+}
+.bidrag-dokument-ui .container {
+    padding: 10px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 91.5%;
+}
+.bidrag-dokument-ui .container .meny {
+    font-size: 2em;
+    float: right;
+    padding: 0.1em;
+    border-radius: 1em;
+}
+.bidrag-dokument-ui .container .meny:hover {
+    font-size: 2em;
+    color: ghostwhite;
+    background-color: darkgrey;
+    cursor: pointer;
+    padding: 0.1em;
+    border-radius: 1em;
+}
+.bidrag-dokument-ui .container.right::after {
+    content: "";
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    right: -17px;
+    background-color: grey;
+    border: 4px solid grey;
+    top: 15px;
+    border-radius: 50%;
+    z-index: 1;
+}
+.bidrag-dokument-ui .left {
+    left: 0;
+}
+.bidrag-dokument-ui .right {
+    left: 13%;
+}
+.bidrag-dokument-ui .right::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    left: 30px;
+    border: medium solid white;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent white transparent transparent;
+}
+.bidrag-dokument-ui .right::after {
+    left: -12px;
+}
+.bidrag-dokument-ui .date {
+    left: -83px;
+    top: -4px;
+    position: absolute;
+}
+.bidrag-dokument-ui .content {
+    padding: 10px 5px 20px 30px;
+    background-color: white;
+    position: relative;
+}
+.bidrag-dokument-ui .document_button_editable_title {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 25rem;
+}
+.bidrag-dokument-ui .document_button_editable_title p:not(.typo-feilmelding) {
+    margin-bottom: initial !important;
+    align-self: center;
+}
+.bidrag-dokument-ui .document_button_editable_title .view-document-button {
+    position: relative;
+    align-self: center;
+}
+.bidrag-dokument-ui .document_button_editable_title .view-document-button :hover {
+    cursor: pointer;
+}
+.bidrag-dokument-ui .document_button_editable_title .view-document-button svg {
+    height: 20px;
+    width: 20px;
+}

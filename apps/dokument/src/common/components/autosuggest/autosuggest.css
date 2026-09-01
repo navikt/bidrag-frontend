@@ -1,0 +1,115 @@
+.autosuggest-input:not(.empty-list)::before {
+    display: none;
+}
+.chevron--ned:before {
+    transform: translate(2px) rotate(45deg);
+}
+.chevron--ned:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 50%;
+    background: currentColor;
+}
+.chevron--ned:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 50%;
+    background: currentColor;
+}
+.chevron--ned:after {
+    transform: translate(-2px) rotate(-45deg);
+}
+.chevron--ned:before,
+.chevron--ned:after {
+    transition: 0.2s transform;
+    border-radius: 10px;
+}
+.chevron--ned {
+    display: inline-block;
+    flex-shrink: 0;
+    height: 2px;
+    line-height: 2px;
+    width: 20px;
+    position: relative;
+    text-align: center;
+    transition: 0.2s transform;
+    vertical-align: middle;
+}
+.autosuggest {
+    width: inherit;
+}
+.autosuggest .autosuggest-input {
+    width: inherit;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: -16px;
+}
+.autosuggest .autosuggest-input .navds-form-field {
+    width: inherit;
+}
+.autosuggest .autosuggest-input input {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: inherit;
+}
+.autosuggest .autosuggest-input .chevron--ned {
+    align-self: center;
+    left: -5px;
+    margin-left: -20px;
+    opacity: 0.5;
+    top: -10px;
+}
+.autosuggest .autosuggest-input.has-label .chevron--ned {
+    top: unset;
+}
+.autosuggest .autosuggest-input.has-description .chevron--ned {
+    top: 10px;
+}
+.autosuggest .autosuggest-input .skjemaelement {
+    width: inherit;
+}
+.autosuggest ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    border: 1px solid var(--ax-accent-700);
+    border-radius: 8px;
+    background: white;
+    z-index: 50;
+    max-height: 500px;
+    overflow: hidden;
+    overflow-y: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.autosuggest .options {
+    width: inherit;
+}
+.autosuggest .options li {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: inherit;
+    padding: 0.5em;
+    border-bottom: lightgrey 1px solid;
+}
+.autosuggest .options li:hover {
+    padding: 0.5em;
+    cursor: pointer;
+    font-weight: bold;
+}
+.autosuggest .options li.option-active {
+    font-weight: bold;
+    background-color: var(--ax-bg-accent-soft);
+    color: black;
+}
+.autosuggest .options li.option-no-content:hover {
+    cursor: initial;
+    font-weight: initial;
+}

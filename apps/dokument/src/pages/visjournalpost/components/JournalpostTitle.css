@@ -1,0 +1,9 @@
+.journalpost-title .autosuggest {
+    width: 40rem;
+}
+.journalpost-title .autosuggest .autosuggest-input > .chevron--ned {
+    left: -5px;
+    margin-left: -35px;
+    top: -13px;
+    width: 33px;
+}

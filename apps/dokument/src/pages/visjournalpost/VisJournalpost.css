@@ -1,0 +1,52 @@
+.journalpost-title {
+    margin-bottom: 20px;
+}
+.journalpost-title .skjemaelement__input {
+    font-size: 2.5rem;
+    width: auto;
+}
+.vis-journalpost-container .sakstilknyttningpanel .no-sak-alert {
+    padding: 15px 0;
+}
+.vis-journalpost-container .sakstilknyttningpanel table .row-cell--combined p {
+    margin: 0;
+}
+.vis-journalpost-container .sakstilknyttningpanel table .row-checbox .skjemaelement {
+    position: relative;
+    top: -9px;
+    right: -9px;
+}
+.vis-journalpost-container .sakstilknyttningpanel .ny-sak-button {
+    margin-top: 15px;
+}
+.vis-journalpost-container .dokumenter-panel-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+}
+.vis-journalpost-container .dokumenter-panel .dokument-item {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 30rem;
+}
+.vis-journalpost-container .dokumenter-panel .dokument-item .view-document-button {
+    position: relative;
+    align-self: center;
+}
+.vis-journalpost-container .dokumenter-panel .dokument-item .view-document-button :hover {
+    cursor: pointer;
+}
+.vis-journalpost-container .dokumenter-panel .dokument-item .view-document-button svg {
+    height: 20px;
+    width: 20px;
+}
+.vis-journalpost-container .bottom-buttons {
+    display: flex;
+    justify-content: flex-start;
+    padding-bottom: 24px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    gap: 7px;
+}

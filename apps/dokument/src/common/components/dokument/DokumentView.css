@@ -1,0 +1,21 @@
+.dokument-item {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 25rem;
+}
+.dokument-item p:not(.typo-feilmelding) {
+    margin-bottom: initial !important;
+    align-self: center;
+}
+.dokument-item .view-document-button {
+    position: relative;
+    align-self: center;
+}
+.dokument-item .view-document-button :hover {
+    cursor: pointer;
+}
+.dokument-item .view-document-button svg {
+    height: 20px;
+    width: 20px;
+}
