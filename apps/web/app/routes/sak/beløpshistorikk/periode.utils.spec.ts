@@ -1,5 +1,5 @@
-import type {TypeArManedsperiode} from "@bidrag/api/BelopshistorikkApi";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import type { TypeArManedsperiode } from "@bidrag/api/BelopshistorikkApi";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { beregnAntallMåneder, erDatoInnenforPeriode, erInnenforPeriode } from "./periode.utils";
 
@@ -46,7 +46,6 @@ describe("periodeFilterUtils", () => {
         it.each(tabell)("%s", (_beskrivelse, dato, forventet) => {
             expect(erDatoInnenforPeriode(dato, periode)).toBe(forventet);
         });
-
     });
 
     describe("erDatoInnenforPeriode åpen periode", () => {
@@ -66,9 +65,7 @@ describe("periodeFilterUtils", () => {
         it.each(tabell)("%s", (_beskrivelse, dato, forventet) => {
             expect(erDatoInnenforPeriode(dato, periode)).toBe(forventet);
         });
-
     });
-
 
     describe("erInnenforPeriode lukket periode", () => {
         const periode: TypeArManedsperiode = {
@@ -143,7 +140,7 @@ describe("periodeFilterUtils", () => {
 
     describe("beregnAntallMåneder", () => {
         // dagens dato er satt til 2024-10-10 i førEach ovenfor
-        
+
         const tabell: Array<[string, Filter, TypeArManedsperiode, number]> = [
             ["lukket periode uten filter til og med", new Filter(), { fom: "2024-01", til: "2024-07" }, 6],
             ["lukket periode uten filter over nyttår", new Filter(), { fom: "2023-07", til: "2024-02" }, 7],
@@ -154,10 +151,24 @@ describe("periodeFilterUtils", () => {
 
             // Med filter
             ["filteret klipper fra-siden av perioden", new Filter("2024-03-01"), { fom: "2024-01", til: "2024-06" }, 3],
-            ["filteret klipper til-siden av perioden", new Filter(null, "2024-04-01"), { fom: "2024-01", til: "2024-06" }, 4],
-            ["filteret klipper begge ender", new Filter("2024-02-01", "2024-05-01"), { fom: "2024-01", til: "2024-06" }, 4],
-            ["filter helt utenfor perioden", new Filter("2024-08-01", "2024-09-01"), { fom: "2024-01", til: "2024-06" }, 0],
-
+            [
+                "filteret klipper til-siden av perioden",
+                new Filter(null, "2024-04-01"),
+                { fom: "2024-01", til: "2024-06" },
+                4,
+            ],
+            [
+                "filteret klipper begge ender",
+                new Filter("2024-02-01", "2024-05-01"),
+                { fom: "2024-01", til: "2024-06" },
+                4,
+            ],
+            [
+                "filter helt utenfor perioden",
+                new Filter("2024-08-01", "2024-09-01"),
+                { fom: "2024-01", til: "2024-06" },
+                0,
+            ],
         ];
 
         it.each(tabell)("%s", (_beskrivelse, filter, periode, forventet) => {

@@ -1,0 +1,147 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchSakOrPersonComponent SearchFailurePanel Should show info message when person not found 1`] = `
+<div
+  class="search-failure-panel"
+>
+  <div
+    class="alertstripe alertstripe alertstripe--info alertstripe--inline"
+  >
+    <span
+      class="alertstripe__ikon"
+    >
+      <span
+        class="sr-only"
+      >
+        info
+      </span>
+      <svg
+        aria-label="info-ikon"
+        focusable="false"
+        height="1.5em"
+        kind="info-sirkel-fyll"
+        role="img"
+        viewBox="0 0 24 24"
+        width="1.5em"
+      >
+        <g
+          fill="none"
+        >
+          <path
+            d="M12 0C5.382 0 0 5.382 0 12s5.382 12 12 12c6.617 0 12-5.382 12-12S18.617 0 12 0z"
+            fill="#337C9B"
+          />
+          <path
+            d="M12 5a1.566 1.566 0 1 1 .11 3.13A1.566 1.566 0 0 1 12 5zm2.976 12.01c.563 0 1.043.431 1.043.991s-.48.992-1.043.992H9.39c-.564 0-1.043-.431-1.043-.992 0-.56.479-.99 1.043-.99h1.6v-5.016h-.986c-.565 0-1.044-.43-1.044-.991 0-.56.48-.991 1.044-.991h2.03c.563 0 1.043.43 1.043.99v6.007h1.899z"
+            fill="#FFF"
+          />
+        </g>
+      </svg>
+    </span>
+    <div
+      class="typo-normal alertstripe__tekst"
+    >
+      <p
+        class="typo-normal"
+      >
+        Fant ingen sak med saksnummer
+         
+        1234
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchSakOrPersonComponent SearchFailurePanel Should show info message when sak not found 1`] = `
+<div
+  class="search-failure-panel"
+>
+  <div
+    class="alertstripe alertstripe alertstripe--info alertstripe--inline"
+  >
+    <span
+      class="alertstripe__ikon"
+    >
+      <span
+        class="sr-only"
+      >
+        info
+      </span>
+      <svg
+        aria-label="info-ikon"
+        focusable="false"
+        height="1.5em"
+        kind="info-sirkel-fyll"
+        role="img"
+        viewBox="0 0 24 24"
+        width="1.5em"
+      >
+        <g
+          fill="none"
+        >
+          <path
+            d="M12 0C5.382 0 0 5.382 0 12s5.382 12 12 12c6.617 0 12-5.382 12-12S18.617 0 12 0z"
+            fill="#337C9B"
+          />
+          <path
+            d="M12 5a1.566 1.566 0 1 1 .11 3.13A1.566 1.566 0 0 1 12 5zm2.976 12.01c.563 0 1.043.431 1.043.991s-.48.992-1.043.992H9.39c-.564 0-1.043-.431-1.043-.992 0-.56.479-.99 1.043-.99h1.6v-5.016h-.986c-.565 0-1.044-.43-1.044-.991 0-.56.48-.991 1.044-.991h2.03c.563 0 1.043.43 1.043.99v6.007h1.899z"
+            fill="#FFF"
+          />
+        </g>
+      </svg>
+    </span>
+    <div
+      class="typo-normal alertstripe__tekst"
+    >
+      <p
+        class="typo-normal"
+      >
+        Fant ingen sak med saksnummer
+         
+        1234
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchSakOrPersonComponent should render 1`] = `
+<div
+  class="search search-sak-person-panel"
+  style=""
+>
+  <div
+    class="search-field"
+  >
+    <div
+      class="skjemaelement"
+    >
+      <label
+        class="skjemaelement__label"
+      >
+        Fødsels- eller Saksnummer
+      </label>
+      <input
+        aria-invalid="false"
+        class="skjemaelement__input input--fullbredde skjemaelement__input--mini"
+        name="searchInputForSaknrEllerFnr"
+        required=""
+        type="text"
+        value=""
+      />
+    </div>
+    <div
+      class="pdlSearchButton"
+      style="padding: 30px 10px 0px 10px; align-self: baseline;"
+    >
+      <button
+        class="knapp knapp--standard knapp--mini knapp--kompakt"
+        type="button"
+      >
+        Personsøk
+      </button>
+    </div>
+  </div>
+</div>
+`;

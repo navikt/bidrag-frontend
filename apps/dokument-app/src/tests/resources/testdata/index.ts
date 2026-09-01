@@ -1,0 +1,25 @@
+export const ENHET_IDENT_PERSON = "2103";
+export const SAKSNUMMER = "0505055";
+export const NY_OPPRETTET_SAKSNUMMER = "3433333";
+export const SAKSNUMMER_2 = "9999999";
+export const SAKSNUMMER_3 = "9999991";
+export const SESSION_STATE = "sessionState";
+export const JOURNALPOST_ID = "BID-100000";
+export const JOURNALPOST_JOARK_ID = "JOARK-100000";
+export const JOURNALFORENDE_ENHET = "4812";
+export const JOURNALFORENDE_TITTEL = "Dette er tittel";
+export const JOURNAL_DATO = "2021-06-01";
+export const DOKUMENT_DATO = "2021-06-06";
+export const AVSENDER_NAVN = "Nikkel Hansen";
+export const PALOGGET_ENHET = "4108";
+export const WEB_COMPONENT_NAME = "div";
+export const PERSON_IDENT = "01427241212";
+export const PERSON_IDENT_2 = "17498931212";
+export const PERSON_IDENT_3 = "11516621212";
+export const PERSON_IDENT_4 = "08488021212";
+export const PERSON_NAVN = "Navn Navnesen";
+
+export * from "./EnhetData";
+export * from "./JournalpostData";
+export * from "./PersonData";
+export * from "./SakData";

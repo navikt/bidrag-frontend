@@ -1,0 +1,12 @@
+BIDRAG_DOKUMENT_URL=https://bidrag-dokument-feature.intern.dev.nav.no
+BIDRAG_DOKUMENT_ARKIVERING_URL=https://bidrag-dokument-arkivering-feature.intern.dev.nav.no
+BIDRAG_SAK_URL=https://bidrag-sak-q1.intern.dev.nav.no
+BIDRAG_PERSON_URL=https://bidrag-person-q1.intern.dev.nav.no
+BIDRAG_ORGANISASJON_URL=https://bidrag-organisasjon-feature.intern.dev.nav.no
+BISYS_URL=https://wasapp-q1.adeo.no/rtv-bidrag/
+BIDRAGDOKUMENTUI_URL=https://bidrag-dokument-ui-feature.intern.dev.nav.no/
+BIDRAG_SAMHANDLER_URL=https://bidrag-samhandler-q1.intern.dev.nav.no
+STATIC_FILES_URL=https://bidrag-ui-static-files.intern.dev.nav.no
+DEPLOY_ENV=feature
+ENVIRONMENT=q1
+LEGACY_ENVIRONMENT=feature

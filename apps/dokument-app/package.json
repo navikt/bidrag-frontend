@@ -1,0 +1,19 @@
+{
+    "name": "@bidrag/dokument-app",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "echo \"no-op build for dokument-app\"",
+        "dev": "echo \"no-op dev for dokument-app\"",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@bidrag/api": "workspace:*",
+        "@bidrag/common": "workspace:*",
+        "@tanstack/react-query": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-router": "catalog:"
+    }
+}

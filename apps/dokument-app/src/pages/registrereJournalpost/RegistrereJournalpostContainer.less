@@ -1,0 +1,132 @@
+@import "../../variables.less";
+.journalpost-detaljer(){
+  .journalpost-detaljer {
+    width: 100%;
+    .journalpost-detaljer-content {
+      padding-top: @distance--m;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: @distance--m;
+      height: max-content;
+    }
+    .edit-document-input {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+      width: 25rem;
+      .view-document-button {
+        position: relative;
+        align-self: center;
+        top: 4px;
+        :hover {
+          cursor: pointer;
+        }
+        svg {
+          height: 20px;
+          width: 20px;
+        }
+      }
+    }
+  }
+}
+
+.search_panel(){
+  .search {
+    .search-failure-panel {
+      .alertstripe {
+        margin-top: 20px;
+      }
+    }
+    .search-field {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+
+      input {
+        width: 315px;
+      }
+    }
+  }
+}
+
+.sakstilknyttning_panel(){
+  .sakstilknyttningpanel {
+    .no-sak-alert {
+      padding: 15px 0;
+    }
+
+    table {
+      .row-cell--combined {
+        p {
+          margin: 0
+        }
+      }
+      .row-checbox {
+        .skjemaelement {
+          position: relative;
+          top: -9px;
+          right: -9px;
+        }
+      }
+    }
+    .ny-sak-button {
+      margin-top: 15px;
+    }
+  }
+}
+
+.gjelder_person_panel(){
+  .gjelder-person-panel >  {
+    .person-radio-button > .person-info  {
+        margin: 0;
+    }
+  }
+}
+
+.header(){
+  .container-header {
+    background-color: #F8F8F8;
+    color: black;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: Source Sans Pro;
+    .title {
+      padding-left: 26px;
+      margin-right: 5em;
+      //styleName: 1. 🔠Page title/$Desktop;
+      font-size: 40px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 44px;
+      letter-spacing: 0px;
+      text-align: left;
+    }
+
+    .link {
+      padding-right: 26px;
+      text-align: end;
+    }
+  }
+}
+.registrere-journalpost-container {
+  .header();
+  .gjelder_person_panel();
+  .search_panel();
+  .journalpost-detaljer();
+  .sakstilknyttning_panel();
+
+  .bottom-buttons {
+    display: flex;
+    justify-content: flex-start;
+    padding-bottom: 24px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    gap: @distance--xs
+  }
+}
+
+
+

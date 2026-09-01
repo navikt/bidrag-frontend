@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RegistrereJournalpostContainer should fail on form validation when journalpost title and sak not selected 1`] = `
+<div
+  class="feiloppsummering"
+  role="region"
+  tabindex="0"
+>
+  <h2
+    class="typo-undertittel"
+  >
+    For å gå videre må du rette opp følgende:
+  </h2>
+  <ul
+    class="feiloppsummering__liste"
+  >
+    <li>
+      <a
+        class="lenke"
+        href=""
+      >
+        Tittel på hoveddokument må settes
+      </a>
+    </li>
+    <li>
+      <a
+        class="lenke"
+        href=""
+      >
+        Du må velge eller opprette ny sak
+      </a>
+    </li>
+  </ul>
+</div>
+`;

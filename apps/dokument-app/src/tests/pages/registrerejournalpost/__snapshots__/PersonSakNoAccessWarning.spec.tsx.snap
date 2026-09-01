@@ -1,0 +1,424 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PersonOrSakNoAccessModal Should render no access modal when journalpost and personenhet is same 1`] = `
+<div
+  class="no-access-modal-content"
+>
+  <div
+    class="alertstripe alertstripe alertstripe--feil"
+  >
+    <span
+      class="alertstripe__ikon"
+    >
+      <span
+        class="sr-only"
+      >
+        feil
+      </span>
+      <svg
+        aria-label="feil-ikon"
+        focusable="false"
+        height="1.5em"
+        kind="feil-sirkel-fyll"
+        role="img"
+        viewBox="0 0 24 24"
+        width="1.5em"
+      >
+        <g
+          fill="none"
+          fill-rule="evenodd"
+        >
+          <path
+            d="M11.999 0C5.395 0 .013 5.372 0 11.976a11.923 11.923 0 0 0 3.498 8.493A11.925 11.925 0 0 0 11.977 24H12c6.603 0 11.986-5.373 12-11.978C24.013 5.406 18.64.012 11.999 0z"
+            fill="#A13A28"
+            fill-rule="nonzero"
+          />
+          <path
+            d="M12 10.651l3.372-3.372a.954.954 0 1 1 1.349 1.35L13.349 12l3.372 3.372a.954.954 0 1 1-1.35 1.349L12 13.349 8.628 16.72a.954.954 0 1 1-1.349-1.35L10.651 12 7.28 8.628A.954.954 0 1 1 8.63 7.28L12 10.651z"
+            fill="#FFF"
+            fill-rule="nonzero"
+          />
+        </g>
+      </svg>
+    </span>
+    <div
+      class="typo-normal alertstripe__tekst"
+    >
+      <div
+        class="alert-content"
+      >
+        <p
+          class="typo-normal"
+        >
+          Du har ingen tilgang til fødselsnummer 
+          0505055343
+        </p>
+        <p
+          class="typo-normal"
+        >
+          Oppgaven må overføres til enhet 
+          <strong>
+            2030 - Nav test
+          </strong>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div
+    class="button-panel"
+  >
+    <button
+      class="knapp cancelbutton knapp--flat"
+      type="submit"
+    >
+      Avbryt
+    </button>
+    <button
+      class="knapp confirmbutton knapp--hoved"
+      type="submit"
+    >
+      Overfør
+    </button>
+  </div>
+</div>
+`;
+
+exports[`PersonOrSakNoAccessModal Should render no access modal when journalpost and sak enhet is same 1`] = `
+<div
+  class="no-access-modal-content"
+>
+  <div
+    class="alertstripe alertstripe alertstripe--feil"
+  >
+    <span
+      class="alertstripe__ikon"
+    >
+      <span
+        class="sr-only"
+      >
+        feil
+      </span>
+      <svg
+        aria-label="feil-ikon"
+        focusable="false"
+        height="1.5em"
+        kind="feil-sirkel-fyll"
+        role="img"
+        viewBox="0 0 24 24"
+        width="1.5em"
+      >
+        <g
+          fill="none"
+          fill-rule="evenodd"
+        >
+          <path
+            d="M11.999 0C5.395 0 .013 5.372 0 11.976a11.923 11.923 0 0 0 3.498 8.493A11.925 11.925 0 0 0 11.977 24H12c6.603 0 11.986-5.373 12-11.978C24.013 5.406 18.64.012 11.999 0z"
+            fill="#A13A28"
+            fill-rule="nonzero"
+          />
+          <path
+            d="M12 10.651l3.372-3.372a.954.954 0 1 1 1.349 1.35L13.349 12l3.372 3.372a.954.954 0 1 1-1.35 1.349L12 13.349 8.628 16.72a.954.954 0 1 1-1.349-1.35L10.651 12 7.28 8.628A.954.954 0 1 1 8.63 7.28L12 10.651z"
+            fill="#FFF"
+            fill-rule="nonzero"
+          />
+        </g>
+      </svg>
+    </span>
+    <div
+      class="typo-normal alertstripe__tekst"
+    >
+      <div
+        class="alert-content"
+      >
+        <p
+          class="typo-normal"
+        >
+          Du har ingen tilgang til sak 
+          200000
+        </p>
+        <p
+          class="typo-normal"
+        >
+          Oppgaven må overføres til enhet 
+          <strong>
+            2030 - Nav test
+          </strong>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div
+    class="button-panel"
+  >
+    <button
+      class="knapp cancelbutton knapp--flat"
+      type="submit"
+    >
+      Avbryt
+    </button>
+    <button
+      class="knapp confirmbutton knapp--hoved"
+      type="submit"
+    >
+      Overfør
+    </button>
+  </div>
+</div>
+`;
+
+exports[`PersonOrSakNoAccessModal Should render no access modal when person has limited access with same journalpost enhet 1`] = `
+<div
+  class="no-access-modal-content"
+>
+  <div
+    class="alertstripe alertstripe alertstripe--feil"
+  >
+    <span
+      class="alertstripe__ikon"
+    >
+      <span
+        class="sr-only"
+      >
+        feil
+      </span>
+      <svg
+        aria-label="feil-ikon"
+        focusable="false"
+        height="1.5em"
+        kind="feil-sirkel-fyll"
+        role="img"
+        viewBox="0 0 24 24"
+        width="1.5em"
+      >
+        <g
+          fill="none"
+          fill-rule="evenodd"
+        >
+          <path
+            d="M11.999 0C5.395 0 .013 5.372 0 11.976a11.923 11.923 0 0 0 3.498 8.493A11.925 11.925 0 0 0 11.977 24H12c6.603 0 11.986-5.373 12-11.978C24.013 5.406 18.64.012 11.999 0z"
+            fill="#A13A28"
+            fill-rule="nonzero"
+          />
+          <path
+            d="M12 10.651l3.372-3.372a.954.954 0 1 1 1.349 1.35L13.349 12l3.372 3.372a.954.954 0 1 1-1.35 1.349L12 13.349 8.628 16.72a.954.954 0 1 1-1.349-1.35L10.651 12 7.28 8.628A.954.954 0 1 1 8.63 7.28L12 10.651z"
+            fill="#FFF"
+            fill-rule="nonzero"
+          />
+        </g>
+      </svg>
+    </span>
+    <div
+      class="typo-normal alertstripe__tekst"
+    >
+      <div
+        class="alert-content"
+      >
+        <p
+          class="typo-normal"
+        >
+          Du har ingen tilgang til fødselsnummer 
+          0505055343
+        </p>
+        <p
+          class="typo-normal"
+        >
+          Oppgaven må overføres til enhet 
+          <strong>
+            2030 - Nav test
+          </strong>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div
+    class="button-panel"
+  >
+    <button
+      class="knapp cancelbutton knapp--flat"
+      type="submit"
+    >
+      Avbryt
+    </button>
+    <button
+      class="knapp confirmbutton knapp--hoved"
+      type="submit"
+    >
+      Overfør
+    </button>
+  </div>
+</div>
+`;
+
+exports[`PersonOrSakNoAccessModal Should render no access modal when sak has limited access with same journalpost enhet 1`] = `
+<div
+  class="no-access-modal-content"
+>
+  <div
+    class="alertstripe alertstripe alertstripe--feil"
+  >
+    <span
+      class="alertstripe__ikon"
+    >
+      <span
+        class="sr-only"
+      >
+        feil
+      </span>
+      <svg
+        aria-label="feil-ikon"
+        focusable="false"
+        height="1.5em"
+        kind="feil-sirkel-fyll"
+        role="img"
+        viewBox="0 0 24 24"
+        width="1.5em"
+      >
+        <g
+          fill="none"
+          fill-rule="evenodd"
+        >
+          <path
+            d="M11.999 0C5.395 0 .013 5.372 0 11.976a11.923 11.923 0 0 0 3.498 8.493A11.925 11.925 0 0 0 11.977 24H12c6.603 0 11.986-5.373 12-11.978C24.013 5.406 18.64.012 11.999 0z"
+            fill="#A13A28"
+            fill-rule="nonzero"
+          />
+          <path
+            d="M12 10.651l3.372-3.372a.954.954 0 1 1 1.349 1.35L13.349 12l3.372 3.372a.954.954 0 1 1-1.35 1.349L12 13.349 8.628 16.72a.954.954 0 1 1-1.349-1.35L10.651 12 7.28 8.628A.954.954 0 1 1 8.63 7.28L12 10.651z"
+            fill="#FFF"
+            fill-rule="nonzero"
+          />
+        </g>
+      </svg>
+    </span>
+    <div
+      class="typo-normal alertstripe__tekst"
+    >
+      <div
+        class="alert-content"
+      >
+        <p
+          class="typo-normal"
+        >
+          Du har ingen tilgang til sak 
+          200000
+        </p>
+        <p
+          class="typo-normal"
+        >
+          Oppgaven må overføres til enhet 
+          <strong>
+            2030 - Nav test
+          </strong>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div
+    class="button-panel"
+  >
+    <button
+      class="knapp cancelbutton knapp--flat"
+      type="submit"
+    >
+      Avbryt
+    </button>
+    <button
+      class="knapp confirmbutton knapp--hoved"
+      type="submit"
+    >
+      Overfør
+    </button>
+  </div>
+</div>
+`;
+
+exports[`PersonSakNoAccessWarning No access to person should render no access to person warning panel 1`] = `
+<div
+  class="typo-normal alertstripe__tekst"
+>
+  <div
+    class="alert-content"
+  >
+    <p
+      class="typo-normal"
+    >
+      Du har ingen tilgang til fødselsnummer 
+      01427241212
+    </p>
+    <p
+      class="typo-normal"
+    >
+      Oppgaven må overføres til enhet 
+      <strong>
+        2103 - NAV Vikafossen
+      </strong>
+    </p>
+  </div>
+</div>
+`;
+
+exports[`PersonSakNoAccessWarning No access to person should render no access to person warning panel when journalpost has same enhet 1`] = `
+<div
+  class="typo-normal alertstripe__tekst"
+>
+  <div
+    class="alert-content"
+  >
+    <p
+      class="typo-normal"
+    >
+      Du har ingen tilgang til fødselsnummer 
+      01427241212
+    </p>
+    <p
+      class="typo-normal"
+    >
+      Oppgaven må behandles av saksbehandler med utvidede rettigheter
+    </p>
+  </div>
+</div>
+`;
+
+exports[`PersonSakNoAccessWarning No access to sak should render no access to sak warning panel 1`] = `
+<div
+  class="typo-normal alertstripe__tekst"
+>
+  <div
+    class="alert-content"
+  >
+    <p
+      class="typo-normal"
+    >
+      Du har ingen tilgang til sak 
+      0505055
+    </p>
+    <p
+      class="typo-normal"
+    >
+      Oppgaven må behandles av saksbehandler med utvidede rettigheter
+    </p>
+  </div>
+</div>
+`;
+
+exports[`PersonSakNoAccessWarning No access to sak should render no access to sak warning panel when journalpost has same enhet 1`] = `
+<div
+  class="typo-normal alertstripe__tekst"
+>
+  <div
+    class="alert-content"
+  >
+    <p
+      class="typo-normal"
+    >
+      Du har ingen tilgang til sak 
+      0505055
+    </p>
+    <p
+      class="typo-normal"
+    >
+      Oppgaven må behandles av saksbehandler med utvidede rettigheter
+    </p>
+  </div>
+</div>
+`;

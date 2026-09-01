@@ -1,0 +1,230 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VisJournalpostPage Form error handling should fail saving journalpost when avsender is empty 1`] = `
+<div
+  class="feiloppsummering"
+  role="region"
+  tabindex="0"
+>
+  <h2
+    class="typo-undertittel"
+  >
+    For å gå videre må du rette opp følgende:
+  </h2>
+  <ul
+    class="feiloppsummering__liste"
+  >
+    <li>
+      <a
+        class="lenke"
+        href=""
+      >
+        Avsender kan ikke være tom
+      </a>
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`VisJournalpostPage Form error handling should fail saving journalpost when date is empty 1`] = `
+<div
+  class="feiloppsummering"
+  role="region"
+  tabindex="0"
+>
+  <h2
+    class="typo-undertittel"
+  >
+    For å gå videre må du rette opp følgende:
+  </h2>
+  <ul
+    class="feiloppsummering__liste"
+  >
+    <li>
+      <a
+        class="lenke"
+        href=""
+      >
+        Dokumentdato kan ikke være tom
+      </a>
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`VisJournalpostPage Form error handling should fail saving journalpost when title is empty 1`] = `
+<div
+  class="feiloppsummering"
+  role="region"
+  tabindex="0"
+>
+  <h2
+    class="typo-undertittel"
+  >
+    For å gå videre må du rette opp følgende:
+  </h2>
+  <ul
+    class="feiloppsummering__liste"
+  >
+    <li>
+      <a
+        class="lenke"
+        href=""
+      >
+        Tittel kan ikke være tom
+      </a>
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`VisJournalpostPage should render 1`] = `
+<div
+  id="vis-journalpost-detaljer"
+  style="display: grid; gap: 1rem; grid-template-columns: repeat(3, 0.5fr);"
+>
+  <div
+    class="pb-2"
+    style="display: flex; flex-direction: column;"
+  >
+    <div>
+      <label
+        class="navds-label navds-typo--spacing navds-label--small"
+      >
+        Journalstatus
+      </label>
+      <p
+        class="navds-body-short navds-body-short--medium"
+        id="journalstatus"
+      >
+        Journalført
+      </p>
+    </div>
+  </div>
+  <div
+    class="pb-2"
+    style="display: flex; flex-direction: column;"
+  >
+    <div>
+      <label
+        class="navds-label navds-typo--spacing navds-label--small"
+      >
+        Dokumenttype
+      </label>
+      <p
+        class="navds-body-short navds-body-short--medium"
+        id="dokumenttype"
+      >
+        Inngående
+      </p>
+    </div>
+  </div>
+  <div
+    class="pb-2"
+    style="display: flex; flex-direction: column;"
+  >
+    <div>
+      <label
+        class="navds-label navds-typo--spacing navds-label--small"
+      >
+        Saksnummer
+      </label>
+      <p
+        class="navds-body-short navds-body-short--medium"
+        id="saksnummer"
+      >
+        0505055
+      </p>
+    </div>
+  </div>
+  <div
+    class="pb-2"
+    style="display: flex; flex-direction: column;"
+  >
+    <div>
+      <label
+        class="navds-label navds-typo--spacing navds-label--small"
+      >
+        Journaldato
+      </label>
+      <p
+        class="navds-body-short navds-body-short--medium"
+        id="journaldato"
+      >
+        01.06.2021
+      </p>
+    </div>
+  </div>
+  <div
+    class="pb-2"
+    style="display: flex; flex-direction: column;"
+  >
+    <div>
+      <label
+        class="navds-label navds-typo--spacing navds-label--small"
+      >
+        Fagområde
+      </label>
+      <p
+        class="navds-body-short navds-body-short--medium"
+        id="fagomrade"
+      >
+        BID
+      </p>
+    </div>
+  </div>
+  <div
+    class="pb-2"
+    style="display: flex; flex-direction: column;"
+  >
+    <div>
+      <label
+        class="navds-label navds-typo--spacing navds-label--small"
+      >
+        Journalført av
+      </label>
+      <p
+        class="navds-body-short navds-body-short--medium"
+        id="journalfortAv"
+      />
+    </div>
+  </div>
+  <div
+    class="pb-2"
+    style="display: flex; flex-direction: column;"
+  >
+    <div>
+      <label
+        class="navds-label navds-typo--spacing navds-label--small"
+      >
+        Enhet
+      </label>
+      <p
+        class="navds-body-short navds-body-short--medium"
+        id="enhet"
+      >
+        4812
+      </p>
+    </div>
+  </div>
+  <div
+    id="dokumentdato_container"
+    style="display: flex; flex-direction: column;"
+  >
+    <label
+      class="skjemaelement__label"
+      for="dokumentdato"
+    >
+      <strong>
+        Dokumentdato
+      </strong>
+    </label>
+    <p
+      class="typo-normal"
+      id="dokumentdato"
+    >
+      06.06.2021
+    </p>
+  </div>
+</div>
+`;
