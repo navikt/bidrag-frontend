@@ -12,8 +12,7 @@ import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts"
 import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
 import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
-import { BidragProgressbarFullScreen } from "@bidrag/common";
-import { Loader } from "@navikt/ds-react";
+import { BidragProgressbarFullScreen, type NavUser } from "@bidrag/common";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
@@ -92,16 +91,16 @@ export default function App({ loaderData }: Route.ComponentProps) {
 
     return (
         <QueryClientWrapper>
-            <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} />}>
-                <FlagProvider unleashClient={unleashClient} startClient={false}>
+            <FlagProvider unleashClient={unleashClient} startClient={false}>
+                <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} />}>
                     <UnleashContextUpdater />
                     <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
                         <ClientOnly fallback={<BidragProgressbarFullScreen />}>
                             <Outlet />
                         </ClientOnly>
                     </AppLayout>
-                </FlagProvider>
-            </FaroErrorBoundary>
+                </FaroErrorBoundary>
+            </FlagProvider>
         </QueryClientWrapper>
     );
 }
@@ -127,13 +126,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-    return <RootErrorBoundary error={error} />;
+    return <RootErrorBoundary error={error} bruker={null} />;
 }
 
-function RootErrorBoundary({ error }: { error: unknown }) {
+function RootErrorBoundary({ error, bruker, bisysUrl }: { error: unknown; bruker: NavUser | null, bisysUrl?: string }) {
     return (
         <QueryClientWrapper>
-            <AppLayout>
+            <AppLayout bruker={bruker} bisysUrl={bisysUrl}>
                 <ErrorPage error={error} />
             </AppLayout>
         </QueryClientWrapper>
