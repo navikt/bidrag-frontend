@@ -1,5 +1,6 @@
 import type { TilgangskontrollResponse } from "@bidrag/api/TilgangskontrollApi";
 import type { ReactNode } from "react";
+import { BidragProgressbar } from "../BidragProgressbar.tsx";
 import { type PartialAlertProps, TilgangLocalAlert } from "./TilgangLocalAlert.tsx";
 
 export interface TilgangssjekkResultat {
@@ -22,7 +23,14 @@ export function tilgangssjekkResultat(
     const { data, isError, isPending } = queryResult;
 
     if (isPending) {
-        return { harTilgang: false, TilgangAlert: () => null };
+        return {
+            harTilgang: false,
+            TilgangAlert: () => (
+                <div className="mx-auto flex min-h-[50vh] w-full max-w-2xl flex-col items-center justify-center">
+                    <BidragProgressbar />
+                </div>
+            ),
+        };
     }
 
     if (isError) {
