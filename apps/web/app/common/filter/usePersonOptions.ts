@@ -4,20 +4,23 @@ import { IdentUtils, useBidragCommons } from "@bidrag/common";
 import { unikeVerdier } from "@bidrag/utils";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { hentPersonInfoMedMaskering } from "~/api/query/person.query.ts";
 import { hentSamhandlerQuery } from "~/api/query/samhandler.query.ts";
-import { useHentFlerePersoninformasjonSuspense } from "~/api/useApi";
 import { IdentQueryParamMapper } from "./IdentQueryParamMapper";
 
 export function usePersonOptions(idents: string[]) {
     const { erMaskert } = useBidragCommons();
 
     const unikeIdents = useMemo(() => unikeVerdier(idents).sort(), [idents]);
-    const personIdents = useMemo(() => unikeIdents.filter((ident) => !IdentUtils.isSamhandlerId(ident)), [unikeIdents]);
 
-    const personResultater = useHentFlerePersoninformasjonSuspense(personIdents);
+    const personIdents = useMemo(() => unikeIdents.filter((ident) => !IdentUtils.isSamhandlerId(ident)), [unikeIdents]);
+    const personResultater = useSuspenseQueries({
+        queries: personIdents.map((ident) => hentPersonInfoMedMaskering(ident)),
+    });
     const personer: Map<string, PersonDto | undefined> = new Map(
         personIdents.map((ident, i) => [ident, personResultater[i]?.data]),
     );
+
     const samhandlerIdents = useMemo(
         () => unikeIdents.filter((ident) => IdentUtils.isSamhandlerId(ident)),
         [unikeIdents],
