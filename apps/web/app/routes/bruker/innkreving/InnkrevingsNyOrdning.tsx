@@ -8,7 +8,7 @@ type Props = {
 };
 
 export function InnkrevingsNyOrdning({ nyBetalingsordning }: Props) {
-    if (!nyBetalingsordning) return null;
+    // if (!nyBetalingsordning) return null;
 
     return (
         <InnkrevingsseksjonKort title="Planlagt fremtidig ordning">
@@ -26,12 +26,12 @@ export function InnkrevingsNyOrdning({ nyBetalingsordning }: Props) {
                         <Table.Row>
                             <Table.DataCell>Gjelder FOM dato</Table.DataCell>
                             <Table.DataCell align="right">
-                                {datoEllerStrek(nyBetalingsordning.dato?.fom)}
+                                {datoEllerStrek(nyBetalingsordning?.dato?.fom)}
                             </Table.DataCell>
                         </Table.Row>
                         <Table.Row>
                             <Table.DataCell>Beløp</Table.DataCell>
-                            <Table.DataCell align="right">{belopEllerStrek(nyBetalingsordning.beløp)}</Table.DataCell>
+                            <Table.DataCell align="right">{belopEllerStrek(nyBetalingsordning?.beløp)}</Table.DataCell>
                         </Table.Row>
                     </Table.Body>
                 </Table>

@@ -129,7 +129,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     return <RootErrorBoundary error={error} bruker={null} />;
 }
 
-function RootErrorBoundary({ error, bruker, bisysUrl }: { error: unknown; bruker: NavUser | null, bisysUrl?: string }) {
+function RootErrorBoundary({ error, bruker, bisysUrl }: { error: unknown; bruker: NavUser | null; bisysUrl?: string }) {
     return (
         <QueryClientWrapper>
             <AppLayout bruker={bruker} bisysUrl={bisysUrl}>

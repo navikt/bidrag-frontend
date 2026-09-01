@@ -81,12 +81,25 @@ export function hentInnkrevingsinformasjonPaPerson(ident: string) {
     return queryOptions({
         queryKey: ["hentInnkrevingsinformasjonPaPerson", ident],
         queryFn: () =>
-            withQueryErrorHandlingV2("hentInnkrevingsinformasjonPaPerson", async () => {
-                const { data } = await BIDRAG_RESKONTRO_API.innkrevingsinformasjon.hentInformasjonOmInnkrevingssaken({
-                    ident: ident,
-                });
-                return data;
-            }),
+            withQueryErrorHandlingV2(
+                "hentInnkrevingsinformasjonPaPerson",
+                async () => {
+                    const { data } =
+                        await BIDRAG_RESKONTRO_API.innkrevingsinformasjon.hentInformasjonOmInnkrevingssaken({
+                            ident: ident,
+                        });
+                    return data;
+                },
+                {
+                    notFoundValue: {
+                        skyldnerinformasjon: null,
+                        gjeldendeBetalingsordning: null,
+                        nyBetalingsordning: null,
+                        innkrevingssakshistorikk: [],
+                    },
+                },
+            ),
+        enabled: !!ident,
         staleTime: Infinity,
     });
 }
