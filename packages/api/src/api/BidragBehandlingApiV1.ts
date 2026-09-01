@@ -1149,6 +1149,7 @@ export interface ForholdmessigFordelingDetaljerDto {
   barn: ForholdsmessigFordelingBarnDto[];
   opprettetAvSaksbehandler?: string | null;
   opprettetAvEnhet?: string | null;
+  overførtTilEnhet?: string | null;
 }
 
 export interface ForholdsmessigFordelingBarnDto {
@@ -1425,14 +1426,14 @@ export interface InntektDtoV2 {
   /** @uniqueItems true */
   inntektstyper: Inntektstype[];
   historisk?: boolean | null;
+  /** Avrundet dagsats for barnetillegg */
+  dagsats?: number | null;
+  skatteprosent?: number | null;
+  beløpstype?: InntektBelopstype | null;
   /** Avrundet månedsbeløp for barnetillegg */
   beløpMånedDagsats?: number | null;
   /** Avrundet månedsbeløp for barnetillegg */
   månedsbeløp?: number | null;
-  skatteprosent?: number | null;
-  /** Avrundet dagsats for barnetillegg */
-  dagsats?: number | null;
-  beløpstype?: InntektBelopstype | null;
 }
 
 export interface InntektPerBarnDto {
@@ -1620,9 +1621,9 @@ export interface PersoninfoDto {
   stønadstype?: Stonadstype | null;
   /** @format int64 */
   bidragsmottakerId?: number | null;
-  sortKey: string;
   /** @format date */
   fødselsdatoSortering?: string | null;
+  sortKey: string;
 }
 
 export interface PrivatAvtaleAndreBarnDetaljerDtoV2 {
@@ -1694,9 +1695,9 @@ export interface PrivatAvtaleValideringsfeilDto {
   ingenLøpendePeriode: boolean;
   /** @uniqueItems true */
   overlappendePerioder: OverlappendePeriode[];
-  gjelderBarnNavn?: string | null;
-  gjelderBarn?: string | null;
   harPeriodiseringsfeil: boolean;
+  gjelderBarn?: string | null;
+  gjelderBarnNavn?: string | null;
 }
 
 export interface RolleDto {
@@ -1758,9 +1759,9 @@ export interface SamvaerValideringsfeilDto {
   overlappendePerioder: OverlappendePeriode[];
   /** Liste med perioder hvor det mangler inntekter. Vil alltid være tom liste for ytelser */
   hullIPerioder: Datoperiode[];
-  gjelderBarnNavn?: string | null;
-  gjelderBarn?: string | null;
   harPeriodiseringsfeil: boolean;
+  gjelderBarn?: string | null;
+  gjelderBarnNavn?: string | null;
 }
 
 export interface SamvaerskalkulatorDetaljer {
@@ -2125,9 +2126,9 @@ export interface UnderholdskostnadValideringsfeil {
   manglerPerioderForTilsynsordning: boolean;
   /** Må ha fylt ut begrunnelse hvis minst en periode er lagt til underholdskostnad */
   manglerBegrunnelse: boolean;
+  gjelderBarn: UnderholdBarnDto;
   /** @format int64 */
   id: number;
-  gjelderBarn: UnderholdBarnDto;
 }
 
 export interface UnderholdskostnadValideringsfeilTabell {
@@ -2958,8 +2959,8 @@ export interface OpprettBehandlingRequest {
   søknadsreferanseid?: number | null;
   kategori?: OpprettKategoriRequestDto | null;
   innkrevingstype?: Innkrevingstype | null;
-  gebyrGjelder18År: boolean;
   rollerUnderBehandling: OpprettRolleDto[];
+  gebyrGjelder18År: boolean;
 }
 
 export interface OpprettKategoriRequestDto {
@@ -3410,10 +3411,10 @@ export interface ResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
+  inntektBarnMånedlig?: number | null;
   inntektBMMånedlig?: number | null;
   inntektBPMånedlig?: number | null;
   totalEndeligInntekt: number;
-  inntektBarnMånedlig?: number | null;
 }
 
 export interface ResultatSaerbidragsberegningDto {
@@ -3444,10 +3445,10 @@ export interface Skatt {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattMånedsbeløp: number;
-  skattAlminneligInntektMånedsbeløp: number;
   trinnskattMånedsbeløp: number;
   trygdeavgiftMånedsbeløp: number;
+  skattMånedsbeløp: number;
+  skattAlminneligInntektMånedsbeløp: number;
 }
 
 export interface UnderholdEgneBarnIHusstand {
@@ -3962,10 +3963,10 @@ export interface HusstandsmedlemDto {
 export interface MaBekrefteNyeOpplysninger {
   type: OpplysningerType;
   rolle: RolleDto;
-  /** @format int64 */
-  underholdskostnadId?: number | null;
   /** Barn som det må bekreftes nye opplysninger for. Vil bare være satt hvis type = BOFORHOLD */
   gjelderBarn?: HusstandsmedlemDto | null;
+  /** @format int64 */
+  underholdskostnadId?: number | null;
 }
 
 export interface ArbeidOgInntektLenkeRequest {
@@ -4314,10 +4315,10 @@ export interface DokumentmalResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
+  inntektBarnMånedlig?: number | null;
   inntektBMMånedlig?: number | null;
   inntektBPMånedlig?: number | null;
   totalEndeligInntekt: number;
-  inntektBarnMånedlig?: number | null;
 }
 
 export type DokumentmalResultatBidragsberegningBarnDto = UtilRequiredKeys<
@@ -4341,10 +4342,10 @@ export interface DokumentmalSkattBeregning {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattMånedsbeløp: number;
-  skattAlminneligInntektMånedsbeløp: number;
   trinnskattMånedsbeløp: number;
   trygdeavgiftMånedsbeløp: number;
+  skattMånedsbeløp: number;
+  skattAlminneligInntektMånedsbeløp: number;
 }
 
 export interface DokumentmalUnderholdEgneBarnIHusstand {
@@ -4421,11 +4422,11 @@ export interface NotatBehandlingDetaljerDto {
    * @deprecated
    */
   avslag?: Resultatkode | null;
+  kategoriVisningsnavn?: string | null;
+  vedtakstypeVisningsnavn?: string | null;
+  erAvvisning: boolean;
   avslagVisningsnavnUtenPrefiks?: string | null;
   avslagVisningsnavn?: string | null;
-  erAvvisning: boolean;
-  vedtakstypeVisningsnavn?: string | null;
-  kategoriVisningsnavn?: string | null;
 }
 
 export interface NotatBeregnetBidragPerBarnDto {
@@ -4482,8 +4483,8 @@ export interface NotatGebyrDetaljerDto {
   beløpGebyrsats: number;
   /** @deprecated */
   rolle: DokumentmalPersonDto;
-  erManueltOverstyrt: boolean;
   gebyrResultatVisningsnavn: string;
+  erManueltOverstyrt: boolean;
 }
 
 export interface NotatGebyrInntektDto {
@@ -4537,16 +4538,16 @@ export interface NotatInntektDto {
   gjelderBarn?: DokumentmalPersonDto | null;
   historisk: boolean;
   inntektsposter: NotatInntektspostDto[];
-  /** Avrundet månedsbeløp for barnetillegg */
-  beløpMånedDagsats?: number | null;
-  /** Avrundet månedsbeløp for barnetillegg */
-  månedsbeløp?: number | null;
-  skattefaktor?: number | null;
+  beløpstypeVisningsnavn: string;
   visningsnavn: string;
   /** Avrundet dagsats for barnetillegg */
   dagsats?: number | null;
   beløpstype?: InntektBelopstype | null;
-  beløpstypeVisningsnavn: string;
+  skattefaktor?: number | null;
+  /** Avrundet månedsbeløp for barnetillegg */
+  beløpMånedDagsats?: number | null;
+  /** Avrundet månedsbeløp for barnetillegg */
+  månedsbeløp?: number | null;
 }
 
 export interface NotatInntekterDto {
@@ -4633,8 +4634,8 @@ export interface NotatResultatPeriodeDto {
   vedtakstype?: Vedtakstype | null;
   /** @format int32 */
   antallBarnIHusstanden: number;
-  sivilstandVisningsnavn?: string | null;
   resultatKodeVisningsnavn: string;
+  sivilstandVisningsnavn?: string | null;
 }
 
 export type NotatResultatSaerbidragsberegningDto = UtilRequiredKeys<
@@ -4658,8 +4659,8 @@ export type NotatResultatSaerbidragsberegningDto = UtilRequiredKeys<
   enesteVoksenIHusstandenErEgetBarn?: boolean | null;
   erDirekteAvslag: boolean;
   bpHarEvne: boolean;
-  beløpSomInnkreves: number;
   resultatVisningsnavn: string;
+  beløpSomInnkreves: number;
 };
 
 export interface NotatSamvaerBarnDto {
@@ -4885,10 +4886,10 @@ export interface NotatVirkningstidspunktBarnDto {
    * @deprecated
    */
   notat: NotatBegrunnelseDto;
+  behandlingstypeVisningsnavn?: string | null;
+  erAvvisning: boolean;
   avslagVisningsnavnUtenPrefiks?: string | null;
   avslagVisningsnavn?: string | null;
-  erAvvisning: boolean;
-  behandlingstypeVisningsnavn?: string | null;
   årsakVisningsnavn?: string | null;
 }
 
@@ -6066,12 +6067,15 @@ export class Api<
      */
     kanOppretteForholdsmessigFordeling: (
       behandlingsid: number,
+      data: OpprettFFRequest,
       params: RequestParams = {},
     ) =>
       this.request<SjekkForholdmessigFordelingResponse, any>({
         path: `/api/v2/behandling/forholdsmessigfordeling/sjekk/${behandlingsid}`,
         method: "POST",
+        body: data,
         secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 
