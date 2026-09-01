@@ -1,6 +1,5 @@
 import type { TilgangskontrollResponse } from "@bidrag/api/TilgangskontrollApi";
 import type { ReactNode } from "react";
-import { BidragProgressbar } from "../BidragProgressbar.tsx";
 import { type PartialAlertProps, TilgangLocalAlert } from "./TilgangLocalAlert.tsx";
 
 export interface TilgangssjekkResultat {
@@ -25,7 +24,7 @@ export function tilgangssjekkResultat(
     if (isPending) {
         return {
             harTilgang: false,
-            TilgangAlert: null
+            TilgangAlert: null,
         };
     }
 

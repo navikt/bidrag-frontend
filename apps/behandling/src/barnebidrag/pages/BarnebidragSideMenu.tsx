@@ -63,7 +63,7 @@ const VirkingstidspunktMenuButton = ({ activeButton, step }: { activeButton: str
             loading={isGrunnlagLoading && shouldShowGrunnlagLoadingProgressbar(BarnebidragStepper.VIRKNINGSTIDSPUNKT)}
             valideringsfeil={
                 !lesemodus &&
-                virkningstidspunkt.barn.some((b) => checkForValidationErrorInVirkningstidspunkt(b.valideringsfeilV2))
+                barnIValgtSak.some((b) => checkForValidationErrorInVirkningstidspunkt(b.valideringsfeilV2))
             }
             subMenu={
                 displaySubmenu &&
