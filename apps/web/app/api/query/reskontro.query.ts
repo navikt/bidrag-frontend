@@ -77,6 +77,20 @@ export function hentInnkrevingssakPaPerson(ident: string) {
     });
 }
 
+export function hentInnkrevingsinformasjonPaPerson(ident: string) {
+    return queryOptions({
+        queryKey: ["hentInnkrevingsinformasjonPaPerson", ident],
+        queryFn: () =>
+            withQueryErrorHandlingV2("hentInnkrevingsinformasjonPaPerson", async () => {
+                const { data } = await BIDRAG_RESKONTRO_API.innkrevingsinformasjon.hentInformasjonOmInnkrevingssaken({
+                    ident: ident,
+                });
+                return data;
+            }),
+        staleTime: Infinity,
+    });
+}
+
 export function hentTransaksjonskoder() {
     return queryOptions({
         queryKey: ["hentTransaksjonskoder"],
