@@ -1,11 +1,14 @@
-import { BIDRAG_PERSON_API } from "@bidrag/api";
+import { BIDRAG_PERSON_API, TilgangsFeilError } from "@bidrag/api";
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { withQueryErrorHandlingV2 } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
 
-export function hentPersonInfo(ident: string, maskeringVedFeil = true) {
+/**
+ * Henter personinformasjon for en gitt ident. Hvis tjenesten nekter tilgang returneres en person med maskert visningsnavn
+ */
+export function hentPersonInfoMedMaskering(ident: string, maskeringVedFeil = true) {
     return queryOptions({
-        queryKey: ["hent_personinformasjon", ident],
+        queryKey: ["hent_personinformasjon", ident, maskeringVedFeil],
         queryFn: () =>
             withQueryErrorHandlingV2("hent_personinformasjon", async () => {
                 const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({
@@ -13,7 +16,7 @@ export function hentPersonInfo(ident: string, maskeringVedFeil = true) {
                 });
                 return data;
             }).catch((error) => {
-                if (maskeringVedFeil) {
+                if (maskeringVedFeil && error instanceof TilgangsFeilError) {
                     const maskertPerson: PersonDto = {
                         ident: ident,
                         visningsnavn: "* ingen tilgang *",
@@ -23,6 +26,7 @@ export function hentPersonInfo(ident: string, maskeringVedFeil = true) {
                     throw error;
                 }
             }),
+        enabled: ident.length === 11,
         staleTime: Infinity,
     });
 }
