@@ -5,7 +5,7 @@ import { type PartialAlertProps, TilgangLocalAlert } from "./TilgangLocalAlert.t
 
 export interface TilgangssjekkResultat {
     harTilgang: boolean;
-    TilgangAlert: (props: PartialAlertProps) => ReactNode;
+    TilgangAlert: ((props: PartialAlertProps) => ReactNode) | null;
 }
 
 export interface TilgangssjekkQueryResultat {
@@ -25,11 +25,7 @@ export function tilgangssjekkResultat(
     if (isPending) {
         return {
             harTilgang: false,
-            TilgangAlert: () => (
-                <div className="mx-auto flex min-h-[50vh] w-full max-w-2xl flex-col items-center justify-center">
-                    <BidragProgressbar />
-                </div>
-            ),
+            TilgangAlert: null
         };
     }
 
