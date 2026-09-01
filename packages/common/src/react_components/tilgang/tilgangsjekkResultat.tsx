@@ -4,7 +4,7 @@ import { type PartialAlertProps, TilgangLocalAlert } from "./TilgangLocalAlert.t
 
 export interface TilgangssjekkResultat {
     harTilgang: boolean;
-    TilgangAlert: (props: PartialAlertProps) => ReactNode;
+    TilgangAlert: ((props: PartialAlertProps) => ReactNode) | null;
 }
 
 export interface TilgangssjekkQueryResultat {
@@ -22,7 +22,10 @@ export function tilgangssjekkResultat(
     const { data, isError, isPending } = queryResult;
 
     if (isPending) {
-        return { harTilgang: false, TilgangAlert: () => null };
+        return {
+            harTilgang: false,
+            TilgangAlert: null,
+        };
     }
 
     if (isError) {
