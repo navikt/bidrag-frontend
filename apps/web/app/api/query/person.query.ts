@@ -4,7 +4,7 @@ import { withQueryErrorHandlingV2 } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
 
 /**
- * Henter personinformasjon for en gitt ident. Hvis det oppstår en feil under henting av informasjonen gis tilbake en person med maskert visningsnavn
+ * Henter personinformasjon for en gitt ident. Hvis tjenesten nekter tilgang returneres en person med maskert visningsnavn
  */
 export function hentPersonInfoMedMaskering(ident: string, maskeringVedFeil = true) {
     return queryOptions({
