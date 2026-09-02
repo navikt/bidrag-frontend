@@ -31,7 +31,10 @@ type VedtakWrapperProps = {
 };
 
 type Feilmelding = { saksnummer?: string | null; node: ReactNode };
-const FeilmeldingComponent = (saksnummer: string | null | undefined, node: ReactNode): Feilmelding => ({ saksnummer, node });
+const FeilmeldingComponent = (saksnummer: string | null | undefined, node: ReactNode): Feilmelding => ({
+    saksnummer,
+    node,
+});
 
 const validerForRoller = {
     [TypeBehandling.FORSKUDD]: [Rolletype.BM],
@@ -568,48 +571,48 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
             ];
         }
         feilInnhold.måBekrefteNyeOpplysninger
-        ?.filter((a) => a.type !== OpplysningerType.BOFORHOLD || a.gjelderBarn != null)
-        ?.forEach((value) => {
-            feilliste.push(
-                FeilmeldingComponent(
-                    value.rolle?.saksnummer,
-                    <ErrorSummary.Item
-                        onClick={() =>
-                            onStepChange(
-                                opplysningTilStep(value, steps),
-                                medSaksnummer(
-                                    {
-                                        [behandlingQueryKeys.tab]:
-                                            value.type === OpplysningerType.BARNETILSYN
-                                                ? toUnderholdskostnadTabQueryParameter(
-                                                    value.gjelderBarn?.husstandsmedlemId,
-                                                    value.underholdskostnadId,
-                                                    true,
-                                                )
-                                                : value.rolle?.id?.toString(),
-                                    },
-                                    value.rolle?.saksnummer,
-                                ),
-                                opplysningTilElementId(value),
-                            )
-                        }
-                    >
-                        {mapOpplysningtypeSomMåBekreftesTilFeilmelding(value, type)}
-                    </ErrorSummary.Item>,
-                ),
-            );
-        });
+            ?.filter((a) => a.type !== OpplysningerType.BOFORHOLD || a.gjelderBarn != null)
+            ?.forEach((value) => {
+                feilliste.push(
+                    FeilmeldingComponent(
+                        value.rolle?.saksnummer,
+                        <ErrorSummary.Item
+                            onClick={() =>
+                                onStepChange(
+                                    opplysningTilStep(value, steps),
+                                    medSaksnummer(
+                                        {
+                                            [behandlingQueryKeys.tab]:
+                                                value.type === OpplysningerType.BARNETILSYN
+                                                    ? toUnderholdskostnadTabQueryParameter(
+                                                          value.gjelderBarn?.husstandsmedlemId,
+                                                          value.underholdskostnadId,
+                                                          true,
+                                                      )
+                                                    : value.rolle?.id?.toString(),
+                                        },
+                                        value.rolle?.saksnummer,
+                                    ),
+                                    opplysningTilElementId(value),
+                                )
+                            }
+                        >
+                            {mapOpplysningtypeSomMåBekreftesTilFeilmelding(value, type)}
+                        </ErrorSummary.Item>,
+                    ),
+                );
+            });
         if (feilliste.length === 0) {
             const feilInnhold =
                 typeof feil.detaljer === "string"
                     ? []
                     : Object.keys(feil.detaljer)
-                    .filter((key) =>
-                        !Array.isArray(feil.detaljer[key])
-                            ? feil.detaljer[key] != null
-                            : feil.detaljer[key].length > 0,
-                    )
-                    .map((key) => capitalizeFirstLetter(key));
+                          .filter((key) =>
+                              !Array.isArray(feil.detaljer[key])
+                                  ? feil.detaljer[key] != null
+                                  : feil.detaljer[key].length > 0,
+                          )
+                          .map((key) => capitalizeFirstLetter(key));
 
             feilliste.push(
                 FeilmeldingComponent(
