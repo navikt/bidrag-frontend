@@ -70,13 +70,16 @@ export const SakQueryFunctions = {
         queryKey: SakApiQueryKeys.hentEnkelSak(),
         queryFn: () => SAK_API.bidragSak.findMetadataForSak(saksnummer),
     }),
+    hentSakerForPerson: (person: Person, queryClient: QueryClient) => ({
+        queryKey: SakApiQueryKeys.hentSakerForPerson(person?.ident),
+        queryFn: () => mapSakerForPerson(person, queryClient),
+    }),
 };
 export const useHentSakerPerson = () => {
     const gjelder = useHentGjelder();
     const queryClient = useQueryClient();
     const { data: saker, isLoading } = useQuery({
-        queryKey: SakApiQueryKeys.hentSakerForPerson(gjelder?.ident),
-        queryFn: async () => mapSakerForPerson(gjelder, queryClient),
+        ...SakQueryFunctions.hentSakerForPerson(gjelder, queryClient),
     });
 
     return { saker, isLoading };
@@ -84,11 +87,16 @@ export const useHentSakerPerson = () => {
 export const useHentSakerForJournalpost = () => {
     const journalpost = useHentJournalpost();
     const gjelder = useHentGjelder();
-    const sakerPerson = useHentSakerPerson();
     const queryClient = useQueryClient();
     const { data: saker, isLoading } = useQuery({
         queryKey: SakApiQueryKeys.hentSakerForJournalpost(journalpost.journalpostId),
-        queryFn: async () => hentSakerForJournalpost(journalpost, gjelder, sakerPerson.saker, queryClient),
+        queryFn: async () => {
+
+            const sakerPerson = await queryClient.fetchQuery({
+                ...SakQueryFunctions.hentSakerForPerson(gjelder, queryClient),
+            });
+            return hentSakerForJournalpost(journalpost, gjelder, sakerPerson, queryClient);
+        },
     });
     return { saker, isLoading };
 };
@@ -124,12 +132,18 @@ export const useSakSearch = () => {
 };
 export function useRefreshSakerJournalpost() {
     const queryClient = useQueryClient();
+    const gjelder = useHentGjelder();
     const {
         appState: { journalpostId },
     } = useAppContext();
 
-    return () => {
-        queryClient.invalidateQueries({ queryKey: DokumentQueryKeys.hentJournalpost(journalpostId) });
+    return async () => {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: DokumentQueryKeys.hentJournalpost(journalpostId) }),
+            queryClient.invalidateQueries({ queryKey: SakApiQueryKeys.hentSakerForFødselsnummer(gjelder?.ident) }),
+            queryClient.invalidateQueries({ queryKey: SakApiQueryKeys.hentSakerForPerson(gjelder?.ident) }),
+            queryClient.invalidateQueries({ queryKey: SakApiQueryKeys.hentSakerForJournalpost(journalpostId) }),
+        ]);
     };
 }
 export const useRefreshSakerPersonQuery = () => {
