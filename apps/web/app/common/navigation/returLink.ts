@@ -54,6 +54,7 @@ const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => 
  * så den trenger ingen parametere utover `sessionState`.
  */
 const bisysBrukeroversiktDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/brukeroversikt" });
+const bisysOppgavelisteDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/oppgaveliste" });
 
 /**
  * Ruteparametere leses fra stien fordi headeren ligger utenfor rutekonteksten til sidene.
@@ -142,16 +143,24 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
     {
         label: "Sakshistorikk",
         id: ({ saksnummer }) => saksnummer,
-        undersider: ["behandling", "vedtak", "forsendelse", "rediger"],
+        undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journal"],
         undersideSti: sakSti,
         destinasjon: bisysSakshistorikkDestinasjon,
     },
+
     {
         label: "Brukeroversikt",
         id: ({ brukerid }) => brukerid,
         undersider: ["", "reskontro", "sumprsak", "innkreving"],
         undersideSti: brukerSti,
         destinasjon: bisysBrukeroversiktDestinasjon,
+    },
+    {
+        label: "Oppgaveliste",
+        id: () => "journal",
+        undersider: ["journal", "journalpost"],
+        undersideSti: (_id, side) => `/${side}`,
+        destinasjon: bisysOppgavelisteDestinasjon,
     },
 ];
 

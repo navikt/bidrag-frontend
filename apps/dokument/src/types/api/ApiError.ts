@@ -2,7 +2,6 @@ import CustomError from "./CustomError";
 
 export default class ApiError extends CustomError {
     public declare status: number;
-    // @ts-expect-error
     public data: any;
     public ok = false;
 

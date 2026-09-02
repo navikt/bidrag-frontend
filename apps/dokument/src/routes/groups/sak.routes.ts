@@ -8,5 +8,5 @@ const { route } = relative(import.meta.dirname);
  */
 export default [
     route("journal/:journalpostId", "../VisJournalpostRoute.tsx", { id: "sak-vis-journalpost" }),
-    route("registrer/:journalpostId", "../RegistrerJournalpostRoute.tsx", { id: "sak-registrer-journalpost" }),
+    route("journalpost/:journalpostId", "../RegistrerJournalpostRoute.tsx", { id: "sak-registrer-journalpost" }),
 ] satisfies RouteConfig;

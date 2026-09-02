@@ -99,7 +99,8 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                 paloggetEnhet: props.paloggetEnhet,
                 saksnummer: props.saksnummer,
             });
-            const enhet = avvik.nyttEnhetsnummer ?? props.paloggetEnhet;
+            const enhet =
+                avvik.type === AvvikType.OVERFOR_TIL_ANNEN_ENHET ? avvik.nyttEnhetsnummer : props.paloggetEnhet;
             const lagreJournalpostSuccess =
                 sendAvvikSuccess &&
                 (await lagreJournalpost.mutateAsync({ journalpost, journalpostId: journalpost.journalpostId, enhet }));

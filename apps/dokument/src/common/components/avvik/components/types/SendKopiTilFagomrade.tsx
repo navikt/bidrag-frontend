@@ -177,7 +177,6 @@ function SendTilFagomradeFirstStep(props: SendTilFagomradeFirstStepProps) {
 
         return (
             <CheckboxGroup
-                //@ts-expect-error
                 error={errors.relevanteDokumenter?.message}
                 legend={"Velg dokumenter som inneholder relevant informasjon for fagområdet:"}
             >
