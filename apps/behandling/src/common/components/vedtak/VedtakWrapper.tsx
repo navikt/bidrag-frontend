@@ -51,7 +51,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
     const medSaksnummer = (query: Record<string, string>, saksnummer?: string | null) =>
         saksnummer ? { ...query, [behandlingQueryKeys.saksnummer]: saksnummer } : query;
     function renderFeilmeldinger() {
-        if (!feil?.detaljer) return null;
+        if (!feil?.detaljer) return [];
         const feilInnhold = feil?.detaljer;
         let feilliste: Feilmelding[] = [];
         if (feilInnhold.privatAvtale != null && "privat_avtale" in steps) {
