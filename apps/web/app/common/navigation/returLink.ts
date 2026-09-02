@@ -135,7 +135,7 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
     {
         label: "Sak",
         id: ({ saksnummer }) => saksnummer,
-        undersider: ["fogdhistorikk", "belopshistorikk", "reskontro", "sakshistorikk"],
+        undersider: ["", "fogdhistorikk", "belopshistorikk", "reskontro", "sakshistorikk"],
         undersideSti: sakSti,
         destinasjon: bisysSakDestinasjon,
     },
@@ -149,14 +149,14 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
     {
         label: "Brukeroversikt",
         id: ({ brukerid }) => brukerid,
-        undersider: ["reskontro"],
+        undersider: ["", "reskontro", "sumprsak", "innkreving"],
         undersideSti: brukerSti,
         destinasjon: bisysBrukeroversiktDestinasjon,
     },
 ];
 
 /** Finner foreldresiden til gjeldende sti, eller null når ingen standardmål passer. */
-function finnStandardReturMål(
+export function finnStandardReturMål(
     pathname: string,
     kontekst: ReturKontekst,
 ): (ReturDestinasjon & { label: string }) | null {
@@ -164,10 +164,21 @@ function finnStandardReturMål(
         const id = mål.id(kontekst);
         if (!id) continue;
 
-        const erTreff = mål.undersider.some((side) => erSammeEllerUnder(pathname, mål.undersideSti(id, side)));
+        const erTreff = mål.undersider.some((side) => erUnderside(pathname, mål.undersideSti(id, side), side));
         if (erTreff) return { label: mål.label, ...mål.destinasjon(id) };
     }
     return null;
+}
+
+/**
+ * Sjekker om `pathname` treffer denne undersiden. Indekssiden (`""`) skal bare
+ * matche eksakt — ellers ville den "stjålet" treff fra andre foreldresiders
+ * mer spesifikke undersider (f.eks. /sak/123/behandling ville matchet "Sak"
+ * i stedet for "Sakshistorikk"). Navngitte undersider matcher fortsatt
+ * seg selv og alt under seg.
+ */
+function erUnderside(pathname: string, sti: string, side: string): boolean {
+    return side === "" ? pathname === sti : erSammeEllerUnder(pathname, sti);
 }
 
 /** Sjekker om `pathname` er `sti` eller en underside av den. */

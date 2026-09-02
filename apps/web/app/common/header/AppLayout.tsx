@@ -4,7 +4,7 @@ import { AppHeader } from "./AppHeader.tsx";
 
 interface AppLayoutProps {
     children: React.ReactNode;
-    bruker?: NavUser | null;
+    bruker: NavUser | null;
     bisysUrl?: string;
 }
 
