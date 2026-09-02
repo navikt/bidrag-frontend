@@ -4,8 +4,8 @@ export function capitalizeFirstLetter(s: string) {
 }
 
 export function removeNonPrintableCharachters(s: string) {
-    // eslint-disable-next-line no-control-regex
-    return s?.replace(/[\x00-\x1F]/g, "");
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: fjerner bevisst ikke-utskrivbare kontrolltegn fra strengen
+    return s?.replace(/[\u0000-\u001F]/g, "");
 }
 
 export function convertStringToNumber(value: string | number): number {

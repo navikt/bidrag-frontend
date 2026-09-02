@@ -46,7 +46,12 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
 
     const hoveddokument = journalpost.dokumenter[0];
     return (
-        <Modal open onClose={onCancel} closeOnBackdropClick={submitState !== "succesfull"} aria-label="">
+        <Modal
+            open
+            onClose={onCancel}
+            closeOnBackdropClick={submitState !== "succesfull"}
+            aria-label="Har du sendt brevet lokalt?"
+        >
             <Modal.Header closeButton>
                 <Heading size={"medium"}>Har du sendt brevet lokalt?</Heading>
             </Modal.Header>

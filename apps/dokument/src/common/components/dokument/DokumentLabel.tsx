@@ -14,9 +14,11 @@ export default function DokumentLabel({ dokument }: LabelPopoverProps) {
     }
     return (
         <>
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: viser en tooltip ved hover/fokus, ikke en interaktiv kontroll */}
             <span
                 style={{ margin: "0" }}
-                onFocus={() => null}
+                onFocus={() => setOpen(true)}
+                onBlur={() => setOpen(false)}
                 onMouseOver={() => setOpen(true)}
                 onMouseLeave={() => setOpen(false)}
                 ref={labelRef}

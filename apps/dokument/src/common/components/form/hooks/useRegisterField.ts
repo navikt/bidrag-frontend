@@ -64,7 +64,7 @@ export default function useRegisterField<T extends FieldValues>(
 
     function getError() {
         const fieldNameSplit = fieldName.split(".");
-        let error;
+        let error: any;
         for (const fieldIndex in fieldNameSplit) {
             const field = fieldNameSplit[fieldIndex];
             error = fieldIndex === "0" ? errors[field] : error?.[field];

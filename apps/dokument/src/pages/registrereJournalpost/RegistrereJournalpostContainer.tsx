@@ -62,6 +62,7 @@ function RegistrereJournalpostContainer() {
     }
 
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: onKeyDown forhindrer kun at Enter sender skjemaet utilsiktet, ikke en interaktiv kontroll
         <div
             id="registrere-journalpost-container"
             className="registrere-journalpost-container"

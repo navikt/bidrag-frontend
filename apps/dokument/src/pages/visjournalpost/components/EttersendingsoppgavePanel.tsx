@@ -112,7 +112,13 @@ function OpprettEttersendelseOppgaveButton() {
             >
                 Opprett
             </Button>
-            <Modal size="small" aria-label="" open={open} onClose={() => setOpen(false)} closeOnBackdropClick>
+            <Modal
+                size="small"
+                aria-label="Opprett ettersendingsoppgave"
+                open={open}
+                onClose={() => setOpen(false)}
+                closeOnBackdropClick
+            >
                 <Modal.Header closeButton>
                     <Heading size="small">Opprett ettersendingsoppgave</Heading>
                 </Modal.Header>

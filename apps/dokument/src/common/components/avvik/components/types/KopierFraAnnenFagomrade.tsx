@@ -368,12 +368,13 @@ function CheckAndEditDocumentsStep(props: KopierFraAnnenFagomradeSecondStepProps
                                 }}
                                 error={errors.redigertDokument?.message}
                             />
-                            <div
-                                className={"pt-8 flex items-center hover:cursor-pointer"}
+                            <button
+                                type="button"
+                                className={"pt-8 flex items-center hover:cursor-pointer bg-transparent border-none p-0"}
                                 onClick={() => FileUtils.openFile(redigertDokument.document.document, true)}
                             >
                                 <ExternalLink />
-                            </div>
+                            </button>
                         </div>
                     </div>
                 )}

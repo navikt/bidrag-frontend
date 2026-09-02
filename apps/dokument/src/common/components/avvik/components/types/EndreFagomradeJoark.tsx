@@ -1,4 +1,5 @@
 import { BodyShort, Select } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -161,7 +162,7 @@ interface EndreFagomradeBekreftelseProps {
 
 function EndreFagomradeBekreftelse(props: EndreFagomradeBekreftelseProps) {
     const { saksnummer } = useAppContext().appState;
-    let message;
+    let message: ReactNode;
     if (props.journalpost.isStatusMottatt) {
         const fagomradeOption = joarkOverforFagomraderOptions.find((option) => option.value === props.fagomrade);
         const isFarskapOrBidrag = props.fagomrade === FAGOMRADE.BID || props.fagomrade === FAGOMRADE.FAR;

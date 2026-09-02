@@ -9,7 +9,13 @@ interface AdresseViewModalProps {
 }
 export default function AdresseViewModal({ adresse, onCancel }: AdresseViewModalProps) {
     return (
-        <Modal open aria-label="" onClose={onCancel} closeOnBackdropClick={true} className="max-w-full w-[400px]">
+        <Modal
+            open
+            aria-label="Dokument ble sendt til adresse"
+            onClose={onCancel}
+            closeOnBackdropClick={true}
+            className="max-w-full w-[400px]"
+        >
             <Modal.Header closeButton>
                 <Heading size="small">Dokument ble sendt til adresse:</Heading>
             </Modal.Header>

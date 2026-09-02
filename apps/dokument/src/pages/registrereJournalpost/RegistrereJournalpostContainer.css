@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-family: Source Sans Pro;
+    font-family: "Source Sans Pro", sans-serif;
 }
 .registrere-journalpost-container .container-header .title {
     padding-left: 26px;

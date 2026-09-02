@@ -44,7 +44,7 @@ export default function AvansertSok({ onResult }: AvansertSokProps): ReactElemen
     return (
         <>
             {venter && (
-                <Modal aria-label="" id={"avansertsok_modal"} onClose={() => null}>
+                <Modal aria-label="Venter på resultat fra avansert søk" id={"avansertsok_modal"} onClose={() => null}>
                     <Modal.Header>Venter på resultat fra avansert søk ...</Modal.Header>
                     <Modal.Body style={{ width: "100%", height: "max-content", padding: "1rem" }}>
                         <Button onClick={avbryt} style={{ marginTop: "1rem" }}>

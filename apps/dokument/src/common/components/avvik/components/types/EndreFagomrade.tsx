@@ -253,7 +253,7 @@ interface EndreFagomradeBekreftelseProps {
 }
 
 function EndreFagomradeBekreftelse(props: EndreFagomradeBekreftelseProps) {
-    let message;
+    let message: string;
     if (props.fagomrade === FAGOMRADE.BID) {
         message = "Fagområdet er endret til Bidrag.";
     } else if (props.fagomrade === FAGOMRADE.FAR) {

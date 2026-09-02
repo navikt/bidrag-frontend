@@ -1,6 +1,7 @@
 function Avvik() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="110" height="110" scale="0.3">
+            <title>Avvik</title>
             <defs>
                 <path id="a" d="M.686.654h4.399v5.852H.686z" />
             </defs>

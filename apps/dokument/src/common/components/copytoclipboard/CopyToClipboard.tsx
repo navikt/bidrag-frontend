@@ -42,9 +42,9 @@ export default function CopyToClipboard({ value }: CopyToClipboardProps) {
             }
             onClickOutside={() => setIsPopoverOpen(false)}
         >
-            <div onClick={onCopyButtonClick} className={"copy-button"}>
+            <button type="button" onClick={onCopyButtonClick} className={"copy-button"}>
                 <File />
-            </div>
+            </button>
         </Popover>
     );
 }

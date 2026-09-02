@@ -50,6 +50,7 @@ export default function SearchSakOrPersonPanel(): ReactElement {
 
     return (
         <div className="search search-sak-person-panel">
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: fanger kun opp Enter fra det fokuserbare TextField-barnet, ikke selv en interaktiv kontroll */}
             <div className={"search-field"} onKeyDown={onKeyDown}>
                 <TextField
                     label={"Fødsels- eller Saksnummer"}

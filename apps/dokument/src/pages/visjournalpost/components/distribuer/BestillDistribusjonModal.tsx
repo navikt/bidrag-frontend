@@ -119,7 +119,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
     return (
         <Modal
             open
-            aria-label=""
+            aria-label="Skal du sende brevet sentralt/digitalt?"
             className="bestill-distribusjon-modal !max-w-[800px]"
             onClose={onCancel}
             closeOnBackdropClick={false}

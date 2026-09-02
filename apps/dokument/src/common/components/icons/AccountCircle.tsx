@@ -1,6 +1,7 @@
 export default function AccountCircle() {
     return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" title={"Account Circle"}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <title>Account Circle</title>
             <path
                 fillRule="evenodd"
                 clipRule="evenodd"
