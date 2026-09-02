@@ -91,7 +91,6 @@ export const useHentSakerForJournalpost = () => {
     const { data: saker, isLoading } = useQuery({
         queryKey: SakApiQueryKeys.hentSakerForJournalpost(journalpost.journalpostId),
         queryFn: async () => {
-
             const sakerPerson = await queryClient.fetchQuery({
                 ...SakQueryFunctions.hentSakerForPerson(gjelder, queryClient),
             });
