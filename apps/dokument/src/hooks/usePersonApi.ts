@@ -5,7 +5,7 @@ import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
 import { IdentUtils } from "@bidrag/common";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import countries from "i18n-iso-countries";
+import countries from "i18n-iso-countries/index.js";
 import norwegianLocale from "i18n-iso-countries/langs/nb.json";
 import { BIDRAG_ORGANISASJON_API, PERSON_API, SAMHANDLER_API } from "../api/api";
 import { useAppContext } from "../store/AppContext";
