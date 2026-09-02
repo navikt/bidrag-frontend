@@ -53,7 +53,10 @@ const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => 
  * Brukeroversikten finnes bare i Bisys, og henter selv opp brukeren fra sesjonen,
  * så den trenger ingen parametere utover `sessionState`.
  */
-const bisysBrukeroversiktDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/brukeroversikt" });
+const bisysBrukeroversiktDestinasjon = (ident: string): ReturDestinasjon => ({
+    sti: "/bisys/brukeroversikt",
+    params: { ident },
+});
 const bisysOppgavelisteDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/oppgaveliste" });
 
 /**
@@ -153,7 +156,7 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
         id: ({ brukerid }) => brukerid,
         undersider: ["", "reskontro", "sumprsak", "innkreving"],
         undersideSti: brukerSti,
-        destinasjon: bisysBrukeroversiktDestinasjon,
+        destinasjon: (ident) => bisysBrukeroversiktDestinasjon(ident),
     },
     {
         label: "Oppgaveliste",
