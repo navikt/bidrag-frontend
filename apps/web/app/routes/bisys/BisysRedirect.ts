@@ -6,6 +6,7 @@ const BISYS_PATHS = {
     sakForside: "Sak.do",
     sakshistorikk: "Sakshistorikk.do",
     oppgaveliste: "Oppgaveliste.do",
+    oppgavePopup: "OppgavePopup.do",
     brukeroversikt: "Brukeroversikt.do",
 } as const;
 

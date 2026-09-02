@@ -1,5 +1,6 @@
 import adminroutes from "@bidrag/admin-app/routes";
 import behandlingroutes, { sakRoutes as behandlingSakRoutes } from "@bidrag/behandling/routes";
+import dokumentroutes, { sakRoutes as dokumentSakRoutes } from "@bidrag/dokument/routes";
 import forsendelseroutes, { sakRoutes as forsendelseSakRoutes } from "@bidrag/forsendelse/routes";
 import redigeringroutes from "@bidrag/redigering/routes";
 import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
@@ -32,6 +33,9 @@ export default [
     // Forsendelse (migrert fra den frittstående bidrag-forsendelse-ui)
     ...forsendelseroutes,
 
+    // Dokument (migrert fra den frittstående bidrag-dokument-ui)
+    ...dokumentroutes,
+
     // Redigering (migrert fra den frittstående bidrag-redigering-ui)
     ...redigeringroutes,
 
@@ -48,6 +52,7 @@ export default [
     route("sak/:saksnummer", "routes/sak/SakBaseLayout.tsx", [
         ...behandlingSakRoutes,
         ...forsendelseSakRoutes,
+        ...dokumentSakRoutes,
         route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),
 
         layout("routes/sak/SakStandardLayout.tsx", [
@@ -57,7 +62,6 @@ export default [
             route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
         ]),
 
-        route("journal/:journalpostId", "routes/dokument/JournalRedirect.ts"),
         route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
     ]),
 ] satisfies RouteConfig;

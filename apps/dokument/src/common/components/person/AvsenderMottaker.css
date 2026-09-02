@@ -1,0 +1,11 @@
+.avsender_input {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+.avsender_input input {
+    width: 300px;
+}
+.avsender_input .pdlSearchButton {
+    align-self: center;
+}

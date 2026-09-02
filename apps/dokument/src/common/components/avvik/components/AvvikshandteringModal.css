@@ -1,0 +1,38 @@
+.AvvikshandteringModal {
+    padding: 2rem;
+    max-width: 76rem;
+    min-width: 76rem;
+}
+@media (max-width: 76rem) {
+    .AvvikshandteringModal {
+        min-width: 50rem;
+    }
+}
+@media (max-width: 50rem) {
+    .AvvikshandteringModal {
+        min-width: 25rem;
+    }
+}
+@media (max-width: 25rem) {
+    .AvvikshandteringModal {
+        min-width: unset;
+    }
+}
+.AvvikshandteringModal .AvvikshandteringModal__spinner-wrapper {
+    text-align: center;
+}
+.AvvikshandteringModal .typo-innholdstittel {
+    margin-bottom: 2rem;
+}
+.AvvikshandteringModal .stegindikator {
+    margin-bottom: 2rem;
+}
+.AvvikshandteringModal .typo-normal {
+    margin-bottom: 1rem;
+}
+.AvvikshandteringModal .EndreFagomrade__checkbox {
+    margin-top: 1rem;
+}
+.AvvikshandteringModal .knapp--hoved {
+    margin-top: 2rem;
+}

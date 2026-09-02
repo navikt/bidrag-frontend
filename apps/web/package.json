@@ -12,6 +12,7 @@
     "dependencies": {
         "@bidrag/api": "workspace:*",
         "@bidrag/behandling": "workspace:*",
+        "@bidrag/dokument": "workspace:*",
         "@bidrag/forsendelse": "workspace:*",
         "@bidrag/redigering": "workspace:*",
         "@bidrag/common": "workspace:*",

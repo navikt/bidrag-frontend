@@ -1,0 +1,14 @@
+{
+    "extends": "../../tsconfig.packages.json",
+    "include": ["src"],
+    "compilerOptions": {
+        "types": ["node", "vite/client"],
+        "lib": ["ES2023", "DOM", "DOM.Iterable"],
+        "resolveJsonModule": true,
+        // Migrert fra den frittstående bidrag-dokument-ui som kjørte uten strict mode.
+        // TODO: skru på strict gradvis.
+        "strict": false,
+        "noUncheckedIndexedAccess": false,
+        "noImplicitOverride": false
+    }
+}

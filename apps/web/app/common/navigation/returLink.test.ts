@@ -67,4 +67,33 @@ describe("finnStandardReturMål", () => {
     it("returnerer null når stien ikke matcher noen undersider", () => {
         expect(finnStandardReturMål("/sak/123/ukjent-side", { saksnummer: "123" })).toBeNull();
     });
+
+    it("journalvisning under en sak faller til Oppgaveliste, ikke Sakshistorikk", () => {
+        expect(finnStandardReturMål("/sak/123/journal/456", { saksnummer: "123" })).toEqual({
+            label: "Oppgaveliste",
+            sti: "/bisys/oppgaveliste",
+        });
+    });
+
+    it("journalvisning utenfor sakskontekst faller til Oppgaveliste", () => {
+        expect(finnStandardReturMål("/journal/456", {})).toEqual({
+            label: "Oppgaveliste",
+            sti: "/bisys/oppgaveliste",
+        });
+    });
+
+    it("registrering av journalpost under en sak faller til Sakshistorikk", () => {
+        expect(finnStandardReturMål("/sak/123/journalpost/456", { saksnummer: "123" })).toEqual({
+            label: "Sakshistorikk",
+            sti: "/bisys/sakshistorikk",
+            params: { saksnr: "123" },
+        });
+    });
+
+    it("registrering av journalpost utenfor sakskontekst faller til Oppgaveliste", () => {
+        expect(finnStandardReturMål("/journalpost/456", {})).toEqual({
+            label: "Oppgaveliste",
+            sti: "/bisys/oppgaveliste",
+        });
+    });
 });
