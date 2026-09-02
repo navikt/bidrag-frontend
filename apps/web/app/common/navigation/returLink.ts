@@ -53,10 +53,7 @@ const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => 
  * Brukeroversikten finnes bare i Bisys, og henter selv opp brukeren fra sesjonen,
  * så den trenger ingen parametere utover `sessionState`.
  */
-const bisysBrukeroversiktDestinasjon = (ident: string): ReturDestinasjon => ({
-    sti: "/bisys/brukeroversikt",
-    params: { ident },
-});
+const bisysBrukeroversiktDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/brukeroversikt" });
 const bisysOppgavelisteDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/oppgaveliste" });
 
 /**
@@ -146,19 +143,31 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
     {
         label: "Sakshistorikk",
         id: ({ saksnummer }) => saksnummer,
-        undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journal"],
+        undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journalpost"],
         undersideSti: sakSti,
         destinasjon: bisysSakshistorikkDestinasjon,
     },
-
+    {
+        // Journalvisning i sakskontekst (`/sak/:saksnummer/journal/:id`) hører hjemme
+        // i Oppgavelista, ikke Sakshistorikk.
+        label: "Oppgaveliste",
+        id: ({ saksnummer }) => saksnummer,
+        undersider: ["journal"],
+        undersideSti: sakSti,
+        destinasjon: bisysOppgavelisteDestinasjon,
+    },
     {
         label: "Brukeroversikt",
         id: ({ brukerid }) => brukerid,
         undersider: ["", "reskontro", "sumprsak", "innkreving"],
         undersideSti: brukerSti,
-        destinasjon: (ident) => bisysBrukeroversiktDestinasjon(ident),
+        destinasjon: bisysBrukeroversiktDestinasjon,
     },
     {
+        // Journal/journalpost utenfor sakskontekst (`/journal/:id`, `/journalpost/:id`)
+        // har ingen sak- eller bruker-id i stien, så stien bygges direkte fra siden.
+        // Journalpost i sakskontekst er allerede fanget opp av Sakshistorikk over,
+        // og journalvisning i sakskontekst av regelen over.
         label: "Oppgaveliste",
         id: () => "journal",
         undersider: ["journal", "journalpost"],
