@@ -24,8 +24,6 @@ const KvTabell = ({ children }: { children: React.ReactNode }) => (
 );
 
 export function InnkrevingsGjeldendeOrdning({ gjeldendeBetalingsordning }: Props) {
-    if (!gjeldendeBetalingsordning) return null;
-
     return (
         <InnkrevingsseksjonKort title="Gjeldende ordning">
             <HStack gap="space-8" align="start" wrap={false}>
@@ -33,31 +31,31 @@ export function InnkrevingsGjeldendeOrdning({ gjeldendeBetalingsordning }: Props
                     <Table.Row>
                         <Table.DataCell>Type ordning</Table.DataCell>
                         <Table.DataCell align="right">
-                            {tekstEllerStrek(gjeldendeBetalingsordning.typeBehandlingsordning)}
+                            {tekstEllerStrek(gjeldendeBetalingsordning?.typeBehandlingsordning)}
                         </Table.DataCell>
                     </Table.Row>
                     <Table.Row>
                         <Table.DataCell>Fnr/Orgnr betalingskilde</Table.DataCell>
                         <Table.DataCell align="right">
-                            {tekstEllerStrek(gjeldendeBetalingsordning.kilde)}
+                            {tekstEllerStrek(gjeldendeBetalingsordning?.kilde)}
                         </Table.DataCell>
                     </Table.Row>
                     <Table.Row>
                         <Table.DataCell>Navn betalingskilde</Table.DataCell>
                         <Table.DataCell align="right">
-                            {tekstEllerStrek(gjeldendeBetalingsordning.kildeNavn)}
+                            {tekstEllerStrek(gjeldendeBetalingsordning?.kildeNavn)}
                         </Table.DataCell>
                     </Table.Row>
                     <Table.Row>
                         <Table.DataCell>Siste giro sendt</Table.DataCell>
                         <Table.DataCell align="right">
-                            {datoEllerStrek(gjeldendeBetalingsordning.datoSisteGiro)}
+                            {datoEllerStrek(gjeldendeBetalingsordning?.datoSisteGiro)}
                         </Table.DataCell>
                     </Table.Row>
                     <Table.Row>
                         <Table.DataCell>Beløp</Table.DataCell>
                         <Table.DataCell align="right">
-                            {belopEllerStrek(gjeldendeBetalingsordning.beløp)}
+                            {belopEllerStrek(gjeldendeBetalingsordning?.beløp)}
                         </Table.DataCell>
                     </Table.Row>
                 </KvTabell>
@@ -65,25 +63,25 @@ export function InnkrevingsGjeldendeOrdning({ gjeldendeBetalingsordning }: Props
                     <Table.Row>
                         <Table.DataCell>Neste forfall</Table.DataCell>
                         <Table.DataCell align="right">
-                            {datoEllerStrek(gjeldendeBetalingsordning.nesteForfall)}
+                            {datoEllerStrek(gjeldendeBetalingsordning?.nesteForfall)}
                         </Table.DataCell>
                     </Table.Row>
                     <Table.Row>
                         <Table.DataCell>Dato sist endret</Table.DataCell>
                         <Table.DataCell align="right">
-                            {datoEllerStrek(gjeldendeBetalingsordning.sistEndret)}
+                            {datoEllerStrek(gjeldendeBetalingsordning?.sistEndret)}
                         </Table.DataCell>
                     </Table.Row>
                     <Table.Row>
                         <Table.DataCell>Årsak siste endring</Table.DataCell>
                         <Table.DataCell align="right">
-                            {tekstEllerStrek(gjeldendeBetalingsordning.sistEndretÅrsak)}
+                            {tekstEllerStrek(gjeldendeBetalingsordning?.sistEndretÅrsak)}
                         </Table.DataCell>
                     </Table.Row>
                     <Table.Row>
                         <Table.DataCell>Sum ubetalt på ordningen</Table.DataCell>
                         <Table.DataCell align="right">
-                            {belopEllerStrek(gjeldendeBetalingsordning.sumUbetalt)}
+                            {belopEllerStrek(gjeldendeBetalingsordning?.sumUbetalt)}
                         </Table.DataCell>
                     </Table.Row>
                 </KvTabell>
