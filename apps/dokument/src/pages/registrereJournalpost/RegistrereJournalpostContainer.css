@@ -67,6 +67,10 @@
 .registrere-journalpost-container .sakstilknyttningpanel .no-sak-alert {
     padding: 15px 0;
 }
+.registrere-journalpost-container .sakstilknyttningpanel .sakstilknytning-table-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+}
 .registrere-journalpost-container .sakstilknyttningpanel table .row-cell--combined p {
     margin: 0;
 }

@@ -38,7 +38,7 @@ export default function SakstilknytningTable({
             );
         }
         return (
-            <CheckboxGroup error={errorMessage} legend="" hideLegend>
+            <CheckboxGroup error={errorMessage} legend="" hideLegend className="sakstilknytning-table-wrapper">
                 <TableInternal
                     id={"sakstilknytningTable"}
                     columns={columns}
@@ -74,7 +74,7 @@ function RollerExpandableContent(sak: Sak) {
             <Heading size="xsmall" className="mb-4">
                 Roller i sak
             </Heading>
-            <HGrid className="w-max" gap={"space-6"} columns={2}>
+            <HGrid className="w-full" gap={"space-6"} columns={{ xs: 1, sm: 2 }}>
                 {sak.roller
                     .filter((rolle) => rolle.rolleType !== Rolletype.FR && rolle.rolleType !== Rolletype.RM)
                     .sort((a, b) => {
