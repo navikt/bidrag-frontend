@@ -14,7 +14,9 @@ export type OpprettFoerstesideRequest = PostFoerstesideRequest;
 export default class FoerstesideGeneratorService {
     async opprettFoersteside(request: OpprettFoerstesideRequest): Promise<FoerstesideResponse> {
         try {
-            const { data } = await BIDRAG_FORSTESIDE_API.api.postNew(request);
+            const { data } = await BIDRAG_FORSTESIDE_API.api.postNew(request, {
+                headers: { "Nav-Consumer-Id": "bidrag-frontend" },
+            });
             // `foersteside` er en base64-enkodet PDF (OpenAPI `format: byte`), som
             // konsumentene dekoder videre med FileUtils._base64ToArrayBuffer.
             return {
