@@ -37,11 +37,7 @@ describe("finnStandardReturMål", () => {
 
     it("ruter sakshistorikk-undersider tilbake til Bisys når from=bisys", () => {
         expect(
-            finnStandardReturMål(
-                "/sak/123/behandling",
-                { saksnummer: "123" },
-                new URLSearchParams({ from: "bisys" }),
-            ),
+            finnStandardReturMål("/sak/123/behandling", { saksnummer: "123" }, new URLSearchParams({ from: "bisys" })),
         ).toEqual({
             label: "Sakshistorikk",
             sti: "/bisys/sakshistorikk",
