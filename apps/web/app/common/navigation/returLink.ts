@@ -143,19 +143,11 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
     {
         label: "Sakshistorikk",
         id: ({ saksnummer }) => saksnummer,
-        undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journalpost"],
+        undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journalpost", "journal"],
         undersideSti: sakSti,
         destinasjon: bisysSakshistorikkDestinasjon,
     },
-    {
-        // Journalvisning i sakskontekst (`/sak/:saksnummer/journal/:id`) hører hjemme
-        // i Oppgavelista, ikke Sakshistorikk.
-        label: "Oppgaveliste",
-        id: ({ saksnummer }) => saksnummer,
-        undersider: ["journal"],
-        undersideSti: sakSti,
-        destinasjon: bisysOppgavelisteDestinasjon,
-    },
+
     {
         label: "Brukeroversikt",
         id: ({ brukerid }) => brukerid,
