@@ -40,7 +40,7 @@ export default class KodeverkService {
     }
 
     async getLandkoder(): Promise<LandkodeLand[]> {
-        const { data } = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("Landkoder");
+        const { data } = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("LandkoderISO2");
         return mapTilKodeVisningstekst<LandkodeLand>(data).sort((a, b) =>
             Object.values(a)[0].localeCompare(Object.values(b)[0], "nb"),
         );
