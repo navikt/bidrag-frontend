@@ -58,8 +58,8 @@ import { Samværsperiode } from "./Samværsperiode";
 
 const SamværForm = () => {
     const samvær = useGetSamværMedBarn();
-    const { setVurderSeparatSamvær: setVurderSeparat } = useBehandlingProvider();
-    const erSammeRef = useRef(samvær.erSammeForAlle);
+    const { setVurderSeparatSamværForSaker } = useBehandlingProvider();
+    const erSammeForAlleSakerRef = useRef(samvær.erSammeForAlleSaker);
     const initialValues = useMemo(() => createInitialValues(samvær.barn), [samvær.barn]);
 
     const ref = useRef(null);
@@ -69,11 +69,11 @@ const SamværForm = () => {
     });
 
     useEffect(() => {
-        erSammeRef.current = samvær.erSammeForAlle;
-    }, [samvær.erSammeForAlle]);
+        erSammeForAlleSakerRef.current = samvær.erSammeForAlleSaker;
+    }, [samvær.erSammeForAlleSaker]);
 
     useEffect(() => {
-        return () => setVurderSeparat(!erSammeRef.current);
+        return () => setVurderSeparatSamværForSaker(erSammeForAlleSakerRef.current);
     }, []);
 
     return (
@@ -93,6 +93,7 @@ const Side = () => {
         getNextStep,
         vurderSeparatSamvær: vurderSeparat,
         selectedRoller,
+        selectedSaksnummer,
     } = useBehandlingProvider();
     const vurderSeparatRef = useRef(vurderSeparat);
     const samvær = useGetSamværMedBarn();
@@ -100,13 +101,17 @@ const Side = () => {
     const { watch, getValues, setValue, setError, clearErrors } = useFormContext<SamværBarnformvalues>();
 
     const visibleSamværBarn = useMemo(() => {
+        const barnISak = selectedSaksnummer
+            ? samvær.barn.filter((barn) => barn.barn.saksnummer === selectedSaksnummer)
+            : samvær.barn;
+        const barnScope = barnISak.length > 0 ? barnISak : samvær.barn;
         const visibleIds = new Set(selectedRoller.map((rolle) => rolle.id));
         if (visibleIds.size === 0) {
-            return samvær.barn;
+            return barnScope;
         }
-        const filtered = samvær.barn.filter((barn) => visibleIds.has(barn.barn.id));
-        return filtered.length > 0 ? filtered : samvær.barn;
-    }, [samvær.barn, selectedRoller]);
+        const filtered = barnScope.filter((barn) => visibleIds.has(barn.barn.id));
+        return filtered.length > 0 ? filtered : barnScope;
+    }, [samvær.barn, selectedRoller, selectedSaksnummer]);
     const { selectedBarn: oppdaterSamvær } = useActiveSamværTab(visibleSamværBarn);
     const mutationState = useFieldMutationStatus(saveSamværFn.mutation, `${oppdaterSamvær?.barn.id}.begrunnelse`);
 
@@ -214,7 +219,6 @@ const Side = () => {
 };
 
 const Main = () => {
-    const { forholdsmessigFordeling } = useGetBehandlingV2();
     const samvær = useGetSamværMedBarn();
     const { reset } = useFormContext<SamværBarnformvalues>();
     const {
@@ -225,17 +229,22 @@ const Main = () => {
         setVurderSeparatSamvær: setVurderSeparat,
         activeStep,
         selectedRoller,
+        selectedSaksnummer,
     } = useBehandlingProvider();
     const mergeSamværMutation = useOnMergeSamvær();
     const ref = useRef<HTMLDialogElement>(null);
     const visibleSamværBarn = useMemo(() => {
+        const barnISak = selectedSaksnummer
+            ? samvær.barn.filter((barn) => barn.barn.saksnummer === selectedSaksnummer)
+            : samvær.barn;
+        const barnScope = barnISak.length > 0 ? barnISak : samvær.barn;
         const visibleIds = new Set(selectedRoller.map((rolle) => rolle.id));
         if (visibleIds.size === 0) {
-            return samvær.barn;
+            return barnScope;
         }
-        const filtered = samvær.barn.filter((barn) => visibleIds.has(barn.barn.id));
-        return filtered.length > 0 ? filtered : samvær.barn;
-    }, [samvær.barn, selectedRoller]);
+        const filtered = barnScope.filter((barn) => visibleIds.has(barn.barn.id));
+        return filtered.length > 0 ? filtered : barnScope;
+    }, [samvær.barn, selectedRoller, selectedSaksnummer]);
 
     const { selectedTab, defaultTab } = useActiveSamværTab(visibleSamværBarn);
 
@@ -267,6 +276,9 @@ const Main = () => {
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
 
+    const erLikForAlleISak =
+        samvær.erSammeForAlleSaker?.find((sak) => sak.saksnummer === selectedSaksnummer)?.erLikForAlle ??
+        samvær.erVirkningSammeForAlle;
     return (
         <div>
             <ConfirmationModal
@@ -290,7 +302,7 @@ const Main = () => {
                     </>
                 }
             />
-            {samvær.barn.length > 1 && !forholdsmessigFordeling && samvær.erVirkningSammeForAlle && (
+            {visibleSamværBarn.length > 1 && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}

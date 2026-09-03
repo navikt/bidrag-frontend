@@ -374,6 +374,7 @@ export const useDeleteSamværsperiode = () => {
                         ...currentData,
                         samværV2: {
                             erSammeForAlle: response.erSammeForAlle,
+                            erSammeForAlleSaker: response.erSammeForAlleSaker,
                             barn: response.samværBarn.map((barn) => {
                                 const currentBegrunnelse = currentData.samværV2.barn.find(
                                     (b) => b.id === barn.id,
@@ -432,6 +433,7 @@ export const useUpdateSamvær = () => {
                         ...currentData,
                         samværV2: {
                             erSammeForAlle: response.erSammeForAlle,
+                            erSammeForAlleSaker: response.erSammeForAlleSaker,
                             barn: response.samværBarn.map((barn) => {
                                 if (input.triggeredBy.includes("begrunnelse")) {
                                     const currentBarn = currentData.samværV2.barn.find((b) => b.id === barn.id);
@@ -1662,12 +1664,17 @@ export const useOppdaterManuelleVedtak = (onSuccess?: () => void) => {
 };
 
 export const useMergeVirkningstidspunkt = () => {
-    const { behandlingId } = useBehandlingProvider();
+    const { behandlingId, vedtakId, selectedSaksnummer } = useBehandlingProvider();
+    const roller = useBehandlingV2(behandlingId, vedtakId).roller;
+    const harFlereSaksnummer = new Set(roller.map((rolle) => rolle.saksnummer).filter(Boolean)).size > 1;
 
     return useMutation({
         mutationKey: MutationKeys.oppdaterBehandling(behandlingId),
         mutationFn: async (): Promise<BehandlingDtoV2> => {
-            const { data } = await BEHANDLING_API_V1.api.brukSammeVirkningstidspunktForAlleBarna(Number(behandlingId));
+            const { data } = await BEHANDLING_API_V1.api.brukSammeVirkningstidspunktForAlleBarna(
+                Number(behandlingId),
+                harFlereSaksnummer ? { saksnummer: selectedSaksnummer } : undefined,
+            );
             return data;
         },
         networkMode: "always",
@@ -1679,13 +1686,18 @@ export const useMergeVirkningstidspunkt = () => {
 };
 
 export const useMergeSamvær = () => {
-    const { behandlingId } = useBehandlingProvider();
+    const { behandlingId, vedtakId, selectedSaksnummer } = useBehandlingProvider();
     const queryClient = useQueryClient();
+    const roller = useBehandlingV2(behandlingId, vedtakId).roller;
+    const harFlereSaksnummer = new Set(roller.map((rolle) => rolle.saksnummer).filter(Boolean)).size > 1;
 
     return useMutation({
         mutationKey: MutationKeys.oppdaterBehandling(behandlingId),
         mutationFn: async (): Promise<BehandlingDtoV2> => {
-            const { data } = await BEHANDLING_API_V1.api.brukSammeSamvaerForAlleBarna(Number(behandlingId));
+            const { data } = await BEHANDLING_API_V1.api.brukSammeSamvaerForAlleBarna(
+                Number(behandlingId),
+                harFlereSaksnummer ? { saksnummer: selectedSaksnummer } : undefined,
+            );
             return data;
         },
         onSuccess: (response) => {

@@ -321,7 +321,7 @@ const Opphør = ({
         setSaveErrorState,
         lesemodus,
         vurderSeparatVirkningstidspunkt: vurderSeparat,
-        setVurderSeparatSamvær,
+        setVurderSeparatSamværForSaker,
     } = useBehandlingProvider();
     const oppdaterOpphørsdato = useOnUpdateOpphørsdato();
     const { getValues, reset, setValue } = useFormContext();
@@ -379,7 +379,7 @@ const Opphør = ({
                             },
                         };
                     });
-                    setVurderSeparatSamvær(!response.samværV2.erSammeForAlle);
+                    setVurderSeparatSamværForSaker(response.samværV2.erSammeForAlleSaker);
 
                     const updatedValues = createInitialValues(
                         response.virkningstidspunktV3,
@@ -510,8 +510,9 @@ const Opphør = ({
 };
 
 const Side = () => {
-    const { onStepChange, getNextStep, vurderSeparatVirkningstidspunkt } = useBehandlingProvider();
-    const { erBisysVedtak, virkningstidspunktV3: virkningstidspunkt, vedtakstype } = useGetBehandlingV2();
+    const { onStepChange, getNextStep, vurderSeparatVirkningstidspunkt, selectedSaksnummer } = useBehandlingProvider();
+    const { erBisysVedtak, virkningstidspunktV3: virkningstidspunkt, vedtakstype, roller } = useGetBehandlingV2();
+    const harFlereSaksnummer = new Set(roller.map((rolle) => rolle.saksnummer).filter(Boolean)).size > 1;
     const saveBegrunnelseMutation = useOnSaveVirkningstidspunktBegrunnelse();
     const { getValues, watch, setError, clearErrors } = useFormContext<VirkningstidspunktFormValues>();
     const [activeTab] = useGetActiveAndDefaultVirkningstidspunktTab();
@@ -534,6 +535,7 @@ const Side = () => {
     const createBegrunnelsePayload = (currentValues: VirkningstidspunktFormValuesPerBarn) => {
         let payload: OppdatereVirkningstidspunktBegrunnelseDto = {
             rolleId: vurderSeparatVirkningstidspunkt ? currentValues.rolle.id : undefined,
+            saksnummer: harFlereSaksnummer ? selectedSaksnummer : undefined,
             oppdatereBegrunnelse: {
                 nyBegrunnelse: currentValues.begrunnelse,
                 rolleid: currentValues.rolle.id,
@@ -659,7 +661,8 @@ const VirkningstidspunktBarn = ({
         lesemodus,
         setSaveErrorState,
         setVurderSeparatVirkningstidspunkt: setVurderSeparat,
-        setVurderSeparatSamvær,
+        setVurderSeparatVirkningstidspunktForSaker,
+        setVurderSeparatSamværForSaker,
         vurderSeparatVirkningstidspunkt: vurderSeparat,
     } = useBehandlingProvider();
     const behandling = useGetBehandlingV2();
@@ -720,8 +723,10 @@ const VirkningstidspunktBarn = ({
                     onSuccess: (response) => {
                         refreshFF();
                         oppdaterBehandling.queryClientUpdater((currentData) => {
-                            setVurderSeparat(!response.virkningstidspunktV3.erLikForAlle);
-                            setVurderSeparatSamvær(!response.samværV2.erSammeForAlle);
+                            setVurderSeparatVirkningstidspunktForSaker(
+                                response.virkningstidspunktV3.erLikForAlleBasertPåSak,
+                            );
+                            setVurderSeparatSamværForSaker(response.samværV2.erSammeForAlleSaker);
                             return {
                                 ...currentData,
                                 ...response,
@@ -772,7 +777,7 @@ const VirkningstidspunktBarn = ({
         [
             oppdaterBehandling,
             setVurderSeparat,
-            setVurderSeparatSamvær,
+            setVurderSeparatSamværForSaker,
             previousValues,
             setPreviousValues,
             reset,
@@ -1241,7 +1246,8 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         lesemodus,
         vurderSeparatVirkningstidspunkt: vurderSeparat,
         setVurderSeparatVirkningstidspunkt: setVurderSeparat,
-        setVurderSeparatSamvær,
+        setVurderSeparatVirkningstidspunktForSaker,
+        setVurderSeparatSamværForSaker,
         selectedRoller,
     } = useBehandlingProvider();
     const [searchParams] = useSearchParams();
@@ -1286,8 +1292,8 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
     const onChangeVurderSeparat = () => {
         mergeVirkningstidspunkterMutation.mutation.mutate(undefined, {
             onSuccess: (response) => {
-                setVurderSeparat(!response.virkningstidspunktV3.erLikForAlle);
-                setVurderSeparatSamvær(!response.samværV2.erSammeForAlle);
+                setVurderSeparatVirkningstidspunktForSaker(response.virkningstidspunktV3.erLikForAlleBasertPåSak);
+                setVurderSeparatSamværForSaker(response.samværV2.erSammeForAlleSaker);
                 mergeVirkningstidspunkterMutation.queryClientUpdater((_) => response);
                 reset(createInitialValues(response.virkningstidspunktV3, response.stønadstype, response.vedtakstype));
             },
