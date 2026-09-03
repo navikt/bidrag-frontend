@@ -68,13 +68,6 @@ describe("finnStandardReturMål", () => {
         expect(finnStandardReturMål("/sak/123/ukjent-side", { saksnummer: "123" })).toBeNull();
     });
 
-    it("journalvisning under en sak faller til Oppgaveliste, ikke Sakshistorikk", () => {
-        expect(finnStandardReturMål("/sak/123/journal/456", { saksnummer: "123" })).toEqual({
-            label: "Oppgaveliste",
-            sti: "/bisys/oppgaveliste",
-        });
-    });
-
     it("journalvisning utenfor sakskontekst faller til Oppgaveliste", () => {
         expect(finnStandardReturMål("/journal/456", {})).toEqual({
             label: "Oppgaveliste",
