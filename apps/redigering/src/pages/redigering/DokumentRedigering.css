@@ -4,8 +4,9 @@
 }
 
 .page_decorator.deleted .page {
-    height: 0;
+    height: 0 !important;
     margin-bottom: 0;
+    overflow: hidden;
 }
 
 .page_decorator .deleted .maskingitem {
