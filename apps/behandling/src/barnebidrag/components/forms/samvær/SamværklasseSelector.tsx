@@ -18,7 +18,7 @@ export const SamværsklasseSelector = ({
     item: SamværPeriodeFormvalues;
 }) => {
     const { clearErrors, control, setValue, getValues } = useFormContext<SamværBarnformvalues>();
-    const periode = useWatch({ control, name: fieldName });
+    const periode = useWatch({ control, name: fieldName }) ?? item;
     const ref = useRef<HTMLDialogElement>(null);
     const previousSamværsklasse = useRef<Samvaersklasse>(periode.samværsklasse);
 
