@@ -127,7 +127,7 @@ const BeregningTabellBarn = ({ resultatBarn }: { resultatBarn: ResultatBidragsbe
                 </BodyShort>
             </Alert>
         );
-    } else if (resultatBarn.erAvvistRevurdering) {
+    } else if (resultatBarn.erAvvistRevurdering && perioder.length === 0) {
         return (
             <Alert variant="info">
                 <BodyShort size="small">
