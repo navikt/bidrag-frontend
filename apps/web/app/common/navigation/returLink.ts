@@ -49,6 +49,11 @@ const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => 
     params: { saksnr: saksnummer },
 });
 
+/** Sakshistorikk-siden i denne appen (ikke Bisys). */
+const sakshistorikkAppDestinasjon = (saksnummer: string): ReturDestinasjon => ({
+    sti: sakSti(saksnummer, "sakshistorikk"),
+});
+
 /**
  * Brukeroversikten finnes bare i Bisys, og henter selv opp brukeren fra sesjonen,
  * så den trenger ingen parametere utover `sessionState`.
@@ -125,8 +130,11 @@ interface StandardReturMål {
     /** Bygger stien til en underside, brukt for å kjenne igjen hvor vi står. */
     undersideSti: (id: string, side: string) => string;
     /** Lenken tilbake til foreldresiden. */
-    destinasjon: (id: string) => ReturDestinasjon;
+    destinasjon: (id: string, searchParams: URLSearchParams) => ReturDestinasjon;
 }
+
+/** Query-verdien i `?from=` som ber oss rute tilbake til Bisys i stedet for i denne appen. */
+const BISYS_RETUR_VERDI = "bisys";
 
 /**
  * Foreldresider undersider faller tilbake til når `?from=` mangler.
@@ -145,7 +153,10 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
         id: ({ saksnummer }) => saksnummer,
         undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journalpost", "journal"],
         undersideSti: sakSti,
-        destinasjon: bisysSakshistorikkDestinasjon,
+        destinasjon: (saksnummer, searchParams) =>
+            searchParams.get(RETUR_PARAM) === BISYS_RETUR_VERDI
+                ? bisysSakshistorikkDestinasjon(saksnummer)
+                : sakshistorikkAppDestinasjon(saksnummer),
     },
 
     {
@@ -172,13 +183,14 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
 export function finnStandardReturMål(
     pathname: string,
     kontekst: ReturKontekst,
+    searchParams: URLSearchParams = new URLSearchParams(),
 ): (ReturDestinasjon & { label: string }) | null {
     for (const mål of STANDARD_RETUR_MÅL) {
         const id = mål.id(kontekst);
         if (!id) continue;
 
         const erTreff = mål.undersider.some((side) => erUnderside(pathname, mål.undersideSti(id, side), side));
-        if (erTreff) return { label: mål.label, ...mål.destinasjon(id) };
+        if (erTreff) return { label: mål.label, ...mål.destinasjon(id, searchParams) };
     }
     return null;
 }
@@ -235,7 +247,7 @@ export function useReturLink(): ReturLenke | null {
 
     const kontekst = hentSakBrukerFraUrl(pathname, searchParams);
 
-    const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst);
+    const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst, searchParams);
 
     if (!mål) return null;
 

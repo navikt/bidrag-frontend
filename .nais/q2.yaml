@@ -92,6 +92,11 @@ env:
   - name: BIDRAG_DOKUMENT_ARKIV_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-dokument-arkiv/.default
 
+  - name: FOERSTESIDEGENERATOR_URL
+    value: https://foerstesidegenerator.dev-fss-pub.nais.io
+  - name: FOERSTESIDEGENERATOR_AUDIENCE
+    value: api://dev-fss.teamdokumenthandtering.foerstesidegenerator/.default
+
 unleash:
   host: bidrag-unleash-api.nav.cloud.nais.io
   environment: development
@@ -114,3 +119,4 @@ outbound:
     - bidrag-person-q2.dev-fss-pub.nais.io
     - bidrag-dokument.dev-fss-pub.nais.io
     - bidrag-dokument-arkiv.dev-fss-pub.nais.io
+    - foerstesidegenerator.dev-fss-pub.nais.io

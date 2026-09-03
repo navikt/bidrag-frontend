@@ -91,6 +91,11 @@ env:
   - name: BIDRAG_DOKUMENT_ARKIV_AUDIENCE
     value: api://prod-fss.bidrag.bidrag-dokument-arkiv/.default
 
+  - name: FOERSTESIDEGENERATOR_URL
+    value: https://foerstesidegenerator.prod-fss-pub.nais.io
+  - name: FOERSTESIDEGENERATOR_AUDIENCE
+    value: api://prod-fss.teamdokumenthandtering.foerstesidegenerator/.default
+
 unleash:
   host: bidrag-unleash-api.nav.cloud.nais.io
   environment: production
@@ -113,3 +118,4 @@ outbound:
     - bidrag-person.prod-fss-pub.nais.io
     - bidrag-dokument.prod-fss-pub.nais.io
     - bidrag-dokument-arkiv.prod-fss-pub.nais.io
+    - foerstesidegenerator.prod-fss-pub.nais.io

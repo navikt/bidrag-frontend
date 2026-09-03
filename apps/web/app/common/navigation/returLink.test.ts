@@ -20,16 +20,25 @@ describe("finnStandardReturMål", () => {
 
     it("faller ikke tilbake på Sak for undersider av sakshistorikk", () => {
         // /sak/123/behandling ligger under Sakshistorikk, ikke direkte under Sak,
-        // selv om stien starter med /sak/123.
+        // selv om stien starter med /sak/123. Uten from=bisys går den til
+        // sakshistorikk i denne appen.
         expect(finnStandardReturMål("/sak/123/behandling", { saksnummer: "123" })).toEqual({
             label: "Sakshistorikk",
-            sti: "/bisys/sakshistorikk",
-            params: { saksnr: "123" },
+            sti: "/sak/123/sakshistorikk",
         });
     });
 
     it("treffer sakshistorikkens undersider", () => {
         expect(finnStandardReturMål("/sak/123/vedtak", { saksnummer: "123" })).toEqual({
+            label: "Sakshistorikk",
+            sti: "/sak/123/sakshistorikk",
+        });
+    });
+
+    it("ruter sakshistorikk-undersider tilbake til Bisys når from=bisys", () => {
+        expect(
+            finnStandardReturMål("/sak/123/behandling", { saksnummer: "123" }, new URLSearchParams({ from: "bisys" })),
+        ).toEqual({
             label: "Sakshistorikk",
             sti: "/bisys/sakshistorikk",
             params: { saksnr: "123" },
@@ -41,8 +50,7 @@ describe("finnStandardReturMål", () => {
         // slik at f.eks. /sak/123/behandling/rediger også havner under Sakshistorikk.
         expect(finnStandardReturMål("/sak/123/behandling/detaljer", { saksnummer: "123" })).toEqual({
             label: "Sakshistorikk",
-            sti: "/bisys/sakshistorikk",
-            params: { saksnr: "123" },
+            sti: "/sak/123/sakshistorikk",
         });
     });
 
@@ -78,8 +86,7 @@ describe("finnStandardReturMål", () => {
     it("registrering av journalpost under en sak faller til Sakshistorikk", () => {
         expect(finnStandardReturMål("/sak/123/journalpost/456", { saksnummer: "123" })).toEqual({
             label: "Sakshistorikk",
-            sti: "/bisys/sakshistorikk",
-            params: { saksnr: "123" },
+            sti: "/sak/123/sakshistorikk",
         });
     });
 
