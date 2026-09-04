@@ -1,16 +1,38 @@
 // Rekkefølgen er signifikant: mer spesifikke/anchored mønstre må stå før generiske,
 // og sak/:saksnummer må erstattes før de sammensatte sak-understi-reglene som bruker den.
+// Rekkefølgen er signifikant: mer spesifikke/anchored mønstre må stå før generiske,
+// og sak/:saksnummer må erstattes før de sammensatte sak-understi-reglene som bruker den.
 const routeMaskRules: ReadonlyArray<readonly [RegExp, string]> = [
-    [/^\/log\/[^/]+$/, "/log/:type"],
-    [/^\/bisys\/[^/]+$/, "/bisys/:target"],
     [/^\/aapnedokument\/[^/]+\/[^/]+$/, "/aapnedokument/:journalpostId/:dokumentreferanse"],
     [/^\/dokument\/[^/]+\/[^/]+$/, "/dokument/:journalpostId/:dokumentreferanse"],
     [/^\/dokument\/[^/]+$/, "/dokument/:journalpostId"],
     [/^\/admin\/endringslogg\/[^/]+$/, "/admin/endringslogg/:id"],
+    [/^\/journal\/[^/]+$/, "/journal/:journalpostId"],
+    [/^\/journalpost\/[^/]+$/, "/journalpost/:journalpostId"],
+    [/^\/rediger\/masker\/[^/]+\/[^/]+$/, "/rediger/masker/:forsendelseId/:dokumentreferanse"],
+    [/^\/rediger\/skjemautfylling\/[^/]+\/[^/]+$/, "/rediger/skjemautfylling/:forsendelseId/:dokumentreferanse"],
+    [/^\/rediger\/debug\/[^/]+\/[^/]+$/, "/rediger/debug/:forsendelseId/:dokumentreferanse"],
+    [/^\/rediger\/[^/]+\/[^/]+$/, "/rediger/:journalpostId/:dokumentreferanse"],
+    [/^\/rediger\/[^/]+$/, "/rediger/:journalpostId"],
+    [/^\/behandling\/[^/]+\/begrunnelse\/[^/]+$/, "/behandling/:behandlingId/begrunnelse/:broadcastChannel"],
+    [/^\/behandling\/[^/]+\/notat$/, "/behandling/:behandlingId/notat"],
+    [/^\/vedtak\/[^/]+\/notat$/, "/vedtak/:vedtakId/notat"],
+    // "brukerveiledning" er en statisk rute, ikke en variabel — må ekskluderes.
+    [/^\/forsendelse\/(?!brukerveiledning$)[^/]+$/, "/forsendelse/:forsendelseId"],
+    // "søk" er en statisk rute, ikke en variabel — må ekskluderes.
+    [/^\/samhandler\/(?!søk$)[^/]+$/, "/samhandler/:samhandlerId"],
     [/\/bruker\/[^/]+/, "/bruker/:id"],
     [/\/sak\/[^/]+/, "/sak/:saksnummer"],
     [/\/sak\/:saksnummer\/journal\/[^/]+$/, "/sak/:saksnummer/journal/:journalpostId"],
+    [/\/sak\/:saksnummer\/journalpost\/[^/]+$/, "/sak/:saksnummer/journalpost/:journalpostId"],
     [/\/sak\/:saksnummer\/vedtak\/[^/]+$/, "/sak/:saksnummer/vedtak/:vedtaksid"],
+    [
+        /\/sak\/:saksnummer\/behandling\/[^/]+\/begrunnelse\/[^/]+$/,
+        "/sak/:saksnummer/behandling/:behandlingId/begrunnelse/:broadcastChannel",
+    ],
+    [/\/sak\/:saksnummer\/behandling\/[^/]+\/notat$/, "/sak/:saksnummer/behandling/:behandlingId/notat"],
+    [/\/sak\/:saksnummer\/behandling\/[^/]+$/, "/sak/:saksnummer/behandling/:behandlingId"],
+    [/\/sak\/:saksnummer\/forsendelse\/[^/]+$/, "/sak/:saksnummer/forsendelse/:forsendelseId"],
 ];
 
 const uuidSegmentPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
