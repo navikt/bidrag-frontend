@@ -31,4 +31,36 @@ describe("maskPathnameForPageId", () => {
     it("bevarer segmenter som ikke matcher fallback-regexp", () => {
         expect(maskPathnameForPageId("/x/abc123/123abc")).toBe("/x/abc123/123abc");
     });
+
+    it("maskerer samhandler-id, men ikke den statiske søk-ruten", () => {
+        expect(maskPathnameForPageId("/samhandler/889123456")).toBe("/samhandler/:samhandlerId");
+        expect(maskPathnameForPageId("/samhandler/søk")).toBe("/samhandler/søk");
+    });
+
+    it("maskerer forsendelse-id, men ikke den statiske brukerveiledning-ruten", () => {
+        expect(maskPathnameForPageId("/forsendelse/aB3xQ9")).toBe("/forsendelse/:forsendelseId");
+        expect(maskPathnameForPageId("/forsendelse/brukerveiledning")).toBe("/forsendelse/brukerveiledning");
+    });
+
+    it("maskerer journalpost under sak (tidligere udekket av journal-regelen)", () => {
+        expect(maskPathnameForPageId("/sak/1234567/journalpost/987654321")).toBe(
+            "/sak/:saksnummer/journalpost/:journalpostId",
+        );
+    });
+
+    it("maskerer rediger/masker med forsendelseId og dokumentreferanse", () => {
+        expect(maskPathnameForPageId("/rediger/masker/aB3xQ9/ABC123")).toBe(
+            "/rediger/masker/:forsendelseId/:dokumentreferanse",
+        );
+    });
+
+    it("maskerer sammensatt behandling-begrunnelse-rute under sak", () => {
+        expect(maskPathnameForPageId("/sak/1234567/behandling/42/begrunnelse/mainWindow")).toBe(
+            "/sak/:saksnummer/behandling/:behandlingId/begrunnelse/:broadcastChannel",
+        );
+    });
+
+    it("maskerer topnivå behandling-notat", () => {
+        expect(maskPathnameForPageId("/behandling/42/notat")).toBe("/behandling/:behandlingId/notat");
+    });
 });
