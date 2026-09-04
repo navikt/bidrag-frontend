@@ -300,12 +300,25 @@ pnpm test:ct:gallery    # http://localhost:3178/playwright/gallery/browse.html
 uskodd i en story. Komponenter som leser via `BidragCommonsContext`
 (`useHentPersonData` m.fl.) er suspense-baserte og henger evig uten ekte
 backend. Bruk en mocket provider per story — se
-`apps/web/playwright/testing/CtProviders.tsx` for eksempel.
+`packages/common/playwright/testing/BidragCommonsProviderMock.tsx` for eksempel.
+
+**Felles test-utils:** Delte hjelpere for CT ligger i
+`packages/common/playwright/testing/` og importeres på tvers av pakker via
+subpath-eksporten i `@bidrag/common`:
+
+```ts
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
+import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
+```
+
+Filendelsen skal være med — eksporten mapper `./playwright/*` direkte til fil,
+uten fallback-oppslag, slik at hver import treffer nøyaktig én kjent fil.
+Bruk `genererFnr()` i stedet for å hardkode fødselsnummer i stories og specs.
 
 **To mock-nivåer, avhengig av hva komponenten kaller:**
-1. **Context-mocking** (`CtProviders`) — for kall via `BidragCommonsContext`
-   (`@bidrag/common`s `useHentPersonData`, `uthevPerson`,
-   `useHentRevurderingsbarn`).
+1. **Context-mocking** (`BidragCommonsProviderMock`) — for kall via
+   `BidragCommonsContext` (`@bidrag/common`s `useHentPersonData`,
+   `uthevPerson`, `useHentRevurderingsbarn`).
 2. **Nettverksmocking** (`page.route()`) — for alt annet, f.eks. apps/web sin
    EGEN `useHentPersonData` i `~/api/useApi.ts` (en annen funksjon enn i
    punkt 1!) eller søk/mutasjoner som kaller `@bidrag/api` direkte. Registrer

@@ -1,10 +1,11 @@
+import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { useForm } from "react-hook-form";
-import { CtProviders } from "../../../../../playwright/testing/CtProviders";
-import ForelderRolleVisning from "./ForelderRolleVisning";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema";
+import ForelderRolleVisning from "./ForelderRolleVisning";
 
 const bpKjentFraStart: Rolle = {
-    fodselsnummer: "10987654321",
+    fodselsnummer: genererFnr(),
     type: "BP",
     rolleType: "BP",
     objektnummer: "1",
@@ -13,7 +14,7 @@ const bpKjentFraStart: Rolle = {
 };
 
 const bmKjentFraStart: Rolle = {
-    fodselsnummer: "01019012345",
+    fodselsnummer: genererFnr(),
     type: "BM",
     rolleType: "BM",
     objektnummer: "2",
@@ -35,7 +36,7 @@ function ForelderRolleVisningScenario({ initialRoller, erNyForelderBp = false }:
     const bm = roller.find((r) => r.type === "BM");
 
     return (
-        <CtProviders
+        <BidragCommonsProviderMock
             personer={{
                 [bpKjentFraStart.fodselsnummer as string]: {
                     ident: bpKjentFraStart.fodselsnummer,
@@ -49,7 +50,7 @@ function ForelderRolleVisningScenario({ initialRoller, erNyForelderBp = false }:
             uthevPerson={(ident) => ident === bpKjentFraStart.fodselsnummer}
         >
             <ForelderRolleVisning bp={bp} bm={bm} erNyForelderBp={erNyForelderBp} form={form} saksnummer="2024/1" />
-        </CtProviders>
+        </BidragCommonsProviderMock>
     );
 }
 

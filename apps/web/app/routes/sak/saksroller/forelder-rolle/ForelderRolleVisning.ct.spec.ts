@@ -1,3 +1,4 @@
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
@@ -81,7 +82,7 @@ test.describe("ForelderRolleVisning", () => {
         mount,
         page,
     }) => {
-        const bmIdent = "01019012345";
+        const bmIdent = genererFnr();
 
         await mockPersonInformasjonForIdentFørMount(page, bmIdent, "Kari Nordmann");
         const component = await mount(STORY_BM_MANGLER);

@@ -2,18 +2,22 @@
  * Stories for `ExpandedRoles` - rollekort-panelet som vises under
  * saksnummer-fanene i `SakHeader`. Samme story + gallery-mønster som
  * `RolleCard.story.tsx`: en mocket `BidragCommonsProvider` rundt komponenten,
- * ingen Storybook, ingen @playwright/experimental-ct-react.
  */
 import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
 import { BidragCommonsProvider } from "../../api/BidragCommonsContext";
-import { mockUseHentPersonData } from "../../../playwright/testing/mockPersonData";
+import { genererFnr } from "../../../playwright/testing/fnrGenerator.ts";
+import { mockUseHentPersonData } from "../../../playwright/testing/mockPersonData.ts";
 import { ExpandedRoles, type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
+
+const identBm = genererFnr();
+const identBp = genererFnr();
+const identBa = genererFnr();
 
 const lagRolle = (overrides: Partial<HeaderRolle>): HeaderRolle => ({
     id: 1,
     rolletype: Rolletype.BM,
-    ident: "12345678910",
+    ident: identBm,
     navn: "Kari Nordmann",
     saksnummer: "2024/1",
     søknader: [],
@@ -23,9 +27,9 @@ const lagRolle = (overrides: Partial<HeaderRolle>): HeaderRolle => ({
 const treRoller: SaksnummerRoller = {
     saksnummer: "2024/1",
     roller: [
-        lagRolle({ id: 1, rolletype: Rolletype.BM, ident: "12345678910", navn: "Kari Nordmann" }),
-        lagRolle({ id: 2, rolletype: Rolletype.BP, ident: "10987654321", navn: "Ola Nordmann" }),
-        lagRolle({ id: 3, rolletype: Rolletype.BA, ident: "01012345678", navn: "Lille Nordmann" }),
+        lagRolle({ id: 1, rolletype: Rolletype.BM, ident: identBm, navn: "Kari Nordmann" }),
+        lagRolle({ id: 2, rolletype: Rolletype.BP, ident: identBp, navn: "Ola Nordmann" }),
+        lagRolle({ id: 3, rolletype: Rolletype.BA, ident: identBa, navn: "Lille Nordmann" }),
     ],
 };
 
@@ -33,9 +37,9 @@ const treRoller: SaksnummerRoller = {
 export const TreRoller = () => (
     <BidragCommonsProvider
         useHentPersonData={mockUseHentPersonData({
-            "12345678910": { ident: "12345678910", visningsnavn: "Kari Nordmann", fornavn: "Kari" },
-            "10987654321": { ident: "10987654321", visningsnavn: "Ola Nordmann", fornavn: "Ola" },
-            "01012345678": { ident: "01012345678", visningsnavn: "Lille Nordmann", fornavn: "Lille" },
+            [identBm]: { ident: identBm, visningsnavn: "Kari Nordmann", fornavn: "Kari" },
+            [identBp]: { ident: identBp, visningsnavn: "Ola Nordmann", fornavn: "Ola" },
+            [identBa]: { ident: identBa, visningsnavn: "Lille Nordmann", fornavn: "Lille" },
         })}
     >
         <ExpandedRoles saksnummerRoller={treRoller} />
@@ -53,13 +57,13 @@ export const IngenEkspandert = () => (
 export const EnRolle = () => (
     <BidragCommonsProvider
         useHentPersonData={mockUseHentPersonData({
-            "12345678910": { ident: "12345678910", visningsnavn: "Kari Nordmann", fornavn: "Kari" },
+            [identBm]: { ident: identBm, visningsnavn: "Kari Nordmann", fornavn: "Kari" },
         })}
     >
         <ExpandedRoles
             saksnummerRoller={{
                 saksnummer: "2024/1",
-                roller: [lagRolle({ id: 1, rolletype: Rolletype.BM, ident: "12345678910", navn: "Kari Nordmann" })],
+                roller: [lagRolle({ id: 1, rolletype: Rolletype.BM, ident: identBm, navn: "Kari Nordmann" })],
             }}
         />
     </BidragCommonsProvider>

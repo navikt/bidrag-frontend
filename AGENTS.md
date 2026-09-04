@@ -52,12 +52,19 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 - Bruk ALDRI appens ekte `QueryClientWrapper` uskodd i en story — komponenter
   som leser `useHentPersonData` via `BidragCommonsContext` er
   suspense-baserte og henger evig uten mock. Bruk en mocket provider per
-  story (se `apps/web/playwright/testing/CtProviders.tsx`).
-- To mock-nivåer: **context-mocking** (`CtProviders`, for kall via
+  story (se `packages/common/playwright/testing/BidragCommonsProviderMock.tsx`).
+- Felles test-utils for CT ligger i `packages/common/playwright/testing/` og
+  importeres på tvers av pakker via subpath-eksporten
+  `@bidrag/common/playwright/testing/<Fil>.<ts|tsx>` (merk: filendelse skal
+  med — eksporten mapper `./playwright/*` direkte, uten fallback).
+- To mock-nivåer: **context-mocking** (`BidragCommonsProviderMock`, for kall via
   `BidragCommonsContext`) og **nettverksmocking** (`page.route()`, for alt
   annet — f.eks. apps/web sin egen `useHentPersonData` i `~/api/useApi.ts`,
   en annen funksjon enn i `@bidrag/common`). Registrer `page.route()` FØR
   `mount()`. Se `ForelderRolleVisning.ct.spec.ts` for eksempel.
+- Bruk `genererFnr()` fra
+  `@bidrag/common/playwright/testing/fnrGenerator.ts` i stedet for å hardkode
+  fødselsnummer i stories og specs.
 - Foreløpig begrenset PoC-omfang (én story-fil per pakke) — ikke utvid uten
   at teamet har besluttet å ta mønsteret i bruk bredere.
 
