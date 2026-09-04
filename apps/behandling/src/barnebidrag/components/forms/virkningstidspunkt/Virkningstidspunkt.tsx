@@ -1310,6 +1310,8 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         });
     };
 
+    const harRevurdering = visibleControlledFields.some(({ rolle }) => rolle.erRevurdering);
+
     usePageTabs({
         items: visibleControlledFields,
         mapToTab: (rolle) => ({
@@ -1343,7 +1345,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
                     </>
                 }
             />
-            {visibleControlledFields.length > 1 && (
+            {visibleControlledFields.length > 1 && !harRevurdering && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
