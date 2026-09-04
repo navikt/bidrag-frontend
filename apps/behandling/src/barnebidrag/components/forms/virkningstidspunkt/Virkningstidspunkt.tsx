@@ -300,12 +300,12 @@ const Beregningsperiode = ({ barnIndex }: { barnIndex: number }) => {
 };
 
 const Opphør = ({
-    item,
-    barnIndex,
-    initialValues,
-    previousValues,
-    setPreviousValues,
-}: {
+                    item,
+                    barnIndex,
+                    initialValues,
+                    previousValues,
+                    setPreviousValues,
+                }: {
     item: VirkningstidspunktFormValuesPerBarn;
     barnIndex: number;
     initialValues: VirkningstidspunktFormValuesPerBarn;
@@ -649,10 +649,10 @@ const Side = () => {
 };
 
 const VirkningstidspunktBarn = ({
-    item,
-    barnIndex,
-    initialValues,
-}: {
+                                    item,
+                                    barnIndex,
+                                    initialValues,
+                                }: {
     item: VirkningstidspunktFormValuesPerBarn;
     barnIndex: number;
     initialValues: VirkningstidspunktFormValuesPerBarn;
@@ -740,7 +740,7 @@ const VirkningstidspunktBarn = ({
                                             ...barn,
                                             begrunnelse: currentBarn?.begrunnelse,
                                             begrunnelseVurderingAvSkolegang:
-                                                currentBarn?.begrunnelseVurderingAvSkolegang,
+                                            currentBarn?.begrunnelseVurderingAvSkolegang,
                                         };
                                     }),
                                 },
@@ -868,10 +868,10 @@ const VirkningstidspunktBarn = ({
     const virkningsårsaker = lesemodus
         ? årsakslisteAlle
         : er18ÅrsBidrag
-          ? årsakListe18årsBidrag
-          : selectedVirkningstidspunkt.harLøpendeBidrag
-            ? harLøpendeBidragÅrsakListe
-            : årsakListe;
+            ? årsakListe18årsBidrag
+            : selectedVirkningstidspunkt.harLøpendeBidrag
+                ? harLøpendeBidragÅrsakListe
+                : årsakListe;
 
     function renderConfirmationModal() {
         if (!confirmationModal.open) return null;
@@ -1055,15 +1055,15 @@ const VirkningstidspunktBarn = ({
                         {!lesemodus && !erTypeOpphør && (
                             <optgroup label={text.label.årsak}>
                                 {virkningsårsaker
-                                    .filter((value) => {
-                                        if (kunEtBarnIBehandlingen) return true;
-                                        return value !== TypeArsakstype.FRABARNETSFODSEL;
-                                    })
-                                    .map((value) => (
-                                        <option key={value} value={value}>
-                                            {hentVisningsnavnVedtakstype(value, vedtakstype)}
-                                        </option>
-                                    ))}
+                                .filter((value) => {
+                                    if (kunEtBarnIBehandlingen) return true;
+                                    return value !== TypeArsakstype.FRABARNETSFODSEL;
+                                })
+                                .map((value) => (
+                                    <option key={value} value={value}>
+                                        {hentVisningsnavnVedtakstype(value, vedtakstype)}
+                                    </option>
+                                ))}
                             </optgroup>
                         )}
 
@@ -1310,6 +1310,8 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         });
     };
 
+    const harRevurdering = visibleControlledFields.some(({ rolle }) => rolle.erRevurdering);
+
     usePageTabs({
         items: visibleControlledFields,
         mapToTab: (rolle) => ({
@@ -1343,7 +1345,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
                     </>
                 }
             />
-            {visibleControlledFields.length > 1 && (
+            {visibleControlledFields.length > 1 && !harRevurdering && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
