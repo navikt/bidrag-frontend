@@ -1,4 +1,10 @@
-import { type RolleDto, Stonadstype, type TypeBehandling, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
+import {
+    type ErSamvaerVirkningLikForAlleForSak,
+    type RolleDto,
+    Stonadstype,
+    type TypeBehandling,
+    Vedtakstype,
+} from "@bidrag/api/BidragBehandlingApiV1";
 import type { IRolleDetaljer, RolleTypeAbbreviation } from "@bidrag/common";
 import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
 import { Button, Heading } from "@navikt/ds-react";
@@ -116,8 +122,10 @@ interface IBehandlingContext {
     getPreviousStep: (currentStep: stepDef) => number;
     vurderSeparatSamvær?: boolean;
     setVurderSeparatSamvær?: Dispatch<SetStateAction<boolean>>;
+    setVurderSeparatSamværForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
     vurderSeparatVirkningstidspunkt?: boolean;
     setVurderSeparatVirkningstidspunkt?: Dispatch<SetStateAction<boolean>>;
+    setVurderSeparatVirkningstidspunktForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
     isGrunnlagLoading: boolean;
 }
 
@@ -159,10 +167,10 @@ export type BehandlingProviderProps = {
             interactive: boolean;
         }[];
         stepsIndex: { [key: string]: number };
-        vurderSeparatSamvær?: boolean;
-        setVurderSeparatSamvær?: Dispatch<SetStateAction<boolean>>;
-        vurderSeparatVirkningstidspunkt?: boolean;
-        setVurderSeparatVirkningstidspunkt?: Dispatch<SetStateAction<boolean>>;
+        vurderSeparatSamværPerSak?: Record<string, boolean>;
+        setVurderSeparatSamværPerSak?: Dispatch<SetStateAction<Record<string, boolean>>>;
+        vurderSeparatVirkningstidspunktPerSak?: Record<string, boolean>;
+        setVurderSeparatVirkningstidspunktPerSak?: Dispatch<SetStateAction<Record<string, boolean>>>;
     };
 };
 
@@ -174,10 +182,10 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         setPageErrorsOrUnsavedState,
         sideMenu,
         stepsIndex,
-        vurderSeparatSamvær,
-        setVurderSeparatSamvær,
-        vurderSeparatVirkningstidspunkt,
-        setVurderSeparatVirkningstidspunkt,
+        vurderSeparatSamværPerSak,
+        setVurderSeparatSamværPerSak,
+        vurderSeparatVirkningstidspunktPerSak,
+        setVurderSeparatVirkningstidspunktPerSak,
     } = props;
     const { vedtaksperre } = useFeatureToogle();
     const { behandlingId, saksnummer, vedtakId } = useParams<{
@@ -194,6 +202,83 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     const [currentTab, setCurrentTab] = useState<FloatingBottomToolbarTab>();
     const [selectedSaksnummer, setSelectedSaksnummer] = useState<string | undefined>(undefined);
     const [selectedRoller, setSelectedRoller] = useState<IRolleDetaljer[]>([]);
+
+    // `vurderSeparatSamvær` lagres per saksnummer (relevant ved forholdsmessig fordeling med flere
+    // saker). Vi utleder en boolean for valgt sak slik at konsumentene kan bruke samme API som før.
+    const vurderSeparatSamvær = useMemo(() => {
+        if (!vurderSeparatSamværPerSak) return undefined;
+        if (selectedSaksnummer && selectedSaksnummer in vurderSeparatSamværPerSak) {
+            return vurderSeparatSamværPerSak[selectedSaksnummer];
+        }
+        return Object.values(vurderSeparatSamværPerSak).some(Boolean);
+    }, [vurderSeparatSamværPerSak, selectedSaksnummer]);
+
+    const setVurderSeparatSamvær = useCallback<Dispatch<SetStateAction<boolean>>>(
+        (action) => {
+            setVurderSeparatSamværPerSak?.((prev) => {
+                const keys = selectedSaksnummer ? [selectedSaksnummer] : Object.keys(prev);
+                const next = { ...prev };
+                for (const key of keys) {
+                    const current = prev[key] ?? false;
+                    next[key] = typeof action === "function" ? action(current) : action;
+                }
+                return next;
+            });
+        },
+        [selectedSaksnummer, setVurderSeparatSamværPerSak],
+    );
+
+    const setVurderSeparatSamværForSaker = useCallback(
+        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+            setVurderSeparatSamværPerSak?.((prev) => {
+                const next = { ...prev };
+                for (const sak of saker) {
+                    next[sak.saksnummer] = !sak.erLikForAlle;
+                }
+                return next;
+            });
+        },
+        [setVurderSeparatSamværPerSak],
+    );
+
+    // Samme mønster som `vurderSeparatSamvær`: lagres per saksnummer, men eksponeres som boolean for
+    // valgt sak slik at konsumentene beholder samme API.
+    const vurderSeparatVirkningstidspunkt = useMemo(() => {
+        if (!vurderSeparatVirkningstidspunktPerSak) return undefined;
+        if (selectedSaksnummer && selectedSaksnummer in vurderSeparatVirkningstidspunktPerSak) {
+            return vurderSeparatVirkningstidspunktPerSak[selectedSaksnummer];
+        }
+        return Object.values(vurderSeparatVirkningstidspunktPerSak).some(Boolean);
+    }, [vurderSeparatVirkningstidspunktPerSak, selectedSaksnummer]);
+
+    const setVurderSeparatVirkningstidspunkt = useCallback<Dispatch<SetStateAction<boolean>>>(
+        (action) => {
+            setVurderSeparatVirkningstidspunktPerSak?.((prev) => {
+                const keys = selectedSaksnummer ? [selectedSaksnummer] : Object.keys(prev);
+                const next = { ...prev };
+                for (const key of keys) {
+                    const current = prev[key] ?? false;
+                    next[key] = typeof action === "function" ? action(current) : action;
+                }
+                return next;
+            });
+        },
+        [selectedSaksnummer, setVurderSeparatVirkningstidspunktPerSak],
+    );
+
+    const setVurderSeparatVirkningstidspunktForSaker = useCallback(
+        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+            setVurderSeparatVirkningstidspunktPerSak?.((prev) => {
+                const next = { ...prev };
+                for (const sak of saker) {
+                    next[sak.saksnummer] = !sak.erLikForAlle;
+                }
+                return next;
+            });
+        },
+        [setVurderSeparatVirkningstidspunktPerSak],
+    );
+
     const [activeStep, setActiveStepState] = useState<stepDef>(
         (searchParams.get(behandlingQueryKeys.steg) ?? defaultStep) as stepDef,
     );
@@ -591,8 +676,10 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             setCurrentTab,
             vurderSeparatSamvær,
             setVurderSeparatSamvær,
+            setVurderSeparatSamværForSaker,
             vurderSeparatVirkningstidspunkt,
             setVurderSeparatVirkningstidspunkt,
+            setVurderSeparatVirkningstidspunktForSaker,
             isGrunnlagLoading,
         }),
         [

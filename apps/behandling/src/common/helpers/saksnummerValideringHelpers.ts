@@ -69,8 +69,15 @@ export const getSaksnummerMedValideringsfeil = (behandling: BehandlingDtoV2): Se
     });
 
     behandling.underholdskostnader?.forEach((underhold) => {
-        if (harUnderholdskostnadValideringsfeil(underhold.valideringsfeil)) {
+        if (!harUnderholdskostnadValideringsfeil(underhold.valideringsfeil)) {
+            return;
+        }
+        if (underhold.gjelderBarn.medIBehandlingen) {
             leggTil(getSaksnummerForIdent(roller, underhold.gjelderBarn.ident));
+        } else {
+            // Andre barn tilhører en konkret bidragsmottaker; knytt feilen til den bidragsmottakerens sak.
+            const bidragsmottaker = roller.find((rolle) => rolle.id === underhold.gjelderBarn.bidragsmottakerId);
+            leggTil(bidragsmottaker?.saksnummer);
         }
     });
 

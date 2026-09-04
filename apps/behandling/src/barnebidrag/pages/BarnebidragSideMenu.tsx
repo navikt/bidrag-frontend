@@ -233,7 +233,9 @@ const UnderholdskostnadMenuButton = ({
             step={step}
             title={text.title.underholdskostnad}
             interactive={interactive}
-            valideringsfeil={!lesemodus && underholdskostnadHasValideringsFeil}
+            valideringsfeil={
+                !lesemodus && (underholdskostnadHasValideringsFeil || underholdskostnadAndreBarnHasValideringsFeil)
+            }
             onStepChange={() => onStepChange(STEPS[BarnebidragStepper.UNDERHOLDSKOSTNAD])}
             active={activeButton?.includes(BarnebidragStepper.UNDERHOLDSKOSTNAD)}
             loading={isGrunnlagLoading && shouldShowGrunnlagLoadingProgressbar(BarnebidragStepper.UNDERHOLDSKOSTNAD)}
