@@ -1,0 +1,55 @@
+{
+    "name": "@bidrag/redigering",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts",
+        "./routes": "./src/routes.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run --passWithNoTests"
+    },
+    "dependencies": {
+        "@bidrag/api": "workspace:*",
+        "@bidrag/common": "workspace:*",
+        "@bidrag/utils": "workspace:*",
+        "@cantoo/pdf-lib": "2.4.2",
+        "@dnd-kit/core": "^6.3.1",
+        "@dnd-kit/modifiers": "^9.0.0",
+        "@dnd-kit/utilities": "^3.2.2",
+        "@mdx-js/react": "^3.1.1",
+        "@navikt/aksel-icons": "catalog:",
+        "@navikt/ds-css": "catalog:",
+        "@navikt/ds-react": "catalog:",
+        "@navikt/ds-tailwind": "catalog:",
+        "@pdf-lib/fontkit": "^1.1.1",
+        "@theme-ui/mdx": "^0.17.1",
+        "axios": "^1.18.0",
+        "immutable": "^5.0.3",
+        "lodash": "^4.17.21",
+        "pdfjs-dist": "4.10.38",
+        "re-resizable": "6.10.3",
+        "react-zoom-pan-pinch": "3.6.1",
+        "tailwindcss": "catalog:",
+        "theme-ui": "^0.17.4",
+        "uuid": "^14"
+    },
+    "devDependencies": {
+        "@react-router/dev": "catalog:",
+        "@types/mdx": "^2.0.13",
+        "@types/node": "^25",
+        "@types/lodash": "^4.17.14",
+        "@types/uuid": "^10.0.0",
+        "jsdom": "^30.0.1",
+        "vite": "^8.0.16"
+    },
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "@unleash/proxy-client-react": "^5.0.1",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-router": "catalog:"
+    }
+}

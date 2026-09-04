@@ -1,0 +1,6 @@
+.forsendelse-page {
+    height: 100vh;
+    .navds-combobox__list--with-hover {
+        overscroll-behavior: auto;
+    }
+}

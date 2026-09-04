@@ -1,3 +1,4 @@
+import { BIDRAG_TILGANGSKONTROLL_API } from "@bidrag/api";
 import {
     type AktivereGrunnlagRequestV2,
     type AktivereGrunnlagResponseV2,
@@ -132,6 +133,7 @@ export const QueryKeys = {
         vedtakId === undefined ? null : vedtakId,
     ],
     sjekkFF: (behandlingId: string) => ["behandlingV2", "FF", QueryKeys.behandlingVersion, behandlingId],
+    sjekkTilgangSak: (saksnummer: string) => ["behandlingV2", "tilgangSak", saksnummer],
     hentSakerForIdent: (ident: string, barn: string) => ["saker", ident, barn],
     grunnlag: () => ["grunnlag", QueryKeys.behandlingVersion],
     arbeidsforhold: (behandlingId: string) => ["arbeidsforhold", behandlingId, QueryKeys.behandlingVersion],
@@ -372,6 +374,7 @@ export const useDeleteSamværsperiode = () => {
                         ...currentData,
                         samværV2: {
                             erSammeForAlle: response.erSammeForAlle,
+                            erSammeForAlleSaker: response.erSammeForAlleSaker,
                             barn: response.samværBarn.map((barn) => {
                                 const currentBegrunnelse = currentData.samværV2.barn.find(
                                     (b) => b.id === barn.id,
@@ -430,6 +433,7 @@ export const useUpdateSamvær = () => {
                         ...currentData,
                         samværV2: {
                             erSammeForAlle: response.erSammeForAlle,
+                            erSammeForAlleSaker: response.erSammeForAlleSaker,
                             barn: response.samværBarn.map((barn) => {
                                 if (input.triggeredBy.includes("begrunnelse")) {
                                     const currentBarn = currentData.samværV2.barn.find((b) => b.id === barn.id);
@@ -662,14 +666,29 @@ export const useHentRevurderingsbarn = (ident: string, stønad18År: boolean): b
             rolle.stønadstype === (stønad18År ? Stonadstype.BIDRAG18AAR : Stonadstype.BIDRAG),
     );
 };
-
+export const useHarTilgangSak = (saksnummer: string): boolean => {
+    const { data: response } = useSuspenseQuery({
+        queryKey: QueryKeys.sjekkTilgangSak(saksnummer),
+        queryFn: async () => {
+            try {
+                const response = await BIDRAG_TILGANGSKONTROLL_API.v2.sjekkTilgangSakV2({ saksnummer });
+                return response.data.harTilgang;
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
+        },
+        staleTime: Infinity,
+    });
+    return response;
+};
 export const useGetBehandlingV2 = (): BehandlingDtoV2 => {
     const { behandlingId, vedtakId } = useBehandlingProvider();
     return useBehandlingV2(behandlingId, vedtakId);
 };
 
 export const useGetForholdsmessigFordelingDetaljer = (): SjekkForholdmessigFordelingResponse => {
-    const { behandlingId } = useBehandlingProvider();
+    const { behandlingId, enhet } = useBehandlingProvider();
     const bidragFlereBarn = useFlag("behandling.behandle_bidrag_flere_barn");
     const { løpendeBidragBarn } = useGetBehandlingV2();
     const { data: response } = useSuspenseQuery({
@@ -682,7 +701,12 @@ export const useGetForholdsmessigFordelingDetaljer = (): SjekkForholdmessigForde
                         løpendeBidragBarn,
                     } as SjekkForholdmessigFordelingResponse;
                 }
-                return (await BEHANDLING_API_V1.api.kanOppretteForholdsmessigFordeling(Number(behandlingId))).data;
+                return (
+                    await BEHANDLING_API_V1.api.kanOppretteForholdsmessigFordeling(Number(behandlingId), {
+                        opprettetAvEnhet: enhet,
+                        detaljerBarn: [],
+                    })
+                ).data;
             } catch (e) {
                 console.log(e);
                 return { kanOppretteForholdsmessigFordeling: false } as SjekkForholdmessigFordelingResponse;
@@ -746,8 +770,12 @@ export const useHentPersonData = (ident?: string) =>
         queryKey: ["persons", ident],
         queryFn: async (): Promise<PersonDto> => {
             if (!ident) return { ident: "", visningsnavn: "Ukjent" };
-            const { data } = await PERSON_API.informasjon.hentPersonPost({ ident: ident });
-            return data;
+            try {
+                const { data } = await PERSON_API.informasjon.hentPersonPost({ ident: ident });
+                return data;
+            } catch (_e) {
+                return { ident: "", visningsnavn: "Ingen tilgang", diskresjonskode: "SPSF" };
+            }
         },
         staleTime: Infinity,
     });
@@ -1636,12 +1664,17 @@ export const useOppdaterManuelleVedtak = (onSuccess?: () => void) => {
 };
 
 export const useMergeVirkningstidspunkt = () => {
-    const { behandlingId } = useBehandlingProvider();
+    const { behandlingId, vedtakId, selectedSaksnummer } = useBehandlingProvider();
+    const roller = useBehandlingV2(behandlingId, vedtakId).roller;
+    const harFlereSaksnummer = new Set(roller.map((rolle) => rolle.saksnummer).filter(Boolean)).size > 1;
 
     return useMutation({
         mutationKey: MutationKeys.oppdaterBehandling(behandlingId),
         mutationFn: async (): Promise<BehandlingDtoV2> => {
-            const { data } = await BEHANDLING_API_V1.api.brukSammeVirkningstidspunktForAlleBarna(Number(behandlingId));
+            const { data } = await BEHANDLING_API_V1.api.brukSammeVirkningstidspunktForAlleBarna(
+                Number(behandlingId),
+                harFlereSaksnummer ? { saksnummer: selectedSaksnummer } : undefined,
+            );
             return data;
         },
         networkMode: "always",
@@ -1653,13 +1686,18 @@ export const useMergeVirkningstidspunkt = () => {
 };
 
 export const useMergeSamvær = () => {
-    const { behandlingId } = useBehandlingProvider();
+    const { behandlingId, vedtakId, selectedSaksnummer } = useBehandlingProvider();
     const queryClient = useQueryClient();
+    const roller = useBehandlingV2(behandlingId, vedtakId).roller;
+    const harFlereSaksnummer = new Set(roller.map((rolle) => rolle.saksnummer).filter(Boolean)).size > 1;
 
     return useMutation({
         mutationKey: MutationKeys.oppdaterBehandling(behandlingId),
         mutationFn: async (): Promise<BehandlingDtoV2> => {
-            const { data } = await BEHANDLING_API_V1.api.brukSammeSamvaerForAlleBarna(Number(behandlingId));
+            const { data } = await BEHANDLING_API_V1.api.brukSammeSamvaerForAlleBarna(
+                Number(behandlingId),
+                harFlereSaksnummer ? { saksnummer: selectedSaksnummer } : undefined,
+            );
             return data;
         },
         onSuccess: (response) => {

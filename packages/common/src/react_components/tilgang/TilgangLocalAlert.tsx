@@ -1,0 +1,35 @@
+import type { TilgangskontrollResponse } from "@bidrag/api/TilgangskontrollApi";
+import { List, LocalAlert } from "@navikt/ds-react";
+import type { ComponentProps } from "react";
+
+export type PartialAlertProps = Partial<Omit<ComponentProps<typeof LocalAlert>, "children">>;
+
+type TilgangAlertProps = PartialAlertProps & {
+    title: string;
+    tilgangResultat?: TilgangskontrollResponse;
+};
+
+export function TilgangLocalAlert({
+    tilgangResultat,
+    title,
+    status = "warning",
+    size = "small",
+    ...rest
+}: TilgangAlertProps) {
+    return (
+        <LocalAlert status={status} size={size} {...rest}>
+            <LocalAlert.Header>
+                <LocalAlert.Title>{title}</LocalAlert.Title>
+            </LocalAlert.Header>
+            <LocalAlert.Content>
+                <List>
+                    {tilgangResultat?.detaljer
+                        .filter((detalj) => !detalj.harTilgang)
+                        .map((detalj) => (
+                            <List.Item key={detalj.begrunnelse}>{detalj.begrunnelse}</List.Item>
+                        ))}
+                </List>
+            </LocalAlert.Content>
+        </LocalAlert>
+    );
+}

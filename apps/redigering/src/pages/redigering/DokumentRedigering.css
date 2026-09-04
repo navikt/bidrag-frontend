@@ -1,0 +1,40 @@
+:root {
+    --editor-height: calc(100vh - 90px);
+    --editor-background-color: var(--ax-bg-default);
+}
+
+.page_decorator.deleted .page {
+    height: 0 !important;
+    margin-bottom: 0;
+    overflow: hidden;
+}
+
+.page_decorator .deleted .maskingitem {
+    display: none;
+}
+
+.page_decorator.deleted .maskingitem {
+    display: none;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.dokumentredigering .editor .pdfviewer_container .pdfrenderer_container {
+    background-color: var(--editor-background-color);
+}
+
+.dokumentredigering .editor .pdfviewer .pdfrenderer_container {
+    height: var(--editor-height);
+    padding-top: 10px;
+}
+
+.dokumentredigering .editor {
+    display: flex;
+    flex-direction: column;
+}
+.navds-skeleton {
+    background-color: var(--ax-neutral-600);
+}

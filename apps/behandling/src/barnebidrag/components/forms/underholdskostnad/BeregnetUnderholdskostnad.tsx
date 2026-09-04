@@ -40,7 +40,7 @@ export const BeregnetUnderholdskostnad = ({
                 </Heading>
             </HStack>
             <div className="overflow-x-auto whitespace-nowrap">
-                <Table size="small" className="table-fixed table bg-[white] w-fit">
+                <Table size="small" className="table-fixed table bg-[white] w-fit text-wrap">
                     <Table.Header>
                         <Table.Row className="align-baseline">
                             <Table.HeaderCell textSize="small" scope="col" className="w-[124px]">

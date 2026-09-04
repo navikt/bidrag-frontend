@@ -57,7 +57,7 @@ function BisysFallbackLink() {
             linkLabel = "Tilbake til oppgaveliste";
             break;
         default:
-            linkLabel = "Tilbake til bisys";
+            linkLabel = "Tilbake til oppgaveliste";
     }
 
     return (

@@ -59,9 +59,17 @@ const APIS: Record<string, ApiConfig> = {
         url: env.KODEVERK_URL,
         audience: env.KODEVERK_URL_AUDIENCE,
     },
+    foerstesidegenerator: {
+        url: env.FOERSTESIDEGENERATOR_URL,
+        audience: env.FOERSTESIDEGENERATOR_AUDIENCE,
+    },
     "bidrag-dokument-produksjon": {
         url: env.BIDRAG_DOKUMENT_PRODUKSJON_URL,
         audience: env.BIDRAG_DOKUMENT_PRODUKSJON_AUDIENCE,
+    },
+    "bidrag-dokument-arkiv": {
+        url: env.BIDRAG_DOKUMENT_ARKIV_URL,
+        audience: env.BIDRAG_DOKUMENT_ARKIV_AUDIENCE,
     },
 };
 

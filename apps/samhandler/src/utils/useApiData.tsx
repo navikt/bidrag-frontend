@@ -1,4 +1,4 @@
-import { BIDRAG_SAK_API, BIDRAG_SAMHANDLER_API, KODEVERK_API } from "@bidrag/api";
+import { BIDRAG_KODEVERK_API, BIDRAG_SAK_API, BIDRAG_SAMHANDLER_API } from "@bidrag/api";
 import type { SamhandlerSakerDto } from "@bidrag/api/SakApi";
 import type { SamhandlerDto, SamhandlerSok, SamhandlersokeresultatDto } from "@bidrag/api/SamhandlerApi";
 import { LoggerService } from "@bidrag/common";
@@ -95,7 +95,7 @@ export const useHentLandkoder = () => {
     const { data: landkoder } = useSuspenseQuery({
         queryKey: ["landkoder"],
         queryFn: async () => {
-            return await KODEVERK_API.kodeverk.hentKodeverk("Landkoder").then((response) => {
+            return await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("Landkoder").then((response) => {
                 const responseData = Object.keys(response.data.betydninger).filter(
                     (d) => !["???", "9999", "XUK"].includes(d),
                 );

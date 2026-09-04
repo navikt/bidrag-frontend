@@ -1,0 +1,58 @@
+import { CheckmarkCircleFillIcon, XMarkOctagonIcon } from "@navikt/aksel-icons";
+import { Heading, Loader } from "@navikt/ds-react";
+import type { CSSProperties } from "react";
+
+import { usePdfEditorContext } from "../PdfEditorContext";
+export default function DocumentStateIndicator() {
+    const { produceAndSaveProgress, hasUnsavedChanges } = usePdfEditorContext();
+
+    const getStyle = (): CSSProperties => ({
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        alignSelf: "center",
+        gap: "5px",
+    });
+
+    function renderSaveState() {
+        if (produceAndSaveProgress.state === "SAVING_METADATA") {
+            return (
+                <>
+                    <Loader title={"Lagrer..."} size={"xsmall"} variant="inverted" />
+                    <Heading size={"xsmall"}>Lagrer...</Heading>
+                </>
+            );
+        }
+
+        if (produceAndSaveProgress.state === "ERROR") {
+            return (
+                <>
+                    <XMarkOctagonIcon color="white" />
+                    <Heading size={"xsmall"}>Lagring feilet :/</Heading>
+                </>
+            );
+        }
+
+        if (hasUnsavedChanges) {
+            return (
+                <>
+                    <XMarkOctagonIcon color="white" />
+                    <Heading size={"xsmall"}>Ikke lagret</Heading>
+                </>
+            );
+        }
+
+        return (
+            <>
+                <CheckmarkCircleFillIcon color="white" />
+                <Heading size={"xsmall"}>Lagret</Heading>{" "}
+            </>
+        );
+    }
+
+    return (
+        <div style={getStyle()} className={"save-state-indicator"}>
+            {renderSaveState()}
+        </div>
+    );
+}

@@ -17,17 +17,18 @@
         "@navikt/aksel-icons": "catalog:",
         "@navikt/ds-css": "catalog:",
         "@navikt/ds-react": "catalog:",
-        "@tanstack/react-query": "catalog:",
         "api": "^6.1.3",
-        "axios": "^1.18.0",
+        "axios": "catalog:",
         "echarts": "^6.1",
         "lodash.debounce": "^4.0.8",
         "uuid": "^14",
-        "zod": "catalog:"
-    },
-    "peerDependencies": {
+        "zod": "catalog:",
+        "@tanstack/react-query": "catalog:",
         "@bidrag/api": "workspace:",
         "react-router": "catalog:"
+    },
+    "peerDependencies": {
+        "react": "catalog:"
     },
     "devDependencies": {
         "@opentelemetry/api": "^1.9.1",

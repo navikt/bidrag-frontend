@@ -1,7 +1,8 @@
 import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
-import { DokumentStatusDto as DokumentStatus, JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
+import { JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
+import { DokumentStatusDto } from "@bidrag/api/BidragForsendelseApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
-import { useBisysLink } from "@bidrag/common";
+import { AapneDokumentKnapp, useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
 import {
     ArrowCirclepathIcon,
@@ -168,14 +169,6 @@ export default function JournalpostTabell({
             ...(sessionState && { sessionState }),
         });
 
-    const åpneDokumentHref = (jp: JournalpostDto): string | undefined => {
-        if (!jp.journalpostId) return undefined;
-        const journalpostId = jp.journalpostId;
-        if (jp.status === JournalpostStatus.UNDER_PRODUKSJON) return undefined;
-        const hoveddokRef = jp.dokumenter?.[0]?.dokumentreferanse;
-        return hoveddokRef ? `/dokument/${journalpostId}/${hoveddokRef}` : undefined;
-    };
-
     const sakRoller = (sak?.roller ?? []) as RolleDto[];
 
     const toggleExpandedRad = (id: string) => {
@@ -187,52 +180,60 @@ export default function JournalpostTabell({
     const beskrivelseCelle = (rad: JournalpostRad) => {
         if (rad.erVedlegg && rad.dok) {
             const dok = rad.dok;
-            const kanÅpnes = Boolean(
-                dok.status === DokumentStatus.FERDIGSTILT && dok.dokumentreferanse && rad.jp.journalpostId,
-            );
+            const journalpostId = rad.jp.journalpostId;
+            const tekst = dok.tittel ?? dok.dokumentreferanse ?? "";
+
+            if (!journalpostId || !dok.dokumentreferanse) {
+                return (
+                    <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
+                        <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
+                        <span className="min-w-0 truncate">{dok.tittel ?? "-"}</span>
+                    </HStack>
+                );
+            }
 
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
-                    {kanÅpnes ? (
-                        <Link
-                            className="min-w-0 truncate"
-                            target="_blank"
-                            title={dok.tittel ?? dok.dokumentreferanse ?? ""}
-                            href={`/dokument/${rad.jp.journalpostId}/${dok.dokumentreferanse}?dok=${dok.dokumentreferanse}`}
-                        >
-                            {dok.tittel ?? dok.dokumentreferanse}
-                        </Link>
-                    ) : (
-                        <span className="min-w-0 truncate">{dok.tittel ?? "-"}</span>
-                    )}
+                    <AapneDokumentKnapp
+                        journalpostId={journalpostId}
+                        dokumentreferanse={dok.dokumentreferanse}
+                        status={dok.status ?? undefined}
+                        className="min-w-0 truncate"
+                        tittel={tekst}
+                    >
+                        {tekst}
+                    </AapneDokumentKnapp>
                 </HStack>
             );
         }
 
         const antall = rad.jp.dokumenter?.length ?? 0;
         const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
-        const href = åpneDokumentHref(rad.jp);
+        const journalpostId = rad.jp.journalpostId;
+        const hoveddokRef = rad.jp.dokumenter?.[0]?.dokumentreferanse;
+        const erUnderProduksjon = rad.jp.dokumenter?.[0]?.status === DokumentStatusDto.UNDER_PRODUKSJON;
 
-        if (href) {
+        if (journalpostId && hoveddokRef) {
+            const status = erUnderProduksjon ? DokumentStatusDto.UNDER_PRODUKSJON : DokumentStatusDto.FERDIGSTILT;
             return (
-                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(720), minWidth: 0 }}>
+                <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
-                    <Link
+                    <AapneDokumentKnapp
+                        journalpostId={journalpostId}
+                        dokumentreferanse={hoveddokRef}
+                        status={status}
                         className="min-w-0 truncate"
-                        target="_blank"
-                        href={href}
-                        title={tekst}
-                        aria-label="Åpne dokument"
+                        tittel={tekst}
                     >
                         {tekst}
-                    </Link>
+                    </AapneDokumentKnapp>
                 </HStack>
             );
         }
 
         return (
-            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(720), display: "inline-block" }}>
+            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(390), display: "inline-block" }}>
                 {tekst}
             </span>
         );
@@ -344,7 +345,7 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { resizable: false, autoResizeOnce: true, value: scaledPx(500) },
+            width: { resizable: false, autoResizeOnce: true, value: scaledPx(419) },
             bodyCell: beskrivelseCelle,
         },
     ];
@@ -445,6 +446,7 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
+                    className="[&_tbody_tr:has(td:first-child_button)]:cursor-pointer"
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
                     //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}

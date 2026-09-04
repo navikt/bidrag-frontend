@@ -1,0 +1,13 @@
+.copy-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+}
+.copy-button:hover {
+    cursor: pointer;
+}
+.copy-to-clipboard.popover {
+    z-index: 1000000;
+}

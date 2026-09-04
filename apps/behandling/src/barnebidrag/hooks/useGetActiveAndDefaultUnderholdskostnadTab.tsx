@@ -35,7 +35,7 @@ export const useGetActiveAndDefaultUnderholdskostnadTab = (visibleUnderholdskost
         return toUnderholdskostnadTabQueryParameter(firstTab?.gjelderBarn?.id, firstTab?.id, true);
     }, [selectedTab, visibleTabs]);
 
-    const activeTab = selectedTab ?? defaultTab;
+    const activeTab = defaultTab;
 
     return [activeTab, defaultTab];
 };

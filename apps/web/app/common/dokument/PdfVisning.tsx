@@ -6,7 +6,6 @@ import { toPdfSource } from "~/common/components/utils/pdfUtils";
 export interface PdfDokument {
     journalpostId?: string;
     dokumentreferanse?: string;
-    dokumentFormat?: string;
     tittel: string;
     kanÅpnes: boolean;
     åpenForklaring?: string;
@@ -24,12 +23,7 @@ export function PdfVisning({ dokument, lasterMetadata = false }: PdfVisningProps
         data: cachedResponse,
         isFetching,
         error,
-    } = useHentSaksdokumentPdf(
-        dokument?.journalpostId,
-        dokument?.dokumentreferanse,
-        dokument?.dokumentFormat,
-        kanHente,
-    );
+    } = useHentSaksdokumentPdf(dokument?.journalpostId, dokument?.dokumentreferanse, kanHente);
 
     const pdfSource = useMemo(() => {
         if (!cachedResponse) return null;

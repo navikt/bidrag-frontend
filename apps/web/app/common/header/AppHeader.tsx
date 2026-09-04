@@ -4,6 +4,7 @@ import { ActionMenu, InternalHeader, Spacer } from "@navikt/ds-react";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import { AppSwitcher } from "~/common/header/AppSwitcher.tsx";
 import BisysHeaderLink from "~/common/header/BisysHeaderLink.tsx";
+import { BrukerOgSakSok } from "~/common/header/BrukerOgSakSok.tsx";
 import type { NavUser } from "~/common/NavUser.ts";
 
 interface AppHeaderProps {
@@ -15,6 +16,7 @@ export function AppHeader({ bruker, bisysUrl }: AppHeaderProps) {
     return (
         <InternalHeader>
             <InternalHeader.Title href="/">Bidrag</InternalHeader.Title>
+            <BrukerOgSakSok />
             <Spacer />
             <BisysHeaderLink />
             <AppSwitcher bisysUrl={bisysUrl} />

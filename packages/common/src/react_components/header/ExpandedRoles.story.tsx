@@ -1,8 +1,8 @@
 import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
-import { BidragCommonsProvider } from "../../api/BidragCommonsContext";
 import { genererFnr } from "../../../playwright/testing/fnrGenerator.ts";
 import { mockUseHentPersonData } from "../../../playwright/testing/mockPersonData.ts";
+import { BidragCommonsProvider } from "../../api/BidragCommonsContext";
 import { ExpandedRoles, type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 const identBm = genererFnr();

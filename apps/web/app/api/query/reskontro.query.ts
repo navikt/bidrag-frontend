@@ -1,7 +1,6 @@
 import { BIDRAG_RESKONTRO_API } from "@bidrag/api";
-import { SecureLoggerService } from "@bidrag/common";
+import { SecureLoggerService, withQueryErrorHandling, withQueryErrorHandlingV2 } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
-import { withQueryErrorHandling, withQueryErrorHandlingV2 } from "./withQueryErrorHandling.ts";
 
 export function hentReskontroTransaksjonerForBruker(ident: string) {
     return queryOptions({
@@ -47,12 +46,61 @@ export function hentInnkrevingForSaksnummer(saksnummer: string) {
     return queryOptions({
         queryKey: ["hentInnkrevingForSaksnummer", saksnummer],
         queryFn: () =>
-            withQueryErrorHandling("hentInnkrevingForSaksnummer", async () => {
+            withQueryErrorHandlingV2("hentInnkrevingForSaksnummer", async () => {
                 const { data } = await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaBidragssak({
                     saksnummer: saksnummer,
                 });
                 return data;
             }),
+        staleTime: Infinity,
+    });
+}
+
+export function hentInnkrevingssakPaPerson(ident: string) {
+    return queryOptions({
+        queryKey: ["hentInnkrevingssakPaPerson", ident],
+        queryFn: () =>
+            withQueryErrorHandlingV2(
+                "hentInnkrevingssakPaPerson",
+                async () => {
+                    const { data } = await BIDRAG_RESKONTRO_API.innkrevningssak.hentInnkrevingssakPaPerson({
+                        ident: ident,
+                    });
+                    return data;
+                },
+                {
+                    notFoundValue: { bidragssaker: [] },
+                },
+            ),
+
+        staleTime: Infinity,
+    });
+}
+
+export function hentInnkrevingsinformasjonPaPerson(ident: string) {
+    return queryOptions({
+        queryKey: ["hentInnkrevingsinformasjonPaPerson", ident],
+        queryFn: () =>
+            withQueryErrorHandlingV2(
+                "hentInnkrevingsinformasjonPaPerson",
+                async () => {
+                    const { data } =
+                        await BIDRAG_RESKONTRO_API.innkrevingsinformasjon.hentInformasjonOmInnkrevingssaken({
+                            ident: ident,
+                        });
+                    return data;
+                },
+                {
+                    notFoundValue: {
+                        skyldnerinformasjon: null,
+                        gjeldendeBetalingsordning: null,
+                        nyBetalingsordning: null,
+                        innkrevingssakshistorikk: [],
+                    },
+                },
+            ),
+        enabled: !!ident,
+        staleTime: Infinity,
     });
 }
 

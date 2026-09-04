@@ -1,0 +1,15 @@
+.AvvikshandteringMainMenu ul {
+    list-style: none;
+}
+.AvvikshandteringMainMenu ul li {
+    display: inline-block;
+    margin-right: 1rem;
+    width: 22rem;
+}
+.AvvikshandteringMainMenu ul li .AvvikshandteringMenuEntry__content {
+    display: flex;
+    align-items: center;
+}
+.AvvikshandteringMainMenu ul li .AvvikshandteringMenuEntry__content .typo-systemtittel {
+    margin-left: 1rem;
+}

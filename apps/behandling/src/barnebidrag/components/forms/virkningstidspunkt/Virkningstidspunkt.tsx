@@ -321,7 +321,7 @@ const Opphør = ({
         setSaveErrorState,
         lesemodus,
         vurderSeparatVirkningstidspunkt: vurderSeparat,
-        setVurderSeparatSamvær,
+        setVurderSeparatSamværForSaker,
     } = useBehandlingProvider();
     const oppdaterOpphørsdato = useOnUpdateOpphørsdato();
     const { getValues, reset, setValue } = useFormContext();
@@ -379,7 +379,7 @@ const Opphør = ({
                             },
                         };
                     });
-                    setVurderSeparatSamvær(!response.samværV2.erSammeForAlle);
+                    setVurderSeparatSamværForSaker(response.samværV2.erSammeForAlleSaker);
 
                     const updatedValues = createInitialValues(
                         response.virkningstidspunktV3,
@@ -510,8 +510,9 @@ const Opphør = ({
 };
 
 const Side = () => {
-    const { onStepChange, getNextStep, vurderSeparatVirkningstidspunkt } = useBehandlingProvider();
-    const { erBisysVedtak, virkningstidspunktV3: virkningstidspunkt, vedtakstype } = useGetBehandlingV2();
+    const { onStepChange, getNextStep, vurderSeparatVirkningstidspunkt, selectedSaksnummer } = useBehandlingProvider();
+    const { erBisysVedtak, virkningstidspunktV3: virkningstidspunkt, vedtakstype, roller } = useGetBehandlingV2();
+    const harFlereSaksnummer = new Set(roller.map((rolle) => rolle.saksnummer).filter(Boolean)).size > 1;
     const saveBegrunnelseMutation = useOnSaveVirkningstidspunktBegrunnelse();
     const { getValues, watch, setError, clearErrors } = useFormContext<VirkningstidspunktFormValues>();
     const [activeTab] = useGetActiveAndDefaultVirkningstidspunktTab();
@@ -534,6 +535,7 @@ const Side = () => {
     const createBegrunnelsePayload = (currentValues: VirkningstidspunktFormValuesPerBarn) => {
         let payload: OppdatereVirkningstidspunktBegrunnelseDto = {
             rolleId: vurderSeparatVirkningstidspunkt ? currentValues.rolle.id : undefined,
+            saksnummer: harFlereSaksnummer ? selectedSaksnummer : undefined,
             oppdatereBegrunnelse: {
                 nyBegrunnelse: currentValues.begrunnelse,
                 rolleid: currentValues.rolle.id,
@@ -659,7 +661,8 @@ const VirkningstidspunktBarn = ({
         lesemodus,
         setSaveErrorState,
         setVurderSeparatVirkningstidspunkt: setVurderSeparat,
-        setVurderSeparatSamvær,
+        setVurderSeparatVirkningstidspunktForSaker,
+        setVurderSeparatSamværForSaker,
         vurderSeparatVirkningstidspunkt: vurderSeparat,
     } = useBehandlingProvider();
     const behandling = useGetBehandlingV2();
@@ -720,8 +723,10 @@ const VirkningstidspunktBarn = ({
                     onSuccess: (response) => {
                         refreshFF();
                         oppdaterBehandling.queryClientUpdater((currentData) => {
-                            setVurderSeparat(!response.virkningstidspunktV3.erLikForAlle);
-                            setVurderSeparatSamvær(!response.samværV2.erSammeForAlle);
+                            setVurderSeparatVirkningstidspunktForSaker(
+                                response.virkningstidspunktV3.erLikForAlleBasertPåSak,
+                            );
+                            setVurderSeparatSamværForSaker(response.samværV2.erSammeForAlleSaker);
                             return {
                                 ...currentData,
                                 ...response,
@@ -772,7 +777,7 @@ const VirkningstidspunktBarn = ({
         [
             oppdaterBehandling,
             setVurderSeparat,
-            setVurderSeparatSamvær,
+            setVurderSeparatSamværForSaker,
             previousValues,
             setPreviousValues,
             reset,
@@ -1065,21 +1070,24 @@ const VirkningstidspunktBarn = ({
                         {renderAvslagsgrunner()}
                     </FormControlledSelectField>
                 )}
-                {!avvisningsListeOpphør.includes(selectedVirkningstidspunkt.avslag) &&
-                    selectedVirkningstidspunkt.kanEndreVirkningstidspunkt !== false && (
-                        <HStack gap={"space-2"}>
-                            <FormControlledMonthPicker
-                                name={`roller.${barnIndex}.virkningstidspunkt`}
-                                label={text.label.virkningstidspunkt}
-                                placeholder="DD.MM.ÅÅÅÅ"
-                                defaultValue={initialValues.virkningstidspunkt}
-                                fromDate={fom}
-                                toDate={tom}
-                                readonly={lesemodus || vedtakstype === Vedtakstype.ALDERSJUSTERING}
-                                required
-                            />
-                        </HStack>
-                    )}
+                {!avvisningsListeOpphør.includes(selectedVirkningstidspunkt.avslag) && (
+                    <HStack gap={"space-2"}>
+                        <FormControlledMonthPicker
+                            name={`roller.${barnIndex}.virkningstidspunkt`}
+                            label={text.label.virkningstidspunkt}
+                            placeholder="DD.MM.ÅÅÅÅ"
+                            defaultValue={initialValues.virkningstidspunkt}
+                            fromDate={fom}
+                            toDate={tom}
+                            readonly={
+                                lesemodus ||
+                                vedtakstype === Vedtakstype.ALDERSJUSTERING ||
+                                selectedVirkningstidspunkt.kanEndreVirkningstidspunkt === false
+                            }
+                            required
+                        />
+                    </HStack>
+                )}
             </FlexRow>
 
             {showChangedVirkningsDatoAlert && !erInnkreving && (
@@ -1241,11 +1249,12 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         lesemodus,
         vurderSeparatVirkningstidspunkt: vurderSeparat,
         setVurderSeparatVirkningstidspunkt: setVurderSeparat,
-        setVurderSeparatSamvær,
+        setVurderSeparatVirkningstidspunktForSaker,
+        setVurderSeparatSamværForSaker,
         selectedRoller,
     } = useBehandlingProvider();
     const [searchParams] = useSearchParams();
-    const { virkningstidspunktV3: virkningstidspunkt, forholdsmessigFordeling } = useGetBehandlingV2();
+    const { virkningstidspunktV3: virkningstidspunkt, forholdsmessigFordeling, søktFomDato } = useGetBehandlingV2();
     const mergeVirkningstidspunkterMutation = useOnMergeVirkningtidspunkt();
     const ref = useRef<HTMLDialogElement>(null);
     const roller = useFieldArray({
@@ -1273,18 +1282,21 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
     }, [controlledFields, selectedRoller]);
 
     const defaultTab = useMemo(() => {
-        const barnId = visibleControlledFields
-            .find(({ rolle }) => rolle.id?.toString() === searchParams.get(urlSearchParams.tab))
-            ?.rolle?.id?.toString();
-        return barnId ?? visibleControlledFields[0].rolle.id?.toString();
-    }, [searchParams, visibleControlledFields]);
-    const selectedTab = searchParams.get(urlSearchParams.tab)?.toString() ?? defaultTab?.toString();
+        return visibleControlledFields[0].rolle.id?.toString();
+    }, [visibleControlledFields]);
+
+    // Fall tilbake til første barn hvis ingen er valgt, eller hvis tab-verdien i URL-en peker
+    // på et barn som ikke lenger er synlig (f.eks. etter bytte av sak i `SakHeader`).
+    const selectedTabParam = searchParams.get(urlSearchParams.tab)?.toString();
+    const selectedTab = visibleControlledFields.some(({ rolle }) => rolle.id?.toString() === selectedTabParam)
+        ? selectedTabParam
+        : defaultTab?.toString();
 
     const onChangeVurderSeparat = () => {
         mergeVirkningstidspunkterMutation.mutation.mutate(undefined, {
             onSuccess: (response) => {
-                setVurderSeparat(!response.virkningstidspunktV3.erLikForAlle);
-                setVurderSeparatSamvær(!response.samværV2.erSammeForAlle);
+                setVurderSeparatVirkningstidspunktForSaker(response.virkningstidspunktV3.erLikForAlleBasertPåSak);
+                setVurderSeparatSamværForSaker(response.samværV2.erSammeForAlleSaker);
                 mergeVirkningstidspunkterMutation.queryClientUpdater((_) => response);
                 reset(createInitialValues(response.virkningstidspunktV3, response.stønadstype, response.vedtakstype));
             },
@@ -1300,6 +1312,13 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
             },
         });
     };
+
+    const harUlikSøktFraDato =
+        new Set(
+            visibleControlledFields.map(
+                ({ rolle }) => virkningstidspunkt.barn.find((barn) => barn.rolle.id === rolle.id)?.søktFomDato,
+            ),
+        ).size > 1;
 
     usePageTabs({
         items: visibleControlledFields,
@@ -1334,7 +1353,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
                     </>
                 }
             />
-            {virkningstidspunkt.barn.length > 1 && !forholdsmessigFordeling && (
+            {visibleControlledFields.length > 1 && !harUlikSøktFraDato && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}

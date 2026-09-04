@@ -68,10 +68,36 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
         inntekt: { error: false },
         privatAvtale: { error: false },
     });
-    const [vurderSeparatSamvær, setVurderSeparatSamvær] = useState<boolean>(!behandling.samværV2?.erSammeForAlle);
-    const [vurderSeparatVirkningstidspunkt, setVurderSeparatVirkningstidspunkt] = useState<boolean>(
-        !behandling.virkningstidspunktV3.erLikForAlle,
-    );
+    const [vurderSeparatSamværPerSak, setVurderSeparatSamværPerSak] = useState<Record<string, boolean>>(() => {
+        const perSak = behandling.samværV2?.erSammeForAlleSaker ?? [];
+        const barn = behandling.samværV2?.barn ?? [];
+        const saksnummerListe = new Set([
+            ...perSak.map((sak) => sak.saksnummer),
+            ...barn.map((b) => b.barn.saksnummer),
+        ]);
+        const result: Record<string, boolean> = {};
+        for (const saksnummer of saksnummerListe) {
+            const sak = perSak.find((s) => s.saksnummer === saksnummer);
+            result[saksnummer] = sak ? !sak.erLikForAlle : !behandling.samværV2?.erSammeForAlle;
+        }
+        return result;
+    });
+    const [vurderSeparatVirkningstidspunktPerSak, setVurderSeparatVirkningstidspunktPerSak] = useState<
+        Record<string, boolean>
+    >(() => {
+        const perSak = behandling.virkningstidspunktV3?.erLikForAlleBasertPåSak ?? [];
+        const barn = behandling.virkningstidspunktV3?.barn ?? [];
+        const saksnummerListe = new Set([
+            ...perSak.map((sak) => sak.saksnummer),
+            ...barn.map((b) => b.rolle.saksnummer),
+        ]);
+        const result: Record<string, boolean> = {};
+        for (const saksnummer of saksnummerListe) {
+            const sak = perSak.find((s) => s.saksnummer === saksnummer);
+            result[saksnummer] = sak ? !sak.erLikForAlle : !behandling.virkningstidspunktV3?.erLikForAlle;
+        }
+        return result;
+    });
     const formSteps = { defaultStep: BarnebidragStepper.VIRKNINGSTIDSPUNKT, steps: BarnebidragSteps };
 
     const erAvvist = behandling.lesemodus?.erAvvist || false;
@@ -196,10 +222,10 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
             setPageErrorsOrUnsavedState,
             sideMenu,
             stepsIndex: STEPS,
-            vurderSeparatSamvær,
-            setVurderSeparatSamvær,
-            vurderSeparatVirkningstidspunkt,
-            setVurderSeparatVirkningstidspunkt,
+            vurderSeparatSamværPerSak,
+            setVurderSeparatSamværPerSak,
+            vurderSeparatVirkningstidspunktPerSak,
+            setVurderSeparatVirkningstidspunktPerSak,
         }),
         [
             JSON.stringify(pageErrorsOrUnsavedState),
@@ -211,8 +237,8 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
             behandling.lesemodus?.opprettetAvBatch,
             behandling.lesemodus?.erAvvist,
             behandling.erBisysVedtak,
-            vurderSeparatSamvær,
-            vurderSeparatVirkningstidspunkt,
+            vurderSeparatSamværPerSak,
+            vurderSeparatVirkningstidspunktPerSak,
         ],
     );
 

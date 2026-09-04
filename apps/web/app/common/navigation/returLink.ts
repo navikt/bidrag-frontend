@@ -49,11 +49,17 @@ const bisysSakshistorikkDestinasjon = (saksnummer: string): ReturDestinasjon => 
     params: { saksnr: saksnummer },
 });
 
+/** Sakshistorikk-siden i denne appen (ikke Bisys). */
+const sakshistorikkAppDestinasjon = (saksnummer: string): ReturDestinasjon => ({
+    sti: sakSti(saksnummer, "sakshistorikk"),
+});
+
 /**
  * Brukeroversikten finnes bare i Bisys, og henter selv opp brukeren fra sesjonen,
  * så den trenger ingen parametere utover `sessionState`.
  */
 const bisysBrukeroversiktDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/brukeroversikt" });
+const bisysOppgavelisteDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/oppgaveliste" });
 
 /**
  * Ruteparametere leses fra stien fordi headeren ligger utenfor rutekonteksten til sidene.
@@ -124,8 +130,11 @@ interface StandardReturMål {
     /** Bygger stien til en underside, brukt for å kjenne igjen hvor vi står. */
     undersideSti: (id: string, side: string) => string;
     /** Lenken tilbake til foreldresiden. */
-    destinasjon: (id: string) => ReturDestinasjon;
+    destinasjon: (id: string, searchParams: URLSearchParams) => ReturDestinasjon;
 }
+
+/** Query-verdien i `?from=` som ber oss rute tilbake til Bisys i stedet for i denne appen. */
+const BISYS_RETUR_VERDI = "bisys";
 
 /**
  * Foreldresider undersider faller tilbake til når `?from=` mangler.
@@ -135,39 +144,66 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
     {
         label: "Sak",
         id: ({ saksnummer }) => saksnummer,
-        undersider: ["fogdhistorikk", "belopshistorikk", "reskontro", "sakshistorikk"],
+        undersider: ["", "fogdhistorikk", "belopshistorikk", "reskontro", "sakshistorikk"],
         undersideSti: sakSti,
         destinasjon: bisysSakDestinasjon,
     },
     {
         label: "Sakshistorikk",
         id: ({ saksnummer }) => saksnummer,
-        undersider: ["behandling", "vedtak"],
+        undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journalpost", "journal"],
         undersideSti: sakSti,
-        destinasjon: bisysSakshistorikkDestinasjon,
+        destinasjon: (saksnummer, searchParams) =>
+            searchParams.get(RETUR_PARAM) === BISYS_RETUR_VERDI
+                ? bisysSakshistorikkDestinasjon(saksnummer)
+                : sakshistorikkAppDestinasjon(saksnummer),
     },
+
     {
         label: "Brukeroversikt",
         id: ({ brukerid }) => brukerid,
-        undersider: ["reskontro"],
+        undersider: ["", "reskontro", "sumprsak", "innkreving"],
         undersideSti: brukerSti,
         destinasjon: bisysBrukeroversiktDestinasjon,
+    },
+    {
+        // Journal/journalpost utenfor sakskontekst (`/journal/:id`, `/journalpost/:id`)
+        // har ingen sak- eller bruker-id i stien, så stien bygges direkte fra siden.
+        // Journalpost i sakskontekst er allerede fanget opp av Sakshistorikk over,
+        // og journalvisning i sakskontekst av regelen over.
+        label: "Oppgaveliste",
+        id: () => "journal",
+        undersider: ["journal", "journalpost"],
+        undersideSti: (_id, side) => `/${side}`,
+        destinasjon: bisysOppgavelisteDestinasjon,
     },
 ];
 
 /** Finner foreldresiden til gjeldende sti, eller null når ingen standardmål passer. */
-function finnStandardReturMål(
+export function finnStandardReturMål(
     pathname: string,
     kontekst: ReturKontekst,
+    searchParams: URLSearchParams = new URLSearchParams(),
 ): (ReturDestinasjon & { label: string }) | null {
     for (const mål of STANDARD_RETUR_MÅL) {
         const id = mål.id(kontekst);
         if (!id) continue;
 
-        const erTreff = mål.undersider.some((side) => erSammeEllerUnder(pathname, mål.undersideSti(id, side)));
-        if (erTreff) return { label: mål.label, ...mål.destinasjon(id) };
+        const erTreff = mål.undersider.some((side) => erUnderside(pathname, mål.undersideSti(id, side), side));
+        if (erTreff) return { label: mål.label, ...mål.destinasjon(id, searchParams) };
     }
     return null;
+}
+
+/**
+ * Sjekker om `pathname` treffer denne undersiden. Indekssiden (`""`) skal bare
+ * matche eksakt — ellers ville den "stjålet" treff fra andre foreldresiders
+ * mer spesifikke undersider (f.eks. /sak/123/behandling ville matchet "Sak"
+ * i stedet for "Sakshistorikk"). Navngitte undersider matcher fortsatt
+ * seg selv og alt under seg.
+ */
+function erUnderside(pathname: string, sti: string, side: string): boolean {
+    return side === "" ? pathname === sti : erSammeEllerUnder(pathname, sti);
 }
 
 /** Sjekker om `pathname` er `sti` eller en underside av den. */
@@ -211,7 +247,7 @@ export function useReturLink(): ReturLenke | null {
 
     const kontekst = hentSakBrukerFraUrl(pathname, searchParams);
 
-    const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst);
+    const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst, searchParams);
 
     if (!mål) return null;
 

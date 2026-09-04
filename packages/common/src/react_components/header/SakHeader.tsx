@@ -1,10 +1,10 @@
 import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
-import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
-import { Bleed, Box, CopyButton } from "@navikt/ds-react";
+import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
+import { Box, CopyButton } from "@navikt/ds-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHentFodselsdatoer } from "../../api/useApiData";
 import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
-import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types/roller/RolleType";
+import { RolleTypeAbbreviation, RolleTypeFullName } from "../../types/roller/RolleType";
 import { ExpandedRoles, type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 type TypeBehandling = string;
@@ -22,6 +22,10 @@ interface ISakHeaderNewProps {
     setSelectedSaksnummer: (saksnummer: string | undefined) => void;
     setSelectedRoller: (roller: HeaderRolle[]) => void;
     HeaderTittel: React.ComponentType<{ type: TypeBehandling; style?: React.CSSProperties }>;
+    /** Saksnummer som har minst én valideringsfeil - fanen markeres da med et varselikon. */
+    saksnummerMedValideringsfeil?: Set<string>;
+    /** Saksnummer som har nye opplysninger (ikke-aktiverte endringer) - fanen markeres da med et oppdateringsikon. */
+    saksnummerMedNyeOpplysninger?: Set<string>;
 }
 
 /** Legacy props for backwards compatibility */
@@ -32,9 +36,6 @@ interface ISakHeaderLegacyProps {
 }
 
 type ISakHeaderProps = ISakHeaderNewProps | ISakHeaderLegacyProps;
-
-// Constants
-const FLASH_ANIMATION_DURATION = 800;
 
 // Styles
 const TAB_CONTAINER_STYLE: React.CSSProperties = {
@@ -65,27 +66,6 @@ const CHEVRON_BUTTON_STYLE: React.CSSProperties = {
 };
 
 // Helpers
-
-// Sorteringsvekt per rolletype: BM først, deretter BP, så barn (BA), øvrige roller sist.
-// Dekker alle tre RolleType-variantene (forkortelse/fullt navn/deprecated) – samme mønster
-// som brukes i `RoleTags.ts` – slik at sorteringen fungerer uansett hvilken variant API-et sender.
-const ROLLE_SORTERINGSVEKT: Record<string, number> = {
-    [RolleTypeAbbreviation.BM]: 0,
-    [RolleTypeAbbreviation.BP]: 1,
-    [RolleTypeAbbreviation.BA]: 2,
-    [RolleTypeAbbreviation.RM]: 3,
-    [RolleTypeAbbreviation.FR]: 4,
-
-    [RolleTypeFullName.BIDRAGSMOTTAKER]: 0,
-    [RolleTypeFullName.BIDRAGSPLIKTIG]: 1,
-    [RolleTypeFullName.BARN]: 2,
-    [RolleTypeFullName.REELMOTTAKER]: 3,
-    [RolleTypeFullName.FEILREGISTRERT]: 4,
-
-    [RolleTypeDeprecated.BIDRAGS_MOTTAKER]: 0,
-    [RolleTypeDeprecated.BIDRAGS_PLIKTIG]: 1,
-    [RolleTypeDeprecated.REELL_MOTTAKER]: 3,
-};
 
 const BARN_ROLLETYPER = new Set<string>([RolleTypeAbbreviation.BA, RolleTypeFullName.BARN]);
 
@@ -131,7 +111,7 @@ const mapSaksnummerRoller = (roller: HeaderRolle[]): SaksnummerRoller[] => {
         .filter((s): s is string => s !== undefined)
         .map((saksnummer) => {
             const rollerISak = roller
-                .filter((rolle) => rolle.saksnummer === saksnummer)
+                .filter((rolle) => rolle.saksnummer === saksnummer || rolle.rolletype === Rolletype.BP)
                 .sort((a, b) => compareRoller(a, b));
             return {
                 saksnummer,
@@ -145,8 +125,9 @@ interface SaksnummerTabProps {
     item: SaksnummerRoller;
     isSelected: boolean;
     isExpanded: boolean;
-    isFlashing: boolean;
     harFlereSaksnummer: boolean;
+    harValideringsfeil: boolean;
+    harNyeOpplysninger: boolean;
     onSelect: (saksnummer: string) => void;
     onToggleExpand: (saksnummer: string) => void;
 }
@@ -155,8 +136,9 @@ const SaksnummerTab = ({
     item,
     isSelected,
     isExpanded,
-    isFlashing,
     harFlereSaksnummer,
+    harValideringsfeil,
+    harNyeOpplysninger,
     onSelect,
     onToggleExpand,
 }: SaksnummerTabProps) => {
@@ -170,9 +152,6 @@ const SaksnummerTab = ({
         background: backgroundColor,
         marginBottom: isSelected ? "-1px" : "0",
         borderBottom: isSelected ? "1px solid var(--ax-bg-default)" : "1px solid transparent",
-        ...(isFlashing && {
-            animation: "saksnummerFlash 0.8s ease-out forwards",
-        }),
     };
 
     return (
@@ -186,8 +165,18 @@ const SaksnummerTab = ({
                     color: textColor,
                     fontWeight,
                     cursor: harFlereSaksnummer ? "pointer" : "default",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
                 }}
             >
+                {harValideringsfeil && (
+                    <ExclamationmarkTriangleIcon
+                        title="Saken har valideringsfeil"
+                        // style={{ color: "var(--ax-text-danger)" }}
+                    />
+                )}
+                {harNyeOpplysninger && <ArrowsCirclepathIcon title="Saken har nye opplysninger" />}
                 Saksnr {item.saksnummer}
             </button>
             <CopyButton size="small" copyText={item.saksnummer} title="Kopier saksnummer" style={COPY_BUTTON_STYLE} />
@@ -212,28 +201,6 @@ const SaksnummerTab = ({
             )}
         </Box>
     );
-};
-
-// Custom Hooks
-const useFlashAnimation = (aktivtSaksnummer: string | undefined) => {
-    const prevSaksnummerRef = useRef<string | undefined>(aktivtSaksnummer);
-    const [flashingSaksnummer, setFlashingSaksnummer] = useState<string | undefined>(undefined);
-
-    useEffect(() => {
-        if (
-            prevSaksnummerRef.current !== undefined &&
-            prevSaksnummerRef.current !== aktivtSaksnummer &&
-            aktivtSaksnummer
-        ) {
-            setFlashingSaksnummer(aktivtSaksnummer);
-            const timer = setTimeout(() => setFlashingSaksnummer(undefined), FLASH_ANIMATION_DURATION);
-            prevSaksnummerRef.current = aktivtSaksnummer;
-            return () => clearTimeout(timer);
-        }
-        prevSaksnummerRef.current = aktivtSaksnummer;
-    }, [aktivtSaksnummer]);
-
-    return flashingSaksnummer;
 };
 
 const useAktivtSaksnummer = (
@@ -295,6 +262,11 @@ const useSyncAktivtSaksnummerToState = (
 
         if (sisteSaksnummer.current !== saksnummerSomSkalBrukes) {
             setSelectedSaksnummer(saksnummerSomSkalBrukes);
+            // Når `saksnummerSomSkalBrukes` endres eksternt (f.eks. fra `BarnebidragSideMenu` etter
+            // klikk på en feilmelding som gjelder en rolle i en annen sak), må selve
+            // tab-visningen (`expandedSaksnummer`) også følge med - ellers vises fortsatt forrige
+            // sak som "aktiv" i SakHeader selv om `selectedSaksnummer` faktisk har byttet.
+            setExpandedSaksnummer(saksnummerSomSkalBrukes);
             sisteSaksnummer.current = saksnummerSomSkalBrukes;
         }
         if (sisteRolleSignatur.current !== nyRolleSignatur) {
@@ -375,6 +347,8 @@ function HeaderRenderer({
     setSelectedSaksnummer,
     setSelectedRoller,
     HeaderTittel,
+    saksnummerMedValideringsfeil,
+    saksnummerMedNyeOpplysninger,
 }: HeaderRendererProps) {
     // Henter fødselsdatoer for barnerollene fra BIDRAG_PERSON, slik at sorteringen under kan
     // bruke reell alder i stedet for å parse fødselsnummeret. Faller tilbake til ident-parsing
@@ -402,9 +376,6 @@ function HeaderRenderer({
 
     // Determine active saksnummer based on availability and selection
     const aktivtSaksnummer = useAktivtSaksnummer(saksnummerRoller, harFlereSaksnummer, selectedSaksnummer);
-
-    // Flash effect when active saksnummer changes
-    const flashingSaksnummer = useFlashAnimation(aktivtSaksnummer);
 
     // Track which saksnummer is expanded
     const [expandedSaksnummer, setExpandedSaksnummer] = useState<string | undefined>(aktivtSaksnummer);
@@ -464,13 +435,6 @@ function HeaderRenderer({
                     borderBottom: "1px solid var(--ax-border-neutral-subtle)",
                 }}
             >
-                <style>{`
-                @keyframes saksnummerFlash {
-                    0%   { box-shadow: 0 0 0 3px var(--ax-border-accent, #0067c5); }
-                    100% { box-shadow: 0 0 0 0px transparent; }
-                }
-            `}</style>
-
                 {/* Title and tabs */}
                 <Box>
                     <Box
@@ -501,8 +465,9 @@ function HeaderRenderer({
                                     item={item}
                                     isSelected={aktivtSaksnummer === item.saksnummer}
                                     isExpanded={expandedSaksnummer === item.saksnummer}
-                                    isFlashing={flashingSaksnummer === item.saksnummer}
                                     harFlereSaksnummer={harFlereSaksnummer}
+                                    harValideringsfeil={saksnummerMedValideringsfeil?.has(item.saksnummer) ?? false}
+                                    harNyeOpplysninger={saksnummerMedNyeOpplysninger?.has(item.saksnummer) ?? false}
                                     onSelect={onSelectSaksnummer}
                                     onToggleExpand={onToggleExpanded}
                                 />

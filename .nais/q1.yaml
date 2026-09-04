@@ -83,9 +83,19 @@ env:
     value: api://dev-gcp.bidrag.bidrag-dokument-forsendelse-feature/.default
 
   - name: KODEVERK_URL
-    value: https://bidrag-kodeverk.intern.dev.nav.no
+    value: http://bidrag-kodeverk
   - name: KODEVERK_URL_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-kodeverk/.default
+
+  - name: BIDRAG_DOKUMENT_ARKIV_URL
+    value: https://bidrag-dokument-arkiv-feature.dev-fss-pub.nais.io/bidrag-dokument-arkiv
+  - name: BIDRAG_DOKUMENT_ARKIV_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-dokument-arkiv-feature/.default
+
+  - name: FOERSTESIDEGENERATOR_URL
+    value: https://foerstesidegenerator-q1.dev-fss-pub.nais.io
+  - name: FOERSTESIDEGENERATOR_AUDIENCE
+    value: api://dev-fss.teamdokumenthandtering.foerstesidegenerator-q1/.default
 
 unleash:
   host: bidrag-unleash-api.nav.cloud.nais.io
@@ -101,9 +111,12 @@ outbound:
     - application: bidrag-dokument-forsendelse-feature
     - application: bidrag-admin
     - application: bidrag-behandling-q1
+    - application: bidrag-kodeverk
     - application: bidrag-dokument-produksjon
   external:
     - bidrag-sak-q1.dev-fss-pub.nais.io
     - bidrag-organisasjon-feature.dev-fss-pub.nais.io
     - bidrag-person-q1.dev-fss-pub.nais.io
     - bidrag-dokument-feature.dev-fss-pub.nais.io
+    - bidrag-dokument-arkiv-feature.dev-fss-pub.nais.io
+    - foerstesidegenerator-q1.dev-fss-pub.nais.io

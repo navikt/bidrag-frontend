@@ -198,12 +198,12 @@ export function useHentSakForPerson(ident: string, enabled: boolean = true) {
     });
 }
 
-export function useHentSak(saksnummer: string, rollehistorikk: boolean = false) {
+export function useHentSak(saksnummer: string | undefined, rollehistorikk: boolean = false, enabled: boolean = true) {
     return useQuery<BidragssakDto, AxiosError | TilgangsFeilError>({
         queryKey: ["hent_sak", saksnummer, rollehistorikk],
         queryFn: async () => {
             try {
-                const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer, {
+                const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer ?? "", {
                     "vis-rollehistorikk": rollehistorikk,
                 });
                 await SecureLoggerService.info(`Hentet sak ${saksnummer}`);
@@ -224,7 +224,7 @@ export function useHentSak(saksnummer: string, rollehistorikk: boolean = false) 
                 throw e;
             }
         },
-        enabled: !!saksnummer,
+        enabled: enabled && !!saksnummer,
         retry: (failureCount, error) => {
             if (error instanceof TilgangsFeilError) {
                 return false;
@@ -973,12 +973,7 @@ export function useHentDokumentUrl() {
     });
 }
 
-export function useHentSaksdokumentPdf(
-    journalpostId?: string,
-    dokumentreferanse?: string,
-    format?: DokumentFormatDto | string,
-    enabled: boolean = true,
-) {
+export function useHentSaksdokumentPdf(journalpostId?: string, dokumentreferanse?: string, enabled: boolean = true) {
     return useQuery({
         queryKey: ["pdf-dokument", journalpostId, dokumentreferanse],
         enabled: enabled && !!journalpostId,
@@ -989,7 +984,11 @@ export function useHentSaksdokumentPdf(
                 throw new Error("Mangler journalpostId for å hente dokument");
             }
 
-            const erMBDok = format === DokumentFormatDto.MBDOK;
+            // Formatet er ikke kjent på forhånd (f.eks. dokumenter under produksjon), så det må hentes her
+            const metadataResponse = dokumentreferanse
+                ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata1(journalpostId, dokumentreferanse)
+                : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata(journalpostId);
+            const erMBDok = metadataResponse.data[0]?.format === DokumentFormatDto.MBDOK;
 
             if (erMBDok) {
                 const url = await hentDokumentUrlApi({

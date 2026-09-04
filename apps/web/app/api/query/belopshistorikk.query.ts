@@ -1,6 +1,5 @@
 import { BIDRAG_BELOPSHISTORIKK_API } from "@bidrag/api";
-import { SecureLoggerService } from "@bidrag/common";
-import { withQueryErrorHandling } from "./withQueryErrorHandling.ts";
+import { SecureLoggerService, withQueryErrorHandling } from "@bidrag/common";
 
 export function hentBelopshistorikkQuery(saksnummer: string) {
     return {

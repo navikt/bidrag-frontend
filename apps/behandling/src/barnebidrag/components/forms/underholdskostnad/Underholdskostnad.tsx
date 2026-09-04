@@ -7,7 +7,7 @@ import {
 import { ModiaLink, RolleTypeAbbreviation } from "@bidrag/common";
 import { BodyShort, Tabs } from "@navikt/ds-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useForm, useFormContext, useWatch } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";
@@ -105,7 +105,8 @@ const Main = () => {
                         label={text.label.andreBarn}
                     />
                 </Tabs.List>
-                {visibleSøknadsBarnUnderholdskostnader.map((underhold, index) => {
+                {visibleSøknadsBarnUnderholdskostnader.map((underhold) => {
+                    const index = søknadsBarnUnderholdskostnader.findIndex((u) => u.id === underhold.id);
                     return (
                         <Tabs.Panel
                             key={`underholdskostnadTabPanel-${underhold.gjelderBarn.id}`}
@@ -126,7 +127,7 @@ const Main = () => {
 const Side = () => {
     const { lesemodus, onStepChange, getNextStep, setSaveErrorState } = useBehandlingProvider();
     const { erBisysVedtak, underholdskostnader, vedtakstype } = useGetBehandlingV2();
-    const { watch, getValues, setValue, setError } = useFormContext<UnderholdskostnadFormValues>();
+    const { watch, control, getValues, setValue, setError } = useFormContext<UnderholdskostnadFormValues>();
     const { selectedRoller } = useBehandlingProvider();
     const visibleUnderholdskostnader = useMemo(() => {
         const currentUnderholdskostnader = getValues("underholdskostnaderMedIBehandling");
@@ -143,15 +144,18 @@ const Side = () => {
     const [field, _, underholdskostnadId] = activeTab.split("-");
     const tabIsAndreBarn = field === "underholdskostnaderAndreBarn";
     const currentBM = selectedRoller.find((rolle) => rolle.rolleType === RolleTypeAbbreviation.BM);
+    const andreBarnWatch = useWatch({ control, name: "underholdskostnaderAndreBarn" });
     const underholdskostnaderAndreBarnForCurrentBM = useMemo(() => {
-        const andreBarn = getValues("underholdskostnaderAndreBarn") ?? [];
+        const andreBarn = andreBarnWatch ?? getValues("underholdskostnaderAndreBarn") ?? [];
         if (currentBM == null) {
             return andreBarn;
         }
 
         return andreBarn.filter((underhold) => underhold.gjelderBarn.bidragsmottakerId === currentBM.id);
-    }, [currentBM, getValues, selectedRoller]);
-    const underholdId = tabIsAndreBarn ? underholdskostnaderAndreBarnForCurrentBM[0]?.id : underholdskostnadId;
+    }, [currentBM, andreBarnWatch, getValues, selectedRoller]);
+    const underholdId = tabIsAndreBarn
+        ? underholdskostnaderAndreBarnForCurrentBM.find((underhold) => underhold.id != null)?.id
+        : underholdskostnadId;
     const fieldIndex = tabIsAndreBarn
         ? 0
         : getValues("underholdskostnaderMedIBehandling").findIndex((underhold) => underhold.id === Number(underholdId));
@@ -290,7 +294,10 @@ const Side = () => {
 const UnderholdskostnadForm = () => {
     const { underholdskostnader } = useGetBehandlingV2();
     const underholdskostnaderRef = useRef<UnderholdDto[]>(underholdskostnader);
-    const initialValues = useMemo(() => createInitialValues(underholdskostnaderRef.current), [underholdskostnaderRef]);
+    const initialValues = useMemo(
+        () => createInitialValues(underholdskostnaderRef.current),
+        [underholdskostnaderRef.current],
+    );
     const useFormMethods = useForm({
         defaultValues: initialValues,
         mode: "onChange",
