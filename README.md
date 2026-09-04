@@ -267,6 +267,68 @@ const [, prefix, scriptUrl] = match;
 const [, prefix = "", scriptUrl = ""] = match;
 ```
 
+## Component-testing (Playwright CT — PoC)
+
+`apps/web` og `packages/common` har et eksperimentelt oppsett for
+Playwright component-testing, som et alternativ til Storybook. Mønsteret:
+
+- Hver komponent kan ha en co-lokalisert **story**-fil (`*.story.tsx`, ren
+  named export per case) og en tilhørende test (`*.ct.spec.ts`).
+- Playwright starter én frittstående Vite dev-server
+  (`apps/web/playwright/vite.config.ts`) som samler alle `*.story.tsx`-filer
+  fra BÅDE `apps/web` og `packages/common` via `import.meta.glob` i ett felles
+  "galleri" (`apps/web/playwright/gallery/`) med venstremeny — ingen
+  Storybook-avhengighet.
+- Testene mounter en story med `await mount("mappe/Fil/EksportNavn")` og
+  asserter med vanlige Playwright-locators.
+
+```bash
+# Kjør alle component-tester (fra repo-roten - felles playwright.config.ts)
+pnpm test:ct
+
+# Kun én pakke
+pnpm test:ct -- --project=web
+pnpm test:ct -- --project=common
+
+# Åpne det felles story-galleriet i nettleseren for manuell utforsking
+# (viser stories fra BÅDE apps/web og @bidrag/common i én venstremeny)
+pnpm test:ct:gallery    # http://localhost:3178/playwright/gallery/browse.html
+# Uten ?story=<mappe>/<Fil>/<EksportNavn> vises en klikkbar liste over alle stories
+```
+
+**⚠️ Viktig mock-fallgruve:** Ikke gjenbruk appens ekte `QueryClientWrapper`
+uskodd i en story. Komponenter som leser via `BidragCommonsContext`
+(`useHentPersonData` m.fl.) er suspense-baserte og henger evig uten ekte
+backend. Bruk en mocket provider per story — se
+`packages/common/playwright/testing/BidragCommonsProviderMock.tsx` for eksempel.
+
+**Felles test-utils:** Delte hjelpere for CT ligger i
+`packages/common/playwright/testing/` og importeres på tvers av pakker via
+subpath-eksporten i `@bidrag/common`:
+
+```ts
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
+import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
+```
+
+Filendelsen skal være med — eksporten mapper `./playwright/*` direkte til fil,
+uten fallback-oppslag, slik at hver import treffer nøyaktig én kjent fil.
+Bruk `genererFnr()` i stedet for å hardkode fødselsnummer i stories og specs.
+
+**To mock-nivåer, avhengig av hva komponenten kaller:**
+1. **Context-mocking** (`BidragCommonsProviderMock`) — for kall via
+   `BidragCommonsContext` (`@bidrag/common`s `useHentPersonData`,
+   `uthevPerson`, `useHentRevurderingsbarn`).
+2. **Nettverksmocking** (`page.route()`) — for alt annet, f.eks. apps/web sin
+   EGEN `useHentPersonData` i `~/api/useApi.ts` (en annen funksjon enn i
+   punkt 1!) eller søk/mutasjoner som kaller `@bidrag/api` direkte. Registrer
+   `page.route()` FØR `mount()`, siden mount navigerer. Se
+   `ForelderRolleVisning.ct.spec.ts` for et eksempel som fullfører en hel
+   søk-og-legg-til-flyt med mocket nettverkssvar.
+
+Status: PoC for å vurdere mønsteret i teamet — foreløpig begrenset omfang
+(én story-fil per pakke), ikke en fullverdig teststrategi ennå.
+
 ## Backends
 
 Appen kaller følgende backends via OBO-token-exchange (Azure AD):

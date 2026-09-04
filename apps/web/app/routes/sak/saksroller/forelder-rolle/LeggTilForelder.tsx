@@ -3,15 +3,16 @@ import { PersonPlusIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import PersonInfo from "./components/PersonInfo.tsx";
-import PersonSøkWrapper from "./PersonSøkWrapper.tsx";
-import type { Rolle, SakRedigeringData } from "./sakvisning-schema.ts";
+import PersonInfo from "../components/PersonInfo.tsx";
+import PersonSøkWrapper from "../PersonSøkWrapper.tsx";
+import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 interface LeggTilForelderProps {
     form: UseFormReturn<SakRedigeringData>;
     rolleType: "BP" | "BM";
     rolleNavn: string;
     muligeAndreForeldre?: PersonDto[];
+    saksnummer?: string;
 }
 
 export default function LeggTilForelder({
@@ -19,6 +20,7 @@ export default function LeggTilForelder({
     rolleType,
     rolleNavn,
     muligeAndreForeldre = [],
+    saksnummer,
 }: LeggTilForelderProps) {
     const [visSøk, setVisSøk] = useState(false);
     const roller = form.watch("roller") || [];
@@ -90,6 +92,7 @@ export default function LeggTilForelder({
             søkeLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
             onPersonValgt={handlePersonValgt}
             onAvbryt={() => setVisSøk(false)}
+            saksnummer={saksnummer}
         >
             {muligeAndreForeldre.length > 0 && (
                 <Box

@@ -2,7 +2,6 @@ import { dateToDDMMYYYYString } from "@bidrag/common";
 import { ClockDashedIcon, ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Box, Button, Detail, Heading, HStack, Modal, Table, VStack } from "@navikt/ds-react";
 import { useState } from "react";
-import { useParams } from "react-router";
 
 import PersonInfo from "./components/PersonInfo.tsx";
 import type { Rolle, Rollehistorikk } from "./sakvisning-schema.ts";
@@ -10,11 +9,11 @@ import type { Rolle, Rollehistorikk } from "./sakvisning-schema.ts";
 type Props = {
     rollehistorikk?: Rollehistorikk[];
     rolle?: Pick<Rolle, "navn" | "fodselsnummer" | "fødselsdato" | "type">;
+    saksnummer?: string;
 };
 
-export default function RollehistorikkVisning({ rollehistorikk, rolle }: Props) {
+export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnummer }: Props) {
     const [isOpen, setIsOpen] = useState(false);
-    const { saksnummer } = useParams();
 
     if (!rollehistorikk || rollehistorikk.length === 0) {
         return null;

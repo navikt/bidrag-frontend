@@ -1,25 +1,18 @@
-import type {RolleDto} from "@bidrag/api/BidragBehandlingApiV1";
-import {Rolletype, Stonadstype} from "@bidrag/api/BidragBehandlingApiV1";
-import {ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon} from "@navikt/aksel-icons";
-import {Box, CopyButton, Skeleton} from "@navikt/ds-react";
-import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {useHentFodselsdatoer} from "../../api/useApiData";
-import type {IRolleDetaljer} from "../../types/roller/IRolleDetaljer";
-import {RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName} from "../../types/roller/RolleType";
-import RolleCard from "../roller/RolleCard";
+import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
+import { Box, CopyButton } from "@navikt/ds-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHentFodselsdatoer } from "../../api/useApiData";
+import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
+import { RolleTypeAbbreviation, RolleTypeFullName } from "../../types/roller/RolleType";
+import { ExpandedRoles, type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 type TypeBehandling = string;
-type HeaderRolle = RolleDto & { visningsnavn?: string };
 
 interface ISkjermbildeDetaljer {
     navn: string;
     referanse: string | number;
 }
-
-type SaksnummerRoller = {
-    saksnummer: string;
-    roller: HeaderRolle[];
-};
 
 /** New props for full featured header */
 interface ISakHeaderNewProps {
@@ -43,7 +36,6 @@ interface ISakHeaderLegacyProps {
 }
 
 type ISakHeaderProps = ISakHeaderNewProps | ISakHeaderLegacyProps;
-
 
 // Styles
 const TAB_CONTAINER_STYLE: React.CSSProperties = {
@@ -73,35 +65,7 @@ const CHEVRON_BUTTON_STYLE: React.CSSProperties = {
     cursor: "pointer",
 };
 
-const ROLE_CARD_CONTAINER_STYLE: React.CSSProperties = {
-    border: "1px solid var(--ax-border-neutral-subtle)",
-    borderRadius: "0.375rem",
-    background: "var(--ax-bg-default)",
-    margin: "0.125rem 0.375rem",
-};
-
 // Helpers
-
-// Sorteringsvekt per rolletype: BM først, deretter BP, så barn (BA), øvrige roller sist.
-// Dekker alle tre RolleType-variantene (forkortelse/fullt navn/deprecated) – samme mønster
-// som brukes i `RoleTags.ts` – slik at sorteringen fungerer uansett hvilken variant API-et sender.
-const ROLLE_SORTERINGSVEKT: Record<string, number> = {
-    [RolleTypeAbbreviation.BM]: 0,
-    [RolleTypeAbbreviation.BP]: 1,
-    [RolleTypeAbbreviation.BA]: 2,
-    [RolleTypeAbbreviation.RM]: 3,
-    [RolleTypeAbbreviation.FR]: 4,
-
-    [RolleTypeFullName.BIDRAGSMOTTAKER]: 0,
-    [RolleTypeFullName.BIDRAGSPLIKTIG]: 1,
-    [RolleTypeFullName.BARN]: 2,
-    [RolleTypeFullName.REELMOTTAKER]: 3,
-    [RolleTypeFullName.FEILREGISTRERT]: 4,
-
-    [RolleTypeDeprecated.BIDRAGS_MOTTAKER]: 0,
-    [RolleTypeDeprecated.BIDRAGS_PLIKTIG]: 1,
-    [RolleTypeDeprecated.REELL_MOTTAKER]: 3,
-};
 
 const BARN_ROLLETYPER = new Set<string>([RolleTypeAbbreviation.BA, RolleTypeFullName.BARN]);
 
@@ -238,45 +202,6 @@ const SaksnummerTab = ({
         </Box>
     );
 };
-
-interface ExpandedRolesProps {
-    saksnummerRoller: SaksnummerRoller | undefined;
-}
-
-const RolleCardSkeleton = () => (
-    <Skeleton
-        variant="text" width={"220px"} height={"54px"}
-    />
-);
-
-const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
-    if (!saksnummerRoller) return null;
-
-    return (
-        <Box
-            style={{
-                padding: "0.75rem",
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.5rem",
-                background: "white",
-            }}
-            shadow="dialog"
-        >
-            {saksnummerRoller.roller.map((rolle) => (
-                <Box key={rolle.id} style={ROLE_CARD_CONTAINER_STYLE}>
-                    {/* Suspense skoperes rundt kun rollekortet (person-navn-oppslaget), ikke hele
-                    SakHeader, slik at tittel/faner alltid rendres umiddelbart og kun selve
-                    navnevisningen viser en liten skjelett-boks mens personoppslaget laster. */}
-                    <Suspense fallback={<RolleCardSkeleton />}>
-                        <RolleCard rolle={rolle} />
-                    </Suspense>
-                </Box>
-            ))}
-        </Box>
-    );
-};
-
 
 const useAktivtSaksnummer = (
     saksnummerRoller: SaksnummerRoller[],
@@ -510,7 +435,6 @@ function HeaderRenderer({
                     borderBottom: "1px solid var(--ax-border-neutral-subtle)",
                 }}
             >
-
                 {/* Title and tabs */}
                 <Box>
                     <Box

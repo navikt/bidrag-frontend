@@ -21,6 +21,7 @@ interface BarnVisningProps {
     hentOgNullstillSamhandler: (barnIndex: number, isLeggTilBarn: boolean) => { ident: string; navn: string } | null;
     closeEditorSignal?: number;
     erOppfostringsbidrag?: boolean;
+    saksnummer?: string;
 }
 
 export default function BarnVisning({
@@ -31,6 +32,7 @@ export default function BarnVisning({
     hentOgNullstillSamhandler,
     closeEditorSignal,
     erOppfostringsbidrag = false,
+    saksnummer,
 }: BarnVisningProps) {
     const form = useFormContext<SakRedigeringData>();
     const errors = form.formState.errors;
@@ -212,7 +214,7 @@ export default function BarnVisning({
                     </ErrorMessage>
                 )}
 
-                <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} />
+                <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} saksnummer={saksnummer} />
             </PersonInfo>
 
             {visReellMottaker && (
