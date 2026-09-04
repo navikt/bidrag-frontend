@@ -1,4 +1,5 @@
-import { DefaultRestService } from "@bidrag/common";
+import { BIDRAG_FORSTESIDE_API } from "@bidrag/api";
+import type { PostFoerstesideRequest } from "@bidrag/api/BidragForstesideApi";
 
 import { fagomradeOptions } from "../common/components/avvik/components/types/AvvikTypes";
 import type { Journalpost } from "../types/journalpost";
@@ -8,36 +9,22 @@ interface FoerstesideResponse {
     loepenummer: string;
 }
 
-export interface OpprettFoerstesideRequest {
-    spraakkode: string;
-    bruker: {
-        brukerId: string;
-        brukerType: string;
-    };
-    tema: string;
-    enhetsnummer?: string;
-    overskriftstittel: string;
-    arkivtittel: string;
-    foerstesidetype: string;
-    netsPostboks: string;
-    navSkjemaId: string;
-}
+export type OpprettFoerstesideRequest = PostFoerstesideRequest;
 
-export default class FoerstesideGeneratorService extends DefaultRestService {
-    constructor() {
-        super("self");
-    }
+export default class FoerstesideGeneratorService {
     async opprettFoersteside(request: OpprettFoerstesideRequest): Promise<FoerstesideResponse> {
         try {
-            const response = await this.post<FoerstesideResponse>(`/api/proxy/foersteside`, JSON.stringify(request));
-            if (!response.ok) {
-                throw new Error(
-                    `Det skjedde en feil ved opprettelse av førsteside med status=${response.status} og innhold=${response.data}`,
-                );
-            }
-            return response.data;
+            const { data } = await BIDRAG_FORSTESIDE_API.api.postNew(request, {
+                headers: { "Nav-Consumer-Id": "bidrag-frontend" },
+            });
+            // `foersteside` er en base64-enkodet PDF (OpenAPI `format: byte`), som
+            // konsumentene dekoder videre med FileUtils._base64ToArrayBuffer.
+            return {
+                foersteside: (data.foersteside ?? "") as unknown as string,
+                loepenummer: data.loepenummer ?? "",
+            };
         } catch (e) {
-            console.warn(`Det skjedde en feil`, e);
+            console.warn(`Det skjedde en feil ved opprettelse av førsteside`, e);
             throw e;
         }
     }

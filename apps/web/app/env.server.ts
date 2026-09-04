@@ -38,6 +38,8 @@ const EnvSchema = z.object({
     BIDRAG_UI_BASE_URL: z.url(),
     KODEVERK_URL: z.url(),
     KODEVERK_URL_AUDIENCE: NonEmpty,
+    FOERSTESIDEGENERATOR_URL: z.url(),
+    FOERSTESIDEGENERATOR_AUDIENCE: NonEmpty,
     UNLEASH_SERVER_API_URL: z.url().optional(),
     UNLEASH_SERVER_API_TOKEN: NonEmpty.optional(),
     UNLEASH_SERVER_API_ENV: NonEmpty.optional(),
