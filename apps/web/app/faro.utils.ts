@@ -1,7 +1,5 @@
 // Rekkefølgen er signifikant: mer spesifikke/anchored mønstre må stå før generiske,
 // og sak/:saksnummer må erstattes før de sammensatte sak-understi-reglene som bruker den.
-// Rekkefølgen er signifikant: mer spesifikke/anchored mønstre må stå før generiske,
-// og sak/:saksnummer må erstattes før de sammensatte sak-understi-reglene som bruker den.
 const routeMaskRules: ReadonlyArray<readonly [RegExp, string]> = [
     [/^\/aapnedokument\/[^/]+\/[^/]+$/, "/aapnedokument/:journalpostId/:dokumentreferanse"],
     [/^\/dokument\/[^/]+\/[^/]+$/, "/dokument/:journalpostId/:dokumentreferanse"],
