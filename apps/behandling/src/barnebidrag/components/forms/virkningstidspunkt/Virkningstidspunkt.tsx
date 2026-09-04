@@ -1343,7 +1343,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
                     </>
                 }
             />
-            {virkningstidspunkt.barn.length > 1 && (
+            {visibleControlledFields.length > 1 && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
