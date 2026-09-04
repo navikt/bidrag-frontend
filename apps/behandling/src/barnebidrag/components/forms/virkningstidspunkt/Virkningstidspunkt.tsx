@@ -1070,21 +1070,24 @@ const VirkningstidspunktBarn = ({
                         {renderAvslagsgrunner()}
                     </FormControlledSelectField>
                 )}
-                {!avvisningsListeOpphør.includes(selectedVirkningstidspunkt.avslag) &&
-                    selectedVirkningstidspunkt.kanEndreVirkningstidspunkt !== false && (
-                        <HStack gap={"space-2"}>
-                            <FormControlledMonthPicker
-                                name={`roller.${barnIndex}.virkningstidspunkt`}
-                                label={text.label.virkningstidspunkt}
-                                placeholder="DD.MM.ÅÅÅÅ"
-                                defaultValue={initialValues.virkningstidspunkt}
-                                fromDate={fom}
-                                toDate={tom}
-                                readonly={lesemodus || vedtakstype === Vedtakstype.ALDERSJUSTERING}
-                                required
-                            />
-                        </HStack>
-                    )}
+                {!avvisningsListeOpphør.includes(selectedVirkningstidspunkt.avslag) && (
+                    <HStack gap={"space-2"}>
+                        <FormControlledMonthPicker
+                            name={`roller.${barnIndex}.virkningstidspunkt`}
+                            label={text.label.virkningstidspunkt}
+                            placeholder="DD.MM.ÅÅÅÅ"
+                            defaultValue={initialValues.virkningstidspunkt}
+                            fromDate={fom}
+                            toDate={tom}
+                            readonly={
+                                lesemodus ||
+                                vedtakstype === Vedtakstype.ALDERSJUSTERING ||
+                                selectedVirkningstidspunkt.kanEndreVirkningstidspunkt === false
+                            }
+                            required
+                        />
+                    </HStack>
+                )}
             </FlexRow>
 
             {showChangedVirkningsDatoAlert && !erInnkreving && (
@@ -1251,7 +1254,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         selectedRoller,
     } = useBehandlingProvider();
     const [searchParams] = useSearchParams();
-    const { virkningstidspunktV3: virkningstidspunkt, forholdsmessigFordeling } = useGetBehandlingV2();
+    const { virkningstidspunktV3: virkningstidspunkt, forholdsmessigFordeling, søktFomDato } = useGetBehandlingV2();
     const mergeVirkningstidspunkterMutation = useOnMergeVirkningtidspunkt();
     const ref = useRef<HTMLDialogElement>(null);
     const roller = useFieldArray({
@@ -1310,7 +1313,12 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         });
     };
 
-    const harRevurdering = visibleControlledFields.some(({ rolle }) => rolle.erRevurdering);
+    const harUlikSøktFraDato =
+        new Set(
+            visibleControlledFields.map(
+                ({ rolle }) => virkningstidspunkt.barn.find((barn) => barn.rolle.id === rolle.id)?.søktFomDato,
+            ),
+        ).size > 1;
 
     usePageTabs({
         items: visibleControlledFields,
@@ -1345,7 +1353,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
                     </>
                 }
             />
-            {visibleControlledFields.length > 1 && !harRevurdering && (
+            {visibleControlledFields.length > 1 && !harUlikSøktFraDato && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
