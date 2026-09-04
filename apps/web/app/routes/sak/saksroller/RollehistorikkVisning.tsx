@@ -9,9 +9,6 @@ import type { Rolle, Rollehistorikk } from "./sakvisning-schema.ts";
 type Props = {
     rollehistorikk?: Rollehistorikk[];
     rolle?: Pick<Rolle, "navn" | "fodselsnummer" | "fødselsdato" | "type">;
-    /** Saksnummer til visning i modal-headeren. Sendes inn som prop i stedet for å
-     * leses via `useParams()`, slik at komponenten ikke krever en Router-kontekst
-     * (gjør den enklere å bruke isolert, bl.a. i Playwright-komponenttester). */
     saksnummer?: string;
 };
 

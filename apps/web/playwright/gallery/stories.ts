@@ -1,14 +1,7 @@
-// Story-discovery: glob-kallene er relative til DENNE filen (Vite krever statisk
-// analyserbare import.meta.glob-kall), derfor kan de ikke flyttes til delt/pakket kode.
-// Vi samler stories fra BÅDE apps/web og @bidrag/common i én felles liste, delt mellom
-// test-kontrakten (main.tsx/index.html, brukt av Playwright) og manuell utforsking
-// (browse.tsx/browse.html, kun for mennesker som vil bla gjennom stories i nettleseren).
 export type StoryImporter = () => Promise<Record<string, unknown>>;
 
 function normaliser(glob: Record<string, () => Promise<unknown>>, stripPrefix: RegExp, kilde: string) {
     const entries = Object.entries(glob);
-    // Varsle i konsollen hvis mønsteret ikke lenger matcher noe (f.eks. etter en
-    // mappe-omstrukturering) - import.meta.glob returnerer stille {} ved feil sti.
     if (entries.length === 0) {
         console.warn(
             `[story-galleri] Fant ingen *.story.tsx-filer for "${kilde}". Sjekk at glob-mønsteret fortsatt matcher mappestrukturen (se stories.ts).`,
@@ -40,8 +33,6 @@ for (const [path, importer] of Object.entries(commonStories)) {
 }
 
 export async function resolve(storyId: string) {
-    // Filnivå: storyId er selve filstien uten eksportnavn (browse-menyen lenker kun hit) -
-    // velg default-eksport, ellers første komponent-eksport (stor forbokstav).
     if (stories[storyId]) {
         const mod = await stories[storyId]();
         const navn = Object.keys(mod).find((n) => /^[A-Z]/.test(n));
@@ -59,11 +50,6 @@ export async function resolve(storyId: string) {
     return mod?.[name] ?? mod?.default;
 }
 
-// Kun for browse.tsx (manuell utforsking) - lister alle navngitte komponent-eksporter
-// (stor forbokstav) per story-fil, slik at menyen kan lenke til hver variant/scenario
-// i filer med flere eksporter (f.eks. ForelderRolleVisning.story.tsx sine 4 scenarioer),
-// ikke bare filen som helhet. Bruker await bevisst - denne siden lastes aldri av
-// Playwright-tester, kun av mennesker som åpner galleriet i nettleseren.
 export async function eksporterPerFil(filsti: string) {
     const mod = await stories[filsti]();
     return Object.keys(mod).filter((navn) => /^[A-Z]/.test(navn));

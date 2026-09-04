@@ -1,12 +1,3 @@
-/**
- * Genererer syntetiske, MOD11-gyldig-formaterte fødselsnummer til bruk i
- * Playwright component-testing (stories og specs). Tallene er tilfeldige og
- * har INGEN sammenheng med ekte personer - kun til testdata, slik at vi ikke
- * trenger å hardkode fnr-lignende strenger i kildekoden.
- *
- * Samme kontrollsiffer-algoritme som `bidrag-sak` (Kotlin) og
- * `bidrag-bisys` (JS) sine tilsvarende testverktøy.
- */
 const K1_VEKTING = [3, 7, 6, 1, 8, 9, 4, 5, 2];
 const K2_VEKTING = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
 
@@ -24,7 +15,10 @@ function kontrollsiffer(siffer: number[], vekting: number[]): number {
     return mod === 11 ? 0 : mod;
 }
 
-/** Genererer et tilfeldig, gyldig-formatert fødselsnummer (11 siffer). */
+/**
+ * Genererer et syntetisk, MOD11-validert fødselsnummer.
+ * Kontrollsifferalgoritmen er hentet fra bidrag-sak.
+ */
 export function genererFnr(): string {
     const år = tilfeldigInt(1940, 2020);
     const måned = tilfeldigInt(1, 12);

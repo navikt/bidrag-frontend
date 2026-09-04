@@ -11,8 +11,6 @@ interface PersonSøkWrapperProps {
     onAvbryt: () => void;
     ikon?: ReactNode;
     children?: ReactNode;
-    /** Saksnummer til visning i modal-headeren. Sendes inn som prop i stedet for
-     * å leses via `useParams()`, se samme refaktorering i `RollehistorikkVisning`. */
     saksnummer?: string;
 }
 

@@ -23,12 +23,6 @@ export interface ExpandedRolesProps {
     saksnummerRoller: SaksnummerRoller | undefined;
 }
 
-/**
- * Rollekort-panelet som vises under saksnummer-fanene i `SakHeader` når et
- * saksnummer er ekspandert. Skilt ut i egen fil (fra `SakHeader.tsx`) slik at
- * den kan story-/komponenttestes isolert uten hele header-komponenten (faner,
- * flash-animasjon osv.).
- */
 export const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
     if (!saksnummerRoller) return null;
 
@@ -45,9 +39,6 @@ export const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
         >
             {saksnummerRoller.roller.map((rolle) => (
                 <Box key={rolle.id} style={ROLE_CARD_CONTAINER_STYLE}>
-                    {/* Suspense skoperes rundt kun rollekortet (person-navn-oppslaget), ikke hele
-                    SakHeader, slik at tittel/faner alltid rendres umiddelbart og kun selve
-                    navnevisningen viser en liten skjelett-boks mens personoppslaget laster. */}
                     <Suspense fallback={<RolleCardSkeleton />}>
                         <RolleCard rolle={rolle} />
                     </Suspense>

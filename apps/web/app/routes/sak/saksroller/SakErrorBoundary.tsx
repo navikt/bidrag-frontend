@@ -2,11 +2,6 @@ import { TilgangsFeilError } from "@bidrag/api";
 import { Alert, BodyLong, Box, ExpansionCard, Heading, Page } from "@navikt/ds-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
-/**
- * Viser tekniske detaljer om feilen (meldingstekst, og i dev-modus stacktrace)
- * i en utvidbar seksjon, slik at faktiske kodefeil (bugs) er mulig å feilsøke
- * i stedet for å skjules bak en generisk melding.
- */
 function TekniskeDetaljer({ error, errorInfo }: { error: Error; errorInfo: ErrorInfo | null }) {
     return (
         <ExpansionCard aria-label="Tekniske detaljer" size="small">

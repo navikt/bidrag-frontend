@@ -6,10 +6,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { eksporterPerFil, resolve, stories } from "./stories";
 
-// Side kun for mennesker som vil bla gjennom stories i nettleseren (pnpm test:ct:gallery).
-// Playwright bruker ALDRI denne siden - testenes mount()-fixture går mot index.html/main.tsx,
-// som er en minimal test-kontrakt uten meny. Holdes derfor bevisst adskilt.
-
 function grupperPerSeksjon(filstier: string[]) {
     const seksjoner = new Map<string, string[]>();
     for (const filsti of filstier) {
@@ -35,7 +31,6 @@ function FilMedEksporter({
     const filsti = `${seksjon}/${fil}`;
 
     if (eksportnavn.length <= 1) {
-        // Ingen (eller kun én) navngitt eksport - lenk direkte til filen (mounter default-/eneste eksport).
         const aktiv = valgtStoryId === filsti || valgtStoryId?.startsWith(`${filsti}/`);
         return (
             <Link
@@ -98,9 +93,6 @@ function Sidebar({
                     🖼️ Stories
                 </Heading>
                 {seksjoner.map(([seksjon, filer]) => {
-                    // Viser kun siste mappenavn i menyen (f.eks. "saksroller", "header")
-                    // for et lesbart hierarki - selve story-ID-en (brukt i href) beholder
-                    // likevel hele stien, så den forblir unik på tvers av pakker.
                     const seksjonsnavn = seksjon.split("/").pop() || seksjon;
                     return (
                         <VStack key={seksjon} gap="space-16">
@@ -175,8 +167,6 @@ const sidebarEl = getRequiredElement("sidebar");
 const filstier = Object.keys(stories).sort();
 const storyIdFraUrl = new URLSearchParams(location.search).get("story");
 
-// Henter navngitte eksporter (scenarioer/varianter) for alle filer parallelt før menyen
-// rendres - kun her i browse.tsx (manuell utforsking), aldri i test-kontrakten (main.tsx).
 Promise.all(filstier.map((filsti) => eksporterPerFil(filsti).then((navn) => [filsti, navn] as const))).then((par) => {
     const eksporterPerFilMap = Object.fromEntries(par);
     createRoot(sidebarEl).render(

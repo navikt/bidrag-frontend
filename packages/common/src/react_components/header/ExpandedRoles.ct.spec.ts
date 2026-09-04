@@ -15,7 +15,6 @@ test.describe("ExpandedRoles", () => {
     test("rendrer ingenting når ingen saksnummer er ekspandert", async ({ mount }) => {
         const component = await mount("react_components/header/ExpandedRoles/IngenEkspandert");
 
-        // Selve gallery-roten finnes, men panelet skal ikke ha noe innhold.
         await expect(component).toBeEmpty();
     });
 

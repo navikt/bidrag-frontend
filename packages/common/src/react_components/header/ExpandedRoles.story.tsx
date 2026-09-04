@@ -1,8 +1,3 @@
-/**
- * Stories for `ExpandedRoles` - rollekort-panelet som vises under
- * saksnummer-fanene i `SakHeader`. Samme story + gallery-mønster som
- * `RolleCard.story.tsx`: en mocket `BidragCommonsProvider` rundt komponenten,
- */
 import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
 import { BidragCommonsProvider } from "../../api/BidragCommonsContext";
@@ -33,7 +28,6 @@ const treRoller: SaksnummerRoller = {
     ],
 };
 
-/** Vanlig visning - BM, BP og barn i samme sak. */
 export const TreRoller = () => (
     <BidragCommonsProvider
         useHentPersonData={mockUseHentPersonData({
@@ -46,14 +40,12 @@ export const TreRoller = () => (
     </BidragCommonsProvider>
 );
 
-/** Ingen ekspandert saksnummer - komponenten skal ikke rendre noe. */
 export const IngenEkspandert = () => (
     <BidragCommonsProvider useHentPersonData={mockUseHentPersonData({})}>
         <ExpandedRoles saksnummerRoller={undefined} />
     </BidragCommonsProvider>
 );
 
-/** Én rolle - enkleste ikke-tomme tilfelle. */
 export const EnRolle = () => (
     <BidragCommonsProvider
         useHentPersonData={mockUseHentPersonData({
