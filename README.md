@@ -292,7 +292,7 @@ pnpm test:ct -- --project=common
 
 # Åpne det felles story-galleriet i nettleseren for manuell utforsking
 # (viser stories fra BÅDE apps/web og @bidrag/common i én venstremeny)
-pnpm test:ct:gallery    # http://localhost:3178/playwright/gallery/index.html
+pnpm test:ct:gallery    # http://localhost:3178/playwright/gallery/browse.html
 # Uten ?story=<mappe>/<Fil>/<EksportNavn> vises en klikkbar liste over alle stories
 ```
 

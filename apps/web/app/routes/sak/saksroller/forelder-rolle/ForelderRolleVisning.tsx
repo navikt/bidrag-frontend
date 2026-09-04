@@ -3,7 +3,7 @@ import { Box, Heading, HGrid, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import ForelderVisning from "./ForelderVisning.tsx";
 import LeggTilForelder from "./LeggTilForelder.tsx";
-import type { Rolle, SakRedigeringData } from "./sakvisning-schema.ts";
+import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 const ROLLE_NAVN: Record<"BP" | "BM", string> = {
     BP: "Bidragspliktig",

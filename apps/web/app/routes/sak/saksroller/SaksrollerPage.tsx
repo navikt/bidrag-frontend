@@ -12,7 +12,7 @@ import type { Route } from "./+types/SaksrollerPage.ts";
 import BarnVisning from "./BarnVisning.tsx";
 import SakButtons from "./components/SakButtons.tsx";
 import Endringsoppsummering from "./Endringsoppsummering.tsx";
-import ForelderRolleVisning from "./ForelderRolleVisning.tsx";
+import ForelderRolleVisning from "./forelder-rolle/ForelderRolleVisning.tsx";
 import { useEndringssporing } from "./hooks/useEndringssporing.ts";
 import { useHentSakMedPersoninfo } from "./hooks/useHentSakMedPersoninfo.ts";
 import { useSakForslag } from "./hooks/useSakForslag.tsx";

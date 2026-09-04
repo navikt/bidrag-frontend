@@ -3,11 +3,11 @@ import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import DiskresjonAlert from "./components/DiskresjonAlert.tsx";
-import PersonInfo from "./components/PersonInfo.tsx";
-import SøkPerson from "./components/SøkPerson.tsx";
-import RollehistorikkVisning from "./RollehistorikkVisning.tsx";
-import type { Rolle, SakRedigeringData } from "./sakvisning-schema.ts";
+import DiskresjonAlert from "../components/DiskresjonAlert.tsx";
+import PersonInfo from "../components/PersonInfo.tsx";
+import SøkPerson from "../components/SøkPerson.tsx";
+import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
+import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 interface ForelderVisningProps {
     form: UseFormReturn<SakRedigeringData>;

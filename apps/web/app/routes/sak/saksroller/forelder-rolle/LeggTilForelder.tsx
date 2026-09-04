@@ -3,9 +3,9 @@ import { PersonPlusIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import PersonInfo from "./components/PersonInfo.tsx";
-import PersonSøkWrapper from "./PersonSøkWrapper.tsx";
-import type { Rolle, SakRedigeringData } from "./sakvisning-schema.ts";
+import PersonInfo from "../components/PersonInfo.tsx";
+import PersonSøkWrapper from "../PersonSøkWrapper.tsx";
+import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 interface LeggTilForelderProps {
     form: UseFormReturn<SakRedigeringData>;

@@ -6,7 +6,7 @@
         "build": "react-router build",
         "dev": "react-router dev | pino-pretty --messageKey=message",
         "test": "vitest run --exclude '**/*.ct.spec.ts'",
-        "test:ct:gallery": "lsof -ti tcp:3178 | xargs kill -9 2>/dev/null; vite --config playwright/vite.config.ts --open /playwright/gallery/index.html",
+        "test:ct:gallery": "lsof -ti tcp:3178 | xargs kill -9 2>/dev/null; vite --config playwright/vite.config.ts --open /playwright/gallery/browse.html",
         "start": "node ./build/server/index.js",
         "typecheck": "react-router typegen && tsc --noEmit"
     },

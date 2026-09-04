@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { CtProviders } from "../../../../playwright/testing/CtProviders";
+import { CtProviders } from "../../../../../playwright/testing/CtProviders";
 import ForelderRolleVisning from "./ForelderRolleVisning";
-import type { Rolle, SakRedigeringData } from "./sakvisning-schema";
+import type { Rolle, SakRedigeringData } from "../sakvisning-schema";
 
 const bpKjentFraStart: Rolle = {
     fodselsnummer: "10987654321",

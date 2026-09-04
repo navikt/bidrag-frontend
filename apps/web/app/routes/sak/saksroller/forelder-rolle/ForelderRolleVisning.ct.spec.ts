@@ -1,10 +1,10 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-const STORY_BEGGE_KJENT = "routes/sak/saksroller/ForelderRolleVisning/BeggeRollerISak";
-const STORY_BM_MANGLER = "routes/sak/saksroller/ForelderRolleVisning/BidragsmottakerMangler";
-const STORY_BP_MANGLER = "routes/sak/saksroller/ForelderRolleVisning/BidragspliktigMangler";
-const STORY_NY_BP = "routes/sak/saksroller/ForelderRolleVisning/NyBidragspliktigKanFjernes";
+const STORY_BEGGE_KJENT = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BeggeRollerISak";
+const STORY_BM_MANGLER = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BidragsmottakerMangler";
+const STORY_BP_MANGLER = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BidragspliktigMangler";
+const STORY_NY_BP = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/NyBidragspliktigKanFjernes";
 
 async function mockPersonInformasjonForIdentFørMount(page: Page, ident: string, visningsnavn: string) {
     await page.route("**/proxy/bidrag-person/informasjon/", async (route) => {
