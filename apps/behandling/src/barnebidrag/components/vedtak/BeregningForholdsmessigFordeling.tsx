@@ -22,6 +22,7 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
     if (!forholdsmessigFordeling) return null;
     if (!forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk) return null;
 
+    // biome-ignore lint/style/noNonNullAssertion: Nullsjekket over
     const beregningFordelingAvBidrag = forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk!;
 
     const bpsSumAndelAvU = beregningFordelingAvBidrag?.sumBidragTilFordeling ?? sluttberegning.bpSumAndelAvU ?? 0;

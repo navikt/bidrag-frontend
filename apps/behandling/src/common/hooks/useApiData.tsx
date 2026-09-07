@@ -799,6 +799,7 @@ export const usePersonsQueries = (roller: RolleDto[]) =>
                 const { data } = await PERSON_API.informasjon.hentPersonPost({ ident: rolle.ident });
                 return {
                     ...rolle,
+                    // biome-ignore lint/style/noNonNullAssertion: rolle har alltid ident, men apiet er ikke godt
                     ident: rolle.ident!,
                     stønadstype: rolle.stønadstype,
                     rolleType: rolle.rolletype as unknown as RolleTypeFullName,

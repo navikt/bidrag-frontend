@@ -84,7 +84,7 @@ const ROLE_CARD_CONTAINER_STYLE: React.CSSProperties = {
 // Sorteringsvekt per rolletype: BM først, deretter BP, så barn (BA), øvrige roller sist.
 // Dekker alle tre RolleType-variantene (forkortelse/fullt navn/deprecated) – samme mønster
 // som brukes i `RoleTags.ts` – slik at sorteringen fungerer uansett hvilken variant API-et sender.
-const ROLLE_SORTERINGSVEKT: Record<string, number> = {
+const _ROLLE_SORTERINGSVEKT: Record<string, number> = {
     [RolleTypeAbbreviation.BM]: 0,
     [RolleTypeAbbreviation.BP]: 1,
     [RolleTypeAbbreviation.BA]: 2,

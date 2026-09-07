@@ -126,7 +126,7 @@ const InntektMenuButton = ({
                         }
                         onStepChange={() =>
                             onStepChange(STEPS[ForskuddStepper.INNTEKT], {
-                                [behandlingQueryKeys.tab]: numberAsString(rolle.id) ,
+                                [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                             })
                         }
                         interactive={interactive}
@@ -166,7 +166,9 @@ const InntektMenuButton = ({
                                             (inntekt) => inntekt.ident === rolle.ident,
                                         )}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                     />
                                     <MenuButton
                                         title={text.title.barnetillegg}
@@ -181,7 +183,9 @@ const InntektMenuButton = ({
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.barnetillegg?.length
                                         }
@@ -199,7 +203,9 @@ const InntektMenuButton = ({
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.utvidetBarnetrygd?.length
                                         }
@@ -217,7 +223,9 @@ const InntektMenuButton = ({
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.småbarnstillegg?.length
                                         }
@@ -235,7 +243,9 @@ const InntektMenuButton = ({
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.kontantstøtte?.length
                                         }

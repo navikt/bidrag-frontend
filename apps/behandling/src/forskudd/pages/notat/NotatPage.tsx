@@ -57,7 +57,6 @@ const RenderNotatPdf = ({ behandlingId, vedtakId }: NotatProps) => {
     const queryClient = useQueryClient();
     const hasSubscribed = useRef<boolean>(false);
     async function subscribeToChanges() {
-
         const behandlingIdString = numberAsString(behandlingId);
         if (!behandlingIdString) return;
         console.debug("Waiting for broadcast PDF", notatBroadcastName, behandlingId);
