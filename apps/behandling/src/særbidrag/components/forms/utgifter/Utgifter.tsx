@@ -37,7 +37,6 @@ import { useBehandlingProvider } from "../../../../common/context/BehandlingCont
 import { actionOnEnter } from "../../../../common/helpers/keyboardHelpers";
 import { type UtgifterPayload, useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { useDebounce } from "../../../../common/hooks/useDebounce";
-import useFeatureToogle from "../../../../common/hooks/useFeatureToggle";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
 import { hentVisningsnavn, hentVisningsnavnVedtakstype } from "../../../../common/hooks/useVisningsnavn";
 import { DateToDDMMYYYYString, dateOrNull, deductMonths, isBeforeDate } from "../../../../utils/date-utils";
@@ -781,7 +780,7 @@ const UtgifterForm = () => {
     const { setValue, getValues } = useFormMethods;
 
     const onSave = async (values: UtgiftFormValues, _name?: FieldPath<UtgiftFormValues>) => {
-        const name = _name.toString();
+        const name = _name?.toString();
         if (name === "beregning.beløpDirekteBetaltAvBp") {
             await updateAndSave(
                 {

@@ -1,11 +1,11 @@
-import type {RolleDto} from "@bidrag/api/BidragBehandlingApiV1";
-import {Rolletype, Stonadstype} from "@bidrag/api/BidragBehandlingApiV1";
-import {ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon} from "@navikt/aksel-icons";
-import {Box, CopyButton, Skeleton} from "@navikt/ds-react";
-import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {useHentFodselsdatoer} from "../../api/useApiData";
-import type {IRolleDetaljer} from "../../types/roller/IRolleDetaljer";
-import {RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName} from "../../types/roller/RolleType";
+import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
+import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
+import { Box, CopyButton, Skeleton } from "@navikt/ds-react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHentFodselsdatoer } from "../../api";
+import type { IRolleDetaljer } from "../../types";
+import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types";
 import RolleCard from "../roller/RolleCard";
 
 type TypeBehandling = string;
@@ -43,7 +43,6 @@ interface ISakHeaderLegacyProps {
 }
 
 type ISakHeaderProps = ISakHeaderNewProps | ISakHeaderLegacyProps;
-
 
 // Styles
 const TAB_CONTAINER_STYLE: React.CSSProperties = {
@@ -85,7 +84,7 @@ const ROLE_CARD_CONTAINER_STYLE: React.CSSProperties = {
 // Sorteringsvekt per rolletype: BM først, deretter BP, så barn (BA), øvrige roller sist.
 // Dekker alle tre RolleType-variantene (forkortelse/fullt navn/deprecated) – samme mønster
 // som brukes i `RoleTags.ts` – slik at sorteringen fungerer uansett hvilken variant API-et sender.
-const ROLLE_SORTERINGSVEKT: Record<string, number> = {
+const _ROLLE_SORTERINGSVEKT: Record<string, number> = {
     [RolleTypeAbbreviation.BM]: 0,
     [RolleTypeAbbreviation.BP]: 1,
     [RolleTypeAbbreviation.BA]: 2,
@@ -243,11 +242,7 @@ interface ExpandedRolesProps {
     saksnummerRoller: SaksnummerRoller | undefined;
 }
 
-const RolleCardSkeleton = () => (
-    <Skeleton
-        variant="text" width={"220px"} height={"54px"}
-    />
-);
+const RolleCardSkeleton = () => <Skeleton variant="text" width={"220px"} height={"54px"} />;
 
 const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
     if (!saksnummerRoller) return null;
@@ -276,7 +271,6 @@ const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
         </Box>
     );
 };
-
 
 const useAktivtSaksnummer = (
     saksnummerRoller: SaksnummerRoller[],
@@ -510,7 +504,6 @@ function HeaderRenderer({
                     borderBottom: "1px solid var(--ax-border-neutral-subtle)",
                 }}
             >
-
                 {/* Title and tabs */}
                 <Box>
                     <Box

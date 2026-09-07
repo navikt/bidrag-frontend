@@ -1,5 +1,5 @@
 import { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
-import { PersonNavnIdent } from "@bidrag/common";
+import { numberAsString, PersonNavnIdent } from "@bidrag/common";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { MenuButton, SideMenu } from "../../../common/components/SideMenu/SideMenu";
@@ -126,7 +126,7 @@ const InntektMenuButton = ({
                         }
                         onStepChange={() =>
                             onStepChange(STEPS[ForskuddStepper.INNTEKT], {
-                                [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                             })
                         }
                         interactive={interactive}
@@ -145,7 +145,7 @@ const InntektMenuButton = ({
                                 inntekter.some((inntekt) => inntekt.ident === rolle.ident),
                             )
                         }
-                        active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                        active={activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`}
                         hideSubMenu
                         subMenu={
                             rolle.rolletype === Rolletype.BM ? (
@@ -156,7 +156,7 @@ const InntektMenuButton = ({
                                             onStepChange(
                                                 STEPS[ForskuddStepper.INNTEKT],
                                                 {
-                                                    [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                                    [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                                                 },
                                                 elementIds.seksjon_inntekt_skattepliktig,
                                             )
@@ -166,7 +166,9 @@ const InntektMenuButton = ({
                                             (inntekt) => inntekt.ident === rolle.ident,
                                         )}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                     />
                                     <MenuButton
                                         title={text.title.barnetillegg}
@@ -174,14 +176,16 @@ const InntektMenuButton = ({
                                             onStepChange(
                                                 STEPS[ForskuddStepper.INNTEKT],
                                                 {
-                                                    [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                                    [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                                                 },
                                                 elementIds.seksjon_inntekt_barnetillegg,
                                             )
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.barnetillegg?.length
                                         }
@@ -192,14 +196,16 @@ const InntektMenuButton = ({
                                             onStepChange(
                                                 STEPS[ForskuddStepper.INNTEKT],
                                                 {
-                                                    [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                                    [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                                                 },
                                                 elementIds.seksjon_inntekt_utvidetbarnetrygd,
                                             )
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.utvidetBarnetrygd?.length
                                         }
@@ -210,14 +216,16 @@ const InntektMenuButton = ({
                                             onStepChange(
                                                 STEPS[ForskuddStepper.INNTEKT],
                                                 {
-                                                    [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                                    [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                                                 },
                                                 elementIds.seksjon_inntekt_småbarnstillegg,
                                             )
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.småbarnstillegg?.length
                                         }
@@ -228,14 +236,16 @@ const InntektMenuButton = ({
                                             onStepChange(
                                                 STEPS[ForskuddStepper.INNTEKT],
                                                 {
-                                                    [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                                    [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                                                 },
                                                 elementIds.seksjon_inntekt_kontantstøtte,
                                             )
                                         }
                                         interactive={interactive}
                                         size="small"
-                                        active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                                        active={
+                                            activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`
+                                        }
                                         unconfirmedUpdates={
                                             !!ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.kontantstøtte?.length
                                         }
@@ -248,14 +258,14 @@ const InntektMenuButton = ({
                                         onStepChange(
                                             STEPS[ForskuddStepper.INNTEKT],
                                             {
-                                                [behandlingQueryKeys.tab]: rolle.id.toString(),
+                                                [behandlingQueryKeys.tab]: numberAsString(rolle.id),
                                             },
                                             elementIds.seksjon_inntekt_skattepliktig,
                                         )
                                     }
                                     interactive={interactive}
                                     size="small"
-                                    active={activeButton === `${ForskuddStepper.INNTEKT}.${rolle.id.toString()}`}
+                                    active={activeButton === `${ForskuddStepper.INNTEKT}.${numberAsString(rolle.id)}`}
                                     unconfirmedUpdates={ikkeAktiverteEndringerIGrunnlagsdata?.inntekter?.årsinntekter?.some(
                                         (inntekt) => inntekt.ident === rolle.ident,
                                     )}

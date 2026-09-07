@@ -1,3 +1,4 @@
+import { BEHANDLING_API_V1 } from "@bidrag/api";
 import type { FatteVedtakRevurderingsbarn } from "@bidrag/api/BidragBehandlingApiV1";
 import {
     ArrowCirclepathIcon,
@@ -27,7 +28,6 @@ import { lightTheme } from "@uiw/react-json-view/light";
 import type React from "react";
 import { useState } from "react";
 import { OverstyrFatteVedtakRevurderingSwitch } from "../../common/components/vedtak/OverstyrRevurderingSwitch";
-import { BEHANDLING_API_V1 } from "../../common/constants/api";
 import { useBehandlingProviderExists } from "../../common/context/BehandlingContext";
 import { useGetBehandlingV2, useRefetchFFInfoFn } from "../../common/hooks/useApiData";
 import useFeatureToogle from "../../common/hooks/useFeatureToggle";
@@ -257,7 +257,7 @@ export const AdminPanel: React.FC = () => {
                                         <VStack gap="space-4">
                                             <HStack gap="space-2" wrap>
                                                 {beregningVedtakActions.map((action) => (
-                                                    <>
+                                                    <div key={action.key}>
                                                         {action.key === "opprett_vedtak" && (
                                                             <OverstyrFatteVedtakRevurderingSwitch
                                                                 onChange={setBegrunnelseIkkeFatteVedtak}
@@ -265,7 +265,6 @@ export const AdminPanel: React.FC = () => {
                                                             />
                                                         )}
                                                         <Button
-                                                            key={action.key}
                                                             variant="secondary"
                                                             size="small"
                                                             icon={<action.icon />}
@@ -275,7 +274,7 @@ export const AdminPanel: React.FC = () => {
                                                         >
                                                             {action.label}
                                                         </Button>
-                                                    </>
+                                                    </div>
                                                 ))}
                                             </HStack>
                                         </VStack>

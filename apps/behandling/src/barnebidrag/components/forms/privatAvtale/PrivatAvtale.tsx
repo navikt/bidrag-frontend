@@ -153,10 +153,12 @@ const Main = ({ initialValues }: { initialValues: PrivatAvtaleFormValues }) => {
     const selectedTab = defaultTab.toString();
 
     const tabsWithAndreBarn = useMemo(() => {
-        const tabs = visibleControlledFields.map((rolle) => ({
-            id: rolle.gjelderBarn.id.toString(),
-            label: rolle.gjelderBarn.ident,
-        }));
+        const tabs = visibleControlledFields
+            .filter((rolle) => rolle.gjelderBarn.id != null)
+            .map((rolle) => ({
+                id: `${rolle.gjelderBarn.id}`,
+                label: rolle.gjelderBarn.ident,
+            }));
         if (bidragFlereBarn) {
             tabs.push({
                 id: "andrebarn",

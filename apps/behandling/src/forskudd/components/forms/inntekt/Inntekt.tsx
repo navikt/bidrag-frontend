@@ -1,5 +1,5 @@
 import { type OppdatereInntektBegrunnelseRequest, Rolletype, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import { PersonNavnIdent, type RolleType } from "@bidrag/common";
+import { numberAsString, PersonNavnIdent, type RolleType } from "@bidrag/common";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -34,7 +34,7 @@ const Main = () => {
     usePageTabs({
         items: inntektRoller,
         mapToTab: (inntektRolle) => ({
-            id: inntektRolle.gjelder.id.toString(),
+            id: `${inntektRolle.gjelder.id ?? ""}`,
             label: inntektRolle.gjelder.rolletype,
         }),
         selectedTabId: selectedTab,
@@ -51,7 +51,7 @@ const Main = () => {
                 {inntektRoller.map((inntektRolle) => (
                     <Tabs.Tab
                         key={inntektRolle.gjelder.id}
-                        value={inntektRolle.gjelder.id.toString()}
+                        value={`${inntektRolle.gjelder.id ?? ""}`}
                         className="[&>*:first-child]:w-max p-2.5"
                         label={
                             <PersonNavnIdent
@@ -70,7 +70,7 @@ const Main = () => {
                     <InntektTableProvider rolle={inntektRolle.gjelder} type={type}>
                         <Tabs.Panel
                             key={inntektRolle.gjelder.id}
-                            value={inntektRolle.gjelder.id.toString()}
+                            value={`${inntektRolle.gjelder.id ?? ""}`}
                             className="grid gap-y-4"
                         >
                             <div className="mt-4">
@@ -91,7 +91,7 @@ const Side = () => {
     const { onStepChange, setSaveErrorState } = useBehandlingProvider();
     const { erBisysVedtak, vedtakstype, inntekterV2: inntektRoller } = useGetBehandlingV2();
     const selectedRolle = inntektRoller.find((inntektRolle) => inntektRolle.gjelder.rolletype === Rolletype.BM);
-    const selectedRolleId = selectedRolle?.gjelder.id.toString();
+    const selectedRolleId = numberAsString(selectedRolle?.gjelder.id);
     const saveInntektBegrunnelse = useOnSaveInntektBegrunnelse();
     const { watch, getValues, setValue } = useFormContext<InntektFormValues>();
     const [previousValues, setPreviousValues] = useState<string>(
