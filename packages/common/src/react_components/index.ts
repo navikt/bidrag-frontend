@@ -1,6 +1,5 @@
 export { default as AutoSuggest } from "./autosuggest/AutoSuggest";
 export * from "./BidragProgressbar";
-export { default as BisysLink } from "./bisys/BisysLink";
 export { getBisysSessionParams, persistBisysParams } from "./bisys/bisys-params";
 export { useBisysLink } from "./bisys/useBisysLink";
 export { default as AapneDokumentKnapp } from "./dokument/AapneDokumentKnapp";
