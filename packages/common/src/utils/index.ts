@@ -3,6 +3,7 @@ export * from "./DateUtils";
 export * from "./FileUtils";
 export * from "./IdentUtils";
 export { default as IdentUtils } from "./IdentUtils";
+export * from "./NumberUtils";
 export * from "./ObjectUtils";
 export { default as ObjectUtils } from "./ObjectUtils";
 export * from "./OpenDocumentUtils";

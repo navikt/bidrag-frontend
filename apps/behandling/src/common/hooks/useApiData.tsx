@@ -57,7 +57,7 @@ import {
 import type { VedtakNotatDto as NotatPayload } from "@bidrag/api/BidragDokumentProduksjonApi";
 import type { VedtakDto } from "@bidrag/api/BidragVedtakApi";
 import type { ForelderBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { LoggerService, RolleTypeFullName } from "@bidrag/common";
+import { LoggerService, nullSafeNumber, numberAsString, RolleTypeFullName } from "@bidrag/common";
 import { useMutation, useQuery, useQueryClient, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { useFlag } from "@unleash/proxy-client-react";
 import { AxiosError } from "axios";
@@ -152,8 +152,9 @@ export const useRefetchOnlyFFInfoFn = () => {
     const client = useQueryClient();
     const { tilgangOppretteFF } = useFeatureToogle();
     return () => {
-        if (tilgangOppretteFF) {
-            client.refetchQueries({ queryKey: QueryKeys.sjekkFF(id.toString()) });
+        const behandlingId = numberAsString(id);
+        if (tilgangOppretteFF && behandlingId) {
+            client.refetchQueries({ queryKey: QueryKeys.sjekkFF(behandlingId) });
         }
     };
 };
@@ -163,9 +164,10 @@ export const useRefetchFFInfoFn = (reloadWindow?: boolean) => {
     const client = useQueryClient();
     const { tilgangOppretteFF } = useFeatureToogle();
     return () => {
-        if (tilgangOppretteFF) {
-            client.refetchQueries({ queryKey: QueryKeys.behandlingV2(id.toString()) });
-            client.refetchQueries({ queryKey: QueryKeys.sjekkFF(id.toString()) });
+        const behandlingId = numberAsString(id);
+        if (tilgangOppretteFF && behandlingId) {
+            client.refetchQueries({ queryKey: QueryKeys.behandlingV2(behandlingId) });
+            client.refetchQueries({ queryKey: QueryKeys.sjekkFF(behandlingId) });
             if (reloadWindow === true) {
                 // Reset queries fører til rar oppførsel i noen tilfeller (form status oppdateres ikke, må gå fram og tilbake mellom bilder), så derfor velger vi å reloade siden
                 window.location.reload();
@@ -813,10 +815,11 @@ export const useNotatPdf = (behandlingId?: string, vedtakId?: string) => {
         queryKey: QueryKeys.notatPdf(behandlingId ?? vedtakId),
         queryFn: async () => {
             if (vedtakId) {
-                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(Number(vedtakId))).data;
+                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(nullSafeNumber(vedtakId))).data;
             }
-            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(Number(behandlingId))).data;
+            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(nullSafeNumber(behandlingId))).data;
         },
+        enabled: !!(behandlingId || vedtakId),
         refetchOnWindowFocus: false,
         refetchInterval: 0,
     });
@@ -847,10 +850,11 @@ export const useNotat = (behandlingId?: string, vedtakId?: string) => {
         queryKey: QueryKeys.notat(behandlingId ?? vedtakId),
         queryFn: async () => {
             if (vedtakId) {
-                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(Number(vedtakId))).data;
+                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(nullSafeNumber(vedtakId))).data;
             }
-            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(Number(behandlingId))).data;
+            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(nullSafeNumber(behandlingId))).data;
         },
+        enabled: !!(behandlingId || vedtakId),
         refetchOnWindowFocus: false,
         refetchInterval: 0,
     });
@@ -1574,7 +1578,7 @@ export const useOppdaterOpprettP35c = (periode: ResultatBarnebidragsberegningPer
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationKey: MutationKeys.oppdaterBehandling(behandlingId.toString()),
+        mutationKey: MutationKeys.oppdaterBehandling(numberAsString(behandlingId) ?? ""),
         mutationFn: async (payload: OppdaterParagraf35CDetaljerDto) => {
             const { data } = await BEHANDLING_API_V1.api.oppdaterVedtakParagraf35C(behandlingId, payload);
             return data;
@@ -1629,7 +1633,7 @@ export const useOppdaterManuelleVedtak = (onSuccess?: () => void) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationKey: MutationKeys.oppdaterBehandling(behandlingId.toString()),
+        mutationKey: MutationKeys.oppdaterBehandling(numberAsString(behandlingId) ?? ""),
         mutationFn: async (payload: OppdaterManuellVedtakRequest) => {
             const { data } = await BEHANDLING_API_V1.api.oppdaterValgtManuellVedtak(behandlingId, payload);
             return data;
@@ -1637,7 +1641,7 @@ export const useOppdaterManuelleVedtak = (onSuccess?: () => void) => {
         onSuccess: async (response, payload) => {
             onSuccess?.();
             queryClient.setQueryData<BehandlingDtoV2>(
-                QueryKeys.behandlingV2(behandlingId.toString()),
+                QueryKeys.behandlingV2(numberAsString(behandlingId) ?? ""),
                 (currentData): BehandlingDtoV2 => {
                     return {
                         ...currentData,
