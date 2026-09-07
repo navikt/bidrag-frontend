@@ -2,7 +2,7 @@ import { EttersendingsppgaveDtoStatusEnum, JournalpostStatus } from "@bidrag/api
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { BodyShort, Box, Button, Heading, HStack, Label, List, Modal, Table } from "@navikt/ds-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React from "react";
+
 import { BIDRAG_DOKUMENT_API } from "../../../api/api";
 import { DokumentQueryKeys, useHentJournalpost } from "../../../hooks/useDokumentApi";
 

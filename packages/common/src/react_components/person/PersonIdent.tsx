@@ -1,5 +1,4 @@
 import { CopyButton } from "@navikt/ds-react";
-import React from "react";
 
 const PersonIdent = ({
     ident,
@@ -11,9 +10,16 @@ const PersonIdent = ({
     ignoreClickOnIdent?: boolean;
 }) => {
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: There's a button inside the div, so can't make the div a button.
         <div
             className={`flex flex-row gap-1 items-center`}
             onClick={(e) => {
+                if (ignoreClickOnIdent) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }}
+            onKeyDown={(e) => {
                 if (ignoreClickOnIdent) {
                     e.preventDefault();
                     e.stopPropagation();

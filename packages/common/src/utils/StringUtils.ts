@@ -1,8 +1,10 @@
+// biome-ignore  lint/complexity/noStaticOnlyClass: No decision yet.
 export class StringUtils {
     static isEmpty(str?: string | null): boolean {
         return isStringEmpty(str);
     }
 }
+
 export function removeNonPrintableCharachters(value?: string): string {
     return value?.replace(/\p{C}/gu, "") ?? "";
 }
@@ -13,8 +15,10 @@ export function isStringEmpty(str?: string | null): boolean {
 
 export function capitalize(str?: string | null, capitalizeWords: boolean = true, toLowercase: boolean = true): string {
     if (isStringEmpty(str)) return "";
-    if (str?.length == 1) return str;
-    const lowercase = toLowercase ? str!.toLocaleLowerCase() : str!;
+    if (str === null || str === undefined) return "";
+
+    if (str?.length === 1) return str;
+    const lowercase = toLowercase ? str.toLocaleLowerCase() : str;
     if (capitalizeWords) {
         return lowercase
             .split("-")

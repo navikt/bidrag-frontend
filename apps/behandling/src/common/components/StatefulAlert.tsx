@@ -1,5 +1,4 @@
 import type { AlertProps } from "@navikt/ds-react";
-import React from "react";
 
 import { BehandlingAlert } from "./BehandlingAlert";
 

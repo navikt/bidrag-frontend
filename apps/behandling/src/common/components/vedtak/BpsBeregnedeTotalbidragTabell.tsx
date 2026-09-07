@@ -3,13 +3,14 @@ import { PersonNavn } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { BodyShort, Heading, HelpText, Link, Table } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
-import React from "react";
+
 import { VedtakLenke } from "../../../barnebidrag/components/vedtak/VedtakCommon";
 import { DateToMMYYYYString } from "../../../utils/date-utils";
 import { formatterBeløp, formatterBeløpForBeregning, formatterProsent } from "../../../utils/number-utils";
 import { useGetBehandlingV2, useGetBeregningSærbidrag } from "../../hooks/useApiData";
 import SakLenke from "../SakLenke";
 import { CalculationTabell } from "./CalculationTable";
+
 export interface BeregnetBidragPerBarnDtoInternal {
     beregnetBidragPerBarn: BeregnetBidragBarnDto;
     personidentBarn: string;
@@ -57,6 +58,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
         type === TypeBehandling.SAeRBIDRAG || (type === TypeBehandling.BIDRAG && visReduksjonAvUFeature);
     const beregningUtenPrivatAvtale = beregning.filter((b) => !b.privatAvtale);
     const inneholderVedtaksid = beregningUtenPrivatAvtale.some((b) => b.beregnetBidragPerBarn.vedtaksid);
+
     function renderTable() {
         return (
             <Table
@@ -309,6 +311,7 @@ export function BpsBeregnedeTotalBidragPerioderTabell({ beregning }: { beregning
         </Table>
     );
 }
+
 export const BpsPrivatAvtalerTabell = ({
     beregning,
     sumBidragPrivatAvtale,

@@ -1,7 +1,6 @@
 import { Arbeidsfordeling, type OpprettSakRequest, type RolleDto, type Rolletype } from "@bidrag/api/SakApi";
-
-import type { RolleType } from "./RolleType.ts";
 import { getMotpartRolleType } from "./personUtils.ts";
+import type { RolleType } from "./RolleType.ts";
 import type { IPersonensReellMottakerRolle } from "./types.ts";
 
 // `OpprettSakRequest`-kontrakten i denne monorepoen krever i tillegg

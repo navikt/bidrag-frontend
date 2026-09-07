@@ -4,6 +4,7 @@ import axios from "axios";
 import { LoggerService } from "../logging";
 import { type EditDocumentBroadcastMessage, type EditDocumentConfig, EditorConfigStorage } from "../types";
 
+// biome-ignore  lint/complexity/noStaticOnlyClass: No decision yet.
 export class OpenDocumentUtils {
     static åpneDokument(
         journalpostid: string,
@@ -51,7 +52,12 @@ export class OpenDocumentUtils {
         return dokumenter.map((dokument) => {
             const [journalpostid, ...rest] = dokument.split(":");
             const dokumentreferanse = rest.length > 0 ? rest.join(":") : undefined;
-            return OpenDocumentUtils.getÅpneDokumentLenke(journalpostid ?? "", dokumentreferanse, undefined, openInNewWindow);
+            return OpenDocumentUtils.getÅpneDokumentLenke(
+                journalpostid ?? "",
+                dokumentreferanse,
+                undefined,
+                openInNewWindow,
+            );
         });
     }
 
@@ -120,7 +126,7 @@ export class OpenDocumentUtils {
             `Åpner dokument ${journalpostId}/${dokumentreferanse} med format ${dokumentMetadata?.format} og status ${dokumentMetadata?.status}`,
         );
 
-        console.log(dokumentMetadataResponse)
+        console.log(dokumentMetadataResponse);
         // Dokumenter under produksjon er ikke arkivert enda, og metadata kan derfor komme litt forsinket
         if (dokumentMetadata?.status === DokumentStatusDto.UNDER_PRODUKSJON) {
             const currentRetryCount = retryCount ?? 0;
@@ -197,14 +203,6 @@ export class OpenDocumentUtils {
         return response.data.journalpost?.dokumenter?.[0]?.dokumentreferanse ?? "";
     }
 
-    private static handleOpenDocumentError(err: unknown) {
-        if (axios.isAxiosError(err) && err.response?.status === 401) {
-            OpenDocumentUtils.loginUserBeforeOpen();
-        } else {
-            throw err;
-        }
-    }
-
     public static loginUserBeforeOpen() {
         const currentUrl = window.location.href;
         if (currentUrl.includes("/aapnedokument/")) {
@@ -213,6 +211,14 @@ export class OpenDocumentUtils {
             searchParams.set("openInNewWindow", "false");
             const updatedUrl = `${authUrl.origin + authUrl.pathname}?${searchParams.toString()}`;
             window.open(updatedUrl);
+        }
+    }
+
+    private static handleOpenDocumentError(err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+            OpenDocumentUtils.loginUserBeforeOpen();
+        } else {
+            throw err;
         }
     }
 }

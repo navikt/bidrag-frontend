@@ -1,7 +1,8 @@
 import { StringUtils } from "./StringUtils";
 
+// biome-ignore  lint/complexity/noStaticOnlyClass: No decision yet.
 export default class ObjectUtils {
-    static isEmpty(value?: any) {
+    static isEmpty(value?: unknown) {
         if (!value) {
             return true;
         }
