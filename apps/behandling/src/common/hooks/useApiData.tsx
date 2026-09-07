@@ -811,15 +811,17 @@ export const usePersonsQueries = (roller: RolleDto[]) =>
     });
 
 export const useNotatPdf = (behandlingId?: string, vedtakId?: string) => {
+    const vedtakNumber = nullSafeNumber(vedtakId);
+    const behandlingNumber = nullSafeNumber(behandlingId);
     const resultPayload = useQuery({
-        queryKey: QueryKeys.notatPdf(behandlingId ?? vedtakId),
+        queryKey: QueryKeys.notatPdf(vedtakId ?? behandlingId),
         queryFn: async () => {
             if (vedtakId) {
-                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(nullSafeNumber(vedtakId))).data;
+                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(vedtakNumber)).data;
             }
-            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(nullSafeNumber(behandlingId))).data;
+            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(behandlingNumber)).data;
         },
-        enabled: !!(behandlingId || vedtakId),
+        enabled: !!(vedtakNumber || behandlingNumber),
         refetchOnWindowFocus: false,
         refetchInterval: 0,
     });
@@ -846,15 +848,17 @@ export const useNotatPdf = (behandlingId?: string, vedtakId?: string) => {
 };
 
 export const useNotat = (behandlingId?: string, vedtakId?: string) => {
+    const vedtakNumber = nullSafeNumber(vedtakId);
+    const behandlingNumber = nullSafeNumber(behandlingId);
     const resultPayload = useQuery({
-        queryKey: QueryKeys.notat(behandlingId ?? vedtakId),
+        queryKey: QueryKeys.notat(vedtakId ?? behandlingId),
         queryFn: async () => {
             if (vedtakId) {
-                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(nullSafeNumber(vedtakId))).data;
+                return (await BEHANDLING_API_V1.api.hentNotatOpplysningerForVedtak(vedtakNumber)).data;
             }
-            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(nullSafeNumber(behandlingId))).data;
+            return (await BEHANDLING_API_V1.api.hentNotatOpplysninger(behandlingNumber)).data;
         },
-        enabled: !!(behandlingId || vedtakId),
+        enabled: !!(behandlingNumber || vedtakNumber),
         refetchOnWindowFocus: false,
         refetchInterval: 0,
     });
@@ -928,16 +932,18 @@ export const useGetBeregningInnteksgrenseSærbidrag = () => {
 };
 export const useGetBeregningBidrag = (endelig: boolean) => {
     const { behandlingId, vedtakId } = useBehandlingProvider();
+    const vedtakNumber = nullSafeNumber(vedtakId);
+    const behandlingNumber = nullSafeNumber(behandlingId);
 
     return useSuspenseQuery<VedtakBarnebidragBeregningResult>({
         queryKey: QueryKeys.beregnBarnebidrag(endelig),
         queryFn: async () => {
             try {
                 if (vedtakId) {
-                    const response = await BEHANDLING_API_V1.api.hentVedtakBeregningResultatBidrag(Number(vedtakId));
+                    const response = await BEHANDLING_API_V1.api.hentVedtakBeregningResultatBidrag(vedtakNumber);
                     return { resultat: response.data };
                 }
-                const response = await BEHANDLING_API_V1.api.beregnBarnebidrag(Number(behandlingId), {
+                const response = await BEHANDLING_API_V1.api.beregnBarnebidrag(behandlingNumber, {
                     endeligBeregning: endelig,
                 });
                 const ugyldigBeregning =

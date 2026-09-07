@@ -15,7 +15,7 @@ function MainMenu(props: MainMenuProps) {
     return (
         <HGrid className="AvvikshandteringMainMenu" columns={{ sm: 2, md: 2, lg: 3, xl: 3 }} gap={"space-4"}>
             {avvikViewModels.map((viewModel) => (
-                <MenuEntry key={viewModel.title} avvik={viewModel} onClick={props.onClick} />
+                <MenuEntry key={viewModel.type} avvik={viewModel} onClick={props.onClick} />
             ))}
         </HGrid>
     );

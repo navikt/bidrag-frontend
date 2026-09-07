@@ -1,5 +1,5 @@
 import { type OppdatereInntektBegrunnelseRequest, Rolletype, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import { PersonNavnIdent, type RolleType } from "@bidrag/common";
+import { numberAsString, PersonNavnIdent, type RolleType } from "@bidrag/common";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -91,7 +91,7 @@ const Side = () => {
     const { onStepChange, setSaveErrorState } = useBehandlingProvider();
     const { erBisysVedtak, vedtakstype, inntekterV2: inntektRoller } = useGetBehandlingV2();
     const selectedRolle = inntektRoller.find((inntektRolle) => inntektRolle.gjelder.rolletype === Rolletype.BM);
-    const selectedRolleId = selectedRolle?.gjelder.id !== undefined ? `${selectedRolle.gjelder.id}` : undefined;
+    const selectedRolleId = numberAsString(selectedRolle?.gjelder.id);
     const saveInntektBegrunnelse = useOnSaveInntektBegrunnelse();
     const { watch, getValues, setValue } = useFormContext<InntektFormValues>();
     const [previousValues, setPreviousValues] = useState<string>(

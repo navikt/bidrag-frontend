@@ -1326,7 +1326,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         // undefined midlertidig (f.eks. før `reset()` har fylt inn skjemaverdiene etter et
         // saksbytte). Enkel nullguard er nok her.
         mapToTab: (rolle) => ({
-            id: `${rolle.rolle.id ?? ""}`,
+            id: `${rolle.rolle.id}`,
             label: rolle.rolle.rolletype,
         }),
         selectedTabId: selectedTab,

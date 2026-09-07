@@ -259,7 +259,7 @@ const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
             shadow="dialog"
         >
             {saksnummerRoller.roller.map((rolle) => (
-                <Box key={rolle.ident} style={ROLE_CARD_CONTAINER_STYLE}>
+                <Box key={rolle.id} style={ROLE_CARD_CONTAINER_STYLE}>
                     {/* Suspense skoperes rundt kun rollekortet (person-navn-oppslaget), ikke hele
                     SakHeader, slik at tittel/faner alltid rendres umiddelbart og kun selve
                     navnevisningen viser en liten skjelett-boks mens personoppslaget laster. */}
