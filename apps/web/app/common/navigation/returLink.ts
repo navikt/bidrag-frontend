@@ -55,8 +55,7 @@ const sakshistorikkAppDestinasjon = (saksnummer: string): ReturDestinasjon => ({
 });
 
 /**
- * Brukeroversikten finnes bare i Bisys, og henter selv opp brukeren fra sesjonen,
- * så den trenger ingen parametere utover `sessionState`.
+ * Legger på obfuskert ident slik at bisys åpner samme person
  */
 const bisysBrukeroversiktDestinasjon = (ident: string): ReturDestinasjon => ({
     sti: "/bisys/brukeroversikt",
