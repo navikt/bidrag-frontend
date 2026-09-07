@@ -314,7 +314,6 @@ export const BeregningForholdsmessigFordelingSøknadsbarn = () => {
             />
         );
     }
-    console.log("forholdsmessigFordeling", forholdsmessigFordeling);
     return (
         <>
             <ForholdsmessigFordelingBeregningAndreBarn />
