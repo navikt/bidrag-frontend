@@ -58,6 +58,7 @@ describe("finnStandardReturMål", () => {
         expect(finnStandardReturMål("/bruker/456", { brukerid: "456" })).toEqual({
             label: "Brukeroversikt",
             sti: "/bisys/brukeroversikt",
+            params: { ident: "456" },
         });
     });
 
@@ -65,6 +66,7 @@ describe("finnStandardReturMål", () => {
         expect(finnStandardReturMål("/bruker/456/reskontro", { brukerid: "456" })).toEqual({
             label: "Brukeroversikt",
             sti: "/bisys/brukeroversikt",
+            params: { ident: "456" },
         });
     });
 
