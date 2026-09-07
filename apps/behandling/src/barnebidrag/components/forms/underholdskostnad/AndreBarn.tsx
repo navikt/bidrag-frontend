@@ -149,9 +149,13 @@ export const AndreBarn = ({ visibleBarnIds }: AndreBarnProps) => {
             {visibleAndreBarnFieldArray.length < 1 && <BodyShort>{text.description.ingenBarn}</BodyShort>}
             {visibleAndreBarnFieldArray.map((underhold, index) => {
                 const underholdFieldName = `underholdskostnaderAndreBarn.${underhold.fieldIndex}` as const;
+                // `gjelderBarn.id` er del av et react-hook-form field array, og kan i praksis
+                // være undefined midlertidig. Enkel nullguard, og hopp over rendring av barnet
+                // hvis id mangler.
+                const gjelderBarnId = underhold?.gjelderBarn?.id != null ? `${underhold.gjelderBarn.id}` : null;
                 return (
-                    underhold?.gjelderBarn && (
-                        <div key={underholdFieldName} id={underhold.gjelderBarn.id.toString()} className="grid gap-y-2">
+                    gjelderBarnId && (
+                        <div key={underholdFieldName} id={gjelderBarnId} className="grid gap-y-2">
                             <RolleInfoBox underholdFieldName={underholdFieldName} onDelete={() => onDelete(index)} />
                             {!lesemodus && displayOver12Alert(calculateAge(underhold.gjelderBarn.fødselsdato)) && (
                                 <StatefulAlert

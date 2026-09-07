@@ -356,7 +356,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
                     {controlledFields.map(({ rolle }) => (
                         <Tabs.Tab
                             key={rolle.id}
-                            value={rolle.id.toString()}
+                            value={`${rolle.id ?? ""}`}
                             className="[&>*:first-child]:w-max p-2.5"
                             label={
                                 <PersonNavnIdent ident={rolle.ident} rolle={tilRolleType(rolle.rolletype)} skjulNavn />
@@ -366,7 +366,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
                 </Tabs.List>
                 {controlledFields.map((item, index) => {
                     return (
-                        <Tabs.Panel key={item.rolle.id} value={item.rolle.id.toString()} className="grid gap-y-4 py-4">
+                        <Tabs.Panel key={item.rolle.id} value={`${item.rolle.id ?? ""}`} className="grid gap-y-4 py-4">
                             <VirkningstidspunktRolle
                                 item={item}
                                 rolleIndex={index}

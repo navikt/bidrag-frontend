@@ -1,5 +1,5 @@
 import "./NotatPage.css";
-import { Broadcast } from "@bidrag/common";
+import { Broadcast, numberAsString } from "@bidrag/common";
 import { FileIcon, FilePdfIcon } from "@navikt/aksel-icons";
 import { Alert, Loader, Tabs } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -57,8 +57,12 @@ const RenderNotatPdf = ({ behandlingId, vedtakId }: NotatProps) => {
     const queryClient = useQueryClient();
     const hasSubscribed = useRef<boolean>(false);
     async function subscribeToChanges() {
+        // Broadcast sendes kun for behandlingId (se useMutationStatus). Vedtak-/lesemodus-visninger har kun
+        // vedtakId, og det finnes da ingen broadcast å vente på.
+        const behandlingIdString = numberAsString(behandlingId);
+        if (!behandlingIdString) return;
         console.debug("Waiting for broadcast PDF", notatBroadcastName, behandlingId);
-        await Broadcast.waitForBroadcast(notatBroadcastName, z.unknown(), behandlingId.toString());
+        await Broadcast.waitForBroadcast(notatBroadcastName, z.unknown(), behandlingIdString);
         console.debug("Received broadcast PDF", notatBroadcastName, behandlingId);
         queryClient.refetchQueries({ queryKey: QueryKeys.notatPdf(behandlingId) });
         setTimeout(() => subscribeToChanges(), 200);
@@ -104,7 +108,11 @@ const RenderNotatHtml = ({ behandlingId, vedtakId }: NotatProps) => {
     const queryClient = useQueryClient();
 
     async function subscribeToChanges() {
-        await Broadcast.waitForBroadcast(notatBroadcastName, z.unknown(), behandlingId.toString());
+        // Broadcast sendes kun for behandlingId (se useMutationStatus). Vedtak-/lesemodus-visninger har kun
+        // vedtakId, og det finnes da ingen broadcast å vente på.
+        const behandlingIdString = numberAsString(behandlingId);
+        if (!behandlingIdString) return;
+        await Broadcast.waitForBroadcast(notatBroadcastName, z.unknown(), behandlingIdString);
         console.debug("Received broadcast HTML", notatBroadcastName, behandlingId);
         queryClient.refetchQueries({ queryKey: QueryKeys.notat(behandlingId) });
         setTimeout(() => subscribeToChanges(), 200);
