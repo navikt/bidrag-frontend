@@ -1322,9 +1322,6 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
 
     usePageTabs({
         items: visibleControlledFields,
-        // `rolle.rolle.id` er del av et react-hook-form field array, og kan i praksis være
-        // undefined midlertidig (f.eks. før `reset()` har fylt inn skjemaverdiene etter et
-        // saksbytte). Enkel nullguard er nok her.
         mapToTab: (rolle) => ({
             id: `${rolle.rolle.id}`,
             label: rolle.rolle.rolletype,

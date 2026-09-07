@@ -57,8 +57,7 @@ const RenderNotatPdf = ({ behandlingId, vedtakId }: NotatProps) => {
     const queryClient = useQueryClient();
     const hasSubscribed = useRef<boolean>(false);
     async function subscribeToChanges() {
-        // Broadcast sendes kun for behandlingId (se useMutationStatus). Vedtak-/lesemodus-visninger har kun
-        // vedtakId, og det finnes da ingen broadcast å vente på.
+
         const behandlingIdString = numberAsString(behandlingId);
         if (!behandlingIdString) return;
         console.debug("Waiting for broadcast PDF", notatBroadcastName, behandlingId);

@@ -153,9 +153,6 @@ const Main = ({ initialValues }: { initialValues: PrivatAvtaleFormValues }) => {
     const selectedTab = defaultTab.toString();
 
     const tabsWithAndreBarn = useMemo(() => {
-        // `gjelderBarn.id` er del av et react-hook-form field array, og kan i praksis være
-        // undefined midlertidig (f.eks. før `reset()` har fylt inn skjemaverdiene etter et
-        // saksbytte). Filtrer bort disse i stedet for å krasje på `.toString()`.
         const tabs = visibleControlledFields
             .filter((rolle) => rolle.gjelderBarn.id != null)
             .map((rolle) => ({
