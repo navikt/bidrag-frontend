@@ -19,6 +19,9 @@ export default [
     // under "sak/:saksnummer" selv om filene ligger under saksroller-mappen.
     route("sak/opprett", "./routes/sak/saksroller/opprett-sak/OpprettSakPage.tsx"),
     route("opprettsakmodal", "./routes/sak/saksroller/opprett-sak/OpprettSakLegacyRedirect.ts"),
+    // Bisys lenker rollebildet til "sak/rolle" med eller uten saksnummer.
+    route("sak/rolle", "./routes/sak/rolle/SakRolleRedirect.ts"),
+    route("sak/ny/saksroller", "./routes/sak/saksroller/NySaksrollerPage.tsx"),
     route("modia/person", "./routes/modia/ModiaRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
