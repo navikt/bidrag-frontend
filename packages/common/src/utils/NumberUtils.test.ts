@@ -20,9 +20,7 @@ describe("nullSafeNumber", () => {
         expect(nullSafeNumber("0")).toBe(0);
         expect(nullSafeNumber("-5")).toBe(-5);
         expect(nullSafeNumber("12.5")).toBe(12.5);
-
     });
-
 
     it("returnerer null for strenger som ikke er ett heltall", () => {
         expect(nullSafeNumber("abc")).toBeNull();

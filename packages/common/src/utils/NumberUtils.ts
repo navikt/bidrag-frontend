@@ -9,12 +9,11 @@ export const nullSafeNumber = (number?: string | number | null): number | null =
     }
 
     const value = typeof number === "string" ? number.trim() : String(number);
-    if ("" === value ) {
+    if ("" === value) {
         return null;
     }
     const parsed = Number(value);
     return Number.isNaN(parsed) ? null : parsed;
-
 };
 
 export const numberAsString = (number?: string | number | null): string | null => {
