@@ -60,7 +60,7 @@ describe("proxy", () => {
         const response = await proxyRequest(new Request("http://frontend/proxy/bidrag-sak/vedtak"));
         const correlationId = response.headers.get("X-Correlation-ID");
 
-        expect(correlationId).toMatch(/^[A-Za-z0-9_-]{16}$/);
+        expect(correlationId).toMatch(/^[0-9A-Z]{5}-[0-9A-Z]{5}$/);
         const backendRequest = fetchMock.mock.calls[0]?.[1];
         expect(new Headers(backendRequest?.headers).get("X-Correlation-ID")).toBe(correlationId);
         expect(mocks.debug).toHaveBeenCalledWith(

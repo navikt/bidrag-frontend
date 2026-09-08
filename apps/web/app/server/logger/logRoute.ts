@@ -78,6 +78,7 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
                 loggerInstance.error(metadata, `Det skjedde en teknisk feil i applikasjonen ${appName}: ${message}`);
                 break;
             }
+            //TODO fjerne errorCode og exceptionCode da de ikke brukes
             const { errorCode, exceptionCode } = await exceptionToErrorCode(resolvedStackTrace || "ukjent", appName);
 
             const errorMetadata = {

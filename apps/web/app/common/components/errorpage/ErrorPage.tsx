@@ -14,7 +14,7 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import { isAxiosError } from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams } from "react-router";
 import styles from "./errorpage.module.css";
 import { Iskrem } from "./Iskrem";
@@ -33,8 +33,6 @@ function getAxiosCorrelationId(error: unknown): string | undefined {
 }
 
 export default function ErrorPage({ error }: ErrorPageProps) {
-    const [logResponse, setLogResponse] = useState<{ exceptionCode: string; status: string }>();
-
     const errorMessage = error instanceof Error ? error.message : undefined;
     const stackTrace = error instanceof Error ? error.stack : undefined;
     const status = error instanceof CustomError ? error.status : 500;
@@ -47,28 +45,14 @@ export default function ErrorPage({ error }: ErrorPageProps) {
     );
 
     useEffect(() => {
-        let cancelled = false;
-
         LoggerService.error(errorMessage ?? "Ukjent feil", {
             message: errorMessage ?? "Ukjent feil",
             stack_trace: stackTrace,
             errorType: error instanceof Error ? error.name : "UnknownError",
             status,
             correlationId,
-        }).then((response) => {
-            if (!cancelled) {
-                setLogResponse({ exceptionCode: response.exceptionCode, status: String(status) });
-            }
         });
-
-        return () => {
-            cancelled = true;
-        };
     }, [correlationId, error, errorMessage, stackTrace, status]);
-
-    if (!logResponse) {
-        return null;
-    }
 
     return (
         <Box
@@ -92,7 +76,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
                 </HStack>
                 <VStack gap="space-16" align="start" justify="center">
                     <ErrorInfo error={errorMessage} stackTrace={stackTrace} />
-                    <ContactInformation exceptionCode={logResponse.exceptionCode} correlationId={correlationId} />
+                    <ContactInformation correlationId={correlationId} />
                     <ButtonRow />
                 </VStack>
             </VStack>
@@ -236,12 +220,11 @@ function formatStackTrace(stackTrace?: string):
     };
 }
 
-function ContactInformation({ exceptionCode, correlationId }: { exceptionCode: string; correlationId: string }) {
+function ContactInformation({ correlationId }: { correlationId: string }) {
     return (
         <>
             <Heading size="medium">Vil du ta kontakt med brukerstøtte?</Heading>
             <Heading size="xsmall">Ved kontakt med brukerstøtte oppgi koden under:</Heading>
-            <ExceptionCode exceptionCode={exceptionCode} />
             <CorrelationId correlationId={correlationId} />
             <div style={{ display: "flex", justifyContent: "row" }}>
                 <BodyShort size="small">
@@ -266,16 +249,6 @@ function CorrelationId({ correlationId }: { correlationId: string }) {
             <BodyShort weight="semibold">Referanse-ID: </BodyShort>
             <BodyShort>{correlationId}</BodyShort>
             <CopyButton size="small" copyText={correlationId} activeText="Kopiert" />
-        </HStack>
-    );
-}
-
-function ExceptionCode({ exceptionCode }: { exceptionCode: string }) {
-    return (
-        <HStack gap="space-4" align="center" justify="start">
-            <BodyShort weight="semibold">Feilkode: </BodyShort>
-            <BodyShort>{exceptionCode}</BodyShort>
-            <CopyButton size="small" copyText={exceptionCode} activeText="Kopiert" />
         </HStack>
     );
 }
