@@ -9,7 +9,7 @@ import {
     LogLevel,
     type LogResponse,
 } from "../types";
-import { SecuritySessionUtils } from "../utils";
+import { correlationIdHeader } from "../utils";
 export abstract class AbstractLoggerService {
     static info(msg: string): Promise<LogResponse> {
         try {
@@ -69,17 +69,20 @@ export abstract class AbstractLoggerService {
         level: LogLevel,
         error?: LogErrorType | ErrorInfo | IErrorContext,
     ): Promise<LogResponse> {
+        const errorInfo = this.normalizeErrorInfo(error);
+        const correlationId = errorInfo?.correlationId ?? undefined;
         const carrier: Record<string, string> = {};
-
+        if (correlationId) {
+            carrier[correlationIdHeader] = correlationId;
+        }
         const logInfo: LogInfo = {
             message,
             level,
             appName: "bidrag-frontend",
             moduleName: "ukjent",
-            correlationId: SecuritySessionUtils.getCorrelationId(),
+            correlationId,
+            error: errorInfo,
         };
-        const errorInfo = this.normalizeErrorInfo(error);
-        logInfo.error = errorInfo;
         //
         // if (errorInfo) {
         //     // Log on console for easy debugging

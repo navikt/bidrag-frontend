@@ -24,7 +24,6 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
         stackTrace?: string;
         componentStack?: string;
     };
-    console.log("Logging", payload, errorPayload );
     const rawStackTrace = [error?.stack_trace, errorPayload?.stackTrace, errorPayload?.stack]
         .filter((value): value is string => Boolean(value?.trim()))
         .join("\n")

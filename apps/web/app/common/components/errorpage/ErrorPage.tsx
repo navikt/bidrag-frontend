@@ -1,4 +1,4 @@
-import { CustomError, LoggerService, useBisysLink } from "@bidrag/common";
+import { CustomError, correlationIdHeader, generateCorrelationId, LoggerService, useBisysLink } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import {
     BodyLong,
@@ -13,7 +13,8 @@ import {
     List,
     VStack,
 } from "@navikt/ds-react";
-import { useEffect, useState } from "react";
+import { isAxiosError } from "axios";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import styles from "./errorpage.module.css";
 import { Iskrem } from "./Iskrem";
@@ -22,12 +23,28 @@ export interface ErrorPageProps {
     error: unknown;
 }
 
+function getAxiosCorrelationId(error: unknown): string | undefined {
+    if (!isAxiosError(error)) {
+        return undefined;
+    }
+
+    const correlationId = error.response?.headers[correlationIdHeader.toLowerCase()];
+    return typeof correlationId === "string" && correlationId ? correlationId : undefined;
+}
+
 export default function ErrorPage({ error }: ErrorPageProps) {
     const [logResponse, setLogResponse] = useState<{ exceptionCode: string; status: string }>();
 
     const errorMessage = error instanceof Error ? error.message : undefined;
     const stackTrace = error instanceof Error ? error.stack : undefined;
     const status = error instanceof CustomError ? error.status : 500;
+    const correlationId = useMemo(
+        () =>
+            error instanceof CustomError && error.correlationId
+                ? error.correlationId
+                : (getAxiosCorrelationId(error) ?? generateCorrelationId()),
+        [error],
+    );
 
     useEffect(() => {
         let cancelled = false;
@@ -37,6 +54,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
             stack_trace: stackTrace,
             errorType: error instanceof Error ? error.name : "UnknownError",
             status,
+            correlationId,
         }).then((response) => {
             if (!cancelled) {
                 setLogResponse({ exceptionCode: response.exceptionCode, status: String(status) });
@@ -46,7 +64,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
         return () => {
             cancelled = true;
         };
-    }, [error]);
+    }, [correlationId, error, errorMessage, stackTrace, status]);
 
     if (!logResponse) {
         return null;
@@ -74,7 +92,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
                 </HStack>
                 <VStack gap="space-16" align="start" justify="center">
                     <ErrorInfo error={errorMessage} stackTrace={stackTrace} />
-                    <ContactInformation exceptionCode={logResponse.exceptionCode} />
+                    <ContactInformation exceptionCode={logResponse.exceptionCode} correlationId={correlationId} />
                     <ButtonRow />
                 </VStack>
             </VStack>
@@ -218,12 +236,13 @@ function formatStackTrace(stackTrace?: string):
     };
 }
 
-function ContactInformation({ exceptionCode }: { exceptionCode: string }) {
+function ContactInformation({ exceptionCode, correlationId }: { exceptionCode: string; correlationId: string }) {
     return (
         <>
             <Heading size="medium">Vil du ta kontakt med brukerstøtte?</Heading>
             <Heading size="xsmall">Ved kontakt med brukerstøtte oppgi koden under:</Heading>
             <ExceptionCode exceptionCode={exceptionCode} />
+            <CorrelationId correlationId={correlationId} />
             <div style={{ display: "flex", justifyContent: "row" }}>
                 <BodyShort size="small">
                     Vennligst lim inn koden over i feltet "Tittel", da du oppretter sak i{" "}
@@ -238,6 +257,16 @@ function ContactInformation({ exceptionCode }: { exceptionCode: string }) {
                 </BodyShort>
             </div>
         </>
+    );
+}
+
+function CorrelationId({ correlationId }: { correlationId: string }) {
+    return (
+        <HStack gap="space-4" align="center" justify="start">
+            <BodyShort weight="semibold">Referanse-ID: </BodyShort>
+            <BodyShort>{correlationId}</BodyShort>
+            <CopyButton size="small" copyText={correlationId} activeText="Kopiert" />
+        </HStack>
     );
 }
 
