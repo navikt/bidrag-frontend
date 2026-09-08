@@ -237,9 +237,7 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
     const roller = useHentRoller();
     const methods = useFormContext();
     const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
-    useEffect(() => {
-        SecureLoggerService.info("Dette er test av sikkerlogg");
-    }, []);
+
     useUpdatePageTitleParam("Opprett forsendelse");
     return (
         <Page className="pt-4">
