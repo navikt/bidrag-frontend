@@ -1,7 +1,6 @@
 // import { context, propagation, Span, trace } from "@opentelemetry/api";
 import { context } from "@opentelemetry/api";
-import { v4 as uuidV4 } from "uuid";
-
+import { generateCorrelationId } from "./CorrelationIdUtils.ts";
 import { SessionStorage } from "./Storage";
 
 const _tracerName = "bidrag-ui-session";
@@ -36,7 +35,7 @@ export class SecuritySessionUtils {
     }
 
     static getCorrelationId(): string {
-        return SessionStorage.getOrDefault("traceparent", `${SecuritySessionUtils.getAppName()}/${uuidV4()}`);
+        return SessionStorage.getOrDefault("traceparent", generateCorrelationId());
     }
 
     static createRequestTrace(_spanName: string): RequestTraceContext {

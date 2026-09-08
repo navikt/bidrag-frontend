@@ -1,17 +1,9 @@
+import { correlationIdHeader, generateCorrelationId } from "@bidrag/common";
 import { getApiConfig } from "~/api.env.ts";
 import { authTokenContext } from "~/server/auth/auth.context.ts";
 import { navLogger } from "~/server/logger/navLogger.ts";
 import type { Route } from "./+types/proxy.ts";
 import { getOnBehalfOfToken } from "./auth.utils.server.ts";
-
-const correlationIdHeader = "X-Correlation-ID";
-
-export function generateCorrelationId(): string {
-    const randomBytes = crypto.getRandomValues(new Uint8Array(12));
-    const base64 = btoa(String.fromCharCode(...randomBytes));
-
-    return base64.replaceAll("+", "-").replaceAll("/", "_");
-}
 
 function responseWithCorrelationId(response: Response, correlationId: string): Response {
     const headers = new Headers(response.headers);
