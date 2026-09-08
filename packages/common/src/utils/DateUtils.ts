@@ -27,7 +27,8 @@ export const deductDays = (date: Date, days: number) => {
 };
 export const lastDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0);
 export const firstDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1);
-export const isValidDate = (date: unknown) => date && date instanceof Date && Number.isFinite(date.getTime());
+// biome-ignore lint/suspicious/noExplicitAny: The function tests for the type of the value, so any is fine here.
+export const isValidDate = (date: any) => date && date instanceof Date && Number.isFinite(date.getTime());
 export const isFirstDayOfMonth = (date: Date) => firstDayOfMonth(date).getDate() === date.getDate();
 export const isLastDayOfMonth = (date: Date) => lastDayOfMonth(date).getDate() === date.getDate();
 export const isAfterDate = (date: string, maxValidate: string) => {

@@ -1,14 +1,14 @@
-import {InntektBelopstype} from "@bidrag/api/BidragBehandlingApiV1";
-import {BodyShort, Box, Heading, HStack, Table} from "@navikt/ds-react";
-import {useFormContext} from "react-hook-form";
-import {FormControlledSelectField} from "../../../../common/components/formFields/FormControlledSelectField";
-import {FormControlledTextField} from "../../../../common/components/formFields/FormControlledTextField";
+import { InntektBelopstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { BodyShort, Box, Heading, HStack, Table } from "@navikt/ds-react";
+import { useFormContext } from "react-hook-form";
+import { FormControlledSelectField } from "../../../../common/components/formFields/FormControlledSelectField";
+import { FormControlledTextField } from "../../../../common/components/formFields/FormControlledTextField";
 import LeggTilPeriodeButton from "../../../../common/components/formFields/FormLeggTilPeriode";
 import elementId from "../../../../common/constants/elementIds";
 import text from "../../../../common/constants/texts";
-import {useBehandlingProvider} from "../../../../common/context/BehandlingContext";
-import {formatterBeløp} from "../../../../utils/number-utils";
-import {useOnSaveTilleggstønad} from "../../../hooks/useOnSaveTilleggstønad";
+import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
+import { formatterBeløp } from "../../../../utils/number-utils";
+import { useOnSaveTilleggstønad } from "../../../hooks/useOnSaveTilleggstønad";
 import type {
     FaktiskTilsynsutgiftPeriode,
     StønadTilBarnetilsynPeriode,
@@ -16,23 +16,23 @@ import type {
     UnderholdkostnadsFormPeriode,
     UnderholdskostnadFormValues,
 } from "../../../types/underholdskostnadFormValues";
-import {DeleteButton, EditOrSaveButton, UnderholdskostnadPeriode} from "./Barnetilsyn";
-import {UnderholdskostnadTabel} from "./UnderholdskostnadTabel";
+import { DeleteButton, EditOrSaveButton, UnderholdskostnadPeriode } from "./Barnetilsyn";
+import { UnderholdskostnadTabel } from "./UnderholdskostnadTabel";
 
 const beløpstypeOptions = [
-    {value: InntektBelopstype.DAGSATS, text: text.select.dagsats},
-    {value: InntektBelopstype.MANEDSBELOP11MANEDER, text: text.select.månedsbeløp},
+    { value: InntektBelopstype.DAGSATS, text: text.select.dagsats },
+    { value: InntektBelopstype.MANEDSBELOP11MANEDER, text: text.select.månedsbeløp },
 ];
 
 const Beløpstype = ({
-                        item,
-                        fieldName,
-                    }: {
+    item,
+    fieldName,
+}: {
     item: TilleggsstonadPeriode;
     fieldName: `underholdskostnaderMedIBehandling.${number}.tilleggsstønad.${number}`;
 }) => {
-    const {lesemodus} = useBehandlingProvider();
-    const {setValue} = useFormContext<UnderholdskostnadFormValues>();
+    const { lesemodus } = useBehandlingProvider();
+    const { setValue } = useFormContext<UnderholdskostnadFormValues>();
 
     if (lesemodus || !item.erRedigerbart) {
         return (
@@ -58,13 +58,13 @@ const Beløpstype = ({
 };
 
 const BeløpDagsatsMåned = ({
-                               item,
-                               fieldName,
-                           }: {
+    item,
+    fieldName,
+}: {
     item: TilleggsstonadPeriode;
     fieldName: `underholdskostnaderMedIBehandling.${number}.tilleggsstønad.${number}`;
 }) => {
-    const {lesemodus} = useBehandlingProvider();
+    const { lesemodus } = useBehandlingProvider();
     return (
         <>
             {!lesemodus && item.erRedigerbart ? (
@@ -85,7 +85,7 @@ const BeløpDagsatsMåned = ({
         </>
     );
 };
-const TotalMåned = ({item}: { item: TilleggsstonadPeriode }) => {
+const TotalMåned = ({ item }: { item: TilleggsstonadPeriode }) => {
     return (
         <div className="h-6 flex items-center justify-end">
             <BodyShort size="small">{formatterBeløp(item.total)}</BodyShort>
@@ -94,29 +94,29 @@ const TotalMåned = ({item}: { item: TilleggsstonadPeriode }) => {
 };
 
 export const TilleggstønadTabel = ({
-                                       underholdFieldName,
-                                   }: {
+    underholdFieldName,
+}: {
     underholdFieldName: `underholdskostnaderMedIBehandling.${number}`;
 }) => {
     const fieldName = `${underholdFieldName}.tilleggsstønad` as const;
-    const {getValues, setError, clearErrors} = useFormContext<UnderholdskostnadFormValues>();
+    const { getValues, setError, clearErrors } = useFormContext<UnderholdskostnadFormValues>();
     const underhold = getValues(underholdFieldName);
     const saveTilleggstønad = useOnSaveTilleggstønad(underhold.id);
 
     const createPayload = (index: number) => {
-        const {id, datoFom, datoTom, beløp, total, beløpstype} = getValues(`${fieldName}.${index}`);
+        const { id, datoFom, datoTom, beløp, total, beløpstype } = getValues(`${fieldName}.${index}`);
         const payload = {
             id,
             beløpstype,
             beløp: beløp ? Number(beløp) : undefined,
             total,
-            periode: {fom: datoFom, tom: datoTom},
+            periode: { fom: datoFom, tom: datoTom },
         };
         return payload;
     };
 
     const validateRow = (index: number) => {
-        const {datoFom, beløp, beløpstype} = getValues(`${fieldName}.${index}`);
+        const { datoFom, beløp, beløpstype } = getValues(`${fieldName}.${index}`);
         if (datoFom === null) {
             setError(`${fieldName}.${index}.datoFom`, {
                 type: "notValid",
@@ -148,12 +148,12 @@ export const TilleggstønadTabel = ({
                 customRowValidation={validateRow}
             >
                 {({
-                      controlledFields,
-                      onRemovePeriode,
-                      onSaveRow,
-                      onEditRow,
-                      addPeriod,
-                  }: {
+                    controlledFields,
+                    onRemovePeriode,
+                    onSaveRow,
+                    onEditRow,
+                    addPeriod,
+                }: {
                     controlledFields: UnderholdkostnadsFormPeriode[];
                     onRemovePeriode: (index: number) => void;
                     onSaveRow: (index: number) => void;
@@ -227,10 +227,10 @@ export const TilleggstønadTabel = ({
                                                     />
                                                 </Table.DataCell>
                                                 <Table.DataCell textSize="small">
-                                                    <Beløpstype fieldName={`${fieldName}.${index}`} item={item}/>
+                                                    <Beløpstype fieldName={`${fieldName}.${index}`} item={item} />
                                                 </Table.DataCell>
                                                 <Table.DataCell align="right">
-                                                    <TotalMåned item={item}/>
+                                                    <TotalMåned item={item} />
                                                 </Table.DataCell>
                                                 <Table.DataCell>
                                                     <EditOrSaveButton
@@ -241,7 +241,7 @@ export const TilleggstønadTabel = ({
                                                     />
                                                 </Table.DataCell>
                                                 <Table.DataCell>
-                                                    <DeleteButton onDelete={() => onRemovePeriode(index)}/>
+                                                    <DeleteButton onDelete={() => onRemovePeriode(index)} />
                                                 </Table.DataCell>
                                             </Table.Row>
                                         ))}

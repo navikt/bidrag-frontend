@@ -1,28 +1,28 @@
-import {ObjectUtils} from "@bidrag/common";
+import { ObjectUtils } from "@bidrag/common";
 
-import {useFormContext} from "react-hook-form";
-import {FormControlledMonthPicker} from "../../../../common/components/formFields/FormControlledMonthPicker";
+import { useFormContext } from "react-hook-form";
+import { FormControlledMonthPicker } from "../../../../common/components/formFields/FormControlledMonthPicker";
 import text from "../../../../common/constants/texts";
-import {useBehandlingProvider} from "../../../../common/context/BehandlingContext";
-import {useFomTomDato} from "../../../../common/hooks/useFomTomDato";
-import type {SamværBarnformvalues, SamværPeriodeFormvalues} from "../../../../common/types/samværFormValues";
-import {dateOrNull, DateToDDMMYYYYString, isAfterDate} from "../../../../utils/date-utils";
+import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
+import { useFomTomDato } from "../../../../common/hooks/useFomTomDato";
+import type { SamværBarnformvalues, SamværPeriodeFormvalues } from "../../../../common/types/samværFormValues";
+import { DateToDDMMYYYYString, dateOrNull, isAfterDate } from "../../../../utils/date-utils";
 
 export const Samværsperiode = ({
-                                   editableRow,
-                                   item,
-                                   field,
-                                   fieldName,
-                                   label,
-                               }: {
+    editableRow,
+    item,
+    field,
+    fieldName,
+    label,
+}: {
     editableRow: boolean;
     item: SamværPeriodeFormvalues;
     fieldName: `${string}.perioder.${number}`;
     field: "fom" | "tom";
     label: string;
 }) => {
-    const {erVirkningstidspunktNåværendeMånedEllerFramITid, lesemodus} = useBehandlingProvider();
-    const {getValues, clearErrors, setError} = useFormContext<SamværBarnformvalues>();
+    const { erVirkningstidspunktNåværendeMånedEllerFramITid, lesemodus } = useBehandlingProvider();
+    const { getValues, clearErrors, setError } = useFormContext<SamværBarnformvalues>();
     const fieldIsDatoTom = field === "tom";
     const [fom, tom] = useFomTomDato(fieldIsDatoTom, undefined, Number(fieldName.split(".")[0]));
 

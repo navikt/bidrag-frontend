@@ -3,7 +3,7 @@ import { PersonNavn } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { BodyShort, Heading, HelpText, Link, Table } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
-
+import { Fragment } from "react";
 import { VedtakLenke } from "../../../barnebidrag/components/vedtak/VedtakCommon";
 import { DateToMMYYYYString } from "../../../utils/date-utils";
 import { formatterBeløp, formatterBeløpForBeregning, formatterProsent } from "../../../utils/number-utils";
@@ -122,7 +122,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
                             const erVedtakKildeBBM =
                                 row.erVedtakKildeBBM === undefined || row.erVedtakKildeBBM === true;
                             return (
-                                <React.Fragment key={rowIndex}>
+                                <Fragment key={rowIndex}>
                                     <Table.ExpandableRow
                                         className="cursor-pointer"
                                         expandOnRowClick
@@ -204,7 +204,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
                                             {formatterBeløpForBeregning(row.beregnetBidrag, true)}
                                         </Table.DataCell>
                                     </Table.ExpandableRow>
-                                </React.Fragment>
+                                </Fragment>
                             );
                         })}
                     <Table.Row className="!bg-inherit">
@@ -283,7 +283,7 @@ export function BpsBeregnedeTotalBidragPerioderTabell({ beregning }: { beregning
             </Table.Header>
             <Table.Body>
                 {beregning.map((row, rowIndex) => (
-                    <React.Fragment key={rowIndex}>
+                    <Fragment key={rowIndex}>
                         <Table.Row className="cursor-pointer">
                             {" "}
                             <Table.DataCell align="left" textSize="small">
@@ -305,7 +305,7 @@ export function BpsBeregnedeTotalBidragPerioderTabell({ beregning }: { beregning
                                 {formatterBeløpForBeregning(row.beregnetBidrag, true)}
                             </Table.DataCell>
                         </Table.Row>
-                    </React.Fragment>
+                    </Fragment>
                 ))}
             </Table.Body>
         </Table>
@@ -358,7 +358,7 @@ export const BpsPrivatAvtalerTabell = ({
                 </Table.Header>
                 <Table.Body>
                     {privatAvtaler.map(({ beregnetBidragPerBarn: row, personidentBarn }, rowIndex) => (
-                        <React.Fragment key={rowIndex}>
+                        <Fragment key={rowIndex}>
                             <Table.Row className="cursor-pointer">
                                 <Table.DataCell align="left" textSize="small">
                                     <PersonNavn ident={personidentBarn} />
@@ -376,7 +376,7 @@ export const BpsPrivatAvtalerTabell = ({
                                     {formatterBeløpForBeregning(row.beregnetBidrag, true)}
                                 </Table.DataCell>
                             </Table.Row>
-                        </React.Fragment>
+                        </Fragment>
                     ))}
                     <Table.Row className="!bg-inherit">
                         <Table.DataCell colSpan={5} align="right" textSize="small">
@@ -473,7 +473,7 @@ export const BpsPrivatAvtalerTabellIkkeTilFordeling = ({
                 <Table.Body>
                     {bidragIkkeTilFordeling.map(
                         ({ beregnetBidragPerBarn: row, personidentBarn, personnavn }, rowIndex) => (
-                            <React.Fragment key={rowIndex}>
+                            <Fragment key={rowIndex}>
                                 <Table.Row className="cursor-pointer">
                                     <Table.DataCell align="left" textSize="small">
                                         <PersonNavn ident={personidentBarn} navn={personnavn} />
@@ -513,7 +513,7 @@ export const BpsPrivatAvtalerTabellIkkeTilFordeling = ({
                                         {formatterBeløpForBeregning(row.beregnetBidrag, true)}
                                     </Table.DataCell>
                                 </Table.Row>
-                            </React.Fragment>
+                            </Fragment>
                         ),
                     )}
                     <Table.Row className="!bg-inherit">

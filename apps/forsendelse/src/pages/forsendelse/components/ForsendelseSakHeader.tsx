@@ -1,14 +1,14 @@
 import { RolleTypeAbbreviation, SakHeader } from "@bidrag/common";
 import { Skeleton } from "@navikt/ds-react";
-
+import { Suspense } from "react";
 import { useBarnIBehandlingDetaljer, useHentForsendelseQuery, useHentRoller } from "../../../hooks/useForsendelseApi";
 import { useSession } from "../context/SessionContext";
 
 export default function ForsendelseSakHeader() {
     return (
-        <React.Suspense fallback={<SakLoadingIndicator />}>
+        <Suspense fallback={<SakLoadingIndicator />}>
             <ForsendelseSakHeaderContent />
-        </React.Suspense>
+        </Suspense>
     );
 }
 
