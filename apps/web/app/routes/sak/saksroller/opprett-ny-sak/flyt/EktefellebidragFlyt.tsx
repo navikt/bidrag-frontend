@@ -5,8 +5,6 @@ import { useForm } from "react-hook-form";
 import EnhetInfoAlert from "../components/EnhetInfoAlert";
 import SubmitButtons from "../components/SubmitButtons";
 import EksisterendeSakAlert from "../EksisterendeSakAlert";
-import EktefellebidragOppsummering from "../ektefellebidrag/EktefellebidragOppsummering";
-import EktefelleMotpartVelger from "../ektefellebidrag/EktefelleMotpartVelger";
 import { useFlowSubmission } from "../hooks/useFlowSubmission";
 import useSyncKategori from "../hooks/useSyncKategori";
 import {
@@ -16,6 +14,8 @@ import {
 } from "../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
 import { hentMotsattRolle } from "../utils";
+import EktefellebidragOppsummering from "./EktefellebidragOppsummering";
+import EktefelleMotpartVelger from "./EktefelleMotpartVelger";
 
 export default function EktefellebidragFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();

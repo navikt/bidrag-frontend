@@ -123,6 +123,25 @@ describe("beregnEksisterendeSakSjekk", () => {
         expect(resultat).toEqual({ harEksisterendeSak: true, eksisterendeSak: sak, infoMelding: null });
     });
 
+    it("krever barn for barnebidrag (brukes av BarnBeggeForeldre/BarnManglendeForeldre) og avviser sak uten barn", () => {
+        const sakUtenBarn = lagSak("100009", [
+            lagRolle(bidragspliktigIdent, Rolletype.BP),
+            lagRolle(bidragsmottakerIdent, Rolletype.BM),
+        ]);
+
+        const resultat = beregnEksisterendeSakSjekk({
+            partISaken,
+            motpart,
+            skalHente: true,
+            isLoading: false,
+            error: null,
+            sakForPartISaken: [sakUtenBarn],
+        });
+
+        expect(resultat.harEksisterendeSak).toBe(false);
+        expect(resultat.infoMelding?.type).toBe("info");
+    });
+
     it("krever IKKE barn for ektefellebidrag, og avviser saker med barn", () => {
         const sakUtenBarn = lagSak("100002", [
             lagRolle(bidragspliktigIdent, Rolletype.BP),

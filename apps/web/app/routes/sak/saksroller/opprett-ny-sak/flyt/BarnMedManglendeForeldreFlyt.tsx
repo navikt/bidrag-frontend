@@ -2,10 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, VStack } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import BarnMottakerKort from "../barn-flyt/BarnMottakerKort";
-import KjentForelderInfo from "../barn-flyt/KjentForelderInfo";
-import LeggTilForelderSeksjon from "../barn-flyt/LeggTilForelderSeksjon";
-import ParterOppsummeringBarn from "../barn-flyt/ParterOppsummeringBarn";
+import BarnMottakerKort from "../barn-felles/BarnMottakerKort";
+import ParterOppsummeringBarn from "../barn-felles/ParterOppsummeringBarn";
 import LasterSkeleton from "../components/LasterSkeleton";
 import { useFlowSubmission } from "../hooks/useFlowSubmission";
 import useSyncKategori from "../hooks/useSyncKategori";
@@ -18,6 +16,8 @@ import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
 import EksisterendeSakSection from "../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../sections/EnhetOgSubmitSection";
 import ValideringsAlertsSection from "../sections/ValideringsAlertsSection";
+import KjentForelderInfo from "./KjentForelderInfo";
+import LeggTilForelderSeksjon from "./LeggTilForelderSeksjon";
 
 export default function BarnMedManglendeForeldreFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();

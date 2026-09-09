@@ -1,8 +1,8 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import type { RefObject } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import ParterOppsummering from "../forelder-flyt/ParterOppsummering";
-import PartManuellRegistrering from "../forelder-flyt/PartManuellRegistrering";
+import ParterOppsummering from "../motpart-felles/ParterOppsummering";
+import PartManuellRegistrering from "../motpart-felles/PartManuellRegistrering";
 import type { ForelderMedBarnSkjemaData, ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
 
 interface MotpartSectionProps {

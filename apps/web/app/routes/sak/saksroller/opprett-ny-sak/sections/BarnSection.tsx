@@ -2,8 +2,8 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Alert, BodyShort, Heading, Tag, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import BarnManueltRegistrering from "../BarnManueltRegistrering";
-import BarnkurvListe from "../forelder-flyt/BarnkurvListe";
-import ValgteBarnListe from "../forelder-flyt/ValgteBarnListe";
+import BarnkurvListe from "../motpart-felles/BarnkurvListe";
+import ValgteBarnListe from "../motpart-felles/ValgteBarnListe";
 import {
     type Barnkurv,
     type BarnMedAlder,

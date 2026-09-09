@@ -4,9 +4,8 @@ import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import FunnetPersonInfo from "../../components/FunnetPersonInfo";
-import BarnMottakerKort from "../barn-flyt/BarnMottakerKort";
-import ParterOppsummeringBarn from "../barn-flyt/ParterOppsummeringBarn";
-import RolleVelger from "../barn-flyt/RollerVelger";
+import BarnMottakerKort from "../barn-felles/BarnMottakerKort";
+import ParterOppsummeringBarn from "../barn-felles/ParterOppsummeringBarn";
 import LasterSkeleton from "../components/LasterSkeleton";
 import { useFlowSubmission } from "../hooks/useFlowSubmission";
 import useSyncKategori from "../hooks/useSyncKategori";
@@ -15,6 +14,7 @@ import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
 import EksisterendeSakSection from "../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../sections/EnhetOgSubmitSection";
 import ValideringsAlertsSection from "../sections/ValideringsAlertsSection";
+import RolleVelger from "./RollerVelger";
 
 export default function BarnBeggeForeldreFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();

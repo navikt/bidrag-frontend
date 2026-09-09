@@ -4,8 +4,8 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import MaskerSensitivInfo from "../components/MaskerSensitivInfo";
-import type { ForeslåttForelder } from "../flyt/ForelderUtenBarnFlyt";
 import type { ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
+import type { ForeslåttForelder } from "./ForelderUtenBarnFlyt";
 
 type Props = {
     form: UseFormReturn<ForelderUtenBarnSkjemaData>;

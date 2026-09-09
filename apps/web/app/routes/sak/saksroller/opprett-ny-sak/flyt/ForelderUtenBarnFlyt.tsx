@@ -10,13 +10,11 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useHentForeldreinformasjonForBarn, useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 import BarnManueltRegistrering from "../BarnManueltRegistrering";
 import LasterSkeleton from "../components/LasterSkeleton";
-import FlereForeslåttMotpartVelger from "../forelder-flyt/FlereForeslåttMotpartVelger";
-import MotpartVelger from "../forelder-flyt/MotpartVelger";
-import SøskenListe from "../forelder-flyt/SøskenListe";
-import ValgteBarnListe from "../forelder-flyt/ValgteBarnListe";
 import { useFlowSubmission } from "../hooks/useFlowSubmission";
 import { useMotpartHandling } from "../hooks/useMotpartHandling";
 import useSyncKategori from "../hooks/useSyncKategori";
+import MotpartVelger from "../motpart-felles/MotpartVelger";
+import ValgteBarnListe from "../motpart-felles/ValgteBarnListe";
 import {
     type BarnMedAlder,
     type ForelderPartRolle,
@@ -31,6 +29,8 @@ import EnhetOgSubmitSection from "../sections/EnhetOgSubmitSection";
 import MotpartSection from "../sections/MotpartSection";
 import ValideringsAlertsSection from "../sections/ValideringsAlertsSection";
 import { hentMotsattRolle } from "../utils";
+import FlereForeslåttMotpartVelger from "./FlereForeslåttMotpartVelger";
+import SøskenListe from "./SøskenListe";
 
 export type ForeslåttForelder = {
     barnIdent: string;

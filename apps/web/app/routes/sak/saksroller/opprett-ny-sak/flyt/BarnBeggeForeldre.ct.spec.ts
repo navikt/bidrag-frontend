@@ -43,4 +43,29 @@ test.describe("Barn med begge foreldre", () => {
         expect(bidragspliktigIdent).toBeTruthy();
         await expect(component.getByRole("button", { name: /Opprett$/ })).toBeDisabled();
     });
+
+    test("eksisterende sak UTEN barn sperrer ikke opprettelse", async ({ mount, page }) => {
+        await mockWizardApi(page);
+        const component = await mount(STORY);
+        const foreldre = component.getByRole("radio");
+        const bidragsmottakerIdent = await foreldre.nth(1).getAttribute("value");
+        await page.route(/\/proxy\/bidrag-sak\/person\/sak$/, async (route) => {
+            const etterspurtIdent = JSON.parse(route.request().postData() ?? '""') as string;
+            await route.fulfill({
+                json: [
+                    {
+                        saksnummer: "1234567",
+                        roller: [
+                            { fodselsnummer: etterspurtIdent, type: "BP" },
+                            { fodselsnummer: bidragsmottakerIdent, type: "BM" },
+                        ],
+                    },
+                ],
+            });
+        });
+        await foreldre.nth(0).check();
+
+        await expect(component.getByText(/1234567/)).not.toBeVisible();
+        await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
+    });
 });
