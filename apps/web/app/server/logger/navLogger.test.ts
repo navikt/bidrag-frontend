@@ -1,8 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-    logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), child: vi.fn(), level: "info" },
-    teamLogger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), child: vi.fn(), level: "info" },
+    logger: {
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        trace: vi.fn(),
+        child: vi.fn(),
+        level: "info",
+        isLevelEnabled: vi.fn(() => true),
+    },
+    teamLogger: {
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        trace: vi.fn(),
+        child: vi.fn(),
+        level: "info",
+        isLevelEnabled: vi.fn(() => true),
+    },
 }));
 
 vi.mock("@navikt/pino-logger", () => ({ logger: mocks.logger }));
@@ -14,6 +30,8 @@ import { navLogger, secureNavLogger } from "./navLogger.ts";
 describe("navLogger", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mocks.logger.isLevelEnabled.mockReturnValue(true);
+        mocks.teamLogger.isLevelEnabled.mockReturnValue(true);
     });
 
     it("legger på correlationId og user uten at kallstedet oppgir dem", () => {
@@ -116,3 +134,97 @@ describe("navLogger", () => {
         );
     });
 });
+
+describe("navLogger — maskering av fødselsnummer", () => {
+    // Syntetisk fødselsnummer med gyldige kontrollsiffer.
+    const FNR = lagSyntetiskFnr();
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mocks.logger.isLevelEnabled.mockReturnValue(true);
+        mocks.teamLogger.isLevelEnabled.mockReturnValue(true);
+    });
+
+    it("maskerer fødselsnummer i meldingen, ikke bare i objektet", () => {
+        // Den vanligste lekkasjeveien: fnr interpolert rett inn i meldingen.
+        navLogger.error(`Fant ikke person ${FNR}`);
+
+        const [obj, melding] = mocks.logger.error.mock.calls[0] ?? [];
+        expect(String(melding)).not.toContain(FNR);
+        expect(obj).toMatchObject({ maskert_fnr: 1 });
+    });
+
+    it("maskerer fødselsnummer i både objekt og melding", () => {
+        navLogger.warn({ app: "bidrag-sak" }, `Ident ${FNR}`);
+
+        const [obj, melding] = mocks.logger.warn.mock.calls[0] ?? [];
+        expect(String(melding)).not.toContain(FNR);
+        expect(obj).toMatchObject({ app: "bidrag-sak", maskert_fnr: 1 });
+    });
+
+    it("maskerer fødselsnummer i en sti, der nøkkelen ikke er sensitiv", () => {
+        // Proxyen logger `path: subPath`, og backend-stier kan inneholde fnr.
+        navLogger.warn({ app: "bidrag-sak", path: `/person/${FNR}` }, "Proxy-kall fullført");
+
+        const [obj] = mocks.logger.warn.mock.calls[0] ?? [];
+        expect(JSON.stringify(obj)).not.toContain(FNR);
+    });
+
+    it("maskerer også kopien som havner i teamloggen", () => {
+        navLogger.error({ path: `/person/${FNR}` }, "Feil");
+
+        expect(JSON.stringify(mocks.teamLogger.error.mock.calls[0])).not.toContain(FNR);
+    });
+
+    it("legger ikke på maskert_fnr når ingenting ble maskert", () => {
+        navLogger.info({ app: "bidrag-sak" }, "Alt i orden");
+
+        expect(mocks.logger.info).toHaveBeenCalledWith({ app: "bidrag-sak" }, "Alt i orden");
+    });
+
+    it("maskerer ikke i securelog", () => {
+        // Teamloggen er det sanksjonerte stedet for sensitive data.
+        secureNavLogger.error({ ident: FNR }, "Feilet");
+
+        expect(JSON.stringify(mocks.teamLogger.error.mock.calls[0])).toContain(FNR);
+    });
+
+    it("viderefører maskeringsinnstillingen til child-loggere", () => {
+        mocks.teamLogger.child.mockReturnValue(mocks.teamLogger);
+
+        secureNavLogger.child({ app: "bidrag-sak" }).error({ ident: FNR }, "Feilet");
+
+        expect(JSON.stringify(mocks.teamLogger.error.mock.calls[0])).toContain(FNR);
+    });
+
+    it("hopper over maskering når nivået er slått av", () => {
+        // Proxyen kaller trace på hvert eneste kall, og trace er av i prod.
+        mocks.logger.isLevelEnabled.mockReturnValue(false);
+        mocks.teamLogger.isLevelEnabled.mockReturnValue(false);
+
+        navLogger.trace({ path: `/person/${FNR}` }, "Proxy-kall fullført");
+
+        expect(mocks.logger.trace).not.toHaveBeenCalled();
+    });
+});
+
+/** Genererer et syntetisk fødselsnummer, slik at ingen ekte identer ligger i repoet. */
+function lagSyntetiskFnr(): string {
+    const vekterK1 = [3, 7, 6, 1, 8, 9, 4, 5, 2];
+    const vekterK2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+    const siffer = (sifre: number[], vekter: number[]) => {
+        const rest = vekter.reduce((akk, vekt, i) => akk + vekt * (sifre[i] ?? 0), 0) % 11;
+        if (rest === 0) return 0;
+        return 11 - rest === 10 ? null : 11 - rest;
+    };
+
+    for (let individ = 0; individ < 1000; individ++) {
+        const base = [...`150685${String(individ).padStart(3, "0")}`].map(Number);
+        const k1 = siffer(base, vekterK1);
+        if (k1 === null) continue;
+        const k2 = siffer([...base, k1], vekterK2);
+        if (k2 === null) continue;
+        return [...base, k1, k2].join("");
+    }
+    throw new Error("Klarte ikke lage syntetisk fnr");
+}

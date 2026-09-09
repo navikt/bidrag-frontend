@@ -1,3 +1,4 @@
+import { maskerFnr } from "@bidrag/common/logging/maskerFnr";
 import { logger } from "@navikt/pino-logger";
 import { teamLogger } from "@navikt/pino-logger/team-log";
 import type { Bindings, Logger } from "pino";
@@ -29,6 +30,48 @@ function medAmbientFelter(arg: unknown): unknown {
     return { ...ambient, ...(arg as object) };
 }
 
+type Loggkall = {
+    obj: unknown;
+    args: unknown[];
+};
+
+/**
+ * Maskerer fødselsnummer i hele loggkallet.
+ *
+ * Både første argument og resten må gjennom. Pino-signaturen er `log(obj, melding)`, og
+ * meldingen er i praksis den vanligste lekkasjeveien — `log.error(`Fant ikke ${fnr}`)`
+ * har ikke noe objekt i det hele tatt.
+ *
+ * Antall treff legges på som `maskert_fnr`, slik at vi kan alarmere på kallsteder som
+ * lekker i stedet for bare å skjule dem.
+ */
+function maskerLoggkall({ obj, args }: Loggkall): Loggkall {
+    const maskertObj = maskerFnr(obj);
+    const maskerteArgs = args.map((arg) => maskerFnr(arg));
+    const antall = maskertObj.antall + maskerteArgs.reduce((sum, a) => sum + a.antall, 0);
+
+    if (antall === 0) {
+        return { obj, args };
+    }
+
+    const verdier = maskerteArgs.map((a) => a.verdi);
+
+    // Telemetrifeltet må ligge på et objekt. Er første argument en streng, er den selve
+    // meldingen, og da skyves den bakover slik at pino fortsatt tolker kallet riktig.
+    if (typeof maskertObj.verdi === "string" || maskertObj.verdi === undefined) {
+        const melding = maskertObj.verdi;
+        return {
+            obj: { maskert_fnr: antall },
+            args: melding === undefined ? verdier : [melding, ...verdier],
+        };
+    }
+
+    return {
+        obj: { ...(maskertObj.verdi as object), maskert_fnr: antall },
+        args: verdier,
+    };
+}
+
 type Loggmetoder = Pick<Logger, Nivå>;
 
 type NavLogger = Loggmetoder & {
@@ -36,14 +79,33 @@ type NavLogger = Loggmetoder & {
     child: (bindings: Bindings) => NavLogger;
 };
 
-function lagLogger(mål: readonly Logger[]): NavLogger {
+type Innstillinger = {
+    /**
+     * Maskerer fødselsnummer før loggen skrives.
+     *
+     * Av for securelog: teamloggen er det sanksjonerte stedet for sensitive data, med
+     * strengere tilgangsstyring og kortere lagringstid. Maskering der ville fjernet det
+     * eneste verktøyet for identspesifikk feilsøking.
+     */
+    masker: boolean;
+};
+
+function lagLogger(mål: readonly Logger[], innstillinger: Innstillinger): NavLogger {
     const metoder = {} as Record<Nivå, (obj: unknown, ...args: unknown[]) => void>;
 
     for (const nivå of NIVÅER) {
         metoder[nivå] = (obj: unknown, ...args: unknown[]) => {
+            // Pino filtrerer selv på nivå, men da hadde vi betalt for maskering av logger
+            // som uansett forkastes. Proxyen kaller `trace` på hvert eneste kall.
+            if (!mål.some((mållogger) => mållogger.isLevelEnabled?.(nivå) ?? true)) {
+                return;
+            }
+
             const beriket = medAmbientFelter(obj);
+            const kall = innstillinger.masker ? maskerLoggkall({ obj: beriket, args }) : { obj: beriket, args };
+
             for (const mållogger of mål) {
-                (mållogger[nivå] as (obj: unknown, ...args: unknown[]) => void)(beriket, ...args);
+                (mållogger[nivå] as (obj: unknown, ...args: unknown[]) => void)(kall.obj, ...kall.args);
             }
         };
     }
@@ -51,12 +113,20 @@ function lagLogger(mål: readonly Logger[]): NavLogger {
     return {
         ...(metoder as Loggmetoder),
         level: mål[0]?.level ?? "info",
-        child: (bindings: Bindings) => lagLogger(mål.map((mållogger) => mållogger.child(bindings))),
+        // Innstillingene må følge med, ellers begynner avledede loggere stille å maskere.
+        child: (bindings: Bindings) =>
+            lagLogger(
+                mål.map((mållogger) => mållogger.child(bindings)),
+                innstillinger,
+            ),
     };
 }
 
-/** Logger til både vanlig logg og teamlogg. Ambient felter legges på automatisk. */
-export const navLogger = lagLogger([logger, teamLogger as Logger]);
+/** Logger til både vanlig logg og teamlogg. Ambient felter og fnr-maskering legges på automatisk. */
+export const navLogger = lagLogger([logger, teamLogger as Logger], { masker: true });
 
-/** Kun teamlogg (securelog), for innhold som ikke skal i den vanlige loggen. */
-export const secureNavLogger = lagLogger([teamLogger as Logger]);
+/**
+ * Kun teamlogg (securelog), for innhold som ikke skal i den vanlige loggen.
+ * Maskeres ikke — bruk denne bevisst når identer faktisk må logges.
+ */
+export const secureNavLogger = lagLogger([teamLogger as Logger], { masker: false });

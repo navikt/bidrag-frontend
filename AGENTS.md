@@ -56,6 +56,10 @@ pnpm test             # Kjør tester i alle workspaces (kun pakker med testscrip
 ## Grenser
 
 - Ikke logg PII (fødselsnummer, navn, adresse)
+  - `navLogger` og Faro maskerer fødselsnummer automatisk (`packages/common/src/logging/maskerFnr.ts`).
+    Dette er et **sikkerhetsnett**, ikke en tillatelse — regelen over står ved lag.
+  - Feltet `maskert_fnr` i loggen betyr at et kallsted lekket og bør rettes.
+  - `secureNavLogger` maskeres ikke. Bruk den bevisst når identer faktisk må logges.
 - Bruk Aksel Design System-komponenter og spacing-tokens (`space-*`)
 - Ikke sett CPU-limits i Nais-manifest (kun requests)
 - Aldri hardkode tokens eller secrets

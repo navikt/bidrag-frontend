@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
     authTokenContext: Symbol("authTokenContext"),
     debug: vi.fn(),
+    trace: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
     getApiConfig: vi.fn(),
@@ -13,7 +14,7 @@ vi.mock("~/api.env.ts", () => ({ getApiConfig: mocks.getApiConfig }));
 vi.mock("~/server/auth/auth.context.ts", () => ({ authTokenContext: mocks.authTokenContext }));
 vi.mock("~/server/auth/auth.utils.server.ts", () => ({ getOnBehalfOfToken: mocks.getOnBehalfOfToken }));
 vi.mock("~/server/logger/navLogger.ts", () => ({
-    navLogger: { debug: mocks.debug, warn: mocks.warn, error: mocks.error },
+    navLogger: { debug: mocks.debug, trace: mocks.trace, warn: mocks.warn, error: mocks.error },
 }));
 
 import { kjørMedLoggerKontekst } from "~/server/logger/loggerContext.ts";
@@ -53,7 +54,7 @@ describe("proxy", () => {
         expect(response.headers.get("X-Correlation-ID")).toBe("KLIEN-T0001");
         expect(response.headers.get("X-Backend-Header")).toBe("behold");
         expect(await response.text()).toBe("ok");
-        expect(mocks.debug).toHaveBeenCalledWith(
+        expect(mocks.trace).toHaveBeenCalledWith(
             expect.objectContaining({ app: "bidrag-sak", method: "GET", status: 200 }),
             "Proxy-kall fullført",
         );
