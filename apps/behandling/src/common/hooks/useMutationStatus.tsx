@@ -30,14 +30,14 @@ export const useMutationStatus = (behandlingId: string) => {
 
     useEffect(() => {
         console.debug("Mutation status changed", JSON.stringify(mutationStatus));
-        if (mutationStatus.status === "success") {
+        if (mutationStatus.status === "success" && behandlingId) {
             console.debug("Sending broadcast", notatBroadcastName, behandlingId);
             Broadcast.sendBroadcast(notatBroadcastName, {
-                id: behandlingId.toString(),
+                id: behandlingId,
                 payload: null,
             });
         }
-    }, [mutationStatus]);
+    }, [mutationStatus, behandlingId]);
 
     return mutationStatus.status;
 };

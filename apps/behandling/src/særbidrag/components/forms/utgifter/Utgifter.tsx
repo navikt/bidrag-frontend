@@ -12,7 +12,7 @@ import { deductDays, ObjectUtils } from "@bidrag/common";
 import { FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Box, Button, Checkbox, Heading, HStack, Label, Table } from "@navikt/ds-react";
 import type { UseMutationResult } from "@tanstack/react-query";
-import React, { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { type FieldPath, FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";
@@ -37,7 +37,6 @@ import { useBehandlingProvider } from "../../../../common/context/BehandlingCont
 import { actionOnEnter } from "../../../../common/helpers/keyboardHelpers";
 import { type UtgifterPayload, useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { useDebounce } from "../../../../common/hooks/useDebounce";
-import useFeatureToogle from "../../../../common/hooks/useFeatureToggle";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
 import { hentVisningsnavn, hentVisningsnavnVedtakstype } from "../../../../common/hooks/useVisningsnavn";
 import { DateToDDMMYYYYString, dateOrNull, deductMonths, isBeforeDate } from "../../../../utils/date-utils";
@@ -83,7 +82,7 @@ const Forfallsdato = ({ item, index }: { item: Utgiftspost; index: number }) => 
             name={`utgifter.${index}.dato`}
             label={text.label.forfallsdato}
             placeholder="DD.MM.ÅÅÅÅ"
-            defaultValue={item["dato"]}
+            defaultValue={item.dato}
             toDate={deductDays(new Date(), 1)}
             required
             hideLabel
@@ -594,7 +593,7 @@ const UtgifterListe = ({
                         <Table.Body>
                             {controlledFields.map((item, index) => (
                                 <Table.Row
-                                    key={item.id + "-" + index}
+                                    key={`${item.id}-${index}`}
                                     className="align-top"
                                     onKeyDown={actionOnEnter(() => {
                                         onSaveRow(index);
@@ -694,7 +693,7 @@ const BeregnetUtgifter = () => {
                     </Table.Header>
                     <Table.Body>
                         {totalBeregning.map((item, index) => (
-                            <Table.Row key={item.utgiftstype + "-" + index} className="align-middle">
+                            <Table.Row key={`${item.utgiftstype}-${index}`} className="align-middle">
                                 <Table.DataCell textSize="small">
                                     <div className="h-8 w-full flex items-center justify-center">
                                         {item.betaltAvBp && (
@@ -781,7 +780,7 @@ const UtgifterForm = () => {
     const { setValue, getValues } = useFormMethods;
 
     const onSave = async (values: UtgiftFormValues, _name?: FieldPath<UtgiftFormValues>) => {
-        const name = _name.toString();
+        const name = _name?.toString();
         if (name === "beregning.beløpDirekteBetaltAvBp") {
             await updateAndSave(
                 {
@@ -857,17 +856,15 @@ const UtgifterForm = () => {
     );
 
     return (
-        <>
-            <FormProvider {...useFormMethods}>
-                <form>
-                    <NewFormLayout
-                        title={text.title.utgift}
-                        main={<Main mutation={saveUtgifter.mutation} />}
-                        side={<Side mutation={saveUtgifter.mutation} />}
-                    />
-                </form>
-            </FormProvider>
-        </>
+        <FormProvider {...useFormMethods}>
+            <form>
+                <NewFormLayout
+                    title={text.title.utgift}
+                    main={<Main mutation={saveUtgifter.mutation} />}
+                    side={<Side mutation={saveUtgifter.mutation} />}
+                />
+            </form>
+        </FormProvider>
     );
 };
 

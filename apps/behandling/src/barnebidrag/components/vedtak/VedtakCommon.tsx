@@ -314,14 +314,12 @@ export const VedtakResultatBarn = ({ barn }: { barn: ResultatRolle }) => (
             ident={barn.ident}
             stønad18År={barn.stønadstype === Stonadstype.BIDRAG18AAR}
         />
-        <BodyShort>
-            <PersonNavnIdent
-                ident={barn.ident}
-                navn={barn.navn}
-                variant="compact"
-                stønad18År={barn.stønadstype === Stonadstype.BIDRAG18AAR}
-            />
-        </BodyShort>
+        <PersonNavnIdent
+            ident={barn.ident}
+            navn={barn.navn}
+            variant="compact"
+            stønad18År={barn.stønadstype === Stonadstype.BIDRAG18AAR}
+        />
     </div>
 );
 export const VedtakTableHeader = ({

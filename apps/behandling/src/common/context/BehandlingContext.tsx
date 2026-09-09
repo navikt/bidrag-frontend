@@ -546,7 +546,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             if (environment.system.sporingEnabled) {
                 if (!tabIdentifier) return;
                 const tabRoleIndex = getFirstNumericalValue(tabIdentifier);
-                const rolle = behandling.roller.find((r) => r.id.toString() === tabRoleIndex?.toString());
+                const rolle = behandling.roller.find((r) => r.id === tabRoleIndex);
 
                 window.faro?.api.pushEvent("undersidenavigering", {
                     side: String(activeStep),

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHentFodselsdatoer } from "../../api/useApiData";
 import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
 import { RolleTypeAbbreviation, RolleTypeFullName } from "../../types/roller/RolleType";
-import { ExpandedRoles, type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
+import ExpandedRoles, { type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 type TypeBehandling = string;
 

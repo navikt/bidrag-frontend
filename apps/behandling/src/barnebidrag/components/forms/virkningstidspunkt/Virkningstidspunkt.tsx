@@ -1254,7 +1254,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
         selectedRoller,
     } = useBehandlingProvider();
     const [searchParams] = useSearchParams();
-    const { virkningstidspunktV3: virkningstidspunkt, forholdsmessigFordeling, søktFomDato } = useGetBehandlingV2();
+    const { virkningstidspunktV3: virkningstidspunkt } = useGetBehandlingV2();
     const mergeVirkningstidspunkterMutation = useOnMergeVirkningtidspunkt();
     const ref = useRef<HTMLDialogElement>(null);
     const roller = useFieldArray({
@@ -1323,7 +1323,7 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
     usePageTabs({
         items: visibleControlledFields,
         mapToTab: (rolle) => ({
-            id: rolle.rolle.id.toString(),
+            id: `${rolle.rolle.id}`,
             label: rolle.rolle.rolletype,
         }),
         selectedTabId: selectedTab,
