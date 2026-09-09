@@ -7,6 +7,7 @@ import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import { env } from "~/env.server.ts";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
 import { userContext } from "~/server/context.ts";
+import { loggerMiddleware } from "~/server/logger/loggerMiddleware.ts";
 import { getNaisConfig } from "~/server/naisConfig.server.ts";
 import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts";
 import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
@@ -21,7 +22,7 @@ import { UnleashContextUpdater } from "~/common/unleash/UnleashContextUpdater.ts
 import type { Route } from "./+types/root.ts";
 import faviconUrl from "./assets/bisys_favicon.ico";
 
-export const middleware = [authMiddleware];
+export const middleware = [loggerMiddleware, authMiddleware];
 export const clientMiddleware = [bisysParamsMiddleware];
 
 export async function loader({ context, request }: Route.LoaderArgs) {

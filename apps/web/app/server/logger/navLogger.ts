@@ -1,69 +1,62 @@
 import { logger } from "@navikt/pino-logger";
 import { teamLogger } from "@navikt/pino-logger/team-log";
-import type { Logger } from "pino";
+import type { Bindings, Logger } from "pino";
+import { hentRequestKontekst } from "./loggerContext.ts";
 
-const combinedLogger: Logger = {
-    level: logger.level,
-    // Implement all the logger methods to call both loggers
-    fatal: (obj: any, ...args: any[]) => {
-        logger.fatal(obj, ...args);
-        teamLogger.fatal(obj, ...args);
-    },
-    error: (obj: any, ...args: any[]) => {
-        logger.error(obj, ...args);
-        teamLogger.error(obj, ...args);
-    },
-    warn: (obj: any, ...args: any[]) => {
-        logger.warn(obj, ...args);
-        teamLogger.warn(obj, ...args);
-    },
-    info: (obj: any, ...args: any[]) => {
-        logger.info(obj, ...args);
-        teamLogger.info(obj, ...args);
-    },
-    debug: (obj: any, ...args: any[]) => {
-        logger.debug(obj, ...args);
-        teamLogger.debug(obj, ...args);
-    },
-    trace: (obj: any, ...args: any[]) => {
-        logger.trace(obj, ...args);
-        teamLogger.debug(obj, ...args);
-    },
-    //@ts-expect-error
-    child: (bindings: pino.Bindings) => {
-        const childLogger = logger.child(bindings);
-        const teamChildLogger = teamLogger.child(bindings);
+const NIVÅER = ["fatal", "error", "warn", "info", "debug", "trace"] as const;
 
-        // Return a combined child logger
-        return {
-            level: childLogger.level,
-            fatal: (obj: any, ...args: any[]) => {
-                childLogger.fatal(obj, ...args);
-                teamChildLogger.fatal(obj, ...args);
-            },
-            error: (obj: any, ...args: any[]) => {
-                childLogger.error(obj, ...args);
-                teamChildLogger.error(obj, ...args);
-            },
-            warn: (obj: any, ...args: any[]) => {
-                childLogger.warn(obj, ...args);
-                teamChildLogger.warn(obj, ...args);
-            },
-            info: (obj: any, ...args: any[]) => {
-                childLogger.info(obj, ...args);
-                teamChildLogger.info(obj, ...args);
-            },
-            debug: (obj: any, ...args: any[]) => {
-                childLogger.debug(obj, ...args);
-                teamChildLogger.debug(obj, ...args);
-            },
-            trace: (obj: any, ...args: any[]) => {
-                childLogger.trace(obj, ...args);
-                teamChildLogger.trace(obj, ...args);
-            },
-        };
-    },
+type Nivå = (typeof NIVÅER)[number];
+
+/**
+ * Slår `correlationId` og `user` fra den aktive requesten inn i loggobjektet.
+ *
+ * Feltene slås inn per kall, ikke når loggeren opprettes, fordi `user` fylles inn av
+ * authMiddleware etter at konteksten er åpnet.
+ */
+function medAmbientFelter(arg: unknown): unknown {
+    const ambient = hentRequestKontekst();
+
+    // pino tolker en ren streng som selve meldingen — den skal slippe gjennom urørt.
+    if (arg === undefined || typeof arg === "string") {
+        return arg;
+    }
+    // Pakkes som `err` slik at pinos innebygde serializer beholder stacktracen.
+    if (arg instanceof Error) {
+        return { ...ambient, err: arg };
+    }
+
+    // Eksplisitte felter spres sist, slik at kallstedet kan overstyre ambient kontekst.
+    return { ...ambient, ...(arg as object) };
+}
+
+type Loggmetoder = Pick<Logger, Nivå>;
+
+type NavLogger = Loggmetoder & {
+    level: string;
+    child: (bindings: Bindings) => NavLogger;
 };
 
-export const navLogger = combinedLogger;
-export const secureNavLogger = teamLogger;
+function lagLogger(mål: readonly Logger[]): NavLogger {
+    const metoder = {} as Record<Nivå, (obj: unknown, ...args: unknown[]) => void>;
+
+    for (const nivå of NIVÅER) {
+        metoder[nivå] = (obj: unknown, ...args: unknown[]) => {
+            const beriket = medAmbientFelter(obj);
+            for (const mållogger of mål) {
+                (mållogger[nivå] as (obj: unknown, ...args: unknown[]) => void)(beriket, ...args);
+            }
+        };
+    }
+
+    return {
+        ...(metoder as Loggmetoder),
+        level: mål[0]?.level ?? "info",
+        child: (bindings: Bindings) => lagLogger(mål.map((mållogger) => mållogger.child(bindings))),
+    };
+}
+
+/** Logger til både vanlig logg og teamlogg. Ambient felter legges på automatisk. */
+export const navLogger = lagLogger([logger, teamLogger as Logger]);
+
+/** Kun teamlogg (securelog), for innhold som ikke skal i den vanlige loggen. */
+export const secureNavLogger = lagLogger([teamLogger as Logger]);

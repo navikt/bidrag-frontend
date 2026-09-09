@@ -1,24 +1,22 @@
 import { type LogInfo, LogLevel, type LogResponse } from "@bidrag/common";
-import type pino from "pino";
 import { env } from "~/env.server.ts";
-import { userContext } from "~/server/auth/auth.context";
 import exceptionToErrorCode from "~/server/logger/utils/ExceptionHasher";
 import { symbolicateStackTrace } from "~/server/logger/utils/SymbolicateStackTrace";
 import type { Route } from "./+types/logRoute.ts";
 import { navLogger, secureNavLogger } from "./navLogger";
 
-export async function action({ params, request, context }: Route.ActionArgs) {
+export async function action({ params, request }: Route.ActionArgs) {
     const { type } = params;
     const isSecureLog = type === "secure";
-    const logger = isSecureLog ? secureNavLogger : navLogger;
 
-    const user = context.get(userContext);
-    return doLog(logger, request, user?.NAVident ?? "ukjent");
+    return doLog(isSecureLog ? secureNavLogger : navLogger, request);
 }
 
-async function doLog(loggerInstance: pino.Logger, req: Request, user: string): Promise<LogResponse> {
+type Logger = typeof navLogger;
+
+async function doLog(logger: Logger, req: Request): Promise<LogResponse> {
     const payload: LogInfo = await req.json();
-    const { moduleName, appName = "bidrag-frontend", level, error, message, correlationId } = payload;
+    const { moduleName, appName = "bidrag-frontend", level, error, message } = payload;
     const errorPayload = error as LogInfo["error"] & {
         stack?: string;
         stackTrace?: string;
@@ -33,17 +31,13 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
     const { symbolicatedStackTrace, didSymbolicate, debug } = await symbolicateStackTrace(rawStackTrace);
     const resolvedStackTrace = symbolicatedStackTrace || rawStackTrace;
 
-    let metadata: Record<string, unknown> =
-        level === LogLevel.FEEDBACK
-            ? {
-                  module: `${appName}/${moduleName}`,
-              }
-            : {
-                  module: `${appName}/${moduleName}`,
-                  user,
-                  // sessionId: req.session.sessionId,
-                  correlationId: correlationId, //?? getCorrelationIdFromThread(),
-              };
+    // `correlationId` og `user` kommer fra request-konteksten. Her overstyres de bevisst:
+    // ID-en fra payloaden gjelder feilen i nettleseren, og tilbakemeldinger logges uten NAV-ident.
+    let metadata: Record<string, unknown> = {
+        module: `${appName}/${moduleName}`,
+        ...(payload.correlationId ? { correlationId: payload.correlationId } : {}),
+        ...(level === LogLevel.FEEDBACK ? { user: undefined } : {}),
+    };
 
     if (error) {
         metadata = {
@@ -62,20 +56,20 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
     switch (level) {
         case LogLevel.FEEDBACK:
         case LogLevel.INFO:
-            loggerInstance.info(metadata, message);
+            logger.info(metadata, message);
             break;
         case LogLevel.WARNING:
-            loggerInstance.warn(metadata, message);
+            logger.warn(metadata, message);
             break;
         case LogLevel.DEBUG: {
             if (env.NODE_ENV === "development") {
-                loggerInstance.debug(metadata, message);
+                logger.debug(metadata, message);
             }
             break;
         }
         case LogLevel.ERROR: {
             if (!error) {
-                loggerInstance.error(metadata, `Det skjedde en teknisk feil i applikasjonen ${appName}: ${message}`);
+                logger.error(metadata, `Det skjedde en teknisk feil i applikasjonen ${appName}: ${message}`);
                 break;
             }
             //TODO fjerne errorCode og exceptionCode da de ikke brukes
@@ -90,7 +84,7 @@ async function doLog(loggerInstance: pino.Logger, req: Request, user: string): P
             logResponse.errorCode = errorCode;
             logResponse.exceptionCode = exceptionCode;
 
-            loggerInstance.error(
+            logger.error(
                 errorMetadata,
                 `Det skjedde en teknisk feil i applikasjonen ${appName}/${moduleName} med feilkode ${errorCode}: ${message}`,
             );
