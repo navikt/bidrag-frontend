@@ -1,7 +1,6 @@
 import { CustomError } from "./CustomError";
 
 export class ApiError extends CustomError {
-    public data: any;
     public ok = false;
     public error?: Error;
 

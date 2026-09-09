@@ -336,4 +336,3 @@ export function maskerFnrITekst(tekst: string): Maskeringsresultat<string> {
 export function erSensitivNøkkel(nøkkel: string): boolean {
     return SENSITIVE_NØKLER.test(nøkkel);
 }
-
