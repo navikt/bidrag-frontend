@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { expectNoAxeViolations, mockWizardApi } from "../network";
+import { expectNoAxeViolations, mockWizardApi } from "../playwright/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/playwright/barn-begge-foreldre/BarnBeggeForeldre/Standard";
+const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/BarnBeggeForeldre/Standard";
 
 test.describe("Barn med begge foreldre", () => {
     test("bytter roller når en annen bidragspliktig velges", async ({ mount, page }) => {

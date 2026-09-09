@@ -1,9 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { expectNoAxeViolations, mockWizardApi } from "../network";
+import { expectNoAxeViolations, mockWizardApi } from "../playwright/network";
 
-const STANDARD = "routes/sak/saksroller/opprett-ny-sak/playwright/forelder-med-barn/ForelderMedBarn/Standard";
-const UKJENT =
-    "routes/sak/saksroller/opprett-ny-sak/playwright/forelder-med-barn/ForelderMedBarn/UkjentBidragsmottaker";
+const STANDARD = "routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/Standard";
+const UKJENT = "routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/UkjentBidragsmottaker";
 
 test.describe("Forelder med barn", () => {
     test("låser andre barnkurver, viser enhet og oppretter sak", async ({ mount, page }) => {

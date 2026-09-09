@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { samhandler } from "../fixtures";
-import { expectNoAxeViolations, mockWizardApi } from "../network";
+import { samhandler } from "../playwright/fixtures";
+import { expectNoAxeViolations, mockWizardApi } from "../playwright/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/playwright/oppfostringsbidrag/Oppfostringsbidrag/Standard";
+const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Oppfostringsbidrag/Standard";
 
 test("krever samhandler som reell mottaker og bruker arbeidsfordeling OPS", async ({ mount, page }) => {
     const requests = await mockWizardApi(page);

@@ -1,5 +1,5 @@
-import { barnkurver, testpersoner, ukjentBarnkurv } from "../fixtures";
-import { WizardFlowStory } from "../WizardFlowStory";
+import { barnkurver, testpersoner, ukjentBarnkurv } from "../playwright/fixtures";
+import { WizardFlowStory } from "../playwright/WizardFlowStory";
 
 export const Standard = () => (
     <WizardFlowStory

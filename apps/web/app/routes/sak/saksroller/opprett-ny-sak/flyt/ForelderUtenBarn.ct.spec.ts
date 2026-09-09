@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { testpersoner } from "../fixtures";
-import { expectNoAxeViolations, mockWizardApi } from "../network";
+import { testpersoner } from "../playwright/fixtures";
+import { expectNoAxeViolations, mockWizardApi } from "../playwright/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/playwright/forelder-uten-barn/ForelderUtenBarn/Standard";
+const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/ForelderUtenBarn/Standard";
 
 test("søker opp barn og foreslår registrert forelder", async ({ mount, page }) => {
     await mockWizardApi(page, {

@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { testpersoner } from "../fixtures";
-import { mockWizardApi } from "../network";
+import { testpersoner } from "./playwright/fixtures";
+import { mockWizardApi } from "./playwright/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/playwright/wizard/OpprettSakFlyt/Standard";
+const STORY = "routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt/Standard";
 
 test("endrer sakstype, søker person via nettverk og endrer valgt part", async ({ mount, page }) => {
     await mockWizardApi(page);

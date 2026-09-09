@@ -1,10 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { expectNoAxeViolations, mockWizardApi } from "../network";
+import { expectNoAxeViolations, mockWizardApi } from "../playwright/network";
 
-const INGEN =
-    "routes/sak/saksroller/opprett-ny-sak/playwright/barn-manglende-foreldre/BarnManglendeForeldre/IngenKjenteForeldre";
-const EN =
-    "routes/sak/saksroller/opprett-ny-sak/playwright/barn-manglende-foreldre/BarnManglendeForeldre/EnKjentForelder";
+const INGEN = "routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/IngenKjenteForeldre";
+const EN = "routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/EnKjentForelder";
 
 test.describe("Barn med manglende foreldre", () => {
     test("viser registrering av begge foreldre og påkrevd reell mottaker", async ({ mount, page }) => {

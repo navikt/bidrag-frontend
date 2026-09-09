@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { expectNoAxeViolations, mockWizardApi } from "../network";
+import { expectNoAxeViolations, mockWizardApi } from "../playwright/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/playwright/farskap/Farskap/Standard";
+const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Farskap/Standard";
 
 test.describe("Farskap", () => {
     test("krever barn og bruker arbeidsfordeling FRS", async ({ mount, page }) => {
