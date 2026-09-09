@@ -70,7 +70,6 @@ export function useSamhandlerHandling() {
             }
 
             const formValues = form.getValues();
-            console.log("Form values ved mottak av samhandler:", formValues, reellMottaker);
 
             const reelMottakerIdent = reellMottaker.samhandlerId ?? reellMottaker.ident ?? reellMottaker.offentligId;
             // For Forelder-flyt (har valgteBarn array)

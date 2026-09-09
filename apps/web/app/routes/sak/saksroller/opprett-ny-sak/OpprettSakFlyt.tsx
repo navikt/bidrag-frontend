@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
 import { PersonIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, Loader, VStack } from "@navikt/ds-react";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import DiskresjonAlert from "../components/DiskresjonAlert";
 import PersonInfo from "../components/PersonInfo";
 import SøkPerson from "../components/SøkPerson";
@@ -74,7 +74,10 @@ export default function OpprettSakFlyt() {
         return map[saksrolleFlyt.type];
     }, [saksrolleFlyt]);
 
+    const barnkurverRequestIdRef = useRef(0);
+
     const endreSakstype = () => {
+        barnkurverRequestIdRef.current += 1;
         setSakstype(null);
         setSakskategori("Nasjonal");
         setPartISakenSkjemaData(null);
@@ -82,6 +85,7 @@ export default function OpprettSakFlyt() {
     };
 
     const endrePartISaken = () => {
+        barnkurverRequestIdRef.current += 1;
         setPartISaken(null);
         setPartISakenSkjemaData(null);
         setSaksrolleFlyt(null);
@@ -91,6 +95,7 @@ export default function OpprettSakFlyt() {
         const autoRole = getAutoAssignedRole(valgtSakstype);
 
         if (!autoRole) {
+            barnkurverRequestIdRef.current += 1;
             setPartISakenSkjemaData(null);
             setSaksrolleFlyt(null);
             return;
@@ -99,8 +104,11 @@ export default function OpprettSakFlyt() {
         setPartISakenSkjemaData(tilPartISaken(person, autoRole));
 
         if (valgtSakstype === "OPPFOSTRINGSBIDRAG") {
+            barnkurverRequestIdRef.current += 1;
+            const requestId = barnkurverRequestIdRef.current;
             hentBarnkurver(person.ident)
                 .then((barnkurver) => {
+                    if (barnkurverRequestIdRef.current !== requestId) return;
                     setSaksrolleFlyt({
                         key: Date.now(),
                         type: "OPPFOSTRINGSBIDRAG",
@@ -108,6 +116,7 @@ export default function OpprettSakFlyt() {
                     });
                 })
                 .catch(() => {
+                    if (barnkurverRequestIdRef.current !== requestId) return;
                     setSaksrolleFlyt({
                         key: Date.now(),
                         type: "OPPFOSTRINGSBIDRAG",
@@ -118,8 +127,11 @@ export default function OpprettSakFlyt() {
         }
 
         if (valgtSakstype === "FARSKAP") {
+            barnkurverRequestIdRef.current += 1;
+            const requestId = barnkurverRequestIdRef.current;
             hentBarnkurver(person.ident)
                 .then((barnkurver) => {
+                    if (barnkurverRequestIdRef.current !== requestId) return;
                     setSaksrolleFlyt({
                         key: Date.now(),
                         type: "FARSKAP",
@@ -127,6 +139,7 @@ export default function OpprettSakFlyt() {
                     });
                 })
                 .catch(() => {
+                    if (barnkurverRequestIdRef.current !== requestId) return;
                     setSaksrolleFlyt({
                         key: Date.now(),
                         type: "FARSKAP",
@@ -152,10 +165,6 @@ export default function OpprettSakFlyt() {
         oppdaterFlytForSakstypeOgPart(person, sakstype);
     };
 
-    console.log("sakskategori", sakskategori);
-    console.log("sakstype", sakstype);
-    console.log("partISaken", partISaken);
-    console.log("saksrolleFlyt", saksrolleFlyt);
     return (
         <div className="max-w-4xl mx-auto">
             <div className="min-h-screen bg-ax-neutral-100 py-8 px-4">

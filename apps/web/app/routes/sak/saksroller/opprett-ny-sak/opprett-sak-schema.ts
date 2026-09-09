@@ -246,7 +246,9 @@ export const EktefellebidragSkjemaSchema = z
 export type EktefellebidragSkjemaData = z.infer<typeof EktefellebidragSkjemaSchema>;
 const validateForeldreHarRoller = (foreldre: ForelderMedRolle[], ctx: z.RefinementCtx) => {
     foreldre.forEach((forelder, index) => {
-        if (forelder.navn.trim() === "") {
+        const erRegistrertSomUkjent = forelder.erKjent === false;
+
+        if (!erRegistrertSomUkjent && forelder.navn.trim() === "") {
             ctx.addIssue({
                 code: "custom",
                 path: ["foreldre", index],

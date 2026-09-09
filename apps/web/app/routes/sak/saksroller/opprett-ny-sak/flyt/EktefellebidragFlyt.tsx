@@ -65,6 +65,7 @@ export default function EktefellebidragFlyt() {
         motpart,
         valgteBarn: [],
         arbeidsfordeling: "EFS",
+        erEktefellebidrag: true,
         eksisterendeSakPartISaken: {
             ident: partISaken.ident,
             rolle: partISaken.rolle,

@@ -39,6 +39,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
     motpart = null,
     valgteBarn = [],
     arbeidsfordeling,
+    erEktefellebidrag,
     bidragspliktig,
     bidragsmottaker,
     eksisterendeSakPartISaken,
@@ -80,6 +81,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
     } = useEksisterendeSakSjekk({
         partISaken: safePartISaken,
         motpart: safeMotpart,
+        erEktefellebidrag,
     });
 
     const {
@@ -91,7 +93,6 @@ export function useFlowSubmission<T extends FormMedKategori>({
     } = useOpprettSakHandling({ enhet: enhet ?? "", arbeidsfordeling: arbeidsfordeling ?? "EEN" });
 
     const onSubmit = form.handleSubmit(async (data) => {
-        console.log(data);
         if (arbeidsfordeling === arbeidsfordelingMap.EKTEFELLLESAK.kode) {
             await opprettEktefellebidragSak(data as unknown as EktefellebidragSkjemaData);
             return;

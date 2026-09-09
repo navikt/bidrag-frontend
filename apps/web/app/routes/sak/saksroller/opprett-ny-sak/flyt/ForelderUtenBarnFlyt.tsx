@@ -263,7 +263,6 @@ function ForelderUtenBarnFlytContent() {
     };
 
     const leggTilBarnManuell = async (barn: PersonDto, alder: number) => {
-        console.log("Legger til barn manuelt:", barn, "med alder", alder);
         settFeil("");
         settSøkteBarn(barn);
 
