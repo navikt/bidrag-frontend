@@ -53,18 +53,12 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
             duplex: "half",
         } as RequestInit);
         const status = backendResponse.status;
+        const logContext = { method: request.method, status, path: subPath };
+        const logMessage = `Proxy-kall mot ${app}: ${backendResponse.statusText}`;
         if (status >= 500) {
-            navLogger.error(
-                { app, method: request.method, status, path: subPath },
-                "Proxy-kall fullført med serverfeil",
-            );
+            navLogger.error(logContext, logMessage);
         } else if (status >= 400) {
-            navLogger.warn(
-                { app, method: request.method, status, path: subPath },
-                "Proxy-kall fullført med klientfeil",
-            );
-        } else {
-            navLogger.trace({ app, method: request.method, status, path: subPath }, "Proxy-kall fullført");
+            navLogger.warn(logContext, logMessage);
         }
 
         return responseWithCorrelationId(backendResponse, correlationId);

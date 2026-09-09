@@ -54,10 +54,6 @@ describe("proxy", () => {
         expect(response.headers.get("X-Correlation-ID")).toBe("KLIEN-T0001");
         expect(response.headers.get("X-Backend-Header")).toBe("behold");
         expect(await response.text()).toBe("ok");
-        expect(mocks.trace).toHaveBeenCalledWith(
-            expect.objectContaining({ app: "bidrag-sak", method: "GET", status: 200 }),
-            "Proxy-kall fullført",
-        );
     });
 
     it("genererer en gyldig ID når proxyen kalles uten kontekst", async () => {
