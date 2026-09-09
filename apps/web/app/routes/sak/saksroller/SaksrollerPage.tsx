@@ -12,14 +12,13 @@ import type { Route } from "./+types/SaksrollerPage.ts";
 import BarnVisning from "./BarnVisning.tsx";
 import SakButtons from "./components/SakButtons.tsx";
 import Endringsoppsummering from "./Endringsoppsummering.tsx";
-import ForelderVisning from "./ForelderVisning.tsx";
+import ForelderRolleVisning from "./forelder-rolle/ForelderRolleVisning.tsx";
 import { useEndringssporing } from "./hooks/useEndringssporing.ts";
 import { useHentSakMedPersoninfo } from "./hooks/useHentSakMedPersoninfo.ts";
 import { useSakForslag } from "./hooks/useSakForslag.tsx";
 import { useSakvisningSamhandlerHandling } from "./hooks/useSakvisningSamhandlerHandling.ts";
 import { useUfullstendigRelasjonSjekk } from "./hooks/useUfullstendigRelasjonSjekk.ts";
 import LeggTilBarn from "./LeggTilBarn.tsx";
-import LeggTilForelder from "./LeggTilForelder.tsx";
 import SakErrorBoundary from "./SakErrorBoundary.tsx";
 import { type BarnRolle, erBarn, type SakRedigeringData, SakRedigeringSchema } from "./sakvisning-schema.ts";
 import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
@@ -292,63 +291,19 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                         <form onSubmit={(event) => event.preventDefault()}>
                             <VStack gap="space-24">
                                 <Box background="sunken" padding="space-12">
-                                    <HGrid columns={{ xs: 1, md: 2 }} gap="space-24">
-                                        <VStack gap="space-4">
-                                            <Heading level="2" size="small">
-                                                Bidragspliktig
-                                            </Heading>
-                                            <Box
-                                                background="raised"
-                                                borderColor="neutral-subtleA"
-                                                borderWidth="1"
-                                                borderRadius="12"
-                                                padding="space-12"
-                                            >
-                                                {bp?.fodselsnummer ? (
-                                                    <ForelderVisning
-                                                        form={formMethods}
-                                                        rolle={bp}
-                                                        erNyForelder={!funnetPersonISak(bp.fodselsnummer)}
-                                                    />
-                                                ) : (
-                                                    <LeggTilForelder
-                                                        rolleType="BP"
-                                                        rolleNavn="Bidragspliktig"
-                                                        form={formMethods}
-                                                        muligeAndreForeldre={muligeAndreForeldre}
-                                                    />
-                                                )}
-                                            </Box>
-                                        </VStack>
-
-                                        <VStack gap="space-4">
-                                            <Heading level="2" size="small">
-                                                Bidragsmottaker
-                                            </Heading>
-                                            <Box
-                                                background="raised"
-                                                borderColor="neutral-subtleA"
-                                                borderWidth="1"
-                                                borderRadius="12"
-                                                padding="space-12"
-                                            >
-                                                {bm?.fodselsnummer ? (
-                                                    <ForelderVisning
-                                                        form={formMethods}
-                                                        rolle={bm}
-                                                        erNyForelder={!funnetPersonISak(bm.fodselsnummer)}
-                                                    />
-                                                ) : (
-                                                    <LeggTilForelder
-                                                        rolleType="BM"
-                                                        rolleNavn="Bidragsmottaker"
-                                                        form={formMethods}
-                                                        muligeAndreForeldre={muligeAndreForeldre}
-                                                    />
-                                                )}
-                                            </Box>
-                                        </VStack>
-                                    </HGrid>
+                                    <ForelderRolleVisning
+                                        bp={bp}
+                                        bm={bm}
+                                        erNyForelderBp={
+                                            bp?.fodselsnummer ? !funnetPersonISak(bp.fodselsnummer) : undefined
+                                        }
+                                        erNyForelderBm={
+                                            bm?.fodselsnummer ? !funnetPersonISak(bm.fodselsnummer) : undefined
+                                        }
+                                        form={formMethods}
+                                        muligeAndreForeldre={muligeAndreForeldre}
+                                        saksnummer={saksnummer}
+                                    />
                                 </Box>
 
                                 {!erEktefellebidrag && (
@@ -362,7 +317,11 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                                                 {barn.length === 0 ? (
                                                     <Alert variant="info">Ingen barn registrert i saken ennå</Alert>
                                                 ) : (
-                                                    <HGrid columns={{ xs: 1, md: 2, lg: 3 }} gap="space-24">
+                                                    <HGrid
+                                                        columns={{ xs: 1, md: 2, lg: 3 }}
+                                                        gap="space-24"
+                                                        align="start"
+                                                    >
                                                         {barn.map((barnRolle, idx) => (
                                                             <BarnVisning
                                                                 key={
@@ -377,6 +336,7 @@ function SakvisningContent({ saksnummer }: SakvisningProps) {
                                                                 hentOgNullstillSamhandler={hentOgNullstillSamhandler}
                                                                 erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
                                                                 erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
+                                                                saksnummer={saksnummer}
                                                             />
                                                         ))}
                                                     </HGrid>
