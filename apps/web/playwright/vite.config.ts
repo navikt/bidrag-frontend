@@ -1,11 +1,12 @@
 import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 /** Vite-server for Playwright-galleriet. */
 export default defineConfig({
     root: fileURLToPath(new URL("..", import.meta.url)),
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     resolve: {
         alias: {
             "~": fileURLToPath(new URL("../app", import.meta.url)),
