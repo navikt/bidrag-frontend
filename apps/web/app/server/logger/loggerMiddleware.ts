@@ -10,7 +10,10 @@ import { kjørMedLoggerKontekst } from "./loggerContext.ts";
  * av nettleser, proxy og backend.
  */
 export const loggerMiddleware: Route.MiddlewareFunction = ({ request }, next) => {
-    const correlationId = request.headers.get(correlationIdHeader) ?? generateCorrelationId();
+    const raw = request.headers.get(correlationIdHeader)?.trim();
+    // sjekker for å unngå injection
+    const erGyldig = !!raw && raw.length < 20 && /^[\w-]+$/.test(raw);
+    const correlationId = erGyldig ? raw : generateCorrelationId();
 
     // next() må kalles inne i scopet. Kalles den utenfor, tapes konteksten stille.
     return kjørMedLoggerKontekst({ correlationId }, () => next());
