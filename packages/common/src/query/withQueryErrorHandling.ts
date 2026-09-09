@@ -1,6 +1,6 @@
 import { type ProblemDetail, TilgangsFeilError } from "@bidrag/api";
 import axios, { type AxiosError } from "axios";
-import { SecureLoggerService } from "../logging";
+import { correlationIdHeader, SecureLoggerService } from "../logging";
 import { ApiError } from "../types";
 
 interface WithQueryErrorHandlingOptions<T> {
@@ -43,7 +43,7 @@ export async function withQueryErrorHandling<T>(
                 throw new ApiError(
                     problemDetail?.detail ?? `Feil ved kall til ${queryName}`,
                     error.stack ?? "",
-                    undefined,
+                    axiosError.response?.headers?.[correlationIdHeader] ?? null,
                     problemDetail?.status ?? error.response.status,
                     error,
                 );

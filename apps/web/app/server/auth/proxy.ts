@@ -54,7 +54,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
         } as RequestInit);
         const status = backendResponse.status;
         const logContext = { method: request.method, status, path: subPath };
-        const logMessage = `Proxy-kall mot ${app}: ${backendResponse.statusText}`;
+        const logMessage = `Proxy-kall mot ${app}: ${status}:${backendResponse.statusText}`;
         if (status >= 500) {
             navLogger.error(logContext, logMessage);
         } else if (status >= 400) {
