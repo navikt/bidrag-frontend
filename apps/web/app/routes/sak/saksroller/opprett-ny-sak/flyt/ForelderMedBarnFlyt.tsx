@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, VStack } from "@navikt/ds-react";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
 
 import LasterSkeleton from "../components/LasterSkeleton";
 import { useFlowSubmission } from "../hooks/useFlowSubmission";
@@ -142,6 +143,8 @@ function ForelderMedBarnFlytContent() {
     }, [valgteBarn.length]);
 
     const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker.erKjent;
+    const { data: kanOppretteSakUtenBm, isLoading: sjekkerTilgangUtenBm } =
+        useSjekkTilgangOpprettSakUtenBm(bidragsmottakerErUkjent);
     const harValgteBarnRelasjonTilMotpart =
         rawBarnkurver.find((kurv) => {
             const identer = kurv.fellesBarn.map((barn) => barn.ident);
@@ -209,6 +212,9 @@ function ForelderMedBarnFlytContent() {
                                 valgteBarn.length > 0 && (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart)
                             }
                             visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
+                            visKanIkkeOppretteSakAlert={
+                                bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false
+                            }
                         />
                     </>
                 )}
@@ -220,7 +226,12 @@ function ForelderMedBarnFlytContent() {
                     enhetNavn={enhetNavn}
                     isLoadingEnhet={isLoadingEnhet}
                     enhetError={enhetError}
-                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    disabled={
+                        harEksisterendeSak ||
+                        isLoadingHentSak ||
+                        isLoadingEnhet ||
+                        (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
+                    }
                     submitError={error}
                     saksnummer={saksnummer}
                 />

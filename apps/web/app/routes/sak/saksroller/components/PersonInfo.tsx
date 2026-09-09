@@ -17,6 +17,7 @@ type Props = {
     tags?: ReactNode;
     headingActions?: ReactNode;
     visModiaLenke?: boolean;
+    visKopieringsknapp?: boolean;
     children?: ReactNode;
 };
 
@@ -30,6 +31,7 @@ function PersonInfoContent({
     tags,
     headingActions,
     visModiaLenke,
+    visKopieringsknapp = true,
     children,
 }: Props) {
     const { data } = useHentPersonData(ident);
@@ -70,7 +72,7 @@ function PersonInfoContent({
                             </Link>
                         </HStack>
                     ) : (
-                        <PersonNavnIdent variant="ident" showCopyButton={true} ident={ident} />
+                        <PersonNavnIdent variant="ident" showCopyButton={visKopieringsknapp} ident={ident} />
                     )}
 
                     {personAlder !== undefined && ` (${personAlder} år)`}

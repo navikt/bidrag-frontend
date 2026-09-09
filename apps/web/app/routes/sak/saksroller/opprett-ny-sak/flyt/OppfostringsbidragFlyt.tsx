@@ -130,7 +130,10 @@ function OppfostringsbidragFlytContent() {
     const harAlleAlternativerValgt =
         valgteBarn.length > 0 &&
         valgteBarn.every(
-            (b) => b.reellMottakerType && b.reellMottakerType !== "ingen" && b.reellMottakerType !== "barnet_selv",
+            (b) =>
+                b.reellMottakerType === "annen_person" &&
+                typeof b.reellMottaker === "string" &&
+                b.reellMottaker.trim().length > 0,
         );
 
     return (

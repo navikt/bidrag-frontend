@@ -80,7 +80,7 @@ export default function RolleVelger({ form, foreldre }: Props) {
                                                     alder={alder ?? 0}
                                                     deaktivert={!person?.erKjent}
                                                 />
-                                                <BodyShort className="text-ax-neutral-600" size="small">
+                                                <BodyShort className="text-ax-neutral-800" size="small">
                                                     <PersonIdent ident={`${forelder.ident}`} />
                                                 </BodyShort>
                                             </div>

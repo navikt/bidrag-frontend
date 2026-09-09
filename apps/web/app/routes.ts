@@ -15,13 +15,10 @@ export default [
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
     route("samhandler/*", "./routes/samhandler/SamhandlerRedirect.ts"),
     route("personsok", "./routes/personsok/PersonSøkPage.tsx"),
-    // Ny sak opprettes uten kjent saksnummer, så ruten kan ikke ligge nestet
-    // under "sak/:saksnummer" selv om filene ligger under saksroller-mappen.
     route("sak/opprett", "./routes/sak/saksroller/opprett-sak/OpprettSakPage.tsx"),
     route("opprettsakmodal", "./routes/sak/saksroller/opprett-sak/OpprettSakLegacyRedirect.ts"),
-    // Bisys lenker rollebildet til "sak/rolle" med eller uten saksnummer.
-    route("sak/rolle", "./routes/sak/rolle/SakRolleRedirect.ts"),
-    route("sak/ny/saksroller", "./routes/sak/saksroller/NySaksrollerPage.tsx"),
+    route("sak/rolle", "./routes/sak/saksroller/opprett-ny-sak/routes/SakRolleRedirect.ts"),
+    route("sak/ny/saksroller", "./routes/sak/saksroller/opprett-ny-sak/routes/NySaksrollerPage.tsx"),
     route("modia/person", "./routes/modia/ModiaRedirect.ts"),
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),

@@ -4,31 +4,51 @@ import "../../app/index.css";
 import { BodyLong, BodyShort, Box, Detail, Heading, Link, VStack } from "@navikt/ds-react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { worker } from "./mocks/browser";
 import { eksporterPerFil, resolve, stories } from "./stories";
 
-function grupperPerSeksjon(filstier: string[]) {
-    const seksjoner = new Map<string, string[]>();
+// Mocker proxy-API-kall stories kan trigge på mount, siden det ikke finnes noen
+// ekte backend bak galleriets Vite-server. Må startes før stories mountes.
+const mockKlar = worker.start({ onUnhandledRequest: "bypass" });
+
+type StoryTre = {
+    filer: string[];
+    mapper: Map<string, StoryTre>;
+};
+
+function byggStoryTre(filstier: string[]) {
+    const rot: StoryTre = { filer: [], mapper: new Map() };
+
     for (const filsti of filstier) {
-        const sep = filsti.lastIndexOf("/");
-        const seksjon = sep === -1 ? "/" : filsti.slice(0, sep);
-        const fil = sep === -1 ? filsti : filsti.slice(sep + 1);
-        seksjoner.set(seksjon, [...(seksjoner.get(seksjon) ?? []), fil]);
+        const deler = filsti.split("/");
+        const fil = deler.pop();
+        if (!fil) continue;
+
+        let node = rot;
+        for (const mappe of deler) {
+            let barn = node.mapper.get(mappe);
+            if (!barn) {
+                barn = { filer: [], mapper: new Map() };
+                node.mapper.set(mappe, barn);
+            }
+            node = barn;
+        }
+        node.filer.push(fil);
     }
-    return [...seksjoner.entries()];
+
+    return rot;
 }
 
 function FilMedEksporter({
-    seksjon,
-    fil,
+    filsti,
     eksportnavn,
     valgtStoryId,
 }: {
-    seksjon: string;
-    fil: string;
+    filsti: string;
     eksportnavn: string[];
     valgtStoryId?: string;
 }) {
-    const filsti = `${seksjon}/${fil}`;
+    const fil = filsti.split("/").pop() ?? filsti;
 
     if (eksportnavn.length <= 1) {
         const aktiv = valgtStoryId === filsti || valgtStoryId?.startsWith(`${filsti}/`);
@@ -68,6 +88,54 @@ function FilMedEksporter({
     );
 }
 
+function StoryTreMeny({
+    tre,
+    foreldresti = "",
+    eksporterPerFil,
+    valgtStoryId,
+}: {
+    tre: StoryTre;
+    foreldresti?: string;
+    eksporterPerFil: Record<string, string[]>;
+    valgtStoryId?: string;
+}) {
+    return (
+        <VStack gap="space-12">
+            {[...tre.mapper.entries()]
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([mappe, barn]) => {
+                    const mappeSti = [foreldresti, mappe].filter(Boolean).join("/");
+                    return (
+                        <VStack key={mappeSti} gap="space-8">
+                            <Detail textColor="subtle" uppercase title={mappeSti}>
+                                {mappe}
+                            </Detail>
+                            <Box paddingInline="space-12 space-0">
+                                <StoryTreMeny
+                                    tre={barn}
+                                    foreldresti={mappeSti}
+                                    eksporterPerFil={eksporterPerFil}
+                                    valgtStoryId={valgtStoryId}
+                                />
+                            </Box>
+                        </VStack>
+                    );
+                })}
+            {tre.filer.sort().map((fil) => {
+                const filsti = [foreldresti, fil].filter(Boolean).join("/");
+                return (
+                    <FilMedEksporter
+                        key={filsti}
+                        filsti={filsti}
+                        eksportnavn={eksporterPerFil[filsti] ?? []}
+                        valgtStoryId={valgtStoryId}
+                    />
+                );
+            })}
+        </VStack>
+    );
+}
+
 function Sidebar({
     filstier,
     eksporterPerFil,
@@ -77,8 +145,6 @@ function Sidebar({
     eksporterPerFil: Record<string, string[]>;
     valgtStoryId?: string;
 }) {
-    const seksjoner = grupperPerSeksjon(filstier);
-
     return (
         <Box
             as="nav"
@@ -86,33 +152,18 @@ function Sidebar({
             borderColor="neutral-subtle"
             borderWidth="0 1 0 0"
             padding="space-24"
+            aria-label="Story-meny"
             style={{ height: "100vh", overflowY: "auto", position: "sticky", top: 0 }}
         >
             <VStack gap="space-28">
                 <Heading level="1" size="small">
-                    🖼️ Stories
+                    Stories
                 </Heading>
-                {seksjoner.map(([seksjon, filer]) => {
-                    const seksjonsnavn = seksjon.split("/").pop() || seksjon;
-                    return (
-                        <VStack key={seksjon} gap="space-16">
-                            <Detail textColor="subtle" uppercase title={seksjon}>
-                                {seksjonsnavn}
-                            </Detail>
-                            <VStack gap="space-8">
-                                {filer.map((fil) => (
-                                    <FilMedEksporter
-                                        key={fil}
-                                        seksjon={seksjon}
-                                        fil={fil}
-                                        eksportnavn={eksporterPerFil[`${seksjon}/${fil}`] ?? []}
-                                        valgtStoryId={valgtStoryId}
-                                    />
-                                ))}
-                            </VStack>
-                        </VStack>
-                    );
-                })}
+                <StoryTreMeny
+                    tre={byggStoryTre(filstier)}
+                    eksporterPerFil={eksporterPerFil}
+                    valgtStoryId={valgtStoryId}
+                />
             </VStack>
         </Box>
     );
@@ -182,7 +233,8 @@ Promise.all(filstier.map((filsti) => eksporterPerFil(filsti).then((navn) => [fil
 
 const rootTreVisning = createRoot(rootEl);
 if (storyIdFraUrl) {
-    resolve(storyIdFraUrl)
+    mockKlar
+        .then(() => resolve(storyIdFraUrl))
         .then((Story) => {
             const KomponentType = Story as React.ComponentType<Record<string, unknown>> | undefined;
             if (!KomponentType) {

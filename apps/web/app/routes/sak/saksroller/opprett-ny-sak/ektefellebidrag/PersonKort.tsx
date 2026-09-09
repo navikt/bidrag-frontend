@@ -25,6 +25,7 @@ export default function PersonKort({ person, erValgt, onClick }: Props) {
                 <HStack gap="space-4" align="center">
                     <div className={`p-2 rounded-full ${erValgt ? "bg-ax-success-300" : "bg-ax-neutral-200"}`}>
                         <PersonIcon
+                            aria-hidden
                             fontSize="1.25rem"
                             className={erValgt ? "text-ax-success-800" : "text-ax-neutral-700"}
                         />
@@ -34,6 +35,7 @@ export default function PersonKort({ person, erValgt, onClick }: Props) {
                             ident={person.ident}
                             fødselsdato={person.fødselsdato ?? undefined}
                             navn={person.visningsnavn}
+                            visKopieringsknapp={false}
                         />
                         {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
                     </VStack>
@@ -41,8 +43,8 @@ export default function PersonKort({ person, erValgt, onClick }: Props) {
 
                 {erValgt && (
                     <HStack gap="space-2" align="center">
-                        <CheckmarkCircleFillIcon fontSize="1.5rem" className="text-ax-success-700" />
-                        <XMarkIcon fontSize="1rem" className="text-ax-neutral-600" />
+                        <CheckmarkCircleFillIcon aria-hidden fontSize="1.5rem" className="text-ax-success-700" />
+                        <XMarkIcon aria-hidden fontSize="1rem" className="text-ax-neutral-600" />
                     </HStack>
                 )}
             </HStack>
