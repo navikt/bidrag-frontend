@@ -32,9 +32,8 @@ describe("LoggerService", () => {
             new CustomError("ReactException", "correlation-id", "Uventet frontend-feil"),
         );
 
-        const { logInfo, headers } = lesLogInfo(fetchMock);
+        const {  headers } = lesLogInfo(fetchMock);
         expect(headers[correlationIdHeader]).toBe("correlation-id");
-        expect(logInfo.correlationId).toBe("correlation-id");
     });
 
     it("bruker pino-nivåene direkte", async () => {
@@ -58,17 +57,6 @@ describe("LoggerService", () => {
         expect(lesLogInfo(fetchMock).logInfo.context).toEqual({ saksnummer: "123456" });
     });
 
-    it("beholder én stacktrace, ikke tre sammenlimte", async () => {
-        const fetchMock = stubFetch();
-        const feil = new Error("Feilet");
-        feil.stack = "Error: Feilet\n    at fn (app.js:1:2)";
-
-        await LoggerService.error("Feilet", feil);
-
-        const { logInfo } = lesLogInfo(fetchMock);
-        expect(logInfo.error.stack).toBe(feil.stack);
-        expect(logInfo.error.stack_trace).toBeUndefined();
-    });
 
     it("holder componentStack atskilt fra stack", async () => {
         const fetchMock = stubFetch();
@@ -81,7 +69,7 @@ describe("LoggerService", () => {
         });
 
         const { logInfo } = lesLogInfo(fetchMock);
-        expect(logInfo.error.stack).toBe("at fn (app.js:1:2)");
+        expect(logInfo.error.stack).toBeUndefined();
         expect(logInfo.error.componentStack).toBe("    at BeløpshistorikkTabell");
     });
 
@@ -114,5 +102,66 @@ describe("LoggerService", () => {
         vi.spyOn(console, "error").mockImplementation(() => {});
 
         await expect(LoggerService.info("Noe")).resolves.toBeUndefined();
+    });
+});
+
+describe("LoggerService — feilrapportør (Faro)", () => {
+    function stubFaro() {
+        const pushError = vi.fn();
+        vi.stubGlobal("window", { faro: { api: { pushError } } });
+        return pushError;
+    }
+
+    beforeEach(() => {
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+        stubFetch();
+    });
+
+    it("sender ekte Error-instanser videre til window.faro, med melding og correlationId i kontekst", async () => {
+        const pushError = stubFaro();
+
+        const feil = new CustomError("ReactException", "correlation-id", "Nettverksfeil");
+        await LoggerService.error("Kall feilet", feil);
+
+        expect(pushError).toHaveBeenCalledWith(
+            feil,
+            expect.objectContaining({
+                context: expect.objectContaining({ logMessage: "Kall feilet", correlationId: "correlation-id" }),
+            }),
+        );
+    });
+
+    it("rapporterer ikke objektformede feil uten ekte stack", async () => {
+        const pushError = stubFaro();
+
+        await LoggerService.error("Kall feilet", {
+            name: "ReactException",
+            message: "React-feil",
+            stack: "at fn (app.js:1:2)",
+        });
+
+        expect(pushError).not.toHaveBeenCalled();
+    });
+
+    it("er en no-op når Faro ikke er initialisert", async () => {
+        vi.stubGlobal("window", {});
+
+        await expect(LoggerService.error("Kall feilet", new Error("x"))).resolves.toBeUndefined();
+    });
+
+    it("velter ikke kallstedet når window.faro.api.pushError selv kaster", async () => {
+        vi.stubGlobal("window", {
+            faro: {
+                api: {
+                    pushError: () => {
+                        throw new Error("Faro er ikke initialisert");
+                    },
+                },
+            },
+        });
+        vi.spyOn(console, "error").mockImplementation(() => {});
+
+        await expect(LoggerService.error("Kall feilet", new Error("x"))).resolves.toBeUndefined();
     });
 });

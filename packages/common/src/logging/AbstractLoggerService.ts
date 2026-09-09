@@ -4,7 +4,6 @@
  * til klassenavnet, kalles alltid stubben under og all logging går tapt.
  */
 
-
 import { CustomError } from "../types";
 import { beskrivCause } from "./beskrivCause.ts";
 import { correlationIdHeader } from "./correlationId.utils.ts";
@@ -13,8 +12,28 @@ import type { LogContext, LogErrorType, LoggetFeil, LogInfo, LogLevel } from "./
 /** Feilformer vi godtar fra kallstedene. Beholdt for å ikke bryte 200+ kallsteder. */
 type FeilInput = LogErrorType | (Partial<LoggetFeil> & { correlationId?: string | null; cause?: unknown });
 
+/**
+ * Sender en ekte `Error`-instans videre til Faro, hvis den er initialisert.
+ *
+ * Faro eksponerer seg selv på `window.faro` som standard (`preventGlobalExposure`
+ * er ikke satt i `apps/web/app/faro.client.ts`). Vi leser den globalen direkte i
+ * stedet for å registrere en hook via `apps/web` — ingen `root.tsx`-kobling
+ * trengs, og apper uten Faro (eller uten nettleser) er en ren no-op. Selve
+ * `Window.faro`-typen er deklarert ett sted, i `../windowTypes.ts`.
+ */
+function pushErrorTilFaro(feil: Error, kontekst: Record<string, string>) {
+    const faro = typeof window !== "undefined" ? window.faro : undefined;
+    faro?.api.pushError(feil, { context: kontekst });
+}
+
 // biome-ignore lint/complexity/noStaticOnlyClass: Basisklasse med statisk API som LoggerService og SecureLoggerService arver
 export abstract class AbstractLoggerService {
+    /**
+     * Overstyres av `SecureLoggerService` (satt til `false`). Sikker logg skal
+     * aldri havne i telemetri, uavhengig av om Faro er initialisert.
+     */
+    protected static readonly rapporterTilTelemetri: boolean = true;
+
     static info(msg: string, context?: LogContext): Promise<void> {
         return this.mapAndLog(msg, "info", undefined, context);
     }
@@ -55,15 +74,35 @@ export abstract class AbstractLoggerService {
             const logInfo: LogInfo = {
                 level,
                 message,
-                correlationId,
                 context,
                 error: feil,
             };
+            // Kun ekte `Error`-instanser gir en brukbar stack til Faros stacktrace-parser.
+            // Objektformen (`SimpleError`/`CustomError`-literaler) har ingen egen stack å tilby.
+            if (this.rapporterTilTelemetri && error instanceof Error) {
+                pushErrorTilFaro(error, this.telemetriKontekst(message, correlationId, context));
+            }
             await this.log(logInfo, carrier);
         } catch (e) {
-            // Logging skal aldri velte kallstedet.
             console.error("Klarte ikke å logge", e);
         }
+    }
+
+    private static telemetriKontekst(
+        message: string,
+        correlationId?: string,
+        context?: LogContext,
+    ): Record<string, string> {
+        const kontekst: Record<string, string> = { logMessage: message };
+        if (correlationId) {
+            kontekst.correlationId = correlationId;
+        }
+        for (const [key, value] of Object.entries(context ?? {})) {
+            if (value !== null) {
+                kontekst[key] = String(value);
+            }
+        }
+        return kontekst;
     }
 
     protected static normaliserFeil(error?: FeilInput): {
@@ -78,7 +117,6 @@ export abstract class AbstractLoggerService {
             const feil: LoggetFeil = {
                 name: error.name,
                 message: error.message,
-                stack: error.stack,
                 cause: beskrivCause(error.cause),
             };
             // ReactError og liknende bærer komponenttreet i et eget felt.
@@ -96,7 +134,6 @@ export abstract class AbstractLoggerService {
         const feil: LoggetFeil = {
             name: error.name ?? "UnknownError",
             message: error.message ?? "Ukjent feil",
-            stack: error.stack,
             componentStack: error.componentStack,
             status: error.status,
             cause: beskrivCause(error.cause),

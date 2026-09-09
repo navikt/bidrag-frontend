@@ -60,6 +60,12 @@ pnpm test             # Kjør tester i alle workspaces (kun pakker med testscrip
     Dette er et **sikkerhetsnett**, ikke en tillatelse — regelen over står ved lag.
   - Feltet `maskert_fnr` i loggen betyr at et kallsted lekket og bør rettes.
   - `secureNavLogger` maskeres ikke. Bruk den bevisst når identer faktisk må logges.
+- Stacktracer fra nettleseren eies av Faro (`window.faro`), ikke av `/log`.
+  `LoggerService.error/warn` sender ekte `Error`-instanser videre til Faro som en
+  strukturert exception via `AbstractLoggerService`. `logRoute` symbolikerer ikke
+  lenger server-side og dropper rå `stack` fra loggen — kun `name`/`message`/`cause`/
+  `componentStack` beholdes. `SecureLoggerService` rapporterer aldri til Faro og
+  fjerner `stack` fra det den sender videre.
 - Bruk Aksel Design System-komponenter og spacing-tokens (`space-*`)
 - Ikke sett CPU-limits i Nais-manifest (kun requests)
 - Aldri hardkode tokens eller secrets

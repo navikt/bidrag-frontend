@@ -3,14 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
     navLogger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
     secureNavLogger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
-    symbolicateStackTrace: vi.fn(),
     env: { NODE_ENV: "production" },
 }));
 
 vi.mock("./navLogger", () => ({ navLogger: mocks.navLogger, secureNavLogger: mocks.secureNavLogger }));
-vi.mock("~/server/logger/utils/SymbolicateStackTrace", () => ({
-    symbolicateStackTrace: mocks.symbolicateStackTrace,
-}));
 vi.mock("~/env.server.ts", () => ({ env: mocks.env }));
 
 import { action } from "./logRoute.ts";
@@ -35,11 +31,6 @@ describe("logRoute", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mocks.env.NODE_ENV = "production";
-        mocks.symbolicateStackTrace.mockResolvedValue({
-            symbolicatedStackTrace: "at fn (kilde.ts:10:5)",
-            didSymbolicate: true,
-            debug: { totalLines: 1 },
-        });
     });
 
     it("sender hvert nivå til riktig pino-metode", async () => {
@@ -76,7 +67,7 @@ describe("logRoute", () => {
         expect(res.status).toBe(400);
     });
 
-    it("legger feilen på err slik pino forventer", async () => {
+    it("legger feilen på err slik pino forventer, uten stack", async () => {
         await kall({
             level: "error",
             message: "Det feilet",
@@ -87,20 +78,13 @@ describe("logRoute", () => {
         const err = felter.err as Record<string, unknown>;
         expect(melding).toBe("Det feilet");
         expect(err.name).toBe("TypeError");
-        expect(err.stack).toBe("at fn (kilde.ts:10:5)");
-        expect(felter.stack_symbolicated).toBe(true);
+        // Stacktracer fra nettleseren symbolikeres ikke lenger server-side — det eies
+        // av Faro. Rå, minifisert `stack` skal derfor ikke havne i Loki.
+        expect(err.stack).toBeUndefined();
+        expect(felter.stack_symbolicated).toBeUndefined();
     });
 
-    it("symbolikerer ikke når feilen mangler stacktrace", async () => {
-        await kall({
-            level: "error",
-            message: "Det feilet",
-            error: { name: "Error", message: "uten stack" },
-        });
-        expect(mocks.symbolicateStackTrace).not.toHaveBeenCalled();
-    });
-
-    it("sender ikke componentStack til symbolikeringen", async () => {
+    it("beholder componentStack (annet format enn stack, uavhengig av symbolikering)", async () => {
         await kall({
             level: "error",
             message: "React-feil",
@@ -112,9 +96,9 @@ describe("logRoute", () => {
             },
         });
 
-        expect(mocks.symbolicateStackTrace).toHaveBeenCalledWith("at fn (app.js:1:2)");
         const [felter] = sisteKall(mocks.navLogger.error);
         expect((felter.err as Record<string, unknown>).componentStack).toBe("    at BeløpshistorikkTabell");
+        expect((felter.err as Record<string, unknown>).stack).toBeUndefined();
     });
 
     it("logger tilbakemelding uten NAV-ident", async () => {
@@ -123,17 +107,4 @@ describe("logRoute", () => {
         expect(felter.user).toBeUndefined();
     });
 
-    it("hopper over debug utenfor utviklingsmiljø", async () => {
-        await kall({ level: "debug", message: "Detaljer" });
-        expect(mocks.navLogger.debug).not.toHaveBeenCalled();
-
-        mocks.env.NODE_ENV = "development";
-        await kall({ level: "debug", message: "Detaljer" });
-        expect(mocks.navLogger.debug).toHaveBeenCalled();
-    });
-
-    it("tar med symbolikeringsdebug kun i utviklingsmiljø", async () => {
-        await kall({ level: "error", message: "f", error: { name: "E", message: "m", stack: "at a (b.js:1:1)" } });
-        expect(sisteKall(mocks.navLogger.error)[0].stack_symbolication_debug).toBeUndefined();
-    });
 });

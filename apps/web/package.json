@@ -42,7 +42,6 @@
         "react-dom": "catalog:",
         "react-hook-form": "^7.85.0",
         "react-router": "catalog:",
-        "source-map": "^0.7.6",
         "sqids": "^0.3.0",
         "tailwindcss": "catalog:",
         "unleash-client": "^6.12.1",
