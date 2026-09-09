@@ -42,7 +42,7 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 - Ruter registreres i `apps/web/app/routes.ts`
 - Health-endepunkter: `GET /internal/health/liveness` og `/readiness`
 
-### Component-testing (Playwright CT — PoC)
+### Component-testing (Playwright CT)
 - `apps/web` og `packages/common` deler ETT story-galleri (servert fra
   apps/web, se README) med felles venstremeny — som alternativ til Storybook.
 - Mount via `await mount("mappe/Fil/EksportNavn")`, kjør alt med `pnpm test:ct`
@@ -65,8 +65,7 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 - Bruk `genererFnr()` fra
   `@bidrag/common/playwright/testing/fnrGenerator.ts` i stedet for å hardkode
   fødselsnummer i stories og specs.
-- Foreløpig begrenset PoC-omfang (én story-fil per pakke) — ikke utvid uten
-  at teamet har besluttet å ta mønsteret i bruk bredere.
+- Foreløpig begrenset omfang (én story-fil per pakke).
 
 ## Kommandoer
 
@@ -78,6 +77,20 @@ pnpm typecheck        # Typesjekk alle pakker
 pnpm check            # Lint + format (Biome)
 pnpm test             # Kjør tester i alle workspaces (kun pakker med testscript)
 ```
+
+### AI og Playwright-skills
+
+Før Playwright-arbeid skal AI sjekke at `playwright-testing`,
+`playwright-component-testing`, `playwright-cli` og `playwright-trace` finnes.
+Hvis en mangler, be brukeren installere den. Bruk prosjektets lokale Playwright:
+
+```bash
+pnpm exec playwright init-skills
+```
+
+Ikke installer globalt eller behold genererte skills i repoet. Kontroller
+output, flytt bare Playwright-mappene til `~/.copilot/skills/`, slett
+repo-kopiene og start en ny Copilot-økt.
 
 ## Grenser
 

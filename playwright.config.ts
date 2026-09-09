@@ -8,7 +8,7 @@ const galleryProjectUse = {
     baseURL: galleryUrl,
     serviceWorkers: "block" as const,
     reuseContext: true,
-    trace: "on-first-retry" as const,
+    trace: "retain-on-failure" as const,
 };
 
 export default defineConfig({
@@ -33,7 +33,7 @@ export default defineConfig({
     webServer: {
         // Rydd opp eventuell hengende prosess.
         command:
-            "lsof -ti tcp:3178 | xargs kill -9 2>/dev/null; node node_modules/vite/bin/vite.js --config playwright/vite.config.ts",
+            "lsof -ti tcp:3178 | xargs kill -9 2>/dev/null || true; node node_modules/vite/bin/vite.js --config playwright/vite.config.ts",
         cwd: "./apps/web",
         url: galleryUrl,
         reuseExistingServer: !process.env.CI,

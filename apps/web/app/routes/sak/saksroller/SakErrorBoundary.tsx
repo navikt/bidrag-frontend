@@ -95,9 +95,11 @@ export default class SakErrorBoundary extends Component<Props, State> {
                                 Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
                             </BodyLong>
                         </Alert>
-                        <Box paddingBlock="space-16 space-0">
-                            <TekniskeDetaljer error={error} errorInfo={this.state.errorInfo} />
-                        </Box>
+                        {import.meta.env.DEV && (
+                            <Box paddingBlock="space-16 space-0">
+                                <TekniskeDetaljer error={error} errorInfo={this.state.errorInfo} />
+                            </Box>
+                        )}
                     </Box>
                 </Page.Block>
             );

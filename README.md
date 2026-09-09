@@ -27,8 +27,11 @@ Eksempel:
 
 ```ini
 @navikt:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=<TOKEN_GITHUB_PAT_MED_PACKAGES_READ>
+//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
 ```
+
+Sett `NPM_TOKEN` som en miljøvariabel lokalt. Ikke skriv selve tokenet i
+`.npmrc`, repoet eller shell-historikken.
 
 ```bash
 # Installer avhengigheter
@@ -267,7 +270,25 @@ const [, prefix, scriptUrl] = match;
 const [, prefix = "", scriptUrl = ""] = match;
 ```
 
-## Component-testing (Playwright CT — PoC)
+## Backends
+
+Appen kaller følgende backends via OBO-token-exchange (Azure AD):
+
+| Backend | Env-variabel |
+|---------|-------------|
+| bidrag-sak | `BIDRAG_SAK_URL` / `BIDRAG_SAK_AUDIENCE` |
+| bidrag-person | `BIDRAG_PERSON_URL` / `BIDRAG_PERSON_AUDIENCE` |
+| bidrag-organisasjon | `BIDRAG_ORGANISASJON_URL` / `BIDRAG_ORGANISASJON_AUDIENCE` |
+| bidrag-tilgangskontroll | `BIDRAG_TILGANGSKONTROLL_URL` / `BIDRAG_TILGANGSKONTROLL_AUDIENCE` |
+| bidrag-vedtak | `BIDRAG_VEDTAK_URL` / `BIDRAG_VEDTAK_AUDIENCE` |
+| bidrag-samhandler | `BIDRAG_SAMHANDLER_URL` / `BIDRAG_SAMHANDLER_AUDIENCE` |
+| bidrag-belopshistorikk | `BIDRAG_BELOPSHISTORIKK_URL` / `BIDRAG_BELOPSHISTORIKK_AUDIENCE` |
+| bidrag-reskontro | `BIDRAG_RESKONTRO_URL` / `BIDRAG_RESKONTRO_AUDIENCE` |
+| bidrag-dokument | `BIDRAG_DOKUMENT_URL` / `BIDRAG_DOKUMENT_AUDIENCE` |
+| bisys | `BISYS_URL` |
+| bidrag-ui | `BIDRAG_UI_BASE_URL` |
+
+## Component-testing (Playwright CT)
 
 `apps/web` og `packages/common` har et eksperimentelt oppsett for
 Playwright component-testing, som et alternativ til Storybook. Mønsteret:
@@ -326,23 +347,18 @@ Bruk `genererFnr()` i stedet for å hardkode fødselsnummer i stories og specs.
    `ForelderRolleVisning.ct.spec.ts` for et eksempel som fullfører en hel
    søk-og-legg-til-flyt med mocket nettverkssvar.
 
-Status: PoC for å vurdere mønsteret i teamet — foreløpig begrenset omfang
-(én story-fil per pakke), ikke en fullverdig teststrategi ennå.
+Omfanget er foreløpig begrenset til én story-fil per pakke.
 
-## Backends
+### AI og Playwright-skills
 
-Appen kaller følgende backends via OBO-token-exchange (Azure AD):
+AI skal før Playwright-arbeid sjekke at `playwright-testing`,
+`playwright-component-testing`, `playwright-cli` og `playwright-trace` finnes.
+Hvis en mangler, installer med prosjektets lokale Playwright:
 
-| Backend | Env-variabel |
-|---------|-------------|
-| bidrag-sak | `BIDRAG_SAK_URL` / `BIDRAG_SAK_AUDIENCE` |
-| bidrag-person | `BIDRAG_PERSON_URL` / `BIDRAG_PERSON_AUDIENCE` |
-| bidrag-organisasjon | `BIDRAG_ORGANISASJON_URL` / `BIDRAG_ORGANISASJON_AUDIENCE` |
-| bidrag-tilgangskontroll | `BIDRAG_TILGANGSKONTROLL_URL` / `BIDRAG_TILGANGSKONTROLL_AUDIENCE` |
-| bidrag-vedtak | `BIDRAG_VEDTAK_URL` / `BIDRAG_VEDTAK_AUDIENCE` |
-| bidrag-samhandler | `BIDRAG_SAMHANDLER_URL` / `BIDRAG_SAMHANDLER_AUDIENCE` |
-| bidrag-belopshistorikk | `BIDRAG_BELOPSHISTORIKK_URL` / `BIDRAG_BELOPSHISTORIKK_AUDIENCE` |
-| bidrag-reskontro | `BIDRAG_RESKONTRO_URL` / `BIDRAG_RESKONTRO_AUDIENCE` |
-| bidrag-dokument | `BIDRAG_DOKUMENT_URL` / `BIDRAG_DOKUMENT_AUDIENCE` |
-| bisys | `BISYS_URL` |
-| bidrag-ui | `BIDRAG_UI_BASE_URL` |
+```bash
+pnpm exec playwright init-skills
+```
+
+Ikke installer globalt eller behold genererte skills i repoet. Kontroller
+output, flytt bare Playwright-mappene til `~/.copilot/skills/`, slett
+repo-kopiene og start en ny Copilot-økt.
