@@ -53,7 +53,7 @@ export default function OppfostringsbidragFlyt() {
 }
 
 function OppfostringsbidragFlytContent() {
-    const { saksrolleFlyt, setIsLoadingOpprettSak, partISaken: partISakenContext } = useSaksrolleroversikt();
+    const { saksrolleFlyt, partISaken: partISakenContext } = useSaksrolleroversikt();
     const form = useFormContext<ForelderMedBarnSkjemaData>();
     const [aktivKurvId, settAktivKurvId] = useState<string | null>(null);
     useSyncKategori(form);
@@ -74,7 +74,6 @@ function OppfostringsbidragFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
-        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -84,10 +83,6 @@ function OppfostringsbidragFlytContent() {
         arbeidsfordeling: "OPS",
         valgteBarn,
     });
-
-    useEffect(() => {
-        setIsLoadingOpprettSak(isLoadingOpprettSak);
-    }, [isLoadingOpprettSak]);
 
     useEffect(() => {
         if (!partISaken.ident && partISakenContext?.ident) {

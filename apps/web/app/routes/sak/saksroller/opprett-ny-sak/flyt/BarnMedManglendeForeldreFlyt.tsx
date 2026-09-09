@@ -65,7 +65,7 @@ export default function BarnMedManglendeForeldreFlyt() {
 }
 
 function BarnMedManglendeForeldreFlytContent() {
-    const { partISaken, saksrolleFlyt, setIsLoadingOpprettSak } = useSaksrolleroversikt();
+    const { partISaken, saksrolleFlyt } = useSaksrolleroversikt();
     const form = useFormContext<BarnMedManglendeForeldreSkjemaData>();
     useSyncKategori(form);
     const kjentForelder = saksrolleFlyt?.type === "BARN_MANGLENDE_FORELDRE" ? saksrolleFlyt.forelder : null;
@@ -100,7 +100,6 @@ function BarnMedManglendeForeldreFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
-        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -127,10 +126,6 @@ function BarnMedManglendeForeldreFlytContent() {
               }
             : null,
     });
-
-    useEffect(() => {
-        setIsLoadingOpprettSak(isLoadingOpprettSak);
-    }, [isLoadingOpprettSak]);
 
     const settRolle = (index: number, rolle: ForelderPartRolle) => {
         foreldre.forEach((_person, index) => {

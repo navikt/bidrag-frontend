@@ -7,6 +7,10 @@ import { HttpResponse, http } from "msw";
  * `opprett-ny-sak/playwright/network.ts` sin `mockWizardApi`, men uten
  * scenario-spesifikke valg – automatiserte CT-spesifikasjoner styrer fortsatt
  * sine egne responser via Playwright sin `page.route()`.
+ *
+ * Statiske enhetsnavn-oppslag (`hent_enhet_info`) trenger ikke nettverksmock
+ * her – de sås direkte i React Query-cachen av
+ * `opprett-ny-sak/playwright/queryCacheSeed.ts`, brukt av alle wizard-stories.
  */
 const persongalleri = {
     bidragspliktig: { ident: genererFnr(), visningsnavn: "Test Bidragspliktig", fødselsdato: "1985-02-14" },
@@ -26,9 +30,6 @@ export const galleryHandlers = [
     http.post("/proxy/bidrag-sak/person/sak", () => HttpResponse.json([])),
     http.post("/proxy/bidrag-organisasjon/arbeidsfordeling/enhet/geografisktilknytning", () =>
         HttpResponse.json({ nummer: "4806", navn: "NAV Test" }),
-    ),
-    http.get("/proxy/bidrag-organisasjon/enhet/info/:nummer", ({ params }) =>
-        HttpResponse.json({ nummer: params.nummer, navn: "NAV Test" }),
     ),
     http.post("/proxy/bidrag-tilgangskontroll/v2/api/tilgang/opprettsakutenbm", () =>
         HttpResponse.json({ harTilgang: true }),

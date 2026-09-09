@@ -44,10 +44,6 @@ export async function mockWizardApi(page: Page, options: MockOptions = {}) {
         requests.unit.push(route.request().postDataJSON() as Record<string, unknown>);
         await route.fulfill({ json: options.unit ?? { nummer: "4806", navn: "NAV Test" } });
     });
-    await page.route(/\/proxy\/bidrag-organisasjon\/enhet\/info\/\d+$/, async (route) => {
-        const nummer = route.request().url().split("/").at(-1) ?? "4806";
-        await route.fulfill({ json: { nummer, navn: nummer === "2103" ? "NAV Vikafossen" : "NAV Test" } });
-    });
     await page.route(/\/proxy\/bidrag-tilgangskontroll\/v2\/api\/tilgang\/opprettsakutenbm$/, async (route) => {
         await route.fulfill({ json: { harTilgang: options.accessAllowed ?? true } });
     });

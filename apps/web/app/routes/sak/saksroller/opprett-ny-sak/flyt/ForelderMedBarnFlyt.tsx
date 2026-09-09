@@ -52,7 +52,7 @@ export default function ForelderMedBarnFlyt() {
 }
 
 function ForelderMedBarnFlytContent() {
-    const { partISaken, saksrolleFlyt, setIsLoadingOpprettSak } = useSaksrolleroversikt();
+    const { partISaken, saksrolleFlyt } = useSaksrolleroversikt();
     const form = useFormContext<ForelderMedBarnSkjemaData>();
     useSyncKategori(form);
     const [aktivKurvId, settAktivKurvId] = useState<string | null>(null);
@@ -99,7 +99,6 @@ function ForelderMedBarnFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
-        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -117,10 +116,6 @@ function ForelderMedBarnFlytContent() {
         bidragspliktig,
         bidragsmottaker,
     });
-
-    useEffect(() => {
-        setIsLoadingOpprettSak(isLoadingOpprettSak);
-    }, [isLoadingOpprettSak]);
 
     useEffect(() => {
         if (error && errorAlertRef.current) {

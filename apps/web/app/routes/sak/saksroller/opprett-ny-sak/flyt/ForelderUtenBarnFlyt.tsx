@@ -68,7 +68,7 @@ export default function ForelderUtenBarnFlyt() {
 }
 
 function ForelderUtenBarnFlytContent() {
-    const { partISaken, setIsLoadingOpprettSak } = useSaksrolleroversikt();
+    const { partISaken } = useSaksrolleroversikt();
     if (!partISaken) {
         return null;
     }
@@ -125,7 +125,6 @@ function ForelderUtenBarnFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
-        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -138,10 +137,6 @@ function ForelderUtenBarnFlytContent() {
         eksisterendeSakPartISaken: { ...form.watch("partISaken"), erKjent: true },
         eksisterendeSakMotpart: normalisertMotpart,
     });
-
-    useEffect(() => {
-        setIsLoadingOpprettSak(isLoadingOpprettSak);
-    }, [isLoadingOpprettSak]);
 
     useEffect(() => {
         if (!motpartBarnRelasjon || valgteBarn.length > 0) {

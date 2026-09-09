@@ -1,7 +1,7 @@
 import { TilgangsFeilError } from "@bidrag/api";
 
 import type { BidragssakDto } from "@bidrag/api/SakApi";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useHentSakForPerson } from "~/api/useApi.ts";
 import type { ForelderPartRolle } from "../opprett-sak-schema";
 
@@ -55,10 +55,6 @@ export function useEksisterendeSakSjekk({
     motpart,
     erEktefellebidrag,
 }: EksisterendeSakSjekkParams): EksisterendeSakSjekkResult {
-    const [harEksisterendeSak, settHarEksisterendeSak] = useState<boolean>(false);
-    const [eksisterendeSak, settEksisterendeSak] = useState<BidragssakDto | null>(null);
-    const [infoMelding, settInfoMelding] = useState<InfoMelding | null>(null);
-
     const partISakenOppgitt = !!partISaken?.ident?.trim();
     const harUkjentMotpart = motpart?.erKjent === false;
     const harMotpartEllerUkjent = typeof motpart?.erKjent === "boolean";
@@ -66,48 +62,37 @@ export function useEksisterendeSakSjekk({
 
     const { data: sakForPartISaken, isLoading, error } = useHentSakForPerson(partISaken?.ident || "", skalHente);
 
-    useEffect(() => {
-        if (error) {
-            if (error instanceof TilgangsFeilError) {
-                settInfoMelding({
-                    type: "error",
-                    melding: error.message,
-                });
-            } else {
-                settInfoMelding({
-                    type: "warning",
-                    melding: "Feil ved henting av eksisterende sak. Kontakt support.",
-                });
-            }
-            settHarEksisterendeSak(false);
-            settEksisterendeSak(null);
-        }
-    }, [error]);
+    const { harEksisterendeSak, eksisterendeSak, infoMelding } = useMemo<
+        Omit<EksisterendeSakSjekkResult, "isLoading">
+    >(() => {
+        const ingenTreff = { harEksisterendeSak: false, eksisterendeSak: null, infoMelding: null };
 
-    useEffect(() => {
         if (!skalHente) {
-            settHarEksisterendeSak(false);
-            settEksisterendeSak(null);
-            settInfoMelding(null);
-            return;
+            return ingenTreff;
+        }
+
+        if (error) {
+            return {
+                ...ingenTreff,
+                infoMelding:
+                    error instanceof TilgangsFeilError
+                        ? { type: "error", melding: error.message }
+                        : { type: "warning", melding: "Feil ved henting av eksisterende sak. Kontakt support." },
+            };
         }
 
         if (isLoading) {
-            return;
-        }
-
-        if (error) {
-            return;
+            return ingenTreff;
         }
 
         if (!sakForPartISaken || sakForPartISaken.length === 0) {
-            settInfoMelding({
-                type: "info",
-                melding: `Ingen eksisterende sak funnet for ${partISaken.navn} (${partISaken.ident}). Du kan opprette en ny sak.`,
-            });
-            settHarEksisterendeSak(false);
-            settEksisterendeSak(null);
-            return;
+            return {
+                ...ingenTreff,
+                infoMelding: {
+                    type: "info",
+                    melding: `Ingen eksisterende sak funnet for ${partISaken.navn} (${partISaken.ident}). Du kan opprette en ny sak.`,
+                },
+            };
         }
 
         const partISakenRolle = partISaken.rolle === "bidragspliktig" ? "BP" : "BM";
@@ -125,18 +110,22 @@ export function useEksisterendeSakSjekk({
                 })
                 .map((sak) => sak.saksnummer);
 
-            if (sakerMedUkjentMotpart.length > 0) {
-                const sakstekst =
-                    sakerMedUkjentMotpart.length === 1
-                        ? `sak ${sakerMedUkjentMotpart[0]}`
-                        : `sakene ${sakerMedUkjentMotpart.join(", ")}`;
+            if (sakerMedUkjentMotpart.length === 0) {
+                return ingenTreff;
+            }
 
-                settInfoMelding({
+            const sakstekst =
+                sakerMedUkjentMotpart.length === 1
+                    ? `sak ${sakerMedUkjentMotpart[0]}`
+                    : `sakene ${sakerMedUkjentMotpart.join(", ")}`;
+
+            return {
+                ...ingenTreff,
+                infoMelding: {
                     type: "warning",
                     melding: `Det finnes allerede ${sakstekst} hvor ${partISaken.navn} er registrert som ${partISakenRolle} uten motpart. Vurder om denne nye saken skal opprettes.`,
-                });
-            }
-            return;
+                },
+            };
         }
 
         const funnetSak = sakForPartISaken.find((sak) => {
@@ -150,27 +139,24 @@ export function useEksisterendeSakSjekk({
             const harBeggeRoller = !!partISakenRolleISak && !!motpartRolleISak;
             const harBarn = sak.roller.some((rolle) => rolle.type === "BA");
 
-            // For ektefellebidrag må saken IKKE ha barn
             if (erEktefellebidrag) {
                 return harBeggeRoller && !harBarn;
             }
 
-            // For barnebidrag må det finnes minst ett barn (BA) i saken
             return harBeggeRoller && harBarn;
         });
 
-        if (funnetSak) {
-            settHarEksisterendeSak(true);
-            settEksisterendeSak(funnetSak);
-            settInfoMelding(null);
-        } else {
-            settHarEksisterendeSak(false);
-            settEksisterendeSak(null);
-            settInfoMelding({
-                type: "info",
-                melding: "Ingen sak funnet mellom disse to partene med samme roller. Du kan opprette en ny sak.",
-            });
+        if (!funnetSak) {
+            return {
+                ...ingenTreff,
+                infoMelding: {
+                    type: "info",
+                    melding: "Ingen sak funnet mellom disse to partene med samme roller. Du kan opprette en ny sak.",
+                },
+            };
         }
+
+        return { harEksisterendeSak: true, eksisterendeSak: funnetSak, infoMelding: null };
     }, [
         sakForPartISaken,
         motpart?.ident,
@@ -179,6 +165,7 @@ export function useEksisterendeSakSjekk({
         partISaken?.rolle,
         partISaken?.navn,
         skalHente,
+        harUkjentMotpart,
         isLoading,
         error,
         erEktefellebidrag,
@@ -188,6 +175,6 @@ export function useEksisterendeSakSjekk({
         harEksisterendeSak,
         eksisterendeSak,
         isLoading,
-        infoMelding: infoMelding || null,
+        infoMelding,
     };
 }

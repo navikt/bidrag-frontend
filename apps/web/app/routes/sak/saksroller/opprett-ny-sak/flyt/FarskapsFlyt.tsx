@@ -49,7 +49,7 @@ export default function FarskapsFlyt() {
 }
 
 function FarskapsFlytContent() {
-    const { saksrolleFlyt, setIsLoadingOpprettSak, partISaken: partISakenContext } = useSaksrolleroversikt();
+    const { saksrolleFlyt, partISaken: partISakenContext } = useSaksrolleroversikt();
     const form = useFormContext<FarskapsSkjemaSchemaData>();
     useSyncKategori(form);
     const [aktivKurvId, settAktivKurvId] = useState<string | null>(null);
@@ -70,7 +70,6 @@ function FarskapsFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
-        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -80,10 +79,6 @@ function FarskapsFlytContent() {
         arbeidsfordeling: "FRS",
         valgteBarn,
     });
-
-    useEffect(() => {
-        setIsLoadingOpprettSak(isLoadingOpprettSak);
-    }, [isLoadingOpprettSak]);
 
     useEffect(() => {
         if (!partISaken.ident && partISakenContext?.ident) {

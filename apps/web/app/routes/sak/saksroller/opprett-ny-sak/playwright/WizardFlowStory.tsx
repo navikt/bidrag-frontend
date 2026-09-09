@@ -13,6 +13,7 @@ import OpprettSakFlyt from "../OpprettSakFlyt";
 import type { PartISaken } from "../opprett-sak-schema";
 import { SaksrolleroversiktProvider, useSaksrolleroversikt } from "../saksrolleroversiktContext";
 import { testpersoner } from "./fixtures";
+import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
 type Scenario =
     | { sakstype: "BARNEBIDRAG"; partISaken: PartISaken; flow: "FORELDER_UTEN_BARN" }
@@ -117,16 +118,16 @@ export function WizardPageStory() {
 }
 
 function StoryRouter({ content }: { content: React.ReactNode }) {
-    const queryClient = useMemo(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: { retry: false, staleTime: Infinity },
-                    mutations: { retry: false },
-                },
-            }),
-        [],
-    );
+    const queryClient = useMemo(() => {
+        const client = new QueryClient({
+            defaultOptions: {
+                queries: { retry: false, staleTime: Infinity },
+                mutations: { retry: false },
+            },
+        });
+        seedStatiskEnhetsinfo(client);
+        return client;
+    }, []);
     const router = useMemo(
         () =>
             createMemoryRouter(

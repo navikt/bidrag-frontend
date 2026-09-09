@@ -54,7 +54,7 @@ export default function BarnBeggeForeldreFlyt() {
 }
 
 function BarnBeggeForeldreFlytContent() {
-    const { partISaken, saksrolleFlyt, setIsLoadingOpprettSak } = useSaksrolleroversikt();
+    const { partISaken, saksrolleFlyt } = useSaksrolleroversikt();
     const form = useFormContext<BarnBeggForeldreSkjemaData>();
     useSyncKategori(form);
     const foreldre = saksrolleFlyt?.type === "BARN_BEGGE_FORELDRE" ? saksrolleFlyt.foreldre : [];
@@ -82,7 +82,6 @@ function BarnBeggeForeldreFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
-        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -115,10 +114,6 @@ function BarnBeggeForeldreFlytContent() {
             form.setValue("barn.rolle", partISaken.rolle);
         }
     }, [partISaken]);
-
-    useEffect(() => {
-        setIsLoadingOpprettSak(isLoadingOpprettSak);
-    }, [isLoadingOpprettSak]);
 
     const settBidragsmottakerUkjent = () => {
         const bidragsmottakerIndex = valgteRoller.findIndex((f) => f.rolle === "bidragsmottaker");
