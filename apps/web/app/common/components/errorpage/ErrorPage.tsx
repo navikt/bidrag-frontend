@@ -47,8 +47,8 @@ export default function ErrorPage({ error }: ErrorPageProps) {
     useEffect(() => {
         LoggerService.error(errorMessage ?? "Ukjent feil", {
             message: errorMessage ?? "Ukjent feil",
-            stack_trace: stackTrace,
-            errorType: error instanceof Error ? error.name : "UnknownError",
+            stack: stackTrace,
+            name: error instanceof Error ? error.name : "UnknownError",
             status,
             correlationId,
         });

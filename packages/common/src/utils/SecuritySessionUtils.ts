@@ -1,6 +1,6 @@
 // import { context, propagation, Span, trace } from "@opentelemetry/api";
 import { context } from "@opentelemetry/api";
-import { generateCorrelationId } from "./CorrelationIdUtils.ts";
+import { generateCorrelationId } from "../logging/correlationId.utils.ts";
 import { SessionStorage } from "./Storage";
 
 const _tracerName = "bidrag-ui-session";

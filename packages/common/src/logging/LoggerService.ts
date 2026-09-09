@@ -1,9 +1,9 @@
-import type { LogInfo, LogResponse } from "../types";
 import { AbstractLoggerService } from "./AbstractLoggerService.ts";
+import type { LogInfo } from "./log.types.ts";
 
 export class LoggerService extends AbstractLoggerService {
-    static override log(logInfo: LogInfo, headers?: Record<string, string>): Promise<LogResponse> {
-        return fetch("/log", {
+    static override async log(logInfo: LogInfo, headers?: Record<string, string>): Promise<void> {
+        await fetch("/log", {
             mode: "cors",
             cache: "no-cache",
             body: JSON.stringify(logInfo),
@@ -12,8 +12,6 @@ export class LoggerService extends AbstractLoggerService {
                 ...headers,
                 "Content-type": "application/json; charset=UTF-8",
             },
-        })
-            .then((res) => res.json())
-            .catch(console.log);
+        });
     }
 }

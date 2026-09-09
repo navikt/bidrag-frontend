@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateCorrelationId } from "./CorrelationIdUtils";
+import { generateCorrelationId } from "./correlationId.utils.ts";
 
 describe("generateCorrelationId", () => {
     it("genererer en lesbar ID gruppert som 5 tegn-5 tegn", () => {

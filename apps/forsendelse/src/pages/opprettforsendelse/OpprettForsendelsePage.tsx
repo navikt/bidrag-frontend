@@ -1,9 +1,9 @@
 import { JournalTema } from "@bidrag/api/BidragForsendelseApi";
-import { ObjectUtils, SecureLoggerService } from "@bidrag/common";
+import { ObjectUtils } from "@bidrag/common";
 import { Button, ErrorSummary, Heading, Loader, Page, VStack } from "@navikt/ds-react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import React, { useEffect } from "react";
+import React from "react";
 import { type FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useBidragForsendelseApi } from "../../api/api";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";

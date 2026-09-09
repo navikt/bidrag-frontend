@@ -75,11 +75,13 @@ export const FatteVedtakButtons = ({
                         const data = error.response.data as FatteVedtakFeil;
                         throw {
                             message: data.feilmelding,
-                            cause: data,
+                            cause: `Ugyldige perioder: ${data.ugyldigPerioder?.length ?? 0}`,
                         };
                     }
                 }
-                throw new Error("Ukjent feil ved fatting av vedtak", { cause: error });
+                throw new Error("Ukjent feil ved fatting av vedtak", {
+                    cause: error instanceof Error ? `${error.name}: ${error.message}` : "ukjent",
+                });
             }
         },
         onSuccess: () => {

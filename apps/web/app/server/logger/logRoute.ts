@@ -1,9 +1,10 @@
-import { type LogInfo, LogLevel, type LogResponse } from "@bidrag/common";
+import { type LoggetFeil, logInfoSchema } from "@bidrag/common";
 import { env } from "~/env.server.ts";
-import exceptionToErrorCode from "~/server/logger/utils/ExceptionHasher";
 import { symbolicateStackTrace } from "~/server/logger/utils/SymbolicateStackTrace";
 import type { Route } from "./+types/logRoute.ts";
 import { navLogger, secureNavLogger } from "./navLogger";
+
+type Logger = typeof navLogger;
 
 export async function action({ params, request }: Route.ActionArgs) {
     const { type } = params;
@@ -12,83 +13,55 @@ export async function action({ params, request }: Route.ActionArgs) {
     return doLog(isSecureLog ? secureNavLogger : navLogger, request);
 }
 
-type Logger = typeof navLogger;
-
-async function doLog(logger: Logger, req: Request): Promise<LogResponse> {
-    const payload: LogInfo = await req.json();
-    const { moduleName, appName = "bidrag-frontend", level, error, message } = payload;
-    const errorPayload = error as LogInfo["error"] & {
-        stack?: string;
-        stackTrace?: string;
-        componentStack?: string;
+/**
+ * Symbolikerer kun JS-stacktracen. `componentStack` har et annet format
+ * (komponentnavn uten fil, linje og kolonne) og ville gitt bare bomtreff.
+ */
+async function symbolikerFeil(feil: LoggetFeil) {
+    if (!feil.stack?.trim()) {
+        return { stack: feil.stack, symbolikert: false, debug: undefined };
+    }
+    const { symbolicatedStackTrace, didSymbolicate, debug } = await symbolicateStackTrace(feil.stack);
+    return {
+        stack: symbolicatedStackTrace || feil.stack,
+        symbolikert: didSymbolicate,
+        debug: env.NODE_ENV === "development" ? debug : undefined,
     };
-    const rawStackTrace = [error?.stack_trace, errorPayload?.stackTrace, errorPayload?.stack]
-        .filter((value): value is string => Boolean(value?.trim()))
-        .join("\n")
-        .trim();
-    const componentStack = errorPayload?.componentStack?.trim();
-    const errorType = error?.errorType ?? "UnknownError";
-    const { symbolicatedStackTrace, didSymbolicate, debug } = await symbolicateStackTrace(rawStackTrace);
-    const resolvedStackTrace = symbolicatedStackTrace || rawStackTrace;
+}
 
-    // `correlationId` og `user` kommer fra request-konteksten. Her overstyres de bevisst:
-    // ID-en fra payloaden gjelder feilen i nettleseren, og tilbakemeldinger logges uten NAV-ident.
-    let metadata: Record<string, unknown> = {
-        module: `${appName}/${moduleName}`,
-        ...(payload.correlationId ? { correlationId: payload.correlationId } : {}),
-        ...(level === LogLevel.FEEDBACK ? { user: undefined } : {}),
+async function doLog(logger: Logger, req: Request): Promise<Response> {
+    const resultat = logInfoSchema.safeParse(await req.json().catch(() => null));
+
+    if (!resultat.success) {
+        // Innholdet logges bevisst ikke — det er nettopp det vi ikke stoler på.
+        logger.warn({ feil: resultat.error.issues.map((i) => i.path.join(".")) }, "Ugyldig loggpayload avvist");
+        return new Response(null, { status: 400 });
+    }
+
+    const { level, message, correlationId, context, error } = resultat.data;
+
+    if (level === "debug" && env.NODE_ENV !== "development") {
+        return new Response(null, { status: 204 });
+    }
+
+    // `correlationId` og `user` kommer fra request-konteksten. ID-en fra payloaden
+    // gjelder feilen i nettleseren, og overstyrer derfor bevisst.
+    const felter: Record<string, unknown> = {
+        ...context,
+        ...(correlationId ? { correlationId } : {}),
+        ...(context?.kind === "feedback" ? { user: undefined } : {}),
     };
 
     if (error) {
-        metadata = {
-            ...metadata,
-            stack_trace: resolvedStackTrace,
-            component_stack: componentStack,
-            stack_trace_symbolicated: didSymbolicate,
-            stack_trace_symbolication_debug: env.NODE_ENV === "development" ? debug : undefined,
-            errorType,
-            status: error.status ?? 500,
-            cause: error.cause ?? "unknown",
-        };
-    }
-
-    const logResponse: LogResponse = {} as LogResponse;
-    switch (level) {
-        case LogLevel.FEEDBACK:
-        case LogLevel.INFO:
-            logger.info(metadata, message);
-            break;
-        case LogLevel.WARNING:
-            logger.warn(metadata, message);
-            break;
-        case LogLevel.DEBUG: {
-            if (env.NODE_ENV === "development") {
-                logger.debug(metadata, message);
-            }
-            break;
-        }
-        case LogLevel.ERROR: {
-            if (!error) {
-                logger.error(metadata, `Det skjedde en teknisk feil i applikasjonen ${appName}: ${message}`);
-                break;
-            }
-            //TODO fjerne errorCode og exceptionCode da de ikke brukes
-            const { errorCode, exceptionCode } = await exceptionToErrorCode(resolvedStackTrace || "ukjent", appName);
-
-            const errorMetadata = {
-                ...metadata,
-                errorCode,
-                exceptionCode,
-            };
-
-            logResponse.errorCode = errorCode;
-            logResponse.exceptionCode = exceptionCode;
-
-            logger.error(
-                errorMetadata,
-                `Det skjedde en teknisk feil i applikasjonen ${appName}/${moduleName} med feilkode ${errorCode}: ${message}`,
-            );
+        const { stack, symbolikert, debug } = await symbolikerFeil(error);
+        felter.err = { ...error, stack };
+        felter.stack_symbolicated = symbolikert;
+        if (debug) {
+            felter.stack_symbolication_debug = debug;
         }
     }
-    return logResponse;
+
+    logger[level](felter, message);
+
+    return new Response(null, { status: 204 });
 }
