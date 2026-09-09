@@ -77,10 +77,15 @@ export abstract class AbstractLoggerService {
                 context,
                 error: feil,
             };
+
             // Kun ekte `Error`-instanser gir en brukbar stack til Faros stacktrace-parser.
             // Objektformen (`SimpleError`/`CustomError`-literaler) har ingen egen stack å tilby.
             if (this.rapporterTilTelemetri && error instanceof Error) {
-                pushErrorTilFaro(error, this.telemetriKontekst(message, correlationId, context));
+                try {
+                    pushErrorTilFaro(error, this.telemetriKontekst(message, correlationId, context));
+                } catch (e) {
+                    console.error("Klarte ikke å pushe feil til Faro", e);
+                }
             }
             await this.log(logInfo, carrier);
         } catch (e) {

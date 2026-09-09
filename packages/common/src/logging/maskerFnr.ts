@@ -337,9 +337,3 @@ export function erSensitivNøkkel(nøkkel: string): boolean {
     return SENSITIVE_NØKLER.test(nøkkel);
 }
 
-export const _internt = {
-    MAKS_DYBDE,
-    MAKS_NODER,
-    HAR_SIFRE,
-    KANDIDAT,
-};

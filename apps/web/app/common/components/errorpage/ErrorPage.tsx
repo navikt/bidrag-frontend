@@ -45,7 +45,8 @@ export default function ErrorPage({ error }: ErrorPageProps) {
     );
 
     useEffect(() => {
-        LoggerService.error(errorMessage ?? "Ukjent feil", {
+        const realError = error instanceof Error ? error : undefined;
+        LoggerService.error(errorMessage ?? "Ukjent feil", realError, {
             message: errorMessage ?? "Ukjent feil",
             name: error instanceof Error ? error.name : "UnknownError",
             status,

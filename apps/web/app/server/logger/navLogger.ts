@@ -19,7 +19,7 @@ function medAmbientFelter(arg: unknown): unknown {
 
     // pino tolker en ren streng som selve meldingen — den skal slippe gjennom urørt.
     if (arg === undefined || typeof arg === "string") {
-        return arg;
+        return { ...ambient, arg };
     }
     // Pakkes som `err` slik at pinos innebygde serializer beholder stacktracen.
     if (arg instanceof Error) {

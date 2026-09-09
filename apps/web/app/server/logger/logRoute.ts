@@ -22,9 +22,12 @@ async function doLog(logger: Logger, req: Request): Promise<Response> {
 
     const { level, message, context, error } = resultat.data;
 
+    const klientfelter = Object.fromEntries(
+        Object.entries(context ?? {}).filter(([nøkkel]) => nøkkel !== "user" && nøkkel !== "correlationId"),
+    );
+
     const felter: Record<string, unknown> = {
-        ...context,
-        ...(context?.kind === "feedback" ? { user: undefined } : {}),
+        ...klientfelter,
         ...(error ? { err: error } : {}),
     };
 
