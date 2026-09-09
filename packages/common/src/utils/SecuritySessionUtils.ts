@@ -1,7 +1,5 @@
-
 // biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class SecuritySessionUtils {
-
     static async hentSaksbehandler(): Promise<NavUser | undefined> {
         const response = await fetch("/me", { method: "GET", headers: { Accept: "application/json" } });
 
@@ -25,4 +23,3 @@ export interface NavUser {
     name: string;
     username: string;
 }
-

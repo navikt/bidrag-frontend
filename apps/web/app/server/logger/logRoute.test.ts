@@ -106,5 +106,4 @@ describe("logRoute", () => {
         const [felter] = sisteKall(mocks.navLogger.info);
         expect(felter.user).toBeUndefined();
     });
-
 });

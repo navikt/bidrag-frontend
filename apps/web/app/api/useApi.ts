@@ -206,7 +206,7 @@ export function useHentSak(saksnummer: string | undefined, rollehistorikk: boole
                 const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer ?? "", {
                     "vis-rollehistorikk": rollehistorikk,
                 });
-                await LoggerService.debug("Hentet sak", {saksnummer} );
+                await LoggerService.debug("Hentet sak", { saksnummer });
                 return response.data;
             } catch (e) {
                 const axiosError = e as AxiosError;

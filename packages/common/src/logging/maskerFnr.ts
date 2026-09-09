@@ -41,7 +41,6 @@ export type Maskeringsresultat<T> = {
     antall: number;
 };
 
-
 /**
  * Avgjør om en kandidat på 11 siffer faktisk er et fødselsnummer.
  *
@@ -295,7 +294,6 @@ function maskerFeil(feil: Error, dybde: number, tilstand: Tilstand): Error {
 
     return kopi;
 }
-
 
 /**
  * Maskerer en verdi ved å beholde de første sifrene og erstatte resten.

@@ -32,7 +32,7 @@ describe("LoggerService", () => {
             new CustomError("ReactException", "correlation-id", "Uventet frontend-feil"),
         );
 
-        const {  headers } = lesLogInfo(fetchMock);
+        const { headers } = lesLogInfo(fetchMock);
         expect(headers[correlationIdHeader]).toBe("correlation-id");
     });
 
@@ -56,7 +56,6 @@ describe("LoggerService", () => {
         await LoggerService.info("Hentet sak", { saksnummer: "123456" });
         expect(lesLogInfo(fetchMock).logInfo.context).toEqual({ saksnummer: "123456" });
     });
-
 
     it("holder componentStack atskilt fra stack", async () => {
         const fetchMock = stubFetch();

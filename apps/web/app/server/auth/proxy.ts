@@ -67,7 +67,6 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
             navLogger.trace({ app, method: request.method, status, path: subPath }, "Proxy-kall fullført");
         }
 
-
         return responseWithCorrelationId(backendResponse, correlationId);
     } catch (error) {
         // Feil før eller under backend-kallet må fortsatt kunne spores av både bruker og utvikler.
