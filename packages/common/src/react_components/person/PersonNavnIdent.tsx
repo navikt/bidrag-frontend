@@ -114,6 +114,7 @@ export default function PersonNavnIdent({
                 size="small"
                 title={genererTittel()}
                 className={`${erKode67 ? "skjermet" : ""} ${erDød ? "doed" : ""} ${highlightClassName}`}
+                data-uthevet={highlight || undefined}
             >
                 <div className={`${paddingClassname} flex items-center gap-2`}>
                     <span className="inline-flex items-center">
@@ -131,6 +132,7 @@ export default function PersonNavnIdent({
                 size="small"
                 title={genererTittel()}
                 className={`${erKode67 ? "skjermet" : ""} ${erDød ? "doed" : ""} ${highlightClassName}`}
+                data-uthevet={highlight || undefined}
             >
                 <div className={`${paddingClassname} flex items-center gap-2`}>
                     {rolle && <RolleTag rolleType={rolle} ident={ident} stønad18År={stønad18År} />}
@@ -163,6 +165,7 @@ export default function PersonNavnIdent({
                 size="small"
                 title={genererTittel()}
                 className={`${erKode67 ? "skjermet" : ""} ${erDød ? "doed" : ""} ${highlightClassName}`}
+                data-uthevet={highlight || undefined}
             >
                 <div className={`${paddingClassname} flex flex-row items-center gap-2`}>
                     {rolle && <RolleTag rolleType={rolle} ident={ident} stønad18År={stønad18År} />}
@@ -195,6 +198,7 @@ export default function PersonNavnIdent({
             as="span"
             size="small"
             className={`${erKode67 ? "skjermet" : ""} ${erDød ? "doed" : ""} ${highlightClassName}`}
+            data-uthevet={highlight || undefined}
             title={genererTittel()}
         >
             <div className={`${paddingClassname} flex gap-1 self-center items-center ${highlightClassName}`}>

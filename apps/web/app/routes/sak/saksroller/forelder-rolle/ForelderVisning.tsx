@@ -3,19 +3,20 @@ import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import DiskresjonAlert from "./components/DiskresjonAlert.tsx";
-import PersonInfo from "./components/PersonInfo.tsx";
-import SøkPerson from "./components/SøkPerson.tsx";
-import RollehistorikkVisning from "./RollehistorikkVisning.tsx";
-import type { Rolle, SakRedigeringData } from "./sakvisning-schema.ts";
+import DiskresjonAlert from "../components/DiskresjonAlert.tsx";
+import PersonInfo from "../components/PersonInfo.tsx";
+import SøkPerson from "../components/SøkPerson.tsx";
+import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
+import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 interface ForelderVisningProps {
     form: UseFormReturn<SakRedigeringData>;
     rolle: Rolle;
     erNyForelder: boolean;
+    saksnummer?: string;
 }
 
-export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderVisningProps) {
+export default function ForelderVisning({ form, rolle, erNyForelder, saksnummer }: ForelderVisningProps) {
     const [visSøk, setVisSøk] = useState(false);
     const roller = form.watch("roller") || [];
 
@@ -73,7 +74,11 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
                     }
                 >
                     {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
-                    <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} />
+                    <RollehistorikkVisning
+                        rollehistorikk={rolle.rollehistorikk}
+                        rolle={rolle}
+                        saksnummer={saksnummer}
+                    />
                 </PersonInfo>
                 <HStack gap="space-8" wrap={false}>
                     {!visSøk && erNyForelder && (

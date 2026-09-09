@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="no">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Story-galleri (bla gjennom) — bidrag-web</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                height: 100%;
+            }
+            #app {
+                display: flex;
+                min-height: 100vh;
+            }
+            #sidebar {
+                flex: 0 0 18rem;
+            }
+            #root {
+                flex: 1 1 auto;
+                min-width: 0;
+                background: #ffffff;
+                padding: 2rem;
+                box-sizing: border-box;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <div id="sidebar"></div>
+            <div id="root"></div>
+        </div>
+        <script type="module" src="./browse.tsx"></script>
+    </body>
+</html>
