@@ -25,7 +25,7 @@ import type {
     OpprettSakRequest,
     SakshendelseDto,
 } from "@bidrag/api/SakApi";
-import { IdentUtils, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
+import { IdentUtils, LoggerService, ObjectUtils, SecureLoggerService, StringUtils } from "@bidrag/common";
 import {
     useMutation,
     useQueries,
@@ -206,7 +206,7 @@ export function useHentSak(saksnummer: string | undefined, rollehistorikk: boole
                 const response = await BIDRAG_SAK_API.bidragSak.findMetadataForSak(saksnummer ?? "", {
                     "vis-rollehistorikk": rollehistorikk,
                 });
-                await SecureLoggerService.info(`Hentet sak ${saksnummer}`);
+                await LoggerService.info("Hentet sak", {saksnummer} );
                 return response.data;
             } catch (e) {
                 const axiosError = e as AxiosError;

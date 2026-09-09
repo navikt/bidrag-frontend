@@ -3,7 +3,7 @@ import type { CustomError, SimpleError } from "../types/error";
 /** Samme navn som pino-metodene, slik at `logger[level](...)` kan brukes direkte. */
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
-export type LogContext = Record<string, string | number | boolean | null>;
+export type LogContext = Record<string, string | number | boolean | null | undefined>;
 
 export interface LogInfo {
     level: LogLevel;

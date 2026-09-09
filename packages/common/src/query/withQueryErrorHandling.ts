@@ -30,7 +30,7 @@ export async function withQueryErrorHandling<T>(
         const status = axiosError?.response?.status;
         if (status === 403 || status === 401) {
             const contextString = context ? `for ${JSON.stringify(context)}` : "";
-            await SecureLoggerService.warn(`Ingen tilgang til ${queryName} ${contextString}`);
+            await SecureLoggerService.warn("Manglende tilgang", axiosError, { ...context, queryName });
             throw new TilgangsFeilError(`Du har ikke tilgang til ${queryName} ${contextString}`);
         }
         if (status === 404 && notFoundValue !== undefined) {

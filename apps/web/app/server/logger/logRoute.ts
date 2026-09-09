@@ -1,5 +1,4 @@
-import { type LoggetFeil, logInfoSchema } from "@bidrag/common";
-import { env } from "~/env.server.ts";
+import { logInfoSchema } from "@bidrag/common";
 import type { Route } from "./+types/logRoute.ts";
 import { navLogger, secureNavLogger } from "./navLogger";
 
@@ -27,7 +26,6 @@ async function doLog(logger: Logger, req: Request): Promise<Response> {
         ...context,
         ...(context?.kind === "feedback" ? { user: undefined } : {}),
         ...(error ? { err: error } : {}),
-
     };
 
     logger[level](felter, message);
