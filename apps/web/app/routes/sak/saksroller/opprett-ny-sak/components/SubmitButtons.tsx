@@ -4,7 +4,7 @@ import { TasklistSaveIcon, TasklistSendIcon, TasklistStartIcon } from "@navikt/a
 import { Alert, Button, HStack } from "@navikt/ds-react";
 import type { AxiosError } from "axios";
 import { useEffect, useRef } from "react";
-import { useRouteLoaderData } from "react-router";
+import { useRouteLoaderData, useSearchParams } from "react-router";
 import type { loader as rootLoader } from "~/root.tsx";
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 
 export default function SubmitButtons({ disabled = false, isLoading = false, error, saksnummer }: Props) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
+    const [, setSearchParams] = useSearchParams();
     const errorRef = useRef<HTMLDivElement>(null);
     const afterSubmitRedirect = useRef<"sak" | "soknad" | null>(null);
 
@@ -27,19 +28,22 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
     }, [error]);
 
     useEffect(() => {
-        console.log("Saksnummer:", saksnummer, "AfterSubmitRedirect:", afterSubmitRedirect.current);
-        if (saksnummer && afterSubmitRedirect.current) {
-            if (afterSubmitRedirect.current === "sak") {
-                RedirectTo.behandleSak(saksnummer, bisysUrl);
-            } else if (afterSubmitRedirect.current === "soknad") {
-                RedirectTo.nySoknad(saksnummer, bisysUrl);
-            }
-        } else if (saksnummer) {
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("saksnummer", saksnummer);
-            window.location.href = `${window.location.pathname}?${searchParams.toString()}`;
+        if (!saksnummer) return;
+
+        if (afterSubmitRedirect.current === "sak") {
+            RedirectTo.behandleSak(saksnummer, bisysUrl);
+        } else if (afterSubmitRedirect.current === "soknad") {
+            RedirectTo.nySoknad(saksnummer, bisysUrl);
+        } else {
+            setSearchParams(
+                (forrige) => {
+                    forrige.set("saksnummer", saksnummer);
+                    return forrige;
+                },
+                { replace: true },
+            );
         }
-    }, [saksnummer]);
+    }, [saksnummer, bisysUrl, setSearchParams]);
 
     function renderButtons() {
         if (saksnummer && afterSubmitRedirect.current) {

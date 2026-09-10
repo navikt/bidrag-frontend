@@ -1,6 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
 import { Alert, BodyShort, Box, HStack, Loader, Search } from "@navikt/ds-react";
+import type { KeyboardEvent } from "react";
 import { useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
 
@@ -45,6 +46,14 @@ export default function PersonSamhandlerSøk({
             });
     }
 
+    function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+        if (event.key === "Enter" && searchValue.trim()) {
+            event.preventDefault();
+            event.stopPropagation();
+            onInputChange(searchValue);
+        }
+    }
+
     const containerWidth = compact ? "100%" : "50rem";
     const containerPadding = compact ? "space-0" : "space-8";
 
@@ -72,12 +81,10 @@ export default function PersonSamhandlerSøk({
                             onClick={(e) => e.stopPropagation()}
                             onChange={setSearchValue}
                             onSearchClick={onInputChange}
-                            onKeyUp={(event) => {
-                                if (!primary && event.key === "Enter" && searchValue.trim()) {
-                                    onInputChange(searchValue);
-                                }
-                            }}
-                        />
+                            onKeyDown={handleSearchKeyDown}
+                        >
+                            {primary && <Search.Button type="button" />}
+                        </Search>
                     </Box>
                     <HStack gap="space-8" align="end" wrap>
                         <PersonSokButton

@@ -1,10 +1,10 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
 import { PlusIcon } from "@navikt/aksel-icons";
-import { Box, Button, VStack } from "@navikt/ds-react";
+import { Button, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import SøkPerson from "../components/SøkPerson";
+import PersonSøkWrapper from "../PersonSøkWrapper";
 import { type Barnkurv, type ForelderMedBarnSkjemaData, MAKS_ALDER_BARN } from "./opprett-sak-schema";
 
 type Props = {
@@ -14,10 +14,11 @@ type Props = {
 };
 
 export default function BarnManueltRegistrering({ form, leggTilBarnMauell, barnkurver }: Props) {
-    const valgteBarn = form.getValues("valgteBarn");
     const [visSok, setVisSok] = useState(false);
 
     const håndterSøk = async (barn: PersonDto) => {
+        const valgteBarn = form.getValues("valgteBarn");
+
         if (valgteBarn.some((b) => b.ident === barn.ident)) {
             if (barn?.visningsnavn && barn?.ident) {
                 throw new Error(
@@ -75,34 +76,26 @@ export default function BarnManueltRegistrering({ form, leggTilBarnMauell, barnk
 
     return (
         <VStack gap="space-12" className="self-end">
-            {!visSok && (
-                <Button
-                    type="button"
-                    variant="secondary"
-                    size="small"
-                    icon={<PlusIcon aria-hidden />}
-                    onClick={() => setVisSok(true)}
-                >
-                    Legg til barn manuelt
-                </Button>
-            )}
+            <Button
+                type="button"
+                variant="secondary"
+                size="small"
+                icon={<PlusIcon aria-hidden />}
+                onClick={() => setVisSok(true)}
+            >
+                Legg til barn manuelt
+            </Button>
             {visSok && (
-                <Box asChild borderWidth="1" borderColor="accent">
-                    <VStack gap="space-12" padding="space-4">
-                        <Button
-                            type="button"
-                            variant="tertiary"
-                            className="self-end"
-                            size="small"
-                            onClick={() => setVisSok(false)}
-                        >
-                            Lukk søk
-                        </Button>
-                        <Box marginBlock="space-8 space-0">
-                            <SøkPerson label="Oppgi barn i saken manuelt" personInformasjon={håndterSøk} />
-                        </Box>
-                    </VStack>
-                </Box>
+                <PersonSøkWrapper
+                    tittel="Legg til barn manuelt"
+                    beskrivelse="Søk opp barnet som skal legges til i saken"
+                    søkeLabel="Oppgi barn i saken manuelt"
+                    onPersonValgt={async (person) => {
+                        await håndterSøk(person);
+                        setVisSok(false);
+                    }}
+                    onAvbryt={() => setVisSok(false)}
+                />
             )}
         </VStack>
     );

@@ -3,7 +3,7 @@ import { PlusIcon } from "@navikt/aksel-icons";
 import { Alert, BodyShort, Box, Button, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import SøkPerson from "../../../components/SøkPerson";
+import PersonSøkWrapper from "../../../PersonSøkWrapper";
 import type { Diskresjonskode, EktefellebidragSkjemaData, ForelderPartRolle } from "../../opprett-sak-schema";
 import PersonKort from "./PersonKort";
 
@@ -81,17 +81,13 @@ export default function EktefelleMotpartVelger({ form, forslagMotpart, motsattRo
                         </Button>
                     </Box>
                 ) : (
-                    <Box asChild borderRadius="8" borderWidth="2" borderColor="accent" background="accent-soft">
-                        <VStack gap="space-12" padding="space-16">
-                            <SøkPerson
-                                label={`Søk etter ${rolleLabel}`}
-                                personInformasjon={(person) => velgPerson(person, true)}
-                            />
-                            <Button type="button" onClick={() => setVisSøkefelt(false)} variant="tertiary" size="small">
-                                Avbryt søk
-                            </Button>
-                        </VStack>
-                    </Box>
+                    <PersonSøkWrapper
+                        tittel={`Søk etter ${rolleLabel}`}
+                        beskrivelse="Søk opp personen som skal være motpart i saken"
+                        søkeLabel={`Søk etter ${rolleLabel}`}
+                        onPersonValgt={(person) => velgPerson(person, true)}
+                        onAvbryt={() => setVisSøkefelt(false)}
+                    />
                 )}
             </VStack>
 

@@ -52,10 +52,17 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
     await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
     await expectNoAxeViolations(page, component);
 
+    // Story-en kjører på createMemoryRouter, så URL-en oppdateres ikke. Markøren nullstilles derimot
+    // ved full reload, og skiller derfor klientsidig oppdatering fra dokumentbytte.
+    await page.evaluate(() => {
+        (window as unknown as { __sammeDokument?: boolean }).__sammeDokument = true;
+    });
+
     await component.getByRole("button", { name: /Opprett$/ }).click();
 
     await expect.poll(() => requests.create).toBeTruthy();
     expect(requests.create?.roller).toHaveLength(2);
-    // Klikk på "Opprett" uten valgt redirect-mål navigerer via window.location til saksnummer-URL-en (reell app-oppførsel, ikke en test-feil)
-    await page.waitForURL(/saksnummer=1234567/);
+    await expect
+        .poll(() => page.evaluate(() => (window as unknown as { __sammeDokument?: boolean }).__sammeDokument))
+        .toBe(true);
 });
