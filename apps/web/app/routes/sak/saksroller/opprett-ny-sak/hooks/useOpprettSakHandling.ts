@@ -92,20 +92,62 @@ export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): Oppre
             await opprettOppfostringssak(data as OppfostringsbidragSkjemaSchemaData);
             return;
         }
-        try {
-            const forelderMedBarnResult = ForelderMedBarnSkjemaSchema.safeParse(data);
-            const forelderUtenBarnResult = ForelderUtenBarnSkjemaSchema.safeParse(data);
+        const forelderMedBarnResult = ForelderMedBarnSkjemaSchema.safeParse(data);
+        const forelderUtenBarnResult = ForelderUtenBarnSkjemaSchema.safeParse(data);
 
-            if (forelderMedBarnResult.success || forelderUtenBarnResult.success) {
-                const forelderData = data as ForelderMedBarnSkjemaData | ForelderUtenBarnSkjemaData;
+        if (forelderMedBarnResult.success || forelderUtenBarnResult.success) {
+            const forelderData = data as ForelderMedBarnSkjemaData | ForelderUtenBarnSkjemaData;
 
-                const [bidragsmottaker, bidragspliktig] =
-                    forelderData.motpart.rolle === "bidragsmottaker"
-                        ? [forelderData.motpart, forelderData.partISaken]
-                        : [forelderData.partISaken, forelderData.motpart];
+            const [bidragsmottaker, bidragspliktig] =
+                forelderData.motpart.rolle === "bidragsmottaker"
+                    ? [forelderData.motpart, forelderData.partISaken]
+                    : [forelderData.partISaken, forelderData.motpart];
+
+            request = {
+                ...lagBaseRequest(enhet, forelderData.kategori, "EEN"),
+                roller: [
+                    {
+                        fodselsnummer: bidragspliktig.ident,
+                        type: Rolletype.BP,
+                        mottagerErVerge: false,
+                        rolleType: Rolletype.BP,
+                    },
+                    {
+                        fodselsnummer: bidragsmottaker.ident,
+                        type: Rolletype.BM,
+                        mottagerErVerge: false,
+                        rolleType: Rolletype.BM,
+                    },
+                    ...forelderData.valgteBarn.map((barn) => ({
+                        fodselsnummer: barn.ident,
+                        type: Rolletype.BA,
+                        rolleType: Rolletype.BA,
+                        reellMottaker: barn?.reellMottaker
+                            ? {
+                                  ident: barn.reellMottaker ?? "",
+                                  verge: false,
+                              }
+                            : null,
+                        mottagerErVerge: false,
+                    })),
+                ],
+            } as OpprettSakRequest;
+        } else {
+            const barnBeggForeldreResult = BarnBeggForeldreSkjemaSchema.safeParse(data);
+            const barnManglendeForeldreResult = BarnMedManglendeForeldreSkjemaSchema.safeParse(data);
+
+            if (barnBeggForeldreResult.success || barnManglendeForeldreResult.success) {
+                const barnData = data as BarnBeggForeldreSkjemaData | BarnMedManglendeForeldreSkjemaData;
+
+                const bidragspliktig = barnData.foreldre.find((f) => f.rolle === "bidragspliktig");
+                const bidragsmottaker = barnData.foreldre.find((f) => f.rolle === "bidragsmottaker");
+
+                if (!bidragspliktig || !bidragsmottaker) {
+                    throw new Error("Mangler bidragspliktig eller bidragsmottaker");
+                }
 
                 request = {
-                    ...lagBaseRequest(enhet, forelderData.kategori, "EEN"),
+                    ...lagBaseRequest(enhet, barnData.kategori, arbeidsfordeling),
                     roller: [
                         {
                             fodselsnummer: bidragspliktig.ident,
@@ -119,76 +161,29 @@ export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): Oppre
                             mottagerErVerge: false,
                             rolleType: Rolletype.BM,
                         },
-                        ...forelderData.valgteBarn.map((barn) => ({
-                            fodselsnummer: barn.ident,
+                        {
+                            fodselsnummer: barnData.barn.ident,
                             type: Rolletype.BA,
                             rolleType: Rolletype.BA,
-                            reellMottaker: barn?.reellMottaker
+                            reellMottaker: barnData.barn?.reellMottaker
                                 ? {
-                                      ident: barn.reellMottaker ?? "",
+                                      ident: barnData.barn.reellMottaker ?? "",
                                       verge: false,
                                   }
                                 : null,
                             mottagerErVerge: false,
-                        })),
+                        },
                     ],
                 } as OpprettSakRequest;
             } else {
-                const barnBeggForeldreResult = BarnBeggForeldreSkjemaSchema.safeParse(data);
-                const barnManglendeForeldreResult = BarnMedManglendeForeldreSkjemaSchema.safeParse(data);
-
-                if (barnBeggForeldreResult.success || barnManglendeForeldreResult.success) {
-                    const barnData = data as BarnBeggForeldreSkjemaData | BarnMedManglendeForeldreSkjemaData;
-
-                    const bidragspliktig = barnData.foreldre.find((f) => f.rolle === "bidragspliktig");
-                    const bidragsmottaker = barnData.foreldre.find((f) => f.rolle === "bidragsmottaker");
-
-                    if (!bidragspliktig || !bidragsmottaker) {
-                        throw new Error("Mangler bidragspliktig eller bidragsmottaker");
-                    }
-
-                    request = {
-                        ...lagBaseRequest(enhet, barnData.kategori, arbeidsfordeling),
-                        roller: [
-                            {
-                                fodselsnummer: bidragspliktig.ident,
-                                type: Rolletype.BP,
-                                mottagerErVerge: false,
-                                rolleType: Rolletype.BP,
-                            },
-                            {
-                                fodselsnummer: bidragsmottaker.ident,
-                                type: Rolletype.BM,
-                                mottagerErVerge: false,
-                                rolleType: Rolletype.BM,
-                            },
-                            {
-                                fodselsnummer: barnData.barn.ident,
-                                type: Rolletype.BA,
-                                rolleType: Rolletype.BA,
-                                reellMottaker: barnData.barn?.reellMottaker
-                                    ? {
-                                          ident: barnData.barn.reellMottaker ?? "",
-                                          verge: false,
-                                      }
-                                    : null,
-                                mottagerErVerge: false,
-                            },
-                        ],
-                    } as OpprettSakRequest;
-                } else {
-                    throw new Error("Ukjent skjematype");
-                }
+                throw new Error("Ukjent skjematype");
             }
-
-            await opprettSak({
-                ...request,
-                roller: request.roller.filter((i) => i.fodselsnummer !== ""),
-            });
-        } catch (e) {
-            console.error("Feil ved opprettelse av sak fra skjema", e);
-            throw e;
         }
+
+        await opprettSak({
+            ...request,
+            roller: request.roller.filter((i) => i.fodselsnummer !== ""),
+        });
     };
 
     const opprettOppfostringssak = async (data: OppfostringsbidragSkjemaSchemaData) => {

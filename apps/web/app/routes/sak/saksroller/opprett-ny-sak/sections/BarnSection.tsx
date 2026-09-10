@@ -66,8 +66,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
         const barnValidation = BarnMedAlderSchema.safeParse(nyttBarn);
 
         if (!barnValidation.success) {
-            console.error("Validering feilet:", barnValidation.error);
-            return;
+            throw new Error("Kunne ikke validere barn som ble lagt til manuelt");
         }
 
         const oppdaterteBarn = [...(forelderBarnForm.getValues("valgteBarn") as BarnMedAlder[]), barnValidation.data];
