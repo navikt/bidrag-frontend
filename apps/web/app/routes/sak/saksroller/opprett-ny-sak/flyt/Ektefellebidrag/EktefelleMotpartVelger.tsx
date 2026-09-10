@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PlusIcon } from "@navikt/aksel-icons";
-import { Alert, BodyShort, Button, Heading, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, Button, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import SøkPerson from "../../../components/SøkPerson";
@@ -47,7 +47,7 @@ export default function EktefelleMotpartVelger({ form, forslagMotpart, motsattRo
                 Velg {rolleLabel}
             </Heading>
 
-            <BodyShort size="small" className="text-ax-neutral-700">
+            <BodyShort size="small" textColor="subtle">
                 {forslagMotpart.length === 0
                     ? "Søk etter ektefelle/partner"
                     : "Velg ektefelle/partner fra listen eller søk etter en annen person"}
@@ -69,26 +69,29 @@ export default function EktefelleMotpartVelger({ form, forslagMotpart, motsattRo
                 {erValgtFraSøk && søktPerson && <PersonKort person={søktPerson} erValgt onClick={fjernValg} />}
 
                 {!visSøkefelt ? (
-                    <Button
-                        type="button"
-                        size="xsmall"
-                        className="w-max"
-                        onClick={() => setVisSøkefelt(true)}
-                        icon={<PlusIcon aria-hidden />}
-                        variant="tertiary"
-                    >
-                        <BodyShort size="small">Søk etter annen person</BodyShort>
-                    </Button>
-                ) : (
-                    <div className="space-y-3 p-4 rounded-lg border-2 border-solid border-ax-accent-400 bg-ax-accent-100">
-                        <SøkPerson
-                            label={`Søk etter ${rolleLabel}`}
-                            personInformasjon={(person) => velgPerson(person, true)}
-                        />
-                        <Button type="button" onClick={() => setVisSøkefelt(false)} variant="tertiary" size="small">
-                            Avbryt søk
+                    <Box asChild width="max-content">
+                        <Button
+                            type="button"
+                            size="xsmall"
+                            onClick={() => setVisSøkefelt(true)}
+                            icon={<PlusIcon aria-hidden />}
+                            variant="tertiary"
+                        >
+                            <BodyShort size="small">Søk etter annen person</BodyShort>
                         </Button>
-                    </div>
+                    </Box>
+                ) : (
+                    <Box asChild borderRadius="8" borderWidth="2" borderColor="accent" background="accent-soft">
+                        <VStack gap="space-12" padding="space-16">
+                            <SøkPerson
+                                label={`Søk etter ${rolleLabel}`}
+                                personInformasjon={(person) => velgPerson(person, true)}
+                            />
+                            <Button type="button" onClick={() => setVisSøkefelt(false)} variant="tertiary" size="small">
+                                Avbryt søk
+                            </Button>
+                        </VStack>
+                    </Box>
                 )}
             </VStack>
 

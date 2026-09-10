@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
 import { PlusIcon } from "@navikt/aksel-icons";
-import { Box, Button } from "@navikt/ds-react";
+import { Box, Button, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import SøkPerson from "../components/SøkPerson";
@@ -74,7 +74,7 @@ export default function BarnManueltRegistrering({ form, leggTilBarnMauell, barnk
     };
 
     return (
-        <div className="space-y-3 self-end">
+        <VStack gap="space-12" className="self-end">
             {!visSok && (
                 <Button
                     type="button"
@@ -87,21 +87,23 @@ export default function BarnManueltRegistrering({ form, leggTilBarnMauell, barnk
                 </Button>
             )}
             {visSok && (
-                <Box as="div" padding="space-4" borderWidth="1" borderColor="accent" className="space-y-3">
-                    <Button
-                        type="button"
-                        variant="tertiary"
-                        className="flex self-end justify-end justify-self-end"
-                        size="small"
-                        onClick={() => setVisSok(false)}
-                    >
-                        Lukk søk
-                    </Button>
-                    <div className="mt-2">
-                        <SøkPerson label="Oppgi barn i saken manuelt" personInformasjon={håndterSøk} />
-                    </div>
+                <Box asChild borderWidth="1" borderColor="accent">
+                    <VStack gap="space-12" padding="space-4">
+                        <Button
+                            type="button"
+                            variant="tertiary"
+                            className="self-end"
+                            size="small"
+                            onClick={() => setVisSok(false)}
+                        >
+                            Lukk søk
+                        </Button>
+                        <Box marginBlock="space-8 space-0">
+                            <SøkPerson label="Oppgi barn i saken manuelt" personInformasjon={håndterSøk} />
+                        </Box>
+                    </VStack>
                 </Box>
             )}
-        </div>
+        </VStack>
     );
 }

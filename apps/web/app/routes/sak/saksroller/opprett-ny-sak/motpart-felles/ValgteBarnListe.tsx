@@ -1,5 +1,5 @@
 import { XMarkIcon } from "@navikt/aksel-icons";
-import { BodyShort, Button, Heading, type HeadingProps } from "@navikt/ds-react";
+import { BodyShort, Box, Button, Heading, type HeadingProps, HStack, VStack } from "@navikt/ds-react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 import DiskresjonAlert from "../../components/DiskresjonAlert";
@@ -37,27 +37,32 @@ export default function ValgteBarnListe<TFieldValues extends FieldValues & { val
     }
 
     return (
-        <div className="pt-6">
-            <div className="flex items-center justify-between mb-3">
+        <Box paddingBlock="space-24 space-0">
+            <HStack align="center" justify="space-between" marginBlock="space-0 space-12">
                 <Heading {...heading}>{tittel}</Heading>
-                <BodyShort
-                    size="small"
-                    className="bg-ax-accent-200 text-ax-accent-800 px-3 py-1 rounded-full font-semibold"
+                <Box
+                    asChild
+                    background="accent-moderate"
+                    paddingInline="space-12"
+                    paddingBlock="space-4"
+                    borderRadius="full"
                 >
-                    {valgteBarn.length} valgt
-                </BodyShort>
-            </div>
+                    <BodyShort size="small" weight="semibold" className="text-ax-accent-800">
+                        {valgteBarn.length} valgt
+                    </BodyShort>
+                </Box>
+            </HStack>
 
-            <div className="grid grid-cols-1 gap-3">
+            <VStack gap="space-12">
                 {valgteBarn.map((barn) => {
                     const barnIndex = alleBarn.findIndex((b) => b.ident === barn.ident);
                     const erReellMottakerPåkrevd =
                         reellMottakerAlltidPåkrevd || barn.erMyndig || bidragsmottakerErUkjent;
 
                     return (
-                        <div key={barn.ident} className="p-4 bg-ax-neutral-100 rounded-lg">
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
+                        <Box key={barn.ident} padding="space-16" background="neutral-soft" borderRadius="8">
+                            <HStack align="start" justify="space-between">
+                                <Box flexGrow="1">
                                     <PersonInfo
                                         ident={barn.ident}
                                         fødselsdato={barn.fødselsdato}
@@ -67,7 +72,7 @@ export default function ValgteBarnListe<TFieldValues extends FieldValues & { val
                                     {barn?.diskresjonskode && (
                                         <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />
                                     )}
-                                </div>
+                                </Box>
                                 <Button
                                     type="button"
                                     variant="tertiary-neutral"
@@ -77,9 +82,9 @@ export default function ValgteBarnListe<TFieldValues extends FieldValues & { val
                                 >
                                     Fjern
                                 </Button>
-                            </div>
+                            </HStack>
                             {visReellMottaker && barnIndex !== -1 && (
-                                <div className="mt-1 pt-1">
+                                <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">
                                     <ReellMottakerInline
                                         form={form}
                                         fieldPath={`valgteBarn.${barnIndex}`}
@@ -88,12 +93,12 @@ export default function ValgteBarnListe<TFieldValues extends FieldValues & { val
                                         isRequired={erReellMottakerPåkrevd}
                                         kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
                                     />
-                                </div>
+                                </Box>
                             )}
-                        </div>
+                        </Box>
                     );
                 })}
-            </div>
-        </div>
+            </VStack>
+        </Box>
     );
 }

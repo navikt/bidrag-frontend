@@ -1,4 +1,4 @@
-import { Radio, RadioGroup } from "@navikt/ds-react";
+import { HStack, Radio, RadioGroup } from "@navikt/ds-react";
 import { type ForelderPartRolle, ForelderPartRolleSchema } from "../../opprett-sak-schema";
 import { hentForelderRolleLabel } from "../../utils";
 
@@ -18,13 +18,13 @@ export default function ForelderRolleVelger({ value, onChange, error, legend = "
             onChange={(val) => onChange(val as ForelderPartRolle)}
             error={error}
         >
-            <div className="flex gap-3">
+            <HStack gap="space-12">
                 {ForelderPartRolleSchema.options.map((rolle) => (
                     <Radio key={rolle} value={rolle}>
                         {hentForelderRolleLabel(rolle)}
                     </Radio>
                 ))}
-            </div>
+            </HStack>
         </RadioGroup>
     );
 }

@@ -1,5 +1,5 @@
 import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, BodyShort, Button, Heading } from "@navikt/ds-react";
+import { Alert, BodyLong, BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -53,7 +53,7 @@ export default function MotpartVelger({
         <div>
             {!visMotpartInfoPanel && (
                 <Alert variant={variant} size="small">
-                    <div className="space-y-3">
+                    <VStack gap="space-12">
                         <div>
                             <Heading level="3" size="small" spacing>
                                 {tittel}
@@ -61,7 +61,7 @@ export default function MotpartVelger({
                             <BodyShort size="small">{beskrivelse}</BodyShort>
                         </div>
 
-                        <div className="flex gap-2 flex-wrap">
+                        <HStack gap="space-8" wrap>
                             {harForeslåttMotpart && (
                                 <Button type="button" size="small" onClick={håndterBrukForeslått}>
                                     Bruk {foreslåttMotpartNavn}
@@ -71,27 +71,35 @@ export default function MotpartVelger({
                             <Button type="button" size="small" onClick={håndterVelgAnnen}>
                                 Velg annen person
                             </Button>
-                        </div>
-                    </div>
+                        </HStack>
+                    </VStack>
                 </Alert>
             )}
 
             {visMotpartInfoPanel && (
-                <div className="mt-4 p-3 border bg-ax-success-200 border-solid border-ax-success-600 rounded-lg flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <PersonIcon fontSize="1.5rem" aria-hidden className="text-ax-success-700" />
-                        <BodyLong size="small" className="font-semibold">
-                            Motpart: {visningsnavn}
-                        </BodyLong>
-                    </div>
-                    <Button
-                        type="button"
-                        size="xsmall"
-                        variant="secondary"
-                        onClick={håndterFjernMotpart}
-                        icon={<XMarkIcon title="Fjern motpart" />}
-                    />
-                </div>
+                <Box
+                    asChild
+                    background="success-moderate"
+                    borderWidth="1"
+                    borderColor="success-strong"
+                    borderRadius="8"
+                >
+                    <HStack align="center" justify="space-between" marginBlock="space-16 space-0" padding="space-12">
+                        <HStack align="center" gap="space-12">
+                            <PersonIcon fontSize="1.5rem" aria-hidden className="text-ax-success-700" />
+                            <BodyLong size="small" weight="semibold">
+                                Motpart: {visningsnavn}
+                            </BodyLong>
+                        </HStack>
+                        <Button
+                            type="button"
+                            size="xsmall"
+                            variant="secondary"
+                            onClick={håndterFjernMotpart}
+                            icon={<XMarkIcon title="Fjern motpart" />}
+                        />
+                    </HStack>
+                </Box>
             )}
         </div>
     );

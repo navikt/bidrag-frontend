@@ -1,5 +1,5 @@
 import { PersonIcon } from "@navikt/aksel-icons";
-import { BodyLong, BodyShort, Button, Heading, VStack } from "@navikt/ds-react";
+import { BodyLong, BodyShort, Box, Button, Heading, HGrid, HStack, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
 import DiskresjonAlert from "../../components/DiskresjonAlert";
@@ -71,33 +71,46 @@ export default function OppsummeringSection({
                 Oppsummering
             </Heading>
 
-            <dl className="rounded-lg border border-ax-neutral-300 bg-ax-neutral-200 p-4">
-                <div className="grid w-fit grid-cols-[max-content_max-content] gap-x-2 gap-y-1 items-start">
-                    <dt>
-                        <BodyShort size="small" className="text-ax-neutral-800">
-                            Sakstype:
-                        </BodyShort>
-                    </dt>
-                    <dd className="ml-0">
-                        <BodyShort size="small" className="font-semibold text-ax-neutral-1000">
-                            {sakstype ? sakstypeTilTekst(sakstype) : "Ikke valgt"}
-                        </BodyShort>
-                    </dd>
+            <Box
+                asChild
+                borderRadius="8"
+                borderColor="neutral-subtleA"
+                borderWidth="1"
+                background="neutral-moderate"
+                padding="space-16"
+            >
+                <dl>
+                    <HGrid columns="max-content max-content" gap="space-4 space-8" align="start" width="fit-content">
+                        <dt>
+                            <BodyShort size="small" textColor="subtle">
+                                Sakstype:
+                            </BodyShort>
+                        </dt>
+                        <Box asChild marginInline="space-0">
+                            <dd>
+                                <BodyShort size="small" weight="semibold" textColor="default">
+                                    {sakstype ? sakstypeTilTekst(sakstype) : "Ikke valgt"}
+                                </BodyShort>
+                            </dd>
+                        </Box>
 
-                    <dt>
-                        <BodyShort size="small" className="text-ax-neutral-800">
-                            Sakskategori:
-                        </BodyShort>
-                    </dt>
-                    <dd className="ml-0">
-                        <BodyShort size="small" className="font-semibold text-ax-neutral-1000">
-                            {sakskategori}
-                        </BodyShort>
-                    </dd>
-                </div>
-            </dl>
+                        <dt>
+                            <BodyShort size="small" textColor="subtle">
+                                Sakskategori:
+                            </BodyShort>
+                        </dt>
+                        <Box asChild marginInline="space-0">
+                            <dd>
+                                <BodyShort size="small" weight="semibold" textColor="default">
+                                    {sakskategori}
+                                </BodyShort>
+                            </dd>
+                        </Box>
+                    </HGrid>
+                </dl>
+            </Box>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
                 {partCards.map((item) => (
                     <PartKort
                         key={item.key}
@@ -106,18 +119,18 @@ export default function OppsummeringSection({
                         onLeggTil={item.addCallback}
                     />
                 ))}
-            </div>
+            </HGrid>
 
             {barn.length > 0 && (
                 <VStack gap="space-2">
-                    <BodyShort size="small" className="font-semibold text-ax-neutral-1000">
+                    <BodyShort size="small" weight="semibold" textColor="default">
                         Barn
                     </BodyShort>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
                         {barn.map((item) => (
                             <BarnKort key={item.ident} barn={item} />
                         ))}
-                    </div>
+                    </HGrid>
                 </VStack>
             )}
         </VStack>
@@ -132,46 +145,50 @@ type PartKortProps = {
 
 function PartKort({ data, onSettUkjent, onLeggTil }: PartKortProps) {
     if (!data) {
-        return <div className="rounded-lg p-4 bg-ax-neutral-200" />;
+        return <Box borderRadius="8" background="neutral-moderate" padding="space-16" />;
     }
 
     const erUkjent = data.erKjent === false || !data.ident || !data.navn;
 
     return (
-        <VStack gap="space-4" className="rounded-lg p-4 bg-ax-neutral-200">
-            <div className="flex items-center gap-2">
-                <PersonIcon aria-hidden fontSize="1.5rem" className="text-ax-neutral-1000" />
-                <BodyLong size="small" className="font-semibold text-ax-neutral-1000">
-                    {hentForelderRolleLabel(data.rolle)}
-                </BodyLong>
-            </div>
-            <MaskerSensitivInfo>
-                {erUkjent ? (
-                    <div className="flex items-center justify-between gap-2">
-                        <BodyLong size="small" className="italic text-ax-neutral-800">
-                            Ukjent
-                        </BodyLong>
-                        {onLeggTil && (
-                            <Button type="button" variant="tertiary" size="xsmall" onClick={onLeggTil}>
-                                Legg til {data.rolle === "bidragspliktig" ? "bidragspliktig" : "bidragsmottaker"}
+        <Box asChild borderRadius="8" background="neutral-moderate">
+            <VStack gap="space-4" padding="space-16">
+                <HStack align="center" gap="space-8">
+                    <PersonIcon aria-hidden fontSize="1.5rem" className="text-ax-neutral-1000" />
+                    <BodyLong size="small" weight="semibold" textColor="default">
+                        {hentForelderRolleLabel(data.rolle)}
+                    </BodyLong>
+                </HStack>
+                <MaskerSensitivInfo>
+                    {erUkjent ? (
+                        <HStack align="center" justify="space-between" gap="space-8">
+                            <BodyLong size="small" textColor="subtle" className="italic">
+                                Ukjent
+                            </BodyLong>
+                            {onLeggTil && (
+                                <Button type="button" variant="tertiary" size="xsmall" onClick={onLeggTil}>
+                                    Legg til {data.rolle === "bidragspliktig" ? "bidragspliktig" : "bidragsmottaker"}
+                                </Button>
+                            )}
+                        </HStack>
+                    ) : (
+                        <VStack gap="space-1">
+                            <PersonInfo ident={data.ident || ""} navn={data.navn} fødselsdato={data.fødselsdato} />
+                            {data.diskresjonskode && <DiskresjonAlert diskresjonskode={data.diskresjonskode} />}
+                        </VStack>
+                    )}
+                </MaskerSensitivInfo>
+                {!erUkjent && onSettUkjent && (
+                    <Box asChild borderColor="neutral-subtleA" borderWidth="1 0 0 0">
+                        <HStack justify="end" paddingBlock="space-4 space-0">
+                            <Button type="button" variant="tertiary" size="small" onClick={onSettUkjent}>
+                                Sett {data.rolle === "bidragspliktig" ? "bidragspliktig" : "bidragsmottaker"} som ukjent
                             </Button>
-                        )}
-                    </div>
-                ) : (
-                    <VStack gap="space-1">
-                        <PersonInfo ident={data.ident || ""} navn={data.navn} fødselsdato={data.fødselsdato} />
-                        {data.diskresjonskode && <DiskresjonAlert diskresjonskode={data.diskresjonskode} />}
-                    </VStack>
+                        </HStack>
+                    </Box>
                 )}
-            </MaskerSensitivInfo>
-            {!erUkjent && onSettUkjent && (
-                <div className="flex justify-end pt-1 border-t border-ax-neutral-300">
-                    <Button type="button" variant="tertiary" size="small" onClick={onSettUkjent}>
-                        Sett {data.rolle === "bidragspliktig" ? "bidragspliktig" : "bidragsmottaker"} som ukjent
-                    </Button>
-                </div>
-            )}
-        </VStack>
+            </VStack>
+        </Box>
     );
 }
 
@@ -183,26 +200,28 @@ function BarnKort({ barn }: BarnKortProps) {
     const reellMottakerTekst = hentReellMottakerTekst(barn);
 
     return (
-        <VStack gap="space-4" className="rounded-lg p-4 bg-ax-neutral-200">
-            <div>
-                <BodyShort size="small" className="font-semibold text-ax-neutral-1000">
-                    Barn
-                </BodyShort>
-                <PersonInfo ident={barn.ident} navn={barn.navn} />
-                {barn.diskresjonskode && <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />}
-            </div>
-
-            <div className="pt-2 border-t border-ax-neutral-300">
+        <Box asChild borderRadius="8" background="neutral-moderate">
+            <VStack gap="space-4" padding="space-16">
                 <div>
-                    <BodyShort size="small" className="text-ax-neutral-700">
-                        Reell mottaker:
+                    <BodyShort size="small" weight="semibold" textColor="default">
+                        Barn
                     </BodyShort>
-                    <BodyShort size="small" className="text-ax-neutral-1000">
-                        {reellMottakerTekst}
-                    </BodyShort>
+                    <PersonInfo ident={barn.ident} navn={barn.navn} />
+                    {barn.diskresjonskode && <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />}
                 </div>
-            </div>
-        </VStack>
+
+                <Box paddingBlock="space-8 space-0" borderColor="neutral-subtleA" borderWidth="1 0 0 0">
+                    <div>
+                        <BodyShort size="small" textColor="subtle">
+                            Reell mottaker:
+                        </BodyShort>
+                        <BodyShort size="small" textColor="default">
+                            {reellMottakerTekst}
+                        </BodyShort>
+                    </div>
+                </Box>
+            </VStack>
+        </Box>
     );
 }
 

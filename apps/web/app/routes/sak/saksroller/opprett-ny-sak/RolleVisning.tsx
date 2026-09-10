@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { BodyShort, Tag } from "@navikt/ds-react";
+import { BodyShort, Box, Tag } from "@navikt/ds-react";
 import { Suspense } from "react";
 import LasterSkeleton from "./components/LasterSkeleton";
 import type { PartRolle } from "./opprett-sak-schema";
@@ -33,9 +33,11 @@ export default function RolleVisning({ partISaken, rolle, editable }: Props) {
 
     return (
         <div>
-            <BodyShort size="small" className="text-ax-neutral-700 mb-2">
-                Rolle i saken
-            </BodyShort>
+            <Box asChild marginBlock="space-0 space-8">
+                <BodyShort size="small" textColor="subtle">
+                    Rolle i saken
+                </BodyShort>
+            </Box>
             <Tag variant="info" size="medium">
                 {ROLLE_LABELS[rolle]}
             </Tag>

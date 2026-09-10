@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonIdent } from "@bidrag/common";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
-import { BodyShort, Heading, Radio, RadioGroup, Tag } from "@navikt/ds-react";
+import { BodyShort, Box, Heading, HGrid, HStack, Radio, RadioGroup, Tag, VStack } from "@navikt/ds-react";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import DiskresjonAlert from "../../../components/DiskresjonAlert";
 import AlderTag from "../../components/AlderTag";
@@ -30,12 +30,12 @@ export default function RolleVelger({ form, foreldre }: Props) {
     const bidragspliktigIdent = valgteRoller.find((f) => f.rolle === "bidragspliktig")?.ident || "";
 
     return (
-        <div className="space-y-4">
+        <VStack gap="space-16">
             <div>
                 <Heading level="2" size="medium" spacing>
                     Velg bidragspliktig
                 </Heading>
-                <BodyShort size="small" className="text-ax-neutral-700">
+                <BodyShort size="small" textColor="subtle">
                     Den andre forelderen blir automatisk bidragsmottaker.
                 </BodyShort>
             </div>
@@ -52,65 +52,72 @@ export default function RolleVelger({ form, foreldre }: Props) {
                         onChange={(value) => håndterValg(value)}
                         error={formState?.errors?.foreldre?.[0]?.rolle?.message}
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
                             {foreldre.map((forelder, index) => {
                                 const person = valgteRoller[index];
                                 const erBidragspliktig = person?.erKjent && person.rolle === "bidragspliktig";
                                 const erBidragsmottaker = person?.erKjent && person.rolle === "bidragsmottaker";
+                                const erUvalgt = !erBidragspliktig && !erBidragsmottaker;
                                 const alder = forelder?.fødselsdato
                                     ? beregnAlder(forelder.fødselsdato)
                                     : beregnAlderFraFnr(forelder.ident);
 
                                 return (
-                                    <div
+                                    <Box
                                         key={index}
-                                        className={`flex justify-between p-4 rounded-lg transition-all ${
+                                        asChild
+                                        borderRadius="8"
+                                        background={
                                             erBidragspliktig
-                                                ? "bg-ax-warning-100"
+                                                ? "warning-soft"
                                                 : erBidragsmottaker
-                                                  ? "bg-ax-success-100"
-                                                  : "border border-solid border-ax-neutral-400 bg-[white]"
-                                        }`}
+                                                  ? "success-soft"
+                                                  : "default"
+                                        }
+                                        borderWidth={erUvalgt ? "1" : "0"}
+                                        borderColor="neutral"
                                     >
-                                        <Radio value={forelder.ident}>
-                                            <div>
-                                                {forelder.visningsnavn}{" "}
-                                                <AlderTag
-                                                    erMyndig={false}
-                                                    alder={alder ?? 0}
-                                                    deaktivert={!person?.erKjent}
-                                                />
-                                                <BodyShort className="text-ax-neutral-800" size="small">
-                                                    <PersonIdent ident={`${forelder.ident}`} />
-                                                </BodyShort>
-                                            </div>
-                                            {forelder?.diskresjonskode && (
-                                                <DiskresjonAlert diskresjonskode={forelder.diskresjonskode} />
+                                        <HStack justify="space-between" padding="space-16" className="transition-all">
+                                            <Radio value={forelder.ident}>
+                                                <div>
+                                                    {forelder.visningsnavn}{" "}
+                                                    <AlderTag
+                                                        erMyndig={false}
+                                                        alder={alder ?? 0}
+                                                        deaktivert={!person?.erKjent}
+                                                    />
+                                                    <BodyShort textColor="subtle" size="small">
+                                                        <PersonIdent ident={`${forelder.ident}`} />
+                                                    </BodyShort>
+                                                </div>
+                                                {forelder?.diskresjonskode && (
+                                                    <DiskresjonAlert diskresjonskode={forelder.diskresjonskode} />
+                                                )}
+                                            </Radio>
+
+                                            {erBidragspliktig && (
+                                                <div>
+                                                    <Tag size="small" variant="warning">
+                                                        Bidragspliktig
+                                                    </Tag>
+                                                </div>
                                             )}
-                                        </Radio>
 
-                                        {erBidragspliktig && (
-                                            <div>
-                                                <Tag size="small" variant="warning">
-                                                    Bidragspliktig
-                                                </Tag>
-                                            </div>
-                                        )}
-
-                                        {erBidragsmottaker && (
-                                            <div>
-                                                <Tag size="small" variant="success">
-                                                    Bidragsmottaker
-                                                </Tag>
-                                            </div>
-                                        )}
-                                    </div>
+                                            {erBidragsmottaker && (
+                                                <div>
+                                                    <Tag size="small" variant="success">
+                                                        Bidragsmottaker
+                                                    </Tag>
+                                                </div>
+                                            )}
+                                        </HStack>
+                                    </Box>
                                 );
                             })}
-                        </div>
+                        </HGrid>
                     </RadioGroup>
                 )}
             />
-        </div>
+        </VStack>
     );
 }

@@ -2,16 +2,19 @@ import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/Bid
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import BarnBeggeForeldreFlyt from "../flyt/BarnBeggeForeldre/BarnBeggeForeldreFlyt";
-import BarnMedManglendeForeldreFlyt from "../flyt/BarnManglendeForeldre/BarnMedManglendeForeldreFlyt";
-import EktefellebidragFlyt from "../flyt/Ektefellebidrag/EktefellebidragFlyt";
-import FarskapsFlyt from "../flyt/Farskap/FarskapsFlyt";
-import ForelderMedBarnFlyt from "../flyt/ForelderMedBarn/ForelderMedBarnFlyt";
-import ForelderUtenBarnFlyt from "../flyt/ForelderUtenBarn/ForelderUtenBarnFlyt";
-import OppfostringsbidragFlyt from "../flyt/Oppfostringsbidrag/OppfostringsbidragFlyt";
-import OpprettSakFlyt from "../OpprettSakFlyt";
-import type { PartISaken } from "../opprett-sak-schema";
-import { SaksrolleroversiktProvider, useSaksrolleroversikt } from "../saksrolleroversiktContext";
+import BarnBeggeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnBeggeForeldre/BarnBeggeForeldreFlyt";
+import BarnMedManglendeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/BarnMedManglendeForeldreFlyt";
+import EktefellebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/EktefellebidragFlyt";
+import FarskapsFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Farskap/FarskapsFlyt";
+import ForelderMedBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/ForelderMedBarnFlyt";
+import ForelderUtenBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderUtenBarn/ForelderUtenBarnFlyt";
+import OppfostringsbidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Oppfostringsbidrag/OppfostringsbidragFlyt";
+import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt";
+import type { PartISaken } from "../../app/routes/sak/saksroller/opprett-ny-sak/opprett-sak-schema";
+import {
+    SaksrolleroversiktProvider,
+    useSaksrolleroversikt,
+} from "../../app/routes/sak/saksroller/opprett-ny-sak/saksrolleroversiktContext";
 import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 

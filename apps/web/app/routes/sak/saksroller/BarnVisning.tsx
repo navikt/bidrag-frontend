@@ -207,9 +207,9 @@ export default function BarnVisning({
                 )}
 
                 {visRmFeil && (
-                    <ErrorMessage size="small" className="mt-2">
-                        {errors.roller?.[index]?.reellMottaker?.message}
-                    </ErrorMessage>
+                    <Box asChild marginBlock="space-8 space-0">
+                        <ErrorMessage size="small">{errors.roller?.[index]?.reellMottaker?.message}</ErrorMessage>
+                    </Box>
                 )}
 
                 <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} saksnummer={saksnummer} />

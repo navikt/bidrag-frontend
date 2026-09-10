@@ -1,12 +1,13 @@
+import { Box } from "@navikt/ds-react";
 import OpprettSakFlyt from "../OpprettSakFlyt";
 import { SaksrolleroversiktProvider } from "../saksrolleroversiktContext";
 
 export default function NySaksrollerPage() {
     return (
         <SaksrolleroversiktProvider>
-            <div className="max-w-5xl mx-auto">
+            <Box maxWidth="64rem" marginInline="auto">
                 <OpprettSakFlyt />
-            </div>
+            </Box>
         </SaksrolleroversiktProvider>
     );
 }

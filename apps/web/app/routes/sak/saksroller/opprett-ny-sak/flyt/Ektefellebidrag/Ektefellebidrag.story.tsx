@@ -1,5 +1,5 @@
-import { testpersoner } from "../../playwright/fixtures";
-import { WizardFlowStory } from "../../playwright/WizardFlowStory";
+import { testpersoner } from "../../../../../../../playwright/opprett-ny-sak/fixtures";
+import { WizardFlowStory } from "../../../../../../../playwright/opprett-ny-sak/WizardFlowStory";
 
 export const MedForslag = () => (
     <WizardFlowStory

@@ -313,152 +313,147 @@ function ForelderUtenBarnFlytContent() {
     const visValideringsAlerts = valgteBarn.length > 0 || (erBidragsmottaker && valgteBarn.length === 0);
 
     return (
-        <Box
-            as="form"
-            onSubmit={onSubmit}
-            borderRadius={"2"}
-            background="default"
-            padding={"space-12"}
-            className="gap-4 flex flex-col"
-        >
-            <VStack gap="space-6">
-                <VStack gap="space-4">
-                    <Heading level="2" size="medium" spacing>
-                        Legg til barn
-                    </Heading>
-                    <BodyShort size="small" className="text-ax-neutral-700">
-                        Ingen barn funnet i registeret. Vi finner ingen registrerte barn for denne personen. Du kan
-                        legge til barn og den andre forelderen manuelt.
-                    </BodyShort>
+        <Box asChild borderRadius="2" background="default">
+            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
+                <VStack gap="space-6">
+                    <VStack gap="space-4">
+                        <Heading level="2" size="medium" spacing>
+                            Legg til barn
+                        </Heading>
+                        <BodyShort size="small" textColor="subtle">
+                            Ingen barn funnet i registeret. Vi finner ingen registrerte barn for denne personen. Du kan
+                            legge til barn og den andre forelderen manuelt.
+                        </BodyShort>
 
-                    {feil && (
-                        <Alert size="small" variant="error">
-                            {feil}
-                        </Alert>
-                    )}
+                        {feil && (
+                            <Alert size="small" variant="error">
+                                {feil}
+                            </Alert>
+                        )}
 
-                    {eksisterendeSakInfoMelding && (
-                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                            {eksisterendeSakInfoMelding.melding}
-                        </Alert>
-                    )}
+                        {eksisterendeSakInfoMelding && (
+                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                                {eksisterendeSakInfoMelding.melding}
+                            </Alert>
+                        )}
 
-                    <EksisterendeSakSection
-                        harEksisterendeSak={harEksisterendeSak}
-                        eksisterendeSak={eksisterendeSak}
-                        partISakenNavn={partISaken.navn}
-                        motpartNavn={motpart.navn}
-                    />
-                </VStack>
+                        <EksisterendeSakSection
+                            harEksisterendeSak={harEksisterendeSak}
+                            eksisterendeSak={eksisterendeSak}
+                            partISakenNavn={partISaken.navn}
+                            motpartNavn={motpart.navn}
+                        />
+                    </VStack>
 
-                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
+                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
 
-                <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnMauell={leggTilBarnManuell} />
+                    <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnMauell={leggTilBarnManuell} />
 
-                {foreldreinformasjonTilBarnError !== null &&
-                    foreldreinformasjonTilBarnError instanceof TilgangsFeilError && (
+                    {foreldreinformasjonTilBarnError !== null &&
+                        foreldreinformasjonTilBarnError instanceof TilgangsFeilError && (
+                            <Alert variant="info" size="small">
+                                {foreldreinformasjonTilBarnError.message}. Vennligst legg til motpart manuell
+                            </Alert>
+                        )}
+
+                    {infoMelding && (
                         <Alert variant="info" size="small">
-                            {foreldreinformasjonTilBarnError.message}. Vennligst legg til motpart manuell
+                            {infoMelding}
                         </Alert>
                     )}
 
-                {infoMelding && (
-                    <Alert variant="info" size="small">
-                        {infoMelding}
-                    </Alert>
-                )}
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
 
-                <div className="border-t border-ax-neutral-300" />
+                    <VStack gap="space-4">
+                        <ValgteBarnListe
+                            form={form}
+                            valgteBarn={valgteBarn}
+                            alleBarn={valgteBarn}
+                            fjernBarn={fjernBarn}
+                            tittel="Barn som legges til"
+                            heading={{ size: "medium", level: "2" }}
+                            visReellMottaker={true}
+                            bidragsmottakerErUkjent={bidragsmottakerErUkjent}
+                            reellMottakerAlltidPåkrevd={false}
+                            kunSamhandlerSomReellMottaker={false}
+                        />
 
-                <VStack gap="space-4">
-                    <ValgteBarnListe
+                        {foreslåttEnkeltMotpart && (
+                            <MotpartVelger
+                                form={form}
+                                tittel={`Foreslått ${motsattRolle}`}
+                                beskrivelse={`Vi fant at ${foreslåttEnkeltMotpart.visningsnavn} (${foreslåttEnkeltMotpart.ident}) er registrert som forelder til ${foreslåttEnkeltMotpart.barnNavn} (${foreslåttEnkeltMotpart.barnIdent}).`}
+                                variant="success"
+                                velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
+                                settMotpartUkjent={settMotpartUkjent}
+                                foreslåttMotpartNavn={foreslåttEnkeltMotpart.visningsnavn}
+                                brukForeslåttMotpart={() => brukForeslåttMotpart(foreslåttEnkeltMotpart)}
+                            />
+                        )}
+
+                        {foreslåttMotpart?.length > 1 && (
+                            <FlereForeslåttMotpartVelger
+                                form={form}
+                                foreslåttMotparter={foreslåttMotpart}
+                                tittel={`Foreslått ${motsattRolle}`}
+                                settMotpartUkjent={settMotpartUkjent}
+                                velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
+                                brukForeslåttMotpart={(forelder) => brukForeslåttMotpart(forelder)}
+                            />
+                        )}
+
+                        {valgteBarn.length > 0 && foreslåttMotpart?.length === 0 && !motpart.erKjent && (
+                            <MotpartVelger
+                                form={form}
+                                tittel="Ingen forelder registrert"
+                                beskrivelse="Dette barnet har ingen registrerte foreldre. Motpart settes til ukjent, men du kan registrere motpart manuelt om nødvendig."
+                                variant="warning"
+                                velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
+                                settMotpartUkjent={settMotpartUkjent}
+                            />
+                        )}
+
+                        <SøskenListe søsken={søsken} form={form} />
+
+                        {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
+                            <Alert variant="error" size="small">
+                                {form.formState.errors.valgteBarn.message}
+                            </Alert>
+                        )}
+                    </VStack>
+
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+
+                    <MotpartSection
                         form={form}
-                        valgteBarn={valgteBarn}
-                        alleBarn={valgteBarn}
-                        fjernBarn={fjernBarn}
-                        tittel="Barn som legges til"
-                        heading={{ size: "medium", level: "2" }}
-                        visReellMottaker={true}
-                        bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                        reellMottakerAlltidPåkrevd={false}
-                        kunSamhandlerSomReellMottaker={false}
+                        onSettMotpartUkjent={settMotpartUkjent}
+                        onLeggTilMotpartManuell={settMotpartManuelt}
+                        bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
+                        visOppsummering={valgteBarn.length > 0}
                     />
 
-                    {foreslåttEnkeltMotpart && (
-                        <MotpartVelger
-                            form={form}
-                            tittel={`Foreslått ${motsattRolle}`}
-                            beskrivelse={`Vi fant at ${foreslåttEnkeltMotpart.visningsnavn} (${foreslåttEnkeltMotpart.ident}) er registrert som forelder til ${foreslåttEnkeltMotpart.barnNavn} (${foreslåttEnkeltMotpart.barnIdent}).`}
-                            variant="success"
-                            velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
-                            settMotpartUkjent={settMotpartUkjent}
-                            foreslåttMotpartNavn={foreslåttEnkeltMotpart.visningsnavn}
-                            brukForeslåttMotpart={() => brukForeslåttMotpart(foreslåttEnkeltMotpart)}
-                        />
+                    {visValideringsAlerts && (
+                        <>
+                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                            <ValideringsAlertsSection
+                                visUfullstendigRelasjonAlert={valgteBarn.length > 0}
+                                visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
+                            />
+                        </>
                     )}
 
-                    {foreslåttMotpart?.length > 1 && (
-                        <FlereForeslåttMotpartVelger
-                            form={form}
-                            foreslåttMotparter={foreslåttMotpart}
-                            tittel={`Foreslått ${motsattRolle}`}
-                            settMotpartUkjent={settMotpartUkjent}
-                            velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
-                            brukForeslåttMotpart={(forelder) => brukForeslåttMotpart(forelder)}
-                        />
-                    )}
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
 
-                    {valgteBarn.length > 0 && foreslåttMotpart?.length === 0 && !motpart.erKjent && (
-                        <MotpartVelger
-                            form={form}
-                            tittel="Ingen forelder registrert"
-                            beskrivelse="Dette barnet har ingen registrerte foreldre. Motpart settes til ukjent, men du kan registrere motpart manuelt om nødvendig."
-                            variant="warning"
-                            velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
-                            settMotpartUkjent={settMotpartUkjent}
-                        />
-                    )}
-
-                    <SøskenListe søsken={søsken} form={form} />
-
-                    {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
-                        <Alert variant="error" size="small">
-                            {form.formState.errors.valgteBarn.message}
-                        </Alert>
-                    )}
+                    <EnhetOgSubmitSection
+                        enhet={enhet}
+                        enhetNavn={enhetNavn}
+                        isLoadingEnhet={isLoadingEnhet}
+                        enhetError={enhetError}
+                        disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                        submitError={error}
+                        saksnummer={saksnummer}
+                    />
                 </VStack>
-
-                <div className="border-t border-ax-neutral-300" />
-
-                <MotpartSection
-                    form={form}
-                    onSettMotpartUkjent={settMotpartUkjent}
-                    onLeggTilMotpartManuell={settMotpartManuelt}
-                    bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
-                    visOppsummering={valgteBarn.length > 0}
-                />
-
-                {visValideringsAlerts && (
-                    <>
-                        <div className="border-t border-ax-neutral-300" />
-                        <ValideringsAlertsSection
-                            visUfullstendigRelasjonAlert={valgteBarn.length > 0}
-                            visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
-                        />
-                    </>
-                )}
-
-                <div className="border-t border-ax-neutral-300" />
-
-                <EnhetOgSubmitSection
-                    enhet={enhet}
-                    enhetNavn={enhetNavn}
-                    isLoadingEnhet={isLoadingEnhet}
-                    enhetError={enhetError}
-                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                    submitError={error}
-                    saksnummer={saksnummer}
-                />
             </VStack>
         </Box>
     );

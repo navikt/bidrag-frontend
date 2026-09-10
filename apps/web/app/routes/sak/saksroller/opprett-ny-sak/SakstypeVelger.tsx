@@ -1,4 +1,4 @@
-import { BodyShort, Heading, Radio, RadioGroup } from "@navikt/ds-react";
+import { BodyShort, Heading, Radio, RadioGroup, VStack } from "@navikt/ds-react";
 
 import type { Sakstype } from "./saksrolleroversiktContext";
 
@@ -37,7 +37,7 @@ type Props = {
 
 export default function SakstypeVelger({ onVelg }: Props) {
     return (
-        <div className="space-y-4">
+        <VStack gap="space-16">
             <Heading level="2" size="medium">
                 Hvilken type sak skal opprettes?
             </Heading>
@@ -47,13 +47,13 @@ export default function SakstypeVelger({ onVelg }: Props) {
                     <Radio key={option.type} value={option.type} onClick={() => onVelg(option.type)}>
                         <div>
                             <BodyShort weight="semibold">{option.label}</BodyShort>
-                            <BodyShort size="small" className="text-ax-neutral-700">
+                            <BodyShort size="small" textColor="subtle">
                                 {option.description}
                             </BodyShort>
                         </div>
                     </Radio>
                 ))}
             </RadioGroup>
-        </div>
+        </VStack>
     );
 }

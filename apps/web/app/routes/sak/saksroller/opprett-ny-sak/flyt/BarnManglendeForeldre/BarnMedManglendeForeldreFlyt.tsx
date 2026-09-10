@@ -145,99 +145,95 @@ function BarnMedManglendeForeldreFlytContent() {
     const visOppsummering = (foreldreKlareForOppsummering && rollerErValgt) || harUkjentForelder;
 
     return (
-        <Box
-            as="form"
-            onSubmit={onSubmit}
-            borderRadius={"2"}
-            background="default"
-            padding={"space-12"}
-            className="gap-4 flex flex-col"
-        >
-            <VStack gap="space-6">
-                <div className="space-y-3">
-                    {kjentForelder ? (
-                        <Alert variant="info" size="small">
-                            Dette barnet har én forelder registrert ({kjentForelder.visningsnavn},{kjentForelder.ident}
-                            ). Du må legge til den andre forelderen manuelt.
-                        </Alert>
-                    ) : (
-                        <Alert variant="warning" size="small">
-                            Dette barnet har ingen registrerte foreldre. Du må legge til begge foreldre manuelt.
-                        </Alert>
-                    )}
+        <Box asChild borderRadius="2" background="default">
+            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
+                <VStack gap="space-6">
+                    <VStack gap="space-12">
+                        {kjentForelder ? (
+                            <Alert variant="info" size="small">
+                                Dette barnet har én forelder registrert ({kjentForelder.visningsnavn},
+                                {kjentForelder.ident}
+                                ). Du må legge til den andre forelderen manuelt.
+                            </Alert>
+                        ) : (
+                            <Alert variant="warning" size="small">
+                                Dette barnet har ingen registrerte foreldre. Du må legge til begge foreldre manuelt.
+                            </Alert>
+                        )}
 
-                    {eksisterendeSakInfoMelding && (
-                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                            {eksisterendeSakInfoMelding.melding}
-                        </Alert>
-                    )}
+                        {eksisterendeSakInfoMelding && (
+                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                                {eksisterendeSakInfoMelding.melding}
+                            </Alert>
+                        )}
 
-                    <EksisterendeSakSection
-                        harEksisterendeSak={harEksisterendeSak}
-                        eksisterendeSak={eksisterendeSak}
-                        partISakenNavn={bidragspliktig?.navn ?? ""}
-                        motpartNavn={bidragsmottaker?.navn}
-                    />
-                </div>
-
-                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                <div className="border-t border-ax-neutral-300" />
-
-                {kjentForelder && (
-                    <KjentForelderInfo
-                        form={form}
-                        forelder={kjentForelder}
-                        onVelgRolle={(rolle) => settRolle(0, rolle)}
-                        valgtRolle={foreldre[0]?.rolle ?? null}
-                    />
-                )}
-
-                <LeggTilForelderSeksjon
-                    form={form}
-                    foreldre={foreldre}
-                    antallManglende={antallManglendeforeldre}
-                    kjentForelderIndex={kjentForelder ? 0 : null}
-                    onVelgRolle={settRolle}
-                />
-
-                {visReellMottaker && (
-                    <>
-                        <div className="border-t border-ax-neutral-300" />
-                        <BarnMottakerKort
-                            form={form}
-                            barn={barn}
-                            visReellMottaker={visReellMottaker}
-                            erPåkrevd={trengerReellMottaker}
+                        <EksisterendeSakSection
+                            harEksisterendeSak={harEksisterendeSak}
+                            eksisterendeSak={eksisterendeSak}
+                            partISakenNavn={bidragspliktig?.navn ?? ""}
+                            motpartNavn={bidragsmottaker?.navn}
                         />
-                    </>
-                )}
+                    </VStack>
 
-                {visOppsummering && (
-                    <>
-                        <div className="border-t border-ax-neutral-300" />
-                        <ParterOppsummeringBarn form={form} />
-                    </>
-                )}
+                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
 
-                {foreldreKlareForOppsummering && (
-                    <>
-                        <div className="border-t border-ax-neutral-300" />
-                        <ValideringsAlertsSection visUfullstendigRelasjonAlert />
-                    </>
-                )}
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
 
-                <div className="border-t border-ax-neutral-300" />
+                    {kjentForelder && (
+                        <KjentForelderInfo
+                            form={form}
+                            forelder={kjentForelder}
+                            onVelgRolle={(rolle) => settRolle(0, rolle)}
+                            valgtRolle={foreldre[0]?.rolle ?? null}
+                        />
+                    )}
 
-                <EnhetOgSubmitSection
-                    enhet={enhet}
-                    enhetNavn={enhetNavn}
-                    isLoadingEnhet={isLoadingEnhet}
-                    enhetError={enhetError}
-                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                    submitError={error}
-                    saksnummer={saksnummer}
-                />
+                    <LeggTilForelderSeksjon
+                        form={form}
+                        foreldre={foreldre}
+                        antallManglende={antallManglendeforeldre}
+                        kjentForelderIndex={kjentForelder ? 0 : null}
+                        onVelgRolle={settRolle}
+                    />
+
+                    {visReellMottaker && (
+                        <>
+                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                            <BarnMottakerKort
+                                form={form}
+                                barn={barn}
+                                visReellMottaker={visReellMottaker}
+                                erPåkrevd={trengerReellMottaker}
+                            />
+                        </>
+                    )}
+
+                    {visOppsummering && (
+                        <>
+                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                            <ParterOppsummeringBarn form={form} />
+                        </>
+                    )}
+
+                    {foreldreKlareForOppsummering && (
+                        <>
+                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                            <ValideringsAlertsSection visUfullstendigRelasjonAlert />
+                        </>
+                    )}
+
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+
+                    <EnhetOgSubmitSection
+                        enhet={enhet}
+                        enhetNavn={enhetNavn}
+                        isLoadingEnhet={isLoadingEnhet}
+                        enhetError={enhetError}
+                        disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                        submitError={error}
+                        saksnummer={saksnummer}
+                    />
+                </VStack>
             </VStack>
         </Box>
     );

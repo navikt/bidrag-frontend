@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { CheckmarkHeavyIcon, PersonPlusIcon } from "@navikt/aksel-icons";
-import { BodyShort, Button, Heading } from "@navikt/ds-react";
+import { BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 
 import FunnetPersonInfo from "../../../components/FunnetPersonInfo";
@@ -73,21 +73,21 @@ export default function LeggTilForelderSeksjon({
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center gap-2">
+        <VStack gap="space-24">
+            <HStack align="center" gap="space-8">
                 <PersonPlusIcon fontSize="1.5rem" aria-hidden />
                 <Heading level="2" size="medium">
                     Legg til {antallManglende === 2 ? "foreldre" : "manglende forelder"}
                 </Heading>
-            </div>
+            </HStack>
 
-            <BodyShort size="small" className="text-ax-neutral-700">
+            <BodyShort size="small" textColor="subtle">
                 {antallManglende === 2
                     ? "Dette barnet har ingen registrerte foreldre. Legg til begge foreldre manuelt."
                     : "Legg til den andre forelderen manuelt."}
             </BodyShort>
 
-            <div className="space-y-6">
+            <VStack gap="space-24">
                 {foreldre.map((forelder, index) => {
                     if (kjentForelderIndex !== null && index === kjentForelderIndex) {
                         return null;
@@ -98,15 +98,20 @@ export default function LeggTilForelderSeksjon({
                     const erUkjent = typeof forelder.erKjent === "boolean" && !forelder.erKjent;
 
                     return (
-                        <div
+                        <Box
                             key={index}
-                            className="p-4 rounded-lg border border-solid border-ax-neutral-400 bg-[white] shadow-sm"
+                            padding="space-16"
+                            borderRadius="8"
+                            borderWidth="1"
+                            borderColor="neutral"
+                            background="default"
+                            className="shadow-sm"
                         >
-                            <div className="flex items-center justify-between mb-3">
-                                <Heading level="3" size="small" className="text-ax-neutral-1000">
+                            <HStack align="center" justify="space-between" marginBlock="space-0 space-12">
+                                <Heading level="3" size="small" textColor="default">
                                     Forelder #{index + 1}
                                 </Heading>
-                            </div>
+                            </HStack>
 
                             {!erLagtTil && (
                                 <div>
@@ -114,7 +119,7 @@ export default function LeggTilForelderSeksjon({
                                         label={`Søk forelder #${index + 1}`}
                                         personInformasjon={(person) => leggTilForelder(person, index)}
                                     />
-                                    <div className="mt-3 text-center">
+                                    <HStack justify="center" marginBlock="space-12 space-0">
                                         <Button
                                             type="button"
                                             size="small"
@@ -123,12 +128,12 @@ export default function LeggTilForelderSeksjon({
                                         >
                                             Eller sett som ukjent
                                         </Button>
-                                    </div>
+                                    </HStack>
                                 </div>
                             )}
 
                             {erLagtTil && (
-                                <div className="space-y-3">
+                                <VStack gap="space-12">
                                     {erUkjent ? (
                                         <FunnetPersonInfo
                                             label="Forelder:"
@@ -157,20 +162,23 @@ export default function LeggTilForelderSeksjon({
                                     />
 
                                     {harRolle && forelder.rolle && (
-                                        <BodyShort
-                                            size="small"
-                                            className="text-ax-success-800 font-semibold flex items-center"
-                                        >
-                                            <CheckmarkHeavyIcon aria-hidden fontSize="1.3rem" /> Rolle valgt:{" "}
-                                            {hentForelderRolleLabel(forelder.rolle)}
-                                        </BodyShort>
+                                        <HStack asChild align="center">
+                                            <BodyShort
+                                                size="small"
+                                                weight="semibold"
+                                                className="text-ax-success-800"
+                                            >
+                                                <CheckmarkHeavyIcon aria-hidden fontSize="1.3rem" /> Rolle valgt:{" "}
+                                                {hentForelderRolleLabel(forelder.rolle)}
+                                            </BodyShort>
+                                        </HStack>
                                     )}
-                                </div>
+                                </VStack>
                             )}
-                        </div>
+                        </Box>
                     );
                 })}
-            </div>
-        </div>
+            </VStack>
+        </VStack>
     );
 }

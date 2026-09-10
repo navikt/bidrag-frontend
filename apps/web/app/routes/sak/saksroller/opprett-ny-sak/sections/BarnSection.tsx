@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Alert, BodyShort, Heading, Tag, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import BarnManueltRegistrering from "../BarnManueltRegistrering";
 import BarnkurvListe from "../motpart-felles/BarnkurvListe";
@@ -90,19 +90,21 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
 
     return (
         <VStack gap="space-6">
-            <div className="flex items-center justify-between">
+            <HStack align="center" justify="space-between">
                 <div>
                     <Heading level="2" size="medium">
                         Velg barn saken gjelder for
                     </Heading>
-                    <BodyShort size="small" className="text-ax-neutral-700 mt-1">
-                        Velg alle barn som skal være med i saken
-                    </BodyShort>
+                    <Box asChild marginBlock="space-4 space-0">
+                        <BodyShort size="small" textColor="subtle">
+                            Velg alle barn som skal være med i saken
+                        </BodyShort>
+                    </Box>
                 </div>
                 <Tag size="small" variant="info">
                     {valgteBarn.length} valgt
                 </Tag>
-            </div>
+            </HStack>
 
             {barnkurver.length > 0 && (
                 <BarnkurvListe
@@ -116,7 +118,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                 />
             )}
 
-            <div className="border-t border-ax-neutral-300" />
+            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
 
             <BarnManueltRegistrering
                 form={forelderBarnForm as unknown as UseFormReturn<ForelderMedBarnSkjemaData>}

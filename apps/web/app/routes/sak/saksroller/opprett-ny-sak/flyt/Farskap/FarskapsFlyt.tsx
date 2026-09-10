@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box } from "@navikt/ds-react";
+import { Alert, Box, VStack } from "@navikt/ds-react";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
@@ -119,71 +119,66 @@ function FarskapsFlytContent() {
     const harAlleAlternativerValgt = valgteBarn.length > 0; // For FARSKAP, reellMottaker is NOT required
 
     return (
-        <Box
-            as="form"
-            onSubmit={onSubmit}
-            borderRadius={"2"}
-            background="default"
-            padding={"space-12"}
-            className="gap-4 flex flex-col"
-        >
-            <div className="space-y-3">
-                {eksisterendeSakInfoMelding && (
-                    <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                        {eksisterendeSakInfoMelding.melding}
-                    </Alert>
+        <Box asChild borderRadius="2" background="default">
+            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
+                <VStack gap="space-12">
+                    {eksisterendeSakInfoMelding && (
+                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                            {eksisterendeSakInfoMelding.melding}
+                        </Alert>
+                    )}
+
+                    <EksisterendeSakSection
+                        harEksisterendeSak={harEksisterendeSak}
+                        eksisterendeSak={eksisterendeSak}
+                        partISakenNavn={partISaken.navn || partISaken.ident}
+                        motpartNavn="Ukjent"
+                    />
+                </VStack>
+
+                {isLoadingHentSak && <LasterSkeleton tekst="Henter barn..." />}
+
+                <BarnSection
+                    form={form}
+                    barnkurver={barnkurver}
+                    aktivKurvId={aktivKurvId}
+                    erBidragspliktig={!erBidragsmottaker}
+                    visReellMottaker={false}
+                />
+
+                {valgteBarn.length > 0 && (
+                    <>
+                        <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                        <OppsummeringSection
+                            bidragspliktig={null}
+                            bidragsmottaker={
+                                partISaken.ident
+                                    ? {
+                                          rolle: "bidragsmottaker",
+                                          ident: partISaken.ident,
+                                          navn: partISaken.navn,
+                                          erKjent: true,
+                                          diskresjonskode: partISaken.diskresjonskode,
+                                      }
+                                    : null
+                            }
+                            barn={valgteBarn}
+                            partISakenRolle="bidragsmottaker"
+                            hideMissingPartCards
+                        />
+                    </>
                 )}
 
-                <EksisterendeSakSection
-                    harEksisterendeSak={harEksisterendeSak}
-                    eksisterendeSak={eksisterendeSak}
-                    partISakenNavn={partISaken.navn || partISaken.ident}
-                    motpartNavn="Ukjent"
+                <EnhetOgSubmitSection
+                    enhet={enhet}
+                    enhetNavn={enhetNavn}
+                    isLoadingEnhet={isLoadingEnhet}
+                    enhetError={enhetError}
+                    disabled={!harAlleAlternativerValgt || harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    submitError={error}
+                    saksnummer={saksnummer}
                 />
-            </div>
-
-            {isLoadingHentSak && <LasterSkeleton tekst="Henter barn..." />}
-
-            <BarnSection
-                form={form}
-                barnkurver={barnkurver}
-                aktivKurvId={aktivKurvId}
-                erBidragspliktig={!erBidragsmottaker}
-                visReellMottaker={false}
-            />
-
-            {valgteBarn.length > 0 && (
-                <>
-                    <div className="border-t border-ax-neutral-300" />
-                    <OppsummeringSection
-                        bidragspliktig={null}
-                        bidragsmottaker={
-                            partISaken.ident
-                                ? {
-                                      rolle: "bidragsmottaker",
-                                      ident: partISaken.ident,
-                                      navn: partISaken.navn,
-                                      erKjent: true,
-                                      diskresjonskode: partISaken.diskresjonskode,
-                                  }
-                                : null
-                        }
-                        barn={valgteBarn}
-                        partISakenRolle="bidragsmottaker"
-                        hideMissingPartCards
-                    />
-                </>
-            )}
-
-            <EnhetOgSubmitSection
-                enhet={enhet}
-                enhetNavn={enhetNavn}
-                isLoadingEnhet={isLoadingEnhet}
-                enhetError={enhetError}
-                disabled={!harAlleAlternativerValgt || harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                submitError={error}
-                saksnummer={saksnummer}
-            />
+            </VStack>
         </Box>
     );
 }

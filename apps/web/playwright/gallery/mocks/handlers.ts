@@ -4,13 +4,13 @@ import { HttpResponse, http } from "msw";
 /**
  * Standard-svar for API-kall stories i manuell galleri-visning (browse.html) kan
  * trigge på mount. Dekker de samme proxy-endepunktene som
- * `opprett-ny-sak/playwright/network.ts` sin `mockWizardApi`, men uten
+ * `playwright/opprett-ny-sak/network.ts` sin `mockWizardApi`, men uten
  * scenario-spesifikke valg – automatiserte CT-spesifikasjoner styrer fortsatt
  * sine egne responser via Playwright sin `page.route()`.
  *
  * Statiske enhetsnavn-oppslag (`hent_enhet_info`) trenger ikke nettverksmock
  * her – de sås direkte i React Query-cachen av
- * `opprett-ny-sak/playwright/queryCacheSeed.ts`, brukt av alle wizard-stories.
+ * `playwright/opprett-ny-sak/queryCacheSeed.ts`, brukt av alle wizard-stories.
  */
 const persongalleri = {
     bidragspliktig: { ident: genererFnr(), visningsnavn: "Test Bidragspliktig", fødselsdato: "1985-02-14" },

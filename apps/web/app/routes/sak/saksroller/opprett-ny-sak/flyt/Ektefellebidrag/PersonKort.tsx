@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { CheckmarkCircleFillIcon, PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { HStack, VStack } from "@navikt/ds-react";
+import { Box, HStack, VStack } from "@navikt/ds-react";
 import DiskresjonAlert from "../../../components/DiskresjonAlert";
 import PersonInfo from "../../../components/PersonInfo";
 
@@ -12,42 +12,49 @@ type Props = {
 
 export default function PersonKort({ person, erValgt, onClick }: Props) {
     return (
-        <button
-            type="button"
-            onClick={onClick}
-            className={`w-full p-4 rounded-lg border-2 border-solid text-left transition-all ${
-                erValgt
-                    ? "bg-ax-success-100 border-ax-success-600"
-                    : "bg-[white] border-ax-neutral-400 hover:border-ax-accent-500 hover:bg-ax-accent-100"
-            }`}
+        <Box
+            asChild
+            width="100%"
+            padding="space-16"
+            borderRadius="8"
+            borderWidth="2"
+            background={erValgt ? "success-soft" : "default"}
+            borderColor={erValgt ? "success-strong" : "neutral"}
+            className={`transition-all ${erValgt ? "" : "hover:border-ax-accent-500 hover:bg-ax-accent-100"}`}
         >
-            <HStack gap="space-4" align="center" justify="space-between">
-                <HStack gap="space-4" align="center">
-                    <div className={`p-2 rounded-full ${erValgt ? "bg-ax-success-300" : "bg-ax-neutral-200"}`}>
-                        <PersonIcon
-                            aria-hidden
-                            fontSize="1.25rem"
-                            className={erValgt ? "text-ax-success-800" : "text-ax-neutral-700"}
-                        />
-                    </div>
-                    <VStack gap="space-0">
-                        <PersonInfo
-                            ident={person.ident}
-                            fødselsdato={person.fødselsdato ?? undefined}
-                            navn={person.visningsnavn}
-                            visKopieringsknapp={false}
-                        />
-                        {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
-                    </VStack>
-                </HStack>
-
-                {erValgt && (
-                    <HStack gap="space-2" align="center">
-                        <CheckmarkCircleFillIcon aria-hidden fontSize="1.5rem" className="text-ax-success-700" />
-                        <XMarkIcon aria-hidden fontSize="1rem" className="text-ax-neutral-600" />
+            <button type="button" onClick={onClick}>
+                <HStack gap="space-4" align="center" justify="space-between">
+                    <HStack gap="space-4" align="center">
+                        <Box
+                            padding="space-8"
+                            borderRadius="full"
+                            background={erValgt ? "success-moderate" : "neutral-moderate"}
+                        >
+                            <PersonIcon
+                                aria-hidden
+                                fontSize="1.25rem"
+                                className={erValgt ? "text-ax-success-800" : "text-ax-neutral-700"}
+                            />
+                        </Box>
+                        <VStack gap="space-0">
+                            <PersonInfo
+                                ident={person.ident}
+                                fødselsdato={person.fødselsdato ?? undefined}
+                                navn={person.visningsnavn}
+                                visKopieringsknapp={false}
+                            />
+                            {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
+                        </VStack>
                     </HStack>
-                )}
-            </HStack>
-        </button>
+
+                    {erValgt && (
+                        <HStack gap="space-2" align="center">
+                            <CheckmarkCircleFillIcon aria-hidden fontSize="1.5rem" className="text-ax-success-700" />
+                            <XMarkIcon aria-hidden fontSize="1rem" className="text-ax-neutral-600" />
+                        </HStack>
+                    )}
+                </HStack>
+            </button>
+        </Box>
     );
 }

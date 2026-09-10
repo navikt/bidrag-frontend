@@ -1,5 +1,5 @@
 import { PersonIdent } from "@bidrag/common";
-import { BodyShort, Heading } from "@navikt/ds-react";
+import { BodyShort, Box, Heading, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 
 import DiskresjonAlert from "../../components/DiskresjonAlert";
@@ -25,19 +25,19 @@ export default function BarnMottakerKort({ form, barn, visReellMottaker, erPåkr
     }
 
     return (
-        <div className="space-y-3">
+        <VStack gap="space-12">
             <Heading level="2" size="medium">
                 Barn
             </Heading>
-            <div className="p-4 rounded-lg bg-ax-neutral-100">
-                <BodyShort size="medium" className="font-semibold text-ax-neutral-1000">
+            <Box padding="space-16" borderRadius="8" background="neutral-soft">
+                <BodyShort size="medium" weight="semibold" textColor="default">
                     {barn.navn}
                 </BodyShort>
-                <BodyShort size="small" className="text-ax-neutral-700">
+                <BodyShort size="small" textColor="subtle">
                     <PersonIdent ident={barn.ident} />
                 </BodyShort>
                 {barn.diskresjonskode && <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />}
-                <div className="mt-1 pt-1">
+                <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">
                     <ReellMottakerInline
                         form={form}
                         fieldPath="barn"
@@ -45,8 +45,8 @@ export default function BarnMottakerKort({ form, barn, visReellMottaker, erPåkr
                         barnNavn={barn.navn}
                         isRequired={erPåkrevd}
                     />
-                </div>
-            </div>
-        </div>
+                </Box>
+            </Box>
+        </VStack>
     );
 }

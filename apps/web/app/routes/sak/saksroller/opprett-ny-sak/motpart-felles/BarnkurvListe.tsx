@@ -1,5 +1,5 @@
 import { PersonIdent } from "@bidrag/common";
-import { BodyShort, Checkbox, CheckboxGroup } from "@navikt/ds-react";
+import { BodyShort, Box, Checkbox, CheckboxGroup, Detail, HStack, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 
 import DiskresjonAlert from "../../components/DiskresjonAlert";
@@ -113,7 +113,7 @@ export default function BarnkurvListe({
     };
 
     return (
-        <div className="space-y-4">
+        <VStack gap="space-16">
             {barnkurver.map((kurv, index) => {
                 const erDeaktivert = erKurvDeaktivert(kurv.id, aktivKurvId, harValgteBarn);
                 const erMotpartUkjent = kurv.id.toLowerCase().includes("ukjent");
@@ -121,71 +121,76 @@ export default function BarnkurvListe({
                 const motpartIdent = kurv.motpart?.ident;
 
                 return (
-                    <div key={index} className="p-4 border border-solid border-ax-neutral-300 rounded-lg">
-                        <BodyShort
-                            size="small"
-                            className="font-semibold text-ax-neutral-800 mb-2 px-2 flex flex-row gap-1"
-                        >
-                            Med {motpartNavn}{" "}
-                            <PersonIdent
-                                ident={`${erMotpartUkjent ? index + 1 : motpartIdent ? `(${motpartIdent})` : ""}`}
-                            />
-                        </BodyShort>
+                    <Box key={index} padding="space-16" borderWidth="1" borderColor="neutral-subtleA" borderRadius="8">
+                        <HStack asChild gap="space-4" paddingInline="space-8" marginBlock="space-0 space-8">
+                            <BodyShort size="small" weight="semibold" textColor="subtle">
+                                Med {motpartNavn}{" "}
+                                <PersonIdent
+                                    ident={`${erMotpartUkjent ? index + 1 : motpartIdent ? `(${motpartIdent})` : ""}`}
+                                />
+                            </BodyShort>
+                        </HStack>
                         <CheckboxGroup
                             legend={`Velg barn med ${motpartNavn}`}
                             hideLegend
                             onChange={(valgteIdenter) => håndterBarnKlikk(valgteIdenter, kurv.id)}
                             size="small"
                         >
-                            <div className="grid grid-cols-1 gap-3 rounded-lg p-2">
-                                {kurv.barn.map((barn, j) => {
-                                    const barnIndex = valgteBarn.findIndex((b) => b.ident === barn.ident);
-                                    const erValgt = erBarnValgt(barn.ident);
-                                    const kanVelges = !erDeaktivert || erValgt;
-                                    const erReellMottakerPåkrevd =
-                                        reellMottakerAlltidPåkrevd || barn.erMyndig || bidragsmottakerErUkjent;
+                            <Box asChild borderRadius="8">
+                                <VStack gap="space-12" padding="space-8">
+                                    {kurv.barn.map((barn, j) => {
+                                        const barnIndex = valgteBarn.findIndex((b) => b.ident === barn.ident);
+                                        const erValgt = erBarnValgt(barn.ident);
+                                        const kanVelges = !erDeaktivert || erValgt;
+                                        const erReellMottakerPåkrevd =
+                                            reellMottakerAlltidPåkrevd || barn.erMyndig || bidragsmottakerErUkjent;
 
-                                    return (
-                                        <div key={j} className="rounded-lg bg-ax-neutral-100 p-3">
-                                            <Checkbox value={barn.ident} disabled={!kanVelges}>
-                                                <div className="flex flex-col">
-                                                    <PersonInfo
-                                                        ident={barn.ident}
-                                                        fødselsdato={barn.fødselsdato}
-                                                        alder={barn.alder}
-                                                        navn={barn.navn}
-                                                    />
-                                                    {barn?.diskresjonskode && (
-                                                        <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />
-                                                    )}
-                                                </div>
-                                            </Checkbox>
-                                            {erValgt && visReellMottaker && barnIndex !== -1 && (
-                                                <div className="mt-1 pt-1">
-                                                    <ReellMottakerInline
-                                                        form={form}
-                                                        fieldPath={`valgteBarn.${barnIndex}`}
-                                                        barnIdent={barn.ident}
-                                                        barnNavn={barn.navn}
-                                                        isRequired={erReellMottakerPåkrevd}
-                                                        kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                        return (
+                                            <Box key={j} borderRadius="8" background="neutral-soft" padding="space-12">
+                                                <Checkbox value={barn.ident} disabled={!kanVelges}>
+                                                    <VStack>
+                                                        <PersonInfo
+                                                            ident={barn.ident}
+                                                            fødselsdato={barn.fødselsdato}
+                                                            alder={barn.alder}
+                                                            navn={barn.navn}
+                                                        />
+                                                        {barn?.diskresjonskode && (
+                                                            <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />
+                                                        )}
+                                                    </VStack>
+                                                </Checkbox>
+                                                {erValgt && visReellMottaker && barnIndex !== -1 && (
+                                                    <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">
+                                                        <ReellMottakerInline
+                                                            form={form}
+                                                            fieldPath={`valgteBarn.${barnIndex}`}
+                                                            barnIdent={barn.ident}
+                                                            barnNavn={barn.navn}
+                                                            isRequired={erReellMottakerPåkrevd}
+                                                            kunSamhandlerSomReellMottaker={
+                                                                kunSamhandlerSomReellMottaker
+                                                            }
+                                                        />
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        );
+                                    })}
+                                </VStack>
+                            </Box>
                         </CheckboxGroup>
 
                         {erDeaktivert && (
-                            <p className="text-xs text-ax-neutral-600 italic mt-1 px-2">
-                                Deaktivert (barn valgt fra annen kurv)
-                            </p>
+                            <Box asChild marginBlock="space-4 space-0" paddingInline="space-8">
+                                <Detail textColor="subtle" className="italic">
+                                    Deaktivert (barn valgt fra annen kurv)
+                                </Detail>
+                            </Box>
                         )}
-                    </div>
+                    </Box>
                 );
             })}
-        </div>
+        </VStack>
     );
 }

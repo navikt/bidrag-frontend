@@ -1,5 +1,5 @@
 import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, BodyShort, Button, Heading, Select } from "@navikt/ds-react";
+import { Alert, BodyLong, BodyShort, Box, Button, Heading, HStack, Select, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -60,7 +60,7 @@ export default function FlereForeslåttMotpartVelger({
         <div>
             {!visMotpartInfoPanel && (
                 <Alert variant="success" size="small">
-                    <div className="space-y-3">
+                    <VStack gap="space-12">
                         <div>
                             <Heading level="3" size="small" spacing>
                                 {tittel}
@@ -84,9 +84,13 @@ export default function FlereForeslåttMotpartVelger({
                             ))}
                         </Select>
 
-                        <div className="text-center text-ax-neutral-700">eller</div>
+                        <HStack justify="center">
+                            <BodyShort size="small" textColor="subtle">
+                                eller
+                            </BodyShort>
+                        </HStack>
 
-                        <div className="flex gap-2 flex-wrap">
+                        <HStack gap="space-8" wrap>
                             <Button type="button" size="small" onClick={håndterVelgAnnen}>
                                 Velg annen person
                             </Button>
@@ -94,27 +98,37 @@ export default function FlereForeslåttMotpartVelger({
                             <Button type="button" size="small" variant="secondary-neutral" onClick={håndterSettUkjent}>
                                 Sett som ukjent
                             </Button>
-                        </div>
-                    </div>
+                        </HStack>
+                    </VStack>
                 </Alert>
             )}
 
             {visMotpartInfoPanel && (
-                <div className="mt-4 p-3 border bg-ax-success-200 border-solid border-ax-success-600 rounded-lg flex items-center justify-between">
-                    <MaskerSensitivInfo className="flex items-center gap-3">
-                        <PersonIcon fontSize="1.5rem" aria-hidden className="text-ax-success-700" />
-                        <BodyLong size="small" className="font-semibold">
-                            Motpart: {visningsnavn}
-                        </BodyLong>
-                    </MaskerSensitivInfo>
-                    <Button
-                        type="button"
-                        size="xsmall"
-                        variant="secondary"
-                        onClick={håndterFjernMotpart}
-                        icon={<XMarkIcon title="Fjern motpart" />}
-                    />
-                </div>
+                <Box
+                    asChild
+                    background="success-moderate"
+                    borderWidth="1"
+                    borderColor="success-strong"
+                    borderRadius="8"
+                >
+                    <HStack align="center" justify="space-between" marginBlock="space-16 space-0" padding="space-12">
+                        <HStack asChild align="center" gap="space-12">
+                            <MaskerSensitivInfo>
+                                <PersonIcon fontSize="1.5rem" aria-hidden className="text-ax-success-700" />
+                                <BodyLong size="small" weight="semibold">
+                                    Motpart: {visningsnavn}
+                                </BodyLong>
+                            </MaskerSensitivInfo>
+                        </HStack>
+                        <Button
+                            type="button"
+                            size="xsmall"
+                            variant="secondary"
+                            onClick={håndterFjernMotpart}
+                            icon={<XMarkIcon title="Fjern motpart" />}
+                        />
+                    </HStack>
+                </Box>
             )}
         </div>
     );

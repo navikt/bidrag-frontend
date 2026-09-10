@@ -1,3 +1,4 @@
+import { VStack } from "@navikt/ds-react";
 import type { PropsWithChildren } from "react";
 import { useFormContext } from "react-hook-form";
 
@@ -58,7 +59,7 @@ export default function OpprettSakFormWrapper({
     });
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-12">
+        <VStack as="form" onSubmit={handleSubmit} gap="space-48">
             {children}
 
             <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
@@ -69,6 +70,6 @@ export default function OpprettSakFormWrapper({
                 error={error}
                 saksnummer={saksnummer}
             />
-        </form>
+        </VStack>
     );
 }

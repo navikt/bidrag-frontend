@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Radio, RadioGroup, Tag } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, HGrid, HStack, Radio, RadioGroup, Tag } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { Controller, type FieldPath, type FieldValues, type PathValue, type UseFormReturn } from "react-hook-form";
 import FunnetPersonInfo from "../../components/FunnetPersonInfo";
@@ -129,8 +129,8 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                 <RadioGroup
                     size="small"
                     legend={
-                        <div className="flex items-center justify-between gap-2">
-                            <BodyShort size="small" className="font-semibold text-ax-neutral-1000">
+                        <HStack align="center" justify="space-between" gap="space-8">
+                            <BodyShort size="small" weight="semibold" textColor="default">
                                 Reell mottaker
                             </BodyShort>
                             {isRequired ? (
@@ -138,11 +138,11 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                                     Påkrevd
                                 </Tag>
                             ) : (
-                                <BodyShort size="small" className="text-ax-neutral-700">
+                                <BodyShort size="small" textColor="subtle">
                                     (valgfritt)
                                 </BodyShort>
                             )}
-                        </div>
+                        </HStack>
                     }
                     value={field.value ?? "ingen"}
                     onChange={(value) => {
@@ -169,7 +169,7 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                     }}
                     error={fieldState.error?.message}
                 >
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 w-max">
+                    <HGrid columns={{ xs: 1, sm: 3 }} gap="space-4" width="max-content">
                         <Radio value="ingen" disabled={isRequired}>
                             Ingen
                         </Radio>
@@ -177,14 +177,16 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                             Barnet selv
                         </Radio>
                         <Radio value="annen_person">Søk samhandler</Radio>
-                    </div>
+                    </HGrid>
                     {kunSamhandlerSomReellMottaker && (
-                        <Alert variant="warning" size="small" className="mt-2">
-                            {kunSamhandlerFeilmelding}
-                        </Alert>
+                        <Box asChild marginBlock="space-8 space-0">
+                            <Alert variant="warning" size="small">
+                                {kunSamhandlerFeilmelding}
+                            </Alert>
+                        </Box>
                     )}
                     {reellMottakerType === "annen_person" && (
-                        <div className="mt-2 -mx-2">
+                        <Box marginBlock="space-8 space-0" className="-mx-2">
                             <ReellMottakerSøk
                                 valgtSamhandlerId={reellMottaker}
                                 onVelg={(ident, navn) => {
@@ -192,7 +194,7 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                                     setDynamiskFeltVerdi(reellMottakerNavnPath, navn ?? "", { shouldValidate: true });
                                 }}
                             />
-                        </div>
+                        </Box>
                     )}
                     {reellMottaker && reellMottakerType !== "barnet_selv" && (
                         <FunnetPersonInfo

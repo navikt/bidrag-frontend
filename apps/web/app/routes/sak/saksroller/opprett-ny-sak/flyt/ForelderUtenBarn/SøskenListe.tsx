@@ -1,6 +1,6 @@
 import { PersonNavn } from "@bidrag/common";
 import { CheckmarkHeavyIcon, PersonGroupIcon } from "@navikt/aksel-icons";
-import { Alert, BodyShort, Button, Heading } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import DiskresjonAlert from "../../../components/DiskresjonAlert";
 import AlderTag from "../../components/AlderTag";
@@ -26,52 +26,65 @@ export default function SøskenListe({ form, søsken }: Props) {
     };
     return (
         <Alert variant="info">
-            <div className="space-y-3">
+            <VStack gap="space-12">
                 <div>
-                    <Heading level="3" size="small" spacing className="flex gap-2">
-                        <PersonGroupIcon aria-hidden fontSize="1.5rem" />
-                        Søsken funnet ({søsken.length})
-                    </Heading>
+                    <HStack asChild align="center" gap="space-8">
+                        <Heading level="3" size="small" spacing>
+                            <PersonGroupIcon aria-hidden fontSize="1.5rem" />
+                            Søsken funnet ({søsken.length})
+                        </Heading>
+                    </HStack>
                     <BodyShort size="small">
                         Vi fant barn som har samme forelder (
                         <PersonNavn bareFornavn={false} navn={motpart.navn || "ukjent"} />
                         ). Disse kan legges til i samme sak.
                     </BodyShort>
                 </div>
-                <div className="space-y-2">
+                <VStack gap="space-8">
                     {søsken.map((barn, i) => {
                         const erAlleredeValgt = valgteBarn.some((b) => b.ident === barn.ident);
                         return (
-                            <div
+                            <Box
                                 key={i}
-                                className="flex items-center justify-between p-3 bg-[white] rounded border border-ax-neutral-300"
+                                background="default"
+                                borderRadius="4"
+                                borderWidth="1"
+                                borderColor="neutral-subtleA"
+                                asChild
                             >
-                                <div className="flex flex-col">
-                                    <BodyShort size="small" className="flex gap-2">
-                                        {barn.navn} ({barn.ident})
-                                        <AlderTag {...barn} deaktivert={false} />
-                                    </BodyShort>
-                                    {barn?.diskresjonskode && (
-                                        <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />
+                                <HStack align="center" justify="space-between" padding="space-12">
+                                    <VStack>
+                                        <HStack asChild align="center" gap="space-8">
+                                            <BodyShort size="small">
+                                                {barn.navn} ({barn.ident})
+                                                <AlderTag {...barn} deaktivert={false} />
+                                            </BodyShort>
+                                        </HStack>
+                                        {barn?.diskresjonskode && (
+                                            <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />
+                                        )}
+                                    </VStack>
+                                    {erAlleredeValgt ? (
+                                        <HStack asChild align="center">
+                                            <BodyShort
+                                                size="small"
+                                                weight="semibold"
+                                                className="text-ax-success-700"
+                                            >
+                                                <CheckmarkHeavyIcon aria-hidden fontSize="1.5rem" /> Valgt
+                                            </BodyShort>
+                                        </HStack>
+                                    ) : (
+                                        <Button type="button" size="xsmall" onClick={() => leggTilSøsken(barn)}>
+                                            Legg til
+                                        </Button>
                                     )}
-                                </div>
-                                {erAlleredeValgt ? (
-                                    <BodyShort
-                                        size="small"
-                                        className="text-ax-success-700 font-semibold flex items-center"
-                                    >
-                                        <CheckmarkHeavyIcon aria-hidden fontSize="1.5rem" /> Valgt
-                                    </BodyShort>
-                                ) : (
-                                    <Button type="button" size="xsmall" onClick={() => leggTilSøsken(barn)}>
-                                        Legg til
-                                    </Button>
-                                )}
-                            </div>
+                                </HStack>
+                            </Box>
                         );
                     })}
-                </div>
-            </div>
+                </VStack>
+            </VStack>
         </Alert>
     );
 }

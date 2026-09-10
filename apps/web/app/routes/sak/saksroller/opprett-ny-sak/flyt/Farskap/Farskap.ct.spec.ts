@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { expectNoAxeViolations, mockWizardApi } from "../../playwright/network";
+import { expectNoAxeViolations, mockWizardApi } from "../../../../../../../playwright/opprett-ny-sak/network";
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Farskap/Farskap/Standard";
 

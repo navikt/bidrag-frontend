@@ -1,7 +1,7 @@
 import { TilgangsFeilError } from "@bidrag/api";
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
-import { Alert, BodyShort, Select, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, Select, VStack } from "@navikt/ds-react";
 import { type ChangeEvent, Suspense, useEffect, useState } from "react";
 import { useHentForeldreinformasjonForBarnSuspense, useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
 import LasterSkeleton from "./components/LasterSkeleton";
@@ -97,9 +97,11 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
     return (
         <VStack gap="space-4">
             <div>
-                <BodyShort size="small" className="text-ax-neutral-700 mb-2">
-                    Rolle i saken
-                </BodyShort>
+                <Box asChild marginBlock="space-0 space-8">
+                    <BodyShort size="small" textColor="subtle">
+                        Rolle i saken
+                    </BodyShort>
+                </Box>
                 <Select
                     label={`Hvilken rolle har ${partISaken.visningsnavn}?`}
                     hideLabel

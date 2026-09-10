@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
 import { PersonIcon } from "@navikt/aksel-icons";
-import { BodyLong, Box, Button, Heading, Loader, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, Button, Heading, HStack, Loader, VStack } from "@navikt/ds-react";
 import { Suspense, useMemo, useRef, useState } from "react";
 import DiskresjonAlert from "../components/DiskresjonAlert";
 import PersonInfo from "../components/PersonInfo";
@@ -166,20 +166,24 @@ export default function OpprettSakFlyt() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="min-h-screen bg-ax-neutral-100 py-8 px-4">
+        <Box maxWidth="56rem" marginInline="auto">
+            <Box background="sunken" minHeight="100vh" paddingBlock="space-32" paddingInline="space-16">
                 <VStack gap="space-12">
                     {isLoadingOpprettSak && (
-                        <div
-                            className="fixed inset-0 bg-[white]/70 backdrop-blur-sm z-50 flex items-center justify-center"
+                        <HStack
+                            position="fixed"
+                            inset="space-0"
+                            align="center"
+                            justify="center"
+                            className="z-50 bg-[white]/70 backdrop-blur-sm"
                             role="status"
                             aria-live="polite"
                         >
-                            <div className="flex flex-col items-center gap-3">
+                            <VStack align="center" gap="space-12">
                                 <Loader size="2xlarge" title="Oppretter sak..." />
-                                <BodyLong className="text-ax-neutral-800">Oppretter sak...</BodyLong>
-                            </div>
-                        </div>
+                                <BodyLong>Oppretter sak...</BodyLong>
+                            </VStack>
+                        </HStack>
                     )}
 
                     <Heading level="1" size="large">
@@ -192,21 +196,23 @@ export default function OpprettSakFlyt() {
 
                             {sakstype && (
                                 <VStack gap="space-2">
-                                    <div className="flex items-start justify-between gap-4">
+                                    <HStack align="start" justify="space-between" gap="space-16">
                                         <div>
-                                            <Heading level="2" size="medium" className="mb-1">
-                                                Sakstype
-                                            </Heading>
-                                            <BodyLong className="text-ax-neutral-1000 text-lg font-semibold">
+                                            <Box asChild marginBlock="space-0 space-4">
+                                                <Heading level="2" size="medium">
+                                                    Sakstype
+                                                </Heading>
+                                            </Box>
+                                            <BodyLong weight="semibold" textColor="default">
                                                 {sakstypeTilTekst(sakstype)}
                                             </BodyLong>
                                         </div>
                                         <Button variant="tertiary" size="small" onClick={endreSakstype}>
                                             Endre
                                         </Button>
-                                    </div>
+                                    </HStack>
 
-                                    <div className="border-t border-ax-neutral-300" />
+                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
 
                                     <SakskategoriVelger value={sakskategori} onChange={setSakskategori} />
                                 </VStack>
@@ -214,7 +220,7 @@ export default function OpprettSakFlyt() {
 
                             {sakstype && !partISaken && (
                                 <>
-                                    <div className="border-t border-ax-neutral-300" />
+                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
                                     <VStack gap="space-4">
                                         <div>
                                             <Heading level="2" size="medium" spacing>
@@ -224,7 +230,7 @@ export default function OpprettSakFlyt() {
                                                       ? "Bidragsmottaker"
                                                       : "Part i saken"}
                                             </Heading>
-                                            <BodyLong size="small" className="text-ax-neutral-700">
+                                            <BodyLong size="small" textColor="subtle">
                                                 {sakstypeTilBeskrivelse(sakstype)}
                                             </BodyLong>
                                         </div>
@@ -244,25 +250,29 @@ export default function OpprettSakFlyt() {
 
                             {partISaken && (
                                 <>
-                                    <div className="border-t border-ax-neutral-300" />
+                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
                                     <VStack gap="space-4">
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-1">
-                                                <Heading level="2" size="small" className="mb-3">
-                                                    {sakstype === "OPPFOSTRINGSBIDRAG"
-                                                        ? "Bidragspliktig"
-                                                        : sakstype === "FARSKAP"
-                                                          ? "Bidragsmottaker"
-                                                          : "Part i saken"}
-                                                </Heading>
-                                                <div className="flex items-start gap-3">
-                                                    <PersonIcon
-                                                        aria-hidden
-                                                        fontSize="1.5rem"
-                                                        className="text-ax-brand-blue-600 mt-1"
-                                                    />
+                                        <HStack justify="space-between" align="start">
+                                            <Box flexGrow="1">
+                                                <Box asChild marginBlock="space-0 space-12">
+                                                    <Heading level="2" size="small">
+                                                        {sakstype === "OPPFOSTRINGSBIDRAG"
+                                                            ? "Bidragspliktig"
+                                                            : sakstype === "FARSKAP"
+                                                              ? "Bidragsmottaker"
+                                                              : "Part i saken"}
+                                                    </Heading>
+                                                </Box>
+                                                <HStack align="start" gap="space-12">
+                                                    <Box asChild marginBlock="space-4 space-0">
+                                                        <PersonIcon
+                                                            aria-hidden
+                                                            fontSize="1.5rem"
+                                                            className="text-ax-brand-blue-600"
+                                                        />
+                                                    </Box>
 
-                                                    <div className="flex-1">
+                                                    <Box flexGrow="1">
                                                         <PersonInfo
                                                             ident={partISaken.ident}
                                                             navn={partISaken.visningsnavn}
@@ -270,23 +280,23 @@ export default function OpprettSakFlyt() {
                                                         />
 
                                                         {partISaken?.diskresjonskode && (
-                                                            <div className="mt-2">
+                                                            <Box marginBlock="space-8 space-0">
                                                                 <DiskresjonAlert
                                                                     diskresjonskode={partISaken.diskresjonskode}
                                                                 />
-                                                            </div>
+                                                            </Box>
                                                         )}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                    </Box>
+                                                </HStack>
+                                            </Box>
                                             <Button variant="tertiary" size="small" onClick={endrePartISaken}>
                                                 Endre part
                                             </Button>
-                                        </div>
+                                        </HStack>
 
                                         {sakstype && sakstype !== "OPPFOSTRINGSBIDRAG" && sakstype !== "FARSKAP" && (
                                             <>
-                                                <div className="border-t border-ax-neutral-300" />
+                                                <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
                                                 <RolleVisning
                                                     partISaken={partISaken}
                                                     rolle={
@@ -310,7 +320,7 @@ export default function OpprettSakFlyt() {
                         </Suspense>
                     )}
                 </VStack>
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }

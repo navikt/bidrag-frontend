@@ -151,85 +151,81 @@ function ForelderMedBarnFlytContent() {
         (erBidragsmottaker && valgteBarn.length === 0);
 
     return (
-        <Box
-            as="form"
-            onSubmit={onSubmit}
-            borderRadius={"2"}
-            background="default"
-            padding={"space-12"}
-            className="gap-4 flex flex-col"
-        >
-            <VStack gap="space-6">
-                <div className="space-y-3">
-                    {eksisterendeSakInfoMelding && (
-                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                            {eksisterendeSakInfoMelding.melding}
-                        </Alert>
+        <Box asChild borderRadius="2" background="default">
+            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
+                <VStack gap="space-6">
+                    <VStack gap="space-12">
+                        {eksisterendeSakInfoMelding && (
+                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                                {eksisterendeSakInfoMelding.melding}
+                            </Alert>
+                        )}
+
+                        <EksisterendeSakSection
+                            harEksisterendeSak={harEksisterendeSak}
+                            eksisterendeSak={eksisterendeSak}
+                            partISakenNavn={partISaken?.navn ?? ""}
+                            motpartNavn={motpart.navn}
+                        />
+                    </VStack>
+
+                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
+
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+
+                    <BarnSection
+                        form={form}
+                        barnkurver={barnkurver}
+                        aktivKurvId={aktivKurvId}
+                        erBidragspliktig={erBidragspliktig}
+                        visReellMottaker={true}
+                        bidragsmottakerErUkjent={bidragsmottakerErUkjent}
+                        onResetMotpart={resetMotpart}
+                    />
+
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+
+                    <MotpartSection
+                        form={form}
+                        onSettMotpartUkjent={settMotpartUkjent}
+                        onLeggTilMotpartManuell={leggTilMotpartManuell}
+                        bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
+                        visOppsummering={valgteBarn.length > 0}
+                    />
+
+                    {visValideringsAlerts && (
+                        <>
+                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+                            <ValideringsAlertsSection
+                                visUfullstendigRelasjonAlert={
+                                    valgteBarn.length > 0 &&
+                                    (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart)
+                                }
+                                visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
+                                visKanIkkeOppretteSakAlert={
+                                    bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false
+                                }
+                            />
+                        </>
                     )}
 
-                    <EksisterendeSakSection
-                        harEksisterendeSak={harEksisterendeSak}
-                        eksisterendeSak={eksisterendeSak}
-                        partISakenNavn={partISaken?.navn ?? ""}
-                        motpartNavn={motpart.navn}
+                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
+
+                    <EnhetOgSubmitSection
+                        enhet={enhet}
+                        enhetNavn={enhetNavn}
+                        isLoadingEnhet={isLoadingEnhet}
+                        enhetError={enhetError}
+                        disabled={
+                            harEksisterendeSak ||
+                            isLoadingHentSak ||
+                            isLoadingEnhet ||
+                            (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
+                        }
+                        submitError={error}
+                        saksnummer={saksnummer}
                     />
-                </div>
-
-                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                <div className="border-t border-ax-neutral-300" />
-
-                <BarnSection
-                    form={form}
-                    barnkurver={barnkurver}
-                    aktivKurvId={aktivKurvId}
-                    erBidragspliktig={erBidragspliktig}
-                    visReellMottaker={true}
-                    bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                    onResetMotpart={resetMotpart}
-                />
-
-                <div className="border-t border-ax-neutral-300" />
-
-                <MotpartSection
-                    form={form}
-                    onSettMotpartUkjent={settMotpartUkjent}
-                    onLeggTilMotpartManuell={leggTilMotpartManuell}
-                    bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
-                    visOppsummering={valgteBarn.length > 0}
-                />
-
-                {visValideringsAlerts && (
-                    <>
-                        <div className="border-t border-ax-neutral-300" />
-                        <ValideringsAlertsSection
-                            visUfullstendigRelasjonAlert={
-                                valgteBarn.length > 0 && (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart)
-                            }
-                            visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
-                            visKanIkkeOppretteSakAlert={
-                                bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false
-                            }
-                        />
-                    </>
-                )}
-
-                <div className="border-t border-ax-neutral-300" />
-
-                <EnhetOgSubmitSection
-                    enhet={enhet}
-                    enhetNavn={enhetNavn}
-                    isLoadingEnhet={isLoadingEnhet}
-                    enhetError={enhetError}
-                    disabled={
-                        harEksisterendeSak ||
-                        isLoadingHentSak ||
-                        isLoadingEnhet ||
-                        (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
-                    }
-                    submitError={error}
-                    saksnummer={saksnummer}
-                />
+                </VStack>
             </VStack>
         </Box>
     );
