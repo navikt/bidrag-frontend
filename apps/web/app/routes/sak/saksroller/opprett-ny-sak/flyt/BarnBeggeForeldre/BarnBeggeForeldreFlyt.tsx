@@ -87,7 +87,6 @@ function BarnBeggeForeldreFlytContent() {
     } = useFlowSubmission({
         form,
         partISaken: partISaken ?? form.getValues("barn"),
-        motpart: null,
         valgteBarn: barn,
         bidragspliktig,
         bidragsmottaker,

@@ -647,7 +647,7 @@ export function useHentForeldreinformasjonForBarnSuspense(request: PersonRequest
 
 export function hentPersonGeografiskEnhetQueryOptions(request: HentEnhetRequest | null, enabled: boolean = true) {
     return {
-        queryKey: ["hent_person_geografisk_enhet", request?.ident],
+        queryKey: ["hent_person_geografisk_enhet", request],
         queryFn: async () => {
             if (!request) throw new Error("Request is required");
             try {

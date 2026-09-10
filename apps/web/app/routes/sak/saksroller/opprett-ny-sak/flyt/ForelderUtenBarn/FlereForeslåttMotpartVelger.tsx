@@ -1,9 +1,9 @@
+import { MaskerSensitivInfo } from "@bidrag/common";
 import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, BodyShort, Box, Button, Heading, HStack, Select, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
-import MaskerSensitivInfo from "../../components/MaskerSensitivInfo";
 import type { ForelderUtenBarnSkjemaData } from "../../opprett-sak-schema";
 import type { ForeslåttForelder } from "./ForelderUtenBarnFlyt";
 

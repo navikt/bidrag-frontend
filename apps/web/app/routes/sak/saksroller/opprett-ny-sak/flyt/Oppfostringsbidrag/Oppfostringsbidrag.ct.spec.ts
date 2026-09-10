@@ -19,6 +19,6 @@ test("krever samhandler som reell mottaker og bruker arbeidsfordeling OPS", asyn
 
     await expect(component.getByText(samhandler.navn).first()).toBeVisible();
     await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
-    await expect.poll(() => requests.unit.some((request) => request.behandlingstema === "ab0324")).toBe(true);
+    await expect.poll(() => requests.unit.some((request) => request.arbeidsfordeling === "OPS")).toBe(true);
     await expectNoAxeViolations(page, component);
 });

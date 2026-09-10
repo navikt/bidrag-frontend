@@ -1,5 +1,5 @@
 import type { TilgangsFeilError } from "@bidrag/api";
-import { arbeidsfordelingTilBehandlingstema } from "@bidrag/utils/organisasjonUtils";
+import type { Arbeidsfordeling } from "@bidrag/api/OrganisasjonApi";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
 import { useQueries } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
@@ -153,7 +153,7 @@ export function useBestemEnhet({
                     biidenter: [],
                     tema: "BID",
                     sakskategori: tilGyldigSakskategori(sakskategori),
-                    behandlingstema: arbeidsfordelingTilBehandlingstema(arbeidsfordeling ?? "EEN"),
+                    arbeidsfordeling: (arbeidsfordeling ?? "EEN") as Arbeidsfordeling,
                 },
                 !harFortroligAdresseVerdi,
             ),

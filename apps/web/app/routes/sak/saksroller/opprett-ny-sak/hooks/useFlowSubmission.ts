@@ -18,7 +18,19 @@ type FormMedKategori = FieldValues & { kategori?: string };
 interface UseFlowSubmissionProps<T extends FormMedKategori> {
     form: UseFormReturn<T>;
     partISaken: PartISaken;
-    motpart?: Motpart | null;
+    /**
+     * Motparten flyten jobber med. `erKjent` styrer duplikatsjekken:
+     * `true`/`false` er avklart (kjent motpart / bevisst ukjent motpart) og lar
+     * sjekken kjøre, mens `undefined` betyr «ikke avklart ennå» og holder den av.
+     *
+     * Flyter uten motpartsbegrep utelater feltet og oppgir i stedet partene
+     * direkte via `eksisterendeSakPartISaken`/`eksisterendeSakMotpart`.
+     *
+     * `null` er bevisst ikke tillatt: det uttrykker «ingen informasjon» og slo
+     * stilltiende av duplikatsjekken selv i flyter som visste at motparten var
+     * ukjent (jf. Farskap og Oppfostringsbidrag).
+     */
+    motpart?: Motpart;
     valgteBarn?: BarnMedAlder[] | BarnMedReellMottaker;
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     erEktefellebidrag?: boolean;
@@ -36,7 +48,7 @@ interface UseFlowSubmissionProps<T extends FormMedKategori> {
 export function useFlowSubmission<T extends FormMedKategori>({
     form,
     partISaken,
-    motpart = null,
+    motpart,
     valgteBarn = [],
     arbeidsfordeling,
     erEktefellebidrag,
@@ -45,8 +57,10 @@ export function useFlowSubmission<T extends FormMedKategori>({
     eksisterendeSakPartISaken,
     eksisterendeSakMotpart,
 }: UseFlowSubmissionProps<T>) {
-    const resolvedBidragspliktig = bidragspliktig ?? (partISaken.rolle === "bidragspliktig" ? partISaken : motpart);
-    const resolvedBidragsmottaker = bidragsmottaker ?? (partISaken.rolle === "bidragsmottaker" ? partISaken : motpart);
+    const resolvedBidragspliktig =
+        bidragspliktig ?? (partISaken.rolle === "bidragspliktig" ? partISaken : motpart) ?? null;
+    const resolvedBidragsmottaker =
+        bidragsmottaker ?? (partISaken.rolle === "bidragsmottaker" ? partISaken : motpart) ?? null;
 
     const {
         enhet,

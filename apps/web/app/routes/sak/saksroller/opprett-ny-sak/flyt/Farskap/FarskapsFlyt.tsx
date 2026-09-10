@@ -59,6 +59,7 @@ function FarskapsFlytContent() {
 
     const valgteBarn = form.watch("valgteBarn");
     const partISaken = form.watch("partISaken");
+    const motpart = form.watch("motpart");
 
     const {
         enhet,
@@ -75,7 +76,7 @@ function FarskapsFlytContent() {
     } = useFlowSubmission({
         form,
         partISaken: { ...partISaken, erKjent: !!partISaken.ident },
-        motpart: null,
+        motpart,
         arbeidsfordeling: "FRS",
         valgteBarn,
     });

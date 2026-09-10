@@ -7,7 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, BodyShort, Box, Heading, VStack } from "@navikt/ds-react";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import { useHentForeldreinformasjonForBarn, useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
+import {
+    useHentForeldreinformasjonForBarn,
+    useHentPersonMotpartBarnRelasjon,
+    useSjekkTilgangOpprettSakUtenBm,
+} from "~/api/useApi.ts";
 import BarnManueltRegistrering from "../../BarnManueltRegistrering";
 import LasterSkeleton from "../../components/LasterSkeleton";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
@@ -104,6 +108,8 @@ function ForelderUtenBarnFlytContent() {
     };
 
     const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker.erKjent;
+    const { data: kanOppretteSakUtenBm, isLoading: sjekkerTilgangUtenBm } =
+        useSjekkTilgangOpprettSakUtenBm(bidragsmottakerErUkjent);
 
     const { data: foreldreinformasjonTilBarn, error: foreldreinformasjonTilBarnError } =
         useHentForeldreinformasjonForBarn(søkteBarn ? { ident: søkteBarn.ident } : null, søkteBarn !== null);
@@ -139,7 +145,7 @@ function ForelderUtenBarnFlytContent() {
     });
 
     useEffect(() => {
-        if (!motpartBarnRelasjon || valgteBarn.length > 0) {
+        if (!motpartBarnRelasjon || valgteBarn.length === 0) {
             return;
         }
 
@@ -310,7 +316,9 @@ function ForelderUtenBarnFlytContent() {
     };
 
     const foreslåttEnkeltMotpart = foreslåttMotpart.length === 1 ? foreslåttMotpart[0] : undefined;
-    const visValideringsAlerts = valgteBarn.length > 0 || (erBidragsmottaker && valgteBarn.length === 0);
+    const kanIkkeOpprettSakUtenBm = bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false;
+    const visValideringsAlerts =
+        valgteBarn.length > 0 || (erBidragsmottaker && valgteBarn.length === 0) || kanIkkeOpprettSakUtenBm;
 
     return (
         <Box asChild borderRadius="2" background="default">
@@ -438,6 +446,7 @@ function ForelderUtenBarnFlytContent() {
                             <ValideringsAlertsSection
                                 visUfullstendigRelasjonAlert={valgteBarn.length > 0}
                                 visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
+                                visKanIkkeOppretteSakAlert={kanIkkeOpprettSakUtenBm}
                             />
                         </>
                     )}
@@ -449,7 +458,12 @@ function ForelderUtenBarnFlytContent() {
                         enhetNavn={enhetNavn}
                         isLoadingEnhet={isLoadingEnhet}
                         enhetError={enhetError}
-                        disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                        disabled={
+                            harEksisterendeSak ||
+                            isLoadingHentSak ||
+                            isLoadingEnhet ||
+                            (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
+                        }
                         submitError={error}
                         saksnummer={saksnummer}
                     />

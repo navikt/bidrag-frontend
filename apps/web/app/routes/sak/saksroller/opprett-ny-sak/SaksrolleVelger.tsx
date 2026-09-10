@@ -32,7 +32,7 @@ function getFilteredPartRoller(
         return roles;
     }
 
-    if (partISakenAlder >= MYNDYG_BARN_ALDER && partISakenAlder < MAKS_ALDER_BARN) {
+    if (partISakenAlder >= MYNDYG_BARN_ALDER && partISakenAlder <= MAKS_ALDER_BARN) {
         return roles.filter((valgt) => valgt.value !== "barn_under_18");
     }
 
@@ -75,7 +75,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
         }
 
         if (!result.success) {
-            console.warn("Ugldig type", verdi);
             return;
         }
 
@@ -85,7 +84,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
     };
 
     useEffect(() => {
-        console.log("Valgt rolle:", valgtRolle, "Enforced rolle:", enforcedRolle);
         if (enforcedRolle) {
             settValgtRolle(enforcedRolle);
             setPartISaken(tilPartISaken(partISaken, enforcedRolle));

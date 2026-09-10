@@ -89,6 +89,7 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
                     title="Opprett sak uten navigering"
                     icon={<TasklistSaveIcon title="lagre" fontSize="1.5rem" />}
                     loading={isLoading}
+                    onClick={() => (afterSubmitRedirect.current = null)}
                     disabled={disabled || isLoading}
                 >
                     Opprett

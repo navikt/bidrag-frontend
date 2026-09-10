@@ -16,13 +16,17 @@ export default defineConfig({
     server: {
         port: 3178,
         strictPort: true,
-        // Forhåndstransformerer galleri-inngangen (main.tsx/stories.ts) og
-        // alle story-filer ved oppstart, slik at Vite ikke lazily
-        // kompilerer/invaliderer moduler midt i en parallell
-        // Playwright-kjøring (mange workers mot samme delte dev-server).
-        // Reduserer risikoen for "Execution context was destroyed, most
-        // likely because of a navigation" pga. et full-reload Vite sender
-        // til allerede tilkoblede sider.
+        // Playwrights mount() gjør page.goto() og deretter page.evaluate().
+        // goto() resolver på load-eventet, så et full-reload fra Vite i
+        // mellomtiden river ned JS-konteksten og gir "Execution context was
+        // destroyed, most likely because of a navigation". Galleriet har ingen
+        // nytte av HMR — hver mount() laster siden på nytt uansett — så vi
+        // fjerner hot-kanalen og filovervåkingen helt i stedet for å redusere
+        // sannsynligheten for at de slår til.
+        hmr: false,
+        watch: null,
+        // Forhåndstransformerer galleri-inngangen og story-filene ved oppstart
+        // slik at første mount() ikke venter på lazy kompilering.
         warmup: {
             clientFiles: [
                 "./playwright/gallery/main.tsx",

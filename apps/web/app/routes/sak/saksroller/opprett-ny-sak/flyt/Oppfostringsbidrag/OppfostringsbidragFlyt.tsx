@@ -63,6 +63,7 @@ function OppfostringsbidragFlytContent() {
 
     const valgteBarn = form.watch("valgteBarn");
     const partISaken = form.watch("partISaken");
+    const motpart = form.watch("motpart");
 
     const {
         enhet,
@@ -79,7 +80,7 @@ function OppfostringsbidragFlytContent() {
     } = useFlowSubmission({
         form,
         partISaken: { ...partISaken, erKjent: !!partISaken.ident },
-        motpart: null,
+        motpart,
         arbeidsfordeling: "OPS",
         valgteBarn,
     });
@@ -135,22 +136,22 @@ function OppfostringsbidragFlytContent() {
         <Box asChild borderRadius="2" background="default">
             <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
                 <VStack gap="space-6">
-                    {harEksisterendeSak && (
-                        <VStack gap="space-12">
-                            {eksisterendeSakInfoMelding && (
-                                <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                                    {eksisterendeSakInfoMelding.melding}
-                                </Alert>
-                            )}
+                    <VStack gap="space-12">
+                        {eksisterendeSakInfoMelding && (
+                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                                {eksisterendeSakInfoMelding.melding}
+                            </Alert>
+                        )}
 
+                        {harEksisterendeSak && (
                             <EksisterendeSakSection
                                 harEksisterendeSak={harEksisterendeSak}
                                 eksisterendeSak={eksisterendeSak}
                                 partISakenNavn={partISaken.navn || partISaken.ident}
                                 motpartNavn="Ukjent"
                             />
-                        </VStack>
-                    )}
+                        )}
+                    </VStack>
                     {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
                     <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
                     <BarnSection

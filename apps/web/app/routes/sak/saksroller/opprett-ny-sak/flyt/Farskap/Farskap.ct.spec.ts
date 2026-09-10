@@ -11,7 +11,7 @@ test.describe("Farskap", () => {
         await expect(component.getByRole("button", { name: /Opprett$/ })).toBeDisabled();
         await component.getByRole("checkbox").first().check();
         await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
-        await expect.poll(() => requests.unit.some((request) => request.behandlingstema === "ab0322")).toBe(true);
+        await expect.poll(() => requests.unit.some((request) => request.arbeidsfordeling === "FRS")).toBe(true);
         await expectNoAxeViolations(page, component);
     });
 

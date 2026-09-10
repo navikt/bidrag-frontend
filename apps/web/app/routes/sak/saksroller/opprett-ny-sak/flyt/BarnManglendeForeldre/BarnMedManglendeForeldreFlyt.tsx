@@ -105,7 +105,6 @@ function BarnMedManglendeForeldreFlytContent() {
     } = useFlowSubmission({
         form,
         partISaken: partISaken ?? form.getValues("barn"),
-        motpart: null,
         valgteBarn: barn,
         bidragspliktig,
         bidragsmottaker,

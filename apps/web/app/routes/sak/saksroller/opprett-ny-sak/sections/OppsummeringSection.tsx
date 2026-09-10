@@ -1,10 +1,10 @@
+import { MaskerSensitivInfo } from "@bidrag/common";
 import { PersonIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Box, Button, Heading, HGrid, HStack, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
 import DiskresjonAlert from "../../components/DiskresjonAlert";
 import PersonInfo from "../../components/PersonInfo";
-import MaskerSensitivInfo from "../components/MaskerSensitivInfo";
 import type { Diskresjonskode, ForelderPartRolle } from "../opprett-sak-schema";
 import { sakstypeTilTekst, useSaksrolleroversikt } from "../saksrolleroversiktContext";
 import { hentForelderRolleLabel } from "../utils";
