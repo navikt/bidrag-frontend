@@ -1,5 +1,5 @@
+import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
 import { expect, test } from "@playwright/test";
-import { expectNoAxeViolations, mockWizardApi } from "../../../../../../../playwright/opprett-ny-sak/network";
 
 const STANDARD = "routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/ForelderMedBarn/Standard";
 const UKJENT = "routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/ForelderMedBarn/UkjentBidragsmottaker";

@@ -1,5 +1,5 @@
-import { barnkurver, testpersoner } from "../../../../../../../playwright/opprett-ny-sak/fixtures";
-import { WizardFlowStory } from "../../../../../../../playwright/opprett-ny-sak/WizardFlowStory";
+import { barnkurver, testpersoner } from "@ct/opprett-ny-sak/fixtures";
+import { WizardFlowStory } from "@ct/opprett-ny-sak/WizardFlowStory";
 
 export const Standard = () => (
     <WizardFlowStory

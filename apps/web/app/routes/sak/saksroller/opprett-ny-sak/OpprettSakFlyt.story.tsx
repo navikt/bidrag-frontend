@@ -1,3 +1,3 @@
-import { WizardPageStory } from "../../../../../playwright/opprett-ny-sak/WizardFlowStory";
+import { WizardPageStory } from "@ct/opprett-ny-sak/WizardFlowStory";
 
 export const Standard = () => <WizardPageStory />;

@@ -1,9 +1,5 @@
+import { AKSEL_MODAL_SECONDARY_KNAPP_KONTRAST, expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
 import { expect, test } from "@playwright/test";
-import {
-    AKSEL_MODAL_SECONDARY_KNAPP_KONTRAST,
-    expectNoAxeViolations,
-    mockWizardApi,
-} from "../../../../../../../playwright/opprett-ny-sak/network";
 
 const INGEN =
     "routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/BarnManglendeForeldre/IngenKjenteForeldre";
