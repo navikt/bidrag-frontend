@@ -1,4 +1,4 @@
-import type { LoggetFeil, NavUser } from "@bidrag/common";
+import type { NavUser } from "@bidrag/common";
 import { LoggerService } from "@bidrag/common";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
@@ -75,25 +75,10 @@ export default class RootErrorBoundary extends Component<Props, State> {
 
         const feil = this.normaliserFeilFor(error);
 
-        LoggerService.error(feil.message, this.tilLoggerFeilInput(feil), {
-            message: feil.message,
-            name: feil.name,
-            status: feil.status,
+        //TODO kanskje legge på url eller annet som gir mer info om hvor vi var...
+        LoggerService.error(feil.message, feil, {
             correlationId: feil.correlationId,
         });
-    }
-
-    private tilLoggerFeilInput(feil: NormalisertFeil): Error | LoggetFeil | undefined {
-        if (feil.realError) {
-            if (feil.componentStack) {
-                (feil.realError as Error & { componentStack?: string }).componentStack = feil.componentStack;
-            }
-            return feil.realError;
-        }
-        if (feil.componentStack) {
-            return { name: feil.name, message: feil.message, status: feil.status, componentStack: feil.componentStack };
-        }
-        return undefined;
     }
 
     override render() {

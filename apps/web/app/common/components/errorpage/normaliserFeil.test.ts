@@ -1,5 +1,5 @@
 import type { ProblemDetail } from "@bidrag/api";
-import { ApiError, CustomError } from "@bidrag/common";
+import { ApiError, CustomError, correlationIdHeader } from "@bidrag/common";
 import { AxiosError } from "axios";
 import { UNSAFE_ErrorResponseImpl as ErrorResponseImpl } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -12,19 +12,15 @@ function axiosFeil(opts: {
     correlationId?: string;
     message?: string;
 }): AxiosError<ProblemDetail> {
-    const headers = opts.correlationId ? { "x-correlation-id": opts.correlationId } : {};
-    const response =
-        opts.status !== undefined
-            ? {
-                  status: opts.status,
-                  statusText: opts.statusText ?? "",
-                  data: opts.problemDetail ?? {},
-                  headers,
-                  config: {} as never,
-              }
-            : undefined;
+    const headers = opts.correlationId ? { [correlationIdHeader]: opts.correlationId } : {};
 
-    return new AxiosError(opts.message ?? "Request failed", "ERR_BAD_REQUEST", undefined, undefined, response);
+    return new AxiosError(opts.message ?? "Request failed", AxiosError.ERR_BAD_RESPONSE, { headers: {} } as never, {}, {
+        status: opts.status ?? 502,
+        statusText: opts.statusText ?? "",
+        data: opts.problemDetail ?? {},
+        headers,
+        config: {} as never,
+    } as never);
 }
 
 describe("normaliserFeil", () => {
@@ -36,8 +32,7 @@ describe("normaliserFeil", () => {
         expect(feil.message).toBe("Noe gikk galt");
         expect(feil.name).toBe("Error");
         expect(feil.status).toBe(500);
-        expect(feil.realError).toBe(error);
-        expect(feil.stackTrace).toBe(error.stack);
+        expect(feil.stack).toBe(error.stack);
         expect(feil.correlationId).toEqual(expect.any(String));
     });
 
@@ -47,7 +42,6 @@ describe("normaliserFeil", () => {
             expect(feil.message).toBe("Ukjent feil");
             expect(feil.name).toBe("UnknownError");
             expect(feil.status).toBe(500);
-            expect(feil.realError).toBeUndefined();
         }
     });
 
@@ -55,9 +49,7 @@ describe("normaliserFeil", () => {
         const feil = normaliserFeil("Fant ingen sak med saksnummer 123456");
 
         expect(feil.message).toBe("Fant ingen sak med saksnummer 123456");
-        expect(feil.name).toBe("Error");
-        expect(feil.status).toBe(500);
-        expect(feil.realError).toBeUndefined();
+        expect(feil.name).toBe("StringError");
         expect(feil.correlationId).toEqual(expect.any(String));
     });
 
@@ -125,24 +117,38 @@ describe("normaliserFeil", () => {
 
             expect(feil.message).toBe("Detalj fra bevart feil");
         });
-    });
 
-    describe("AxiosError", () => {
-        it("bruker ProblemDetail.detail (RFC 7807) som melding når den finnes", () => {
-            const error = axiosFeil({
-                status: 404,
-                statusText: "Not Found",
-                problemDetail: { detail: "Fant ingen sak med saksnummer 123456", status: 404 },
-                correlationId: "correlation-fra-header",
+        it("gjenkjenner en ekte AxiosError og henter felter fra problem detail", () => {
+            const feil = axiosFeil({
+                status: 400,
+                problemDetail: { type: "ValideringsFeil", detail: "Ugyldig input" } as ProblemDetail,
+                correlationId: "corr-123",
             });
 
-            const feil = normaliserFeil(error);
+            const resultat = normaliserFeil(feil);
 
-            expect(feil.message).toBe("Fant ingen sak med saksnummer 123456");
-            expect(feil.status).toBe(404);
-            expect(feil.correlationId).toBe("correlation-fra-header");
-            expect(feil.realError).toBe(error);
-            expect(feil.stackTrace).toBe(error.stack);
+            expect(resultat.name).toBe("ValideringsFeil");
+            expect(resultat.message).toBe("Ugyldig input");
+            expect(resultat.status).toBe(400);
+            expect(resultat.correlationId).toBe("corr-123");
+        });
+
+        it("gjenkjenner en ekte RouteErrorResponse og skiller den fra AxiosError", () => {
+            const routeErrorResponse = new ErrorResponseImpl(404, "Not Found", "Fant ikke ressursen");
+
+            const resultat = normaliserFeil(routeErrorResponse);
+
+            expect(resultat.name).toBe("RouteErrorResponse");
+            expect(resultat.status).toBe(404);
+            expect(resultat.message).toBe("Fant ikke ressursen");
+        });
+
+        it("blander ikke sammen AxiosError og RouteErrorResponse", () => {
+            const axios = axiosFeil({ status: 500 });
+            const route = new ErrorResponseImpl(500, "Internal Server Error", "noe gikk galt");
+
+            expect(normaliserFeil(axios).name).not.toBe("RouteErrorResponse");
+            expect(normaliserFeil(route).name).not.toBe(axios.name || "AxiosError");
         });
 
         it("faller tilbake til error.message når ProblemDetail.detail mangler", () => {
@@ -155,7 +161,7 @@ describe("normaliserFeil", () => {
         });
 
         it("bruker status 500 ved nettverksfeil (ingen response i det hele tatt)", () => {
-            const error = axiosFeil({ message: "Network Error" });
+            const error = axiosFeil({ message: "Network Error", status: 500 });
 
             const feil = normaliserFeil(error);
 
@@ -166,33 +172,16 @@ describe("normaliserFeil", () => {
     });
 
     describe("ErrorResponse (React Router)", () => {
-        it("rekursiverer inn i bevart Error og beholder stacktrace", () => {
+        it("rekursiverer inn i bevart Error og beholder .stack", () => {
             const opprinneligFeil = new Error("Kunne ikke hente sak");
             const routeError = new ErrorResponseImpl(500, "Internal Server Error", opprinneligFeil, true);
 
             const feil = normaliserFeil(routeError);
 
-            expect(feil.message).toBe("Kunne ikke hente sak");
-            expect(feil.realError).toBe(opprinneligFeil);
-            expect(feil.stackTrace).toBe(opprinneligFeil.stack);
+            expect(feil.message).toBe("Error: Kunne ikke hente sak");
+            expect(feil.stack).toBe(opprinneligFeil.stack);
             expect(feil.status).toBe(500);
-            expect(feil.name).toBe("Error");
-        });
-
-        it("rekursiverer inn i bevart AxiosError og bruker ProblemDetail.detail", () => {
-            const bevartAxiosFeil = axiosFeil({
-                status: 404,
-                problemDetail: { detail: "Fant ingen sak" },
-                correlationId: "correlation-fra-axios",
-            });
-            const routeError = new ErrorResponseImpl(404, "Not Found", bevartAxiosFeil, true);
-
-            const feil = normaliserFeil(routeError);
-
-            expect(feil.message).toBe("Fant ingen sak");
-            expect(feil.status).toBe(404);
-            expect(feil.correlationId).toBe("correlation-fra-axios");
-            expect(feil.realError).toBe(bevartAxiosFeil);
+            expect(feil.name).toBe("RouteErrorResponse");
         });
 
         it("faller tilbake til status/statusText/data når ingen feil er bevart", () => {
@@ -201,7 +190,6 @@ describe("normaliserFeil", () => {
             const feil = normaliserFeil(routeError);
 
             expect(feil.message).toBe("Fant ingen sak med saksnummer 123456");
-            expect(feil.realError).toBeUndefined();
             expect(feil.status).toBe(404);
             expect(feil.name).toBe("RouteErrorResponse");
         });

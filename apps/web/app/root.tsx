@@ -129,6 +129,5 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-    console.log("React router error", error);
     return <RootErrorBoundary error={error} bruker={null} />;
 }

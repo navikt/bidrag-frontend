@@ -29,7 +29,7 @@ describe("SecureLoggerService", () => {
         expect(fetchMock).toHaveBeenCalledWith("/log/secure", expect.anything());
     });
 
-    it("fjerner stack fra nettleseren, men beholder resten av feilen", async () => {
+    it("beholder stack ved siden av resten av feilen", async () => {
         const fetchMock = stubFetch();
 
         await SecureLoggerService.error("Feilet", {
@@ -40,7 +40,7 @@ describe("SecureLoggerService", () => {
         });
 
         const logInfo = lesLogInfo(fetchMock);
-        expect(logInfo.error.stack).toBeUndefined();
+        expect(logInfo.error.stack).toBe("at fn (app.js:1:2)");
         expect(logInfo.error.name).toBe("TypeError");
         expect(logInfo.error.componentStack).toBe("    at BeløpshistorikkTabell");
     });

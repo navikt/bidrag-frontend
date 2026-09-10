@@ -13,8 +13,9 @@ const MAKS_CONTEXT_VERDI = 500;
 const contextVerdi = z.union([z.string().max(MAKS_CONTEXT_VERDI), z.number(), z.boolean(), z.null()]);
 
 const loggetFeilSchema = z.object({
-    name: z.string().max(200).default("UnknownError"),
-    message: z.string().max(MAKS_MELDING).default("Ukjent feil"),
+    name: z.string().max(200),
+    message: z.string().max(MAKS_MELDING),
+    stack: z.string().max(MAKS_STACK).optional(),
     componentStack: z.string().max(MAKS_STACK).optional(),
     status: z.number().int().optional(),
     cause: z.string().max(MAKS_CONTEXT_VERDI).optional(),

@@ -57,7 +57,7 @@ describe("LoggerService", () => {
         expect(lesLogInfo(fetchMock).logInfo.context).toEqual({ saksnummer: "123456" });
     });
 
-    it("holder componentStack atskilt fra stack", async () => {
+    it("tar med stack ved siden av componentStack", async () => {
         const fetchMock = stubFetch();
 
         await LoggerService.error("React-feil", {
@@ -68,7 +68,7 @@ describe("LoggerService", () => {
         });
 
         const { logInfo } = lesLogInfo(fetchMock);
-        expect(logInfo.error.stack).toBeUndefined();
+        expect(logInfo.error.stack).toBe("at fn (app.js:1:2)");
         expect(logInfo.error.componentStack).toBe("    at BeløpshistorikkTabell");
     });
 

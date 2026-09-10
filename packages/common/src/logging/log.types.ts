@@ -1,4 +1,4 @@
-import type { CustomError, SimpleError } from "../types/error";
+import type { CustomError, SimpleError } from "../types";
 
 /** Samme navn som pino-metodene, slik at `logger[level](...)` kan brukes direkte. */
 export type LogLevel = "debug" | "info" | "warn" | "error";
@@ -12,9 +12,7 @@ export interface LogInfo {
     error?: LoggetFeil;
 }
 
-export interface LoggetFeil {
-    name: string;
-    message: string;
+export interface LoggetFeil extends Error {
     /** React-komponenttre. Annet format enn `stack`, og symbolikeres derfor ikke. */
     componentStack?: string;
     status?: number;

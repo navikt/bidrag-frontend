@@ -122,6 +122,7 @@ export abstract class AbstractLoggerService {
             const feil: LoggetFeil = {
                 name: error.name,
                 message: error.message,
+                stack: error.stack,
                 cause: beskrivCause(error.cause),
             };
             // ReactError og liknende bærer komponenttreet i et eget felt.
@@ -139,6 +140,7 @@ export abstract class AbstractLoggerService {
         const feil: LoggetFeil = {
             name: error.name ?? "UnknownError",
             message: error.message ?? "Ukjent feil",
+            stack: error.stack,
             componentStack: error.componentStack,
             status: error.status,
             cause: beskrivCause(error.cause),

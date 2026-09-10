@@ -67,7 +67,7 @@ describe("logRoute", () => {
         expect(res.status).toBe(400);
     });
 
-    it("legger feilen på err slik pino forventer, uten stack", async () => {
+    it("legger feilen på err slik pino forventer, inkl. stack", async () => {
         await kall({
             level: "error",
             message: "Det feilet",
@@ -78,13 +78,12 @@ describe("logRoute", () => {
         const err = felter.err as Record<string, unknown>;
         expect(melding).toBe("Det feilet");
         expect(err.name).toBe("TypeError");
-        // Stacktracer fra nettleseren symbolikeres ikke lenger server-side — det eies
-        // av Faro. Rå, minifisert `stack` skal derfor ikke havne i Loki.
-        expect(err.stack).toBeUndefined();
-        expect(felter.stack_symbolicated).toBeUndefined();
+        // Rå stack fra klienten videresendes urørt til pino sin err-serializer,
+        // som gir exception_type/exception_message/exception_stacktrace i sluttresultatet.
+        expect(err.stack).toBe("at fn (app.js:1:2)");
     });
 
-    it("beholder componentStack (annet format enn stack, uavhengig av symbolikering)", async () => {
+    it("beholder componentStack ved siden av stack", async () => {
         await kall({
             level: "error",
             message: "React-feil",
@@ -98,7 +97,21 @@ describe("logRoute", () => {
 
         const [felter] = sisteKall(mocks.navLogger.error);
         expect((felter.err as Record<string, unknown>).componentStack).toBe("    at BeløpshistorikkTabell");
-        expect((felter.err as Record<string, unknown>).stack).toBeUndefined();
+        expect((felter.err as Record<string, unknown>).stack).toBe("at fn (app.js:1:2)");
+    });
+
+    it("ruter feil med stack til secureNavLogger på samme måte", async () => {
+        await kall(
+            {
+                level: "error",
+                message: "Hemmelig feil",
+                error: { name: "TypeError", message: "x er undefined", stack: "at fn (app.js:1:2)" },
+            },
+            "secure",
+        );
+
+        const [felter] = sisteKall(mocks.secureNavLogger.error);
+        expect((felter.err as Record<string, unknown>).stack).toBe("at fn (app.js:1:2)");
     });
 
     it("logger tilbakemelding uten NAV-ident", async () => {

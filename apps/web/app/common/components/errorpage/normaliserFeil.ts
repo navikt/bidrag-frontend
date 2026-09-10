@@ -1,19 +1,9 @@
 import type { ProblemDetail } from "@bidrag/api";
-import { ApiError, CustomError, correlationIdHeader, generateCorrelationId } from "@bidrag/common";
-import { isAxiosError } from "axios";
+import { ApiError, CustomError, correlationIdHeader, generateCorrelationId, type LoggetFeil } from "@bidrag/common";
+import { type AxiosError, isAxiosError } from "axios";
 import { type ErrorResponse, isRouteErrorResponse } from "react-router";
 
-export type NormalisertFeil = {
-    message: string;
-    /** `Error.name`, eller en syntetisk verdi for ikke-Error-tilfeller. */
-    name: string;
-    status: number;
-    /** Kun satt når vi har en ekte stacktrace å vise/logge. */
-    stackTrace?: string;
-    /** Kun satt når vi har en ekte `Error`-instans å gi videre til Faro/pino sin stacktrace-parsing. */
-    realError?: Error;
-    /** Satt når feilen ble fanget av en React error boundary (componentDidCatch). */
-    componentStack?: string;
+export type NormalisertFeil = LoggetFeil & {
     correlationId: string;
 };
 
@@ -21,7 +11,7 @@ function getAxiosCorrelationId(error: unknown): string | undefined {
     if (!isAxiosError(error)) {
         return undefined;
     }
-    const correlationId = error.response?.headers[correlationIdHeader.toLowerCase()];
+    const correlationId = error.response?.headers[correlationIdHeader];
     return typeof correlationId === "string" && correlationId ? correlationId : undefined;
 }
 
@@ -35,7 +25,7 @@ export function normaliserFeil(error: unknown): NormalisertFeil {
         return normaliserRouteErrorResponse(error);
     }
 
-    if (isAxiosError<ProblemDetail>(error)) {
+    if (isAxiosError(error)) {
         return normaliserAxiosError(error);
     }
 
@@ -48,15 +38,14 @@ export function normaliserFeil(error: unknown): NormalisertFeil {
             message: error.message,
             name: error.name,
             status: 500,
-            stackTrace: error.stack,
-            realError: error,
+            stack: error.stack,
             componentStack: finnComponentStack(error),
             correlationId: getAxiosCorrelationId(error) ?? generateCorrelationId(),
         };
     }
 
     if (typeof error === "string" && error) {
-        return { message: error, name: "Error", status: 500, correlationId: generateCorrelationId() };
+        return { message: error, name: "StringError", status: 200, correlationId: generateCorrelationId() };
     }
 
     return { message: "Ukjent feil", name: "UnknownError", status: 500, correlationId: generateCorrelationId() };
@@ -66,42 +55,39 @@ function normaliserRouteErrorResponse(error: ErrorResponse): NormalisertFeil {
     // `.error` er et privat felt på `ErrorResponseImpl`, ikke del av den
     // offentlige `ErrorResponse`-typen — men det er her React Router bevarer
     // den opprinnelige feilen (med stacktrace) fra en uventet loader/action-feil.
-    const bevartFeil = (error as unknown as { error?: unknown }).error;
-    if (bevartFeil !== undefined) {
-        return normaliserFeil(bevartFeil);
-    }
+    const ukjentFeil = (error as unknown as { error?: unknown }).error;
+    const bevartFeil: Error | undefined = ukjentFeil instanceof Error ? ukjentFeil : undefined;
 
     const dataSomTekst = typeof error.data === "string" && error.data ? error.data : undefined;
-    const message = dataSomTekst ?? error.statusText ?? `Feil ${error.status}`;
+    const message = dataSomTekst ?? bevartFeil?.message ?? error.statusText ?? `Feil ${error.status}`;
 
     return {
         message,
         name: "RouteErrorResponse",
         status: error.status,
+        stack: bevartFeil?.stack,
         componentStack: finnComponentStack(error),
         correlationId: generateCorrelationId(),
     };
 }
 
-function normaliserAxiosError(error: import("axios").AxiosError<ProblemDetail>): NormalisertFeil {
+function normaliserAxiosError(error: AxiosError<ProblemDetail>): NormalisertFeil {
     const problemDetail = error.response?.data;
     const message = (typeof problemDetail?.detail === "string" && problemDetail.detail) || error.message;
     const status = problemDetail?.status ?? error.response?.status ?? 500;
+    const type = problemDetail?.type ?? error.name ?? "AxiosError";
 
     return {
         message,
-        name: error.name,
+        name: type,
         status,
-        stackTrace: error.stack,
-        realError: error,
+        stack: error.stack,
         componentStack: finnComponentStack(error),
         correlationId: getAxiosCorrelationId(error) ?? generateCorrelationId(),
     };
 }
 
 function normaliserCustomError(error: CustomError): NormalisertFeil {
-    // ApiError sitt `.error`-felt (opprinnelig wrappet feil) brukes kun som
-    // reserve når CustomError sine egne felter mangler.
     const bevartFeil = error instanceof ApiError ? error.error : undefined;
     const bevartNormalisert = bevartFeil ? normaliserFeil(bevartFeil) : undefined;
 
@@ -109,8 +95,7 @@ function normaliserCustomError(error: CustomError): NormalisertFeil {
         message: error.message || bevartNormalisert?.message || "Ukjent feil",
         name: error.name,
         status: error.status,
-        stackTrace: error.stack ?? bevartFeil?.stack,
-        realError: error,
+        stack: error.stack ?? bevartFeil?.stack,
         componentStack: finnComponentStack(error),
         correlationId: error.correlationId || bevartNormalisert?.correlationId || generateCorrelationId(),
     };

@@ -1,4 +1,5 @@
 import { logInfoSchema } from "@bidrag/common";
+import type { z } from "zod";
 import type { Route } from "./+types/logRoute.ts";
 import { navLogger, secureNavLogger } from "./navLogger";
 
@@ -9,6 +10,21 @@ export async function action({ params, request }: Route.ActionArgs) {
     const isSecureLog = type === "secure";
 
     return doLog(isSecureLog ? secureNavLogger : navLogger, request);
+}
+type LoggetFeilData = NonNullable<z.infer<typeof logInfoSchema>["error"]>;
+/** Gjenoppbygger en ekte Error slik at pinos `err`-serializer får riktig `type`, stack osv. */
+function tilError(feil: LoggetFeilData): Error {
+    // Dynamisk klassenavn -> e.constructor.name === feil.type
+    const NavngittError = { [feil.name]: class extends Error {} }[feil.name] ?? Error;
+    const error = new NavngittError(feil.message);
+    error.name = feil.name;
+    error.stack = feil.stack ?? feil.componentStack;
+    Object.assign(error, {
+        cause: feil.cause,
+        status: feil.status,
+        componentStack: feil.componentStack,
+    });
+    return error;
 }
 
 async function doLog(logger: Logger, req: Request): Promise<Response> {
@@ -28,7 +44,7 @@ async function doLog(logger: Logger, req: Request): Promise<Response> {
 
     const felter: Record<string, unknown> = {
         ...klientfelter,
-        ...(error ? { err: error } : {}),
+        ...(error ? { err: tilError(error) } : {}),
     };
 
     logger[level](felter, message);
