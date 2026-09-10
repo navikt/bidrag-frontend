@@ -163,11 +163,7 @@ export default function LeggTilForelderSeksjon({
 
                                     {harRolle && forelder.rolle && (
                                         <HStack asChild align="center">
-                                            <BodyShort
-                                                size="small"
-                                                weight="semibold"
-                                                className="text-ax-success-800"
-                                            >
+                                            <BodyShort size="small" weight="semibold" className="text-ax-success-800">
                                                 <CheckmarkHeavyIcon aria-hidden fontSize="1.3rem" /> Rolle valgt:{" "}
                                                 {hentForelderRolleLabel(forelder.rolle)}
                                             </BodyShort>

@@ -66,11 +66,7 @@ export default function SøskenListe({ form, søsken }: Props) {
                                     </VStack>
                                     {erAlleredeValgt ? (
                                         <HStack asChild align="center">
-                                            <BodyShort
-                                                size="small"
-                                                weight="semibold"
-                                                className="text-ax-success-700"
-                                            >
+                                            <BodyShort size="small" weight="semibold" className="text-ax-success-700">
                                                 <CheckmarkHeavyIcon aria-hidden fontSize="1.5rem" /> Valgt
                                             </BodyShort>
                                         </HStack>
