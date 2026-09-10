@@ -108,3 +108,4 @@ repo-kopiene og start en ny Copilot-økt.
 - Bruk Aksel Design System-komponenter og spacing-tokens (`space-*`)
 - Ikke sett CPU-limits i Nais-manifest (kun requests)
 - Aldri hardkode tokens eller secrets
+- Bare lag kommentarer på steder der det er nødvendig for å forklare hvorfor noe gjøres på en spesiell måte. Ikke kommenter åpenbare ting.

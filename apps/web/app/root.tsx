@@ -13,10 +13,10 @@ import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts"
 import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
 import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
-import { BidragProgressbarFullScreen, type NavUser } from "@bidrag/common";
+import { BidragProgressbarFullScreen } from "@bidrag/common";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
-import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
+import RootErrorBoundary from "~/common/components/errorpage/RootErrorBoundary.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import { UnleashContextUpdater } from "~/common/unleash/UnleashContextUpdater.tsx";
 import type { Route } from "./+types/root.ts";
@@ -93,13 +93,17 @@ export default function App({ loaderData }: Route.ComponentProps) {
     return (
         <QueryClientWrapper>
             <FlagProvider unleashClient={unleashClient} startClient={false}>
-                <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} />}>
-                    <UnleashContextUpdater />
-                    <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
-                        <ClientOnly fallback={<BidragProgressbarFullScreen />}>
-                            <Outlet />
-                        </ClientOnly>
-                    </AppLayout>
+                <FaroErrorBoundary
+                    fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} bisysUrl={bisysUrl} />}
+                >
+                    <RootErrorBoundary bruker={navUser} bisysUrl={bisysUrl}>
+                        <UnleashContextUpdater />
+                        <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
+                            <ClientOnly fallback={<BidragProgressbarFullScreen />}>
+                                <Outlet />
+                            </ClientOnly>
+                        </AppLayout>
+                    </RootErrorBoundary>
                 </FaroErrorBoundary>
             </FlagProvider>
         </QueryClientWrapper>
@@ -127,15 +131,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+    console.log("React router error", error);
     return <RootErrorBoundary error={error} bruker={null} />;
-}
-
-function RootErrorBoundary({ error, bruker, bisysUrl }: { error: unknown; bruker: NavUser | null; bisysUrl?: string }) {
-    return (
-        <QueryClientWrapper>
-            <AppLayout bruker={bruker} bisysUrl={bisysUrl}>
-                <ErrorPage error={error} />
-            </AppLayout>
-        </QueryClientWrapper>
-    );
 }

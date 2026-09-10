@@ -1,4 +1,4 @@
-import { CustomError, correlationIdHeader, generateCorrelationId, LoggerService, useBisysLink } from "@bidrag/common";
+import { useBisysLink } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import {
     BodyLong,
@@ -13,47 +13,17 @@ import {
     List,
     VStack,
 } from "@navikt/ds-react";
-import { isAxiosError } from "axios";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router";
 import styles from "./errorpage.module.css";
 import { Iskrem } from "./Iskrem";
+import type { NormalisertFeil } from "./normaliserFeil.ts";
 
 export interface ErrorPageProps {
-    error: unknown;
+    feil: NormalisertFeil;
 }
 
-function getAxiosCorrelationId(error: unknown): string | undefined {
-    if (!isAxiosError(error)) {
-        return undefined;
-    }
-
-    const correlationId = error.response?.headers[correlationIdHeader.toLowerCase()];
-    return typeof correlationId === "string" && correlationId ? correlationId : undefined;
-}
-
-export default function ErrorPage({ error }: ErrorPageProps) {
-    const errorMessage = error instanceof Error ? error.message : undefined;
-    const stackTrace = error instanceof Error ? error.stack : undefined;
-    const status = error instanceof CustomError ? error.status : 500;
-    const correlationId = useMemo(
-        () =>
-            error instanceof CustomError && error.correlationId
-                ? error.correlationId
-                : (getAxiosCorrelationId(error) ?? generateCorrelationId()),
-        [error],
-    );
-
-    useEffect(() => {
-        const realError = error instanceof Error ? error : undefined;
-        LoggerService.error(errorMessage ?? "Ukjent feil", realError, {
-            message: errorMessage ?? "Ukjent feil",
-            name: error instanceof Error ? error.name : "UnknownError",
-            status,
-            correlationId,
-        });
-    }, [correlationId, error, errorMessage, stackTrace, status]);
-
+export default function ErrorPage({ feil }: ErrorPageProps) {
     return (
         <Box
             background="raised"
@@ -75,8 +45,8 @@ export default function ErrorPage({ error }: ErrorPageProps) {
                     </Heading>
                 </HStack>
                 <VStack gap="space-16" align="start" justify="center">
-                    <ErrorInfo error={errorMessage} stackTrace={stackTrace} />
-                    <ContactInformation correlationId={correlationId} />
+                    <ErrorInfo error={feil.message} stackTrace={feil.stackTrace} />
+                    <ContactInformation correlationId={feil.correlationId} />
                     <ButtonRow />
                 </VStack>
             </VStack>
