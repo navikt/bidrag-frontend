@@ -10,7 +10,7 @@ const PersonIdent = ({
     ignoreClickOnIdent?: boolean;
 }) => {
     return (
-        // biome-ignore lint/a11y/noStaticElementInteractions: There's a button inside the div, so can't make the div a button.
+        // biome-ignore lint/a11y/noStaticElementInteractions: To stop click event from propagating to parent elements.
         <div
             className={`flex flex-row gap-1 items-center`}
             onClick={(e) => {
@@ -20,9 +20,11 @@ const PersonIdent = ({
                 }
             }}
             onKeyDown={(e) => {
-                if (ignoreClickOnIdent) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                if (e.key === "Enter" || e.key === " ") {
+                    if (ignoreClickOnIdent) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                 }
             }}
         >

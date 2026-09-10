@@ -1,5 +1,5 @@
 import { type OppdatereBoforholdRequestV2, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";

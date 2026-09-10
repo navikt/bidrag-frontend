@@ -42,18 +42,16 @@ const Beløpstype = ({
         );
     }
     return (
-        <>
-            <FormControlledSelectField
-                name={`${fieldName}.beløpstype`}
-                className="w-fit h-max"
-                label={text.label.beløpstype}
-                hideLabel
-                onSelect={() => {
-                    setValue(`${fieldName}.total`, 0);
-                }}
-                options={beløpstypeOptions}
-            />
-        </>
+        <FormControlledSelectField
+            name={`${fieldName}.beløpstype`}
+            className="w-fit h-max"
+            label={text.label.beløpstype}
+            hideLabel
+            onSelect={() => {
+                setValue(`${fieldName}.total`, 0);
+            }}
+            options={beløpstypeOptions}
+        />
     );
 };
 

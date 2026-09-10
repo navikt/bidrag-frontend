@@ -101,8 +101,10 @@ function parseQueryString(query: string) {
 }
 
 // eslint-disable-next-line no-control-regex
+//biome-ignore lint/suspicious/noControlCharactersInRegex: Allows to replace invisible characters with space, e.g. for search.
 const NullCharactersRegExp = /\x00/g;
 // eslint-disable-next-line no-control-regex
+//biome-ignore lint/suspicious/noControlCharactersInRegex: Allows to replace invisible characters with space, e.g. for search.
 const InvisibleCharactersRegExp = /[\x01-\x1F]/g;
 
 /**
@@ -195,6 +197,7 @@ function _approximateFraction(x: number) {
             b = q;
         }
     }
+    //biome-ignore lint/suspicious/noImplicitAnyLet: Hjelpefunksjon
     let result;
     // Select closest of the neighbours to x.
     if (x_ - a / b < c / d - x_) {
@@ -395,6 +398,7 @@ function getVisibleElements({
         const elementBottom = element.offsetTop + element.clientTop + element.clientHeight;
         return elementBottom > top;
     }
+
     function isElementNextAfterViewHorizontally(view: { div: HTMLElement }) {
         const element = view.div;
         const elementLeft = element.offsetLeft + element.clientLeft;

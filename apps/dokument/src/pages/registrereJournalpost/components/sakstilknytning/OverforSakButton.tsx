@@ -33,7 +33,7 @@ export default function OverforSakButton({ sak, onModalStateChange }: OverforSak
                 className={"overfor-button"}
                 onClick={openAvvikModal}
             />
-            <React.Suspense fallback={<></>}>
+            <React.Suspense fallback={null}>
                 {isAvvikModalOpen && (
                     <AvvikshandteringModal
                         closeModal={closeAvvikModal}

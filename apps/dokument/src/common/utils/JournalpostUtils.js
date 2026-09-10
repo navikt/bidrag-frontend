@@ -2,6 +2,7 @@ import _ from "lodash";
 
 import { formatDate } from "./DateUtils";
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export default class JournalpostUtils {
     static getSanifiedJournalpost(journalpostToSanifiy) {
         let sanifiedJournalpost = _.omit(journalpostToSanifiy, [

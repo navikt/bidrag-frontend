@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
     FormControlledCustomTextareaEditor,
     type FormControlledCustomTextEditorProps,
@@ -7,9 +8,9 @@ import ForholdsmessigFordelingInfo from "../../forholdsmessigfordeling/Forholdsm
 export const BegrunnelseSidemeny = (props: FormControlledCustomTextEditorProps) => {
     return (
         <>
-            <React.Suspense fallback={null}>
+            <Suspense fallback={null}>
                 <ForholdsmessigFordelingInfo />
-            </React.Suspense>
+            </Suspense>
             <FormControlledCustomTextareaEditor {...props} />
         </>
     );

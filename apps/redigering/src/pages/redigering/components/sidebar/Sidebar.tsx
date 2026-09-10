@@ -15,9 +15,11 @@ interface PageRangeDetails {
     title?: string;
     range: [number, number];
 }
+
 interface SidebarProps {
     onDocumentLoaded?: (pagsNumber: number, pages: number[]) => void;
 }
+
 export default function Sidebar({ onDocumentLoaded }: SidebarProps) {
     const { sidebarHidden, dokumentMetadata, hideSidebar, pageRotations } = usePdfEditorContext();
     const containerRef = useRef<HTMLDivElement>(undefined);
@@ -54,10 +56,14 @@ export default function Sidebar({ onDocumentLoaded }: SidebarProps) {
     }
 
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: This is a sidebar that is not meant to be interactive in the same way as a button or link. It is used for navigation within the PDF viewer.
         <div
             ref={containerRef}
             className={`sidebar_viewer ${sidebarHidden ? "inactive" : "open"} ${hasSidewaysRotatedPages ? "wide" : ""}`}
             onClick={(e) => {
+                e.stopPropagation();
+            }}
+            onKeyDown={(e) => {
                 e.stopPropagation();
             }}
         >
@@ -90,6 +96,7 @@ interface IPageSectionProps {
     pageRange: [number, number];
     index: number;
 }
+
 function PageSection({ title, pageRange, index }: IPageSectionProps) {
     const pagesLength = pageRange[1] - pageRange[0];
     const { toggleDeletedPage, removedPages, isAllowedToDeletePage } = usePdfEditorContext();
@@ -100,6 +107,7 @@ function PageSection({ title, pageRange, index }: IPageSectionProps) {
 
     const isAllPagesDeleted = pagesInSection.length === getDeletedPages().length;
     const isSomePagesDeleted = getDeletedPages().length > 0 && pagesInSection.length > getDeletedPages().length;
+
     function toggleDeletePages() {
         // if (!isAllowedToDeletePage()) return;
         if (isAllPagesDeleted) {
@@ -108,6 +116,7 @@ function PageSection({ title, pageRange, index }: IPageSectionProps) {
             getNotDeletedPages().filter(toggleDeletedPage);
         }
     }
+
     return (
         <>
             {title && (
@@ -118,7 +127,9 @@ function PageSection({ title, pageRange, index }: IPageSectionProps) {
                         indeterminate={isSomePagesDeleted}
                         size={"small"}
                         className={"checkbox"}
-                    >.</Checkbox>
+                    >
+                        .
+                    </Checkbox>
                     <BodyShort
                         size="small"
                         as="div"
@@ -143,11 +154,14 @@ function DocumentTitlePopover({ title }: { title: string }) {
     const buttonRef = useRef(null);
     return (
         <>
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: This is a span that acts as a button to show the popover, so it is not a semantic element. */}
             <span
                 ref={buttonRef}
                 className="truncate"
                 onMouseOver={() => setOpenState(true)}
                 onMouseLeave={() => setOpenState(false)}
+                onFocus={() => setOpenState(true)}
+                onBlur={() => setOpenState(false)}
             >
                 {title}
             </span>

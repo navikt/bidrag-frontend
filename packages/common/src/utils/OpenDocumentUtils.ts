@@ -4,7 +4,7 @@ import axios from "axios";
 import { LoggerService } from "../logging";
 import { type EditDocumentBroadcastMessage, type EditDocumentConfig, EditorConfigStorage } from "../types";
 
-// biome-ignore  lint/complexity/noStaticOnlyClass: No decision yet.
+// biome-ignore  lint/complexity/noStaticOnlyClass: Hjelpefunksjoner (brukes som namespace for dokument-åpning)..
 export class OpenDocumentUtils {
     static åpneDokument(
         journalpostid: string,

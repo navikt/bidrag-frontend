@@ -1,6 +1,6 @@
 import { StringUtils } from "./StringUtils";
 
-// biome-ignore  lint/complexity/noStaticOnlyClass: No decision yet.
+// biome-ignore  lint/complexity/noStaticOnlyClass: Hjelpefunksjoner for å sjekke om et objekt er tomt. Kan brukes på både objekter og strenger.
 export default class ObjectUtils {
     // biome-ignore lint/suspicious/noExplicitAny: The function tests for the type of the value, so any is fine here.
     static isEmpty(value?: any) {

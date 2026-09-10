@@ -7,7 +7,7 @@ import {
     queryParams,
 } from "@bidrag/common";
 import { Loader } from "@navikt/ds-react";
-
+import { Suspense } from "react";
 import { lastDokumenter } from "../../api/queries";
 import type { EditDocumentMetadata } from "../../types/EditorTypes";
 import PageWrapper from "../PageWrapper";
@@ -25,9 +25,9 @@ interface DokumentRedigeringPageProps {
 export default function DokumentRedigeringPage(props: DokumentRedigeringPageProps) {
     return (
         <PageWrapper name={"dokumentredigering"}>
-            <React.Suspense fallback={<Loader size="large"></Loader>}>
+            <Suspense fallback={<Loader size="large"></Loader>}>
                 <DokumentRedigeringContainer {...props} />
-            </React.Suspense>
+            </Suspense>
         </PageWrapper>
     );
 }

@@ -1,6 +1,6 @@
 import { FaroErrorBoundary } from "@grafana/faro-react";
 import { FlagProvider } from "@unleash/proxy-client-react";
-import { useEffect, useMemo } from "react";
+import { type ReactNode, useEffect, useMemo } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { UnleashClient } from "unleash-proxy-client";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
@@ -108,7 +108,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
     );
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: ReactNode }) {
     return (
         <html lang="nb">
             <head>

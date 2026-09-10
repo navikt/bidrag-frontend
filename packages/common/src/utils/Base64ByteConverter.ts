@@ -1,3 +1,5 @@
+// biome-ignore-all lint/style/noNonNullAssertion: Values are guaranteed to be non-null due to the way the code is structured.
+// biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
 const lookup: any[] = [];
 const revLookup: number[] = [];
 
@@ -8,6 +10,8 @@ for (let i = 0, len = code.length; i < len; ++i) {
 }
 revLookup["-".charCodeAt(0)] = 62;
 revLookup["_".charCodeAt(0)] = 63;
+
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class Base64ByteConverter {
     private static readonly VALID_BASE64 = /^[A-Za-z0-9+/\-_]*={0,2}$/;
 

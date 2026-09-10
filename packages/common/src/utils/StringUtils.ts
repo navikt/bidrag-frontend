@@ -1,4 +1,4 @@
-// biome-ignore  lint/complexity/noStaticOnlyClass: No decision yet.
+// biome-ignore  lint/complexity/noStaticOnlyClass: Hjelpefunksjoner for string validering.
 export class StringUtils {
     static isEmpty(str?: string | null): boolean {
         return isStringEmpty(str);
@@ -15,10 +15,10 @@ export function isStringEmpty(str?: string | null): boolean {
 
 export function capitalize(str?: string | null, capitalizeWords: boolean = true, toLowercase: boolean = true): string {
     if (isStringEmpty(str)) return "";
-    if (str === null || str === undefined) return "";
+    const s = str as string;
 
-    if (str?.length === 1) return str;
-    const lowercase = toLowercase ? str.toLocaleLowerCase() : str;
+    if (s?.length === 1) return s;
+    const lowercase = toLowercase ? s.toLocaleLowerCase() : s;
     if (capitalizeWords) {
         return lowercase
             .split("-")

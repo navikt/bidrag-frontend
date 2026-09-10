@@ -1,6 +1,6 @@
 import { type OppdatereInntektBegrunnelseRequest, Rolletype, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, type RolleType } from "@bidrag/common";
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";
@@ -163,6 +163,7 @@ const Side = () => {
                 return undefined;
         }
     }
+
     return (
         <Fragment key={selectedRolleId}>
             {!erBisysVedtak && !erAldersjusteringsVedtakstype && (
