@@ -6,7 +6,6 @@
         "build": "react-router build",
         "dev": "react-router dev | pino-pretty --messageKey=message",
         "test": "vitest run --exclude '**/*.ct.spec.ts'",
-        "test:ct:gallery": "lsof -ti tcp:3178 | xargs kill -9 2>/dev/null || true; vite --config playwright/vite.config.ts --open /playwright/gallery/browse.html",
         "start": "node ./build/server/index.js",
         "typecheck": "react-router typegen && tsc --noEmit"
     },
@@ -58,15 +57,9 @@
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "^6.1.0",
-        "msw": "^2.15.0",
         "pino-pretty": "^13.1.3",
         "rehype-slug": "^6.0.0",
         "remark-gfm": "^4.0.1",
         "vite": "^8.0.16"
-    },
-    "msw": {
-        "workerDirectory": [
-            "public"
-        ]
     }
 }
