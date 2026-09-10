@@ -4,7 +4,7 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import ErrorPage from "./ErrorPage.tsx";
-import { type NormalisertFeil, normaliserFeil } from "./normaliserFeil.ts";
+import { type NormalisertFeil, normaliserFeil } from "./normaliserFeil";
 
 type Props = { bruker: NavUser | null; bisysUrl?: string } & (
     | { error: unknown; children?: never }
@@ -14,17 +14,7 @@ type Props = { bruker: NavUser | null; bisysUrl?: string } & (
 type State = { fangetFeil?: unknown };
 
 /**
- * Har to bruksmåter:
- * - Gis `error` direkte: viser og logger en feil som allerede er fanget andre
- *   steder (rute-nivå loader/action-feil via React Router, eller Faros
- *   `fallback`).
- * - Gis `children`: opptrer som en ekte React error boundary og fanger
- *   render-feil selv, og setter `componentStack` på feilen før den
- *   normaliseres og logges.
- *
- * All normalisering av feilen (Error/CustomError/AxiosError/ErrorResponse/
- * ukjent) skjer i `normaliserFeil`, se `./normaliserFeil.ts`. `ErrorPage` er
- * ren visning — all logging skjer herfra.
+ * RootErrorBoundary fanger opp alle feil som skjer i React-komponenter under seg.
  */
 export default class RootErrorBoundary extends Component<Props, State> {
     override state: State = {};

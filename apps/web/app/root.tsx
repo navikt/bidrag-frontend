@@ -96,14 +96,12 @@ export default function App({ loaderData }: Route.ComponentProps) {
                 <FaroErrorBoundary
                     fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} bisysUrl={bisysUrl} />}
                 >
-                    <RootErrorBoundary bruker={navUser} bisysUrl={bisysUrl}>
-                        <UnleashContextUpdater />
-                        <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
-                            <ClientOnly fallback={<BidragProgressbarFullScreen />}>
-                                <Outlet />
-                            </ClientOnly>
-                        </AppLayout>
-                    </RootErrorBoundary>
+                    <UnleashContextUpdater />
+                    <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
+                        <ClientOnly fallback={<BidragProgressbarFullScreen />}>
+                            <Outlet />
+                        </ClientOnly>
+                    </AppLayout>
                 </FaroErrorBoundary>
             </FlagProvider>
         </QueryClientWrapper>
