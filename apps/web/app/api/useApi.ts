@@ -502,11 +502,11 @@ export function useHentFlerePersoninformasjon(identer: string[], enabled: boolea
     });
 }
 
-function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null, enabled?: boolean) {
+function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
     return {
-        queryKey: ["hent_person_motpart_barn_relasjon", request?.ident, enabled],
+        queryKey: ["hent_person_motpart_barn_relasjon", request?.ident],
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
-            if (!request || enabled === false) return undefined;
+            if (!request) return undefined;
             try {
                 const { data } = await BIDRAG_PERSON_API.motpartbarnrelasjon.getPersonensMotpartBarnRelasjon(request);
                 await SecureLoggerService.info(`Hentet personen motpart-barn relasjon for ident ${request.ident}`);
@@ -541,9 +541,9 @@ export function useHentPersonMotpartBarnRelasjon(request: PersonRequest | null, 
     });
 }
 
-export function useHentPersonMotpartBarnRelasjonSuspense(request: PersonRequest | null, enabled: boolean = true) {
+export function useHentPersonMotpartBarnRelasjonSuspense(request: PersonRequest) {
     return useSuspenseQuery<MotpartBarnRelasjonDto | undefined, AxiosError | TilgangsFeilError>({
-        ...hentPersonMotpartBarnRelasjonQueryOptions(request, enabled),
+        ...hentPersonMotpartBarnRelasjonQueryOptions(request),
     });
 }
 
@@ -580,11 +580,11 @@ export function useHentForelderBarnRelasjon(request: PersonRequest | null, enabl
     });
 }
 
-function hentForeldreinformasjonForBarnQueryOptions(request: PersonRequest | null, enabled?: boolean) {
+function hentForeldreinformasjonForBarnQueryOptions(request: PersonRequest | null) {
     return {
-        queryKey: ["hent_foreldreinformasjon_for_barn", request?.ident, enabled],
+        queryKey: ["hent_foreldreinformasjon_for_barn", request?.ident],
         queryFn: async () => {
-            if (!request?.ident || enabled === false) return [];
+            if (!request?.ident) return [];
 
             try {
                 const { data } = await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(request);
@@ -637,9 +637,9 @@ export function useHentForeldreinformasjonForBarn(request: PersonRequest | null,
     });
 }
 
-export function useHentForeldreinformasjonForBarnSuspense(request: PersonRequest | null, enabled: boolean = true) {
+export function useHentForeldreinformasjonForBarnSuspense(request: PersonRequest) {
     return useSuspenseQuery<PersonDto[], AxiosError | TilgangsFeilError>({
-        ...hentForeldreinformasjonForBarnQueryOptions(request, enabled),
+        ...hentForeldreinformasjonForBarnQueryOptions(request),
     });
 }
 

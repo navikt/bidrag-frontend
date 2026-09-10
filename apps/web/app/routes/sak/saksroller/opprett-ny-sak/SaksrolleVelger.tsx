@@ -2,8 +2,9 @@ import { TilgangsFeilError } from "@bidrag/api";
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
 import { Alert, BodyShort, Select, VStack } from "@navikt/ds-react";
-import { type ChangeEvent, useEffect, useState } from "react";
+import { type ChangeEvent, Suspense, useEffect, useState } from "react";
 import { useHentForeldreinformasjonForBarnSuspense, useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
+import LasterSkeleton from "./components/LasterSkeleton";
 import { MAKS_ALDER_BARN, MYNDYG_BARN_ALDER, type PartRolle, PartRolleSchema } from "./opprett-sak-schema";
 import { useSaksrolleroversikt } from "./saksrolleroversiktContext";
 import { tilPartISaken } from "./utils";
@@ -58,16 +59,8 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
     } = useSaksrolleroversikt();
 
     const erBarnRolle = valgtRolle === "barn_over_18" || valgtRolle === "barn_under_18";
-    const trengerRelasjon = !!valgtRolle && (sakstype === "EKTEFELLEBIDRAG" || !erBarnRolle);
+    const trengerRelasjon = !!valgtRolle && !erBarnRolle;
     const trengerForeldreinfo = !!valgtRolle && erBarnRolle;
-
-    const { data: relasjonTilBarn, error: relasjonTilBarnError } = useHentPersonMotpartBarnRelasjonSuspense(
-        partISaken ? { ident: partISaken.ident } : null,
-        trengerRelasjon,
-    );
-
-    const { data: foreldreinformasjonTilBarn, error: foreldreinformasjonTilBarnError } =
-        useHentForeldreinformasjonForBarnSuspense(partISaken ? { ident: partISaken.ident } : null, trengerForeldreinfo);
 
     if (partISaken === null) {
         return null;
@@ -96,21 +89,82 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
         if (enforcedRolle) {
             settValgtRolle(enforcedRolle);
             setPartISaken(tilPartISaken(partISaken, enforcedRolle));
-            return;
         }
-        if (!valgtRolle) {
-            return;
-        }
+    }, [enforcedRolle, partISaken, setPartISaken, valgtRolle]);
 
+    const alternativer = getFilteredPartRoller(sakstype, partISakenAlder, skjemaPartRoller);
+
+    return (
+        <VStack gap="space-4">
+            <div>
+                <BodyShort size="small" className="text-ax-neutral-700 mb-2">
+                    Rolle i saken
+                </BodyShort>
+                <Select
+                    label={`Hvilken rolle har ${partISaken.visningsnavn}?`}
+                    hideLabel
+                    onChange={(value) => velgSaksrolle(value)}
+                    size="small"
+                    readOnly={!!enforcedRolle}
+                    value={valgtRolle ?? ""}
+                >
+                    <option value="">- Velg rolle -</option>
+                    {alternativer.map((skjemaRoller, index) => (
+                        <option key={index} value={skjemaRoller.value}>
+                            {skjemaRoller.label}
+                        </option>
+                    ))}
+                </Select>
+            </div>
+
+            {feil && <Alert variant="error">{feil}</Alert>}
+
+            {trengerRelasjon && (
+                <Suspense fallback={<LasterSkeleton tekst="Henter relasjoner..." />}>
+                    <RelasjonTilBarnBranch
+                        partISaken={partISaken}
+                        sakstype={sakstype}
+                        setSaksrolleFlyt={setSaksrolleFlyt}
+                        onFeil={settFeil}
+                    />
+                </Suspense>
+            )}
+
+            {trengerForeldreinfo && (
+                <Suspense fallback={<LasterSkeleton tekst="Henter foreldreinformasjon..." />}>
+                    <ForeldreinfoBranch partISaken={partISaken} setSaksrolleFlyt={setSaksrolleFlyt} onFeil={settFeil} />
+                </Suspense>
+            )}
+        </VStack>
+    );
+}
+
+/**
+ * Henter relasjon til barn/motpart for den valgte rollen og utleder riktig saksrolleflyt.
+ *
+ * Egen komponent slik at `useHentPersonMotpartBarnRelasjonSuspense` (en Suspense-spørring)
+ * kun monteres når relasjonen faktisk trengs. Suspense-spørringer kan ikke deaktiveres med
+ * et `enabled`-flagg, så betinget montering er riktig måte å styre om spørringen kjører.
+ */
+function RelasjonTilBarnBranch({
+    partISaken,
+    sakstype,
+    setSaksrolleFlyt,
+    onFeil,
+}: {
+    partISaken: PersonDto;
+    sakstype: string | null;
+    setSaksrolleFlyt: ReturnType<typeof useSaksrolleroversikt>["setSaksrolleFlyt"];
+    onFeil: (feil: string) => void;
+}) {
+    const { data: relasjonTilBarn, error } = useHentPersonMotpartBarnRelasjonSuspense({ ident: partISaken.ident });
+
+    useEffect(() => {
         if (sakstype === "EKTEFELLEBIDRAG") {
-            if (!relasjonTilBarn) {
-                return;
-            }
-
             setSaksrolleFlyt({
                 key: Math.random(),
                 type: "EKTEFELLEBIDRAG",
-                motpart: relasjonTilBarn.personensMotpartBarnRelasjon
+                motpart: relasjonTilBarn?.personensMotpartBarnRelasjon
                     ? Array.from(
                           relasjonTilBarn.personensMotpartBarnRelasjon
                               .reduce<Map<string, PersonDto>>((unikeMotparter, rel) => {
@@ -123,35 +177,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
                       )
                     : null,
             });
-            return;
-        }
-
-        if (erBarnRolle) {
-            if (!foreldreinformasjonTilBarn) {
-                return;
-            }
-
-            if (foreldreinformasjonTilBarn.length === 2) {
-                setSaksrolleFlyt({
-                    key: Math.random(),
-                    type: "BARN_BEGGE_FORELDRE",
-                    foreldre: foreldreinformasjonTilBarn,
-                });
-            }
-
-            if (foreldreinformasjonTilBarn.length < 2) {
-                setSaksrolleFlyt({
-                    key: Math.random(),
-                    type: "BARN_MANGLENDE_FORELDRE",
-                    forelder: foreldreinformasjonTilBarn[0] ?? null,
-                });
-            }
-
-            if (foreldreinformasjonTilBarn.length > 2) {
-                settFeil(
-                    `Dette barnet (${partISaken.ident}) har flere enn 2 registrerte foreldre i systemet. Dette kan skyldes feil i data. Kontakt support.`,
-                );
-            }
             return;
         }
 
@@ -170,7 +195,7 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
         );
 
         if (harDuplisertMotpartMedUlikeRoller) {
-            settFeil(
+            onFeil(
                 `Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for ${partISaken.visningsnavn}. Kontakt support for å få hjelp.`,
             );
             return;
@@ -212,53 +237,72 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
             type: "FORELDER_MED_BARN",
             barnkurver: relasjonMedBarnUnder24,
         });
-    }, [valgtRolle, sakstype, erBarnRolle, relasjonTilBarn, foreldreinformasjonTilBarn, partISaken, setSaksrolleFlyt]);
+    }, [relasjonTilBarn, sakstype, partISaken, setSaksrolleFlyt, onFeil]);
 
-    const alternativer = getFilteredPartRoller(sakstype, partISakenAlder, skjemaPartRoller);
+    if (error === null) {
+        return null;
+    }
 
-    return (
-        <VStack gap="space-4">
-            <div>
-                <BodyShort size="small" className="text-ax-neutral-700 mb-2">
-                    Rolle i saken
-                </BodyShort>
-                <Select
-                    label={`Hvilken rolle har ${partISaken.visningsnavn}?`}
-                    hideLabel
-                    onChange={(value) => velgSaksrolle(value)}
-                    size="small"
-                    readOnly={!!enforcedRolle}
-                    value={valgtRolle ?? ""}
-                >
-                    <option value="">- Velg rolle -</option>
-                    {alternativer.map((skjemaRoller, index) => (
-                        <option key={index} value={skjemaRoller.value}>
-                            {skjemaRoller.label}
-                        </option>
-                    ))}
-                </Select>
-            </div>
+    return error instanceof TilgangsFeilError ? (
+        <Alert variant="error">{error.message}</Alert>
+    ) : (
+        <Alert variant="error">Kunne ikke hente barn til {partISaken.visningsnavn}. Vennligst prøv igjen.</Alert>
+    );
+}
 
-            {feil && <Alert variant="error">{feil}</Alert>}
+/**
+ * Henter foreldreinformasjon for en valgt barnerolle og utleder riktig saksrolleflyt.
+ *
+ * Egen komponent av samme grunn som `RelasjonTilBarnBranch`: monteres kun når foreldreinfo
+ * faktisk trengs, slik at Suspense-spørringen aldri kalles i en "deaktivert" tilstand.
+ */
+function ForeldreinfoBranch({
+    partISaken,
+    setSaksrolleFlyt,
+    onFeil,
+}: {
+    partISaken: PersonDto;
+    setSaksrolleFlyt: ReturnType<typeof useSaksrolleroversikt>["setSaksrolleFlyt"];
+    onFeil: (feil: string) => void;
+}) {
+    const { data: foreldreinformasjonTilBarn, error } = useHentForeldreinformasjonForBarnSuspense({
+        ident: partISaken.ident,
+    });
 
-            {relasjonTilBarnError !== null &&
-                (relasjonTilBarnError instanceof TilgangsFeilError ? (
-                    <Alert variant="error">{relasjonTilBarnError.message}</Alert>
-                ) : (
-                    <Alert variant="error">
-                        Kunne ikke hente barn til {partISaken.visningsnavn}. Vennligst prøv igjen.
-                    </Alert>
-                ))}
+    useEffect(() => {
+        if (foreldreinformasjonTilBarn.length === 2) {
+            setSaksrolleFlyt({
+                key: Math.random(),
+                type: "BARN_BEGGE_FORELDRE",
+                foreldre: foreldreinformasjonTilBarn,
+            });
+        }
 
-            {foreldreinformasjonTilBarnError !== null &&
-                (foreldreinformasjonTilBarnError instanceof TilgangsFeilError ? (
-                    <Alert variant="error">{foreldreinformasjonTilBarnError.message}</Alert>
-                ) : (
-                    <Alert variant="error">
-                        Kunne ikke hente foreldreinformasjon til {partISaken.visningsnavn}. Vennligst prøv igjen.
-                    </Alert>
-                ))}
-        </VStack>
+        if (foreldreinformasjonTilBarn.length < 2) {
+            setSaksrolleFlyt({
+                key: Math.random(),
+                type: "BARN_MANGLENDE_FORELDRE",
+                forelder: foreldreinformasjonTilBarn[0] ?? null,
+            });
+        }
+
+        if (foreldreinformasjonTilBarn.length > 2) {
+            onFeil(
+                `Dette barnet (${partISaken.ident}) har flere enn 2 registrerte foreldre i systemet. Dette kan skyldes feil i data. Kontakt support.`,
+            );
+        }
+    }, [foreldreinformasjonTilBarn, partISaken, setSaksrolleFlyt, onFeil]);
+
+    if (error === null) {
+        return null;
+    }
+
+    return error instanceof TilgangsFeilError ? (
+        <Alert variant="error">{error.message}</Alert>
+    ) : (
+        <Alert variant="error">
+            Kunne ikke hente foreldreinformasjon til {partISaken.visningsnavn}. Vennligst prøv igjen.
+        </Alert>
     );
 }
 
