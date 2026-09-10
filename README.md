@@ -306,9 +306,9 @@ Playwright component-testing, som et alternativ til Storybook. Mønsteret:
 # Kjør alle component-tester (fra repo-roten - felles playwright.config.ts)
 pnpm test:ct
 
-# Kun én pakke
-pnpm test:ct -- --project=web
-pnpm test:ct -- --project=common
+# Filtrer på filsti ved behov
+pnpm test:ct -- apps/web
+pnpm test:ct -- packages/common
 
 # Visuell inspeksjon av stories/komponenter (Playwright UI-modus)
 pnpm test:ct:ui

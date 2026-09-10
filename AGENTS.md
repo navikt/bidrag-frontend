@@ -46,8 +46,8 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 - `apps/web` og `packages/common` deler ETT story-galleri (servert fra
   apps/web, se README) — som alternativ til Storybook.
 - Mount via `await mount("mappe/Fil/EksportNavn")`, kjør alt med `pnpm test:ct`
-  (felles `playwright.config.ts` i repo-roten), eller kun én pakke med
-  `pnpm test:ct -- --project=web`/`--project=common`. Visuell inspeksjon:
+  (felles `playwright.config.ts` i repo-roten), eller filtrer på filsti med
+  `pnpm test:ct -- apps/web`/`packages/common`. Visuell inspeksjon:
   `pnpm test:ct:ui` eller VS Code-extensionen `ms-playwright.playwright`
   (anbefalt i `.vscode/extensions.json`).
 - Bruk ALDRI appens ekte `QueryClientWrapper` uskodd i en story — komponenter
