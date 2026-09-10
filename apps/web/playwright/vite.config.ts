@@ -16,5 +16,20 @@ export default defineConfig({
     server: {
         port: 3178,
         strictPort: true,
+        // Forhåndstransformerer galleri-inngangen (main.tsx/stories.ts) og
+        // alle story-filer ved oppstart, slik at Vite ikke lazily
+        // kompilerer/invaliderer moduler midt i en parallell
+        // Playwright-kjøring (mange workers mot samme delte dev-server).
+        // Reduserer risikoen for "Execution context was destroyed, most
+        // likely because of a navigation" pga. et full-reload Vite sender
+        // til allerede tilkoblede sider.
+        warmup: {
+            clientFiles: [
+                "./playwright/gallery/main.tsx",
+                "./playwright/gallery/stories.ts",
+                "./app/**/*.story.tsx",
+                "../../packages/common/src/**/*.story.tsx",
+            ],
+        },
     },
 });
