@@ -32,9 +32,9 @@ const kutt = (verdi: string, maks: number) => (verdi.length > maks ? verdi.slice
 
 /** Gjør en vilkårlig context-verdi om til noe pino/JSON kan håndtere trygt, med lengdebegrensning. */
 function normaliserContextVerdi(verdi: unknown): string | number | boolean | null {
-    if (verdi === null || typeof verdi === "number" || typeof verdi === "boolean") return verdi;
-
-    if (typeof verdi === "string") return kutt(verdi, MAKS_CONTEXT_VERDI);
+    if (verdi === null) return null;
+    if (typeof verdi === "number") return verdi;
+    if (typeof verdi === "boolean") return verdi;
 
     // undefined, objekter, arrays, Date, Error o.l. -> forsøk JSON.stringify som fallback.
     try {
