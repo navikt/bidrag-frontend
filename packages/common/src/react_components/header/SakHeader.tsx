@@ -65,13 +65,6 @@ const CHEVRON_BUTTON_STYLE: CSSProperties = {
     cursor: "pointer",
 };
 
-const ROLE_CARD_CONTAINER_STYLE: CSSProperties = {
-    border: "1px solid var(--ax-border-neutral-subtle)",
-    borderRadius: "0.375rem",
-    background: "var(--ax-bg-default)",
-    margin: "0.125rem 0.375rem",
-};
-
 // Helpers
 
 const BARN_ROLLETYPER = new Set<string>([RolleTypeAbbreviation.BA, RolleTypeFullName.BARN]);
