@@ -114,9 +114,7 @@ function RollerExpandableContent(sak: Sak) {
                                         <span className="ml-2 personnavn">Ingen reell mottaker</span>
                                     </div>
                                 )
-                            ) : (
-                                <></>
-                            )}
+                            ) : null}
                         </div>
                     ))}
             </HGrid>

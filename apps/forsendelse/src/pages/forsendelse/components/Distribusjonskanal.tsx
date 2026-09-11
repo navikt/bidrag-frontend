@@ -1,5 +1,4 @@
 import { Loader } from "@navikt/ds-react";
-import React from "react";
 
 import { mapToDistribusjonKanalBeskrivelse } from "../../../helpers/forsendelseHelpers";
 import { useDistribusjonKanal } from "../../../hooks/useDokumentApi";

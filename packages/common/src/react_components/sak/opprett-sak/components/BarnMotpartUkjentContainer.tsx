@@ -1,6 +1,5 @@
 import { Alert, Button, Checkbox, ConfirmationPanel, Heading, Select, TextField } from "@navikt/ds-react";
 import { type ChangeEvent, type MouseEvent, useEffect, useState } from "react";
-import { RolleType } from "../RolleType.ts";
 import { useKanOppretteSakUtenBm, useOpprettSak } from "../../../../api/useOpprettSakApiData.ts";
 import {
     INGEN_BARN,
@@ -9,6 +8,7 @@ import {
     OBLIGATORISK_FELT,
 } from "../constants.ts";
 import { useSakContext } from "../OpprettSakContext.tsx";
+import { RolleType } from "../RolleType.ts";
 import { createSakPayload } from "../sakUtils.ts";
 import type { IPersonensReellMottakerRolle } from "../types.ts";
 import type { IBarnContainerProps } from "./BarnContainer.tsx";

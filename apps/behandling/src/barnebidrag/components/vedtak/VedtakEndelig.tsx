@@ -78,9 +78,8 @@ const VedtakEndelig = () => {
         lastetFørstegang.current = true;
     }, [activeStep]);
     if (
-        beregning &&
-        beregning.resultat?.ugyldigBeregning &&
-        beregning.resultat.ugyldigBeregning.feiltype === UgyldigBeregningDtoFeiltypeEnum.UFULSTENDING_GRUNNLAG_FF
+        beregning?.resultat?.ugyldigBeregning &&
+        beregning.resultat?.ugyldigBeregning.feiltype === UgyldigBeregningDtoFeiltypeEnum.UFULSTENDING_GRUNNLAG_FF
     ) {
         return <Klagevedtak endeligVedtak />;
     }
@@ -309,7 +308,7 @@ function BeregningTabellBarn({
                     return (
                         <VStack>
                             <ResultatTabell
-                                key={i + `Delvedtak ${hentVisningsnavn(vedtakstype)}`}
+                                key={`${i}Delvedtak ${hentVisningsnavn(vedtakstype)}`}
                                 erAvslag={delvedtak.perioder.every((p) => p.erDirekteAvslag)}
                                 avvistAldersjustering={avvistAldersjustering}
                                 beregnet={
@@ -330,7 +329,7 @@ function BeregningTabellBarn({
                                 <BodyShort size="small">
                                     <HStack gap="space-2" className="items-center">
                                         <InnkrevingIkon />
-                                        <div>Innkreves: </div>
+                                        <div>Innkreves:</div>
                                         <div>
                                             {resultatBarn.innkrevesFraPerioder
                                                 .map(

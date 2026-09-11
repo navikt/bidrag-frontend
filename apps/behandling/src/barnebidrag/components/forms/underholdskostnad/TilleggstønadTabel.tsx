@@ -1,6 +1,5 @@
 import { InntektBelopstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { BodyShort, Box, Heading, HStack, Table } from "@navikt/ds-react";
-import React from "react";
 import { useFormContext } from "react-hook-form";
 import { FormControlledSelectField } from "../../../../common/components/formFields/FormControlledSelectField";
 import { FormControlledTextField } from "../../../../common/components/formFields/FormControlledTextField";
@@ -43,18 +42,16 @@ const Beløpstype = ({
         );
     }
     return (
-        <>
-            <FormControlledSelectField
-                name={`${fieldName}.beløpstype`}
-                className="w-fit h-max"
-                label={text.label.beløpstype}
-                hideLabel
-                onSelect={() => {
-                    setValue(`${fieldName}.total`, 0);
-                }}
-                options={beløpstypeOptions}
-            />
-        </>
+        <FormControlledSelectField
+            name={`${fieldName}.beløpstype`}
+            className="w-fit h-max"
+            label={text.label.beløpstype}
+            hideLabel
+            onSelect={() => {
+                setValue(`${fieldName}.total`, 0);
+            }}
+            options={beløpstypeOptions}
+        />
     );
 };
 

@@ -13,10 +13,9 @@ export const useHentPersonData = (ident?: string) => {
             try {
                 const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident: ident });
                 return data;
-            } catch (error) {
+            } catch (_error) {
                 return { ident: "", visningsnavn: "Ingen tilgang", diskresjonskode: "SPSF" };
             }
-
         },
         staleTime: Infinity,
     });

@@ -5,7 +5,7 @@ import "quill-paste-smart";
 
 import { ErrorMessage } from "@navikt/ds-react";
 import Quill from "quill";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 const Clipboard = Quill.import("modules/clipboard");
 
@@ -36,6 +36,7 @@ class CustomClipboard extends Clipboard {
     onCaptureCut(e: ClipboardEvent) {
         this.onCaptureCopy(e, true);
     }
+
     tilpassFormatteringForLegacyBidragMaler(html: string): string {
         // Create a container and fill it with the copied HTML.
         const container = document.createElement("div");
@@ -71,7 +72,7 @@ export type EditorProps = {
     prefilledHtml?: string;
     onTextChange: (html: string) => void;
     resize?: boolean;
-    error?: React.ReactNode;
+    error?: ReactNode;
     ref;
 };
 const normalizeEditorHtml = (html = "") => html.replaceAll("<p></p>", "<p><br/></p>");

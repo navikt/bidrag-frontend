@@ -1,10 +1,10 @@
 import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
 import { Box, CopyButton } from "@navikt/ds-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useHentFodselsdatoer } from "../../api/useApiData";
-import type { IRolleDetaljer } from "../../types/roller/IRolleDetaljer";
-import { RolleTypeAbbreviation, RolleTypeFullName } from "../../types/roller/RolleType";
+import { type ComponentType, type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHentFodselsdatoer } from "../../api";
+import type { IRolleDetaljer } from "../../types";
+import { RolleTypeAbbreviation, RolleTypeFullName } from "../../types";
 import ExpandedRoles, { type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 type TypeBehandling = string;
@@ -21,7 +21,7 @@ interface ISakHeaderNewProps {
     selectedSaksnummer?: string;
     setSelectedSaksnummer: (saksnummer: string | undefined) => void;
     setSelectedRoller: (roller: HeaderRolle[]) => void;
-    HeaderTittel: React.ComponentType<{ type: TypeBehandling; style?: React.CSSProperties }>;
+    HeaderTittel: ComponentType<{ type: TypeBehandling; style?: CSSProperties }>;
     /** Saksnummer som har minst én valideringsfeil - fanen markeres da med et varselikon. */
     saksnummerMedValideringsfeil?: Set<string>;
     /** Saksnummer som har nye opplysninger (ikke-aktiverte endringer) - fanen markeres da med et oppdateringsikon. */
@@ -38,28 +38,28 @@ interface ISakHeaderLegacyProps {
 type ISakHeaderProps = ISakHeaderNewProps | ISakHeaderLegacyProps;
 
 // Styles
-const TAB_CONTAINER_STYLE: React.CSSProperties = {
+const TAB_CONTAINER_STYLE: CSSProperties = {
     display: "flex",
     alignItems: "center",
     gap: "0.25rem",
     padding: "0.5rem 1rem",
 };
 
-const TAB_BUTTON_STYLE: React.CSSProperties = {
+const TAB_BUTTON_STYLE: CSSProperties = {
     background: "transparent",
     border: "none",
     whiteSpace: "nowrap",
     cursor: "pointer",
 };
 
-const COPY_BUTTON_STYLE: React.CSSProperties = {
+const COPY_BUTTON_STYLE: CSSProperties = {
     borderRadius: 0,
     border: 0,
     background: "transparent",
     boxShadow: "none",
 };
 
-const CHEVRON_BUTTON_STYLE: React.CSSProperties = {
+const CHEVRON_BUTTON_STYLE: CSSProperties = {
     background: "transparent",
     border: 0,
     cursor: "pointer",
@@ -146,7 +146,7 @@ const SaksnummerTab = ({
     const textColor = isSelected ? "var(--ax-text-default)" : "var(--ax-text-accent-subtle)";
     const fontWeight = isSelected ? 600 : 400;
 
-    const containerStyle: React.CSSProperties = {
+    const containerStyle: CSSProperties = {
         ...TAB_CONTAINER_STYLE,
         position: "relative",
         background: backgroundColor,

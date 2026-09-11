@@ -1,5 +1,4 @@
 import { Loader } from "@navikt/ds-react";
-import React from "react";
 
 import ForsendelseSakHeader from "../forsendelse/components/ForsendelseSakHeader";
 import PageWrapper from "../PageWrapper";
@@ -20,6 +19,7 @@ export default function ({ ...otherProps }: IOpprettForsendelseProviderProps) {
         </PageWrapper>
     );
 }
+
 function LoadingIndicator() {
     return (
         <div className="m-auto w-max flex flex-col justify-center">

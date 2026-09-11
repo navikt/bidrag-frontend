@@ -12,6 +12,7 @@ export interface AvvikTypeCommonProps {
     initialAvvik?: Avvik;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
 export function registerToSelectProps(formName: string, register: UseFormRegister<any>) {
     const { ref, ...otherProps } = register(formName);
     return {
@@ -25,6 +26,7 @@ export function erFarskapBehandledeEnhet(enhet: string) {
         enhet as BidragEnhet,
     );
 }
+
 export function skalOverføreTilFarskapEnhet(
     eksisterendeEnhetsnummer: string,
     nyFagområde: string,

@@ -1,5 +1,5 @@
 import { ObjectUtils } from "@bidrag/common";
-import React from "react";
+
 import { useFormContext } from "react-hook-form";
 import { FormControlledMonthPicker } from "../../../../common/components/formFields/FormControlledMonthPicker";
 import text from "../../../../common/constants/texts";

@@ -1,5 +1,5 @@
 import { Alert, Heading } from "@navikt/ds-react";
-import React from "react";
+
 import { FloatingBottomToolbar } from "../../common/components/FloatingBottomToolbar";
 import { NavigationLoaderWrapper } from "../../common/components/NavigationLoaderWrapper";
 import texts from "../../common/constants/texts";
@@ -9,6 +9,7 @@ import PageWrapper from "../../common/PageWrapper";
 import FormWrapper from "../components/forms/FormWrapper";
 import EksterneLenkerKnapperFloating, { BrukerveiledningKnappSærbidrag } from "./EksterneLenkerKnapper";
 import { SaerbidragSideMenu } from "./SaerbidragSideMenu";
+
 export const NewSærbidragPage = () => {
     const { lesemodus } = useBehandlingProvider();
     const { erVedtakFattet, kanBehandlesINyLøsning } = useGetBehandlingV2();

@@ -1,5 +1,4 @@
 import { CopyButton } from "@navikt/ds-react";
-import React from "react";
 
 const PersonIdent = ({
     ident,
@@ -11,12 +10,21 @@ const PersonIdent = ({
     ignoreClickOnIdent?: boolean;
 }) => {
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: To stop click event from propagating to parent elements.
         <div
             className={`flex flex-row gap-1 items-center`}
             onClick={(e) => {
                 if (ignoreClickOnIdent) {
                     e.preventDefault();
                     e.stopPropagation();
+                }
+            }}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    if (ignoreClickOnIdent) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                 }
             }}
         >

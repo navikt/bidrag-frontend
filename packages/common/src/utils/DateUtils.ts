@@ -9,7 +9,7 @@ export const ISODateTimeStringToDDMMYYYYString = (isoDateTimeString?: string) =>
 export const toISODateString = (date: Date): string =>
     date.toLocaleDateString("sv-SV", { year: "numeric", month: "2-digit", day: "2-digit" });
 export const toISODateTimeString = (date?: Date): string | null =>
-    date == undefined
+    date === undefined
         ? null
         : date?.toLocaleDateString("sv-SV", { year: "numeric", month: "2-digit", day: "2-digit" }) +
           "T" +
@@ -27,7 +27,8 @@ export const deductDays = (date: Date, days: number) => {
 };
 export const lastDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0);
 export const firstDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1);
-export const isValidDate = (date: any) => date && date instanceof Date && isFinite(date.getTime());
+// biome-ignore lint/suspicious/noExplicitAny: The function tests for the type of the value, so any is fine here.
+export const isValidDate = (date: any) => date && date instanceof Date && Number.isFinite(date.getTime());
 export const isFirstDayOfMonth = (date: Date) => firstDayOfMonth(date).getDate() === date.getDate();
 export const isLastDayOfMonth = (date: Date) => lastDayOfMonth(date).getDate() === date.getDate();
 export const isAfterDate = (date: string, maxValidate: string) => {

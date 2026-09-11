@@ -1,9 +1,8 @@
 import "./VisJournalpost.css";
 
 import { Button, HGrid, HStack, Loader, Page, VStack } from "@navikt/ds-react";
-import React from "react";
+import { Suspense } from "react";
 import { useFormContext } from "react-hook-form";
-
 import Avvikshandtering from "../../common/components/avvik/Avvikshandtering";
 import ErrorSummary from "../../common/components/form/ErrorSummary";
 import useJournalpostChangePoller from "../../common/hooks/useJournalpostChangePoller";
@@ -39,9 +38,9 @@ export default function VisJournalpostContainer() {
                         <VStack gap="space-2">
                             <JournalpostDetaljer />
                             <div className={"grid-border"} />
-                            <React.Suspense fallback={<Loader size="xsmall" />}>
+                            <Suspense fallback={<Loader size="xsmall" />}>
                                 <GjelderBrukere />
-                            </React.Suspense>
+                            </Suspense>
                             <div className={"grid-border"} />
                             <TilknyttetSak />
                         </VStack>

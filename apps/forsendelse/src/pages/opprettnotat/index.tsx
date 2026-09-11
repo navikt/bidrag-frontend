@@ -1,5 +1,4 @@
 import { Loader } from "@navikt/ds-react";
-import React from "react";
 
 import ForsendelseSakHeader from "../forsendelse/components/ForsendelseSakHeader";
 import {

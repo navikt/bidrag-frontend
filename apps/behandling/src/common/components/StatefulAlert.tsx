@@ -1,10 +1,10 @@
 import type { AlertProps } from "@navikt/ds-react";
-import React from "react";
+import { type ReactNode, useState } from "react";
 
 import { BehandlingAlert } from "./BehandlingAlert";
 
 type StatefulAlertProps = {
-    children?: React.ReactNode;
+    children?: ReactNode;
     alertKey: string;
 };
 export default function StatefulAlert({ children, ...alertprops }: StatefulAlertProps & AlertProps) {
@@ -15,10 +15,10 @@ const AlertWithCloseButton = ({
     alertKey,
     ...alertProps
 }: {
-    children?: React.ReactNode;
+    children?: ReactNode;
     alertKey: string;
 } & AlertProps) => {
-    const [show, setShow] = React.useState(window.localStorage.getItem(alertKey) !== "closed");
+    const [show, setShow] = useState(window.localStorage.getItem(alertKey) !== "closed");
 
     const close = () => {
         window.localStorage.setItem(alertKey, "closed");

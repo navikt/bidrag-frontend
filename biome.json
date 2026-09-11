@@ -1,25 +1,17 @@
 {
     "files": {
-        "includes": [
-            "**",
-            "!!**/packages/api/src/api",
-            "!!apps/redigering/src/components/pdfcore/pdfjslib",
-            "!!apps/redigering/src/pages/skjemutfylling/pdfviewer.lazy.css",
-            "!!apps/redigering/src/pages/redigering/components/sidebar"
-        ]
+        "includes": ["**", "!!**/packages/api/src/api"]
     },
     "vcs": {
         "enabled": true,
         "clientKind": "git",
         "useIgnoreFile": true
     },
-
     "formatter": {
         "enabled": true,
         "lineWidth": 120,
         "useEditorconfig": true
     },
-
     "javascript": {
         "formatter": {
             "quoteStyle": "double",
