@@ -1,5 +1,5 @@
 import { Loader } from "@navikt/ds-react";
-
+import { Suspense } from "react";
 import ForsendelseSakHeader from "../forsendelse/components/ForsendelseSakHeader";
 import {
     type IOpprettForsendelseProviderProps,
@@ -14,9 +14,9 @@ export default function ({ ...otherProps }: IOpprettForsendelseProviderProps) {
             <OpprettForsendelseProvider {...otherProps}>
                 <div>
                     <ForsendelseSakHeader />
-                    <React.Suspense fallback={<LoadingIndicator />}>
+                    <Suspense fallback={<LoadingIndicator />}>
                         <OpprettNotatPage />
-                    </React.Suspense>
+                    </Suspense>
                 </div>
             </OpprettForsendelseProvider>
         </PageWrapper>
