@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-    navLogger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    navCombinedLogger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    navStandardLogger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
     secureNavLogger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
     env: { NODE_ENV: "production" },
 }));
 
-vi.mock("./navLogger", () => ({ navLogger: mocks.navLogger, secureNavLogger: mocks.secureNavLogger }));
+vi.mock("./navLogger", () => ({ navCombinedLogger: mocks.navCombinedLogger, secureNavLogger: mocks.secureNavLogger }));
 vi.mock("~/env.server.ts", () => ({ env: mocks.env }));
 
 import { action } from "./logRoute.ts";
@@ -35,7 +36,7 @@ describe("logRoute", () => {
 
     it("sender hvert nivå til riktig pino-metode", async () => {
         await kall({ level: "warn", message: "Advarsel" });
-        expect(mocks.navLogger.warn).toHaveBeenCalledWith({}, "Advarsel");
+        expect(mocks.navCombinedLogger.warn).toHaveBeenCalledWith({}, "Advarsel");
     });
 
     it("svarer 204 uten innhold", async () => {
@@ -46,15 +47,15 @@ describe("logRoute", () => {
     it("ruter secure-logg til teamloggeren", async () => {
         await kall({ level: "info", message: "Hemmelig" }, "secure");
         expect(mocks.secureNavLogger.info).toHaveBeenCalled();
-        expect(mocks.navLogger.info).not.toHaveBeenCalled();
+        expect(mocks.navCombinedLogger.info).not.toHaveBeenCalled();
     });
 
     it("Klipper og fixer ugyldig payload", async () => {
         const res = await kall({ level: "katastrofe", message: "x", hemmelig: "12345678901" });
 
         expect(res.status).toBe(204);
-        expect(mocks.navLogger.warn).toHaveBeenCalled();
-        const loggetTekst = JSON.stringify(mocks.navLogger.warn.mock.calls);
+        expect(mocks.navCombinedLogger.warn).toHaveBeenCalled();
+        const loggetTekst = JSON.stringify(mocks.navCombinedLogger.warn.mock.calls);
         expect(loggetTekst).not.toContain("12345678901");
     });
 
@@ -65,8 +66,8 @@ describe("logRoute", () => {
             context: { bruker: { fnr: "12345678901" } },
         });
         expect(res.status).toBe(204);
-        expect(mocks.navLogger.info).toHaveBeenCalled();
-        const loggetTekst = JSON.stringify(mocks.navLogger.info.mock.calls);
+        expect(mocks.navCombinedLogger.info).toHaveBeenCalled();
+        const loggetTekst = JSON.stringify(mocks.navCombinedLogger.info.mock.calls);
         expect(loggetTekst).toContain("12345678901");
     });
 
@@ -77,7 +78,7 @@ describe("logRoute", () => {
             error: { name: "TypeError", message: "x er undefined", stack: "at fn (app.js:1:2)" },
         });
 
-        const [felter, melding] = sisteKall(mocks.navLogger.error);
+        const [felter, melding] = sisteKall(mocks.navCombinedLogger.error);
         const err = felter.err as Record<string, unknown>;
         expect(melding).toBe("Det feilet");
         expect(err.name).toBe("TypeError");
@@ -98,7 +99,7 @@ describe("logRoute", () => {
             },
         });
 
-        const [felter] = sisteKall(mocks.navLogger.error);
+        const [felter] = sisteKall(mocks.navCombinedLogger.error);
         expect((felter.err as Record<string, unknown>).componentStack).toBe("    at BeløpshistorikkTabell");
         expect((felter.err as Record<string, unknown>).stack).toBe("at fn (app.js:1:2)");
     });
@@ -119,7 +120,7 @@ describe("logRoute", () => {
 
     it("logger tilbakemelding uten NAV-ident", async () => {
         await kall({ level: "info", message: "Tilbakemelding", context: { kind: "feedback" } });
-        const [felter] = sisteKall(mocks.navLogger.info);
+        const [felter] = sisteKall(mocks.navCombinedLogger.info);
         expect(felter.user).toBeUndefined();
     });
 });

@@ -14,7 +14,7 @@ vi.mock("~/env.server.ts", () => ({
     },
 }));
 vi.mock("~/server/logger/navLogger.ts", () => ({
-    navLogger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
+    navStandardLogger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
 describe("unleash.server uten konfigurasjon", () => {
