@@ -17,13 +17,14 @@
         "check:changed:write": "biome check --write --changed --since=origin/main --no-errors-on-unmatched",
         "test": "pnpm -r --if-present run test",
         "test:ct": "playwright test",
-        "test:ct:gallery": "pnpm --filter web test:ct:gallery",
+        "test:ct:ui": "playwright test --ui",
         "kill:gallery": "lsof -ti tcp:3178 | xargs kill -9 2>/dev/null || true",
         "deploy:clean": "rm -rf deploy_dist",
         "deploy:web": "pnpm --filter web --prod --legacy deploy deploy_dist",
         "deploy:docker": "pnpm run build && pnpm run deploy:clean && pnpm run deploy:web"
     },
     "devDependencies": {
+        "@axe-core/playwright": "^4.13.0",
         "@biomejs/biome": "^2.5.0",
         "@playwright/test": "^1.62.1",
         "@types/node": "^25.9.3",

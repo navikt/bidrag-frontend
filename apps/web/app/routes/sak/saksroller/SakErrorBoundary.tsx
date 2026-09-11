@@ -40,8 +40,7 @@ export default class SakErrorBoundary extends Component<Props, State> {
         return { hasError: true, error, errorInfo: null };
     }
 
-    override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        console.error("Error caught in SakErrorBoundary:", error, errorInfo);
+    override componentDidCatch(_error: Error, errorInfo: ErrorInfo) {
         this.setState({ errorInfo });
     }
 

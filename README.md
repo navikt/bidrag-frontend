@@ -298,8 +298,7 @@ Playwright component-testing, som et alternativ til Storybook. Mønsteret:
 - Playwright starter én frittstående Vite dev-server
   (`apps/web/playwright/vite.config.ts`) som samler alle `*.story.tsx`-filer
   fra BÅDE `apps/web` og `packages/common` via `import.meta.glob` i ett felles
-  "galleri" (`apps/web/playwright/gallery/`) med venstremeny — ingen
-  Storybook-avhengighet.
+  "galleri" (`apps/web/playwright/gallery/`) — ingen Storybook-avhengighet.
 - Testene mounter en story med `await mount("mappe/Fil/EksportNavn")` og
   asserter med vanlige Playwright-locators.
 
@@ -307,15 +306,17 @@ Playwright component-testing, som et alternativ til Storybook. Mønsteret:
 # Kjør alle component-tester (fra repo-roten - felles playwright.config.ts)
 pnpm test:ct
 
-# Kun én pakke
-pnpm test:ct -- --project=web
-pnpm test:ct -- --project=common
+# Filtrer på filsti ved behov
+pnpm test:ct -- apps/web
+pnpm test:ct -- packages/common
 
-# Åpne det felles story-galleriet i nettleseren for manuell utforsking
-# (viser stories fra BÅDE apps/web og @bidrag/common i én venstremeny)
-pnpm test:ct:gallery    # http://localhost:3178/playwright/gallery/browse.html
-# Uten ?story=<mappe>/<Fil>/<EksportNavn> vises en klikkbar liste over alle stories
+# Visuell inspeksjon av stories/komponenter (Playwright UI-modus)
+pnpm test:ct:ui
 ```
+
+**VS Code:** Installer den anbefalte "Playwright Test for VSCode"-extensionen
+(`ms-playwright.playwright`, se `.vscode/extensions.json`) for å kjøre og se
+enkeltstories direkte i editoren via Test Explorer-sidepanelet, uten terminal.
 
 **⚠️ Viktig mock-fallgruve:** Ikke gjenbruk appens ekte `QueryClientWrapper`
 uskodd i en story. Komponenter som leser via `BidragCommonsContext`

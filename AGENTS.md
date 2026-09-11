@@ -44,11 +44,12 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 
 ### Component-testing (Playwright CT)
 - `apps/web` og `packages/common` deler ETT story-galleri (servert fra
-  apps/web, se README) med felles venstremeny — som alternativ til Storybook.
+  apps/web, se README) — som alternativ til Storybook.
 - Mount via `await mount("mappe/Fil/EksportNavn")`, kjør alt med `pnpm test:ct`
-  (felles `playwright.config.ts` i repo-roten), eller kun én pakke med
-  `pnpm test:ct -- --project=web`/`--project=common`. Manuell utforsking i
-  nettleser: `pnpm test:ct:gallery`.
+  (felles `playwright.config.ts` i repo-roten), eller filtrer på filsti med
+  `pnpm test:ct -- apps/web`/`packages/common`. Visuell inspeksjon:
+  `pnpm test:ct:ui` eller VS Code-extensionen `ms-playwright.playwright`
+  (anbefalt i `.vscode/extensions.json`).
 - Bruk ALDRI appens ekte `QueryClientWrapper` uskodd i en story — komponenter
   som leser `useHentPersonData` via `BidragCommonsContext` er
   suspense-baserte og henger evig uten mock. Bruk en mocket provider per
