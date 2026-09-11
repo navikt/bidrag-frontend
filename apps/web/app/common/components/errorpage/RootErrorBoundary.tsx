@@ -75,7 +75,7 @@ export default class RootErrorBoundary extends Component<Props, State> {
 
         const feil = this.normaliserFeilFor(error);
 
-        //TODO kanskje legge på url eller annet som gir mer info om hvor vi var...
+        // kanskje legge på url eller annet som gir mer info om hvor vi var...
         LoggerService.error(feil.message, feil, {
             correlationId: feil.correlationId,
         });
@@ -85,7 +85,7 @@ export default class RootErrorBoundary extends Component<Props, State> {
         const error =
             "error" in this.props && this.props.error !== undefined ? this.props.error : this.state.fangetFeil;
 
-        if (error) {
+        if (error !== undefined) {
             return (
                 <QueryClientWrapper>
                     <AppLayout bruker={this.props.bruker} bisysUrl={this.props.bisysUrl}>

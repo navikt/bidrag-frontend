@@ -1,6 +1,6 @@
 import type { ProblemDetail } from "@bidrag/api";
 import { ApiError, CustomError, correlationIdHeader } from "@bidrag/common";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosHeaders } from "axios";
 import { UNSAFE_ErrorResponseImpl as ErrorResponseImpl } from "react-router";
 import { describe, expect, it } from "vitest";
 import { normaliserFeil } from "./normaliserFeil.ts";
@@ -12,7 +12,7 @@ function axiosFeil(opts: {
     correlationId?: string;
     message?: string;
 }): AxiosError<ProblemDetail> {
-    const headers = opts.correlationId ? { [correlationIdHeader]: opts.correlationId } : {};
+    const headers =  new AxiosHeaders(opts.correlationId ? { [correlationIdHeader]: opts.correlationId }: undefined )
 
     return new AxiosError(opts.message ?? "Request failed", AxiosError.ERR_BAD_RESPONSE, { headers: {} } as never, {}, {
         status: opts.status ?? 502,

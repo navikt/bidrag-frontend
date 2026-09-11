@@ -1,6 +1,6 @@
 import type { ProblemDetail } from "@bidrag/api";
 import { ApiError, CustomError, correlationIdHeader, generateCorrelationId, type LoggetFeil } from "@bidrag/common";
-import { type AxiosError, isAxiosError } from "axios";
+import { type AxiosError, type AxiosHeaders, isAxiosError } from "axios";
 import { type ErrorResponse, isRouteErrorResponse } from "react-router";
 
 export type NormalisertFeil = LoggetFeil & {
@@ -11,7 +11,8 @@ function getAxiosCorrelationId(error: unknown): string | undefined {
     if (!isAxiosError(error)) {
         return undefined;
     }
-    const correlationId = error.response?.headers[correlationIdHeader];
+    const responseHeaders = error.response?.headers as AxiosHeaders;
+    const correlationId = responseHeaders.get(correlationIdHeader);
     return typeof correlationId === "string" && correlationId ? correlationId : undefined;
 }
 

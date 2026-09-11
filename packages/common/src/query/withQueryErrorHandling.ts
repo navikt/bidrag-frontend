@@ -1,5 +1,5 @@
 import { type ProblemDetail, TilgangsFeilError } from "@bidrag/api";
-import axios, { type AxiosError } from "axios";
+import axios, { type AxiosError, type AxiosHeaders } from "axios";
 import { correlationIdHeader, SecureLoggerService } from "../logging";
 import { ApiError } from "../types";
 
@@ -40,10 +40,11 @@ export async function withQueryErrorHandling<T>(
         if (axios.isAxiosError<ProblemDetail>(error)) {
             if (error.response) {
                 const problemDetail = error.response.data;
+                const headers = error.response.headers as AxiosHeaders;
                 throw new ApiError(
                     problemDetail?.detail ?? `Feil ved kall til ${queryName}`,
                     error.stack ?? "",
-                    axiosError.response?.headers?.[correlationIdHeader] ?? null,
+                    headers.get(correlationIdHeader)?.toString(),
                     problemDetail?.status ?? error.response.status,
                     error,
                 );
