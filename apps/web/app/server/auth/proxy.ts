@@ -2,7 +2,7 @@ import { correlationIdHeader, generateCorrelationId, type LogContext } from "@bi
 import { getApiConfig } from "~/api.env.ts";
 import { authTokenContext } from "~/server/auth/auth.context.ts";
 import { hentRequestKontekst } from "~/server/logger/loggerContext.ts";
-import { navLogger } from "~/server/logger/navLogger.ts";
+import { navLogger, secureNavLogger } from "~/server/logger/navLogger.ts";
 import type { Route } from "./+types/proxy.ts";
 import { getOnBehalfOfToken } from "./auth.utils.server.ts";
 
@@ -35,9 +35,9 @@ const logErrorResponse = async (request: Request, backendResponse: Response, sub
         // Body kunne ikke leses (f.eks. allerede konsumert) - ignorer stille.
     }
     if (status >= 500) {
-        navLogger.error(logContext, logMessage);
+        secureNavLogger.error(logContext, logMessage);
     } else if (status >= 400) {
-        navLogger.warn(logContext, logMessage);
+        secureNavLogger.warn(logContext, logMessage);
     }
 };
 
