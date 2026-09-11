@@ -1,4 +1,4 @@
-import { CustomError, LoggerService, useBisysLink } from "@bidrag/common";
+import { useBisysLink } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import {
     BodyLong,
@@ -13,45 +13,17 @@ import {
     List,
     VStack,
 } from "@navikt/ds-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router";
 import styles from "./errorpage.module.css";
 import { Iskrem } from "./Iskrem";
+import type { NormalisertFeil } from "./normaliserFeil.ts";
 
 export interface ErrorPageProps {
-    error: unknown;
+    feil: NormalisertFeil;
 }
 
-export default function ErrorPage({ error }: ErrorPageProps) {
-    const [logResponse, setLogResponse] = useState<{ exceptionCode: string; status: string }>();
-
-    const errorMessage = error instanceof Error ? error.message : undefined;
-    const stackTrace = error instanceof Error ? error.stack : undefined;
-    const status = error instanceof CustomError ? error.status : 500;
-
-    useEffect(() => {
-        let cancelled = false;
-
-        LoggerService.error(errorMessage ?? "Ukjent feil", {
-            message: errorMessage ?? "Ukjent feil",
-            stack_trace: stackTrace,
-            errorType: error instanceof Error ? error.name : "UnknownError",
-            status,
-        }).then((response) => {
-            if (!cancelled) {
-                setLogResponse({ exceptionCode: response.exceptionCode, status: String(status) });
-            }
-        });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [error]);
-
-    if (!logResponse) {
-        return null;
-    }
-
+export default function ErrorPage({ feil }: ErrorPageProps) {
     return (
         <Box
             background="raised"
@@ -73,8 +45,8 @@ export default function ErrorPage({ error }: ErrorPageProps) {
                     </Heading>
                 </HStack>
                 <VStack gap="space-16" align="start" justify="center">
-                    <ErrorInfo error={errorMessage} stackTrace={stackTrace} />
-                    <ContactInformation exceptionCode={logResponse.exceptionCode} />
+                    <ErrorInfo error={feil.message} stackTrace={feil.stack} />
+                    <ContactInformation correlationId={feil.correlationId} />
                     <ButtonRow />
                 </VStack>
             </VStack>
@@ -218,12 +190,12 @@ function formatStackTrace(stackTrace?: string):
     };
 }
 
-function ContactInformation({ exceptionCode }: { exceptionCode: string }) {
+function ContactInformation({ correlationId }: { correlationId: string }) {
     return (
         <>
             <Heading size="medium">Vil du ta kontakt med brukerstøtte?</Heading>
             <Heading size="xsmall">Ved kontakt med brukerstøtte oppgi koden under:</Heading>
-            <ExceptionCode exceptionCode={exceptionCode} />
+            <CorrelationId correlationId={correlationId} />
             <div style={{ display: "flex", justifyContent: "row" }}>
                 <BodyShort size="small">
                     Vennligst lim inn koden over i feltet "Tittel", da du oppretter sak i{" "}
@@ -241,12 +213,12 @@ function ContactInformation({ exceptionCode }: { exceptionCode: string }) {
     );
 }
 
-function ExceptionCode({ exceptionCode }: { exceptionCode: string }) {
+function CorrelationId({ correlationId }: { correlationId: string }) {
     return (
         <HStack gap="space-4" align="center" justify="start">
-            <BodyShort weight="semibold">Feilkode: </BodyShort>
-            <BodyShort>{exceptionCode}</BodyShort>
-            <CopyButton size="small" copyText={exceptionCode} activeText="Kopiert" />
+            <BodyShort weight="semibold">Referanse-ID: </BodyShort>
+            <BodyShort>{correlationId}</BodyShort>
+            <CopyButton size="small" copyText={correlationId} activeText="Kopiert" />
         </HStack>
     );
 }

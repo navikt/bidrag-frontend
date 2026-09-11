@@ -691,9 +691,6 @@ importers:
       react-router:
         specifier: 'catalog:'
         version: 8.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      source-map:
-        specifier: ^0.7.6
-        version: 0.7.6
       sqids:
         specifier: ^0.3.0
         version: 0.3.0
@@ -799,9 +796,6 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@opentelemetry/api':
-        specifier: ^1.9.1
-        version: 1.9.1
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1

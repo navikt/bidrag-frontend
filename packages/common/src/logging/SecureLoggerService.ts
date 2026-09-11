@@ -1,9 +1,12 @@
-import { AbstractLoggerService } from "../service/AbstractLoggerService";
-import type { LogInfo, LogResponse } from "../types";
+import { AbstractLoggerService } from "./AbstractLoggerService.ts";
+import type { LogInfo } from "./log.types.ts";
 
 export class SecureLoggerService extends AbstractLoggerService {
-    static override log(logInfo: LogInfo, headers?: Record<string, string>): Promise<LogResponse> {
-        return fetch("/log/secure", {
+    // Sikker logg skal aldri havne i telemetri (Faro), uansett om window.faro finnes.
+    protected static override readonly rapporterTilTelemetri = false;
+
+    static override async log(logInfo: LogInfo, headers?: Record<string, string>): Promise<void> {
+        await fetch("/log/secure", {
             mode: "cors",
             cache: "no-cache",
             body: JSON.stringify(logInfo),
@@ -12,8 +15,6 @@ export class SecureLoggerService extends AbstractLoggerService {
                 ...headers,
                 "Content-type": "application/json; charset=UTF-8",
             },
-        })
-            .then((res) => res.json())
-            .catch(console.log);
+        });
     }
 }
