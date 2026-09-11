@@ -45,7 +45,7 @@ export default function ErrorPage({ feil }: ErrorPageProps) {
                     </Heading>
                 </HStack>
                 <VStack gap="space-16" align="start" justify="center">
-                    <ErrorInfo error={feil.message} stackTrace={feil.stackTrace} />
+                    <ErrorInfo error={feil.message} stackTrace={feil.stack} />
                     <ContactInformation correlationId={feil.correlationId} />
                     <ButtonRow />
                 </VStack>
