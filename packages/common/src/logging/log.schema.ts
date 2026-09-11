@@ -54,24 +54,24 @@ function normaliserContextVerdi(verdi: unknown): string | number | boolean | nul
 export function normaliserLogInfo(payload: ValidertLogInfo) {
     const context = payload.context
         ? Object.fromEntries(
-            Object.entries(payload.context)
-                .slice(0, MAKS_CONTEXT_NØKLER)
-                .map(([nøkkel, verdi]) => [nøkkel, normaliserContextVerdi(verdi)]),
-        )
+              Object.entries(payload.context)
+                  .slice(0, MAKS_CONTEXT_NØKLER)
+                  .map(([nøkkel, verdi]) => [nøkkel, normaliserContextVerdi(verdi)]),
+          )
         : payload.context;
 
     const error = payload.error
         ? {
-            ...payload.error,
-            name: kutt(payload.error.name, 200),
-            message: kutt(payload.error.message, MAKS_MELDING),
-            stack: payload.error.stack !== undefined ? kutt(payload.error.stack, MAKS_STACK) : undefined,
-            componentStack:
-                payload.error.componentStack !== undefined
-                    ? kutt(payload.error.componentStack, MAKS_STACK)
-                    : undefined,
-            cause: payload.error.cause !== undefined ? kutt(payload.error.cause, MAKS_CONTEXT_VERDI) : undefined,
-        }
+              ...payload.error,
+              name: kutt(payload.error.name, 200),
+              message: kutt(payload.error.message, MAKS_MELDING),
+              stack: payload.error.stack !== undefined ? kutt(payload.error.stack, MAKS_STACK) : undefined,
+              componentStack:
+                  payload.error.componentStack !== undefined
+                      ? kutt(payload.error.componentStack, MAKS_STACK)
+                      : undefined,
+              cause: payload.error.cause !== undefined ? kutt(payload.error.cause, MAKS_CONTEXT_VERDI) : undefined,
+          }
         : payload.error;
 
     return {

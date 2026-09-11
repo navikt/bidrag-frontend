@@ -1,4 +1,4 @@
-import { correlationIdHeader, generateCorrelationId } from "@bidrag/common";
+import { correlationIdHeader, generateCorrelationId, type LogContext } from "@bidrag/common";
 import { getApiConfig } from "~/api.env.ts";
 import { authTokenContext } from "~/server/auth/auth.context.ts";
 import { hentRequestKontekst } from "~/server/logger/loggerContext.ts";
@@ -16,6 +16,30 @@ function responseWithCorrelationId(response: Response, correlationId: string): R
         headers,
     });
 }
+
+const logErrorResponse = async (request: Request, backendResponse: Response, subPath: string, app: string) => {
+    if (backendResponse.ok) {
+        return;
+    }
+
+    const status = backendResponse.status;
+    const logContext: LogContext = { method: request.method, app, status, path: subPath };
+    const logMessage = `Proxy-kall mot ${app}: ${status}:${backendResponse.statusText}`;
+    try {
+        const clonedForLogging = backendResponse.clone();
+        const body = await clonedForLogging.text();
+        if (body) {
+            logContext.reason = body;
+        }
+    } catch {
+        // Body kunne ikke leses (f.eks. allerede konsumert) - ignorer stille.
+    }
+    if (status >= 500) {
+        navLogger.error(logContext, logMessage);
+    } else if (status >= 400) {
+        navLogger.warn(logContext, logMessage);
+    }
+};
 
 async function proxyRequest(request: Request, app: string, context: Route.LoaderArgs["context"]): Promise<Response> {
     // Middleware har allerede satt ID-en. Fallback er kun en sikring for kall utenom kjeden.
@@ -52,14 +76,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
             body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
             duplex: "half",
         } as RequestInit);
-        const status = backendResponse.status;
-        const logContext = { method: request.method, status, path: subPath };
-        const logMessage = `Proxy-kall mot ${app}: ${status}:${backendResponse.statusText}`;
-        if (status >= 500) {
-            navLogger.error(logContext, logMessage);
-        } else if (status >= 400) {
-            navLogger.warn(logContext, logMessage);
-        }
+        await logErrorResponse(request, backendResponse, subPath, app);
 
         return responseWithCorrelationId(backendResponse, correlationId);
     } catch (error) {
