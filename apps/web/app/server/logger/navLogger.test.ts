@@ -25,7 +25,7 @@ vi.mock("@navikt/pino-logger", () => ({ logger: mocks.logger }));
 vi.mock("@navikt/pino-logger/team-log", () => ({ teamLogger: mocks.teamLogger }));
 
 import { kjørMedLoggerKontekst, settBrukerPåRequestKontekst } from "./loggerContext.ts";
-import { navLogger, secureNavLogger } from "./navLogger.ts";
+import { navCombinedLogger, secureNavLogger } from "./navLogger.ts";
 
 describe("navLogger", () => {
     beforeEach(() => {
@@ -36,7 +36,7 @@ describe("navLogger", () => {
 
     it("legger på correlationId og user uten at kallstedet oppgir dem", () => {
         kjørMedLoggerKontekst({ correlationId: "ABCDE-12345", user: "Z994321" }, () => {
-            navLogger.info({ app: "bidrag-sak" }, "Hendelse");
+            navCombinedLogger.info({ app: "bidrag-sak" }, "Hendelse");
         });
 
         expect(mocks.logger.info).toHaveBeenCalledWith(
@@ -47,7 +47,7 @@ describe("navLogger", () => {
 
     it("logger til både vanlig logg og teamlogg", () => {
         kjørMedLoggerKontekst({ correlationId: "ABCDE-12345" }, () => {
-            navLogger.warn("Advarsel");
+            navCombinedLogger.warn("Advarsel");
         });
 
         expect(mocks.logger.warn).toHaveBeenCalledWith("Advarsel");
@@ -68,7 +68,7 @@ describe("navLogger", () => {
 
     it("lar eksplisitte felter overstyre ambient kontekst", () => {
         kjørMedLoggerKontekst({ correlationId: "ABCDE-12345", user: "Z994321" }, () => {
-            navLogger.info({ correlationId: "FRA-PAYLOAD", user: undefined }, "Overstyrt");
+            navCombinedLogger.info({ correlationId: "FRA-PAYLOAD", user: undefined }, "Overstyrt");
         });
 
         expect(mocks.logger.info).toHaveBeenCalledWith({ correlationId: "FRA-PAYLOAD", user: undefined }, "Overstyrt");
@@ -78,7 +78,7 @@ describe("navLogger", () => {
         const feil = new Error("Noe gikk galt");
 
         kjørMedLoggerKontekst({ correlationId: "ABCDE-12345" }, () => {
-            navLogger.error(feil);
+            navCombinedLogger.error(feil);
         });
 
         expect(mocks.logger.error).toHaveBeenCalledWith({ correlationId: "ABCDE-12345", err: feil });
@@ -86,23 +86,23 @@ describe("navLogger", () => {
 
     it("sender rene meldinger videre urørt", () => {
         kjørMedLoggerKontekst({ correlationId: "ABCDE-12345" }, () => {
-            navLogger.info("Bare en melding");
+            navCombinedLogger.info("Bare en melding");
         });
 
         expect(mocks.logger.info).toHaveBeenCalledWith("Bare en melding");
     });
 
     it("kaster ikke når det logges utenfor en request", () => {
-        navLogger.info({ app: "bidrag-sak" }, "Ved oppstart");
+        navCombinedLogger.info({ app: "bidrag-sak" }, "Ved oppstart");
 
         expect(mocks.logger.info).toHaveBeenCalledWith({ app: "bidrag-sak" }, "Ved oppstart");
     });
 
     it("tar med user som fylles inn etter at konteksten er åpnet", () => {
         kjørMedLoggerKontekst({ correlationId: "ABCDE-12345" }, () => {
-            navLogger.info({ steg: "før" }, "Før auth");
+            navCombinedLogger.info({ steg: "før" }, "Før auth");
             settBrukerPåRequestKontekst("Z994321");
-            navLogger.info({ steg: "etter" }, "Etter auth");
+            navCombinedLogger.info({ steg: "etter" }, "Etter auth");
         });
 
         expect(mocks.logger.info).toHaveBeenNthCalledWith(1, { correlationId: "ABCDE-12345", steg: "før" }, "Før auth");
@@ -117,7 +117,7 @@ describe("navLogger", () => {
         const loggEtterVent = (correlationId: string, ventetid: number) =>
             kjørMedLoggerKontekst({ correlationId }, async () => {
                 await new Promise((resolve) => setTimeout(resolve, ventetid));
-                navLogger.info({ app: "bidrag-sak" }, "Parallelt");
+                navCombinedLogger.info({ app: "bidrag-sak" }, "Parallelt");
             });
 
         await Promise.all([loggEtterVent("FØRST-00001", 10), loggEtterVent("ANDRE-00002", 1)]);
@@ -147,7 +147,7 @@ describe("navLogger — maskering av fødselsnummer", () => {
 
     it("maskerer fødselsnummer i meldingen, ikke bare i objektet", () => {
         // Den vanligste lekkasjeveien: fnr interpolert rett inn i meldingen.
-        navLogger.error(`Fant ikke person ${FNR}`);
+        navCombinedLogger.error(`Fant ikke person ${FNR}`);
 
         const [obj, melding] = mocks.logger.error.mock.calls[0] ?? [];
         expect(String(melding)).not.toContain(FNR);
@@ -155,7 +155,7 @@ describe("navLogger — maskering av fødselsnummer", () => {
     });
 
     it("maskerer fødselsnummer i både objekt og melding", () => {
-        navLogger.warn({ app: "bidrag-sak" }, `Ident ${FNR}`);
+        navCombinedLogger.warn({ app: "bidrag-sak" }, `Ident ${FNR}`);
 
         const [obj, melding] = mocks.logger.warn.mock.calls[0] ?? [];
         expect(String(melding)).not.toContain(FNR);
@@ -164,20 +164,20 @@ describe("navLogger — maskering av fødselsnummer", () => {
 
     it("maskerer fødselsnummer i en sti, der nøkkelen ikke er sensitiv", () => {
         // Proxyen logger `path: subPath`, og backend-stier kan inneholde fnr.
-        navLogger.warn({ app: "bidrag-sak", path: `/person/${FNR}` }, "Proxy-kall fullført");
+        navCombinedLogger.warn({ app: "bidrag-sak", path: `/person/${FNR}` }, "Proxy-kall fullført");
 
         const [obj] = mocks.logger.warn.mock.calls[0] ?? [];
         expect(JSON.stringify(obj)).not.toContain(FNR);
     });
 
     it("maskerer også kopien som havner i teamloggen", () => {
-        navLogger.error({ path: `/person/${FNR}` }, "Feil");
+        navCombinedLogger.error({ path: `/person/${FNR}` }, "Feil");
 
         expect(JSON.stringify(mocks.teamLogger.error.mock.calls[0])).not.toContain(FNR);
     });
 
     it("legger ikke på maskert_fnr når ingenting ble maskert", () => {
-        navLogger.info({ app: "bidrag-sak" }, "Alt i orden");
+        navCombinedLogger.info({ app: "bidrag-sak" }, "Alt i orden");
 
         expect(mocks.logger.info).toHaveBeenCalledWith({ app: "bidrag-sak" }, "Alt i orden");
     });
@@ -202,7 +202,7 @@ describe("navLogger — maskering av fødselsnummer", () => {
         mocks.logger.isLevelEnabled.mockReturnValue(false);
         mocks.teamLogger.isLevelEnabled.mockReturnValue(false);
 
-        navLogger.trace({ path: `/person/${FNR}` }, "Proxy-kall fullført");
+        navCombinedLogger.trace({ path: `/person/${FNR}` }, "Proxy-kall fullført");
 
         expect(mocks.logger.trace).not.toHaveBeenCalled();
     });

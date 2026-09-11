@@ -1,15 +1,15 @@
 import { type logInfoSchema, normalisertLogInfoSchema } from "@bidrag/common";
 import type { z } from "zod";
 import type { Route } from "./+types/logRoute.ts";
-import { navLogger, secureNavLogger } from "./navLogger";
+import { navCombinedLogger, secureNavLogger } from "./navLogger.ts";
 
-type Logger = typeof navLogger;
+type Logger = typeof navCombinedLogger;
 
 export async function action({ params, request }: Route.ActionArgs) {
     const { type } = params;
     const isSecureLog = type === "secure";
 
-    return doLog(isSecureLog ? secureNavLogger : navLogger, request);
+    return doLog(isSecureLog ? secureNavLogger : navCombinedLogger, request);
 }
 type LoggetFeilData = NonNullable<z.infer<typeof logInfoSchema>["error"]>;
 /** Gjenoppbygger en ekte Error slik at pinos `err`-serializer får riktig `type`, stack osv. */

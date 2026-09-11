@@ -2,7 +2,7 @@ import { correlationIdHeader, generateCorrelationId, type LogContext } from "@bi
 import { getApiConfig } from "~/api.env.ts";
 import { authTokenContext } from "~/server/auth/auth.context.ts";
 import { hentRequestKontekst } from "~/server/logger/loggerContext.ts";
-import { navLogger, secureNavLogger } from "~/server/logger/navLogger.ts";
+import { navCombinedLogger, navStandardLogger, secureNavLogger } from "~/server/logger/navLogger.ts";
 import type { Route } from "./+types/proxy.ts";
 import { getOnBehalfOfToken } from "./auth.utils.server.ts";
 
@@ -24,20 +24,23 @@ const logErrorResponse = async (request: Request, backendResponse: Response, sub
 
     const status = backendResponse.status;
     const logContext: LogContext = { method: request.method, app, status, path: subPath };
+    const logContextSecure: LogContext = { method: request.method, app, status, path: subPath };
     const logMessage = `Proxy-kall mot ${app}: ${status}:${backendResponse.statusText}`;
     try {
         const clonedForLogging = backendResponse.clone();
         const body = await clonedForLogging.text();
         if (body) {
-            logContext.reason = body;
+            logContextSecure.reason = body;
         }
     } catch {
         // Body kunne ikke leses (f.eks. allerede konsumert) - ignorer stille.
     }
     if (status >= 500) {
-        secureNavLogger.error(logContext, logMessage);
+        navStandardLogger.error(logContext, logMessage);
+        secureNavLogger.error(logContextSecure, logMessage);
     } else if (status >= 400) {
-        secureNavLogger.warn(logContext, logMessage);
+        navStandardLogger.warn(logContext, logMessage);
+        secureNavLogger.warn(logContextSecure, logMessage);
     }
 };
 
@@ -46,7 +49,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
     const correlationId = hentRequestKontekst().correlationId ?? generateCorrelationId();
     const authToken = context.get(authTokenContext);
     if (!authToken) {
-        navLogger.warn({ app }, "Proxy-kall avvist uten gyldig token");
+        navCombinedLogger.warn({ app }, "Proxy-kall avvist uten gyldig token");
 
         throw new Response("Unauthorized", {
             status: 401,
@@ -82,12 +85,12 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
     } catch (error) {
         // Feil før eller under backend-kallet må fortsatt kunne spores av både bruker og utvikler.
         if (error instanceof Response) {
-            navLogger.warn({ app, status: error.status }, "Proxy-kall feilet");
+            navCombinedLogger.warn({ app, status: error.status }, "Proxy-kall feilet");
 
             throw responseWithCorrelationId(error, correlationId);
         }
 
-        navLogger.error({ app, method: request.method, err: error }, "Proxy-kall feilet");
+        navCombinedLogger.error({ app, method: request.method, err: error }, "Proxy-kall feilet");
 
         throw new Response("Bad Gateway", {
             status: 502,
