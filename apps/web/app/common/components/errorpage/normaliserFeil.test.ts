@@ -12,7 +12,7 @@ function axiosFeil(opts: {
     correlationId?: string;
     message?: string;
 }): AxiosError<ProblemDetail> {
-    const headers =  new AxiosHeaders(opts.correlationId ? { [correlationIdHeader]: opts.correlationId }: undefined )
+    const headers = new AxiosHeaders(opts.correlationId ? { [correlationIdHeader]: opts.correlationId } : undefined);
 
     return new AxiosError(opts.message ?? "Request failed", AxiosError.ERR_BAD_RESPONSE, { headers: {} } as never, {}, {
         status: opts.status ?? 502,
