@@ -14,7 +14,7 @@ vi.mock("~/api.env.ts", () => ({ getApiConfig: mocks.getApiConfig }));
 vi.mock("~/server/auth/auth.context.ts", () => ({ authTokenContext: mocks.authTokenContext }));
 vi.mock("~/server/auth/auth.utils.server.ts", () => ({ getOnBehalfOfToken: mocks.getOnBehalfOfToken }));
 vi.mock("~/server/logger/navLogger.ts", () => ({
-    navLogger: { debug: mocks.debug, trace: mocks.trace, warn: mocks.warn, error: mocks.error },
+    navCombinedLogger: { debug: mocks.debug, trace: mocks.trace, warn: mocks.warn, error: mocks.error },
 }));
 
 import { kjørMedLoggerKontekst } from "~/server/logger/loggerContext.ts";

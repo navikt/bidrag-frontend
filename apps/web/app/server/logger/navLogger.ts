@@ -123,7 +123,9 @@ function lagLogger(mål: readonly Logger[], innstillinger: Innstillinger): NavLo
 }
 
 /** Logger til både vanlig logg og teamlogg. Ambient felter og fnr-maskering legges på automatisk. */
-export const navLogger = lagLogger([logger, teamLogger as Logger], { masker: true });
+export const navCombinedLogger = lagLogger([logger, teamLogger as Logger], { masker: true });
+
+export const navStandardLogger = lagLogger([logger as Logger], { masker: true });
 
 /**
  * Kun teamlogg (securelog), for innhold som ikke skal i den vanlige loggen.

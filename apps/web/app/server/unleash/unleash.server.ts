@@ -1,6 +1,6 @@
 import { destroy, initialize, type Unleash, type Variant } from "unleash-client";
 import { env } from "~/env.server.ts";
-import { navLogger } from "~/server/logger/navLogger.ts";
+import { navStandardLogger } from "~/server/logger/navLogger.ts";
 import { UNLEASH_APP_NAME, type UnleashContext } from "~/server/unleash/unleashContext.ts";
 
 export type { UnleashContext };
@@ -55,7 +55,7 @@ export function initUnleash(): Promise<Unleash | null> {
     const apiToken = env.UNLEASH_SERVER_API_TOKEN;
 
     if (!apiUrl || !apiToken) {
-        navLogger.warn(
+        navStandardLogger.warn(
             "Unleash er ikke konfigurert – alle feature toggles er av. " +
                 "Lokalt: skru flagg av/på med UNLEASH_LOCAL_TOGGLES i apps/web/.env.development",
         );
@@ -70,15 +70,15 @@ export function initUnleash(): Promise<Unleash | null> {
         customHeaders: { Authorization: apiToken },
     });
 
-    client.on("error", (error: unknown) => {
-        navLogger.error({ err: error }, "Feil fra Unleash-klienten");
+    client.on("error", (error) => {
+        navStandardLogger.warn({ err: error }, "Feil fra Unleash-klienten");
     });
 
     unleashKlient = client;
 
     isReadyPromise = new Promise<Unleash | null>((resolve) => {
         client.on("ready", () => {
-            navLogger.info("Unleash-klienten er klar");
+            navStandardLogger.debug("Unleash-klienten er klar");
             resolve(client);
         });
         // Ved feil (f.eks. Unleash utilgjengelig) faller vi tilbake til default-verdier
