@@ -1,4 +1,4 @@
-import { logInfoSchema } from "@bidrag/common";
+import { type logInfoSchema, normalisertLogInfoSchema } from "@bidrag/common";
 import type { z } from "zod";
 import type { Route } from "./+types/logRoute.ts";
 import { navLogger, secureNavLogger } from "./navLogger";
@@ -28,7 +28,8 @@ function tilError(feil: LoggetFeilData): Error {
 }
 
 async function doLog(logger: Logger, req: Request): Promise<Response> {
-    const resultat = logInfoSchema.safeParse(await req.json().catch(() => null));
+    const logRequest = await req.json().catch(() => null);
+    const resultat = normalisertLogInfoSchema.safeParse(logRequest);
 
     if (!resultat.success) {
         // Innholdet logges bevisst ikke — det er nettopp det vi ikke stoler på.

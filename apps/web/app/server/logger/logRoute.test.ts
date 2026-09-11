@@ -49,22 +49,25 @@ describe("logRoute", () => {
         expect(mocks.navLogger.info).not.toHaveBeenCalled();
     });
 
-    it("avviser ugyldig payload med 400 uten å logge innholdet", async () => {
+    it("Klipper og fixer ugyldig payload", async () => {
         const res = await kall({ level: "katastrofe", message: "x", hemmelig: "12345678901" });
 
-        expect(res.status).toBe(400);
-        expect(mocks.navLogger.error).not.toHaveBeenCalled();
+        expect(res.status).toBe(204);
+        expect(mocks.navLogger.warn).toHaveBeenCalled();
         const loggetTekst = JSON.stringify(mocks.navLogger.warn.mock.calls);
         expect(loggetTekst).not.toContain("12345678901");
     });
 
-    it("avviser context med objektverdi", async () => {
+    it("omgjør context med objektverdi", async () => {
         const res = await kall({
             level: "info",
             message: "Hendelse",
             context: { bruker: { fnr: "12345678901" } },
         });
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(204);
+        expect(mocks.navLogger.info).toHaveBeenCalled();
+        const loggetTekst = JSON.stringify(mocks.navLogger.info.mock.calls);
+        expect(loggetTekst).toContain("12345678901");
     });
 
     it("legger feilen på err slik pino forventer, inkl. stack", async () => {
