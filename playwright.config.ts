@@ -18,14 +18,8 @@ export default defineConfig({
     reporter: [["html", { open: "never" }]],
     projects: [
         {
-            name: "web",
-            testDir: "./apps/web/app",
-            testMatch: "**/*.ct.spec.ts",
-            use: galleryProjectUse,
-        },
-        {
-            name: "common",
-            testDir: "./packages/common/src",
+            name: "components",
+            testDir: ".",
             testMatch: "**/*.ct.spec.ts",
             use: galleryProjectUse,
         },
