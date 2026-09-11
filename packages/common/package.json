@@ -31,7 +31,6 @@
         "react": "catalog:"
     },
     "devDependencies": {
-        "@opentelemetry/api": "^1.9.1",
         "@playwright/test": "^1.62.1",
         "@types/lodash": "^4.14.202",
         "@types/node": "^25",

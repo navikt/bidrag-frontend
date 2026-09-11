@@ -1,4 +1,4 @@
-import type { LogErrorType } from "./types";
+import type { LogErrorType } from "./logging/log.types.ts";
 import type { IHeaderNavigationContext, IWindowAppContext, IWindowLogToServer } from "./windowTypes";
 
 declare global {

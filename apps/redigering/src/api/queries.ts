@@ -103,7 +103,6 @@ export const lastDokumenter = (
             }
         },
         select: (response) => {
-            LoggerService.info(`Hentet dokumenter ${dokumenter} og resizeToA4=${resizeToA4}.`);
             return response.data;
         },
     });

@@ -7,21 +7,22 @@ import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import { env } from "~/env.server.ts";
 import { authMiddleware } from "~/server/auth/auth.middleware.server.ts";
 import { userContext } from "~/server/context.ts";
+import { loggerMiddleware } from "~/server/logger/loggerMiddleware.ts";
 import { getNaisConfig } from "~/server/naisConfig.server.ts";
 import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts";
 import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
 import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
-import { BidragProgressbarFullScreen, type NavUser } from "@bidrag/common";
+import { BidragProgressbarFullScreen } from "@bidrag/common";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
-import ErrorPage from "~/common/components/errorpage/ErrorPage.tsx";
+import RootErrorBoundary from "~/common/components/errorpage/RootErrorBoundary.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import { UnleashContextUpdater } from "~/common/unleash/UnleashContextUpdater.tsx";
 import type { Route } from "./+types/root.ts";
 import faviconUrl from "./assets/bisys_favicon.ico";
 
-export const middleware = [authMiddleware];
+export const middleware = [loggerMiddleware, authMiddleware];
 export const clientMiddleware = [bisysParamsMiddleware];
 
 export async function loader({ context, request }: Route.LoaderArgs) {
@@ -92,7 +93,9 @@ export default function App({ loaderData }: Route.ComponentProps) {
     return (
         <QueryClientWrapper>
             <FlagProvider unleashClient={unleashClient} startClient={false}>
-                <FaroErrorBoundary fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} />}>
+                <FaroErrorBoundary
+                    fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} bisysUrl={bisysUrl} />}
+                >
                     <UnleashContextUpdater />
                     <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
                         <ClientOnly fallback={<BidragProgressbarFullScreen />}>
@@ -127,14 +130,4 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     return <RootErrorBoundary error={error} bruker={null} />;
-}
-
-function RootErrorBoundary({ error, bruker, bisysUrl }: { error: unknown; bruker: NavUser | null; bisysUrl?: string }) {
-    return (
-        <QueryClientWrapper>
-            <AppLayout bruker={bruker} bisysUrl={bisysUrl}>
-                <ErrorPage error={error} />
-            </AppLayout>
-        </QueryClientWrapper>
-    );
 }

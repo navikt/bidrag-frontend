@@ -13,13 +13,20 @@ const LENKE_STYLE = {
 } as const;
 
 /**
- * `useReturLink` bygger kun på URL-en (`useLocation`/`useSearchParams`) og er derfor trygg å
- * rendre på serveren - i motsetning til `useBisysLink`, som leser `sessionStorage` og ville gitt
- * hydration-mismatch. Vi gater derfor kun bisys-fallbacken bak `ClientOnly`, slik at tilbakelenken
- * vises med en gang (også under SSR/hydrering) når vi faktisk har et returmål, i stedet for at hele
- * knappen forsvinner helt til klienten er ferdig montert.
+ * Både `useReturLink` og `useBisysLink` leser `sessionStorage` (via `getBisysSessionParams`), som
+ * ikke finnes på serveren. Rendres de under SSR, bygger server og klient ulik `href`, og React
+ * avbryter hydreringen av treet med "some attributes of the server rendered HTML didn't match".
+ * Derfor gates hele lenken bak `ClientOnly`, slik at den først rendres når klienten er montert.
  */
 export default function BisysHeaderLink() {
+    return (
+        <ClientOnly>
+            <BisysHeaderLinkInnhold />
+        </ClientOnly>
+    );
+}
+
+function BisysHeaderLinkInnhold() {
     const returLink = useReturLink();
 
     // Når brukeren er rutet hit fra en annen side i appen, peker tilbakelenken dit i stedet for til Bisys.
@@ -31,11 +38,7 @@ export default function BisysHeaderLink() {
         );
     }
 
-    return (
-        <ClientOnly>
-            <BisysFallbackLink />
-        </ClientOnly>
-    );
+    return <BisysFallbackLink />;
 }
 
 function BisysFallbackLink() {

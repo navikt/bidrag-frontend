@@ -96,6 +96,18 @@ repo-kopiene og start en ny Copilot-økt.
 ## Grenser
 
 - Ikke logg PII (fødselsnummer, navn, adresse)
+  - `navLogger` og Faro maskerer fødselsnummer automatisk (`packages/common/src/logging/maskerFnr.ts`).
+    Dette er et **sikkerhetsnett**, ikke en tillatelse — regelen over står ved lag.
+  - Feltet `maskert_fnr` i loggen betyr at et kallsted lekket og bør rettes.
+  - `secureNavLogger` maskeres ikke. Bruk den bevisst når identer faktisk må logges.
+- Feil logges med OTel-lignende exception-felt: `navLogger` gir
+  `exception_type`/`exception_message`/`exception_stacktrace` på `err`-objektet
+  (satt via en pino `serializers.err`-utvidelse i `navLogger.ts`), `secureNavLogger`
+  gir `exception_type`/`message`/`stack_trace`. Stacktracer logges dermed både
+  server-side (Loki/teamlogg) og pushes til Faro klient-side via
+  `AbstractLoggerService` — de to er ikke gjensidig utelukkende.
+  `SecureLoggerService` rapporterer aldri til Faro, uavhengig av dette.
 - Bruk Aksel Design System-komponenter og spacing-tokens (`space-*`)
 - Ikke sett CPU-limits i Nais-manifest (kun requests)
 - Aldri hardkode tokens eller secrets
+- Bare lag kommentarer på steder der det er nødvendig for å forklare hvorfor noe gjøres på en spesiell måte. Ikke kommenter åpenbare ting.

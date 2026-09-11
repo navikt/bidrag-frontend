@@ -1,6 +1,7 @@
 import { getToken, validateToken } from "@navikt/oasis";
 import { redirect } from "react-router";
 import type { Route } from "../../../.react-router/types/app/+types/root.ts";
+import { settBrukerPåRequestKontekst } from "../logger/loggerContext.ts";
 import { authTokenContext, userContext } from "./auth.context.ts";
 import { parseToken } from "./auth.utils.server.ts";
 
@@ -29,6 +30,7 @@ export const authMiddleware: Route.MiddlewareFunction = async ({ request, contex
     const user = parseToken(token);
     context.set(userContext, user);
     context.set(authTokenContext, token);
+    settBrukerPåRequestKontekst(user.NAVident);
 
     return next();
 };
