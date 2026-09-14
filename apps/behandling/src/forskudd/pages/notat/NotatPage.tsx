@@ -3,7 +3,7 @@ import { Broadcast, numberAsString } from "@bidrag/common";
 import { FileIcon, FilePdfIcon } from "@navikt/aksel-icons";
 import { Alert, Loader, Tabs } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { Suspense, useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import text from "../../../common/constants/texts";
 import { QueryKeys, useNotat, useNotatPdf } from "../../../common/hooks/useApiData";
@@ -12,7 +12,7 @@ import { notatBroadcastName } from "../../constants/notat";
 
 type NotatProps = { behandlingId?: string; vedtakId?: string };
 export default (props: NotatProps) => {
-    const [showTab, setShowTab] = React.useState<string>("html");
+    const [showTab, setShowTab] = useState<string>("html");
     return (
         <div className="max-w-[1092px] m-auto px-6 py-6">
             <Suspense

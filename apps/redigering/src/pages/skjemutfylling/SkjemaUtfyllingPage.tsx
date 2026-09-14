@@ -14,7 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as pdfjsLib from "pdfjs-dist";
 import { AnnotationMode, type PDFDocumentProxy } from "pdfjs-dist";
 import { EventBus, PDFPageView } from "pdfjs-dist/web/pdf_viewer";
-import React, { type PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
+import { createContext, type PropsWithChildren, Suspense, useContext, useEffect, useRef, useState } from "react";
 
 import { lastDokumenter, RedigeringQueries } from "../../api/queries";
 import { useDebounce } from "../../components/hooks/useDebounce";
@@ -54,16 +54,14 @@ export const useSkjemaUtfyllingContext = () => {
     }
     return context;
 };
-export const SkjemaUtfyllingContext = React.createContext<SkjemaUtfyllingContextProps>(
-    {} as SkjemaUtfyllingContextProps,
-);
+export const SkjemaUtfyllingContext = createContext<SkjemaUtfyllingContextProps>({} as SkjemaUtfyllingContextProps);
 
 export default function SkjemaUtfyllingPage(props: SkjemaUtfyllingPageProps) {
     return (
         <PageWrapper name={"skjemautfylling"}>
-            <React.Suspense fallback={<Loader size="large"></Loader>}>
+            <Suspense fallback={<Loader size="large"></Loader>}>
                 <SkjemaUtfyllingContainer {...props} />
-            </React.Suspense>
+            </Suspense>
         </PageWrapper>
     );
 }

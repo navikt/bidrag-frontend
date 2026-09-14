@@ -2,7 +2,7 @@ import "./ForsendelsePage.css";
 
 import { Alert, BodyShort, Heading, HGrid, Loader, Page, VStack } from "@navikt/ds-react";
 import { useIsMutating } from "@tanstack/react-query";
-import React, { type PropsWithChildren, Suspense, useEffect } from "react";
+import { type PropsWithChildren, Suspense, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
@@ -133,9 +133,9 @@ function BottomButtons() {
     return (
         <div className={"mt-2 flex flex-row gap-[5px]"}>
             <SendButton />
-            <React.Suspense fallback={<Loader size="xsmall" />}>
+            <Suspense fallback={<Loader size="xsmall" />}>
                 <AvvikshandteringButton />
-            </React.Suspense>
+            </Suspense>
         </div>
     );
 }

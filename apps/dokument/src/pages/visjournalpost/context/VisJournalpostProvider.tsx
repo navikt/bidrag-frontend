@@ -1,4 +1,4 @@
-import React, { type PropsWithChildren, useContext, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import environment from "../../../environment";
@@ -26,7 +26,7 @@ export enum ApplicationViewModes {
 }
 
 export const useVisJournalpostContext = () => useContext(EnkelJournalpostContext);
-const EnkelJournalpostContext = React.createContext<EnkelJournalpostProviderProps>({} as EnkelJournalpostProviderProps);
+const EnkelJournalpostContext = createContext<EnkelJournalpostProviderProps>({} as EnkelJournalpostProviderProps);
 
 export interface UpdateJournalpostFormValues {
     tittel?: string;

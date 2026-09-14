@@ -4,7 +4,7 @@ import type { DistribuerJournalpostRequest } from "@bidrag/api/BidragForsendelse
 import { ObjectUtils } from "@bidrag/common";
 import { Alert, BodyShort, Button, ConfirmationPanel, Loader, Modal } from "@navikt/ds-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useBidragForsendelseApi, usePersonApi } from "../../../api/api";
 import { useHentPostnummere } from "../../../hooks/kodeverkQueries";
 import { useDistribusjonKanal } from "../../../hooks/useDokumentApi";
@@ -109,15 +109,15 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
         const cancelButtonDisabled = submitState === "pending" || submitState === "succesfull";
         return (
             <>
-                <React.Suspense fallback={<Loader variant="neutral" size="small" />}>
+                <Suspense fallback={<Loader variant="neutral" size="small" />}>
                     <BestillDistribusjonInfo
                         adresse={adresse}
                         editable={submitState === "idle" || submitState === "error"}
                         onEditModeChanged={setOnEditMode}
                         onAdresseChanged={setAdresse}
                     />
-                </React.Suspense>
-                <React.Suspense fallback={<div />}>
+                </Suspense>
+                <Suspense fallback={<div />}>
                     <DistribusjonKnapper
                         onSubmit={onSubmit}
                         onCancel={onCancel}
@@ -126,7 +126,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                         submitButtonDisabled={submitButtonDisabled}
                         cancelButtonDisabled={cancelButtonDisabled}
                     />
-                </React.Suspense>
+                </Suspense>
             </>
         );
     }

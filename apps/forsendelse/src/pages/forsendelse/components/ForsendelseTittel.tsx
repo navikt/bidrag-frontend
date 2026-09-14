@@ -1,7 +1,6 @@
 import "./ForsendelseTittel.css";
 
 import { Heading } from "@navikt/ds-react";
-
 import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseTittel() {
     const forsendelse = useHentForsendelseQuery();

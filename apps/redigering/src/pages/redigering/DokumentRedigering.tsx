@@ -3,7 +3,7 @@
 import "./DokumentRedigering.css";
 
 import { useDroppable } from "@dnd-kit/core";
-import React, { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, memo, useEffect, useRef, useState } from "react";
 import { type ReactZoomPanPinchRef, TransformWrapper } from "react-zoom-pan-pinch";
 
 import KeyboardShortcuts from "../../components/KeyboardShortcuts";
@@ -190,7 +190,7 @@ interface IMaskinItemPortalProps {
     scale: number;
     id: string;
 }
-const MaskinItemPortal = React.memo(({ scale, id }: IMaskinItemPortalProps) => {
+const MaskinItemPortal = memo(({ scale, id }: IMaskinItemPortalProps) => {
     const { items } = useMaskingContainer();
 
     return (
