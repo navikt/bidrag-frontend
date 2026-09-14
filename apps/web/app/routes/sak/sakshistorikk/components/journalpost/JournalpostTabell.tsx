@@ -1,6 +1,5 @@
 import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { JournalpostStatus } from "@bidrag/api/BidragDokumentApi";
-import { DokumentStatusDto } from "@bidrag/api/BidragForsendelseApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { AapneDokumentKnapp, useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
@@ -198,7 +197,7 @@ export default function JournalpostTabell({
                     <AapneDokumentKnapp
                         journalpostId={journalpostId}
                         dokumentreferanse={dok.dokumentreferanse}
-                        status={dok.status ?? undefined}
+                        status={rad.jp.status ?? undefined}
                         className="min-w-0 truncate"
                         tittel={tekst}
                     >
@@ -212,17 +211,16 @@ export default function JournalpostTabell({
         const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
         const journalpostId = rad.jp.journalpostId;
         const hoveddokRef = rad.jp.dokumenter?.[0]?.dokumentreferanse;
-        const erUnderProduksjon = rad.jp.dokumenter?.[0]?.status === DokumentStatusDto.UNDER_PRODUKSJON;
 
         if (journalpostId && hoveddokRef) {
-            const status = erUnderProduksjon ? DokumentStatusDto.UNDER_PRODUKSJON : DokumentStatusDto.FERDIGSTILT;
+            const dokStatus = rad.jp.dokumenter?.[0]?.status ?? undefined;
             return (
                 <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
                     <PaperclipIcon aria-hidden className="shrink-0 text-gray-500" />
                     <AapneDokumentKnapp
                         journalpostId={journalpostId}
                         dokumentreferanse={hoveddokRef}
-                        status={status}
+                        status={dokStatus}
                         className="min-w-0 truncate"
                         tittel={tekst}
                     >
