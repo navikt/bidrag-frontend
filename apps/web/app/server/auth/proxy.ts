@@ -39,8 +39,8 @@ const logErrorResponse = async (request: Request, backendResponse: Response, sub
         navStandardLogger.error(logContext, logMessage);
         secureNavLogger.error(logContextSecure, logMessage);
     } else if (status >= 400) {
-        navStandardLogger.warn(logContext, logMessage);
-        secureNavLogger.warn(logContextSecure, logMessage);
+        navStandardLogger.info(logContext, logMessage);
+        secureNavLogger.info(logContextSecure, logMessage);
     }
 };
 
@@ -49,7 +49,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
     const correlationId = hentRequestKontekst().correlationId ?? generateCorrelationId();
     const authToken = context.get(authTokenContext);
     if (!authToken) {
-        navCombinedLogger.warn({ app }, "Proxy-kall avvist uten gyldig token");
+        navCombinedLogger.error({ app }, "Proxy-kall avvist uten gyldig token");
 
         throw new Response("Unauthorized", {
             status: 401,
@@ -85,7 +85,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
     } catch (error) {
         // Feil før eller under backend-kallet må fortsatt kunne spores av både bruker og utvikler.
         if (error instanceof Response) {
-            navCombinedLogger.warn({ app, status: error.status }, "Proxy-kall feilet");
+            navCombinedLogger.warn({ app, status: error.status, }, "Proxy-kall feilet");
 
             throw responseWithCorrelationId(error, correlationId);
         }
