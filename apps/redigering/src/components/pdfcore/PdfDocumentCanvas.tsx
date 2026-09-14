@@ -90,7 +90,7 @@ export default function PdfDocumentCanvas(props: PropsWithChildren<CanvasProps>)
     }, [mouseMove]);
 
     const startPan = useCallback(
-        (event: MouseEvent) => {
+        (event) => {
             document.addEventListener("mousemove", mouseMove);
             document.addEventListener("mouseup", mouseUp);
             lastMousePosRef.current = { x: event.pageX, y: event.pageY };
@@ -204,7 +204,8 @@ export default function PdfDocumentCanvas(props: PropsWithChildren<CanvasProps>)
     }, [context, mousePos.x, mousePos.y, viewportTopLeft, scale]);
 
     return (
-        <div /*onMouseDown={startPan}*/ ref={canvasRef} className={props.className}>
+        // biome-ignore lint/a11y/noStaticElementInteractions: Brukes vel ikke og bør fjernes
+        <div onMouseDown={startPan} ref={canvasRef} className={props.className}>
             {props.children}
         </div>
     );

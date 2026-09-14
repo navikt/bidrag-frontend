@@ -1,7 +1,7 @@
 import "@navikt/ds-css";
 import "../../app/index.css";
 
-import { StrictMode } from "react";
+import { type ComponentType, StrictMode } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { resolve } from "./stories";
