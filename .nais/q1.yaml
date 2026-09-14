@@ -90,7 +90,7 @@ env:
   - name: BIDRAG_DOKUMENT_ARKIV_URL
     value: https://bidrag-dokument-arkiv-feature.dev-fss-pub.nais.io/bidrag-dokument-arkiv
   - name: BIDRAG_DOKUMENT_ARKIV_AUDIENCE
-    value: api://dev-gcp.bidrag.bidrag-dokument-arkiv-feature/.default
+    value: api://dev-fss.bidrag.bidrag-dokument-arkiv-feature/.default
 
   - name: FOERSTESIDEGENERATOR_URL
     value: https://foerstesidegenerator-q1.dev-fss-pub.nais.io
