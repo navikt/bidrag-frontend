@@ -22,7 +22,6 @@ export default function useFeatureToogle() {
         });
     }, [userId]);
 
-
     return {
         isEttersendingsoppgaveEnabled: enableEttersendingsoppgave,
         visDokumentmalKode: visDokumentmalKode,
