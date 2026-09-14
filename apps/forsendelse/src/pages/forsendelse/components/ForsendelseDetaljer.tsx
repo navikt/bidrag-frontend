@@ -3,7 +3,6 @@ import "./ForsendelseDetaljer.css";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { BodyLong, Label } from "@navikt/ds-react";
 import type { JSX } from "react";
-
 import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { Distribusjonskanal } from "./Distribusjonskanal";
 export default function ForsendelseDetaljer() {

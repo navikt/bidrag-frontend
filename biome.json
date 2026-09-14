@@ -27,5 +27,14 @@
             "enabled": true,
             "quoteStyle": "double"
         }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "preset": "recommended",
+            "correctness": {
+                "noUndeclaredVariables": "error"
+            }
+        }
     }
 }
