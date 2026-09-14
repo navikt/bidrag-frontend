@@ -85,7 +85,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
     } catch (error) {
         // Feil før eller under backend-kallet må fortsatt kunne spores av både bruker og utvikler.
         if (error instanceof Response) {
-            navCombinedLogger.warn({ app, status: error.status, }, "Proxy-kall feilet");
+            navCombinedLogger.warn({ app, status: error.status }, "Proxy-kall feilet");
 
             throw responseWithCorrelationId(error, correlationId);
         }
