@@ -1,8 +1,9 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
 import { useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
-import { Heading, VStack } from "@navikt/ds-react";
+import { Heading, HStack, Pagination, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
+import { useMemo, useState } from "react";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
@@ -11,14 +12,11 @@ import { NotatLink } from "./NotatLink";
 import { ResultatLink } from "./ResultatLink";
 import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
 
-export default function HendelseTabell({
-    saksnummer,
-    hendelser,
-}: {
-    saksnummer: string;
-    hendelser: SakshendelseDto[];
-}) {
+const ROWS_PER_PAGE = 5;
+
+export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string; hendelser: SakshendelseDto[] }) {
     const { sort, handleSort, sortData } = useSort<SakshendelseDto>();
+    const [page, setPage] = useState(1);
     const { bisysSessionParams } = useBisysLink();
     const { enhet, sessionState } = bisysSessionParams;
 
@@ -34,13 +32,19 @@ export default function HendelseTabell({
         : [];
 
     const sortedData = sortData(hendelser);
+    const pageCount = Math.ceil(sortedData.length / ROWS_PER_PAGE);
+    const currentPage = Math.min(page, pageCount || 1);
+    const paginatedData = useMemo(
+        () => sortedData.slice((currentPage - 1) * ROWS_PER_PAGE, currentPage * ROWS_PER_PAGE),
+        [currentPage, sortedData],
+    );
 
     return (
         <VStack gap={"space-16"}>
             <Heading size="medium">Sakslogg</Heading>
-            <VStack maxHeight="32rem" overflowY="auto">
+
                 <DataGrid
-                    data={sortedData}
+                    data={paginatedData}
                     getRowId={(h) => h.hendelseId ?? `${h.opprettetTidspunkt}-${h.type}`}
                     settings={{
                         zebraStripes: true,
@@ -133,12 +137,15 @@ export default function HendelseTabell({
                         sorting={{
                             sortOrder: sortOrder,
                             onSortOrderChange: (_, detail) => {
+                                setPage(1);
                                 handleSort(detail.columnId as Extract<keyof SakshendelseDto, string>);
                             },
                         }}
                     />
                 </DataGrid>
-            </VStack>
+            {sortedData.length > ROWS_PER_PAGE && (
+                <HStack justify={"end"}><Pagination page={currentPage} onPageChange={setPage} count={pageCount} size="small" /></HStack>
+            )}
         </VStack>
     );
 }
