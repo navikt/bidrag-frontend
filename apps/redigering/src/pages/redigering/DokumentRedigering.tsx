@@ -154,7 +154,7 @@ function PageDecorator({ pageNumber }: IPageDecoratorProps) {
         cursor: isAddNewElementMode ? "crosshair" : "default",
     };
 
-    function onClick(e: React.MouseEvent) {
+    function onClick(e: MouseEvent) {
         const { x, y } = DomUtils.getMousePosition(id, e);
         addItem(pageNumber, x / scale, y / scale - divRef.current.clientHeight);
         return;

@@ -14,7 +14,7 @@ interface GenericTableProps {
     className?: string;
 }
 
-export const ResultatDescription: React.FC<GenericTableProps> = ({ data, title, className }) => {
+export const ResultatDescription: FC<GenericTableProps> = ({ data, title, className }) => {
     const harResultat = data.some((d) => d.result);
     return (
         <div>

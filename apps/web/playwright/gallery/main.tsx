@@ -23,7 +23,7 @@ declare global {
 }
 
 window.mount = async ({ story, props }) => {
-    const Story = (await resolve(story)) as React.ComponentType<Record<string, unknown>> | undefined;
+    const Story = (await resolve(story)) as ComponentType<Record<string, unknown>> | undefined;
     if (!Story) throw new Error(`Unknown story: ${story}`);
     if (!root) root = createRoot(rootEl);
     const currentRoot = root;

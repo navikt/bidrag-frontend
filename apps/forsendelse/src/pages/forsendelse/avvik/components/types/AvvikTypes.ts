@@ -38,7 +38,7 @@ export function mapToAvvikRequest(avvik: Avvik, saksnummer: string): Avvikshende
     }
 }
 
-export const handleSubmitPreventPropagation = (handleSubmit: (e) => void) => (e: React.FormEvent) => {
+export const handleSubmitPreventPropagation = (handleSubmit: (e) => void) => (e: FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     handleSubmit(e);

@@ -6,7 +6,7 @@ import { useGetBeregningSærbidrag } from "../../../common/hooks/useApiData";
 import { dateOrNull } from "../../../utils/date-utils";
 import { formatterBeløpForBeregning } from "../../../utils/number-utils";
 
-export const UtgifsposterTable: React.FC = () => {
+export const UtgifsposterTable: FC = () => {
     const { data: beregnetSærbidrag } = useGetBeregningSærbidrag();
 
     const utgifstposter = beregnetSærbidrag.resultat.utgiftsposter;

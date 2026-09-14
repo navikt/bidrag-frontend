@@ -12,7 +12,7 @@ export default function SlettForsendelseButton() {
     const bidragForsendelseApi = useBidragForsendelseApi();
     const openModal = () => ref.current?.showModal();
     // biome-ignore lint/suspicious/noExplicitAny: Migrering
-    const closeModal = (e: React.MouseEvent<any>) => {
+    const closeModal = (e: MouseEvent<any>) => {
         e.preventDefault();
         ref.current?.close();
     };

@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-type GridProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+type GridProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
 type BidragCellProps = {
     xs?: number;

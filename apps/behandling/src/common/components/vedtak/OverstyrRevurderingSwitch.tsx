@@ -62,7 +62,7 @@ export const OverstyrFatteVedtakRevurderingSwitch = ({
     }, [erLesemodus, overstyrtFatteVedtak, begrunnelse, onValidationChange]);
 
     const handleToggle = useCallback(
-        (value: React.ChangeEvent<HTMLInputElement>) => {
+        (value: ChangeEvent<HTMLInputElement>) => {
             const nyOverstyring = value.target.checked;
             const skalFatteVedtakEtterOverstyring = nyOverstyring
                 ? !skalFatteVedtakForRevurderingsbarn
@@ -95,7 +95,7 @@ export const OverstyrFatteVedtakRevurderingSwitch = ({
     );
 
     const handleBegrunnelseChange = useCallback(
-        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        (e: ChangeEvent<HTMLTextAreaElement>) => {
             const newBegrunnelse = e.target.value;
             const trimmedBegrunnelse = newBegrunnelse.trim();
             const isInvalid = overstyrtFatteVedtak && trimmedBegrunnelse.length === 0;

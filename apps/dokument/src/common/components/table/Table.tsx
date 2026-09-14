@@ -1,6 +1,5 @@
 import { Table } from "@navikt/ds-react";
-import type React from "react";
-import type { ReactElement } from "react";
+import type { DetailedHTMLProps, HTMLAttributes, MouseEvent, ReactElement, TdHTMLAttributes } from "react";
 
 export interface ColumnData {
     label: string;
@@ -8,17 +7,13 @@ export interface ColumnData {
 }
 
 interface RowComponentType
-    extends Omit<
-        React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>,
-        "content"
-    > {
+    extends Omit<DetailedHTMLProps<TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>, "content"> {
     content: ReactElement | string;
     className?: string;
 }
 
-export interface RowData
-    extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> {
-    onClick?: (e: React.MouseEvent<HTMLTableRowElement>) => void;
+export interface RowData extends DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> {
+    onClick?: (e: MouseEvent<HTMLTableRowElement>) => void;
     components: RowComponentType[];
     isSelected?: boolean;
 }

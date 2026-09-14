@@ -72,7 +72,7 @@ export default function ForsendelseTittel() {
 //         onSuccess: (data) => onSubmit(data.tittel ?? defaultValue),
 //     });
 //
-//     function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+//     function onChange(e: ChangeEvent<HTMLInputElement>) {
 //         const value = e.target.value;
 //         setUpdatedTitle(value);
 //     }

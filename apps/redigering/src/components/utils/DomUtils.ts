@@ -1,7 +1,7 @@
-import type React from "react";
+import type { MouseEvent } from "react";
 
 export default class DomUtils {
-    static getMousePosition(id: string, e: MouseEvent | React.MouseEvent) {
+    static getMousePosition(id: string, e: MouseEvent | MouseEvent) {
         const parentElement = document.getElementById(id);
         const rect = parentElement.getBoundingClientRect();
         const x = e.clientX - rect.left;

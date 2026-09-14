@@ -7,7 +7,7 @@ type Props = {
     gjeldendeBetalingsordning?: GjeldendeBetalingsordning | null;
 };
 
-const KvTabell = ({ children }: { children: React.ReactNode }) => (
+const KvTabell = ({ children }: { children: ReactNode }) => (
     <Box
         asChild
         background="default"

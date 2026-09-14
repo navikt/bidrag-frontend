@@ -4,7 +4,7 @@ import "./Toolbar.css";
 
 import type { PropsWithChildren } from "react";
 
-const Toolbar: React.FC<PropsWithChildren<unknown>> = ({ children }) => {
+const Toolbar: FC<PropsWithChildren<unknown>> = ({ children }) => {
     return (
         <div
             className={"editor_toolbar"}

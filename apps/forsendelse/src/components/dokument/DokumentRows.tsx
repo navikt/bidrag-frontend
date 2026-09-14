@@ -239,7 +239,7 @@ function EditableDokumentTitleRow({ dokument, index }: IEditableDokumentTitleRow
         updateTitle(removeNonPrintableCharachters(value), dokument.dokumentreferanse);
     }
 
-    function onKeyDown(e: React.KeyboardEvent) {
+    function onKeyDown(e: KeyboardEvent) {
         if (e.code === "Escape") {
             setInEditMode(false);
             setIsEditingTittel(false);

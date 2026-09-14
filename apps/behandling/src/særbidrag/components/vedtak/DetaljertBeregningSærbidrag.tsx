@@ -6,7 +6,7 @@ import { useGetBehandlingV2, useGetBeregningSærbidrag } from "../../../common/h
 import { formatterBeløp } from "../../../utils/number-utils";
 import { BPsAndelUtgifter } from "./BPsAndelUtgifter";
 
-export const DetaljertBeregningSærbidrag: React.FC = () => {
+export const DetaljertBeregningSærbidrag: FC = () => {
     const { data: beregnetSærbidrag } = useGetBeregningSærbidrag();
 
     return (

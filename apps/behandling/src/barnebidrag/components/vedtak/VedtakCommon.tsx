@@ -12,8 +12,7 @@ import { dateToDDMMYYYYString, deductDays, PersonNavnIdent, RolleTag, RolleTypeA
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Alert, BodyShort, Button, Checkbox, Heading, HStack, Link, Modal, Switch, Table } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import type React from "react";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { VedtakstidspunktDisplay } from "../../../common/components/VedtakstidspunktDisplay";
 import { ResultatDescription } from "../../../common/components/vedtak/ResultatDescription";
 import text from "../../../common/constants/texts";
@@ -78,7 +77,7 @@ export const NesteIndeksår = ({ nesteIndeksår, barnId }: { nesteIndeksår?: nu
         </HStack>
     );
 };
-export const VedtakProvider = ({ children, className }: { children: React.ReactNode; className?: string }) => {
+export const VedtakProvider = ({ children, className }: { children: ReactNode; className?: string }) => {
     const [skalIndeksreguleres, setSkalIndeksreguleres] = useState<Map<string, boolean>>(new Map());
     return (
         <VedtakContext

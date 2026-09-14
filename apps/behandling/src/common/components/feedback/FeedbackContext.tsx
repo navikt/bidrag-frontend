@@ -1,5 +1,4 @@
-import type React from "react";
-import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { createContext, type FC, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import { useSendFeedback } from "./useFeedbackMutation";
 
@@ -30,7 +29,7 @@ interface FeedbackProviderProps {
     children: ReactNode;
 }
 
-export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({ children }) => {
+export const FeedbackProvider: FC<FeedbackProviderProps> = ({ children }) => {
     const [isAnswered, setIsAnswered] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const answerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

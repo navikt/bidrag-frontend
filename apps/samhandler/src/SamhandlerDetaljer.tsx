@@ -27,7 +27,7 @@ import {
     useOppdaterSamhandler,
 } from "./utils/useApiData";
 
-type InfoRowProps = { label: string; value: React.ReactNode };
+type InfoRowProps = { label: string; value: ReactNode };
 
 function InfoRow({ label, value }: InfoRowProps) {
     return (

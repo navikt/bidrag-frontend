@@ -22,7 +22,7 @@ interface CalculationTableProps {
     className?: string;
 }
 
-export const CalculationTabell: React.FC<CalculationTableProps> = ({
+export const CalculationTabell: FC<CalculationTableProps> = ({
     data,
     title,
     result,
@@ -102,7 +102,7 @@ interface MathDivisionProps {
     bottom: number | string;
 }
 
-export const MathDivision: React.FC<MathDivisionProps> = ({ negativeValue, top, bottom }) => {
+export const MathDivision: FC<MathDivisionProps> = ({ negativeValue, top, bottom }) => {
     return (
         <BodyShort as="span" size="small">
             {negativeValue && <span>-</span>}
@@ -113,7 +113,7 @@ export const MathDivision: React.FC<MathDivisionProps> = ({ negativeValue, top, 
     );
 };
 
-export const MathValue: React.FC<{ value: string | number; negativeValue?: boolean }> = ({ value, negativeValue }) => {
+export const MathValue: FC<{ value: string | number; negativeValue?: boolean }> = ({ value, negativeValue }) => {
     return (
         <BodyShort as="span" size="small">
             {negativeValue && <span>-</span>}
@@ -127,7 +127,7 @@ interface MathMultiplicationProps {
     right: string | number;
 }
 
-export const MathMultiplication: React.FC<MathMultiplicationProps> = ({ negativeValue, left, right }) => {
+export const MathMultiplication: FC<MathMultiplicationProps> = ({ negativeValue, left, right }) => {
     return (
         <BodyShort as="span" size="small">
             {negativeValue && <span>-</span>}

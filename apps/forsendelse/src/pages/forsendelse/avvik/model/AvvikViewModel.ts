@@ -5,7 +5,7 @@ import { AvvikType } from "../../../../types/AvvikTypes";
 
 type TitleSelectorFn = (metadata?: { tema: string }) => string;
 export interface AvvikViewModel {
-    IconComponent: ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
+    IconComponent: ForwardRefExoticComponent<SVGProps<SVGSVGElement>>;
     title: string | TitleSelectorFn;
     description?: string;
     metadata?: { tema: string };

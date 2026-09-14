@@ -9,8 +9,7 @@ import {
 import { deductDays, PersonNavn, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, Button, Heading, Switch, Table } from "@navikt/ds-react";
-import type React from "react";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FC } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
@@ -716,7 +715,7 @@ interface SamværsperiodeTableProps {
     onRemovePeriode: (index: number) => void;
 }
 
-const SamværsperiodeTable: React.FC<SamværsperiodeTableProps> = ({
+const SamværsperiodeTable: FC<SamværsperiodeTableProps> = ({
     editableRowIndex,
     controlledFields,
     fieldName,

@@ -7,8 +7,8 @@ export interface PdfDocumentContextProps {
     renderPageIndexes: number[];
     onPageLoaded?: (pageNumber: number, page: PDFPageProxy) => void;
     scale: number;
-    pdfEventBus?: React.MutableRefObject<EventBus>;
-    pdfViewerRef?: React.MutableRefObject<PDFViewer>;
+    pdfEventBus?: MutableRefObject<EventBus>;
+    pdfViewerRef?: MutableRefObject<PDFViewer>;
 }
 
 export const usePdfDocumentContext = () => useContext(PdfDocumentContext);

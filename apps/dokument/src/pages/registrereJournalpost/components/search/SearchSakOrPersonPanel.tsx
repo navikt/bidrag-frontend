@@ -40,7 +40,7 @@ export default function SearchSakOrPersonPanel(): ReactElement {
         setSearchValue(undefined);
     }
 
-    function onKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
         if (e.code === "Enter") {
             e.preventDefault();
             e.stopPropagation();

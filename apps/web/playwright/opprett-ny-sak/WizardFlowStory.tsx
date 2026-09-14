@@ -120,7 +120,7 @@ export function WizardPageStory() {
     return <StoryRouter content={<OpprettSakFlyt />} />;
 }
 
-function StoryRouter({ content }: { content: React.ReactNode }) {
+function StoryRouter({ content }: { content: ReactNode }) {
     const queryClient = useMemo(() => {
         const client = new QueryClient({
             defaultOptions: {

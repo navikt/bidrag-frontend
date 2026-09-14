@@ -9,7 +9,7 @@ interface Props {
 
 type FadeSlotProps = {
     visible: boolean;
-    children: React.ReactNode;
+    children: ReactNode;
 };
 
 const StatusWrapper = ({ visible, children }: FadeSlotProps) => {
