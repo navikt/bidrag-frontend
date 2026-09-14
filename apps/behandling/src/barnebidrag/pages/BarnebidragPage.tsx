@@ -1,5 +1,5 @@
 import { Alert, Heading, Provider } from "@navikt/ds-react";
-import React, { useLayoutEffect, useRef } from "react";
+import { Suspense, useLayoutEffect, useRef, useState } from "react";
 import FloatingBottomToolbar from "../../common/components/FloatingBottomToolbar/FloatingBottomToolbar";
 import { NavigationLoaderWrapper } from "../../common/components/NavigationLoaderWrapper";
 import texts from "../../common/constants/texts";
@@ -22,7 +22,7 @@ export const BarnebidragPage = () => {
     } = useGetBehandlingV2();
     const { vedtaksperre } = useFeatureToogle();
     const ref = useRef<HTMLDivElement>(null);
-    const [rootElement, setRootElement] = React.useState<HTMLDivElement | null>(null);
+    const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
 
     useLayoutEffect(() => {
         setRootElement(ref.current);
@@ -37,9 +37,9 @@ export const BarnebidragPage = () => {
                 >
                     <BarnebidragSideMenu />
                     <div className="w-full p-6 pb-32 overflow-x-scroll min-[1440px]:overflow-x-visible">
-                        <React.Suspense fallback={null}>
+                        <Suspense fallback={null}>
                             <OpprettForholdsmessigFordelingPrompt />
-                        </React.Suspense>
+                        </Suspense>
                         {erVedtakFattet && !lesemodus && (
                             <Alert variant="info" size="small" className="mb-4 w-max m-auto">
                                 <Heading level="3" size="small">

@@ -1,8 +1,7 @@
 import { type RolleDto, TypeBehandling } from "@bidrag/api/BidragBehandlingApiV1";
 import { SakHeader } from "@bidrag/common";
 import { BodyShort } from "@navikt/ds-react";
-import type React from "react";
-import { memo, useEffect, useMemo } from "react";
+import { type CSSProperties, memo, useEffect, useMemo } from "react";
 import { updateUrlSearchParam } from "../../../utils/window-utils";
 import text from "../../constants/texts";
 import { toRolleDetaljer, useBehandlingProvider } from "../../context/BehandlingContext";
@@ -26,7 +25,7 @@ const behandlingTypeTitleMapper = {
 
 type HeaderRolle = RolleDto & { visningsnavn?: string };
 
-const HeaderTittel = ({ type, style }: { type: TypeBehandling; style?: React.CSSProperties }) => {
+const HeaderTittel = ({ type, style }: { type: TypeBehandling; style?: CSSProperties }) => {
     const { forholdsmessigFordeling } = useGetBehandlingV2();
 
     return (

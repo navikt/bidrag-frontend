@@ -1,6 +1,7 @@
 import type { Avvikshendelse } from "@bidrag/api/BidragForsendelseApi";
 import { Alert, BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
+import type { MouseEvent } from "react";
 import { useRef } from "react";
 import { useBidragForsendelseApi } from "../../api/api";
 import useOnMutationSuccess from "../../hooks/useOnMutationSuccess";
@@ -12,7 +13,7 @@ export default function SlettForsendelseButton() {
     const bidragForsendelseApi = useBidragForsendelseApi();
     const openModal = () => ref.current?.showModal();
     // biome-ignore lint/suspicious/noExplicitAny: Migrering
-    const closeModal = (e: React.MouseEvent<any>) => {
+    const closeModal = (e: MouseEvent<any>) => {
         e.preventDefault();
         ref.current?.close();
     };

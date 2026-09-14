@@ -9,7 +9,7 @@ import { dateOrNull, PersonNavnIdent } from "@bidrag/common";
 import { PlusIcon } from "@navikt/aksel-icons";
 import { Alert, BodyShort, Box, Button, HStack, Label, Loader, VStack } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { AddBarnForm } from "../../../../common/components/AddBarnForm";
 import { FormControlledSwitch } from "../../../../common/components/formFields/FormControlledSwitch";
@@ -155,7 +155,7 @@ export const PrivatAvtaleAndreBarn = ({ initialValues }: { initialValues: Privat
                 )}
             </div>
             {andreBarnFieldArray.length === 0 && <BodyShort>{text.description.ingenBarn}</BodyShort>}
-            <React.Suspense
+            <Suspense
                 fallback={
                     <VStack gap="space-2" align="center">
                         <Loader size="medium" />
@@ -175,7 +175,7 @@ export const PrivatAvtaleAndreBarn = ({ initialValues }: { initialValues: Privat
                         );
                     })}
                 </VStack>
-            </React.Suspense>
+            </Suspense>
         </div>
     );
 };

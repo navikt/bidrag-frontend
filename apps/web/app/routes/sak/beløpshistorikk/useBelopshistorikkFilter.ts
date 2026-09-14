@@ -1,7 +1,7 @@
 import type { VedtakDto } from "@bidrag/api/BidragVedtakApi";
 import { parseDateQueryParam, unikeVerdier } from "@bidrag/utils";
 import { useSuspenseQueries } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 import { useLocation } from "react-router";
 import { hentVedtakQuery } from "~/api/query/vedtak.query.ts";
 import { IdentQueryParamMapper } from "~/common/filter/IdentQueryParamMapper.ts";

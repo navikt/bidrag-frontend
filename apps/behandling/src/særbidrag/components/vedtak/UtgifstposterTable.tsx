@@ -1,12 +1,13 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { Table } from "@navikt/ds-react";
+import type { FC } from "react";
 
 import tekster from "../../../common/constants/texts";
 import { useGetBeregningSærbidrag } from "../../../common/hooks/useApiData";
 import { dateOrNull } from "../../../utils/date-utils";
 import { formatterBeløpForBeregning } from "../../../utils/number-utils";
 
-export const UtgifsposterTable: React.FC = () => {
+export const UtgifsposterTable: FC = () => {
     const { data: beregnetSærbidrag } = useGetBeregningSærbidrag();
 
     const utgifstposter = beregnetSærbidrag.resultat.utgiftsposter;

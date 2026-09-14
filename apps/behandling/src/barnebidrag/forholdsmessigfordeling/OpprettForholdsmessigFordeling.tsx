@@ -9,7 +9,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, BodyShort, Button, Dialog, Heading, HStack, Loader, VStack } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 import {
     useGetBehandlingV2,
     useGetForholdsmessigFordelingDetaljer,
@@ -186,9 +186,9 @@ export default function OpprettForholdsmessigFordelingPrompt() {
                     </Dialog.Header>
 
                     <Dialog.Body className="min-w-[700px]">
-                        <React.Suspense fallback={<Loader size="medium" />}>
+                        <Suspense fallback={<Loader size="medium" />}>
                             <OpprettForholdsmessigFordelingPanelContent showAlert={false} />
-                        </React.Suspense>
+                        </Suspense>
                     </Dialog.Body>
                 </Dialog.Popup>
             </Dialog>

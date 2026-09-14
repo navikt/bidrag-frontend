@@ -1,5 +1,5 @@
 import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import React, { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";
@@ -63,9 +63,9 @@ export const Begrunnelse = () => {
 
     return (
         <>
-            <React.Suspense fallback={null}>
+            <Suspense fallback={null}>
                 <ForholdsmessigFordelingInfo />
-            </React.Suspense>
+            </Suspense>
             {!erBisysVedtak && !erAldersjusteringsVedtakstype && (
                 <FormControlledCustomTextareaEditor
                     label={text.title.begrunnelse}

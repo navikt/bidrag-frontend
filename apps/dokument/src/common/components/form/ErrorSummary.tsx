@@ -1,6 +1,5 @@
 import { ErrorSummary as ErrorSummaryDS, Link } from "@navikt/ds-react";
-import type React from "react";
-import { useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import type { DeepMap } from "react-hook-form";
 
 export interface FeiloppsummeringFeil {
@@ -35,7 +34,7 @@ export default function ErrorSummary(props: ErrorSummaryProps) {
         element?.focus();
     }
 
-    function customFeilRender(feil: FeiloppsummeringFeil): React.ReactNode {
+    function customFeilRender(feil: FeiloppsummeringFeil): ReactNode {
         return (
             <Link
                 as="span"

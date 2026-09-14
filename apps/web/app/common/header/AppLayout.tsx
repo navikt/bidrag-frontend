@@ -1,9 +1,10 @@
 import { Page } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 import type { NavUser } from "~/common/NavUser.ts";
 import { AppHeader } from "./AppHeader.tsx";
 
 interface AppLayoutProps {
-    children: React.ReactNode;
+    children: ReactNode;
     bruker: NavUser | null;
     bisysUrl?: string;
 }

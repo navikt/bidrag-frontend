@@ -25,7 +25,7 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 
 import {
@@ -58,7 +58,7 @@ export default function OpprettEttersendelseOppgaveButton() {
     if (!isEttersendingsoppgaveEnabled) return;
     if (forsendelse.gjelderIdent !== forsendelse.mottaker?.ident) return;
     return (
-        <React.Suspense fallback={<Loader size="xsmall" />}>
+        <Suspense fallback={<Loader size="xsmall" />}>
             {forsendelse.ettersendingsoppgave ? (
                 <EttersendelseOppgavePanel />
             ) : (
@@ -69,7 +69,7 @@ export default function OpprettEttersendelseOppgaveButton() {
                     <OpprettEttersendelseOppgaveModal isOpen={isOpen} setIsOpen={setIsOpen} />
                 </>
             )}
-        </React.Suspense>
+        </Suspense>
     );
 }
 
@@ -137,7 +137,7 @@ function OpprettEttersendelseOppgaveModal({
                 </Modal.Header>
                 <Modal.Body>
                     <FormProvider {...form}>
-                        <React.Suspense fallback={<Loader size="xsmall" />}>
+                        <Suspense fallback={<Loader size="xsmall" />}>
                             <EksisterendeOppgaveVarsel />
                             <VarselForJournalpostSelect />
                             {journalpostId === navAnnenSkjema && (
@@ -149,7 +149,7 @@ function OpprettEttersendelseOppgaveModal({
                                     error={form.formState?.errors?.tittel?.message}
                                 />
                             )}
-                        </React.Suspense>
+                        </Suspense>
                     </FormProvider>
                 </Modal.Body>
                 <Modal.Footer>
