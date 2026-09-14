@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type PropsWithChildren, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type CanvasProps = {
     canvasWidth: number;
@@ -90,7 +90,7 @@ export default function PdfDocumentCanvas(props: PropsWithChildren<CanvasProps>)
     }, [mouseMove]);
 
     const startPan = useCallback(
-        (event: MouseEvent<HTMLDivElement, MouseEvent>) => {
+        (event: MouseEvent) => {
             document.addEventListener("mousemove", mouseMove);
             document.addEventListener("mouseup", mouseUp);
             lastMousePosRef.current = { x: event.pageX, y: event.pageY };
@@ -204,7 +204,7 @@ export default function PdfDocumentCanvas(props: PropsWithChildren<CanvasProps>)
     }, [context, mousePos.x, mousePos.y, viewportTopLeft, scale]);
 
     return (
-        <div onMouseDown={startPan} ref={canvasRef} className={props.className}>
+        <div /*onMouseDown={startPan}*/ ref={canvasRef} className={props.className}>
             {props.children}
         </div>
     );
