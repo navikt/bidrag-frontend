@@ -1,7 +1,7 @@
 import { CheckmarkCircleIcon, XMarkOctagonIcon } from "@navikt/aksel-icons";
 import { BodyShort, Loader } from "@navikt/ds-react";
 import type { MutationStatus } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 interface Props {
     mutationStatus: MutationStatus;

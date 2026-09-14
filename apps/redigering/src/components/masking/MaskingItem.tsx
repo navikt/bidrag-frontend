@@ -5,7 +5,7 @@ import { type DragEndEvent, useDndMonitor, useDraggable } from "@dnd-kit/core";
 import { FilesIcon, TrashIcon } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
 import { Resizable } from "re-resizable";
-import { type CSSProperties, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import DomUtils from "../utils/DomUtils";
 import { useMaskingContainer } from "./MaskingContainer";
@@ -178,7 +178,7 @@ function DuplicatedMaskingItem({ id, coordinates: _coordinates, parentId, scale 
     const [currentCoordinates, setCurrentCoordinates] = useState<ICoordinates>(_coordinates);
     const { updateItemPosition, focusItem } = useMaskingContainer();
     const hasMouseMoved = useRef(false);
-    function calculateCurrentPosition(e: MouseEvent | MouseEvent) {
+    function calculateCurrentPosition(e: MouseEvent | ReactMouseEvent) {
         const parentElement = document.getElementById(parentId as string);
         const { x, y } = DomUtils.getMousePosition(parentId as string, e);
         const yRelative = y / scale - parentElement.clientHeight;
@@ -204,7 +204,7 @@ function DuplicatedMaskingItem({ id, coordinates: _coordinates, parentId, scale 
         }));
     }
 
-    function onMouseDown(e: MouseEvent) {
+    function onMouseDown(e: ReactMouseEvent<HTMLDivElement>) {
         e.stopPropagation();
         const { x, y } = calculateCurrentPosition(e);
         setCurrentCoordinates((prevState) => ({

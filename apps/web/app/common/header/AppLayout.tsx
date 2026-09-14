@@ -1,4 +1,5 @@
 import { Page } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 import type { NavUser } from "~/common/NavUser.ts";
 import { AppHeader } from "./AppHeader.tsx";
 

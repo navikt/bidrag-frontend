@@ -1,6 +1,6 @@
 import type { FatteVedtakRevurderingsbarn } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, BodyShort, Box, Heading, Switch, Textarea } from "@navikt/ds-react";
-import { useCallback, useEffect, useState } from "react";
+import { type ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useGetBehandlingV2, useGetBeregningBidrag } from "../../hooks/useApiData";
 
 interface OverstyrFatteVedtakRevurderingSwitchProps {

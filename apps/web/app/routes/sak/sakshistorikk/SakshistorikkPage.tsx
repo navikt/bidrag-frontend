@@ -1,4 +1,5 @@
 import { Box, VStack } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 import { useFinnHendelserForSak, useHentFarskapUtelukkedeJournalposter, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";

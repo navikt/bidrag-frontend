@@ -1,5 +1,5 @@
 import { BodyShort, Heading, Table } from "@navikt/ds-react";
-import type { ReactElement } from "react";
+import type { FC, ReactElement } from "react";
 
 //file:@ts-expect-error
 interface CalculationTableData {

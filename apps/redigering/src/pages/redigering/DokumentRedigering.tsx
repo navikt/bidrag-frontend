@@ -3,7 +3,7 @@
 import "./DokumentRedigering.css";
 
 import { useDroppable } from "@dnd-kit/core";
-import { type CSSProperties, memo, useEffect, useRef, useState } from "react";
+import { type CSSProperties, memo, type MouseEvent as ReactMouseEvent, useEffect, useRef, useState } from "react";
 import { type ReactZoomPanPinchRef, TransformWrapper } from "react-zoom-pan-pinch";
 
 import KeyboardShortcuts from "../../components/KeyboardShortcuts";
@@ -154,7 +154,7 @@ function PageDecorator({ pageNumber }: IPageDecoratorProps) {
         cursor: isAddNewElementMode ? "crosshair" : "default",
     };
 
-    function onClick(e: MouseEvent) {
+    function onClick(e: ReactMouseEvent<HTMLDivElement>) {
         const { x, y } = DomUtils.getMousePosition(id, e);
         addItem(pageNumber, x / scale, y / scale - divRef.current.clientHeight);
         return;

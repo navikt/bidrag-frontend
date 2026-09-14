@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from "react";
 
 type GridProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 

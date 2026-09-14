@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from "react";
 
 type ContainerProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 export default function BidragContainer({ children, ...otherProps }: PropsWithChildren<ContainerProps>) {

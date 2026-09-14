@@ -1,6 +1,6 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 import type { EventBus, PDFViewer } from "pdfjs-dist/web/pdf_viewer";
-import { createContext, useContext } from "react";
+import { createContext, type MutableRefObject, useContext } from "react";
 
 export interface PdfDocumentContextProps {
     pdfDocument: PDFDocumentProxy;

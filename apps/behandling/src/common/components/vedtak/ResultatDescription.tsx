@@ -1,5 +1,5 @@
 import { BodyShort, Heading } from "@navikt/ds-react";
-import type { ReactElement } from "react";
+import type { FC, ReactElement } from "react";
 
 interface TableData {
     label?: string | number | ReactElement;

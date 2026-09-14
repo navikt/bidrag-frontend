@@ -27,7 +27,7 @@ import {
     Switch,
     VStack,
 } from "@navikt/ds-react";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type Dispatch, Fragment, type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { Link, useSearchParams } from "react-router";
 import { ActionButtons } from "../../../../common/components/ActionButtons";

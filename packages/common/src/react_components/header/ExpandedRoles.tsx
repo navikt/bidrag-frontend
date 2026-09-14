@@ -1,6 +1,6 @@
 import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Box, Skeleton } from "@navikt/ds-react";
-import { Suspense } from "react";
+import { type CSSProperties, Suspense } from "react";
 import RolleCard from "../roller/RolleCard";
 
 export type HeaderRolle = RolleDto & { visningsnavn?: string };

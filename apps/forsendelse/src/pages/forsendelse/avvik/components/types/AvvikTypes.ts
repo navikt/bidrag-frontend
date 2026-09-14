@@ -1,4 +1,5 @@
 import type { Avvikshendelse } from "@bidrag/api/BidragForsendelseApi";
+import type { FormEvent } from "react";
 import type { UseFormRegister } from "react-hook-form";
 import { type Avvik, AvvikType } from "../../../../../types/AvvikTypes";
 

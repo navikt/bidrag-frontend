@@ -4,7 +4,7 @@ import type { DragEndEvent, DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { TrashIcon as Delete, DragVerticalIcon, EyeIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Checkbox, Modal, Table, Textarea } from "@navikt/ds-react";
-import { type CSSProperties, forwardRef, useEffect, useRef, useState } from "react";
+import { type CSSProperties, forwardRef, type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import {

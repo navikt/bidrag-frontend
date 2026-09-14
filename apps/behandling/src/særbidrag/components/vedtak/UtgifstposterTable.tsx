@@ -1,5 +1,6 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { Table } from "@navikt/ds-react";
+import type { FC } from "react";
 
 import tekster from "../../../common/constants/texts";
 import { useGetBeregningSærbidrag } from "../../../common/hooks/useApiData";

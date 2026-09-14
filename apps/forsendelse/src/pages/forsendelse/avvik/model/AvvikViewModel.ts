@@ -1,5 +1,5 @@
 import { ArrowRightLeftIcon, FileXMarkIcon } from "@navikt/aksel-icons";
-import type { ForwardRefExoticComponent } from "react";
+import type { ForwardRefExoticComponent, SVGProps } from "react";
 
 import { AvvikType } from "../../../../types/AvvikTypes";
 

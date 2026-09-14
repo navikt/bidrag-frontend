@@ -1,5 +1,6 @@
 import type { GjeldendeBetalingsordning } from "@bidrag/api/BidragReskontroApi";
 import { Box, HStack, Table } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 import { InnkrevingsseksjonKort } from "./InnkrevingsseksjonKort";
 import { belopEllerStrek, datoEllerStrek, tekstEllerStrek } from "./innkrevingsformattering";
 

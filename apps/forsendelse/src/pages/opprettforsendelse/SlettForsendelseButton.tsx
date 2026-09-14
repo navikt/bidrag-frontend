@@ -1,6 +1,7 @@
 import type { Avvikshendelse } from "@bidrag/api/BidragForsendelseApi";
 import { Alert, BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
+import type { MouseEvent } from "react";
 import { useRef } from "react";
 import { useBidragForsendelseApi } from "../../api/api";
 import useOnMutationSuccess from "../../hooks/useOnMutationSuccess";

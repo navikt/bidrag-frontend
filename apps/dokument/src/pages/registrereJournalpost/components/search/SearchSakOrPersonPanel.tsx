@@ -1,6 +1,6 @@
 import { TextField } from "@navikt/ds-react";
 import lodash from "lodash";
-import { type ChangeEvent, type ReactElement, Suspense, useRef, useState } from "react";
+import { type ChangeEvent, type KeyboardEvent, type ReactElement, Suspense, useRef, useState } from "react";
 
 import AvansertSok from "../../../../common/components/person/AvansertSok";
 import { useStartPersonOrSakSearchCallback } from "../../../../hooks/useSakApi";

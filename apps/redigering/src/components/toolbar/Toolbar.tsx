@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: wrapper only stops click propagation and has no interactive semantics of its own */
 import "./Toolbar.css";
 
-import type { PropsWithChildren } from "react";
+import type { FC, PropsWithChildren } from "react";
 
 const Toolbar: FC<PropsWithChildren<unknown>> = ({ children }) => {
     return (
