@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 /** Vite-server for Playwright-galleriet. */
 export default defineConfig({
     root: fileURLToPath(new URL("..", import.meta.url)),
+    envDir: false,
     plugins: [react(), tailwindcss()],
     resolve: {
         alias: {
