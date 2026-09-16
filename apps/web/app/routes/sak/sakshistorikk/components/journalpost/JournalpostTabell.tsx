@@ -34,7 +34,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
-import { medReturMål } from "~/common/navigation/returLink.ts";
+import { medReturMål, RETUR_PARAM, SAKSNR_PARAM } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
 import { journalstatusDisplayVerdi, standardSort } from "./journalpostUtils";
@@ -209,6 +209,7 @@ export default function JournalpostTabell({
                     dokumentreferanse={dok.dokumentreferanse}
                     status={dokStatus ?? undefined}
                     tittel={tittel}
+                    extraQueryParams={{ [RETUR_PARAM]: "sakshistorikk", [SAKSNR_PARAM]: saksnummer }}
                 >
                     {<TruncatedText tittel={tittel} />}
                 </AapneDokumentKnapp>

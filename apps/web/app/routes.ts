@@ -6,10 +6,12 @@ import redigeringroutes from "@bidrag/redigering/routes";
 import { index, layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
+    // Server routes
     route("internal/health/liveness", "./server/liveness.ts"),
     route("internal/health/readiness", "./server/readiness.ts"),
     route("log/:type?", "./server/logger/logRoute.ts"),
     route("me", "./server/meRoute.ts"),
+
     route("proxy/:app/*", "./server/auth/proxy.ts"),
     route("unleash/proxy/*", "./server/unleash/unleashProxyRoute.ts"),
     route("bisys/:target", "./routes/bisys/BisysRedirect.ts"),
