@@ -40,8 +40,6 @@ import JournalpostStatusTag from "./JournalpostStatusTag";
 import { journalstatusDisplayVerdi, standardSort } from "./journalpostUtils";
 import PersonIdentMedRolle from "./PersonIdentMedRolle";
 
-const scaledPx = (value: number) => `${value}px`;
-
 interface JournalpostRad {
     id: string;
     jp: JournalpostDto;
@@ -75,6 +73,16 @@ const erUnderProduksjon = (dok: DokumentDto) => {
         dok.status ?? DokumentStatusDto.FERDIGSTILT,
     );
 };
+function TruncatedText(props: { tittel: string; maxWith?: string }) {
+    return (
+        <HStack maxWidth={props.maxWith ?? "40ch"}>
+            <BodyShort size={"small"} truncate>
+                {props.tittel}
+            </BodyShort>
+        </HStack>
+    );
+}
+
 export default function JournalpostTabell({
     saksnummer,
     journalposter,
@@ -186,33 +194,23 @@ export default function JournalpostTabell({
         );
     };
 
-    const renderNoDocLink = (tittel: string) => {
-        return (
-            <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
-                <BodyShort size={"small"} truncate>
-                    {tittel}
-                </BodyShort>
-            </HStack>
-        );
-    };
     const renderDokumentLink = (dok: DokumentDto, tittel: string, journalpostId?: string | null) => {
         const dokStatus = dok.status;
         if (!journalpostId || !dok.dokumentreferanse) {
-            return renderNoDocLink(tittel);
+            return <TruncatedText tittel={tittel} />;
         }
         const underProduksjon = erUnderProduksjon(dok);
 
         return (
-            <HStack gap="space-2" align="center" wrap={false} style={{ maxWidth: scaledPx(390), minWidth: 0 }}>
-                {underProduksjon ? <PencilWritingIcon aria-hidden /> : <PaperclipIcon aria-hidden />}
+            <HStack gap="space-2" align="center" wrap={false}>
+                {underProduksjon ? <PencilWritingIcon aria-label="rediger" /> : <PaperclipIcon aria-label="Åpne" />}
                 <AapneDokumentKnapp
                     journalpostId={journalpostId}
                     dokumentreferanse={dok.dokumentreferanse}
                     status={dokStatus ?? undefined}
-                    className="min-w-0 truncate"
                     tittel={tittel}
                 >
-                    {tittel}
+                    {<TruncatedText tittel={tittel} />}
                 </AapneDokumentKnapp>
             </HStack>
         );
@@ -231,11 +229,11 @@ export default function JournalpostTabell({
         const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
 
         if (jp.status === JournalpostStatus.UNDER_OPPRETTELSE) {
-            return renderNoDocLink(tekst);
+            return <TruncatedText tittel={tekst} />;
         }
         const harDokumenterUnderProduksjon = jp.dokumenter?.some((dok) => erUnderProduksjon(dok));
         if (harDokumenterUnderProduksjon && antall > 1) {
-            return renderNoDocLink(tekst);
+            return <TruncatedText tittel={tekst} />;
         }
 
         const hoveddokRef = rad.jp.dokumenter?.[0];
@@ -243,24 +241,18 @@ export default function JournalpostTabell({
             return renderDokumentLink(hoveddokRef, tekst, journalpostId);
         }
 
-        return (
-            <span className="truncate" title={tekst} style={{ maxWidth: scaledPx(390), display: "inline-block" }}>
-                {tekst}
-            </span>
-        );
+        return <TruncatedText tittel={tekst} />;
     };
 
     const basisKolonner = [
         {
             id: "expand",
             header: "",
-            width: { resizable: false, value: scaledPx(54) },
             bodyCell: () => null,
         },
         harDokumenterUnderOpprettelse && {
             id: "slett",
             header: "",
-            width: { resizable: false, autoResizeOnce: true },
             bodyCell: (rad: JournalpostRad) =>
                 !rad.erVedlegg && rad.jp.status === JournalpostStatus.UNDER_OPPRETTELSE && rad.jp.journalpostId ? (
                     <Button
@@ -277,7 +269,6 @@ export default function JournalpostTabell({
         {
             id: "journalpostId",
             header: "",
-            width: { resizable: false, value: scaledPx(52) },
             bodyCell: (rad: JournalpostRad) => {
                 if (rad.erVedlegg) return null;
                 if (rad.jp.journalpostId?.startsWith("BIF")) {
@@ -303,14 +294,12 @@ export default function JournalpostTabell({
         {
             id: "dokumentType",
             header: "K",
-            width: { resizable: false, value: scaledPx(32) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : rad.jp.dokumentType),
         },
         {
             id: "dokumentDato",
             header: "Dok.dato",
-            width: { resizable: false, value: scaledPx(108) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : rad.jp.dokumentDato ? formaterDato(rad.jp.dokumentDato) : "",
@@ -318,7 +307,6 @@ export default function JournalpostTabell({
         {
             id: "journalfortDato",
             header: "Jour.dato",
-            width: { resizable: false, value: scaledPx(108) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : rad.jp.journalfortDato ? formaterDato(rad.jp.journalfortDato) : "",
@@ -326,14 +314,12 @@ export default function JournalpostTabell({
         {
             id: "journalforendeEnhet",
             header: "Enhet",
-            width: { resizable: false, value: scaledPx(74) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.journalforendeEnhet ?? "-")),
         },
         {
             id: "gjelderAktor",
             header: "Gjelder",
-            width: { resizable: false, value: scaledPx(150) },
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : <PersonIdentMedRolle gjelderAktor={rad.jp.gjelderAktor} sakRoller={sakRoller} />,
@@ -342,7 +328,6 @@ export default function JournalpostTabell({
             id: "status",
             header: "Status",
             isSortable: true,
-            width: { resizable: false, value: scaledPx(178) },
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? (
                     <span />
@@ -356,7 +341,6 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            width: { resizable: false, autoResizeOnce: true, value: scaledPx(419) },
             bodyCell: beskrivelseCelle,
         },
     ];
@@ -365,7 +349,6 @@ export default function JournalpostTabell({
         id: "fagomrade",
         header: "Fag",
         isSortable: true,
-        width: { resizable: false, value: scaledPx(60) },
         bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.fagomrade ?? "-")),
     };
 
@@ -470,7 +453,7 @@ export default function JournalpostTabell({
                     columns={columnDefinitions}
                 >
                     <DataGrid.Table<JournalpostRad>
-                        layout="fixed"
+                        layout="auto"
                         stickyHeader
                         onRowAction={(rad) => {
                             if (rad.row.erVedlegg || rad.row.vedlegg.length === 0) return null;
