@@ -5,7 +5,8 @@ export default function SakMeny({ saksnummer }: { saksnummer: string }) {
         { label: "Fogdhistorikk", href: `/sak/${saksnummer}/fogdhistorikk` },
         { label: "Beløpshistorikk", href: `/sak/${saksnummer}/belopshistorikk` },
         { label: "Sakshistorikk", href: `/sak/${saksnummer}/sakshistorikk` },
-        { label: "Reskontro", href: `/sak/${saksnummer}/reskontro` },
+        { label: "Saksreskontro", href: `/sak/${saksnummer}/reskontro` },
+        { label: "Dokumenter", href: `/sak/${saksnummer}/dokumenter` },
     ];
 
     return <SideNav items={items} ariaLabel="Sakmeny" />;
