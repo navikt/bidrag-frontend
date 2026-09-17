@@ -249,7 +249,8 @@ export default function JournalpostTabell({
         {
             id: "expand",
             header: "",
-            bodyCell: () => null,
+            sortable: false,
+            bodyCell: () => "",
         },
         harDokumenterUnderOpprettelse && {
             id: "slett",
@@ -276,9 +277,9 @@ export default function JournalpostTabell({
                     return (
                         <Link
                             href={`/sak/${saksnummer}/forsendelse/${rad.jp.journalpostId}?${jpParams()}`}
-                            aria-label="Vis journalpost"
+                            aria-label="Vis forsendelse"
                         >
-                            <TasklistSendIcon aria-hidden title="Vis journalpost" />
+                            <TasklistSendIcon aria-hidden title="Vis forsendelse" />
                         </Link>
                     );
                 }
@@ -295,7 +296,7 @@ export default function JournalpostTabell({
         {
             id: "dokumentType",
             header: "K",
-            isSortable: true,
+            isSortable: false,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : rad.jp.dokumentType),
         },
         {
@@ -308,14 +309,14 @@ export default function JournalpostTabell({
         {
             id: "journalfortDato",
             header: "Jour.dato",
-            isSortable: true,
+            isSortable: false,
             bodyCell: (rad: JournalpostRad) =>
                 rad.erVedlegg ? "" : rad.jp.journalfortDato ? formaterDato(rad.jp.journalfortDato) : "",
         },
         {
             id: "journalforendeEnhet",
             header: "Enhet",
-            isSortable: true,
+            isSortable: false,
             bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.journalforendeEnhet ?? "-")),
         },
         {
@@ -450,8 +451,10 @@ export default function JournalpostTabell({
                         rowDensity: "tight",
                         textSize: "small",
                         truncateContent: true,
+                        stickyColumns: {  end: 1 },
                     }}
                     columns={columnDefinitions}
+
                 >
                     <DataGrid.Table<JournalpostRad>
                         layout="auto"
