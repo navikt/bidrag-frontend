@@ -11,7 +11,7 @@ async function isVisible(locator: Locator) {
 }
 
 test("logger inn testbrukeren", async ({ page }) => {
-    await page.goto("/admin");
+    await page.goto("/me");
 
     if (new URL(page.url()).origin !== new URL(environment.baseUrl).origin) {
         const username = page
@@ -39,12 +39,13 @@ test("logger inn testbrukeren", async ({ page }) => {
         }
     }
 
-    await expect(page).toHaveURL(new RegExp(`^${escapeRegExp(environment.baseUrl)}/admin`), { timeout: 30_000 });
+    await expect(page).toHaveURL(`${environment.baseUrl}/me`, { timeout: 30_000 });
+
+    const meResponse = await page.request.get("/me");
+    expect(meResponse.ok(), "/me avviste den innloggede testbrukeren.").toBe(true);
+    const me = (await meResponse.json()) as { NAVident?: unknown };
+    expect(typeof me.NAVident, "/me returnerte ikke NAVident.").toBe("string");
+
     await mkdir(authDirectory, { recursive: true });
     await page.context().storageState({ path: storageStatePath });
-    await page.reload();
 });
-
-function escapeRegExp(value: string) {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}

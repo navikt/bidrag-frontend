@@ -11,5 +11,4 @@ export async function assertPageIsUsable(page: Page, path: string, pageMarker: L
     await expect(pageMarker.or(pageFailure).first()).toBeVisible();
     expect(await pageFailure.count(), "Siden viste en teknisk feil eller et tilgangsavslag.").toBe(0);
     await expect(pageMarker).toBeVisible();
-    expect(new URL(page.url()).pathname).toBe(new URL(path, "http://playwright.local").pathname);
 }

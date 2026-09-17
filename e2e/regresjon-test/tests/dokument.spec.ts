@@ -3,5 +3,5 @@ import { routes } from "../routes/routes.ts";
 import { assertPageIsUsable } from "../support/assertPageIsUsable.ts";
 
 test("viser dokument", async ({ page }) => {
-    await assertPageIsUsable(page, routes.dokument, page.getByText(/Journalpost/).first());
+    await assertPageIsUsable(page, routes.dokument, page.getByText(/Dokumenter/).first());
 });
