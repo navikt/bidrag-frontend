@@ -451,10 +451,9 @@ export default function JournalpostTabell({
                         rowDensity: "tight",
                         textSize: "small",
                         truncateContent: true,
-                        stickyColumns: {  end: 1 },
+                        stickyColumns: { end: 1 },
                     }}
                     columns={columnDefinitions}
-
                 >
                     <DataGrid.Table<JournalpostRad>
                         layout="auto"
