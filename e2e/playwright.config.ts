@@ -13,7 +13,11 @@ export default defineConfig({
     expect: {
         timeout: 20_000,
     },
-    reporter: [["list"],["junit",{outputFile:"playwright-report/junit.xml"}], ["html", { open: "never", outputFolder: "playwright-report" }]],
+    reporter: [
+        ["list"],
+        ["junit", { outputFile: "playwright-report/junit.xml" }],
+        ["html", { open: "never", outputFolder: "playwright-report" }],
+    ],
     outputDir: "test-results",
     use: {
         baseURL: environment.baseUrl,
