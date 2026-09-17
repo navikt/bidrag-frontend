@@ -59,7 +59,7 @@ function generateBisysResultatUrl(
         executeResultat: "1",
         linkTil: hendelse.link ?? "",
         saksnr: saksnummer,
-        ...(hendelse.søknadsid && { soknadId: hendelse.søknadsid }),
+        ...(hendelse.søknadsid && { soknid: hendelse.søknadsid }),
         ...(enhet && { enhet }),
         ...(sessionState && { sessionState }),
     });
