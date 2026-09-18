@@ -140,7 +140,6 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                             setPage(1);
                             handleSort(detail.columnId as Extract<keyof SakshendelseDto, string>);
                         },
-
                     }}
                 />
             </DataGrid>

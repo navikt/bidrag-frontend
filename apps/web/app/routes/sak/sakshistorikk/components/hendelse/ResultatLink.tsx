@@ -1,9 +1,9 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
-import {BodyShort, HStack, Link } from "@navikt/ds-react";
+import { BodyShort, HStack, Link } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
 
 const getResultatTekst = (hendelse: SakshendelseDto) => {
-    if (!hendelse.resultat){
+    if (!hendelse.resultat) {
         switch (hendelse.type) {
             case "INDEKSREGULERT":
             case "INDEKSREGULERT_KOMMUNE":
@@ -12,7 +12,7 @@ const getResultatTekst = (hendelse: SakshendelseDto) => {
         }
     }
     return hendelse.resultat;
-}
+};
 
 export function ResultatLink({
     saksnummer,
@@ -28,7 +28,7 @@ export function ResultatLink({
     const visINyLosning = useFlag("bisys.vedtak_lesemodus_ny_losning");
     const visIBegge = useFlag("bisys.vedtak_lesemodus_lenke_begge");
     const resultatTekst = getResultatTekst(hendelse);
-    
+
     const resultatUrl = generateResultatUrl(hendelse, enhet, sessionState, saksnummer);
     const bisysResultatUrl = generateBisysResultatUrl(hendelse, saksnummer, enhet, sessionState);
 
