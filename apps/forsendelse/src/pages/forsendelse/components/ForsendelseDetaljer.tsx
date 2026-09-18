@@ -1,10 +1,11 @@
 import "./ForsendelseDetaljer.css";
 
 import { dateToDDMMYYYYString } from "@bidrag/common";
-import { BodyLong, Label } from "@navikt/ds-react";
+import { Label } from "@navikt/ds-react";
 import type { JSX } from "react";
 import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { Distribusjonskanal } from "./Distribusjonskanal";
+
 export default function ForsendelseDetaljer() {
     const forsendelse = useHentForsendelseQuery();
 
@@ -48,12 +49,12 @@ function DetailsGrid({ rows }: DetailsColumnProps) {
     return (
         <dl className="forsendelse_description_list">
             {rows.map((row) => (
-                <BodyLong key={row.value + row.label}>
-                    <dt>
+                <div key={row.value + row.label}>
+                    <dt key={row.value + row.label}>
                         <Label>{row.label}</Label>
                     </dt>
                     <dd>{row.value}</dd>
-                </BodyLong>
+                </div>
             ))}
         </dl>
     );

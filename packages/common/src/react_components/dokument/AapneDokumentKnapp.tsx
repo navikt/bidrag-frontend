@@ -3,7 +3,7 @@ import { PencilIcon } from "@navikt/aksel-icons";
 import { Button, Link, Loader } from "@navikt/ds-react";
 import { type PropsWithChildren, useState } from "react";
 
-import { OpenDocumentUtils } from "../../utils/OpenDocumentUtils";
+import { OpenDocumentUtils } from "../../utils";
 
 const MBDOK_SPINNER_VARIGHET_MS = 5000;
 
@@ -21,8 +21,9 @@ export interface AapneDokumentKnappProps {
     className?: string;
     /** Vis en ekstra knapp for å åpne dokumentet i redigeringsverktøyet, i tillegg til vanlig åpning. */
     visRedigeringKnapp?: boolean;
+    /** Ekstra query-parametre som skal legges til lenken for å åpne dokumentet. */
+    extraQueryParams?: Record<string, string>;
 }
-
 /**
  * Felleskomponent for å åpne et dokument, uavhengig av om det ligger i en journalpost
  * (ferdigstilt/arkivert) eller fortsatt er under produksjon i mbdok.
@@ -40,12 +41,14 @@ export default function AapneDokumentKnapp({
     className,
     visRedigeringKnapp = false,
     children,
+    extraQueryParams,
 }: PropsWithChildren<AapneDokumentKnappProps>) {
     const [laster, setLaster] = useState(false);
 
     const kanÅpnesDirekte = status === DokumentStatusDto.FERDIGSTILT && Boolean(dokumentreferanse);
     const kanÅpnesMedMbdok = status === DokumentStatusDto.UNDER_REDIGERING && Boolean(dokumentreferanse);
-    const dokumentHref = `/dokument/${journalpostId}/${dokumentreferanse}?dok=${dokumentreferanse}`;
+    const extraParams = new URLSearchParams(extraQueryParams).toString();
+    const dokumentHref = `/dokument/${journalpostId}/${dokumentreferanse}?dok=${dokumentreferanse}&${extraParams}`;
 
     function åpneMedMbdok() {
         if (laster || !dokumentreferanse) return;
