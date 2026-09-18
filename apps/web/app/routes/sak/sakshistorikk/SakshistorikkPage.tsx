@@ -4,7 +4,7 @@ import { useFinnHendelserForSak, useHentFarskapUtelukkedeJournalposter, useHentJ
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SakshistorikkPage";
-import HendelseTabell from "./components/hendelse/HendelseTabell";
+import SaksLogg from "./components/hendelse/SaksLogg.tsx";
 import JournalpostTabell from "./components/journalpost/JournalpostTabell";
 
 export const handle: SakSideTittelHandle = { sakSideTittel: "Sakshistorikk" };
@@ -36,7 +36,7 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
         <VStack gap={"space-32"}>
             <title>{tabTitle}</title>
             <TabellKort>
-                <HendelseTabell saksnummer={saksnummer} hendelser={hendelser ?? []} />
+                <SaksLogg saksnummer={saksnummer} hendelser={hendelser ?? []} />
             </TabellKort>
             <TabellKort>
                 <JournalpostTabell

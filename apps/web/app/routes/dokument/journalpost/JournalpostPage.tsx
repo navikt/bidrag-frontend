@@ -11,12 +11,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function JournalpostPage({ params, loaderData }: Route.ComponentProps) {
     const { journalpostId, dokumentreferanse } = params;
     const { openInNewTab } = loaderData;
+    const documentTitle = `Journalpost - ${journalpostId}`;
 
     return (
-        <JournalpostFremviser
-            journalpostId={journalpostId}
-            dokumentreferanse={dokumentreferanse}
-            openInNewTab={openInNewTab}
-        />
+        <>
+            <title>{documentTitle}</title>
+            <JournalpostFremviser
+                journalpostId={journalpostId}
+                dokumentreferanse={dokumentreferanse}
+                openInNewTab={openInNewTab}
+            />
+        </>
     );
 }

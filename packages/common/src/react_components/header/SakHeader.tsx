@@ -311,8 +311,8 @@ export default function SakHeader(props: ISakHeaderProps) {
         // til RolleDto-baserte HeaderRolle som resten av komponenten forventer.
         const transformedProps: ISakHeaderNewProps = {
             rollerMedPersonNavn: legacyProps.roller.map(
-                (r): HeaderRolle => ({
-                    id: r.id ?? 0,
+                (r, index): HeaderRolle => ({
+                    id: r.id ?? index,
                     rolletype: r.rolleType as unknown as Rolletype,
                     ident: r.ident,
                     navn: r.navn,

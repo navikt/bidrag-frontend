@@ -22,9 +22,6 @@ export default function useFeatureToogle() {
         });
     }, [userId]);
 
-    useEffect(() => {
-        console.debug("enableEttersendingsoppgave", enableEttersendingsoppgave, "utvikler", utvikler);
-    }, [enableEttersendingsoppgave, utvikler]);
     return {
         isEttersendingsoppgaveEnabled: enableEttersendingsoppgave,
         visDokumentmalKode: visDokumentmalKode,
