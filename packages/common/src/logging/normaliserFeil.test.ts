@@ -1,7 +1,7 @@
 import type { ProblemDetail } from "@bidrag/api";
-import { ApiError, CustomError, correlationIdHeader } from "@bidrag/common";
 import { AxiosError, AxiosHeaders } from "axios";
 import { UNSAFE_ErrorResponseImpl as ErrorResponseImpl } from "react-router";
+import { ApiError, CustomError, correlationIdHeader } from "src/index.ts";
 import { describe, expect, it } from "vitest";
 import { normaliserFeil } from "./normaliserFeil.ts";
 
