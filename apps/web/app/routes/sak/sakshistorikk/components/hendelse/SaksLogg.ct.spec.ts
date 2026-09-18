@@ -23,7 +23,7 @@ test.describe("SaksLogg", () => {
         await expect(component.getByText("Klagevedtak", { exact: true })).toBeVisible();
         await expect(component.getByText("Fastsettelse")).toBeVisible();
         await expect(component.getByText("Indeksregulert")).toBeVisible();
-        await expect(component.getByText("4803", { exact: true })).toHaveCount(4);
+        await expect(component.getByText("4803", { exact: true })).toHaveCount(6);
     });
 
     test("viser skrivehandlinger for søknad og klage, samt resultatlenke for vedtak", async ({ mount, page }) => {
@@ -48,5 +48,22 @@ test.describe("SaksLogg", () => {
                 .filter({ hasText: "Indeksregulering" })
                 .getByRole("link", { name: "Indeksregulert" }),
         ).toHaveAttribute("href", /\/sak\/2024\/1234\/vedtak\/vedtak-3/);
+    });
+
+    test("viser paginering når saksloggen har mer enn seks hendelser", async ({ mount, page }) => {
+        await mockSkrivetilgang(page);
+        const component = await mount(STORY);
+
+        await expect(component.getByRole("row")).toHaveCount(7);
+        const pagination = component.getByRole("navigation");
+        await expect(pagination).toBeVisible();
+        await expect(pagination.getByRole("button", { name: "1" })).toBeVisible();
+        await expect(pagination.getByRole("button", { name: "2" })).toBeVisible();
+        await expect(component.getByText("Endring fra bidragsmottaker")).toHaveCount(0);
+
+        await pagination.getByRole("button", { name: "2" }).click();
+
+        await expect(component.getByText("Endring fra bidragsmottaker")).toBeVisible();
+        await expect(component.getByText("Sak avsluttet")).toHaveCount(0);
     });
 });

@@ -63,6 +63,28 @@ const hendelser: SakshendelseDto[] = [
         resultat: "Klage behandlet",
         erKlageberettigetVedtak: true,
     }),
+    hendelse({
+        hendelseId: "hendelse-revurdering",
+        opprettetTidspunkt: "2024-05-14T12:00:00Z",
+        type: HendelseType.REVURDERING_BM,
+        typeBeskrivelse: "Revurdering fra bidragsmottaker",
+        resultat: "Under behandling",
+    }),
+    hendelse({
+        hendelseId: "hendelse-avsluttet",
+        opprettetTidspunkt: "2024-05-15T12:00:00Z",
+        type: HendelseType.AVSLUTTET,
+        typeBeskrivelse: "Sak avsluttet",
+        resultat: "Avsluttet",
+        erLukket: true,
+    }),
+    hendelse({
+        hendelseId: "hendelse-endring",
+        opprettetTidspunkt: "2024-05-16T12:00:00Z",
+        type: HendelseType.ENDRING_BM,
+        typeBeskrivelse: "Endring fra bidragsmottaker",
+        resultat: "Registrert",
+    }),
 ];
 
 function StoryWrapper({ children }: PropsWithChildren) {

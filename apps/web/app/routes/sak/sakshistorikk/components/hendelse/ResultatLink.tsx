@@ -32,7 +32,7 @@ export function ResultatLink({
     const resultatUrl = generateResultatUrl(hendelse, enhet, sessionState, saksnummer);
     const bisysResultatUrl = generateBisysResultatUrl(hendelse, saksnummer, enhet, sessionState);
 
-    if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
+    if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl && hendelse.link) {
         return (
             <HStack gap={"space-12"}>
                 <Link href={bisysResultatUrl}>{resultatTekst}*</Link>
@@ -51,7 +51,7 @@ export function ResultatLink({
         return <Link href={resultatUrl}>{resultatTekst}</Link>;
     }
 
-    if (hendelse.resultatIBisys) {
+    if (hendelse.resultatIBisys && hendelse.link) {
         return <Link href={bisysResultatUrl}>{resultatTekst}*</Link>;
     }
 
