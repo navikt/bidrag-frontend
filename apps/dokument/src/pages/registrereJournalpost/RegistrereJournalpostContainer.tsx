@@ -1,9 +1,9 @@
 import "./RegistrereJournalpostContainer.css";
 
+import { normaliserFeil } from "@bidrag/common";
 import { Button, HGrid, Page, VStack } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-
 import Avvikshandtering from "../../common/components/avvik/Avvikshandtering";
 import ErrorSummary from "../../common/components/form/ErrorSummary";
 import environment from "../../environment";
@@ -24,6 +24,15 @@ function RegistrereJournalpostContainer() {
     } = useAppContext();
     const journalpost = useHentJournalpost();
     const { setError } = useAppContext();
+    const onJournalpostError = (error: Error) => {
+        const feil = normaliserFeil(error);
+        // throw error
+        methods.setError( "journalpostId", {
+            type: `${feil.status ?? 500}`,
+            message: `Journalposten kunne ikke oppdateres ${feil.message}`,
+        });
+        // setError(`Journalposten kunne ikke oppdateres ${feil.message}`, "Feil ved registrering av journalpost");
+    };
     const registrerJournalpost = useRegistrerJournalpostMutation();
     const [waitingForRegisterJournalpost, setWaitingForRegisterJournalpost] = useState(false);
 
@@ -48,7 +57,7 @@ function RegistrereJournalpostContainer() {
         methods.register("journalforendeEnhet");
     }, []);
 
-    function onSubmit(data: JournalpostToRegister) {
+    async function onSubmit(data: JournalpostToRegister) {
         environment.system.isDevelopment && console.log("JournalpostToRegister form data", data);
         const journalpostToRegisterDTO = mapToReqistrerJournalpostRequest(
             journalpost.journalfortDato,
@@ -56,8 +65,10 @@ function RegistrereJournalpostContainer() {
             journalpost.fagomrade,
         );
         setWaitingForRegisterJournalpost(true);
-        registrerJournalpost
+
+        await registrerJournalpost
             .mutateAsync({ journalpostId: data.journalpostId, påloggetEnhet, journalpost: journalpostToRegisterDTO })
+            .catch((error) => onJournalpostError(error))
             .finally(() => setWaitingForRegisterJournalpost(false));
     }
 
