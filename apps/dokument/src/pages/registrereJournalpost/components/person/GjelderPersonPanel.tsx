@@ -1,7 +1,7 @@
 import { Alert, Heading, Loader } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
 import _ from "lodash";
-import React, { type MutableRefObject, type ReactElement, useCallback, useEffect, useRef } from "react";
+import { type MutableRefObject, type ReactElement, Suspense, useCallback, useEffect, useRef } from "react";
 
 import useRegisterField from "../../../../common/components/form/hooks/useRegisterField";
 import Gjelder from "../../../../common/components/person/Gjelder";
@@ -20,9 +20,9 @@ export default function GjelderPersonPanel(): ReactElement {
         <div className={"gjelder-person-panel"} id={"gjelderPersonPanel"}>
             <Heading size="medium">Gjelder</Heading>
 
-            <React.Suspense fallback={<Loader title={"Laster person eller sak"} />}>
+            <Suspense fallback={<Loader title={"Laster person eller sak"} />}>
                 <GjelderPersonForm person={person} />
-            </React.Suspense>
+            </Suspense>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import { BodyShort, TextField } from "@navikt/ds-react";
-import type React from "react";
+import type { ChangeEvent } from "react";
 import { useController, useFormContext } from "react-hook-form";
 
 import { useBehandlingProvider } from "../../context/BehandlingContext";
@@ -42,7 +42,7 @@ export const FormControlledTextField = ({
         maxFractionDigits = fractionalStep ? fractionalStep.length : 0;
     }
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         clearErrors(name);
         if (["numeric", "decimal"].includes(inputMode) && e.target.value === "") {
             field.onChange(0);

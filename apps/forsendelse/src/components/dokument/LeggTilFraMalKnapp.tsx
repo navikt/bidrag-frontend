@@ -2,7 +2,7 @@ import "./LeggTilDokumentButton.css";
 
 import { PlusIcon as Add } from "@navikt/aksel-icons";
 import { Button, Loader, Modal } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
@@ -83,9 +83,9 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                             overflowY: "auto",
                         }}
                     >
-                        <React.Suspense fallback={<Loader size={"medium"} />}>
+                        <Suspense fallback={<Loader size={"medium"} />}>
                             <DokumentValgForsendelse showLegend={false} />
-                        </React.Suspense>
+                        </Suspense>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="small" type="submit">

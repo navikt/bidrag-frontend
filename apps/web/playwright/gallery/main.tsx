@@ -1,7 +1,7 @@
 import "@navikt/ds-css";
 import "../../app/index.css";
 
-import { StrictMode } from "react";
+import { type ComponentType, StrictMode } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { resolve } from "./stories";
@@ -23,7 +23,7 @@ declare global {
 }
 
 window.mount = async ({ story, props }) => {
-    const Story = (await resolve(story)) as React.ComponentType<Record<string, unknown>> | undefined;
+    const Story = (await resolve(story)) as ComponentType<Record<string, unknown>> | undefined;
     if (!Story) throw new Error(`Unknown story: ${story}`);
     if (!root) root = createRoot(rootEl);
     const currentRoot = root;

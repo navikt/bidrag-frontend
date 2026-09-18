@@ -3,7 +3,7 @@ import { MDXProvider, useMDXComponents } from "@mdx-js/react";
 import { BodyShort, Heading, Skeleton } from "@navikt/ds-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useThemedStylesWithMdx } from "@theme-ui/mdx";
-import React, { type PropsWithChildren } from "react";
+import { type PropsWithChildren, Suspense } from "react";
 import { ThemeUIProvider } from "theme-ui";
 
 const mdxComponents = { Heading, BodyShort };
@@ -29,9 +29,9 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
         <ThemeUIProvider theme={bidragMDXTheme}>
             <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>
                 <QueryClientProvider client={queryClient}>
-                    <React.Suspense fallback={<LoadingIndicatorSkeleton />}>
+                    <Suspense fallback={<LoadingIndicatorSkeleton />}>
                         <div className={`${name} bidrag-dokument-redigering-ui`}>{children}</div>
-                    </React.Suspense>
+                    </Suspense>
                 </QueryClientProvider>
             </MDXProvider>
         </ThemeUIProvider>

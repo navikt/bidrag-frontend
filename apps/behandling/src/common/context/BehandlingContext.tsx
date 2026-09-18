@@ -9,7 +9,7 @@ import type { IRolleDetaljer, RolleTypeAbbreviation } from "@bidrag/common";
 import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
 import { Button, Heading } from "@navikt/ds-react";
 import { useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
-import React, {
+import {
     createContext,
     type Dispatch,
     type PropsWithChildren,
@@ -97,9 +97,9 @@ interface IBehandlingContext {
     setSelectedRoller: Dispatch<SetStateAction<IRolleDetaljer[]>>;
     onStepChange: (x: number, query?: Record<string, string>, hash?: string) => void;
     pendingTransitionState: boolean;
-    setDebouncing: React.Dispatch<React.SetStateAction<boolean>>;
-    setMutating: React.Dispatch<React.SetStateAction<boolean>>;
-    setBeregnetGebyrErEndret: React.Dispatch<React.SetStateAction<boolean>>;
+    setDebouncing: Dispatch<SetStateAction<boolean>>;
+    setMutating: Dispatch<SetStateAction<boolean>>;
+    setBeregnetGebyrErEndret: Dispatch<SetStateAction<boolean>>;
     onNavigateToTab: (nextTab: string) => void;
     sideMenu: {
         step: stepDef;
@@ -363,7 +363,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     const mutationStatus = useMutationStatus(behandlingId);
     const [debouncing, setDebouncingState] = useState<boolean>(false);
     const debouncingRef = useRef(false);
-    const setDebouncing = useCallback<React.Dispatch<React.SetStateAction<boolean>>>((value) => {
+    const setDebouncing = useCallback<Dispatch<SetStateAction<boolean>>>((value) => {
         const nextValue = typeof value === "function" ? value(debouncingRef.current) : value;
         debouncingRef.current = nextValue;
         setDebouncingState(nextValue);
@@ -615,7 +615,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         ],
     );
 
-    const value = React.useMemo(
+    const value = useMemo(
         () => ({
             activeStep,
             behandlingId,
