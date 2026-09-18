@@ -27,7 +27,7 @@ function RegistrereJournalpostContainer() {
     const onJournalpostError = (error: Error) => {
         const feil = normaliserFeil(error);
         // throw error
-        methods.setError( "journalpostId", {
+        methods.setError("journalpostId", {
             type: `${feil.status ?? 500}`,
             message: `Journalposten kunne ikke oppdateres ${feil.message}`,
         });
