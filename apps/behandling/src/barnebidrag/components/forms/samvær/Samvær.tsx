@@ -231,6 +231,7 @@ const Main = () => {
         selectedRoller,
         selectedSaksnummer,
     } = useBehandlingProvider();
+    const {virkningstidspunktV3} = useGetBehandlingV2()
     const mergeSamværMutation = useOnMergeSamvær();
     const ref = useRef<HTMLDialogElement>(null);
     const visibleSamværBarn = useMemo(() => {
@@ -275,7 +276,8 @@ const Main = () => {
         selectedTabId: selectedTab,
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
-
+    const erVirkningLikForAlleRoller =virkningstidspunktV3.erLikForAlleBasertPåSak
+    .find((sak) => selectedSaksnummer === sak.saksnummer)?.erLikForAlle ?? false
     return (
         <div>
             <ConfirmationModal
@@ -299,7 +301,7 @@ const Main = () => {
                     </>
                 }
             />
-            {visibleSamværBarn.length > 1 && (
+            {visibleSamværBarn.length > 1 && erVirkningLikForAlleRoller && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
