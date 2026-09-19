@@ -276,7 +276,7 @@ const Main = () => {
         selectedTabId: selectedTab,
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
-    const erVirkningLikForAlleRoller =virkningstidspunktV3.erVirkningstidspunktLiktForAlleSaker
+    const erVirkningLikForAlleRoller =virkningstidspunktV3.erLikForAlleBasertPåSak
     .find((sak) => selectedSaksnummer === sak.saksnummer)?.erLikForAlle ?? false
     return (
         <div>
