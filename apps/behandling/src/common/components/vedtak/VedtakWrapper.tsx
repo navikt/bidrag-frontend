@@ -454,6 +454,55 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                         ),
                     );
 
+                if (value.forpleining)
+                    feilliste.push(
+                        FeilmeldingComponent(
+                            underholdSaksnummer,
+                            <ErrorSummary.Item
+                                onClick={() =>
+                                    onStepChange(
+                                        steps.underholdskostnad,
+                                        medSaksnummer(
+                                            {
+                                                [behandlingQueryKeys.tab]:
+                                                    toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                            },
+                                            underholdSaksnummer,
+                                        ),
+                                        `${elementIds.seksjon_underholdskostnad_forpleining}`,
+                                    )
+                                }
+                            >
+                                Underholdskostnad: Ugyldig perioder i forpleining for barn {value.gjelderBarn.navn}
+                            </ErrorSummary.Item>,
+                        ),
+                    );
+
+                if (value.forpleiningOverstigerUnderholdskostnad.length > 0)
+                    feilliste.push(
+                        FeilmeldingComponent(
+                            underholdSaksnummer,
+                            <ErrorSummary.Item
+                                onClick={() =>
+                                    onStepChange(
+                                        steps.underholdskostnad,
+                                        medSaksnummer(
+                                            {
+                                                [behandlingQueryKeys.tab]:
+                                                    toUnderholdskostnadTabQueryParameterForUnderhold(value),
+                                            },
+                                            underholdSaksnummer,
+                                        ),
+                                        `${elementIds.seksjon_underholdskostnad_forpleining}`,
+                                    )
+                                }
+                            >
+                                Underholdskostnad: Forpleining overstiger underholdskostnaden for barn{" "}
+                                {value.gjelderBarn.navn}
+                            </ErrorSummary.Item>,
+                        ),
+                    );
+
                 if (value.manglerBegrunnelse && value.gjelderBarn.medIBehandlingen)
                     feilliste.push(
                         FeilmeldingComponent(

@@ -33,10 +33,11 @@ import type {
 } from "../../../types/underholdskostnadFormValues";
 import { transformUnderholdskostnadPeriode } from "../helpers/UnderholdskostnadFormHelpers";
 
-const fieldNameToSletteUnderholdselementTypeEnum = {
+export const fieldNameToSletteUnderholdselementTypeEnum = {
     stønadTilBarnetilsyn: SletteUnderholdselementTypeEnum.STONADTILBARNETILSYN,
     faktiskTilsynsutgift: SletteUnderholdselementTypeEnum.FAKTISK_TILSYNSUTGIFT,
     tilleggsstønad: SletteUnderholdselementTypeEnum.TILLEGGSSTONAD,
+    forpleining: SletteUnderholdselementTypeEnum.FORPLEINING,
 };
 
 type UnderholdskostnadTableChildrenProps = {
@@ -113,7 +114,8 @@ export const UnderholdskostnadTabel = ({
         const transformedUpdatedPerioder = updatedPerioder.map(transformUnderholdskostnadPeriode) as
             | StønadTilBarnetilsynPeriode[]
             | FaktiskTilsynsutgiftPeriode[]
-            | TilleggsstonadPeriode[];
+            | TilleggsstonadPeriode[]
+            | ForpleiningPeriode[];
         setValue(fieldName, transformedUpdatedPerioder);
     };
 

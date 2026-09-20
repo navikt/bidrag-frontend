@@ -5,6 +5,7 @@ import LeggTilPeriodeButton from "../../../../common/components/formFields/FormL
 import elementId from "../../../../common/constants/elementIds";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
+import { useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { formatterBeløp } from "../../../../utils/number-utils";
 import { useOnSaveForpleining } from "../../../hooks/useOnSaveForpleining";
 import type {
@@ -51,6 +52,7 @@ export const ForpleiningTabel = ({
 }) => {
     const fieldName = `${underholdFieldName}.forpleining` as const;
     const { getValues, setError, clearErrors } = useFormContext<UnderholdskostnadFormValues>();
+    const { underholdskostnader } = useGetBehandlingV2();
     const underhold = getValues(underholdFieldName);
     const saveForpleining = useOnSaveForpleining(underhold.id);
 
@@ -66,7 +68,10 @@ export const ForpleiningTabel = ({
     // Forpleiningen kan ikke overstige underholdskostnaden før forpleining er trukket fra. Underholdskostnaden
     // splittes i flere perioder enn forpleiningen, så beløpet kontrolleres mot den laveste i perioden.
     const høyesteTillatteBeløp = (datoFom: string, datoTom: string) => {
-        const overlappende = underhold.beregnetUnderholdskostnad.filter(
+        // Skjemaet initialiseres én gang og oppdateres ikke, så underholdskostnaden må leses fra cachen
+        const beregnetUnderholdskostnad =
+            underholdskostnader.find((u) => u.id === underhold.id)?.beregnetUnderholdskostnad ?? [];
+        const overlappende = beregnetUnderholdskostnad.filter(
             (periode) =>
                 periode.periode.fom <= (datoTom || "9999-12-31") && datoFom <= (periode.periode.tom ?? "9999-12-31"),
         );

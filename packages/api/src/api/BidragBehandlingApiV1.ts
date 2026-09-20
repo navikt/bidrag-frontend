@@ -2448,6 +2448,8 @@ export interface OppdatereUnderholdResponse {
   /** @uniqueItems true */
   tilleggsstønad: TilleggsstonadDto[];
   /** @uniqueItems true */
+  forpleining: ForpleiningDto[];
+  /** @uniqueItems true */
   valideringsfeil?: UnderholdskostnadValideringsfeil[] | null;
   /** @uniqueItems true */
   beregnetUnderholdskostnader: BeregnetUnderholdskostnad[];
