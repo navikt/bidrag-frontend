@@ -84,6 +84,8 @@ const tekster = {
     },
     error: {
         dagsatsVerdi: "Dagsats kan ikke være 0 eller mindre",
+        forpleiningVerdi: "Beløp kan ikke være 0 eller mindre",
+        forpleiningOverstigerUnderholdskostnad: "Beløp kan ikke være høyere enn underholdskostnaden",
         månedsbeløpVerdi: "Månedsbeløp kan ikke være 0 eller mindre",
         datoIkkeGyldig: "Dato er ikke gyldig",
         datoMåFyllesUt: "Dato må fylles ut",
@@ -331,6 +333,7 @@ const tekster = {
         småbarnstillegg: "Småbarnstillegg",
         stønadTilBarnetilsyn: "Stønad til barnetilsyn",
         tilleggsstønad: "Tilleggsstønad",
+        forpleining: "Forpleining",
         opplysningerFraFolkeregistret: "Opplysninger fra offentlige registre",
         oppsummering: "Oppsummering",
         oversiktOverUtgifter: "Oversikt over utgifter",

@@ -20,6 +20,7 @@ export type UnderholdskostnadTables =
     | `underholdskostnaderMedIBehandling.${number}.stønadTilBarnetilsyn`
     | `underholdskostnaderMedIBehandling.${number}.faktiskTilsynsutgift`
     | `underholdskostnaderMedIBehandling.${number}.tilleggsstønad`
+    | `underholdskostnaderMedIBehandling.${number}.forpleining`
     | `underholdskostnaderAndreBarn.${number}.faktiskTilsynsutgift`;
 
 type HusstandsbarnTables = "andreVoksneIHusstanden" | "sivilstand" | "newBarn" | `husstandsmedlem.${string}`;

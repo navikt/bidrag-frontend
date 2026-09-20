@@ -1,6 +1,7 @@
 import {
     type BehandlingDtoV2,
     type FaktiskTilsynsutgiftDto,
+    type ForpleiningDto,
     type OppdatereUnderholdResponse,
     SletteUnderholdselementTypeEnum,
     type StonadTilBarnetilsynDto,
@@ -24,6 +25,7 @@ import type { UnderholdskostnadTables } from "../../../context/BarnebidragProvid
 import { useOnDeleteUnderholdsObjekt } from "../../../hooks/useOnDeleteUnderholdsObjekt";
 import type {
     FaktiskTilsynsutgiftPeriode,
+    ForpleiningPeriode,
     StønadTilBarnetilsynPeriode,
     TilleggsstonadPeriode,
     UnderholdkostnadsFormPeriode,
@@ -42,7 +44,9 @@ type UnderholdskostnadTableChildrenProps = {
     onRemovePeriode: (index: number) => void;
     onSaveRow: (index: number) => void;
     onEditRow: (index: number) => void;
-    addPeriod: (periode: StønadTilBarnetilsynPeriode | FaktiskTilsynsutgiftPeriode | TilleggsstonadPeriode) => void;
+    addPeriod: (
+        periode: StønadTilBarnetilsynPeriode | FaktiskTilsynsutgiftPeriode | TilleggsstonadPeriode | ForpleiningPeriode,
+    ) => void;
 };
 
 export const UnderholdskostnadTabel = ({
@@ -58,12 +62,14 @@ export const UnderholdskostnadTabel = ({
         mutation: UseMutationResult<
             OppdatereUnderholdResponse,
             Error,
-            StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto,
+            StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto | ForpleiningDto,
             unknown
         >;
         queryClientUpdater: (updateFn: (currentData: BehandlingDtoV2) => BehandlingDtoV2) => BehandlingDtoV2;
     };
-    createPayload: (index: number) => StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto;
+    createPayload: (
+        index: number,
+    ) => StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto | ForpleiningDto;
     children: (props: UnderholdskostnadTableChildrenProps) => React.ReactNode;
 }) => {
     const { underholdskostnader } = useGetBehandlingV2();
@@ -96,12 +102,13 @@ export const UnderholdskostnadTabel = ({
         const updatedPerioder = response[underholdskostnadType] as
             | StonadTilBarnetilsynDto[]
             | FaktiskTilsynsutgiftDto[]
-            | TilleggsstonadDto[];
+            | TilleggsstonadDto[]
+            | ForpleiningDto[];
 
         return updatedPerioder;
     };
     const updateTable = (
-        updatedPerioder: StonadTilBarnetilsynDto[] | FaktiskTilsynsutgiftDto[] | TilleggsstonadDto[],
+        updatedPerioder: StonadTilBarnetilsynDto[] | FaktiskTilsynsutgiftDto[] | TilleggsstonadDto[] | ForpleiningDto[],
     ) => {
         const transformedUpdatedPerioder = updatedPerioder.map(transformUnderholdskostnadPeriode) as
             | StønadTilBarnetilsynPeriode[]
@@ -186,8 +193,13 @@ export const UnderholdskostnadTabel = ({
                         } else {
                             const cachedUnderhold = underholdskostnader.find((cU) => cU.id === underhold.id);
                             const cachedPeriode = cachedUnderhold[underholdskostnadType]?.find(
-                                (p: StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto) =>
-                                    p.id === cachedPeriode.id,
+                                (
+                                    p:
+                                        | StonadTilBarnetilsynDto
+                                        | FaktiskTilsynsutgiftDto
+                                        | TilleggsstonadDto
+                                        | ForpleiningDto,
+                                ) => p.id === cachedPeriode.id,
                             );
                             setValue(`${fieldName}.${index}`, cachedPeriode);
                         }
