@@ -231,7 +231,7 @@ const Main = () => {
         selectedRoller,
         selectedSaksnummer,
     } = useBehandlingProvider();
-    const {virkningstidspunktV3} = useGetBehandlingV2()
+    const { roller } = useGetBehandlingV2();
     const mergeSamværMutation = useOnMergeSamvær();
     const ref = useRef<HTMLDialogElement>(null);
     const visibleSamværBarn = useMemo(() => {
@@ -276,8 +276,12 @@ const Main = () => {
         selectedTabId: selectedTab,
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
-    const erVirkningLikForAlleRoller =virkningstidspunktV3.erLikForAlleBasertPåSak
-    .find((sak) => selectedSaksnummer === sak.saksnummer)?.erLikForAlle ?? false
+
+    const datoer = roller
+        .filter((i) => i.rolletype === Rolletype.BA && i.saksnummer === selectedSaksnummer)
+        .map((i) => i.beregnFraDato + i.beregnTilDato);
+
+    const erVirkningLikForAlleRoller = datoer.every((d) => d === datoer[0]);
     return (
         <div>
             <ConfirmationModal
