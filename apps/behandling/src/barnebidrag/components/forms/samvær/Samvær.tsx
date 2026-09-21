@@ -276,9 +276,6 @@ const Main = () => {
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
 
-    const erLikForAlleISak =
-        samvær.erSammeForAlleSaker?.find((sak) => sak.saksnummer === selectedSaksnummer)?.erLikForAlle ??
-        samvær.erVirkningSammeForAlle;
     return (
         <div>
             <ConfirmationModal
@@ -628,89 +625,85 @@ export const SamværBarn = ({ gjelderBarn, gjelderBarnId }: { gjelderBarn: strin
 
     const valideringsfeil = samvær?.valideringsfeil;
     return (
-        <>
-            <Box
-                background="neutral-soft"
-                className="overflow-hidden grid gap-2 py-2 px-4 w-full"
-                id={`${elementIds.seksjon_samvær}_${samværId}`}
-            >
-                {displayRoleDetails && (
-                    <div className="grid grid-cols-[max-content_auto] items-center p-2 bg-[white]">
-                        <div>
-                            <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={gjelderBarn} />
-                        </div>
-                        <BodyShort size="small" className="flex items-center gap-4">
-                            <PersonNavn bold ident={gjelderBarn} bareFornavn={false}></PersonNavn>
-                            <span>{DateToDDMMYYYYString(dateOrNull())}</span>
-                        </BodyShort>
+        <Box
+            background="neutral-soft"
+            className="overflow-hidden grid gap-2 py-2 px-4 w-full"
+            id={`${elementIds.seksjon_samvær}_${samværId}`}
+        >
+            {displayRoleDetails && (
+                <div className="grid grid-cols-[max-content_auto] items-center p-2 bg-[white]">
+                    <div>
+                        <RolleTag rolleType={RolleTypeAbbreviation.BA} ident={gjelderBarn} />
                     </div>
-                )}
-                {!lesemodus && valideringsfeil?.harPeriodiseringsfeil && (
-                    <div className="mb-4">
-                        <BehandlingAlert variant="warning">
-                            <Heading size="xsmall" level="6">
-                                {text.alert.feilIPeriodisering}
-                            </Heading>
-                            {valideringsfeil.hullIPerioder.length > 0 && (
-                                <BodyShort size="small">Det er perioder uten samvær.</BodyShort>
-                            )}
-                            {valideringsfeil.ingenLøpendeSamvær && (
-                                <BodyShort size="small">{text.error.ingenLøpendeSamvær}</BodyShort>
-                            )}
-                            {valideringsfeil.overlappendePerioder.length > 0 && (
-                                <BodyShort size="small">{text.error.overlappendeSamværsperioder}</BodyShort>
-                            )}
-                            {valideringsfeil.manglerSamvær && (
-                                <BodyShort size="small">{text.error.manglerSamværsperioder}</BodyShort>
-                            )}
-                            {valideringsfeil.ugyldigSluttperiode && (
-                                <BodyShort size="small">
-                                    {text.error.sistePeriodeMåSluttePåOpphørsdato.replace(
-                                        "{}",
-                                        DateToDDMMYYYYString(
-                                            deductDays(dateOrNull(virkningstidspunkt?.opphørsdato), 1),
-                                        ),
-                                    )}
-                                </BodyShort>
-                            )}
-                        </BehandlingAlert>
-                    </div>
-                )}
-                <div className="grid gap-2 w-full">
-                    {controlledFields.length > 0 && (
-                        <div
-                            className={`${
-                                tableUpdatePending ? "relative" : "inherit"
-                            } block overflow-x-auto whitespace-nowrap w-full`}
-                        >
-                            <OverlayLoader loading={tableUpdatePending} />
-                            <SamværsperiodeTable
-                                onSaveRow={onSaveRow}
-                                onEditRow={onEditRow}
-                                fieldName={`${gjelderBarnId}.perioder`}
-                                onRemovePeriode={onRemovePeriode}
-                                controlledFields={controlledFields}
-                                editableRowIndex={editableRow}
-                            />
-                        </div>
-                    )}
-                    <div className="grid gap-2">
-                        {!lesemodus &&
-                            (!erVirkningstidspunktNåværendeMånedEllerFramITid || controlledFields.length === 0) && (
-                                <Button
-                                    variant="tertiary"
-                                    type="button"
-                                    size="small"
-                                    className="w-fit"
-                                    onClick={addPeriode}
-                                >
-                                    {text.label.leggTilPeriode}
-                                </Button>
-                            )}
-                    </div>
+                    <BodyShort size="small" className="flex items-center gap-4">
+                        <PersonNavn bold ident={gjelderBarn} bareFornavn={false}></PersonNavn>
+                        <span>{DateToDDMMYYYYString(dateOrNull())}</span>
+                    </BodyShort>
                 </div>
-            </Box>
-        </>
+            )}
+            {!lesemodus && valideringsfeil?.harPeriodiseringsfeil && (
+                <div className="mb-4">
+                    <BehandlingAlert variant="warning">
+                        <Heading size="xsmall" level="6">
+                            {text.alert.feilIPeriodisering}
+                        </Heading>
+                        {valideringsfeil.hullIPerioder.length > 0 && (
+                            <BodyShort size="small">Det er perioder uten samvær.</BodyShort>
+                        )}
+                        {valideringsfeil.ingenLøpendeSamvær && (
+                            <BodyShort size="small">{text.error.ingenLøpendeSamvær}</BodyShort>
+                        )}
+                        {valideringsfeil.overlappendePerioder.length > 0 && (
+                            <BodyShort size="small">{text.error.overlappendeSamværsperioder}</BodyShort>
+                        )}
+                        {valideringsfeil.manglerSamvær && (
+                            <BodyShort size="small">{text.error.manglerSamværsperioder}</BodyShort>
+                        )}
+                        {valideringsfeil.ugyldigSluttperiode && (
+                            <BodyShort size="small">
+                                {text.error.sistePeriodeMåSluttePåOpphørsdato.replace(
+                                    "{}",
+                                    DateToDDMMYYYYString(deductDays(dateOrNull(virkningstidspunkt?.opphørsdato), 1)),
+                                )}
+                            </BodyShort>
+                        )}
+                    </BehandlingAlert>
+                </div>
+            )}
+            <div className="grid gap-2 w-full">
+                {controlledFields.length > 0 && (
+                    <div
+                        className={`${
+                            tableUpdatePending ? "relative" : "inherit"
+                        } block overflow-x-auto whitespace-nowrap w-full`}
+                    >
+                        <OverlayLoader loading={tableUpdatePending} />
+                        <SamværsperiodeTable
+                            onSaveRow={onSaveRow}
+                            onEditRow={onEditRow}
+                            fieldName={`${gjelderBarnId}.perioder`}
+                            onRemovePeriode={onRemovePeriode}
+                            controlledFields={controlledFields}
+                            editableRowIndex={editableRow}
+                        />
+                    </div>
+                )}
+                <div className="grid gap-2">
+                    {!lesemodus &&
+                        (!erVirkningstidspunktNåværendeMånedEllerFramITid || controlledFields.length === 0) && (
+                            <Button
+                                variant="tertiary"
+                                type="button"
+                                size="small"
+                                className="w-fit"
+                                onClick={addPeriode}
+                            >
+                                {text.label.leggTilPeriode}
+                            </Button>
+                        )}
+                </div>
+            </div>
+        </Box>
     );
 };
 

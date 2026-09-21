@@ -11,18 +11,18 @@ import { DokumentQueryKeys } from "./useDokumentApi";
 export const useSendAvvikMutation = () => {
     const queryClient = useQueryClient();
     const { setAvvikState } = useJournalpost();
-    return useMutation<boolean, any, any, any>({
-        mutationFn: async ({
-            avvik,
-            journalpostId,
-            paloggetEnhet,
-            saksnummer,
-        }: {
+    return useMutation<
+        boolean,
+        unknown,
+        {
             avvik: Avvik;
             journalpostId: string;
             paloggetEnhet: string;
             saksnummer?: string;
-        }) => {
+        },
+        unknown
+    >({
+        mutationFn: async ({ avvik, journalpostId, paloggetEnhet, saksnummer }) => {
             setAvvikState("pending");
             try {
                 LoggerService.info(`Sender avvik ${avvik.type} for journalpostid ${journalpostId}`);
@@ -67,6 +67,7 @@ function skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik: string) {
         AvvikType.FEILFORE_SAK,
     ].some((avvikType) => avvikType === avvik);
 }
+
 const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse => {
     const { type: avvikType, ...otherValues } = avvik;
     const baseBody = { avvikType, saksnummer, detaljer: {} };

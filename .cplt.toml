@@ -1,0 +1,11 @@
+[propose]
+
+# Suggested by: apps/behandling, apps/dokument, apps/forsendelse, apps/redigering, apps/web, packages/common
+allow_localhost_any = true
+
+[propose.allow]
+localhost = [5173]
+
+# The following are machine-specific — add to ~/.config/cplt/config.toml:
+# sandbox.allow_cache_exec += ["ms-playwright"]  # in personal config
+

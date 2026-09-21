@@ -46,7 +46,7 @@ const WrappingTabsList = forwardRef<HTMLDivElement, WrappingTabsListProps>(
                 return;
             }
 
-            const currentIndex = tabs.findIndex((tab) => tab === document.activeElement);
+            const currentIndex = tabs.indexOf(document.activeElement as HTMLButtonElement);
             let nextIndex = currentIndex;
 
             if (event.key === "ArrowRight") {

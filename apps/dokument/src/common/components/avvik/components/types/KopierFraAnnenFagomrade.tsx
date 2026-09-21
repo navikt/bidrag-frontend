@@ -27,6 +27,7 @@ interface EditedDocument {
     document: EditDocumentBroadcastMessage;
     title: string;
 }
+
 interface KopierFraAnnenFagomradeProps extends AvvikTypeCommonProps {
     journalpost: Journalpost;
 }
@@ -63,7 +64,8 @@ function KopierFraAnnenFagomrade(props: KopierFraAnnenFagomradeProps) {
                 type: AvvikType.KOPIER_FRA_ANNEN_FAGOMRADE,
                 relevanteDokumenter: (redigertDokument
                     ? [{ tittel: redigertDokument.title, dokument: redigertDokument.document.document }]
-                    : relevanteDokumenter) as any,
+                    : // biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
+                      relevanteDokumenter) as any,
                 knyttTilSaker: oppdatertKnyttTilSaker,
             })
             .then(() => {
@@ -202,6 +204,7 @@ function KopierFraAnnenFagomradeFirstStep(props: SendTilFagomradeFirstStepProps)
     function isAllSelected() {
         return relevanteDokumenter.length === props.journalpost.dokumenter.length;
     }
+
     function renderDocumentSelect() {
         const dokumenter = [...props.journalpost.dokumenter];
 
@@ -290,6 +293,7 @@ interface CheckAndEditDocumentsStepFormValues {
     editedDocumentTitle: string;
     redigertDokument: EditedDocument;
 }
+
 function CheckAndEditDocumentsStep(props: KopierFraAnnenFagomradeSecondStepProps) {
     const [waitinForEditResult, setWaitingForEditResult] = useState<boolean>(false);
     const journalpost = useHentJournalpost();
@@ -320,6 +324,7 @@ function CheckAndEditDocumentsStep(props: KopierFraAnnenFagomradeSecondStepProps
             setValue("redigertDokument", props.redigerDokument);
         }
     }, [props.redigerDokument]);
+
     function submit(data: CheckAndEditDocumentsStepFormValues) {
         if (!redigertDokument) {
             props.onSubmit();

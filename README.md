@@ -27,8 +27,11 @@ Eksempel:
 
 ```ini
 @navikt:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=<TOKEN_GITHUB_PAT_MED_PACKAGES_READ>
+//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
 ```
+
+Sett `NPM_TOKEN` som en miljøvariabel lokalt. Ikke skriv selve tokenet i
+`.npmrc`, repoet eller shell-historikken.
 
 ```bash
 # Installer avhengigheter
@@ -284,3 +287,79 @@ Appen kaller følgende backends via OBO-token-exchange (Azure AD):
 | bidrag-dokument | `BIDRAG_DOKUMENT_URL` / `BIDRAG_DOKUMENT_AUDIENCE` |
 | bisys | `BISYS_URL` |
 | bidrag-ui | `BIDRAG_UI_BASE_URL` |
+
+## Component-testing (Playwright CT)
+
+`apps/web` og `packages/common` har et eksperimentelt oppsett for
+Playwright component-testing, som et alternativ til Storybook. Mønsteret:
+
+- Hver komponent kan ha en co-lokalisert **story**-fil (`*.story.tsx`, ren
+  named export per case) og en tilhørende test (`*.ct.spec.ts`).
+- Playwright starter én frittstående Vite dev-server
+  (`apps/web/playwright/vite.config.ts`) som samler alle `*.story.tsx`-filer
+  fra BÅDE `apps/web` og `packages/common` via `import.meta.glob` i ett felles
+  "galleri" (`apps/web/playwright/gallery/`) — ingen Storybook-avhengighet.
+- Testene mounter en story med `await mount("mappe/Fil/EksportNavn")` og
+  asserter med vanlige Playwright-locators.
+
+```bash
+# Kjør alle component-tester (fra repo-roten - felles playwright.config.ts)
+pnpm test:ct
+
+# Filtrer på filsti ved behov
+pnpm test:ct -- apps/web
+pnpm test:ct -- packages/common
+
+# Visuell inspeksjon av stories/komponenter (Playwright UI-modus)
+pnpm test:ct:ui
+```
+
+**VS Code:** Installer den anbefalte "Playwright Test for VSCode"-extensionen
+(`ms-playwright.playwright`, se `.vscode/extensions.json`) for å kjøre og se
+enkeltstories direkte i editoren via Test Explorer-sidepanelet, uten terminal.
+
+**⚠️ Viktig mock-fallgruve:** Ikke gjenbruk appens ekte `QueryClientWrapper`
+uskodd i en story. Komponenter som leser via `BidragCommonsContext`
+(`useHentPersonData` m.fl.) er suspense-baserte og henger evig uten ekte
+backend. Bruk en mocket provider per story — se
+`packages/common/playwright/testing/BidragCommonsProviderMock.tsx` for eksempel.
+
+**Felles test-utils:** Delte hjelpere for CT ligger i
+`packages/common/playwright/testing/` og importeres på tvers av pakker via
+subpath-eksporten i `@bidrag/common`:
+
+```ts
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
+import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
+```
+
+Filendelsen skal være med — eksporten mapper `./playwright/*` direkte til fil,
+uten fallback-oppslag, slik at hver import treffer nøyaktig én kjent fil.
+Bruk `genererFnr()` i stedet for å hardkode fødselsnummer i stories og specs.
+
+**To mock-nivåer, avhengig av hva komponenten kaller:**
+1. **Context-mocking** (`BidragCommonsProviderMock`) — for kall via
+   `BidragCommonsContext` (`@bidrag/common`s `useHentPersonData`,
+   `uthevPerson`, `useHentRevurderingsbarn`).
+2. **Nettverksmocking** (`page.route()`) — for alt annet, f.eks. apps/web sin
+   EGEN `useHentPersonData` i `~/api/useApi.ts` (en annen funksjon enn i
+   punkt 1!) eller søk/mutasjoner som kaller `@bidrag/api` direkte. Registrer
+   `page.route()` FØR `mount()`, siden mount navigerer. Se
+   `ForelderRolleVisning.ct.spec.ts` for et eksempel som fullfører en hel
+   søk-og-legg-til-flyt med mocket nettverkssvar.
+
+Omfanget er foreløpig begrenset til én story-fil per pakke.
+
+### AI og Playwright-skills
+
+AI skal før Playwright-arbeid sjekke at `playwright-testing`,
+`playwright-component-testing`, `playwright-cli` og `playwright-trace` finnes.
+Hvis en mangler, installer med prosjektets lokale Playwright:
+
+```bash
+pnpm exec playwright init-skills
+```
+
+Ikke installer globalt eller behold genererte skills i repoet. Kontroller
+output, flytt bare Playwright-mappene til `~/.copilot/skills/`, slett
+repo-kopiene og start en ny Copilot-økt.

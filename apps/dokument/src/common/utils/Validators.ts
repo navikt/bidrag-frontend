@@ -1,6 +1,7 @@
 import validateFnr from "./fnrValidator";
 import { isEmpty } from "./ObjectUtils";
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export default class Validator {
     static isValidFnr(value: string) {
         return validateFnr(value);

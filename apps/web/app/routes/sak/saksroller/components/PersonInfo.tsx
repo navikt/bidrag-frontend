@@ -1,6 +1,6 @@
 import { IdentUtils, ModiaLink, PersonIdent, PersonNavnIdent, RolleTag, type RolleType } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
-import { BodyShort, HStack, Link, Loader, VStack } from "@navikt/ds-react";
+import { BodyShort, Box, HStack, Link, Loader, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
@@ -17,6 +17,7 @@ type Props = {
     tags?: ReactNode;
     headingActions?: ReactNode;
     visModiaLenke?: boolean;
+    visKopieringsknapp?: boolean;
     children?: ReactNode;
 };
 
@@ -30,6 +31,7 @@ function PersonInfoContent({
     tags,
     headingActions,
     visModiaLenke,
+    visKopieringsknapp = true,
     children,
 }: Props) {
     const { data } = useHentPersonData(ident);
@@ -45,36 +47,41 @@ function PersonInfoContent({
             <VStack minWidth="0" flexGrow="1">
                 <HStack gap="space-8" align="center">
                     {!erSamhandlerIdent && (
-                        <BodyShort
-                            size="small"
-                            weight="semibold"
-                            className="personnavn min-w-0 truncate"
-                            title={data?.visningsnavn ?? navn}
-                        >
-                            {data?.visningsnavn ?? navn}
-                        </BodyShort>
+                        <Box asChild minWidth="0">
+                            <BodyShort
+                                size="small"
+                                weight="semibold"
+                                truncate
+                                className="personnavn"
+                                title={data?.visningsnavn ?? navn}
+                            >
+                                {data?.visningsnavn ?? navn}
+                            </BodyShort>
+                        </Box>
                     )}
                     {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} />}
                     {tags}
                     {headingActions}
                 </HStack>
 
-                <BodyShort textColor="subtle" className="flex items-center" size="small">
-                    {erSamhandlerIdent ? (
-                        <HStack gap="space-1">
-                            <BodyShort size="small" className="personnavn">
-                                {navn ?? samhandlerData?.navn}
-                            </BodyShort>
-                            <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
-                                <PersonIdent ident={ident} />
-                            </Link>
-                        </HStack>
-                    ) : (
-                        <PersonNavnIdent variant="ident" showCopyButton={true} ident={ident} />
-                    )}
+                <HStack asChild align="center">
+                    <BodyShort textColor="subtle" size="small">
+                        {erSamhandlerIdent ? (
+                            <HStack gap="space-1">
+                                <BodyShort size="small" className="personnavn">
+                                    {navn ?? samhandlerData?.navn}
+                                </BodyShort>
+                                <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
+                                    <PersonIdent ident={ident} />
+                                </Link>
+                            </HStack>
+                        ) : (
+                            <PersonNavnIdent variant="ident" showCopyButton={visKopieringsknapp} ident={ident} />
+                        )}
 
-                    {personAlder !== undefined && ` (${personAlder} år)`}
-                </BodyShort>
+                        {personAlder !== undefined && ` (${personAlder} år)`}
+                    </BodyShort>
+                </HStack>
 
                 {children}
             </VStack>

@@ -33,7 +33,8 @@ import {
 } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { EndringsModal } from "../index.tsx";
-import { CustomQuillEditor } from "./customEditor/CustomQuillEditorImpl.tsx";
+
+//import { CustomQuillEditor } from "./customEditor/CustomQuillEditorImpl.tsx";
 
 type Endring = {
     innhold: string;
@@ -108,7 +109,7 @@ const EndringsBox = ({
 }: {
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
-    const quillRef = useRef<HTMLDivElement>(null);
+    //const quillRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDialogElement>(null);
     const { getValues, control, resetField, setError, clearErrors } = useFormContext<EndringsloggFormValues>();
 

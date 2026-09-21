@@ -1,6 +1,6 @@
 import { type ProblemDetail, TilgangsFeilError } from "@bidrag/api";
-import axios, { type AxiosError } from "axios";
-import { SecureLoggerService } from "../logging";
+import axios, { type AxiosError, type AxiosHeaders } from "axios";
+import { correlationIdHeader, SecureLoggerService } from "../logging";
 import { ApiError } from "../types";
 
 interface WithQueryErrorHandlingOptions<T> {
@@ -30,7 +30,7 @@ export async function withQueryErrorHandling<T>(
         const status = axiosError?.response?.status;
         if (status === 403 || status === 401) {
             const contextString = context ? `for ${JSON.stringify(context)}` : "";
-            await SecureLoggerService.warn(`Ingen tilgang til ${queryName} ${contextString}`);
+            await SecureLoggerService.warn("Manglende tilgang", axiosError, { ...context, queryName });
             throw new TilgangsFeilError(`Du har ikke tilgang til ${queryName} ${contextString}`);
         }
         if (status === 404 && notFoundValue !== undefined) {
@@ -40,10 +40,11 @@ export async function withQueryErrorHandling<T>(
         if (axios.isAxiosError<ProblemDetail>(error)) {
             if (error.response) {
                 const problemDetail = error.response.data;
+                const headers = error.response.headers as AxiosHeaders;
                 throw new ApiError(
                     problemDetail?.detail ?? `Feil ved kall til ${queryName}`,
                     error.stack ?? "",
-                    undefined,
+                    headers.get(correlationIdHeader)?.toString(),
                     problemDetail?.status ?? error.response.status,
                     error,
                 );

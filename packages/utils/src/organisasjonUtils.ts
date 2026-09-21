@@ -5,7 +5,3 @@ export const arbeidsfordelingMap = {
     OPPFOSTRINGSSAK: { kode: "OPS", behandlingstema: "ab0324" },
     REISEKOSTNADSAK: { kode: "RKS", behandlingstema: "ab0129" },
 };
-
-export function arbeidsfordelingTilBehandlingstema(arbeidsfordeling: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS") {
-    return Object.values(arbeidsfordelingMap).find((af) => af.kode === arbeidsfordeling)?.behandlingstema ?? null;
-}

@@ -13,6 +13,7 @@ export function showErrorPage(error: CustomError | Error): never {
     throw error;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
 export function isApiResponse(value: any): value is ApiResponse {
     return "data" in value && "status" in value;
 }

@@ -8,6 +8,7 @@
         "types": ["node", "react", "react-dom", "vite/client"],
         "paths": {
             "~/*": ["./app/*"],
+            "@ct/*": ["./playwright/*"],
             "@bidrag/behandling": ["./app/types/behandling.d.ts"],
             "/nais.js": ["./app/nais.d.ts"],
             "@shared/*": ["./shared/*"]

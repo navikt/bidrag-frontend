@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
 export function arraysDeepEqual(arr1: any[], arr2: any[]): boolean {
     if (arr1.length !== arr2.length) {
         return false;
@@ -46,6 +47,7 @@ export function objectsDeepEqual(obj1: object, obj2: object): boolean {
     return true;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: Feilmelding kan ha hvilken som helst form, så vi kan ikke type den
 export function arrayMove(array: any[], oldIndex: number, newIndex: number) {
     const updatedArray = [...array];
     const [element] = updatedArray.splice(oldIndex, 1);

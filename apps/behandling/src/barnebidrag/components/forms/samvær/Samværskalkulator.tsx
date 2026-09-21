@@ -2,7 +2,7 @@ import { SamvaerskalkulatorNetterFrekvens } from "@bidrag/api/BidragBehandlingAp
 import { CalculatorIcon } from "@navikt/aksel-icons";
 import { Alert, BodyShort, Button, Heading, HelpText, HStack, Modal, Table, VStack } from "@navikt/ds-react";
 import { useMutationState } from "@tanstack/react-query";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { FormControlledSelectField } from "../../../../common/components/formFields/FormControlledSelectField";
 import { FormControlledTextField } from "../../../../common/components/formFields/FormControlledTextField";
@@ -20,6 +20,7 @@ interface SamværskalkulatorProps {
     fieldname: `${string}.perioder.${number}`;
     viewOnly?: boolean;
 }
+
 export const SamværskalkulatorForm = ({ fieldname, viewOnly = false }: SamværskalkulatorProps) => {
     const { control, watch, setValue } = useFormContext<SamværBarnformvalues>();
 
@@ -42,6 +43,7 @@ export const SamværskalkulatorForm = ({ fieldname, viewOnly = false }: Samværs
             },
         });
     }
+
     const debouncedOnSave = useDebounce(beregnSamværsklasse);
 
     useEffect(() => {
@@ -117,7 +119,7 @@ export const SamværskalkulatorForm = ({ fieldname, viewOnly = false }: Samværs
                     </Table.Header>
                     <Table.Body>
                         {Object.entries(ferier).map(([ferietype, _item], index) => (
-                            <Table.Row key={ferietype + "_" + index} className="align-top">
+                            <Table.Row key={`${ferietype}_${index}`} className="align-top">
                                 <Table.DataCell textSize="small">{hentVisningsnavn(ferietype)}</Table.DataCell>
                                 <Table.DataCell textSize="small">
                                     {viewOnly ? (
@@ -239,6 +241,7 @@ interface SamværskalkulatorButtonProps {
     editableRow: boolean;
     fieldname: `${string}.perioder.${number}`;
 }
+
 export const SamværskalkulatorButton = ({ fieldname, editableRow }: SamværskalkulatorButtonProps) => {
     const ref = useRef<HTMLDialogElement>(null);
     const { control, getValues, setValue, setError, getFieldState, clearErrors } =

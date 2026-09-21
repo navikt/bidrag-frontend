@@ -8,7 +8,7 @@ export const RETUR_PARAM = "from";
  * Query-parameter som tar vare på saksnummeret når returmålet ligger under en sak,
  * men målsiden selv ikke har saksnummer i stien (f.eks. brukersider).
  */
-const SAKSNR_PARAM = "returSaksnr";
+export const SAKSNR_PARAM = "returSaksnr";
 
 /** Tilbakelenken slik den vises i headeren. */
 export interface ReturLenke {

@@ -1,6 +1,6 @@
-import PersonNavnIdent from "../../../person/PersonNavnIdent.tsx";
 import { Checkbox, TextField } from "@navikt/ds-react";
 import type { ChangeEvent } from "react";
+import PersonNavnIdent from "../../../person/PersonNavnIdent.tsx";
 
 // Migrert fra bidrag-ui
 // (apps/sak-ui/src/components/card/person-rellmottaker-card/PersonReellMottakerCard.tsx).

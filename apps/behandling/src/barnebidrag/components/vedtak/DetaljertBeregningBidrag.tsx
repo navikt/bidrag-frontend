@@ -6,7 +6,7 @@ import {
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { VStack } from "@navikt/ds-react";
-import { createContext, useContext } from "react";
+import { createContext, type FC, useContext } from "react";
 import { BPsEvne } from "../../../common/components/vedtak/BPsEvneTabell";
 import { AldersjusteringUnderholdskostnader } from "./AldersjusteringUnderholdskostnader";
 import { BarnetilleggSkatteprosent } from "./BarnetilleggSkatteprosent";
@@ -43,7 +43,7 @@ export const useBidragBeregningPeriode = () => {
     return context;
 };
 
-export const DetaljertBeregningBidrag: React.FC<
+export const DetaljertBeregningBidrag: FC<
     DetaljertBeregningBidragProps & {
         kanFatteVedtakForRevurderingsbarn?: boolean;
         anbefalesÅFatteVedtakForRevurderingsbarn?: boolean;

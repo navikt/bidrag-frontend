@@ -29,6 +29,7 @@ export const SamværsklasseSelector = ({
         previousSamværsklasse.current = periode.samværsklasse;
         ref.current?.close();
     };
+
     function renderModal() {
         return (
             <Modal
@@ -60,33 +61,32 @@ export const SamværsklasseSelector = ({
             </Modal>
         );
     }
+
     return (
         <>
             {renderModal()}
             {editableRow ? (
-                <>
-                    <FormControlledSelectField
-                        name={`${fieldName}.samværsklasse`}
-                        className="w-fit"
-                        label={text.label.status}
-                        options={options.map((value) => ({
-                            value,
-                            text: hentVisningsnavn(value),
-                        }))}
-                        hideLabel
-                        onBeforeSelect={(value) => {
+                <FormControlledSelectField
+                    name={`${fieldName}.samværsklasse`}
+                    className="w-fit"
+                    label={text.label.status}
+                    options={options.map((value) => ({
+                        value,
+                        text: hentVisningsnavn(value),
+                    }))}
+                    hideLabel
+                    onBeforeSelect={(value) => {
+                        previousSamværsklasse.current = value as Samvaersklasse;
+                    }}
+                    onSelect={(value) => {
+                        if (periode.beregning?.isSaved === true) {
+                            ref.current?.showModal();
+                        } else {
                             previousSamværsklasse.current = value as Samvaersklasse;
-                        }}
-                        onSelect={(value) => {
-                            if (periode.beregning?.isSaved === true) {
-                                ref.current?.showModal();
-                            } else {
-                                previousSamværsklasse.current = value as Samvaersklasse;
-                            }
-                            clearErrors(`${fieldName}.samværsklasse`);
-                        }}
-                    />
-                </>
+                        }
+                        clearErrors(`${fieldName}.samværsklasse`);
+                    }}
+                />
             ) : (
                 <div className="h-6 flex items-center">{hentVisningsnavn(item.samværsklasse)}</div>
             )}

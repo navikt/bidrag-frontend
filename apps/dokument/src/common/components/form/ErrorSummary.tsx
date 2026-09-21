@@ -2,6 +2,7 @@ import { ErrorSummary as ErrorSummaryDS, Link } from "@navikt/ds-react";
 import type React from "react";
 import { useRef } from "react";
 import type { DeepMap } from "react-hook-form";
+
 export interface FeiloppsummeringFeil {
     /**
      * ID til skjemaelementet som feilmeldingen tilhører.
@@ -12,7 +13,9 @@ export interface FeiloppsummeringFeil {
      */
     feilmelding: string;
 }
+
 interface ErrorSummaryProps {
+    // biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
     errors: DeepMap<any, any>;
 }
 
@@ -46,6 +49,7 @@ export default function ErrorSummary(props: ErrorSummaryProps) {
         );
     }
 
+    // biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
     function getErrorProps(errors: any): FeiloppsummeringFeil[] {
         if (Array.isArray(errors)) {
             return errors

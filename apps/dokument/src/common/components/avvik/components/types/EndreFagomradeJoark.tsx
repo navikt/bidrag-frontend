@@ -92,7 +92,7 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
     const journalforendeEnhetList = useHentJournalforendeEnheter();
     const journalpost = useHentJournalpost();
 
-    const { register, handleSubmit, watch } = useForm<EndreFagomradeFirstStepValues>({
+    const { register, handleSubmit } = useForm<EndreFagomradeFirstStepValues>({
         defaultValues: {
             fagomrade: "BAR",
         },

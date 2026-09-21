@@ -21,6 +21,7 @@ export default function EksterneLenkerKnapperFloating() {
         </div>
     );
 }
+
 export function BrukerveiledningKnappSærbidrag() {
     const nudgeEnabledName = "brukerveiledningShowNudge";
     const { activeStep } = useBehandlingProvider();
@@ -33,6 +34,7 @@ export function BrukerveiledningKnappSærbidrag() {
         }, 5000);
         return () => clearTimeout(timeoutId);
     }, []);
+
     function renderHref() {
         switch (activeStep) {
             case SærligeutgifterStepper.BOFORHOLD:
@@ -47,6 +49,7 @@ export function BrukerveiledningKnappSærbidrag() {
                 return "";
         }
     }
+
     return (
         <div>
             <Button
@@ -59,7 +62,7 @@ export function BrukerveiledningKnappSærbidrag() {
                 icon={<ExternalLinkIcon />}
                 onClick={() => {
                     // faro.api.pushEvent("click.button.brukerveiledning", { type: TypeBehandling.SAeRBIDRAG });
-                    window.open(environment.url.særbidragBrukerveiledning + "#" + renderHref(), "_blank");
+                    window.open(`${environment.url.særbidragBrukerveiledning}#${renderHref()}`, "_blank");
                 }}
             >
                 Brukerveiledning

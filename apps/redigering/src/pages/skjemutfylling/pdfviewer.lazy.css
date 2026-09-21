@@ -495,8 +495,8 @@
 }
 
 .secondaryButton:is(
-        :is(.dialog .mainContainer) button:not(:is(.toggle-button, .closeButton, .clearInputButton))
-    ):hover {
+    :is(.dialog .mainContainer) button:not(:is(.toggle-button, .closeButton, .clearInputButton))
+):hover {
     color: var(--button-secondary-hover-fg-color);
     background-color: var(--button-secondary-hover-bg-color);
     border-color: var(--button-secondary-hover-border-color);
@@ -716,12 +716,10 @@
 }
 
 .textLayer ::-moz-selection {
-    background: rgba(0 0 255 / 0.25);
     background: color-mix(in srgb, AccentColor, transparent 75%);
 }
 
 .textLayer ::selection {
-    background: rgba(0 0 255 / 0.25);
     background: color-mix(in srgb, AccentColor, transparent 75%);
 }
 
@@ -1036,7 +1034,6 @@
     position: absolute;
     font-size: calc(9px * var(--total-scale-factor));
     pointer-events: none;
-    width: -moz-max-content;
     width: max-content;
     max-width: 45%;
     height: auto;
@@ -1077,7 +1074,6 @@
 .annotationLayer .popup > .header .popupDate {
     display: inline-block;
     margin-left: calc(5px * var(--total-scale-factor));
-    width: -moz-fit-content;
     width: fit-content;
 }
 
@@ -1140,6 +1136,7 @@
     :root {
         --xfa-focus-outline: 2px solid CanvasText;
     }
+
     .xfaLayer *:required {
         outline: 1.5px solid selectedItem;
     }
@@ -1687,7 +1684,7 @@
     background-color: var(--toggle-dot-background-color-on-pressed);
 }
 
-.toggle-button[aria-pressed="true"]:-moz-locale-dir(rtl)::before,
+.toggle-button[aria-pressed="true"]::before,
 [dir="rtl"] .toggle-button[aria-pressed="true"]::before {
     translate: calc(-1 * var(--toggle-dot-transform-x));
 }
@@ -2083,8 +2080,8 @@
 }
 
 #addSignatureTypeContainer:is(
-        :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
-    ) {
+    :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
+) {
     display: none;
 }
 
@@ -2102,19 +2099,20 @@
     color: var(--signature-color);
     background-color: transparent;
 
-    font-family: "Brush script", "Apple Chancery", "Segoe script", "Freestyle Script", "Palace Script MT",
-        "Brush Script MT", TK, cursive, serif;
+    font-family:
+        "Brush script", "Apple Chancery", "Segoe script", "Freestyle Script", "Palace Script MT", "Brush Script MT", TK,
+        cursive, serif;
     font-size: 44px;
     font-style: italic;
     font-weight: 400;
 }
 
 :is(
-        #addSignatureTypeContainer:is(
-                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
-            )
-            #addSignatureTypeInput
-    )::-moz-placeholder {
+    #addSignatureTypeContainer:is(
+            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
+        )
+        #addSignatureTypeInput
+)::-moz-placeholder {
     color: var(--signature-placeholder-color);
     text-align: center;
 
@@ -2126,11 +2124,11 @@
 }
 
 :is(
-        #addSignatureTypeContainer:is(
-                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
-            )
-            #addSignatureTypeInput
-    )::placeholder {
+    #addSignatureTypeContainer:is(
+            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
+        )
+        #addSignatureTypeInput
+)::placeholder {
     color: var(--signature-placeholder-color);
     text-align: center;
 
@@ -2142,8 +2140,8 @@
 }
 
 #addSignatureDrawContainer:is(
-        :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
-    ) {
+    :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
+) {
     display: none;
 }
 
@@ -2180,11 +2178,11 @@
 }
 
 :is(
-        #addSignatureDrawContainer:is(
-                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
-            )
-            > svg
-    ):hover {
+    #addSignatureDrawContainer:is(
+            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
+        )
+        > svg
+):hover {
     cursor: var(--draw-cursor);
 }
 
@@ -2260,73 +2258,73 @@
 }
 
 :is(
-        :is(
-                :is(
-                        #addSignatureDrawContainer:is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    > [role="tabpanel"]
-                            )
-                            #thickness
-                    )
-                    > div
-            )
-            > input
-    )::-webkit-slider-runnable-track,
+    :is(
+            :is(
+                    #addSignatureDrawContainer:is(
+                            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
+                                > [role="tabpanel"]
+                        )
+                        #thickness
+                )
+                > div
+        )
+        > input
+)::-webkit-slider-runnable-track,
 :is(
-        :is(
-                :is(
-                        #addSignatureDrawContainer:is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    > [role="tabpanel"]
-                            )
-                            #thickness
-                    )
-                    > div
-            )
-            > input
-    )::-moz-range-track,
+    :is(
+            :is(
+                    #addSignatureDrawContainer:is(
+                            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
+                                > [role="tabpanel"]
+                        )
+                        #thickness
+                )
+                > div
+        )
+        > input
+)::-moz-range-track,
 :is(
-        :is(
-                :is(
-                        #addSignatureDrawContainer:is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    > [role="tabpanel"]
-                            )
-                            #thickness
-                    )
-                    > div
-            )
-            > input
-    )::-moz-range-progress {
+    :is(
+            :is(
+                    #addSignatureDrawContainer:is(
+                            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
+                                > [role="tabpanel"]
+                        )
+                        #thickness
+                )
+                > div
+        )
+        > input
+)::-moz-range-progress {
     background-color: var(--thickness-slider-color);
 }
 
 :is(
-        :is(
-                :is(
-                        #addSignatureDrawContainer:is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    > [role="tabpanel"]
-                            )
-                            #thickness
-                    )
-                    > div
-            )
-            > input
-    )::-webkit-slider-thumb,
+    :is(
+            :is(
+                    #addSignatureDrawContainer:is(
+                            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
+                                > [role="tabpanel"]
+                        )
+                        #thickness
+                )
+                > div
+        )
+        > input
+)::-webkit-slider-thumb,
 :is(
-        :is(
-                :is(
-                        #addSignatureDrawContainer:is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    > [role="tabpanel"]
-                            )
-                            #thickness
-                    )
-                    > div
-            )
-            > input
-    )::-moz-range-thumb {
+    :is(
+            :is(
+                    #addSignatureDrawContainer:is(
+                            :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
+                                > [role="tabpanel"]
+                        )
+                        #thickness
+                )
+                > div
+        )
+        > input
+)::-moz-range-thumb {
     background-color: var(--thickness-bg);
 }
 
@@ -2346,8 +2344,8 @@
 }
 
 #addSignatureImageContainer:is(
-        :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
-    ) {
+    :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) > [role="tabpanel"]
+) {
     display: none;
 }
 
@@ -2481,18 +2479,15 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    #addSignatureControls
-                            )
-                            #horizontalContainer
-                    )
-                    #clearSignatureButton
-            )
-            > span
-    )::after {
+    :is(
+            :is(
+                    :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                        #horizontalContainer
+                )
+                #clearSignatureButton
+        )
+        > span
+)::after {
     content: "";
     display: inline-block;
     width: 16px;
@@ -2506,12 +2501,12 @@
 }
 
 :is(
-        :is(
-                :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
-                    #horizontalContainer
-            )
-            #clearSignatureButton
-    ):hover {
+    :is(
+            :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                #horizontalContainer
+        )
+        #clearSignatureButton
+):hover {
     background-color: var(--clear-signature-button-bg-hover);
 }
 
@@ -2527,28 +2522,25 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    #addSignatureControls
-                            )
-                            #horizontalContainer
-                    )
-                    #clearSignatureButton
-            ):hover
-            > span
-    )::after {
+    :is(
+            :is(
+                    :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                        #horizontalContainer
+                )
+                #clearSignatureButton
+        ):hover
+        > span
+)::after {
     background-color: var(--clear-signature-button-hover-color);
 }
 
 :is(
-        :is(
-                :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
-                    #horizontalContainer
-            )
-            #clearSignatureButton
-    ):active {
+    :is(
+            :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                #horizontalContainer
+        )
+        #clearSignatureButton
+):active {
     background-color: var(--clear-signature-button-bg-active);
 }
 
@@ -2564,28 +2556,25 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    #addSignatureControls
-                            )
-                            #horizontalContainer
-                    )
-                    #clearSignatureButton
-            ):active
-            > span
-    )::after {
+    :is(
+            :is(
+                    :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                        #horizontalContainer
+                )
+                #clearSignatureButton
+        ):active
+        > span
+)::after {
     background-color: var(--clear-signature-button-active-color);
 }
 
 :is(
-        :is(
-                :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
-                    #horizontalContainer
-            )
-            #clearSignatureButton
-    ):focus-visible {
+    :is(
+            :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                #horizontalContainer
+        )
+        #clearSignatureButton
+):focus-visible {
     background-color: var(--clear-signature-button-bg-focus);
 }
 
@@ -2601,28 +2590,25 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    #addSignatureControls
-                            )
-                            #horizontalContainer
-                    )
-                    #clearSignatureButton
-            ):focus-visible
-            > span
-    )::after {
+    :is(
+            :is(
+                    :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                        #horizontalContainer
+                )
+                #clearSignatureButton
+        ):focus-visible
+        > span
+)::after {
     background-color: var(--clear-signature-button-focus-color);
 }
 
 :is(
-        :is(
-                :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
-                    #horizontalContainer
-            )
-            #clearSignatureButton
-    ):disabled {
+    :is(
+            :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                #horizontalContainer
+        )
+        #clearSignatureButton
+):disabled {
     background-color: var(--clear-signature-button-bg-disabled);
     border-color: var(--clear-signature-button-border-disabled-color);
 }
@@ -2639,18 +2625,15 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                :is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer)
-                                    #addSignatureControls
-                            )
-                            #horizontalContainer
-                    )
-                    #clearSignatureButton
-            ):disabled
-            > span
-    )::after {
+    :is(
+            :is(
+                    :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+                        #horizontalContainer
+                )
+                #clearSignatureButton
+        ):disabled
+        > span
+)::after {
     background-color: var(--clear-signature-button-disabled-color);
 }
 
@@ -2700,9 +2683,9 @@
 }
 
 :is(
-        :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
-            #addSignatureSaveContainer
-    ):is([disabled], .fullStorage) {
+    :is(:is(:is(#addSignatureDialog .mainContainer) #addSignatureActionContainer) #addSignatureControls)
+        #addSignatureSaveContainer
+):is([disabled], .fullStorage) {
     pointer-events: none;
 }
 
@@ -2759,8 +2742,8 @@
 }
 
 .contours:is(
-        :is(:is(:is(#editSignatureDescriptionDialog .mainContainer) #editSignatureDescriptionAndView) > svg) > path
-    ) {
+    :is(:is(:is(#editSignatureDescriptionDialog .mainContainer) #editSignatureDescriptionAndView) > svg) > path
+) {
     fill: var(--button-signature-color);
     stroke-width: 0.5px;
 }
@@ -2801,27 +2784,26 @@
 }
 
 :is(
-        :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer) button
-    ):active::before {
+    :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer) button
+):active::before {
     background-color: var(--button-signature-active-color);
 }
 
 :is(
-        :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer) button
-    ):focus-visible {
+    :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer) button
+):focus-visible {
     outline: var(--focus-ring-outline);
 }
 
 :is(
-        :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer) button
-    ):focus-visible::before {
+    :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer) button
+):focus-visible::before {
     background-color: var(--button-signature-color);
 }
 
 :is(
-        :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer)
-            .deleteButton
-    )::before {
+    :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer) .deleteButton
+)::before {
     -webkit-mask-image: var(--clear-signature-button-icon);
     mask-image: var(--clear-signature-button-icon);
 }
@@ -2883,18 +2865,15 @@
 }
 
 .contours:is(
-        :is(
-                :is(
-                        :is(
-                                :is(#editorSignatureParamsToolbar #addSignatureDoorHanger)
-                                    .toolbarAddSignatureButtonContainer
-                            )
-                            .toolbarAddSignatureButton
-                    )
-                    > svg
-            )
-            > path
-    ) {
+    :is(
+            :is(
+                    :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer)
+                        .toolbarAddSignatureButton
+                )
+                > svg
+        )
+        > path
+) {
     fill: var(--button-signature-color);
     stroke-width: 0.5px;
 }
@@ -2917,16 +2896,16 @@
 }
 
 :is(
-        :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer)
-            .toolbarAddSignatureButton
-    ):active {
+    :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer)
+        .toolbarAddSignatureButton
+):active {
     background-color: var(--button-signature-active-bg);
 }
 
 :is(
-        :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer)
-            .toolbarAddSignatureButton
-    ):is([disabled="disabled"], [disabled]) {
+    :is(:is(#editorSignatureParamsToolbar #addSignatureDoorHanger) .toolbarAddSignatureButtonContainer)
+        .toolbarAddSignatureButton
+):is([disabled="disabled"], [disabled]) {
     opacity: 0.5;
     pointer-events: none;
 }
@@ -2972,6 +2951,7 @@
     --resizer-shift: calc(0px - (var(--outline-width) + var(--resizer-size)) / 2 - var(--outline-around-width));
     --editorFreeText-editing-cursor: text;
 }
+
 .visuallyHidden {
     position: absolute;
     top: 0;
@@ -3099,15 +3079,15 @@
 }
 
 :is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)):hover:not(
-        .selectedEditor
-    ) {
+    .selectedEditor
+) {
     border: var(--hover-outline);
     outline: var(--hover-outline-around);
 }
 
 :is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)):hover:not(
-        .selectedEditor
-    )::before {
+    .selectedEditor
+)::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -3195,7 +3175,6 @@
     )
     .editToolbar {
     display: flex;
-    width: -moz-fit-content;
     width: fit-content;
     height: var(--editor-toolbar-height);
     flex-direction: column;
@@ -3217,24 +3196,22 @@
 }
 
 .hidden:is(
-        :is(
-                .annotationEditorLayer
-                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                .textLayer
-            )
-            .editToolbar
-    ) {
+    :is(
+            .annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+            .textLayer
+        )
+        .editToolbar
+) {
     display: none;
 }
 
 :is(
-        :is(
-                .annotationEditorLayer
-                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                .textLayer
-            )
-            .editToolbar
-    ):has(:focus-visible) {
+    :is(
+            .annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+            .textLayer
+        )
+        .editToolbar
+):has(:focus-visible) {
     border-color: transparent;
 }
 
@@ -3329,19 +3306,19 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .highlightButton
-    )::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .highlightButton
+)::before {
     content: "";
     -webkit-mask-image: var(--editor-toolbar-highlight-image);
     mask-image: var(--editor-toolbar-highlight-image);
@@ -3356,19 +3333,19 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .highlightButton
-    ):hover::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .highlightButton
+):hover::before {
     background-color: var(--editor-toolbar-hover-fg-color);
 }
 
@@ -3388,19 +3365,19 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .delete
-    )::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .delete
+)::before {
     content: "";
     -webkit-mask-image: var(--editor-toolbar-delete-image);
     mask-image: var(--editor-toolbar-delete-image);
@@ -3415,19 +3392,19 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .delete
-    ):hover::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .delete
+):hover::before {
     background-color: var(--editor-toolbar-hover-fg-color);
 }
 
@@ -3464,19 +3441,19 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            > :not(.divider)
-    ):hover {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        > :not(.divider)
+):hover {
     border-radius: 2px;
     background-color: var(--editor-toolbar-hover-bg-color);
     color: var(--editor-toolbar-hover-fg-color);
@@ -3485,36 +3462,36 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            > :not(.divider)
-    ):hover:active {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        > :not(.divider)
+):hover:active {
     outline: none;
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            > :not(.divider)
-    ):focus-visible {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        > :not(.divider)
+):focus-visible {
     border-radius: 2px;
     outline: 2px solid var(--editor-toolbar-focus-outline-color);
 }
@@ -3534,7 +3511,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: -moz-max-content;
     width: max-content;
     padding-inline: 8px;
     pointer-events: all;
@@ -3545,36 +3521,36 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    ):disabled {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+):disabled {
     pointer-events: none;
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    )::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+)::before {
     content: "";
     -webkit-mask-image: var(--alt-text-add-image);
     mask-image: var(--alt-text-add-image);
@@ -3590,54 +3566,54 @@
 }
 
 :is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    ):hover::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+):hover::before {
     background-color: var(--editor-toolbar-hover-fg-color);
 }
 
 .done:is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    )::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+)::before {
     -webkit-mask-image: var(--alt-text-done-image);
     mask-image: var(--alt-text-done-image);
 }
 
 .new:is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    )::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+)::before {
     width: 16px;
     height: 16px;
     -webkit-mask-image: var(--new-alt-text-warning-image);
@@ -3648,55 +3624,55 @@
 }
 
 .new:is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    ):hover::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+):hover::before {
     background-color: var(--alt-text-hover-warning-color);
 }
 
 .new.done:is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    )::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+)::before {
     -webkit-mask-image: var(--alt-text-done-image);
     mask-image: var(--alt-text-done-image);
     background-color: var(--alt-text-done-color);
 }
 
 .new.done:is(
-        :is(
-                :is(
-                        :is(
-                                .annotationEditorLayer
-                                    :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
-                                .textLayer
-                            )
-                            .editToolbar
-                    )
-                    .buttons
-            )
-            .altText
-    ):hover::before {
+    :is(
+            :is(
+                    :is(
+                            .annotationEditorLayer
+                                :is(.freeTextEditor, .inkEditor, .stampEditor, .highlightEditor, .signatureEditor),
+                            .textLayer
+                        )
+                        .editToolbar
+                )
+                .buttons
+        )
+        .altText
+):hover::before {
     background-color: var(--alt-text-hover-done-color);
 }
 
@@ -3720,28 +3696,28 @@
 }
 
 .show:is(
-        :is(
-                :is(
-                        :is(
-                                :is(
-                                        .annotationEditorLayer
-                                            :is(
-                                                .freeTextEditor,
-                                                .inkEditor,
-                                                .stampEditor,
-                                                .highlightEditor,
-                                                .signatureEditor
-                                            ),
-                                        .textLayer
-                                    )
-                                    .editToolbar
-                            )
-                            .buttons
-                    )
-                    .altText
-            )
-            .tooltip
-    ) {
+    :is(
+            :is(
+                    :is(
+                            :is(
+                                    .annotationEditorLayer
+                                        :is(
+                                            .freeTextEditor,
+                                            .inkEditor,
+                                            .stampEditor,
+                                            .highlightEditor,
+                                            .signatureEditor
+                                        ),
+                                    .textLayer
+                                )
+                                .editToolbar
+                        )
+                        .buttons
+                )
+                .altText
+        )
+        .tooltip
+) {
     --alt-text-tooltip-bg: #f0f0f4;
     --alt-text-tooltip-fg: #15141a;
     --alt-text-tooltip-border: #8f8f9d;
@@ -3810,36 +3786,6 @@
 
 @media screen and (forced-colors: active) {
     .show:is(
-            :is(
-                    :is(
-                            :is(
-                                    :is(
-                                            .annotationEditorLayer
-                                                :is(
-                                                    .freeTextEditor,
-                                                    .inkEditor,
-                                                    .stampEditor,
-                                                    .highlightEditor,
-                                                    .signatureEditor
-                                                ),
-                                            .textLayer
-                                        )
-                                        .editToolbar
-                                )
-                                .buttons
-                        )
-                        .altText
-                )
-                .tooltip
-        ) {
-        --alt-text-tooltip-bg: Canvas;
-        --alt-text-tooltip-fg: CanvasText;
-        --alt-text-tooltip-border: CanvasText;
-        --alt-text-tooltip-shadow: none;
-    }
-}
-
-.show:is(
         :is(
                 :is(
                         :is(
@@ -3862,6 +3808,36 @@
             )
             .tooltip
     ) {
+        --alt-text-tooltip-bg: Canvas;
+        --alt-text-tooltip-fg: CanvasText;
+        --alt-text-tooltip-border: CanvasText;
+        --alt-text-tooltip-shadow: none;
+    }
+}
+
+.show:is(
+    :is(
+            :is(
+                    :is(
+                            :is(
+                                    .annotationEditorLayer
+                                        :is(
+                                            .freeTextEditor,
+                                            .inkEditor,
+                                            .stampEditor,
+                                            .highlightEditor,
+                                            .signatureEditor
+                                        ),
+                                    .textLayer
+                                )
+                                .editToolbar
+                        )
+                        .buttons
+                )
+                .altText
+        )
+        .tooltip
+) {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -3872,7 +3848,6 @@
     padding-block: 2px 3px;
     padding-inline: 3px;
     max-width: 300px;
-    width: -moz-max-content;
     width: max-content;
     height: auto;
     font-size: 12px;
@@ -3914,7 +3889,7 @@
     height: 100%;
 }
 
-.annotationEditorLayer freeTextEditor .overlay.enabled {
+.annotationEditorLayer .freeTextEditor .overlay.enabled {
     display: block;
 }
 
@@ -4039,314 +4014,314 @@
 }
 
 .topLeft:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     top: var(--resizer-shift);
     left: var(--resizer-shift);
 }
 
 .topMiddle:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     top: var(--resizer-shift);
     left: calc(50% + var(--resizer-shift));
 }
 
 .topRight:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     top: var(--resizer-shift);
     right: var(--resizer-shift);
 }
 
 .middleRight:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     top: calc(50% + var(--resizer-shift));
     right: var(--resizer-shift);
 }
 
 .bottomRight:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     bottom: var(--resizer-shift);
     right: var(--resizer-shift);
 }
 
 .bottomMiddle:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     bottom: var(--resizer-shift);
     left: calc(50% + var(--resizer-shift));
 }
 
 .bottomLeft:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     bottom: var(--resizer-shift);
     left: var(--resizer-shift);
 }
 
 .middleLeft:is(
-        :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
-            > .resizer
-    ) {
+    :is(:is(.annotationEditorLayer :is(.freeTextEditor, .inkEditor, .stampEditor, .signatureEditor)) > .resizers)
+        > .resizer
+) {
     top: calc(50% + var(--resizer-shift));
     left: var(--resizer-shift);
 }
 
 .topLeft:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+),
 .bottomRight:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: nwse-resize;
 }
 
 .topMiddle:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+),
 .bottomMiddle:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: ns-resize;
 }
 
 .topRight:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+),
 .bottomLeft:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: nesw-resize;
 }
 
 .middleRight:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+),
 .middleLeft:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: ew-resize;
 }
 
 .topLeft:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+),
 .bottomRight:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: nesw-resize;
 }
 
 .topMiddle:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+),
 .bottomMiddle:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: ew-resize;
 }
 
 .topRight:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+),
 .bottomLeft:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: nwse-resize;
 }
 
 .middleRight:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ),
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+),
 .middleLeft:is(
-        :is(
-                .annotationEditorLayer[data-main-rotation="0"]
-                    :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
-                .annotationEditorLayer[data-main-rotation="90"]
-                    :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
-                .annotationEditorLayer[data-main-rotation="180"]
-                    :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
-                .annotationEditorLayer[data-main-rotation="270"]
-                    :is([data-editor-rotation="180"], [data-editor-rotation="0"])
-            )
-            > .resizers
-            > .resizer
-    ) {
+    :is(
+            .annotationEditorLayer[data-main-rotation="0"]
+                :is([data-editor-rotation="90"], [data-editor-rotation="270"]),
+            .annotationEditorLayer[data-main-rotation="90"]
+                :is([data-editor-rotation="0"], [data-editor-rotation="180"]),
+            .annotationEditorLayer[data-main-rotation="180"]
+                :is([data-editor-rotation="270"], [data-editor-rotation="90"]),
+            .annotationEditorLayer[data-main-rotation="270"]
+                :is([data-editor-rotation="180"], [data-editor-rotation="0"])
+        )
+        > .resizers
+        > .resizer
+) {
     cursor: ns-resize;
 }
 
@@ -4470,7 +4445,6 @@
 
 .dialog.altText #altTextContainer {
     width: 300px;
-    height: -moz-fit-content;
     height: fit-content;
     display: inline-flex;
     flex-direction: column;
@@ -4632,22 +4606,22 @@
 }
 
 :is(
-        :is(
-                :is(:is(:is(.dialog.newAltText #newAltTextContainer) #mainContent) #descriptionInstruction)
-                    #newAltTextDescriptionContainer
-            )
-            textarea
-    )::-moz-placeholder {
+    :is(
+            :is(:is(:is(.dialog.newAltText #newAltTextContainer) #mainContent) #descriptionInstruction)
+                #newAltTextDescriptionContainer
+        )
+        textarea
+)::-moz-placeholder {
     color: var(--text-secondary-color);
 }
 
 :is(
-        :is(
-                :is(:is(:is(.dialog.newAltText #newAltTextContainer) #mainContent) #descriptionInstruction)
-                    #newAltTextDescriptionContainer
-            )
-            textarea
-    )::placeholder {
+    :is(
+            :is(:is(:is(.dialog.newAltText #newAltTextContainer) #mainContent) #descriptionInstruction)
+                #newAltTextDescriptionContainer
+        )
+        textarea
+)::placeholder {
     color: var(--text-secondary-color);
 }
 
@@ -4707,9 +4681,8 @@
 }
 
 :is(
-        :is(:is(:is(.dialog.newAltText #newAltTextContainer) #mainContent) #descriptionInstruction)
-            #newAltTextDisclaimer
-    )::before {
+    :is(:is(:is(.dialog.newAltText #newAltTextContainer) #mainContent) #descriptionInstruction) #newAltTextDisclaimer
+)::before {
     content: "";
     display: inline-block;
     width: 17px;
@@ -4882,14 +4855,14 @@
 }
 
 :is(:is(:is(:is(.annotationEditorLayer .highlightEditor) .editToolbar) .buttons) .colorPicker):has(
-        .dropdown:not(.hidden)
-    ) {
+    .dropdown:not(.hidden)
+) {
     background-color: var(--editor-toolbar-hover-bg-color);
 }
 
 :is(:is(:is(:is(.annotationEditorLayer .highlightEditor) .editToolbar) .buttons) .colorPicker):has(
-        .dropdown:not(.hidden)
-    )::after {
+    .dropdown:not(.hidden)
+)::after {
     scale: -1;
 }
 
@@ -4921,9 +4894,8 @@
 }
 
 :is(
-        :is(:is(:is(:is(:is(.annotationEditorLayer .highlightEditor) .editToolbar) .buttons) .colorPicker) .dropdown)
-            button
-    ):is(:active, :focus-visible) {
+    :is(:is(:is(:is(:is(.annotationEditorLayer .highlightEditor) .editToolbar) .buttons) .colorPicker) .dropdown) button
+):is(:active, :focus-visible) {
     outline: none;
 }
 
@@ -5138,7 +5110,6 @@
 }
 
 :is(:is(#altTextSettingsDialog #altTextSettingsContainer) #aiModelSettings) button {
-    width: -moz-fit-content;
     width: fit-content;
 }
 
@@ -5203,9 +5174,11 @@
 [data-main-rotation="90"] {
     transform: rotate(90deg) translateY(-100%);
 }
+
 [data-main-rotation="180"] {
     transform: rotate(180deg) translate(-100%, -100%);
 }
+
 [data-main-rotation="270"] {
     transform: rotate(270deg) translateX(-100%);
 }
@@ -5397,8 +5370,8 @@
     --toolbar-border-color: rgb(184 184 184);
     --toolbar-box-shadow: 0 1px 0 var(--toolbar-border-color);
     --toolbar-border-bottom: none;
-    --toolbarSidebar-box-shadow: inset calc(-1px * var(--dir-factor)) 0 0 rgb(0 0 0 / 0.25), 0 1px 0 rgb(0 0 0 / 0.15),
-        0 0 1px rgb(0 0 0 / 0.1);
+    --toolbarSidebar-box-shadow:
+        inset calc(-1px * var(--dir-factor)) 0 0 rgb(0 0 0 / 0.25), 0 1px 0 rgb(0 0 0 / 0.15), 0 0 1px rgb(0 0 0 / 0.1);
     --toolbarSidebar-border-bottom: none;
     --button-hover-color: color-mix(in srgb, currentColor 17%, transparent);
     --toggled-btn-color: rgb(0 0 0);
@@ -6434,7 +6407,6 @@ dialog :link {
 
 .toolbarButton.labeled > span {
     display: inline-block;
-    width: -moz-max-content;
     width: max-content;
     height: auto;
 }
@@ -6486,7 +6458,6 @@ dialog :link {
     font-style: normal;
     font-weight: 400;
     line-height: 150%;
-    width: -moz-fit-content;
     width: fit-content;
     inset-inline-start: 0;
     color: var(--main-color);
@@ -6528,26 +6499,26 @@ dialog :link {
 }
 
 :is(
-        :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
-    )::-moz-range-progress {
+    :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
+)::-moz-range-progress {
     background-color: black;
 }
 
 :is(
-        :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
-    )::-webkit-slider-runnable-track,
+    :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
+)::-webkit-slider-runnable-track,
 :is(
-        :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
-    )::-moz-range-track {
+    :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
+)::-moz-range-track {
     background-color: black;
 }
 
 :is(
-        :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
-    )::-webkit-slider-thumb,
+    :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
+)::-webkit-slider-thumb,
 :is(
-        :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
-    )::-moz-range-thumb {
+    :is(:is(.toolbarButtonWithContainer .editorParamsToolbar) .editorParamsToolbarContainer) .editorParamsSlider
+)::-moz-range-thumb {
     background-color: white;
 }
 
@@ -6664,9 +6635,6 @@ dialog :link {
 #findbar {
     --input-horizontal-padding: 4px;
     --findbar-padding: 2px;
-
-    width: -moz-max-content;
-
     width: max-content;
     max-width: 90vw;
     min-height: var(--toolbar-height);
@@ -6754,7 +6722,6 @@ dialog :link {
 #findbar.wrapContainers {
     flex-direction: column;
     align-items: flex-start;
-    height: -moz-max-content;
     height: max-content;
 }
 
@@ -6763,10 +6730,8 @@ dialog :link {
 }
 
 #findbar.wrapContainers #findbarMessageContainer {
-    flex-wrap: wrap;
     flex-flow: column nowrap;
     align-items: flex-start;
-    height: -moz-max-content;
     height: max-content;
 }
 
@@ -6802,6 +6767,7 @@ dialog :link {
     #printContainer {
         height: 100%;
     }
+
     #printContainer > .printedPage {
         page-break-after: always;
         page-break-inside: avoid;
@@ -6840,7 +6806,6 @@ dialog :link {
 }
 
 .toolbarLabel {
-    width: -moz-max-content;
     width: max-content;
     min-width: 16px;
     height: 100%;
@@ -6883,9 +6848,6 @@ dialog :link {
     align-items: center;
     justify-content: center;
     position: relative;
-
-    width: -moz-fit-content;
-
     width: fit-content;
     min-width: 140px;
     padding: 0;
@@ -7121,6 +7083,7 @@ dialog :link {
     #sidebarContainer {
         background-color: var(--sidebar-narrow-bg-color);
     }
+
     #outerContainer.sidebarOpen #viewerContainer {
         inset-inline-start: 0;
     }
@@ -7130,6 +7093,7 @@ dialog :link {
     #outerContainer .hiddenMediumView {
         display: none;
     }
+
     #outerContainer .visibleMediumView:not(.hidden, [hidden]) {
         display: inline-block;
     }

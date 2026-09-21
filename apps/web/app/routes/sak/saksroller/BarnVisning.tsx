@@ -21,6 +21,7 @@ interface BarnVisningProps {
     hentOgNullstillSamhandler: (barnIndex: number, isLeggTilBarn: boolean) => { ident: string; navn: string } | null;
     closeEditorSignal?: number;
     erOppfostringsbidrag?: boolean;
+    saksnummer?: string;
 }
 
 export default function BarnVisning({
@@ -31,6 +32,7 @@ export default function BarnVisning({
     hentOgNullstillSamhandler,
     closeEditorSignal,
     erOppfostringsbidrag = false,
+    saksnummer,
 }: BarnVisningProps) {
     const form = useFormContext<SakRedigeringData>();
     const errors = form.formState.errors;
@@ -76,7 +78,6 @@ export default function BarnVisning({
         if (samhandlerInfo && rolle.reellMottakerType === "samhandler" && !rolle.reellMottakerNavn) {
             handleEndreReellMottaker("samhandler", rolle.reellMottaker, samhandlerInfo.navn);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [samhandlerInfo]);
 
     useEffect(() => {
@@ -100,7 +101,6 @@ export default function BarnVisning({
                 setVisReellMottaker(false);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [index, visReellMottaker, hentOgNullstillSamhandler]);
 
     const handleEndreReellMottaker = (type?: "barnet_selv" | "samhandler", ident?: string, navn?: string) => {
@@ -207,12 +207,12 @@ export default function BarnVisning({
                 )}
 
                 {visRmFeil && (
-                    <ErrorMessage size="small" className="mt-2">
-                        {errors.roller?.[index]?.reellMottaker?.message}
-                    </ErrorMessage>
+                    <Box asChild marginBlock="space-8 space-0">
+                        <ErrorMessage size="small">{errors.roller?.[index]?.reellMottaker?.message}</ErrorMessage>
+                    </Box>
                 )}
 
-                <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} />
+                <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} saksnummer={saksnummer} />
             </PersonInfo>
 
             {visReellMottaker && (

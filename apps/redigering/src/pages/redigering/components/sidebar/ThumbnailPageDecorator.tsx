@@ -21,9 +21,12 @@ export default function ThumbnailPageDecorator({ pageNumber }: ThumbnailPageDeco
     const [mouseOver, setMouseOver] = useState(false);
     const isEnabled = mode === "remove_pages_only" || mode === "edit";
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: This is a thumbnail page decorator, and it is not meant to be interactive in the same way as a button or link. It is used for navigation within the PDF viewer.
         <div
             onMouseOver={() => setMouseOver(true)}
             onMouseLeave={() => setMouseOver(false)}
+            onFocus={() => setMouseOver(true)}
+            onBlur={() => setMouseOver(false)}
             ref={decoratorRef}
             className={`thumbnail_decorator ${isDeleted ? "deleted" : ""}`}
         >
@@ -52,12 +55,14 @@ interface PdfPageContainerProps {
     onPageClick: (pageNumber: number) => void;
     index: number;
 }
+
 const PageContainer = ({ pageNumber, onPageClick, index, currentPage }: PdfPageContainerProps) => {
     const { items } = useMaskingContainer();
     const { pageRotations } = usePdfEditorContext();
     const id = `thumbnail_page_${pageNumber}`;
     const pageRotation = pageRotations[pageNumber] ?? 0;
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: This is a thumbnail page container, and it is not meant to be interactive in the same way as a button or link. It is used for navigation within the PDF viewer.
         <div
             onClick={() => onPageClick(pageNumber)}
             className={`thumbnail_page_container ${currentPage === pageNumber ? "infocus" : ""}`}
@@ -85,6 +90,7 @@ interface ThumbnailPageToolbarProps {
     hidden?: boolean;
     onToggleDelete: () => void;
 }
+
 function ThumbnailPageToolbar({ hidden, isDeleted, onToggleDelete }: ThumbnailPageToolbarProps) {
     const { isAllowedToDeletePage } = usePdfEditorContext();
     return (
@@ -93,7 +99,7 @@ function ThumbnailPageToolbar({ hidden, isDeleted, onToggleDelete }: ThumbnailPa
                 className={
                     "bg-[white] border-solid border border-ax-border-neutral inline-flex rounded-md shadow-sm hover:border-ax-border-neutral-strong"
                 }
-                role={"group"}
+                role={"toolbar"}
             >
                 {!isDeleted && isAllowedToDeletePage() && (
                     <ToolbarButton
@@ -124,6 +130,7 @@ interface ToolbarButtonProps {
     onClick?: () => void;
     className?: string;
 }
+
 function ToolbarButton({ children, position, style, onClick, className }: PropsWithChildren<ToolbarButtonProps>) {
     function getStyles() {
         switch (position) {
@@ -136,6 +143,7 @@ function ToolbarButton({ children, position, style, onClick, className }: PropsW
         }
         return "";
     }
+
     return (
         <button
             onClick={onClick}

@@ -38,6 +38,7 @@ function overførFarskapTekst(journalpost: Journalpost, påloggetEnhet: string, 
         </>
     );
 }
+
 export function overførOppgaveTekst(
     journalpost: Journalpost,
     påloggetEnhet: string,
@@ -53,6 +54,7 @@ export function overførOppgaveTekst(
         </>
     );
 }
+
 interface EndreFagomradeProps extends AvvikTypeCommonProps {
     journalpost: Journalpost;
 }
@@ -138,7 +140,7 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
     } = useAppContext();
     const journalforendeEnhetList = useHentJournalforendeEnheter();
     const journalpost = useHentJournalpost();
-    const { register, handleSubmit, watch } = useForm<EndreFagomradeFirstStepValues>({
+    const { register, handleSubmit } = useForm<EndreFagomradeFirstStepValues>({
         defaultValues: {
             fagomrade: "AAP",
         },

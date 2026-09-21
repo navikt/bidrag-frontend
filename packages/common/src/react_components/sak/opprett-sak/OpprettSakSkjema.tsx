@@ -1,11 +1,14 @@
 import { TextField } from "@navikt/ds-react";
 import { type ChangeEvent, useEffect, useState } from "react";
 
-import { useHentPersonMotpartBarnRelasjonSuspense, useKanOppretteSakUtenBm } from "../../../api/useOpprettSakApiData.ts";
-import SakErrorMessage from "./components/SakErrorMessage.tsx";
+import {
+    useHentPersonMotpartBarnRelasjonSuspense,
+    useKanOppretteSakUtenBm,
+} from "../../../api/useOpprettSakApiData.ts";
 import FamilieenheterBAContainer from "./components/FamilieenheterBAContainer.tsx";
 import FamilieenheterContainer from "./components/FamilieenheterContainer.tsx";
 import RoleSelect, { type ISelectData } from "./components/RoleSelect.tsx";
+import SakErrorMessage from "./components/SakErrorMessage.tsx";
 import { PERSON_IKKE_FINNES } from "./constants.ts";
 import { useSakContext } from "./OpprettSakContext.tsx";
 import { RolleType } from "./RolleType.ts";

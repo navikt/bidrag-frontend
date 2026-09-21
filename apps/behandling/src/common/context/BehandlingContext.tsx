@@ -45,18 +45,6 @@ import useFeatureToogle from "../hooks/useFeatureToggle";
 import { useMutationStatus } from "../hooks/useMutationStatus";
 import { useQueryParams } from "../hooks/useQueryParams";
 
-// Faro initialiseres og eksponeres globalt (window.faro) av web-shellet. behandling-app
-// har ikke @grafana/faro-web-sdk som avhengighet, så vi deklarerer kun det vi trenger.
-declare global {
-    interface Window {
-        faro?: {
-            api: {
-                pushEvent: (name: string, attributes?: Record<string, string>) => void;
-            };
-        };
-    }
-}
-
 interface SaveErrorState {
     error: boolean;
     retryFn?: () => void;

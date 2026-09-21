@@ -8,6 +8,7 @@ export { default as BidragContainer } from "./grid/BidragContainer";
 export { default as BidragGrid } from "./grid/BidragGrid";
 export { default as SakHeader } from "./header/SakHeader";
 export * from "./hooks";
+export { default as MaskerSensitivInfo } from "./MaskerSensitivInfo";
 export { default as PopupSokButton } from "./PopupSøkButton";
 export { default as ModiaLink } from "./person/ModiaLink";
 export { default as PersonIdent } from "./person/PersonIdent";

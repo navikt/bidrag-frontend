@@ -4,19 +4,19 @@ import type { NavUser } from "../../common/NavUser.ts";
 
 export async function getOnBehalfOfToken(token: string, audience: string) {
     if (!token) {
-        secureNavLogger.error("Missing token");
+        secureNavLogger.error({ audience }, "Mangler token");
         throw new Response("Missing token", { status: 401 });
     }
 
     const valid = await validateToken(token);
     if (!valid.ok) {
-        secureNavLogger.error(`Failed to validate token: ${valid.error}`);
+        secureNavLogger.error({ audience }, `Klarte ikke å validere token: ${valid.error}`);
         throw new Response("Token validation failed", { status: 401 });
     }
 
     const obo = await requestOboToken(token, audience);
     if (!obo.ok) {
-        secureNavLogger.error(`Failed to get OBO token: ${obo.error}`);
+        secureNavLogger.error({ audience }, `Klarte ikke å hente OBO-token: ${obo.error}`);
         throw new Response("Unauthorized", { status: 401 });
     }
 

@@ -30,12 +30,14 @@ export default function JournalpostKilde({ journalpost }: JournalpostKildeProps)
         }
         return journalpost.kildeDisplayValue;
     }
+
     return (
         <div className={"journalpost-kilde"}>
             <SimpleTextField label={"Kanal"} value={getKilde()} />
             {adresseModalOpen && (
                 <AdresseViewModal
                     onCancel={() => setAdresseModalOpen(false)}
+                    // biome-ignore lint/suspicious/noExplicitAny: Hjelpefunksjon
                     adresse={journalpost.distribuertTilAdresse as any}
                 />
             )}

@@ -42,6 +42,32 @@ packages/utils/    # @bidrag/utils — formattering og norsk locale
 - Ruter registreres i `apps/web/app/routes.ts`
 - Health-endepunkter: `GET /internal/health/liveness` og `/readiness`
 
+### Component-testing (Playwright CT)
+- `apps/web` og `packages/common` deler ETT story-galleri (servert fra
+  apps/web, se README) — som alternativ til Storybook.
+- Mount via `await mount("mappe/Fil/EksportNavn")`, kjør alt med `pnpm test:ct`
+  (felles `playwright.config.ts` i repo-roten), eller filtrer på filsti med
+  `pnpm test:ct -- apps/web`/`packages/common`. Visuell inspeksjon:
+  `pnpm test:ct:ui` eller VS Code-extensionen `ms-playwright.playwright`
+  (anbefalt i `.vscode/extensions.json`).
+- Bruk ALDRI appens ekte `QueryClientWrapper` uskodd i en story — komponenter
+  som leser `useHentPersonData` via `BidragCommonsContext` er
+  suspense-baserte og henger evig uten mock. Bruk en mocket provider per
+  story (se `packages/common/playwright/testing/BidragCommonsProviderMock.tsx`).
+- Felles test-utils for CT ligger i `packages/common/playwright/testing/` og
+  importeres på tvers av pakker via subpath-eksporten
+  `@bidrag/common/playwright/testing/<Fil>.<ts|tsx>` (merk: filendelse skal
+  med — eksporten mapper `./playwright/*` direkte, uten fallback).
+- To mock-nivåer: **context-mocking** (`BidragCommonsProviderMock`, for kall via
+  `BidragCommonsContext`) og **nettverksmocking** (`page.route()`, for alt
+  annet — f.eks. apps/web sin egen `useHentPersonData` i `~/api/useApi.ts`,
+  en annen funksjon enn i `@bidrag/common`). Registrer `page.route()` FØR
+  `mount()`. Se `ForelderRolleVisning.ct.spec.ts` for eksempel.
+- Bruk `genererFnr()` fra
+  `@bidrag/common/playwright/testing/fnrGenerator.ts` i stedet for å hardkode
+  fødselsnummer i stories og specs.
+- Foreløpig begrenset omfang (én story-fil per pakke).
+
 ## Kommandoer
 
 ```bash
@@ -53,9 +79,28 @@ pnpm check            # Lint + format (Biome)
 pnpm test             # Kjør tester i alle workspaces (kun pakker med testscript)
 ```
 
+### AI og Playwright-skills
+
+Før Playwright-arbeid skal AI sjekke at `playwright-testing`,
+`playwright-component-testing`, `playwright-cli` og `playwright-trace` finnes.
+Hvis en mangler, be brukeren installere den. Bruk prosjektets lokale Playwright:
+
+```bash
+pnpm exec playwright init-skills
+```
+
+Ikke installer globalt eller behold genererte skills i repoet. Kontroller
+output, flytt bare Playwright-mappene til `~/.copilot/skills/`, slett
+repo-kopiene og start en ny Copilot-økt.
+
 ## Grenser
 
 - Ikke logg PII (fødselsnummer, navn, adresse)
+  - `navLogger` og Faro maskerer fødselsnummer automatisk (`packages/common/src/logging/maskerFnr.ts`).
+    Dette er et **sikkerhetsnett**, ikke en tillatelse — regelen over står ved lag.
+  - Feltet `maskert_fnr` i loggen betyr at et kallsted lekket og bør rettes.
+  - `secureNavLogger` maskeres ikke. Bruk den bevisst når identer faktisk må logges.
 - Bruk Aksel Design System-komponenter og spacing-tokens (`space-*`)
 - Ikke sett CPU-limits i Nais-manifest (kun requests)
 - Aldri hardkode tokens eller secrets
+- Bare lag kommentarer på steder der det er nødvendig for å forklare hvorfor noe gjøres på en spesiell måte. Ikke kommenter åpenbare ting.

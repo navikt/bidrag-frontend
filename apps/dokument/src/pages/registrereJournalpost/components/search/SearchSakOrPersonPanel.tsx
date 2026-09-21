@@ -63,7 +63,7 @@ export default function SearchSakOrPersonPanel(): ReactElement {
                 />
                 <AvansertSok onResult={(data) => doSearch(data.ident)} />
             </div>
-            <React.Suspense fallback={<></>}>
+            <React.Suspense fallback={null}>
                 <SearchFailurePanel resetSearch={resetSearch} failedSearchValue={failedSearchValue} />
             </React.Suspense>
         </div>

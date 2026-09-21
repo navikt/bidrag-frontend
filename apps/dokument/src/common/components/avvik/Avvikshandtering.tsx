@@ -30,7 +30,7 @@ function Avvikshandtering() {
                 Avvikshåndtering
             </Button>
             {isModalOpen && (
-                <React.Suspense fallback={<></>}>
+                <React.Suspense fallback={null}>
                     <AvvikshandteringModal
                         closeModal={closeModal}
                         paloggetEnhet={påloggetEnhet}

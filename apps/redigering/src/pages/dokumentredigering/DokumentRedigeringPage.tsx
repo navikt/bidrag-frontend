@@ -7,8 +7,7 @@ import {
     queryParams,
 } from "@bidrag/common";
 import { Loader } from "@navikt/ds-react";
-import React from "react";
-
+import { Suspense } from "react";
 import { lastDokumenter } from "../../api/queries";
 import type { EditDocumentMetadata } from "../../types/EditorTypes";
 import PageWrapper from "../PageWrapper";
@@ -26,9 +25,9 @@ interface DokumentRedigeringPageProps {
 export default function DokumentRedigeringPage(props: DokumentRedigeringPageProps) {
     return (
         <PageWrapper name={"dokumentredigering"}>
-            <React.Suspense fallback={<Loader size="large"></Loader>}>
+            <Suspense fallback={<Loader size="large"></Loader>}>
                 <DokumentRedigeringContainer {...props} />
-            </React.Suspense>
+            </Suspense>
         </PageWrapper>
     );
 }
@@ -39,6 +38,7 @@ function DokumentRedigeringContainer({ journalpostId, dokumentreferanse, dokumen
     if (!isLoading && !documentFile) {
         return <div>Det skjedde en feil ved lasting av dokument</div>;
     }
+
     function broadcast(document: Uint8Array, config: EditDocumentMetadata) {
         const params = queryParams();
         const message: BroadcastMessage<EditDocumentBroadcastMessage> = Broadcast.convertToBroadcastMessage(params.id, {
@@ -48,6 +48,7 @@ function DokumentRedigeringContainer({ journalpostId, dokumentreferanse, dokumen
         });
         Broadcast.sendBroadcast(BroadcastNames.EDIT_DOCUMENT_RESULT, message);
     }
+
     async function broadcastAndCloseWindow(config: EditDocumentMetadata, document: Uint8Array) {
         await broadcast(document, config);
         window.close();

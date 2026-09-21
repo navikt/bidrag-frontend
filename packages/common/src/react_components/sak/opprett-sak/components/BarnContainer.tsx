@@ -1,9 +1,9 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Button, Checkbox } from "@navikt/ds-react";
 import { type ChangeEvent, type MouseEvent, useEffect, useState } from "react";
-import { RolleType } from "../RolleType.ts";
 import { useOpprettSak } from "../../../../api/useOpprettSakApiData.ts";
 import { useSakContext } from "../OpprettSakContext.tsx";
+import { RolleType } from "../RolleType.ts";
 import { createSakPayload } from "../sakUtils.ts";
 import type { IPersonensReellMottakerRolle } from "../types.ts";
 import DefaultButton from "./DefaultButton.tsx";

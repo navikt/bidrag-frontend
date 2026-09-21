@@ -1,7 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { BodyLong, Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
-import { useParams } from "react-router";
 import SøkPerson from "./components/SøkPerson.tsx";
 
 interface PersonSøkWrapperProps {
@@ -12,6 +11,7 @@ interface PersonSøkWrapperProps {
     onAvbryt: () => void;
     ikon?: ReactNode;
     children?: ReactNode;
+    saksnummer?: string;
 }
 
 export default function PersonSøkWrapper({
@@ -22,9 +22,8 @@ export default function PersonSøkWrapper({
     onAvbryt,
     ikon,
     children,
+    saksnummer,
 }: PersonSøkWrapperProps) {
-    const { saksnummer } = useParams();
-
     return (
         <Modal open onClose={onAvbryt} width="medium" aria-label={tittel}>
             <Modal.Header>

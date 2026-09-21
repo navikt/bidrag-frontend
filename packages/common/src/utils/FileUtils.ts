@@ -1,6 +1,7 @@
 import type { FileData } from "../types";
 import { Base64ByteConverter } from "./Base64ByteConverter";
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class FileUtils {
     static dataToFileUrl(data: FileData, type: string): string {
         let byteData = data;

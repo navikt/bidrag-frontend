@@ -1,6 +1,6 @@
 import "./FeedbackForm.css";
-
 import { BodyShort, Button, HStack, Textarea, VStack } from "@navikt/ds-react";
+import type { MouseEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useFeedback } from "./FeedbackContext";
 import type { Rating } from "./feedback";
@@ -39,7 +39,7 @@ const FeedbackForm = ({ onDoNotShow }: Props) => {
         });
     };
 
-    const handleFormClick = (e: React.MouseEvent) => {
+    const handleFormClick = (e: MouseEvent) => {
         e.stopPropagation();
     };
 

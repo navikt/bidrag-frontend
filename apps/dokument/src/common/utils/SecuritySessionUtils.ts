@@ -1,5 +1,6 @@
 import { v4 as uuidV4 } from "uuid";
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export default class SecuritySessionUtils {
     static async hentSecuritySessionTokenFromBackend() {
         const tokenReq = await fetch("/session", { method: "GET" });
@@ -20,6 +21,7 @@ export default class SecuritySessionUtils {
         LocalStorage.set("correlationId", correlationId);
         return correlationId;
     }
+
     static async getSession(): Promise<SessionResponse> {
         return {
             user_id: "",
@@ -37,10 +39,13 @@ interface SessionResponse {
     user_id: string;
     correlation_id: string;
 }
+
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export class LocalStorage {
     static reset() {
         window.sessionStorage.clear();
     }
+
     static get(key: string) {
         return window.sessionStorage.getItem(key);
     }

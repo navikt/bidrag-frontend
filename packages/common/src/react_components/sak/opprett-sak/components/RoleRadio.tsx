@@ -1,6 +1,6 @@
-import PersonNavnIdent from "../../../person/PersonNavnIdent.tsx";
 import { Radio, RadioGroup } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
+import PersonNavnIdent from "../../../person/PersonNavnIdent.tsx";
 
 import { RolleType } from "../RolleType.ts";
 import type { ISelectData } from "./RoleSelect.tsx";

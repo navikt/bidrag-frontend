@@ -28,6 +28,7 @@ const individsifferAsString = (num: number): string => {
     return `${num}`;
 };
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Hjelpefunksjoner
 export default class IdentUtils {
     static isFnr(value: string) {
         return IdentUtils.validateFnr(value);

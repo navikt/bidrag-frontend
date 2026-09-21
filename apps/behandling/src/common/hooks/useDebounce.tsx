@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// biome-ignore-all lint/suspicious/noExplicitAny: Hjelpefunksjoner
 
 import debounce from "lodash/debounce";
 import { useEffect, useMemo, useRef } from "react";

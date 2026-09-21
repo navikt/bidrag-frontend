@@ -1,3 +1,4 @@
+import { maskerFnr } from "@bidrag/common/logging/maskerFnr";
 import { ReactIntegration } from "@grafana/faro-react";
 import { getWebInstrumentations, initializeFaro } from "@grafana/faro-web-sdk";
 import type { NaisConfig } from "~/nais.ts";
@@ -37,13 +38,18 @@ export function initFaro(nais: NaisConfig) {
                 }
             }
 
-            // Drop items that may contain fødselsnummer (11-digit pattern)
-            const payload = JSON.stringify(item);
-            if (/\b\d{11}\b/.test(payload)) {
-                return null;
+            // Maskerer fødselsnummer i stedet for å droppe hele signalet. Tidligere ble
+            // alt med 11 sammenhengende sifre forkastet, slik at en falsk positiv
+            // (kontonummer, ordre-ID) stille fjernet et helt feilsignal.
+            const { verdi, antall } = maskerFnr(item);
+            if (antall === 0) {
+                return item;
             }
 
-            return item;
+            return {
+                ...verdi,
+                meta: { ...verdi.meta, maskert_fnr: String(antall) },
+            };
         },
     });
 

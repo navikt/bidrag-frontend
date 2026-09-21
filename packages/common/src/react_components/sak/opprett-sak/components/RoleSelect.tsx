@@ -1,6 +1,6 @@
-import PersonNavnIdent from "../../../person/PersonNavnIdent.tsx";
 import { Select } from "@navikt/ds-react";
 import { type ChangeEvent, useEffect, useState } from "react";
+import PersonNavnIdent from "../../../person/PersonNavnIdent.tsx";
 
 import { RolleType } from "../RolleType.ts";
 

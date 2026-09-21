@@ -15,8 +15,7 @@ import type { ComposeOption, ECharts, SetOptionOpts } from "echarts/core";
 import { getInstanceByDom, init, use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import type { InsideDataZoomOption, SliderDataZoomOption } from "echarts/types/dist/shared";
-import type React from "react";
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactElement, useEffect, useRef, useState } from "react";
 
 use([
     LegendComponent,
@@ -51,7 +50,7 @@ export interface ReactEChartsProps {
 
 let currentIndex = -1;
 
-export function ReactECharts({ option, style, settings }: ReactEChartsProps): React.ReactElement {
+export function ReactECharts({ option, style, settings }: ReactEChartsProps): ReactElement {
     const chartRef = useRef<HTMLDivElement>(null);
     const [chartInitialized, setChartInitialized] = useState(false);
 

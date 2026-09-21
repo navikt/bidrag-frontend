@@ -46,7 +46,6 @@ const EnvSchema = z.object({
     // Lokal utvikling: overstyr feature toggles uten token, f.eks. "mitt.flagg=true,annet=false"
     UNLEASH_LOCAL_TOGGLES: z.string().optional(),
     NODE_ENV: z.enum(["development", "test", "production"]),
-    STACKTRACE_SOURCE_MAP_ALLOWED_HOSTS: z.string().optional(),
     OVERRIDE_BRUK_DOKUMENTVISNING_POC: z
         .enum(["true", "false"])
         .optional()

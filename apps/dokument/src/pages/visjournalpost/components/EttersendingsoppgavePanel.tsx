@@ -2,7 +2,7 @@ import { EttersendingsppgaveDtoStatusEnum, JournalpostStatus } from "@bidrag/api
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { BodyShort, Box, Button, Heading, HStack, Label, List, Modal, Table } from "@navikt/ds-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React from "react";
+import { useState } from "react";
 import { BIDRAG_DOKUMENT_API } from "../../../api/api";
 import { DokumentQueryKeys, useHentJournalpost } from "../../../hooks/useDokumentApi";
 
@@ -89,7 +89,7 @@ export default function EttersendingsoppgavePanel() {
 }
 
 function OpprettEttersendelseOppgaveButton() {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const qc = useQueryClient();
     const journalpost = useHentJournalpost();
     const opprettEttersendingsoppgave = useMutation({

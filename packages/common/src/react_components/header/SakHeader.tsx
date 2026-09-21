@@ -1,25 +1,18 @@
-import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
-import { Box, CopyButton, Skeleton } from "@navikt/ds-react";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Box, CopyButton } from "@navikt/ds-react";
+import { type ComponentType, type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHentFodselsdatoer } from "../../api";
 import type { IRolleDetaljer } from "../../types";
-import { RolleTypeAbbreviation, RolleTypeDeprecated, RolleTypeFullName } from "../../types";
-import RolleCard from "../roller/RolleCard";
+import { RolleTypeAbbreviation, RolleTypeFullName } from "../../types";
+import ExpandedRoles, { type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 type TypeBehandling = string;
-type HeaderRolle = RolleDto & { visningsnavn?: string };
 
 interface ISkjermbildeDetaljer {
     navn: string;
     referanse: string | number;
 }
-
-type SaksnummerRoller = {
-    saksnummer: string;
-    roller: HeaderRolle[];
-};
 
 /** New props for full featured header */
 interface ISakHeaderNewProps {
@@ -28,7 +21,7 @@ interface ISakHeaderNewProps {
     selectedSaksnummer?: string;
     setSelectedSaksnummer: (saksnummer: string | undefined) => void;
     setSelectedRoller: (roller: HeaderRolle[]) => void;
-    HeaderTittel: React.ComponentType<{ type: TypeBehandling; style?: React.CSSProperties }>;
+    HeaderTittel: ComponentType<{ type: TypeBehandling; style?: CSSProperties }>;
     /** Saksnummer som har minst én valideringsfeil - fanen markeres da med et varselikon. */
     saksnummerMedValideringsfeil?: Set<string>;
     /** Saksnummer som har nye opplysninger (ikke-aktiverte endringer) - fanen markeres da med et oppdateringsikon. */
@@ -45,62 +38,34 @@ interface ISakHeaderLegacyProps {
 type ISakHeaderProps = ISakHeaderNewProps | ISakHeaderLegacyProps;
 
 // Styles
-const TAB_CONTAINER_STYLE: React.CSSProperties = {
+const TAB_CONTAINER_STYLE: CSSProperties = {
     display: "flex",
     alignItems: "center",
     gap: "0.25rem",
     padding: "0.5rem 1rem",
 };
 
-const TAB_BUTTON_STYLE: React.CSSProperties = {
+const TAB_BUTTON_STYLE: CSSProperties = {
     background: "transparent",
     border: "none",
     whiteSpace: "nowrap",
     cursor: "pointer",
 };
 
-const COPY_BUTTON_STYLE: React.CSSProperties = {
+const COPY_BUTTON_STYLE: CSSProperties = {
     borderRadius: 0,
     border: 0,
     background: "transparent",
     boxShadow: "none",
 };
 
-const CHEVRON_BUTTON_STYLE: React.CSSProperties = {
+const CHEVRON_BUTTON_STYLE: CSSProperties = {
     background: "transparent",
     border: 0,
     cursor: "pointer",
 };
 
-const ROLE_CARD_CONTAINER_STYLE: React.CSSProperties = {
-    border: "1px solid var(--ax-border-neutral-subtle)",
-    borderRadius: "0.375rem",
-    background: "var(--ax-bg-default)",
-    margin: "0.125rem 0.375rem",
-};
-
 // Helpers
-
-// Sorteringsvekt per rolletype: BM først, deretter BP, så barn (BA), øvrige roller sist.
-// Dekker alle tre RolleType-variantene (forkortelse/fullt navn/deprecated) – samme mønster
-// som brukes i `RoleTags.ts` – slik at sorteringen fungerer uansett hvilken variant API-et sender.
-const _ROLLE_SORTERINGSVEKT: Record<string, number> = {
-    [RolleTypeAbbreviation.BM]: 0,
-    [RolleTypeAbbreviation.BP]: 1,
-    [RolleTypeAbbreviation.BA]: 2,
-    [RolleTypeAbbreviation.RM]: 3,
-    [RolleTypeAbbreviation.FR]: 4,
-
-    [RolleTypeFullName.BIDRAGSMOTTAKER]: 0,
-    [RolleTypeFullName.BIDRAGSPLIKTIG]: 1,
-    [RolleTypeFullName.BARN]: 2,
-    [RolleTypeFullName.REELMOTTAKER]: 3,
-    [RolleTypeFullName.FEILREGISTRERT]: 4,
-
-    [RolleTypeDeprecated.BIDRAGS_MOTTAKER]: 0,
-    [RolleTypeDeprecated.BIDRAGS_PLIKTIG]: 1,
-    [RolleTypeDeprecated.REELL_MOTTAKER]: 3,
-};
 
 const BARN_ROLLETYPER = new Set<string>([RolleTypeAbbreviation.BA, RolleTypeFullName.BARN]);
 
@@ -181,7 +146,7 @@ const SaksnummerTab = ({
     const textColor = isSelected ? "var(--ax-text-default)" : "var(--ax-text-accent-subtle)";
     const fontWeight = isSelected ? 600 : 400;
 
-    const containerStyle: React.CSSProperties = {
+    const containerStyle: CSSProperties = {
         ...TAB_CONTAINER_STYLE,
         position: "relative",
         background: backgroundColor,
@@ -234,40 +199,6 @@ const SaksnummerTab = ({
                     }}
                 />
             )}
-        </Box>
-    );
-};
-
-interface ExpandedRolesProps {
-    saksnummerRoller: SaksnummerRoller | undefined;
-}
-
-const RolleCardSkeleton = () => <Skeleton variant="text" width={"220px"} height={"54px"} />;
-
-const ExpandedRoles = ({ saksnummerRoller }: ExpandedRolesProps) => {
-    if (!saksnummerRoller) return null;
-
-    return (
-        <Box
-            style={{
-                padding: "0.75rem",
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.5rem",
-                background: "white",
-            }}
-            shadow="dialog"
-        >
-            {saksnummerRoller.roller.map((rolle) => (
-                <Box key={rolle.id} style={ROLE_CARD_CONTAINER_STYLE}>
-                    {/* Suspense skoperes rundt kun rollekortet (person-navn-oppslaget), ikke hele
-                    SakHeader, slik at tittel/faner alltid rendres umiddelbart og kun selve
-                    navnevisningen viser en liten skjelett-boks mens personoppslaget laster. */}
-                    <Suspense fallback={<RolleCardSkeleton />}>
-                        <RolleCard rolle={rolle} />
-                    </Suspense>
-                </Box>
-            ))}
         </Box>
     );
 };
@@ -380,8 +311,8 @@ export default function SakHeader(props: ISakHeaderProps) {
         // til RolleDto-baserte HeaderRolle som resten av komponenten forventer.
         const transformedProps: ISakHeaderNewProps = {
             rollerMedPersonNavn: legacyProps.roller.map(
-                (r): HeaderRolle => ({
-                    id: r.id ?? 0,
+                (r, index): HeaderRolle => ({
+                    id: r.id ?? index,
                     rolletype: r.rolleType as unknown as Rolletype,
                     ident: r.ident,
                     navn: r.navn,
