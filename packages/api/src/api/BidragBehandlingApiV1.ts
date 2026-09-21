@@ -47,6 +47,7 @@ export enum Grunnlagstype {
   TILLEGGSSTONADPERIODE = "TILLEGGSSTØNAD_PERIODE",
   BARNETILSYNMEDSTONADPERIODE = "BARNETILSYN_MED_STØNAD_PERIODE",
   FORPLEINING_UTGIFT = "FORPLEINING_UTGIFT",
+  FORPLEINING_PERIODE = "FORPLEINING_PERIODE",
   NETTO_BARNETILSYN = "NETTO_BARNETILSYN",
   UNDERHOLDSKOSTNAD = "UNDERHOLDSKOSTNAD",
   BPS_ANDEL_UNDERHOLDSKOSTNAD = "BPS_ANDEL_UNDERHOLDSKOSTNAD",
@@ -4508,6 +4509,11 @@ export interface NotatFaktiskTilsynsutgiftDto {
   total: number;
 }
 
+export interface NotatForpleiningDto {
+  periode: DatoperiodeDto;
+  beløp: number;
+}
+
 export interface NotatGebyrDetaljerDto {
   søknad?: NotatGebyrSoknadDetaljerDto | null;
   inntekt: NotatGebyrInntektDto;
@@ -4787,6 +4793,7 @@ export interface NotatUnderholdBarnDto {
   stønadTilBarnetilsyn: NotatStonadTilBarnetilsynDto[];
   faktiskTilsynsutgift: NotatFaktiskTilsynsutgiftDto[];
   tilleggsstønad: NotatTilleggsstonadDto[];
+  forpleining: NotatForpleiningDto[];
   underholdskostnad: NotatUnderholdskostnadBeregningDto[];
   begrunnelse?: NotatBegrunnelseDto | null;
 }
@@ -4804,6 +4811,7 @@ export interface NotatUnderholdskostnadBeregningDto {
   stønadTilBarnetilsyn: number;
   tilsynsutgifter: number;
   barnetrygd: number;
+  forpleining?: number | null;
   total: number;
   beregningsdetaljer?: NotatUnderholdskostnadPeriodeBeregningsdetaljer | null;
 }
