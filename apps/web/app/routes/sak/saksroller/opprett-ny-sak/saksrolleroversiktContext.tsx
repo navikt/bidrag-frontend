@@ -3,6 +3,8 @@ import type { ForelderBarnRelasjonDto, MotpartBarnRelasjon, PersonDto } from "@b
 import { SecureLoggerService } from "@bidrag/common";
 import { useQueryClient } from "@tanstack/react-query";
 import { createContext, type PropsWithChildren, useContext, useState } from "react";
+
+import { hentPersonMotpartBarnRelasjonQueryOptions } from "~/api/useApi.ts";
 import type { PartISaken } from "./opprett-sak-schema";
 
 export type Sakstype = "BARNEBIDRAG" | "EKTEFELLEBIDRAG" | "OPPFOSTRINGSBIDRAG" | "FARSKAP";
@@ -70,14 +72,9 @@ function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
     const queryClient = useQueryClient();
 
     const hentBarnkurver = async (ident: string) => {
-        return queryClient.fetchQuery({
-            queryKey: ["hent_barnkurver", ident],
-            queryFn: async () => {
-                const { data } = await BIDRAG_PERSON_API.motpartbarnrelasjon.getPersonensMotpartBarnRelasjon({ ident });
-                await SecureLoggerService.info(`Hentet barnkurver for ident ${ident}`);
-                return data.personensMotpartBarnRelasjon ?? [];
-            },
-        });
+        const data = await queryClient.fetchQuery(hentPersonMotpartBarnRelasjonQueryOptions({ ident }));
+        await SecureLoggerService.info(`Hentet barnkurver for ident ${ident}`);
+        return data?.personensMotpartBarnRelasjon ?? [];
     };
 
     const hentForelderBarnRelasjon = async (ident: string): Promise<ForelderBarnRelasjonDto> => {
