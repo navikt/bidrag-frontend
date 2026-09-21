@@ -17,6 +17,8 @@ export default function ModiaLink({ ident, className }: ModiaLinkProps) {
             rel="noopener noreferrer"
             title="Åpne personen i Modia"
             className={className}
-        >m</Link>
+        >
+            m
+        </Link>
     );
 }

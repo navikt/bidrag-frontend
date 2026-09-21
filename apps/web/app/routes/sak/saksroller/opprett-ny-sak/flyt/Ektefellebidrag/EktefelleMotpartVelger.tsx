@@ -4,8 +4,8 @@ import { Alert, BodyShort, Box, Button, Heading, VStack } from "@navikt/ds-react
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonSøkModal from "../../../components/PersonSøkModal";
+import PersonKort from "../../../felles/PersonKort";
 import type { Diskresjonskode, EktefellebidragSkjemaData, ForelderPartRolle } from "../../opprett-sak-schema";
-import PersonKort from "./PersonKort";
 
 type Props = {
     form: UseFormReturn<EktefellebidragSkjemaData>;
