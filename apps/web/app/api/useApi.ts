@@ -938,30 +938,58 @@ export function useHentDokument() {
     });
 }
 
+/**
+ * Henter én sammenslått PDF for en liste med dokumenter. Hvert element må være på formatet
+ * `<Kilde>-<journalpostId>:<dokumentReferanse>` (f.eks. `JOARK-123:456`), slik `hentDokumenter`-
+ * endepunktet forventer.
+ */
+export async function hentDokumenterApi({
+    dokumenter,
+    resizeToA4,
+    optimizeForPrint,
+}: HentDokumenterRequest): Promise<ArrayBuffer> {
+    try {
+        const queryParams = new URLSearchParams();
+        dokumenter.forEach((dokument) => {
+            queryParams.append("dokument", dokument);
+        });
+        queryParams.set("resizeToA4", String(Boolean(resizeToA4)));
+        queryParams.set("optimizeForPrint", String(optimizeForPrint ?? true));
+
+        const response = await BIDRAG_DOKUMENT_API.request<ArrayBuffer, unknown>({
+            path: `/dokument?${queryParams.toString()}`,
+            method: "GET",
+            secure: true,
+            format: "arraybuffer",
+        });
+
+        return response.data;
+    } catch (e) {
+        return handleApiError(e, "hente dokumentene");
+    }
+}
+
 // Her brukes HentDokumenterRequest akkurat som før!
 export function useHentDokumenter() {
     return useMutation<ArrayBuffer, AxiosError | TilgangsFeilError, HentDokumenterRequest>({
         mutationKey: ["hent_dokumenter"],
-        mutationFn: async ({ dokumenter, resizeToA4, optimizeForPrint }) => {
-            try {
-                const queryParams = new URLSearchParams();
-                dokumenter.forEach((dokument) => {
-                    queryParams.append("dokument", dokument);
-                });
-                queryParams.set("resizeToA4", String(Boolean(resizeToA4)));
-                queryParams.set("optimizeForPrint", String(optimizeForPrint ?? true));
+        mutationFn: hentDokumenterApi,
+    });
+}
 
-                const response = await BIDRAG_DOKUMENT_API.request<ArrayBuffer, unknown>({
-                    path: `/dokument?${queryParams.toString()}`,
-                    method: "GET",
-                    secure: true,
-                    format: "arraybuffer",
-                });
-
-                return response.data;
-            } catch (e) {
-                return handleApiError(e, "hente dokumentene");
-            }
+/**
+ * Query-variant av `hentDokumenter` for visning av én sammenslått PDF drevet av URL-en (f.eks.
+ * `?dokument=JOARK-123:456&dokument=JOARK-123:789`). Returnerer samme `{ type, payload }`-form som
+ * `useHentSaksdokumentPdf`, slik at `PdfVisning` kan gjenbrukes direkte.
+ */
+export function useHentDokumenterPdf(dokumenter: string[], enabled: boolean = true) {
+    return useQuery({
+        queryKey: ["pdf-dokumenter", dokumenter],
+        enabled: enabled && dokumenter.length > 0,
+        staleTime: 1000 * 60 * 5,
+        queryFn: async () => {
+            const arrayBuffer = await hentDokumenterApi({ dokumenter });
+            return { type: "RAW" as const, payload: arrayBuffer };
         },
     });
 }
