@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonIdent } from "@bidrag/common";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
+import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { BodyShort, Box, Heading, HGrid, HStack, Radio, RadioGroup, Tag, VStack } from "@navikt/ds-react";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import DiskresjonAlert from "../../../components/DiskresjonAlert";
@@ -58,9 +58,7 @@ export default function RolleVelger({ form, foreldre }: Props) {
                                 const erBidragspliktig = person?.erKjent && person.rolle === "bidragspliktig";
                                 const erBidragsmottaker = person?.erKjent && person.rolle === "bidragsmottaker";
                                 const erUvalgt = !erBidragspliktig && !erBidragsmottaker;
-                                const alder = forelder?.fødselsdato
-                                    ? beregnAlder(forelder.fødselsdato)
-                                    : beregnAlderFraFnr(forelder.ident);
+                                const alder = beregnAlderForPerson(forelder);
 
                                 return (
                                     <Box

@@ -1,6 +1,6 @@
 import { TilgangsFeilError } from "@bidrag/api";
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
+import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { Alert, BodyShort, Box, Select, VStack } from "@navikt/ds-react";
 import { type ChangeEvent, Suspense, useEffect, useState } from "react";
 import { useHentForeldreinformasjonForBarnSuspense, useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
@@ -210,7 +210,7 @@ function RelasjonTilBarnBranch({
             .map((relasjon) => ({
                 ...relasjon,
                 fellesBarn: relasjon.fellesBarn.filter((barn) => {
-                    const alder = barn?.fødselsdato ? beregnAlder(barn.fødselsdato) : beregnAlderFraFnr(barn.ident);
+                    const alder = beregnAlderForPerson(barn);
 
                     return alder !== null && alder <= MAKS_ALDER_BARN;
                 }),

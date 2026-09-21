@@ -2,7 +2,7 @@ import { TilgangsFeilError } from "@bidrag/api";
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { SecureLoggerService } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils/datoUtils";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
+import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, BodyShort, Box, Heading, VStack } from "@navikt/ds-react";
 import { useEffect, useRef, useState } from "react";
@@ -158,9 +158,7 @@ function ForelderUtenBarnFlytContent() {
             const søskenMedAlder: BarnMedAlder[] = relasjonerMedAlleBarn
                 .flatMap((x) => x.fellesBarn)
                 .flatMap((enkeltBarn) => {
-                    const alder = enkeltBarn?.fødselsdato
-                        ? beregnAlder(enkeltBarn.fødselsdato)
-                        : beregnAlderFraFnr(enkeltBarn.ident);
+                    const alder = beregnAlderForPerson(enkeltBarn);
 
                     if (
                         alder === null ||

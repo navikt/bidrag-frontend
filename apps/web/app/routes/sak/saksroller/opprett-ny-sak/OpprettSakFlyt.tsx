@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
+import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { PersonIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, HStack, Loader, VStack } from "@navikt/ds-react";
 import { Suspense, useMemo, useRef, useState } from "react";
@@ -159,7 +159,7 @@ export default function OpprettSakFlyt() {
 
     const leggTilPartISaken = (person: PersonDto) => {
         setPartISaken(person);
-        const partISakAlder = person?.fødselsdato ? beregnAlder(person.fødselsdato) : beregnAlderFraFnr(person.ident);
+        const partISakAlder = beregnAlderForPerson(person);
         setPartISakenAlder(partISakAlder);
 
         oppdaterFlytForSakstypeOgPart(person, sakstype);

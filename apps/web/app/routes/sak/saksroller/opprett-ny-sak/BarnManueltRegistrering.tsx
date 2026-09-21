@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
+import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { PlusIcon } from "@navikt/aksel-icons";
 import { Button, VStack } from "@navikt/ds-react";
 import { useState } from "react";
@@ -51,7 +51,7 @@ export default function BarnManueltRegistrering({ form, leggTilBarnMauell, barnk
             }
         }
 
-        const alder = barn?.fødselsdato ? beregnAlder(barn.fødselsdato) : beregnAlderFraFnr(barn.ident);
+        const alder = beregnAlderForPerson(barn);
 
         if (alder === null) {
             throw new Error("Kunne ikke beregne alder for barnet.");

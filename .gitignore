@@ -39,3 +39,6 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+
+# Scratch/plan files, not for commit
+tmp/

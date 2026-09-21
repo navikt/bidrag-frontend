@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
+import { beregnAlderForPerson } from "@bidrag/utils";
 import { PersonTallShortIcon, PlusIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, Box, Button, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
@@ -38,8 +38,7 @@ export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps
         (søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident),
     );
 
-    const alderFor = (person: PersonDto) =>
-        person?.fødselsdato ? beregnAlder(person.fødselsdato) : (beregnAlderFraFnr(person.ident) ?? 0);
+    const alderFor = (person: PersonDto) => beregnAlderForPerson(person) ?? 0;
 
     const finnValideringsfeil = (person: PersonDto): string | undefined => {
         if (roller.some((b) => b.fodselsnummer === person.ident)) {
