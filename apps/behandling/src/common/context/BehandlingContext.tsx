@@ -1,5 +1,5 @@
 import {
-    type ErSamvaerVirkningLikForAlleForSak,
+    type ErLikForAlleBasertPaSak,
     type RolleDto,
     Stonadstype,
     type TypeBehandling,
@@ -110,10 +110,10 @@ interface IBehandlingContext {
     getPreviousStep: (currentStep: stepDef) => number;
     vurderSeparatSamvær?: boolean;
     setVurderSeparatSamvær?: Dispatch<SetStateAction<boolean>>;
-    setVurderSeparatSamværForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
+    setVurderSeparatSamværForSaker?: (saker: ErLikForAlleBasertPaSak[]) => void;
     vurderSeparatVirkningstidspunkt?: boolean;
     setVurderSeparatVirkningstidspunkt?: Dispatch<SetStateAction<boolean>>;
-    setVurderSeparatVirkningstidspunktForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
+    setVurderSeparatVirkningstidspunktForSaker?: (saker: ErLikForAlleBasertPaSak[]) => void;
     isGrunnlagLoading: boolean;
 }
 
@@ -217,11 +217,11 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     );
 
     const setVurderSeparatSamværForSaker = useCallback(
-        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+        (saker: ErLikForAlleBasertPaSak[]) => {
             setVurderSeparatSamværPerSak?.((prev) => {
                 const next = { ...prev };
                 for (const sak of saker) {
-                    next[sak.saksnummer] = !sak.erLikForAlle;
+                    next[sak.saksnummer] = !sak.kanVurdereSamlet || !sak.erLikForAlle;
                 }
                 return next;
             });
@@ -255,7 +255,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     );
 
     const setVurderSeparatVirkningstidspunktForSaker = useCallback(
-        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+        (saker: ErLikForAlleBasertPaSak[]) => {
             setVurderSeparatVirkningstidspunktPerSak?.((prev) => {
                 const next = { ...prev };
                 for (const sak of saker) {

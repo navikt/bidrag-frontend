@@ -231,7 +231,7 @@ const Main = () => {
         selectedRoller,
         selectedSaksnummer,
     } = useBehandlingProvider();
-    const { roller } = useGetBehandlingV2();
+    const { samværV2 } = useGetBehandlingV2();
     const mergeSamværMutation = useOnMergeSamvær();
     const ref = useRef<HTMLDialogElement>(null);
     const visibleSamværBarn = useMemo(() => {
@@ -277,11 +277,7 @@ const Main = () => {
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
 
-    const datoer = roller
-        .filter((i) => i.rolletype === Rolletype.BA && i.saksnummer === selectedSaksnummer)
-        .map((i) => i.beregnFraDato + i.beregnTilDato);
-
-    const erVirkningLikForAlleRoller = datoer.every((d) => d === datoer[0]);
+    const samværSak = samværV2.erSammeForAlleSaker.find((i)=>i.saksnummer === selectedSaksnummer) ?? samværV2.erSammeForAlleSaker?.[0]
     return (
         <div>
             <ConfirmationModal
@@ -305,11 +301,11 @@ const Main = () => {
                     </>
                 }
             />
-            {visibleSamværBarn.length > 1 && erVirkningLikForAlleRoller && (
+            {visibleSamværBarn.length > 1 && (
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
-                    readOnly={lesemodus}
+                    readOnly={lesemodus || !samværSak.kanVurdereSamlet}
                     onChange={(e) => {
                         if (e.target.checked) {
                             setVurderSeparat(e.target.checked);
