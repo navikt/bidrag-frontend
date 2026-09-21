@@ -8,7 +8,7 @@ import {
 import type { IRolleDetaljer, RolleTypeAbbreviation } from "@bidrag/common";
 import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
 import { Button, Heading } from "@navikt/ds-react";
-import { useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
+import { useIsMutating, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
 import React, {
     createContext,
     type Dispatch,
@@ -38,6 +38,7 @@ import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { PERSON_API } from "../constants/api";
 import urlSearchParams from "../constants/behandlingQueryKeys";
 import behandlingQueryKeys from "../constants/behandlingQueryKeys";
+import { fatteVedtakMutationKey } from "../constants/mutationKeys";
 import text from "../constants/texts";
 import { shouldShowGrunnlagLoadingProgressbar } from "../helpers/shouldShowGrunnlagProgressbar";
 import { QueryKeys, useBehandlingV2, useSjekkLasterGrunnlag } from "../hooks/useApiData";
@@ -115,6 +116,7 @@ interface IBehandlingContext {
     setVurderSeparatVirkningstidspunkt?: Dispatch<SetStateAction<boolean>>;
     setVurderSeparatVirkningstidspunktForSaker?: (saker: ErLikForAlleBasertPaSak[]) => void;
     isGrunnlagLoading: boolean;
+    erFatterVedtak: boolean;
 }
 
 export const BehandlingContext = createContext<IBehandlingContext | null>(null);
@@ -487,8 +489,15 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         setActiveTab,
     ]);
 
+    // Sant mens "fatte vedtak" kjører. Da skal ingen navigasjon (steg/fane) eller sidemeny være
+    // mulig, slik at behandlingen ikke endres mens vedtaket fattes i bakgrunnen.
+    const erFatterVedtak = useIsMutating({ mutationKey: fatteVedtakMutationKey }) > 0;
+    const erFatterVedtakRef = useRef(erFatterVedtak);
+    erFatterVedtakRef.current = erFatterVedtak;
+
     const onNavigateToTab = useCallback(
         (nextTab: string) => {
+            if (erFatterVedtakRef.current) return;
             if (mutating || mutationStatusDerived === "pending" || debouncingRef.current) {
                 setNavigatingToNextTab(true);
                 setNextTab(nextTab);
@@ -564,6 +573,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     };
     const onStepChange = useCallback(
         (x: number, query?: Record<string, string>, hash?: string) => {
+            if (erFatterVedtakRef.current) return;
             const currentPageErrors = pageErrorsOrUnsavedState[activeStep];
             setPageTabs(() => []); // Clear tabs when changing step to prevent showing incorrect tabs during transition
             trackStep(x, activeStep);
@@ -669,6 +679,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             setVurderSeparatVirkningstidspunkt,
             setVurderSeparatVirkningstidspunktForSaker,
             isGrunnlagLoading,
+            erFatterVedtak,
         }),
         [
             activeStep,
@@ -700,6 +711,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             vurderSeparatSamvær,
             vurderSeparatVirkningstidspunkt,
             isGrunnlagLoading,
+            erFatterVedtak,
             searchParams,
         ],
     );
