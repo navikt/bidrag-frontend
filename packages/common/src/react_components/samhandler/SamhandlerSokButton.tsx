@@ -1,4 +1,4 @@
-import type { ButtonProps } from "@navikt/ds-react";
+import type { LinkProps } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
 import { BroadcastNames, type SamhandlerBroadcastMessage } from "../../types";
@@ -12,11 +12,11 @@ type SamhandlerSokProps = {
 export default function SamhandlerSøkButton({
     onResult,
     onError,
-    ...buttonProps
-}: SamhandlerSokProps & Omit<ButtonProps, "children" | "onError">): ReactNode {
+    ...linkProps
+}: SamhandlerSokProps & Omit<LinkProps, "children" | "onError" | "onClick" | "href">): ReactNode {
     return (
         <PopupSøkButton<SamhandlerBroadcastMessage>
-            {...buttonProps}
+            {...linkProps}
             channelName={BroadcastNames.SAMHANDLERSOK_RESULT_EVENT}
             søkPath="/samhandler/søk/"
             tekst="Samhandlersøk"

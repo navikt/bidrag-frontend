@@ -1,4 +1,3 @@
-import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Link } from "@navikt/ds-react";
 
 type ModiaLinkProps = {
@@ -18,8 +17,6 @@ export default function ModiaLink({ ident, className }: ModiaLinkProps) {
             rel="noopener noreferrer"
             title="Åpne personen i Modia"
             className={className}
-        >
-            Modia <ExternalLinkIcon aria-hidden />
-        </Link>
+        >m</Link>
     );
 }

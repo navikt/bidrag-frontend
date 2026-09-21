@@ -15,6 +15,7 @@ export default function SakButtons({
     valideringsFeil,
     harAdvarsel,
     harEndringer,
+    harÅpneRedigeringer,
     suksessmelding,
     statusRef,
 }: {
@@ -24,6 +25,7 @@ export default function SakButtons({
     valideringsFeil?: string | null;
     harAdvarsel: boolean;
     harEndringer: boolean;
+    harÅpneRedigeringer?: boolean;
     suksessmelding?: string | null;
     statusRef?: RefObject<HTMLDivElement | null>;
 }) {
@@ -58,7 +60,7 @@ export default function SakButtons({
             return;
         }
 
-        if (!harEndringer) {
+        if (!harEndringer && !harÅpneRedigeringer) {
             setIngenEndringer(true);
             return;
         }
@@ -179,6 +181,7 @@ export default function SakButtons({
                         <Dialog.Footer>
                             <Button
                                 type="button"
+                                size="small"
                                 loading={lagrer}
                                 disabled={lagrer}
                                 onClick={() => void bekreftLagring()}
@@ -187,6 +190,7 @@ export default function SakButtons({
                             </Button>
                             <Button
                                 type="button"
+                                size="small"
                                 variant="secondary"
                                 disabled={lagrer}
                                 onClick={() => setBekreftHandling(null)}

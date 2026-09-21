@@ -6,12 +6,13 @@ import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { useHentSamhandler } from "~/api/useApi.ts";
-import DiskresjonAlert from "./components/DiskresjonAlert.tsx";
-import FunnetPersonInfo from "./components/FunnetPersonInfo.tsx";
-import PersonInfo from "./components/PersonInfo.tsx";
-import ReellMottakerVelger from "./ReellMottakerVelger.tsx";
-import RollehistorikkVisning from "./RollehistorikkVisning.tsx";
-import type { BarnRolle, SakRedigeringData } from "./sakvisning-schema.ts";
+import DiskresjonAlert from "../components/DiskresjonAlert.tsx";
+import FunnetPersonInfo from "../components/FunnetPersonInfo.tsx";
+import PersonInfo from "../components/PersonInfo.tsx";
+import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
+import ReellMottakerVelger from "../ReellMottakerVelger.tsx";
+import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
+import type { BarnRolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 interface BarnVisningProps {
     rolle: BarnRolle;
@@ -47,6 +48,7 @@ export default function BarnVisning({
     } = useHentSamhandler(rolle.reellMottaker || "", skalHenteSamhandler);
 
     const [visReellMottaker, setVisReellMottaker] = useState(false);
+    useRegistrerÅpenRedigering(`barn-reell-mottaker-${rolle.fodselsnummer || index}`, visReellMottaker);
     const roller = form.watch("roller") || [];
 
     const getReellMottakerInfo = (): ReactNode => {

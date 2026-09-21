@@ -1,5 +1,6 @@
 import { Box, Label, LocalAlert, Radio, RadioGroup, VStack } from "@navikt/ds-react";
 
+import { useState } from "react";
 import FunnetPersonInfo from "./FunnetPersonInfo.tsx";
 import PersonInfo from "./PersonInfo.tsx";
 import ReellMottakerSøk from "./ReellMottakerSøk.tsx";
@@ -56,6 +57,8 @@ export default function ReellMottakerValgGruppe({
         onValg({ type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn });
     };
 
+    const [error, setError] = useState<string>();
+
     return (
         <VStack gap="space-24">
             {visBarnekort && barnIdent && (
@@ -103,10 +106,11 @@ export default function ReellMottakerValgGruppe({
                 <ReellMottakerSøk
                     valgtSamhandlerId={valg.ident ?? lagretSamhandler?.ident}
                     onVelg={(ident, navn) => onValg({ type: "samhandler", ident, navn })}
+                    onError={setError}
                 />
             )}
 
-            {valg.type === "samhandler" && valg.navn && valg.ident && (
+            {!feil && !error && valg.type === "samhandler" && valg.navn && valg.ident && (
                 <FunnetPersonInfo label="Reell mottaker:" navn={valg.navn} ident={valg.ident} disabled={disabled} />
             )}
         </VStack>

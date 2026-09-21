@@ -1,11 +1,11 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { BodyLong, Box, Button, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
+import { Button, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import DiskresjonAlert from "../components/DiskresjonAlert.tsx";
 import PersonInfo from "../components/PersonInfo.tsx";
-import SøkPerson from "../components/SøkPerson.tsx";
+import PersonSøkWrapper from "../components/PersonSøkWrapper.tsx";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
@@ -58,28 +58,24 @@ export default function ForelderVisning({ form, rolle, erNyForelder, saksnummer 
 
     return (
         <VStack gap="space-4">
-            <HStack gap="space-4" align="start" justify="space-between" wrap={false}>
-                <PersonInfo
-                    navn={rolle.navn}
-                    ident={rolle.fodselsnummer}
-                    fødselsdato={rolle.fødselsdato}
-                    rolle={rolle.type}
-                    visModiaLenke
-                    tags={
-                        erNyForelder && (
-                            <Tag variant="alt1" size="xsmall">
-                                Ny
-                            </Tag>
-                        )
-                    }
-                >
-                    {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
-                    <RollehistorikkVisning
-                        rollehistorikk={rolle.rollehistorikk}
-                        rolle={rolle}
-                        saksnummer={saksnummer}
-                    />
-                </PersonInfo>
+            <PersonInfo
+                navn={rolle.navn}
+                ident={rolle.fodselsnummer}
+                fødselsdato={rolle.fødselsdato}
+                rolle={rolle.type}
+                visModiaLenke
+                tags={
+                    erNyForelder && (
+                        <Tag variant="alt1" size="xsmall">
+                            Ny
+                        </Tag>
+                    )
+                }
+            >
+                {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
+                <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} saksnummer={saksnummer} />
+            </PersonInfo>
+            <HStack gap="space-4">
                 <HStack gap="space-8" wrap={false}>
                     {!visSøk && erNyForelder && (
                         <Button
@@ -107,24 +103,13 @@ export default function ForelderVisning({ form, rolle, erNyForelder, saksnummer 
             </HStack>
 
             {visSøk && (
-                <Box background="accent-soft" borderColor="accent" borderWidth="1" borderRadius="12" padding="space-16">
-                    <VStack gap="space-16">
-                        <VStack gap="space-4">
-                            <Heading level="3" size="small">
-                                Endre {forelderRolleNavn}
-                            </Heading>
-                            <BodyLong size="small" textColor="subtle">
-                                Søk opp personen som skal være {forelderRolleNavn} i saken
-                            </BodyLong>
-                        </VStack>
-
-                        <SøkPerson label={`Søk etter ${forelderRolleNavn}`} personInformasjon={handlePersonValgt} />
-
-                        <Button size="small" variant="tertiary" onClick={() => setVisSøk(false)} type="button">
-                            Avbryt
-                        </Button>
-                    </VStack>
-                </Box>
+                <PersonSøkWrapper
+                    tittel={`Endre ${forelderRolleNavn}`}
+                    beskrivelse={`Søk opp personen som skal være ${forelderRolleNavn} i saken`}
+                    søkeLabel={`Søk etter ${forelderRolleNavn}`}
+                    onPersonValgt={handlePersonValgt}
+                    onAvbryt={() => setVisSøk(false)}
+                />
             )}
         </VStack>
     );

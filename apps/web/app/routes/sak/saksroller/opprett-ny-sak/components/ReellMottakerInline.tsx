@@ -1,5 +1,5 @@
 import { Alert, BodyShort, Box, HGrid, HStack, Radio, RadioGroup, Tag } from "@navikt/ds-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, type FieldPath, type FieldValues, type PathValue, type UseFormReturn } from "react-hook-form";
 import FunnetPersonInfo from "../../components/FunnetPersonInfo";
 import ReellMottakerSøk from "../../components/ReellMottakerSøk";
@@ -36,6 +36,7 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     const reellMottakerType = form.watch(reellMottakerTypePath);
     const reellMottaker = form.watch(reellMottakerPath);
     const reellMottakerNavn = form.watch(reellMottakerNavnPath);
+    const [reellMottakerFeil, setReellMottakerFeil] = useState<string>();
 
     useEffect(() => {
         if (!kunSamhandlerSomReellMottaker || reellMottakerType !== "barnet_selv") {
@@ -193,7 +194,15 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                                     setDynamiskFeltVerdi(reellMottakerPath, ident, { shouldValidate: true });
                                     setDynamiskFeltVerdi(reellMottakerNavnPath, navn ?? "", { shouldValidate: true });
                                 }}
+                                onError={setReellMottakerFeil}
                             />
+                        </Box>
+                    )}
+                    {reellMottakerFeil && reellMottakerType === "annen_person" && (
+                        <Box asChild marginBlock="space-8 space-0">
+                            <Alert variant="warning" size="small">
+                                {reellMottakerFeil}
+                            </Alert>
                         </Box>
                     )}
                     {reellMottaker && reellMottakerType !== "barnet_selv" && (

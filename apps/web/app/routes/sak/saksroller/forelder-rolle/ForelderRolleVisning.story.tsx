@@ -24,16 +24,20 @@ const bmKjentFraStart: Rolle = {
 
 interface ForelderRolleVisningScenarioProps {
     initialRoller: Rolle[];
-    erNyForelderBp?: boolean;
+    baselineRoller?: Rolle[];
 }
 
-function ForelderRolleVisningScenario({ initialRoller, erNyForelderBp = false }: ForelderRolleVisningScenarioProps) {
+function ForelderRolleVisningScenario({ initialRoller, baselineRoller }: ForelderRolleVisningScenarioProps) {
     const form = useForm<SakRedigeringData>({
         defaultValues: { saksnummer: "2024/1", roller: initialRoller },
     });
     const roller = form.watch("roller") || [];
     const bp = roller.find((r) => r.type === "BP");
     const bm = roller.find((r) => r.type === "BM");
+
+    const funnetPersonISak = (fnr: string) => (baselineRoller ?? initialRoller).some((r) => r.fodselsnummer === fnr);
+    const erNyForelderBp = bp?.fodselsnummer ? !funnetPersonISak(bp.fodselsnummer) : undefined;
+    const erNyForelderBm = bm?.fodselsnummer ? !funnetPersonISak(bm.fodselsnummer) : undefined;
 
     return (
         <BidragCommonsProviderMock
@@ -49,7 +53,14 @@ function ForelderRolleVisningScenario({ initialRoller, erNyForelderBp = false }:
             }}
             uthevPerson={(ident) => ident === bpKjentFraStart.fodselsnummer}
         >
-            <ForelderRolleVisning bp={bp} bm={bm} erNyForelderBp={erNyForelderBp} form={form} saksnummer="2024/1" />
+            <ForelderRolleVisning
+                bp={bp}
+                bm={bm}
+                erNyForelderBp={erNyForelderBp}
+                erNyForelderBm={erNyForelderBm}
+                form={form}
+                saksnummer="2024/1"
+            />
         </BidragCommonsProviderMock>
     );
 }
@@ -63,5 +74,26 @@ export const BidragsmottakerMangler = () => <ForelderRolleVisningScenario initia
 export const BidragspliktigMangler = () => <ForelderRolleVisningScenario initialRoller={[bmKjentFraStart]} />;
 
 export const NyBidragspliktigKanFjernes = () => (
-    <ForelderRolleVisningScenario initialRoller={[bpKjentFraStart, bmKjentFraStart]} erNyForelderBp />
+    <ForelderRolleVisningScenario initialRoller={[bpNyLagtTil, bmKjentFraStart]} baselineRoller={[bmKjentFraStart]} />
+);
+
+const bpNyLagtTil: Rolle = {
+    fodselsnummer: genererFnr(),
+    type: "BP",
+    rolleType: "BP",
+    objektnummer: "3",
+    mottagerErVerge: false,
+    navn: "Ny Bidragspliktig",
+};
+
+const bpPlassholderMedTomtFodselsnummer: Rolle = {
+    fodselsnummer: "",
+    type: "BP",
+    rolleType: "BP",
+    objektnummer: "1",
+    mottagerErVerge: false,
+};
+
+export const BidragspliktigManglerMedPlassholderRolle = () => (
+    <ForelderRolleVisningScenario initialRoller={[bpPlassholderMedTomtFodselsnummer, bmKjentFraStart]} />
 );

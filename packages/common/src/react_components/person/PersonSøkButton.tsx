@@ -1,4 +1,4 @@
-import type { ButtonProps } from "@navikt/ds-react";
+import type { LinkProps } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
 import PopupSøkButton from "../PopupSøkButton";
@@ -15,11 +15,11 @@ type PersonSøkProps = {
 export default function PersonSøkButton({
     onResult,
     onError,
-    ...buttonProps
-}: PersonSøkProps & Omit<ButtonProps, "children" | "onError">): ReactNode {
+    ...linkProps
+}: PersonSøkProps & Omit<LinkProps, "children" | "onError" | "onClick" | "href">): ReactNode {
     return (
         <PopupSøkButton<PersonSøkResult>
-            {...buttonProps}
+            {...linkProps}
             channelName={PERSONSOK_RESULT_EVENT}
             søkPath="/personsok"
             tekst="Personsøk"

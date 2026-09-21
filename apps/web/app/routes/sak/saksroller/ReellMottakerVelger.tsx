@@ -1,8 +1,7 @@
 import { PersonPencilIcon } from "@navikt/aksel-icons";
-import { Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react";
+import { Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import { useParams } from "react-router";
 
 import ReellMottakerValgGruppe, { type ReellMottakerValg } from "./components/ReellMottakerValgGruppe.tsx";
 import type { BarnRolle, SakRedigeringData } from "./sakvisning-schema.ts";
@@ -31,7 +30,6 @@ export default function ReellMottakerVelger({
     onBekreft,
 }: ReellMottakerVelgerProps) {
     const form = useFormContext<SakRedigeringData>();
-    const { saksnummer } = useParams();
     const barn = useWatch({
         control: form.control,
         name: `roller.${rolleIndex}`,
@@ -90,20 +88,13 @@ export default function ReellMottakerVelger({
             : !isRequired || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
 
     return (
-        <Modal open onClose={onAvbryt} width="medium" aria-label="Endre reell mottaker">
-            <Modal.Header>
-                <VStack gap="space-2">
-                    {saksnummer && <Detail>Sak {saksnummer}</Detail>}
-                    <HStack gap="space-4" align="center" wrap={false}>
-                        <PersonPencilIcon aria-hidden fontSize="1.5rem" />
-                        <Heading level="2" size="medium">
-                            Endre reell mottaker av barnebidraget
-                        </Heading>
-                    </HStack>
-                </VStack>
-            </Modal.Header>
+        <Box background="brand-beige-soft" padding={"space-8"} borderRadius={"12"}>
+            <VStack gap={"space-16"}>
+                <HStack gap="space-4" align="center" wrap={false}>
+                    <PersonPencilIcon aria-hidden />
+                    <Heading size="xsmall">Endre reell mottaker</Heading>
+                </HStack>
 
-            <Modal.Body>
                 <ReellMottakerValgGruppe
                     barnNavn={barnNavn}
                     barnIdent={barn.fodselsnummer}
@@ -111,23 +102,23 @@ export default function ReellMottakerVelger({
                     valg={utkast}
                     lagretSamhandler={lagretSamhandler}
                     onValg={handleValg}
-                    visBarnekort
+                    visBarnekort={false}
                     kanFjerne={kanFjerne}
                     isRequired={isRequired}
                     kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
                     disabled={disabled}
                     feil={feil}
                 />
-            </Modal.Body>
 
-            <Modal.Footer>
-                <Button type="button" onClick={handleBekreft} disabled={disabled || !kanBekrefte}>
-                    Legg til
-                </Button>
-                <Button type="button" variant="secondary" onClick={onAvbryt} disabled={disabled}>
-                    Avbryt
-                </Button>
-            </Modal.Footer>
-        </Modal>
+                <HStack gap={"space-8"}>
+                    <Button type="button" size="small" onClick={handleBekreft} disabled={disabled || !kanBekrefte}>
+                        Legg til
+                    </Button>
+                    <Button type="button" size="small" variant="secondary" onClick={onAvbryt} disabled={disabled}>
+                        Avbryt
+                    </Button>
+                </HStack>
+            </VStack>
+        </Box>
     );
 }

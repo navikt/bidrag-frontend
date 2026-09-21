@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import FunnetPersonInfo from "../../../components/FunnetPersonInfo";
-import PersonSøkWrapper from "../../../PersonSøkWrapper";
+import PersonSøkModal from "../../../components/PersonSøkModal";
 import type { BarnMedManglendeForeldreSkjemaData, ForelderMedRolle, ForelderPartRolle } from "../../opprett-sak-schema";
 import { hentForelderRolleLabel, hentMotsattRolle } from "../../utils";
 import ForelderRolleVelger from "./ForelderRolleVelger";
@@ -117,7 +117,12 @@ export default function LeggTilForelderSeksjon({
 
                             {!erLagtTil && (
                                 <VStack gap="space-12">
-                                    <Button type="button" variant="secondary" onClick={() => setÅpenSøkeIndex(index)}>
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="small"
+                                        onClick={() => setÅpenSøkeIndex(index)}
+                                    >
                                         Søk forelder
                                     </Button>
                                     <HStack justify="center" marginBlock="space-12 space-0">
@@ -131,7 +136,7 @@ export default function LeggTilForelderSeksjon({
                                         </Button>
                                     </HStack>
                                     {åpenSøkeIndex === index && (
-                                        <PersonSøkWrapper
+                                        <PersonSøkModal
                                             tittel={`Søk forelder #${index + 1}`}
                                             beskrivelse="Søk opp forelderen som skal legges til i saken"
                                             søkeLabel={`Søk forelder #${index + 1}`}

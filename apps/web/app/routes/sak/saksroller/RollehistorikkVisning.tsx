@@ -64,6 +64,7 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
                                         ident={rolle.fodselsnummer}
                                         fødselsdato={rolle.fødselsdato}
                                         rolle={rolle.type}
+                                        compact
                                     />
                                 </Box>
                             )}

@@ -4,7 +4,7 @@ import { PlusIcon } from "@navikt/aksel-icons";
 import { Button, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import PersonSøkWrapper from "../PersonSøkWrapper";
+import PersonSøkModal from "../components/PersonSøkModal";
 import { type Barnkurv, type ForelderMedBarnSkjemaData, MAKS_ALDER_BARN } from "./opprett-sak-schema";
 
 type Props = {
@@ -86,7 +86,7 @@ export default function BarnManueltRegistrering({ form, leggTilBarnMauell, barnk
                 Legg til barn manuelt
             </Button>
             {visSok && (
-                <PersonSøkWrapper
+                <PersonSøkModal
                     tittel="Legg til barn manuelt"
                     beskrivelse="Søk opp barnet som skal legges til i saken"
                     søkeLabel="Oppgi barn i saken manuelt"
