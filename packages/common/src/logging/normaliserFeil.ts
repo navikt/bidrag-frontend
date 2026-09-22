@@ -1,7 +1,9 @@
 import type { ProblemDetail } from "@bidrag/api";
-import { ApiError, CustomError, correlationIdHeader, generateCorrelationId, type LoggetFeil } from "@bidrag/common";
 import { type AxiosError, type AxiosHeaders, isAxiosError } from "axios";
 import { type ErrorResponse, isRouteErrorResponse } from "react-router";
+import { ApiError, CustomError } from "../types";
+import { correlationIdHeader, generateCorrelationId } from "./correlationId.utils";
+import type { LoggetFeil } from "./log.types";
 
 export type NormalisertFeil = LoggetFeil & {
     correlationId: string;
