@@ -8,7 +8,7 @@ import {
 import type { IRolleDetaljer, RolleTypeAbbreviation } from "@bidrag/common";
 import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
 import { Button, Heading } from "@navikt/ds-react";
-import { useIsMutating, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
+import { useMutationState, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
 import React, {
     createContext,
     type Dispatch,
@@ -491,7 +491,15 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
 
     // Sant mens "fatte vedtak" kjører. Da skal ingen navigasjon (steg/fane) eller sidemeny være
     // mulig, slik at behandlingen ikke endres mens vedtaket fattes i bakgrunnen.
-    const erFatterVedtak = useIsMutating({ mutationKey: fatteVedtakMutationKey }) > 0;
+    // Sant mens "fatte vedtak" kjører, OG etter at det er fullført (status "success") frem til
+    // omdirigeringen til Bisys faktisk har skjedd. Da skal ingen navigasjon (steg/fane) eller
+    // sidemeny være mulig, slik at behandlingen ikke endres mens vedtaket fattes/omdirigerer.
+    // Ved feil ("error") låses ikke noe, slik at saksbehandler kan rette opp og prøve igjen.
+    const fatteVedtakStatuser = useMutationState({
+        filters: { mutationKey: fatteVedtakMutationKey },
+        select: (mutation) => mutation.state.status,
+    });
+    const erFatterVedtak = fatteVedtakStatuser.some((status) => status === "pending" || status === "success");
     const erFatterVedtakRef = useRef(erFatterVedtak);
     erFatterVedtakRef.current = erFatterVedtak;
 

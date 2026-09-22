@@ -78,7 +78,9 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
         const result: Record<string, boolean> = {};
         for (const saksnummer of saksnummerListe) {
             const sak = perSak.find((s) => s.saksnummer === saksnummer);
-            result[saksnummer] = sak ? (!sak.kanVurdereSamlet || !sak.erLikForAlle) : !behandling.samværV2?.erSammeForAlle;
+            result[saksnummer] = sak
+                ? !sak.kanVurdereSamlet || !sak.erLikForAlle
+                : !behandling.samværV2?.erSammeForAlle;
         }
         return result;
     });
