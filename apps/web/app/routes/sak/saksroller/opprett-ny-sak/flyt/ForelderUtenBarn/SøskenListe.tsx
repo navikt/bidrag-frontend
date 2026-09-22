@@ -1,8 +1,8 @@
 import { PersonNavn } from "@bidrag/common";
 import { CheckmarkHeavyIcon, PersonGroupIcon } from "@navikt/aksel-icons";
-import { Alert, BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
-import DiskresjonAlert from "../../../components/DiskresjonAlert";
+import PersonKort from "../../../felles/PersonKort";
 import AlderTag from "../../components/AlderTag";
 import type { BarnMedAlder, ForelderUtenBarnSkjemaData } from "../../opprett-sak-schema";
 
@@ -44,28 +44,18 @@ export default function SøskenListe({ form, søsken }: Props) {
                     {søsken.map((barn, i) => {
                         const erAlleredeValgt = valgteBarn.some((b) => b.ident === barn.ident);
                         return (
-                            <Box
+                            <PersonKort
                                 key={i}
-                                background="default"
-                                borderRadius="4"
-                                borderWidth="1"
-                                borderColor="neutral-subtleA"
-                                asChild
+                                person={{
+                                    ident: barn.ident,
+                                    visningsnavn: barn.navn,
+                                    diskresjonskode: barn.diskresjonskode,
+                                }}
                             >
-                                <HStack align="center" justify="space-between" padding="space-12">
-                                    <VStack>
-                                        <HStack asChild align="center" gap="space-8">
-                                            <BodyShort size="small">
-                                                {barn.navn} ({barn.ident})
-                                                <AlderTag {...barn} deaktivert={false} />
-                                            </BodyShort>
-                                        </HStack>
-                                        {barn?.diskresjonskode && (
-                                            <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />
-                                        )}
-                                    </VStack>
+                                <HStack align="center" justify="space-between" gap="space-8">
+                                    <AlderTag {...barn} deaktivert={false} />
                                     {erAlleredeValgt ? (
-                                        <HStack asChild align="center">
+                                        <HStack asChild align="center" gap="space-4">
                                             <BodyShort size="small" weight="semibold" className="text-ax-success-700">
                                                 <CheckmarkHeavyIcon aria-hidden fontSize="1.5rem" /> Valgt
                                             </BodyShort>
@@ -76,7 +66,7 @@ export default function SøskenListe({ form, søsken }: Props) {
                                         </Button>
                                     )}
                                 </HStack>
-                            </Box>
+                            </PersonKort>
                         );
                     })}
                 </VStack>
