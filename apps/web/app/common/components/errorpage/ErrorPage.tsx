@@ -1,3 +1,4 @@
+import type { NormalisertFeil } from "@bidrag/common";
 import { useBisysLink } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import {
@@ -17,7 +18,6 @@ import { useEffect } from "react";
 import { useParams } from "react-router";
 import styles from "./errorpage.module.css";
 import { Iskrem } from "./Iskrem";
-import type { NormalisertFeil } from "./normaliserFeil.ts";
 
 export interface ErrorPageProps {
     feil: NormalisertFeil;

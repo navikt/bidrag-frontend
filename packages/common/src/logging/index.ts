@@ -3,4 +3,5 @@ export * from "./LoggerService";
 export * from "./log.schema.ts";
 export * from "./log.types.ts";
 export * from "./maskerFnr.ts";
+export * from "./normaliserFeil";
 export * from "./SecureLoggerService";
