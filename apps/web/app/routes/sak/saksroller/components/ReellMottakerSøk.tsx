@@ -17,7 +17,7 @@ export default function ReellMottakerSøk({
                 onVelg(treff.samhandlerId ?? treff.ident ?? treff.offentligId ?? "", treff.navn ?? undefined);
             }}
             onError={onError}
-            visSamhandlerSøk
+            søketype="person-og-samhandler"
             compact
         />
     );

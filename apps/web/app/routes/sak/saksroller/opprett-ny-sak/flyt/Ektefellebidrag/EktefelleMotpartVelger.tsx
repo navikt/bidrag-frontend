@@ -4,7 +4,7 @@ import { Alert, BodyShort, Box, Button, Heading, VStack } from "@navikt/ds-react
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonSøkModal from "../../../components/PersonSøkModal";
-import PersonKort from "../../../felles/PersonKort";
+import { PersonKortInnhold } from "../../../felles/PersonKort";
 import type { Diskresjonskode, EktefellebidragSkjemaData, ForelderPartRolle } from "../../opprett-sak-schema";
 
 type Props = {
@@ -12,6 +12,24 @@ type Props = {
     forslagMotpart: PersonDto[];
     motsattRolle: ForelderPartRolle;
 };
+
+function PersonValg({ person, erValgt, onClick }: { person: PersonDto; erValgt: boolean; onClick: () => void }) {
+    return (
+        <Box
+            asChild
+            width="100%"
+            padding="space-16"
+            borderRadius="8"
+            borderWidth="2"
+            background={erValgt ? "success-soft" : "default"}
+            borderColor={erValgt ? "success-strong" : "neutral"}
+        >
+            <button type="button" onClick={onClick}>
+                <PersonKortInnhold person={person} erValgt={erValgt} />
+            </button>
+        </Box>
+    );
+}
 
 export default function EktefelleMotpartVelger({ form, forslagMotpart, motsattRolle }: Props) {
     const [visSøkefelt, setVisSøkefelt] = useState(false);
@@ -57,7 +75,7 @@ export default function EktefelleMotpartVelger({ form, forslagMotpart, motsattRo
                 {forslagMotpart.map((person) => {
                     const erValgt = valgtIdent === person.ident;
                     return (
-                        <PersonKort
+                        <PersonValg
                             key={person.ident}
                             person={person}
                             erValgt={erValgt}
@@ -66,20 +84,18 @@ export default function EktefelleMotpartVelger({ form, forslagMotpart, motsattRo
                     );
                 })}
 
-                {erValgtFraSøk && søktPerson && <PersonKort person={søktPerson} erValgt onClick={fjernValg} />}
+                {erValgtFraSøk && søktPerson && <PersonValg person={søktPerson} erValgt onClick={fjernValg} />}
 
                 {!visSøkefelt ? (
-                    <Box asChild width="max-content">
-                        <Button
-                            type="button"
-                            size="xsmall"
-                            onClick={() => setVisSøkefelt(true)}
-                            icon={<PlusIcon aria-hidden />}
-                            variant="tertiary"
-                        >
-                            <BodyShort size="small">Søk etter annen person</BodyShort>
-                        </Button>
-                    </Box>
+                    <Button
+                        type="button"
+                        size="xsmall"
+                        onClick={() => setVisSøkefelt(true)}
+                        icon={<PlusIcon aria-hidden />}
+                        variant="tertiary"
+                    >
+                        <BodyShort size="small">Søk etter annen person</BodyShort>
+                    </Button>
                 ) : (
                     <PersonSøkModal
                         tittel={`Søk etter ${rolleLabel}`}

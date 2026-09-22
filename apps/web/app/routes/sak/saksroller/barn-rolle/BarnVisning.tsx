@@ -1,14 +1,15 @@
-import { RolleTag, RolleTypeAbbreviation, SecureLoggerService } from "@bidrag/common";
-import { PencilIcon, PlusIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { BodyLong, Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react";
+import { SecureLoggerService } from "@bidrag/common";
+import { XMarkIcon } from "@navikt/aksel-icons";
+import { Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { useHentSamhandler } from "~/api/useApi.ts";
-import DiskresjonAlert from "../components/DiskresjonAlert.tsx";
-import FunnetPersonInfo from "../components/FunnetPersonInfo.tsx";
-import PersonInfo from "../components/PersonInfo.tsx";
+import { FunnetPersonInnhold } from "../components/FunnetPersonInfo.tsx";
+import { BarnKortInnhold } from "../felles/BarnKort.tsx";
+import { KortRamme } from "../felles/PersonRolleKort.tsx";
+import ReellMottakerRad from "../felles/ReellMottakerRad.tsx";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import ReellMottakerVelger from "../ReellMottakerVelger.tsx";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
@@ -66,10 +67,10 @@ export default function BarnVisning({
 
         if (rolle.reellMottakerType === "samhandler") {
             if (rolle.reellMottakerNavn) {
-                return <FunnetPersonInfo simple navn={rolle.reellMottakerNavn} ident={rolle.reellMottaker} />;
+                return <FunnetPersonInnhold navn={rolle.reellMottakerNavn} ident={rolle.reellMottaker} />;
             }
             if (samhandlerInfo) {
-                return <FunnetPersonInfo simple navn={samhandlerInfo.navn ?? ""} ident={rolle.reellMottaker} />;
+                return <FunnetPersonInnhold navn={samhandlerInfo.navn ?? ""} ident={rolle.reellMottaker} />;
             }
         }
 
@@ -141,16 +142,18 @@ export default function BarnVisning({
     const visRmFeil = Boolean(errors.roller?.[index]?.reellMottaker) && !visReellMottaker;
 
     return (
-        <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-16">
+        <KortRamme>
             <VStack gap={"space-16"}>
-                <PersonInfo
-                    navn={rolle.navn || ""}
-                    ident={rolle.fodselsnummer}
-                    alder={rolle.alder}
-                    fødselsdato={rolle.fødselsdato}
-                    rolle="BA"
-                    stønad18År={rolle.erMyndig}
-                    tags={null}
+                <BarnKortInnhold
+                    barn={{
+                        ident: rolle.fodselsnummer,
+                        navn: rolle.navn,
+                        fødselsdato: rolle.fødselsdato,
+                        alder: rolle.alder,
+                        erMyndig: rolle.erMyndig,
+                        diskresjonskode: rolle.diskresjonskode,
+                    }}
+                    visIkon={false}
                     headingActions={
                         erNyttBarn && (
                             <HStack gap="space-12" align="center" flexShrink="0" marginInline="auto space-0">
@@ -170,48 +173,13 @@ export default function BarnVisning({
                         )
                     }
                 >
-                    {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
-
                     {!visReellMottaker && (
-                        <Box marginBlock="space-8 space-0">
-                            {harReellMottaker ? (
-                                <>
-                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                                    <HStack
-                                        gap="space-12"
-                                        align="center"
-                                        justify="space-between"
-                                        paddingBlock="space-8"
-                                    >
-                                        <HStack gap="space-8" align="center" minWidth="0">
-                                            <RolleTag rolleType={RolleTypeAbbreviation.RM} />
-                                            <BodyLong size="small" textColor="subtle" truncate>
-                                                {getReellMottakerInfo()}
-                                            </BodyLong>
-                                        </HStack>
-                                        <Button
-                                            variant="tertiary"
-                                            size="xsmall"
-                                            type="button"
-                                            icon={<PencilIcon aria-hidden />}
-                                            aria-label="Endre reell mottaker"
-                                            onClick={handleÅpneReellMottaker}
-                                        />
-                                    </HStack>
-                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                                </>
-                            ) : (
-                                <Button
-                                    variant="tertiary"
-                                    size="small"
-                                    type="button"
-                                    icon={<PlusIcon aria-hidden />}
-                                    onClick={handleÅpneReellMottaker}
-                                >
-                                    Legg til reell mottaker
-                                </Button>
-                            )}
-                        </Box>
+                        <ReellMottakerRad
+                            harReellMottaker={harReellMottaker}
+                            reellMottakerInfo={getReellMottakerInfo()}
+                            onEndre={handleÅpneReellMottaker}
+                            onLeggTil={handleÅpneReellMottaker}
+                        />
                     )}
 
                     {visRmFeil && (
@@ -219,21 +187,27 @@ export default function BarnVisning({
                             <ErrorMessage size="small">{errors.roller?.[index]?.reellMottaker?.message}</ErrorMessage>
                         </Box>
                     )}
-                </PersonInfo>
+                </BarnKortInnhold>
 
                 {visReellMottaker && (
                     <ReellMottakerVelger
-                        rolleIndex={index}
                         barnNavn={rolle.navn || "Barnet"}
+                        barnIdent={rolle.fodselsnummer}
+                        verdi={{
+                            type: rolle.reellMottakerType,
+                            ident: rolle.reellMottaker,
+                            navn: rolle.reellMottakerNavn,
+                        }}
                         onAvbryt={handleLukkReellMottaker}
-                        onBekreft={handleLukkReellMottaker}
-                        kanFjerne={kanFjerneRM}
-                        isRequired={!kanFjerneRM}
-                        kunSamhandlerSomReellMottaker={erOppfostringsbidrag}
+                        onBekreft={(valg) => {
+                            handleEndreReellMottaker(valg.type, valg.ident, valg.navn);
+                            handleLukkReellMottaker();
+                        }}
+                        regel={erOppfostringsbidrag ? "kun-samhandler" : kanFjerneRM ? "valgfri" : "påkrevd"}
                     />
                 )}
                 <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} saksnummer={saksnummer} />
             </VStack>
-        </Box>
+        </KortRamme>
     );
 }

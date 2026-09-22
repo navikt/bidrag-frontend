@@ -27,7 +27,7 @@ export default function SøskenListe({ form, søsken }: Props) {
     return (
         <Alert variant="info">
             <VStack gap="space-12">
-                <div>
+                <VStack gap="space-4">
                     <HStack asChild align="center" gap="space-8">
                         <Heading level="3" size="small" spacing>
                             <PersonGroupIcon aria-hidden fontSize="1.5rem" />
@@ -39,7 +39,7 @@ export default function SøskenListe({ form, søsken }: Props) {
                         <PersonNavn bareFornavn={false} navn={motpart.navn || "ukjent"} />
                         ). Disse kan legges til i samme sak.
                     </BodyShort>
-                </div>
+                </VStack>
                 <VStack gap="space-8">
                     {søsken.map((barn, i) => {
                         const erAlleredeValgt = valgteBarn.some((b) => b.ident === barn.ident);
@@ -56,7 +56,7 @@ export default function SøskenListe({ form, søsken }: Props) {
                                     <AlderTag {...barn} deaktivert={false} />
                                     {erAlleredeValgt ? (
                                         <HStack asChild align="center" gap="space-4">
-                                            <BodyShort size="small" weight="semibold" className="text-ax-success-700">
+                                            <BodyShort size="small" weight="semibold">
                                                 <CheckmarkHeavyIcon aria-hidden fontSize="1.5rem" /> Valgt
                                             </BodyShort>
                                         </HStack>

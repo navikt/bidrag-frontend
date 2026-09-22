@@ -1,49 +1,22 @@
-import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonPlusIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
-import { useState } from "react";
-import SøkPerson from "../components/SøkPerson.tsx";
+import type { ReactNode } from "react";
 
-type Forslag = {
-    ident?: string;
+export type Personforslag = {
     navn: string;
     fødselsdato?: string;
-    onBruk?: () => void;
+    onBruk: () => void;
 };
 
 type Props = {
     tittel: string;
     beskrivelse: string;
     variant?: "warning" | "success" | "info";
-    /** Enkel foreslått person — vises som "Bruk {navn}"-knapp */
-    forslagNavn?: string;
-    onBrukForslag?: () => void;
-    /** Flere foreslåtte personer — vises som individuelle "Bruk {navn}"-knapper */
-    forslagListe?: Forslag[];
-    onVelgPerson: (person: PersonDto) => void;
-    onError?: (feil: string) => void;
-    søkLabel?: string;
+    forslag?: Personforslag[];
+    children?: ReactNode;
 };
 
-export default function ForeslåPersonPanel({
-    tittel,
-    beskrivelse,
-    variant = "info",
-    forslagNavn,
-    onBrukForslag,
-    forslagListe,
-    onVelgPerson,
-    onError,
-    søkLabel = "Søk etter person",
-}: Props) {
-    const [visSøk, setVisSøk] = useState(false);
-    const harFlereForslag = Array.isArray(forslagListe) && forslagListe.length > 0;
-    const harEnkeltForslag = !!forslagNavn && !!onBrukForslag && !harFlereForslag;
-
-    if (visSøk) {
-        return <SøkPerson label={søkLabel} personInformasjon={onVelgPerson} onError={onError} />;
-    }
-
+export default function ForeslåPersonPanel({ tittel, beskrivelse, variant = "info", forslag = [], children }: Props) {
     return (
         <Alert variant={variant} size="small">
             <VStack gap="space-12">
@@ -54,20 +27,18 @@ export default function ForeslåPersonPanel({
                     <BodyShort size="small">{beskrivelse}</BodyShort>
                 </div>
 
-                {!harFlereForslag && (
+                {forslag.length <= 1 && (
                     <HStack gap="space-8" wrap>
-                        {harEnkeltForslag && (
-                            <Button type="button" size="small" onClick={onBrukForslag}>
-                                Bruk {forslagNavn}
+                        {forslag[0] && (
+                            <Button type="button" size="small" onClick={forslag[0].onBruk}>
+                                Bruk {forslag[0].navn}
                             </Button>
                         )}
-                        <Button type="button" size="small" onClick={() => setVisSøk(true)}>
-                            Velg annen person
-                        </Button>
+                        {children}
                     </HStack>
                 )}
 
-                {harFlereForslag && (
+                {forslag.length > 1 && (
                     <Box
                         background="raised"
                         borderColor="neutral-subtleA"
@@ -76,37 +47,26 @@ export default function ForeslåPersonPanel({
                         padding="space-16"
                     >
                         <Heading level="4" size="xsmall" spacing>
-                            Foreslåtte personer ({forslagListe.length})
+                            Foreslåtte personer ({forslag.length})
                         </Heading>
                         <BodyLong size="small" textColor="subtle" spacing>
                             Velg en foreslått person for å bruke den direkte
                         </BodyLong>
                         <VStack gap="space-8">
-                            {forslagListe.map((forslag) => (
+                            {forslag.map((personforslag) => (
                                 <Button
-                                    key={forslag.ident ?? forslag.navn}
+                                    key={personforslag.navn}
                                     type="button"
                                     variant="tertiary"
                                     size="small"
                                     className="w-full justify-start"
-                                    onClick={() => {
-                                        if (forslag.onBruk) {
-                                            forslag.onBruk();
-                                            return;
-                                        }
-                                        if (!forslag.ident) return;
-                                        onVelgPerson({
-                                            ident: forslag.ident,
-                                            visningsnavn: forslag.navn,
-                                            fødselsdato: forslag.fødselsdato,
-                                        });
-                                    }}
+                                    onClick={personforslag.onBruk}
                                 >
                                     <HStack gap="space-4" align="center">
                                         <PersonPlusIcon aria-hidden className="shrink-0" />
                                         <BodyLong size="small">
-                                            {forslag.navn}
-                                            {forslag.fødselsdato && ` (${forslag.fødselsdato})`}
+                                            {personforslag.navn}
+                                            {personforslag.fødselsdato && ` (${personforslag.fødselsdato})`}
                                         </BodyLong>
                                     </HStack>
                                 </Button>
@@ -114,6 +74,7 @@ export default function ForeslåPersonPanel({
                         </VStack>
                     </Box>
                 )}
+                {forslag.length > 1 && children}
             </VStack>
         </Alert>
     );

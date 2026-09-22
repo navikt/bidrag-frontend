@@ -1,7 +1,7 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { createRoutesStub } from "react-router";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
@@ -30,6 +30,7 @@ function LeggTilBarnScenario({ initialRoller }: { initialRoller: Rolle[] }) {
     const form = useForm<SakRedigeringData>({
         defaultValues: { saksnummer: "2024/1", roller: initialRoller },
     });
+    const [visSøk, setVisSøk] = useState(false);
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -42,7 +43,7 @@ function LeggTilBarnScenario({ initialRoller }: { initialRoller: Rolle[] }) {
                 }}
             >
                 <FormProvider {...form}>
-                    <LeggTilBarn />
+                    <LeggTilBarn visSøk={visSøk} setVisSøk={setVisSøk} />
                 </FormProvider>
             </BidragCommonsProviderMock>
         </QueryClientProvider>

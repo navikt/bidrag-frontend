@@ -25,7 +25,7 @@ export default function KjentForelderInfo({ form, forelder, onVelgRolle, valgtRo
                 Registrert forelder
             </Heading>
 
-            <Box asChild borderRadius="8" borderWidth="1" borderColor="neutral-subtleA" background="accent-soft">
+            <Box asChild borderRadius="8" background="accent-soft">
                 <VStack gap="space-12" padding="space-16">
                     <PersonKort person={forelder} />
 
@@ -38,7 +38,7 @@ export default function KjentForelderInfo({ form, forelder, onVelgRolle, valgtRo
 
                     {harRolle && (
                         <HStack asChild align="center">
-                            <BodyShort size="small" weight="semibold" className="text-ax-success-800">
+                            <BodyShort size="small" weight="semibold">
                                 <CheckmarkHeavyIcon aria-hidden fontSize="1.3rem" /> Rolle valgt:{" "}
                                 {hentForelderRolleLabel(kjentForelderRolle)}
                             </BodyShort>

@@ -1,7 +1,7 @@
 import { TilgangsFeilError } from "@bidrag/api";
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { Alert, BodyShort, Box, Select, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Select, VStack } from "@navikt/ds-react";
 import { type ChangeEvent, Suspense, useEffect, useState } from "react";
 import { useHentForeldreinformasjonForBarnSuspense, useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
 import LasterSkeleton from "./components/LasterSkeleton";
@@ -56,10 +56,11 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
         partISakenAlder,
         partISaken: partISakenSkjemaData,
         sakstype,
+        nullstillRolleOgFlyt,
     } = useSaksrolleroversikt();
 
     const erBarnRolle = valgtRolle === "barn_over_18" || valgtRolle === "barn_under_18";
-    const trengerRelasjon = !!valgtRolle && !erBarnRolle;
+    const trengerRelasjon = !!valgtRolle && !erBarnRolle && !enforcedRolle;
     const trengerForeldreinfo = !!valgtRolle && erBarnRolle;
 
     if (partISaken === null) {
@@ -70,36 +71,45 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
         const valgteRolle = verdi.target.value;
         const result = PartRolleSchema.safeParse(valgteRolle);
 
-        if (partISakenSkjemaData && partISakenSkjemaData.rolle === result.data) {
+        if (!result.success) {
+            settFeil("");
+            settValgtRolle(null);
+            nullstillRolleOgFlyt();
             return;
         }
 
-        if (!result.success) {
+        if (partISakenSkjemaData?.rolle === result.data) {
             return;
         }
 
         settFeil("");
+        nullstillRolleOgFlyt();
         settValgtRolle(result.data);
-        setPartISaken(tilPartISaken(partISaken, result.data));
+        const oppdatertPart = tilPartISaken(partISaken, result.data);
+        setPartISaken(oppdatertPart);
     };
 
     useEffect(() => {
-        if (enforcedRolle) {
-            settValgtRolle(enforcedRolle);
-            setPartISaken(tilPartISaken(partISaken, enforcedRolle));
+        if (!enforcedRolle) {
+            return;
         }
-    }, [enforcedRolle, partISaken, setPartISaken, valgtRolle]);
+
+        settValgtRolle(enforcedRolle);
+        if (partISakenSkjemaData?.rolle !== enforcedRolle) {
+            nullstillRolleOgFlyt();
+            const oppdatertPart = tilPartISaken(partISaken, enforcedRolle);
+            setPartISaken(oppdatertPart);
+        }
+    }, [enforcedRolle, partISaken, partISakenSkjemaData?.rolle, nullstillRolleOgFlyt, setPartISaken]);
 
     const alternativer = getFilteredPartRoller(sakstype, partISakenAlder, skjemaPartRoller);
 
     return (
         <VStack gap="space-4">
-            <div>
-                <Box asChild marginBlock="space-0 space-8">
-                    <BodyShort size="small" textColor="subtle">
-                        Rolle i saken
-                    </BodyShort>
-                </Box>
+            <VStack gap="space-8">
+                <BodyShort size="small" textColor="subtle">
+                    Rolle i saken
+                </BodyShort>
                 <Select
                     label={`Hvilken rolle har ${partISaken.visningsnavn}?`}
                     hideLabel
@@ -115,13 +125,14 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
                         </option>
                     ))}
                 </Select>
-            </div>
+            </VStack>
 
             {feil && <Alert variant="error">{feil}</Alert>}
 
             {trengerRelasjon && (
                 <Suspense fallback={<LasterSkeleton tekst="Henter relasjoner..." />}>
                     <RelasjonTilBarnBranch
+                        key={valgtRolle}
                         partISaken={partISaken}
                         sakstype={sakstype}
                         setSaksrolleFlyt={setSaksrolleFlyt}
@@ -132,7 +143,12 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
 
             {trengerForeldreinfo && (
                 <Suspense fallback={<LasterSkeleton tekst="Henter foreldreinformasjon..." />}>
-                    <ForeldreinfoBranch partISaken={partISaken} setSaksrolleFlyt={setSaksrolleFlyt} onFeil={settFeil} />
+                    <ForeldreinfoBranch
+                        key={valgtRolle}
+                        partISaken={partISaken}
+                        setSaksrolleFlyt={setSaksrolleFlyt}
+                        onFeil={settFeil}
+                    />
                 </Suspense>
             )}
         </VStack>
@@ -237,7 +253,7 @@ function RelasjonTilBarnBranch({
             type: "FORELDER_MED_BARN",
             barnkurver: relasjonMedBarnUnder24,
         });
-    }, [relasjonTilBarn, sakstype, partISaken, setSaksrolleFlyt, onFeil]);
+    }, [relasjonTilBarn, sakstype, partISaken.ident, setSaksrolleFlyt, onFeil]);
 
     if (error === null) {
         return null;
@@ -291,7 +307,7 @@ function ForeldreinfoBranch({
                 `Dette barnet (${partISaken.ident}) har flere enn 2 registrerte foreldre i systemet. Dette kan skyldes feil i data. Kontakt support.`,
             );
         }
-    }, [foreldreinformasjonTilBarn, partISaken, setSaksrolleFlyt, onFeil]);
+    }, [foreldreinformasjonTilBarn, partISaken.ident, setSaksrolleFlyt, onFeil]);
 
     if (error === null) {
         return null;

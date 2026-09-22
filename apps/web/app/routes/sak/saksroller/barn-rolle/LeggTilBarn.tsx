@@ -16,14 +16,11 @@ const MAKS_ALDER_BARN = 24;
 interface LeggTilBarnProps {
     søsken?: PersonDto[];
     erOppfostringsbidrag?: boolean;
-    visSøk?: boolean;
-    setVisSøk?: (v: boolean) => void;
+    visSøk: boolean;
+    setVisSøk: (visSøk: boolean) => void;
 }
 
-export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps) {
-    const [internalVisSøk, setInternalVisSøk] = useState(false);
-    const visSøk = typeof props.visSøk === "boolean" ? props.visSøk : internalVisSøk;
-    const setVisSøk = props.setVisSøk ?? setInternalVisSøk;
+export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSøk, setVisSøk }: LeggTilBarnProps) {
     const [feil, setFeil] = useState<string | undefined>(undefined);
     const [valgtBarn, setValgtBarn] = useState<PersonDto | null>(null);
     const [visReellMottaker, setVisReellMottaker] = useState(false);
@@ -136,12 +133,16 @@ export default function LeggTilBarn({ søsken = [], ...props }: LeggTilBarnProps
         return (
             <ReellMottakerVelger
                 barnNavn={valgtBarn.visningsnavn ?? "Barnet"}
-                rolleIndex={rolleIndex}
+                barnIdent={valgtBarn.ident}
+                verdi={{}}
                 onAvbryt={resetEtterReellMottaker}
-                onBekreft={resetEtterReellMottaker}
-                kanFjerne={!reellMottakerPåkrevd}
-                isRequired={reellMottakerPåkrevd}
-                kunSamhandlerSomReellMottaker={props.erOppfostringsbidrag}
+                onBekreft={(valg) => {
+                    form.setValue(`roller.${rolleIndex}.reellMottakerType`, valg.type);
+                    form.setValue(`roller.${rolleIndex}.reellMottaker`, valg.ident);
+                    form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, valg.navn, { shouldValidate: true });
+                    resetEtterReellMottaker();
+                }}
+                regel={erOppfostringsbidrag ? "kun-samhandler" : reellMottakerPåkrevd ? "påkrevd" : "valgfri"}
             />
         );
     }

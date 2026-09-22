@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, VStack } from "@navikt/ds-react";
 import { useForm } from "react-hook-form";
 
 import EnhetInfoAlert from "../../components/EnhetInfoAlert";
 import SubmitButtons from "../../components/SubmitButtons";
 import EksisterendeSakAlert from "../../EksisterendeSakAlert";
+import FlytSkjema from "../../felles/FlytSkjema";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import {
@@ -81,24 +81,22 @@ export default function EktefellebidragFlyt() {
     });
 
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                {harEksisterendeSak && eksisterendeSak && (
-                    <EksisterendeSakAlert
-                        eksisterendeSak={eksisterendeSak}
-                        partISakenNavn={partISaken.navn}
-                        motpartNavn={motpart.navn}
-                    />
-                )}
-                <EktefelleMotpartVelger form={form} forslagMotpart={forslagMotpart ?? []} motsattRolle={motsattRolle} />
-                {motpart.ident && <EktefellebidragOppsummering form={form} />}
-                <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
-                <SubmitButtons
-                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                    error={submitError}
-                    saksnummer={saksnummer}
+        <FlytSkjema onSubmit={onSubmit}>
+            {harEksisterendeSak && eksisterendeSak && (
+                <EksisterendeSakAlert
+                    eksisterendeSak={eksisterendeSak}
+                    partISakenNavn={partISaken.navn}
+                    motpartNavn={motpart.navn}
                 />
-            </VStack>
-        </Box>
+            )}
+            <EktefelleMotpartVelger form={form} forslagMotpart={forslagMotpart ?? []} motsattRolle={motsattRolle} />
+            {motpart.ident && <EktefellebidragOppsummering form={form} />}
+            <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
+            <SubmitButtons
+                disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                error={submitError}
+                saksnummer={saksnummer}
+            />
+        </FlytSkjema>
     );
 }

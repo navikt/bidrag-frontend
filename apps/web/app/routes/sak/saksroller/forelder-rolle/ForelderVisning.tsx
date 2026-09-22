@@ -3,9 +3,8 @@ import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { Button, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import DiskresjonAlert from "../components/DiskresjonAlert.tsx";
-import PersonInfo from "../components/PersonInfo.tsx";
 import PersonSøkWrapper from "../components/PersonSøkWrapper.tsx";
+import { ForelderKortInnhold } from "../felles/ForelderKort.tsx";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
@@ -58,12 +57,16 @@ export default function ForelderVisning({ form, rolle, erNyForelder, saksnummer 
 
     return (
         <VStack gap="space-4">
-            <PersonInfo
-                navn={rolle.navn}
-                ident={rolle.fodselsnummer}
-                fødselsdato={rolle.fødselsdato}
-                rolle={rolle.type}
+            <ForelderKortInnhold
+                forelder={{
+                    ident: rolle.fodselsnummer,
+                    navn: rolle.navn,
+                    fødselsdato: rolle.fødselsdato,
+                    diskresjonskode: rolle.diskresjonskode,
+                }}
+                rolle={rolle.type === "BP" || rolle.type === "BM" ? rolle.type : undefined}
                 visModiaLenke
+                visIkon={false}
                 tags={
                     erNyForelder && (
                         <Tag variant="alt1" size="xsmall">
@@ -72,9 +75,8 @@ export default function ForelderVisning({ form, rolle, erNyForelder, saksnummer 
                     )
                 }
             >
-                {rolle.diskresjonskode && <DiskresjonAlert diskresjonskode={rolle.diskresjonskode} />}
                 <RollehistorikkVisning rollehistorikk={rolle.rollehistorikk} rolle={rolle} saksnummer={saksnummer} />
-            </PersonInfo>
+            </ForelderKortInnhold>
             <HStack gap="space-4">
                 <HStack gap="space-8" wrap={false}>
                     {!visSøk && erNyForelder && (

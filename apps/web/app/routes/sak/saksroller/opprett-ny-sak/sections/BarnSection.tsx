@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Alert, BodyShort, Box, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import BarnManueltRegistrering from "../BarnManueltRegistrering";
 import BarnkurvListe from "../motpart-felles/BarnkurvListe";
@@ -11,28 +11,21 @@ import {
     type ForelderMedBarnSkjemaData,
     MYNDYG_BARN_ALDER,
 } from "../opprett-sak-schema";
+import type { ReellMottakerRegel } from "../reell-mottaker-regel";
 
 interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     form: UseFormReturn<T>;
     barnkurver?: Barnkurv[];
-    aktivKurvId?: string | null;
     erBidragspliktig?: boolean;
-    visReellMottaker?: boolean;
-    bidragsmottakerErUkjent?: boolean;
-    reellMottakerAlltidPåkrevd?: boolean;
-    kunSamhandlerSomReellMottaker?: boolean;
+    reellMottakerRegel: ReellMottakerRegel;
     onResetMotpart?: () => void;
 }
 
 export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     form,
     barnkurver = [],
-    aktivKurvId = null,
     erBidragspliktig = false,
-    visReellMottaker = true,
-    bidragsmottakerErUkjent = false,
-    reellMottakerAlltidPåkrevd = false,
-    kunSamhandlerSomReellMottaker = false,
+    reellMottakerRegel,
     onResetMotpart,
 }: BarnSectionProps<T>) {
     const forelderBarnForm = form as unknown as UseFormReturn<{
@@ -90,16 +83,14 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     return (
         <VStack gap="space-6">
             <HStack align="center" justify="space-between">
-                <div>
-                    <Heading level="2" size="medium">
+                <VStack gap="space-4">
+                    <Heading level="2" size="small">
                         Velg barn saken gjelder for
                     </Heading>
-                    <Box asChild marginBlock="space-4 space-0">
-                        <BodyShort size="small" textColor="subtle">
-                            Velg alle barn som skal være med i saken
-                        </BodyShort>
-                    </Box>
-                </div>
+                    <BodyShort size="small" textColor="subtle">
+                        Velg alle barn som skal være med i saken
+                    </BodyShort>
+                </VStack>
                 <Tag size="small" variant="info">
                     {valgteBarn.length} valgt
                 </Tag>
@@ -108,20 +99,14 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
             {barnkurver.length > 0 && (
                 <BarnkurvListe
                     barnkurver={barnkurver}
-                    aktivKurvId={aktivKurvId}
                     form={forelderBarnForm as unknown as UseFormReturn<ForelderMedBarnSkjemaData>}
-                    visReellMottaker={visReellMottaker}
-                    bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                    reellMottakerAlltidPåkrevd={reellMottakerAlltidPåkrevd}
-                    kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
+                    reellMottakerRegel={reellMottakerRegel}
                 />
             )}
 
-            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
             <BarnManueltRegistrering
                 form={forelderBarnForm as unknown as UseFormReturn<ForelderMedBarnSkjemaData>}
-                leggTilBarnMauell={leggTilBarnManuell}
+                leggTilBarnManuell={leggTilBarnManuell}
                 barnkurver={barnkurver}
             />
 
@@ -133,10 +118,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                     fjernBarn={fjernBarn}
                     tittel="Barn som legges til manuelt"
                     heading={{ size: "small", level: "3" }}
-                    visReellMottaker={visReellMottaker}
-                    bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                    reellMottakerAlltidPåkrevd={reellMottakerAlltidPåkrevd}
-                    kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
+                    reellMottakerRegel={reellMottakerRegel}
                 />
             )}
 

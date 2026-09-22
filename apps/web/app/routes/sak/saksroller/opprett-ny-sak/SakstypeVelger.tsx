@@ -45,12 +45,12 @@ export default function SakstypeVelger({ onVelg }: Props) {
             <RadioGroup legend="Velg sakstype" hideLegend>
                 {SAKSTYPE_OPTIONS.map((option) => (
                     <Radio key={option.type} value={option.type} onClick={() => onVelg(option.type)}>
-                        <div>
+                        <VStack gap="space-0">
                             <BodyShort weight="semibold">{option.label}</BodyShort>
                             <BodyShort size="small" textColor="subtle">
                                 {option.description}
                             </BodyShort>
-                        </div>
+                        </VStack>
                     </Radio>
                 ))}
             </RadioGroup>

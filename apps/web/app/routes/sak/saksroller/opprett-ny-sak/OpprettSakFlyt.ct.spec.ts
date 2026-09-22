@@ -21,6 +21,39 @@ test("endrer sakstype, søker person via nettverk og endrer valgt part", async (
     await expect(component.getByRole("searchbox", { name: "Søk etter part" })).toBeVisible();
 });
 
+test("nullstiller rolle og underflyt når rolle, part eller sakstype endres", async ({ mount, page }) => {
+    await mockWizardApi(page);
+    const component = await mount(STORY);
+
+    const søkOgVelgPart = async () => {
+        const search = component.getByRole("searchbox", { name: "Søk etter part" });
+        await search.fill(testpersoner.bidragspliktig.ident);
+        await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
+    };
+
+    await søkOgVelgPart();
+    const rolleVelger = component.getByRole("combobox", { name: /Hvilken rolle har/ });
+    await rolleVelger.selectOption("bidragspliktig");
+    await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeVisible();
+    await expect(component.getByRole("button", { name: "Legg til bidragsmottaker" })).toBeVisible();
+
+    await rolleVelger.selectOption("bidragsmottaker");
+    await expect(component.getByRole("button", { name: "Legg til bidragspliktig" })).toBeVisible();
+    await component.getByRole("button", { name: "Endre part" }).click();
+    await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeHidden();
+
+    await søkOgVelgPart();
+    const nyRolleVelger = component.getByRole("combobox", { name: /Hvilken rolle har/ });
+    await expect(nyRolleVelger).toHaveValue("");
+    await nyRolleVelger.selectOption("bidragspliktig");
+    await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeVisible();
+
+    await component.getByRole("button", { name: "Endre", exact: true }).click();
+    await expect(component.getByRole("button", { name: "Endre part" })).toBeHidden();
+    await expect(component.getByRole("combobox", { name: /Hvilken rolle har/ })).toBeHidden();
+    await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeHidden();
+});
+
 test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter ektefellebidragssak", async ({
     mount,
     page,

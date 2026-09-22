@@ -1,9 +1,11 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { CheckmarkHeavyIcon, PersonPlusIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import FunnetPersonInfo from "../../../components/FunnetPersonInfo";
+import SøkPerson from "../../../components/SøkPerson";
 import ForeslåPersonPanel from "../../../felles/ForeslåPersonPanel";
 import type { BarnMedManglendeForeldreSkjemaData, ForelderMedRolle, ForelderPartRolle } from "../../opprett-sak-schema";
 import { hentForelderRolleLabel, hentMotsattRolle } from "../../utils";
@@ -16,6 +18,37 @@ type Props = {
     kjentForelderIndex: number | null;
     onVelgRolle: (index: number, rolle: ForelderPartRolle) => void;
 };
+
+function LeggTilForelderPanel({
+    index,
+    onLeggTil,
+    onSettUkjent,
+}: {
+    index: number;
+    onLeggTil: (person: PersonDto) => void;
+    onSettUkjent: () => void;
+}) {
+    const [visSøk, setVisSøk] = useState(false);
+
+    if (visSøk) {
+        return <SøkPerson label={`Søk forelder #${index + 1}`} personInformasjon={onLeggTil} />;
+    }
+
+    return (
+        <VStack gap="space-12">
+            <ForeslåPersonPanel tittel="Legg til forelder" beskrivelse="Søk opp forelderen som skal legges til i saken">
+                <Button type="button" size="small" onClick={() => setVisSøk(true)}>
+                    Velg annen person
+                </Button>
+            </ForeslåPersonPanel>
+            <HStack justify="center">
+                <Button type="button" size="small" variant="tertiary" onClick={onSettUkjent}>
+                    Eller sett som ukjent
+                </Button>
+            </HStack>
+        </VStack>
+    );
+}
 
 export default function LeggTilForelderSeksjon({
     form,
@@ -105,7 +138,6 @@ export default function LeggTilForelderSeksjon({
                             borderWidth="1"
                             borderColor="neutral"
                             background="default"
-                            className="shadow-sm"
                         >
                             <HStack align="center" justify="space-between" marginBlock="space-0 space-12">
                                 <Heading level="3" size="small" textColor="default">
@@ -114,25 +146,11 @@ export default function LeggTilForelderSeksjon({
                             </HStack>
 
                             {!erLagtTil && (
-                                <VStack gap="space-12">
-                                    <ForeslåPersonPanel
-                                        tittel="Legg til forelder"
-                                        beskrivelse="Søk opp forelderen som skal legges til i saken"
-                                        onVelgPerson={(person) => leggTilForelder(person, index)}
-                                        onError={() => {}}
-                                        søkLabel={`Søk forelder #${index + 1}`}
-                                    />
-                                    <HStack justify="center">
-                                        <Button
-                                            type="button"
-                                            size="small"
-                                            variant="tertiary"
-                                            onClick={() => settForelderUkjent(index)}
-                                        >
-                                            Eller sett som ukjent
-                                        </Button>
-                                    </HStack>
-                                </VStack>
+                                <LeggTilForelderPanel
+                                    index={index}
+                                    onLeggTil={(person) => leggTilForelder(person, index)}
+                                    onSettUkjent={() => settForelderUkjent(index)}
+                                />
                             )}
 
                             {erLagtTil && (
@@ -142,9 +160,7 @@ export default function LeggTilForelderSeksjon({
                                             label="Forelder:"
                                             navn="Ukjent"
                                             fjern={() => fjernForelder(index)}
-                                            bakgrunn="bg-ax-warning-200"
-                                            border="border-ax-warning-600"
-                                            ikon="text-ax-warning-700"
+                                            variant="warning"
                                         />
                                     ) : (
                                         <FunnetPersonInfo
@@ -152,9 +168,6 @@ export default function LeggTilForelderSeksjon({
                                             ident={forelder.ident}
                                             diskresjonskode={forelder.diskresjonskode}
                                             fjern={() => fjernForelder(index)}
-                                            bakgrunn="bg-ax-accent-100"
-                                            border="border-ax-accent-200"
-                                            ikon="text-ax-accent-700"
                                         />
                                     )}
 
@@ -166,7 +179,7 @@ export default function LeggTilForelderSeksjon({
 
                                     {harRolle && forelder.rolle && (
                                         <HStack asChild align="center">
-                                            <BodyShort size="small" weight="semibold" className="text-ax-success-800">
+                                            <BodyShort size="small" weight="semibold">
                                                 <CheckmarkHeavyIcon aria-hidden fontSize="1.3rem" /> Rolle valgt:{" "}
                                                 {hentForelderRolleLabel(forelder.rolle)}
                                             </BodyShort>

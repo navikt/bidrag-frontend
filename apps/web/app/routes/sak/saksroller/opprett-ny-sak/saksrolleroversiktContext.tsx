@@ -2,7 +2,7 @@ import { BIDRAG_PERSON_API } from "@bidrag/api";
 import type { ForelderBarnRelasjonDto, MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { SecureLoggerService } from "@bidrag/common";
 import { useQueryClient } from "@tanstack/react-query";
-import { createContext, type PropsWithChildren, useContext, useState } from "react";
+import { createContext, type PropsWithChildren, useCallback, useContext, useState } from "react";
 
 import { hentPersonMotpartBarnRelasjonQueryOptions } from "~/api/useApi.ts";
 import type { PartISaken } from "./opprett-sak-schema";
@@ -46,6 +46,8 @@ type SaksrolleroversiktContext = {
     setSaksrolleFlyt: (flyt: SaksrolleFlyt | null) => void;
     setPartISaken: (person: PartISaken | null) => void;
     setPartISakenAlder: (alder: number | null) => void;
+    nullstillRolleOgFlyt: () => void;
+    nullstillPartOgFlyt: () => void;
     harUfullstendigRelasjon: (barn: string[], bidragsmottaker?: string, bidragspliktig?: string) => Promise<boolean>;
     hentBarnkurver: (ident: string) => Promise<MotpartBarnRelasjon[]>;
 };
@@ -70,6 +72,16 @@ function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
     const [sakskategori, setSakskategori] = useState<Sakskategori>("Nasjonal");
 
     const queryClient = useQueryClient();
+
+    const nullstillRolleOgFlyt = useCallback(() => {
+        setPartISaken(null);
+        setSaksrolleFlyt(null);
+    }, []);
+
+    const nullstillPartOgFlyt = useCallback(() => {
+        setPartISakenAlder(null);
+        nullstillRolleOgFlyt();
+    }, [nullstillRolleOgFlyt]);
 
     const hentBarnkurver = async (ident: string) => {
         const data = await queryClient.fetchQuery(hentPersonMotpartBarnRelasjonQueryOptions({ ident }));
@@ -134,6 +146,8 @@ function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
                 setSaksrolleFlyt,
                 setPartISaken,
                 setPartISakenAlder,
+                nullstillRolleOgFlyt,
+                nullstillPartOgFlyt,
                 harUfullstendigRelasjon,
                 hentBarnkurver,
             }}

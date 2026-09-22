@@ -1,42 +1,23 @@
 import { PersonIdent } from "@bidrag/common";
-import { BodyShort, Box, Checkbox, CheckboxGroup, Detail, HStack, VStack } from "@navikt/ds-react";
+import { BodyShort, Box, Checkbox, CheckboxGroup, HGrid, HStack, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 
-import DiskresjonAlert from "../../components/DiskresjonAlert";
-import PersonInfo from "../../components/PersonInfo";
+import { BarnKortInnhold } from "../../felles/BarnKort";
+import { KortRamme } from "../../felles/PersonRolleKort";
 import ReellMottakerInline from "../components/ReellMottakerInline";
 import type { Barnkurv, ForelderMedBarnSkjemaData } from "../opprett-sak-schema";
-import { erKurvDeaktivert } from "../utils";
+import { type ReellMottakerRegel, reellMottakerValgregel } from "../reell-mottaker-regel";
 
 type Props = {
     barnkurver: Barnkurv[];
-    aktivKurvId: string | null;
     form: UseFormReturn<ForelderMedBarnSkjemaData>;
-    visReellMottaker: boolean;
-    bidragsmottakerErUkjent: boolean;
-    reellMottakerAlltidPåkrevd: boolean;
-    kunSamhandlerSomReellMottaker: boolean;
+    reellMottakerRegel: ReellMottakerRegel;
 };
 
-export default function BarnkurvListe({
-    barnkurver,
-    aktivKurvId,
-    form,
-    visReellMottaker,
-    bidragsmottakerErUkjent,
-    reellMottakerAlltidPåkrevd,
-    kunSamhandlerSomReellMottaker,
-}: Props) {
+export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel }: Props) {
     const valgteBarn = form.watch("valgteBarn") || [];
-    const harValgteBarn = valgteBarn.length > 0;
 
-    const erBarnValgt = (barnIdent: string | string[]) => {
-        if (Array.isArray(barnIdent)) {
-            return barnIdent.some((id) => valgteBarn.some((b) => b.ident === id));
-        }
-
-        return valgteBarn.some((b) => b.ident === barnIdent);
-    };
+    const erBarnValgt = (barnIdent: string) => valgteBarn.some((b) => b.ident === barnIdent);
 
     const håndterBarnKlikk = (valgteIdenter: string[], kurvId: string) => {
         const kurv = barnkurver.find((k) => k.id === kurvId);
@@ -46,27 +27,19 @@ export default function BarnkurvListe({
 
         // Read current form values synchronously (avoid stale render-time closure).
         const currentValgteBarn = form.getValues("valgteBarn") || [];
-
         const identerIPar = kurv.barn.map((b) => b.ident);
-
-        // STABLE-INDEX STRATEGY: never reorder existing selections.
-        // Rebuilding the array ordered by kurv.barn causes existing children to shift indices,
-        // which makes react-hook-form Controllers momentarily subscribe to wrong array paths
-        // and pick up neighbouring children's values (e.g. "ingen" from the newly added child).
-        //
-        // Instead:
-        //  1. Keep all children that remain selected, in their current positions.
-        //  2. Remove children from this kurv that were deselected.
-        //  3. Append brand-new selections at the end.
-
-        // Step 1 + 2: keep existing entries that are still wanted
-        const forblirValgt = currentValgteBarn.filter(
+        const aktivKurv = barnkurver.find((barnkurv) =>
+            barnkurv.barn.some((barn) =>
+                currentValgteBarn.some((valgtBarn) => !valgtBarn.manuellLagtTil && valgtBarn.ident === barn.ident),
+            ),
+        );
+        const bytterKurv = valgteIdenter.length > 0 && aktivKurv !== undefined && aktivKurv.id !== kurvId;
+        const eksisterendeValg = bytterKurv ? [] : currentValgteBarn;
+        const forblirValgt = eksisterendeValg.filter(
             (b) => !identerIPar.includes(b.ident) || valgteIdenter.includes(b.ident),
         );
-
-        // Step 3: add children that are newly selected (not already in the array)
         const nyeBarn = kurv.barn
-            .filter((b) => valgteIdenter.includes(b.ident) && !currentValgteBarn.some((cb) => cb.ident === b.ident))
+            .filter((b) => valgteIdenter.includes(b.ident) && !eksisterendeValg.some((cb) => cb.ident === b.ident))
             .map((kurvBarn) => ({
                 ...kurvBarn,
                 reellMottakerType: "ingen" as const,
@@ -89,7 +62,7 @@ export default function BarnkurvListe({
             return;
         }
 
-        if (currentValgteBarn.length === 0 && oppdaterteBarn.length > 0) {
+        if (valgteIdenter.length > 0 && aktivKurv?.id !== kurvId) {
             const erMotpartUkjent = kurv.id.toLowerCase().includes("ukjent");
 
             if (!erMotpartUkjent && kurv.motpart) {
@@ -115,13 +88,13 @@ export default function BarnkurvListe({
     return (
         <VStack gap="space-16">
             {barnkurver.map((kurv, index) => {
-                const erDeaktivert = erKurvDeaktivert(kurv.id, aktivKurvId, harValgteBarn);
                 const erMotpartUkjent = kurv.id.toLowerCase().includes("ukjent");
                 const motpartNavn = kurv.motpart?.visningsnavn ?? "ukjent forelder";
                 const motpartIdent = kurv.motpart?.ident;
+                const valgteIdenter = kurv.barn.filter((barn) => erBarnValgt(barn.ident)).map((barn) => barn.ident);
 
                 return (
-                    <Box key={index} padding="space-16" borderWidth="1" borderColor="neutral-subtleA" borderRadius="8">
+                    <Box key={kurv.id} padding="space-16" borderRadius="8">
                         <HStack asChild gap="space-4" paddingInline="space-8" marginBlock="space-0 space-8">
                             <BodyShort size="small" weight="semibold" textColor="subtle">
                                 Med {motpartNavn}{" "}
@@ -133,61 +106,54 @@ export default function BarnkurvListe({
                         <CheckboxGroup
                             legend={`Velg barn med ${motpartNavn}`}
                             hideLegend
+                            value={valgteIdenter}
                             onChange={(valgteIdenter) => håndterBarnKlikk(valgteIdenter, kurv.id)}
                             size="small"
                         >
-                            <Box asChild borderRadius="8">
-                                <VStack gap="space-12" padding="space-8">
-                                    {kurv.barn.map((barn, j) => {
-                                        const barnIndex = valgteBarn.findIndex((b) => b.ident === barn.ident);
-                                        const erValgt = erBarnValgt(barn.ident);
-                                        const kanVelges = !erDeaktivert || erValgt;
-                                        const erReellMottakerPåkrevd =
-                                            reellMottakerAlltidPåkrevd || barn.erMyndig || bidragsmottakerErUkjent;
-
-                                        return (
-                                            <Box key={j} borderRadius="8" background="neutral-soft" padding="space-12">
-                                                <Checkbox value={barn.ident} disabled={!kanVelges}>
-                                                    <VStack>
-                                                        <PersonInfo
-                                                            ident={barn.ident}
-                                                            fødselsdato={barn.fødselsdato}
-                                                            alder={barn.alder}
-                                                            navn={barn.navn}
-                                                        />
-                                                        {barn?.diskresjonskode && (
-                                                            <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />
-                                                        )}
-                                                    </VStack>
+                            <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-16" align="start">
+                                {kurv.barn.map((barn) => {
+                                    const barnIndex = valgteBarn.findIndex((b) => b.ident === barn.ident);
+                                    const erValgt = erBarnValgt(barn.ident);
+                                    return (
+                                        <KortRamme key={barn.ident}>
+                                            <VStack gap="space-16">
+                                                <Checkbox value={barn.ident}>
+                                                    <BarnKortInnhold
+                                                        barn={{
+                                                            ident: barn.ident,
+                                                            navn: barn.navn,
+                                                            fødselsdato: barn.fødselsdato,
+                                                            alder: barn.alder,
+                                                            diskresjonskode: barn.diskresjonskode,
+                                                        }}
+                                                        visIkon={false}
+                                                    />
                                                 </Checkbox>
-                                                {erValgt && visReellMottaker && barnIndex !== -1 && (
-                                                    <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">
-                                                        <ReellMottakerInline
-                                                            form={form}
-                                                            fieldPath={`valgteBarn.${barnIndex}`}
-                                                            barnIdent={barn.ident}
-                                                            barnNavn={barn.navn}
-                                                            isRequired={erReellMottakerPåkrevd}
-                                                            kunSamhandlerSomReellMottaker={
-                                                                kunSamhandlerSomReellMottaker
-                                                            }
-                                                        />
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                        );
-                                    })}
-                                </VStack>
-                            </Box>
+                                                {erValgt &&
+                                                    reellMottakerRegel.type !== "skjult" &&
+                                                    barnIndex !== -1 && (
+                                                        <Box
+                                                            marginBlock="space-4 space-0"
+                                                            paddingBlock="space-4 space-0"
+                                                        >
+                                                            <ReellMottakerInline
+                                                                form={form}
+                                                                fieldPath={`valgteBarn.${barnIndex}`}
+                                                                barnIdent={barn.ident}
+                                                                barnNavn={barn.navn}
+                                                                regel={reellMottakerValgregel(
+                                                                    reellMottakerRegel,
+                                                                    barn.erMyndig,
+                                                                )}
+                                                            />
+                                                        </Box>
+                                                    )}
+                                            </VStack>
+                                        </KortRamme>
+                                    );
+                                })}
+                            </HGrid>
                         </CheckboxGroup>
-
-                        {erDeaktivert && (
-                            <Box asChild marginBlock="space-4 space-0" paddingInline="space-8">
-                                <Detail textColor="subtle" className="italic">
-                                    Deaktivert (barn valgt fra annen kurv)
-                                </Detail>
-                            </Box>
-                        )}
                     </Box>
                 );
             })}

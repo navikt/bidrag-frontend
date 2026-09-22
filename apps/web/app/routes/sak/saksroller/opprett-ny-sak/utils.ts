@@ -45,14 +45,6 @@ export function grupperBarnIKurver(relasjoner: MotpartBarnRelasjon[]): Barnkurv[
     });
 }
 
-export function erKurvDeaktivert(kurvId: string, aktivKurvId: string | null, harValgteBarn: boolean): boolean {
-    if (!harValgteBarn || !aktivKurvId) {
-        return false;
-    }
-
-    return kurvId !== aktivKurvId;
-}
-
 export function tilPartISaken(person: PersonDto, rolle: PartRolle): PartISaken {
     return {
         ident: person.ident,

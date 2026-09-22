@@ -51,7 +51,6 @@ export default function OppsummeringSection({
     onLeggTilBidragsmottaker,
 }: Props) {
     const { sakstype, sakskategori } = useSaksrolleroversikt();
-    // Always show part i saken first (left), then motpart (right)
     const firstPart = partISakenRolle === "bidragspliktig" ? bidragspliktig : bidragsmottaker;
     const secondPart = partISakenRolle === "bidragspliktig" ? bidragsmottaker : bidragspliktig;
     const firstCallback = partISakenRolle === "bidragspliktig" ? undefined : onSettBidragsmottakerUkjent;
@@ -66,74 +65,76 @@ export default function OppsummeringSection({
     ].filter((item) => !hideMissingPartCards || item.data !== null);
 
     return (
-        <VStack gap="space-4">
-            <Heading level="2" size="large">
-                Oppsummering
-            </Heading>
+        <Box background="default" paddingBlock="space-24 space-0">
+            <Box background="sunken">
+                <VStack gap="space-4">
+                    <Heading level="2" size="medium">
+                        Oppsummering
+                    </Heading>
 
-            <Box
-                asChild
-                borderRadius="8"
-                borderColor="neutral-subtleA"
-                borderWidth="1"
-                background="neutral-moderate"
-                padding="space-16"
-            >
-                <dl>
-                    <HGrid columns="max-content max-content" gap="space-4 space-8" align="start" width="fit-content">
-                        <dt>
-                            <BodyShort size="small" textColor="subtle">
-                                Sakstype:
-                            </BodyShort>
-                        </dt>
-                        <Box asChild marginInline="space-0">
-                            <dd>
-                                <BodyShort size="small" weight="semibold" textColor="default">
-                                    {sakstype ? sakstypeTilTekst(sakstype) : "Ikke valgt"}
-                                </BodyShort>
-                            </dd>
-                        </Box>
+                    <Box asChild borderRadius="8" background="raised" padding="space-16">
+                        <dl>
+                            <HGrid
+                                columns="max-content max-content"
+                                gap="space-4 space-8"
+                                align="start"
+                                width="fit-content"
+                            >
+                                <dt>
+                                    <BodyShort size="small" textColor="subtle">
+                                        Sakstype:
+                                    </BodyShort>
+                                </dt>
+                                <Box asChild marginInline="space-0">
+                                    <dd>
+                                        <BodyShort size="small" weight="semibold" textColor="default">
+                                            {sakstype ? sakstypeTilTekst(sakstype) : "Ikke valgt"}
+                                        </BodyShort>
+                                    </dd>
+                                </Box>
 
-                        <dt>
-                            <BodyShort size="small" textColor="subtle">
-                                Sakskategori:
-                            </BodyShort>
-                        </dt>
-                        <Box asChild marginInline="space-0">
-                            <dd>
-                                <BodyShort size="small" weight="semibold" textColor="default">
-                                    {sakskategori}
-                                </BodyShort>
-                            </dd>
-                        </Box>
-                    </HGrid>
-                </dl>
-            </Box>
+                                <dt>
+                                    <BodyShort size="small" textColor="subtle">
+                                        Sakskategori:
+                                    </BodyShort>
+                                </dt>
+                                <Box asChild marginInline="space-0">
+                                    <dd>
+                                        <BodyShort size="small" weight="semibold" textColor="default">
+                                            {sakskategori}
+                                        </BodyShort>
+                                    </dd>
+                                </Box>
+                            </HGrid>
+                        </dl>
+                    </Box>
 
-            <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
-                {partCards.map((item) => (
-                    <PartKort
-                        key={item.key}
-                        data={item.data}
-                        onSettUkjent={item.callback}
-                        onLeggTil={item.addCallback}
-                    />
-                ))}
-            </HGrid>
-
-            {barn.length > 0 && (
-                <VStack gap="space-2">
-                    <BodyShort size="small" weight="semibold" textColor="default">
-                        Barn
-                    </BodyShort>
                     <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
-                        {barn.map((item) => (
-                            <BarnKort key={item.ident} barn={item} />
+                        {partCards.map((item) => (
+                            <PartKort
+                                key={item.key}
+                                data={item.data}
+                                onSettUkjent={item.callback}
+                                onLeggTil={item.addCallback}
+                            />
                         ))}
                     </HGrid>
+
+                    {barn.length > 0 && (
+                        <VStack gap="space-2">
+                            <BodyShort size="small" weight="semibold" textColor="default">
+                                Barn
+                            </BodyShort>
+                            <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
+                                {barn.map((item) => (
+                                    <BarnKort key={item.ident} barn={item} />
+                                ))}
+                            </HGrid>
+                        </VStack>
+                    )}
                 </VStack>
-            )}
-        </VStack>
+            </Box>
+        </Box>
     );
 }
 
@@ -145,16 +146,16 @@ type PartKortProps = {
 
 function PartKort({ data, onSettUkjent, onLeggTil }: PartKortProps) {
     if (!data) {
-        return <Box borderRadius="8" background="neutral-moderate" padding="space-16" />;
+        return <Box borderRadius="8" background="raised" padding="space-16" />;
     }
 
     const erUkjent = data.erKjent === false || !data.ident || !data.navn;
 
     return (
-        <Box asChild borderRadius="8" background="neutral-moderate">
+        <Box asChild borderRadius="8" background="raised">
             <VStack gap="space-4" padding="space-16">
                 <HStack align="center" gap="space-8">
-                    <PersonIcon aria-hidden fontSize="1.5rem" className="text-ax-neutral-1000" />
+                    <PersonIcon aria-hidden fontSize="1.5rem" />
                     <BodyLong size="small" weight="semibold" textColor="default">
                         {hentForelderRolleLabel(data.rolle)}
                     </BodyLong>
@@ -192,33 +193,27 @@ function PartKort({ data, onSettUkjent, onLeggTil }: PartKortProps) {
     );
 }
 
-type BarnKortProps = {
-    barn: BarnOppsummering;
-};
-
-function BarnKort({ barn }: BarnKortProps) {
-    const reellMottakerTekst = hentReellMottakerTekst(barn);
-
+function BarnKort({ barn }: { barn: BarnOppsummering }) {
     return (
-        <Box asChild borderRadius="8" background="neutral-moderate">
+        <Box asChild borderRadius="8" background="raised">
             <VStack gap="space-4" padding="space-16">
-                <div>
+                <VStack gap="space-1">
                     <BodyShort size="small" weight="semibold" textColor="default">
                         Barn
                     </BodyShort>
                     <PersonInfo ident={barn.ident} navn={barn.navn} />
                     {barn.diskresjonskode && <DiskresjonAlert diskresjonskode={barn.diskresjonskode} />}
-                </div>
+                </VStack>
 
                 <Box paddingBlock="space-8 space-0" borderColor="neutral-subtleA" borderWidth="1 0 0 0">
-                    <div>
+                    <VStack gap="space-1">
                         <BodyShort size="small" textColor="subtle">
                             Reell mottaker:
                         </BodyShort>
                         <BodyShort size="small" textColor="default">
-                            {reellMottakerTekst}
+                            {hentReellMottakerTekst(barn)}
                         </BodyShort>
-                    </div>
+                    </VStack>
                 </Box>
             </VStack>
         </Box>

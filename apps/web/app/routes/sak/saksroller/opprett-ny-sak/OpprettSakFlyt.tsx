@@ -1,6 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { PersonIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, HStack, Loader, VStack } from "@navikt/ds-react";
 import { Suspense, useMemo, useRef, useState } from "react";
 import DiskresjonAlert from "../components/DiskresjonAlert";
@@ -15,8 +14,8 @@ import ForelderMedBarnFlyt from "./flyt/ForelderMedBarn/ForelderMedBarnFlyt";
 import ForelderUtenBarnFlyt from "./flyt/ForelderUtenBarn/ForelderUtenBarnFlyt";
 import OppfostringsbidragFlyt from "./flyt/Oppfostringsbidrag/OppfostringsbidragFlyt";
 import type { PartRolle } from "./opprett-sak-schema";
-import RolleVisning from "./RolleVisning";
 import SakskategoriVelger from "./SakskategoriVelger";
+import SaksrolleVelger from "./SaksrolleVelger";
 import SakstypeVelger from "./SakstypeVelger";
 import {
     type Sakstype,
@@ -36,8 +35,59 @@ function getAutoAssignedRole(sakstype: Sakstype | null): PartRolle | null {
     return AUTO_ASSIGNED_ROLES[sakstype] || null;
 }
 
-function requiresRoleSelection(sakstype: Sakstype | null): boolean {
-    return !getAutoAssignedRole(sakstype);
+function ValgtPart({
+    person,
+    sakstype,
+    onEndre,
+}: {
+    person: PersonDto;
+    sakstype: Sakstype | null;
+    onEndre: () => void;
+}) {
+    const rolleNavn =
+        sakstype === "OPPFOSTRINGSBIDRAG"
+            ? "Bidragspliktig"
+            : sakstype === "FARSKAP"
+              ? "Bidragsmottaker"
+              : "Part i saken";
+
+    return (
+        <Box asChild background="sunken" padding="space-12">
+            <VStack gap="space-4">
+                <Heading level="2" size="small">
+                    {rolleNavn}
+                </Heading>
+                <Box
+                    background="raised"
+                    borderColor="neutral-subtleA"
+                    borderWidth="1"
+                    borderRadius="12"
+                    padding="space-12"
+                >
+                    <VStack gap="space-8">
+                        <HStack align="start" justify="space-between" gap="space-8">
+                            <Box flexGrow="1">
+                                <PersonInfo
+                                    ident={person.ident}
+                                    navn={person.visningsnavn}
+                                    fødselsdato={person.fødselsdato ?? undefined}
+                                />
+                                {person.diskresjonskode && (
+                                    <Box marginBlock="space-8 space-0">
+                                        <DiskresjonAlert diskresjonskode={person.diskresjonskode} />
+                                    </Box>
+                                )}
+                            </Box>
+                            <Button variant="tertiary" size="small" onClick={onEndre}>
+                                Endre part
+                            </Button>
+                        </HStack>
+                        <SaksrolleVelger partISaken={person} enforcedRolle={getAutoAssignedRole(sakstype)} />
+                    </VStack>
+                </Box>
+            </VStack>
+        </Box>
+    );
 }
 
 export default function OpprettSakFlyt() {
@@ -49,11 +99,12 @@ export default function OpprettSakFlyt() {
         setSakskategori,
         saksrolleFlyt,
         isLoadingOpprettSak,
-        partISaken: partISakenSkjemaData,
         setPartISaken: setPartISakenSkjemaData,
         setSaksrolleFlyt,
         setPartISakenAlder,
         hentBarnkurver,
+        nullstillRolleOgFlyt,
+        nullstillPartOgFlyt,
     } = useSaksrolleroversikt();
 
     const FlytKomponent = useMemo(() => {
@@ -75,29 +126,26 @@ export default function OpprettSakFlyt() {
     }, [saksrolleFlyt]);
 
     const barnkurverRequestIdRef = useRef(0);
-
-    const endreSakstype = () => {
-        barnkurverRequestIdRef.current += 1;
-        setSakstype(null);
-        setSakskategori("Nasjonal");
-        setPartISakenSkjemaData(null);
-        setSaksrolleFlyt(null);
-    };
-
-    const endrePartISaken = () => {
+    const nullstillValgtPart = () => {
         barnkurverRequestIdRef.current += 1;
         setPartISaken(null);
-        setPartISakenSkjemaData(null);
-        setSaksrolleFlyt(null);
+        nullstillPartOgFlyt();
     };
+
+    const endreSakstype = () => {
+        nullstillValgtPart();
+        setSakstype(null);
+        setSakskategori("Nasjonal");
+    };
+
+    const endrePartISaken = nullstillValgtPart;
 
     const oppdaterFlytForSakstypeOgPart = (person: PersonDto, valgtSakstype: Sakstype | null) => {
         const autoRole = getAutoAssignedRole(valgtSakstype);
 
         if (!autoRole) {
             barnkurverRequestIdRef.current += 1;
-            setPartISakenSkjemaData(null);
-            setSaksrolleFlyt(null);
+            nullstillRolleOgFlyt();
             return;
         }
 
@@ -167,8 +215,8 @@ export default function OpprettSakFlyt() {
 
     return (
         <Box maxWidth="56rem" marginInline="auto">
-            <Box background="sunken" minHeight="100vh" paddingBlock="space-32" paddingInline="space-16">
-                <VStack gap="space-12">
+            <Box minHeight="100vh" paddingBlock="space-32" paddingInline="space-16">
+                <VStack gap="space-24">
                     {isLoadingOpprettSak && (
                         <HStack
                             position="fixed"
@@ -190,50 +238,53 @@ export default function OpprettSakFlyt() {
                         Opprett ny sak
                     </Heading>
 
-                    <Box as="div" background="default" borderRadius={"2"} padding="space-12">
-                        <VStack gap="space-2">
-                            {!sakstype && <SakstypeVelger onVelg={velgSakstype} />}
+                    <VStack gap="space-24">
+                        {!sakstype && (
+                            <Box background="sunken" padding="space-12">
+                                <SakstypeVelger onVelg={velgSakstype} />
+                            </Box>
+                        )}
 
-                            {sakstype && (
-                                <VStack gap="space-2">
+                        {sakstype && (
+                            <Box asChild background="sunken" padding="space-12">
+                                <VStack gap="space-8">
                                     <HStack align="start" justify="space-between" gap="space-16">
-                                        <div>
-                                            <Box asChild marginBlock="space-0 space-4">
-                                                <Heading level="2" size="medium">
-                                                    Sakstype
-                                                </Heading>
-                                            </Box>
+                                        <VStack gap="space-4">
+                                            <Heading level="2" size="medium">
+                                                Sakstype
+                                            </Heading>
                                             <BodyLong weight="semibold" textColor="default">
                                                 {sakstypeTilTekst(sakstype)}
                                             </BodyLong>
-                                        </div>
+                                        </VStack>
                                         <Button variant="tertiary" size="small" onClick={endreSakstype}>
                                             Endre
                                         </Button>
                                     </HStack>
 
-                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                                    <SakskategoriVelger value={sakskategori} onChange={setSakskategori} />
+                                    <Box background="raised" padding="space-12">
+                                        <SakskategoriVelger value={sakskategori} onChange={setSakskategori} />
+                                    </Box>
                                 </VStack>
-                            )}
+                            </Box>
+                        )}
 
-                            {sakstype && !partISaken && (
-                                <>
-                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                                    <VStack gap="space-4">
-                                        <div>
-                                            <Heading level="2" size="medium" spacing>
-                                                {sakstype === "OPPFOSTRINGSBIDRAG"
-                                                    ? "Bidragspliktig"
-                                                    : sakstype === "FARSKAP"
-                                                      ? "Bidragsmottaker"
-                                                      : "Part i saken"}
-                                            </Heading>
-                                            <BodyLong size="small" textColor="subtle">
-                                                {sakstypeTilBeskrivelse(sakstype)}
-                                            </BodyLong>
-                                        </div>
+                        {sakstype && !partISaken && (
+                            <Box asChild background="sunken" padding="space-12">
+                                <VStack gap="space-8">
+                                    <Box>
+                                        <Heading level="2" size="medium">
+                                            {sakstype === "OPPFOSTRINGSBIDRAG"
+                                                ? "Bidragspliktig"
+                                                : sakstype === "FARSKAP"
+                                                  ? "Bidragsmottaker"
+                                                  : "Part i saken"}
+                                        </Heading>
+                                        <BodyLong size="small" textColor="subtle">
+                                            {sakstypeTilBeskrivelse(sakstype)}
+                                        </BodyLong>
+                                    </Box>
+                                    <Box background="raised" padding="space-12">
                                         <SøkPerson
                                             label={
                                                 sakstype === "OPPFOSTRINGSBIDRAG"
@@ -243,76 +294,15 @@ export default function OpprettSakFlyt() {
                                                       : "Søk etter part"
                                             }
                                             personInformasjon={(person) => leggTilPartISaken(person)}
+                                            compact
                                         />
-                                    </VStack>
-                                </>
-                            )}
+                                    </Box>
+                                </VStack>
+                            </Box>
+                        )}
 
-                            {partISaken && (
-                                <>
-                                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                                    <VStack gap="space-4">
-                                        <HStack justify="space-between" align="start">
-                                            <Box flexGrow="1">
-                                                <Box asChild marginBlock="space-0 space-12">
-                                                    <Heading level="2" size="small">
-                                                        {sakstype === "OPPFOSTRINGSBIDRAG"
-                                                            ? "Bidragspliktig"
-                                                            : sakstype === "FARSKAP"
-                                                              ? "Bidragsmottaker"
-                                                              : "Part i saken"}
-                                                    </Heading>
-                                                </Box>
-                                                <HStack align="start" gap="space-12">
-                                                    <Box asChild marginBlock="space-4 space-0">
-                                                        <PersonIcon
-                                                            aria-hidden
-                                                            fontSize="1.5rem"
-                                                            className="text-ax-brand-blue-600"
-                                                        />
-                                                    </Box>
-
-                                                    <Box flexGrow="1">
-                                                        <PersonInfo
-                                                            ident={partISaken.ident}
-                                                            navn={partISaken.visningsnavn}
-                                                            fødselsdato={partISaken.fødselsdato ?? undefined}
-                                                        />
-
-                                                        {partISaken?.diskresjonskode && (
-                                                            <Box marginBlock="space-8 space-0">
-                                                                <DiskresjonAlert
-                                                                    diskresjonskode={partISaken.diskresjonskode}
-                                                                />
-                                                            </Box>
-                                                        )}
-                                                    </Box>
-                                                </HStack>
-                                            </Box>
-                                            <Button variant="tertiary" size="small" onClick={endrePartISaken}>
-                                                Endre part
-                                            </Button>
-                                        </HStack>
-
-                                        {sakstype && sakstype !== "OPPFOSTRINGSBIDRAG" && sakstype !== "FARSKAP" && (
-                                            <>
-                                                <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                                                <RolleVisning
-                                                    partISaken={partISaken}
-                                                    rolle={
-                                                        getAutoAssignedRole(sakstype) ||
-                                                        partISakenSkjemaData?.rolle ||
-                                                        null
-                                                    }
-                                                    editable={requiresRoleSelection(sakstype)}
-                                                />
-                                            </>
-                                        )}
-                                    </VStack>
-                                </>
-                            )}
-                        </VStack>
-                    </Box>
+                        {partISaken && <ValgtPart person={partISaken} sakstype={sakstype} onEndre={endrePartISaken} />}
+                    </VStack>
 
                     {partISaken && (
                         <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>

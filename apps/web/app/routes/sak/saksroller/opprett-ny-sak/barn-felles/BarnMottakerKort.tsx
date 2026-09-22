@@ -14,15 +14,10 @@ type FormType = UseFormReturn<BarnBeggForeldreSkjemaData> | UseFormReturn<BarnMe
 type Props = {
     form: FormType;
     barn: BarnMedReellMottaker;
-    visReellMottaker: boolean;
     erPåkrevd: boolean;
 };
 
-export default function BarnMottakerKort({ form, barn, visReellMottaker, erPåkrevd }: Props) {
-    if (!visReellMottaker) {
-        return null;
-    }
-
+export default function BarnMottakerKort({ form, barn, erPåkrevd }: Props) {
     return (
         <VStack gap="space-12">
             <Heading level="2" size="medium">
@@ -40,7 +35,7 @@ export default function BarnMottakerKort({ form, barn, visReellMottaker, erPåkr
                     fieldPath="barn"
                     barnIdent={barn.ident}
                     barnNavn={barn.navn}
-                    isRequired={erPåkrevd}
+                    regel={erPåkrevd ? "påkrevd" : "valgfri"}
                 />
             </PersonKort>
         </VStack>

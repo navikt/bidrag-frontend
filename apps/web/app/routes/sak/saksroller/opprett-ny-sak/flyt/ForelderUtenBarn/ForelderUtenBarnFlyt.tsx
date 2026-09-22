@@ -4,7 +4,7 @@ import { SecureLoggerService } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils/datoUtils";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, BodyShort, Box, Heading, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Heading, VStack } from "@navikt/ds-react";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
@@ -13,7 +13,10 @@ import {
     useSjekkTilgangOpprettSakUtenBm,
 } from "~/api/useApi.ts";
 import BarnManueltRegistrering from "../../BarnManueltRegistrering";
+import BMUtenBarnAlert from "../../components/BMUtenBarnAlert";
+import KanIkkeOppretteSakAlert from "../../components/KanIkkeOppretteSakAlert";
 import LasterSkeleton from "../../components/LasterSkeleton";
+import FlytSkjema from "../../felles/FlytSkjema";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import { useMotpartHandling } from "../../hooks/useMotpartHandling";
 import useSyncKategori from "../../hooks/useSyncKategori";
@@ -31,7 +34,7 @@ import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import MotpartSection from "../../sections/MotpartSection";
-import ValideringsAlertsSection from "../../sections/ValideringsAlertsSection";
+import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
 import { hentMotsattRolle } from "../../utils";
 import FlereForeslåttMotpartVelger from "./FlereForeslåttMotpartVelger";
 import SøskenListe from "./SøskenListe";
@@ -319,156 +322,139 @@ function ForelderUtenBarnFlytContent() {
         valgteBarn.length > 0 || (erBidragsmottaker && valgteBarn.length === 0) || kanIkkeOpprettSakUtenBm;
 
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                <VStack gap="space-6">
-                    <VStack gap="space-4">
-                        <Heading level="2" size="medium" spacing>
-                            Legg til barn
-                        </Heading>
-                        <BodyShort size="small" textColor="subtle">
-                            Ingen barn funnet i registeret. Vi finner ingen registrerte barn for denne personen. Du kan
-                            legge til barn og den andre forelderen manuelt.
-                        </BodyShort>
+        <FlytSkjema onSubmit={onSubmit}>
+            <VStack gap="space-6">
+                <VStack gap="space-4">
+                    <Heading level="2" size="medium" spacing>
+                        Legg til barn
+                    </Heading>
+                    <BodyShort size="small" textColor="subtle">
+                        Ingen barn funnet i registeret. Vi finner ingen registrerte barn for denne personen. Du kan
+                        legge til barn og den andre forelderen manuelt.
+                    </BodyShort>
 
-                        {feil && (
-                            <Alert size="small" variant="error">
-                                {feil}
-                            </Alert>
-                        )}
-
-                        {eksisterendeSakInfoMelding && (
-                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                                {eksisterendeSakInfoMelding.melding}
-                            </Alert>
-                        )}
-
-                        <EksisterendeSakSection
-                            harEksisterendeSak={harEksisterendeSak}
-                            eksisterendeSak={eksisterendeSak}
-                            partISakenNavn={partISaken.navn}
-                            motpartNavn={motpart.navn}
-                        />
-                    </VStack>
-
-                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                    <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnMauell={leggTilBarnManuell} />
-
-                    {foreldreinformasjonTilBarnError !== null &&
-                        foreldreinformasjonTilBarnError instanceof TilgangsFeilError && (
-                            <Alert variant="info" size="small">
-                                {foreldreinformasjonTilBarnError.message}. Vennligst legg til motpart manuell
-                            </Alert>
-                        )}
-
-                    {infoMelding && (
-                        <Alert variant="info" size="small">
-                            {infoMelding}
+                    {feil && (
+                        <Alert size="small" variant="error">
+                            {feil}
                         </Alert>
                     )}
 
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <VStack gap="space-4">
-                        <ValgteBarnListe
-                            form={form}
-                            valgteBarn={valgteBarn}
-                            alleBarn={valgteBarn}
-                            fjernBarn={fjernBarn}
-                            tittel="Barn som legges til"
-                            heading={{ size: "medium", level: "2" }}
-                            visReellMottaker={true}
-                            bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                            reellMottakerAlltidPåkrevd={false}
-                            kunSamhandlerSomReellMottaker={false}
-                        />
-
-                        {foreslåttEnkeltMotpart && (
-                            <MotpartVelger
-                                form={form}
-                                tittel={`Foreslått ${motsattRolle}`}
-                                beskrivelse={`Vi fant at ${foreslåttEnkeltMotpart.visningsnavn} (${foreslåttEnkeltMotpart.ident}) er registrert som forelder til ${foreslåttEnkeltMotpart.barnNavn} (${foreslåttEnkeltMotpart.barnIdent}).`}
-                                variant="success"
-                                velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
-                                settMotpartUkjent={settMotpartUkjent}
-                                foreslåttMotpartNavn={foreslåttEnkeltMotpart.visningsnavn}
-                                brukForeslåttMotpart={() => brukForeslåttMotpart(foreslåttEnkeltMotpart)}
-                                settMotpartManuelt={settMotpartManuelt}
-                            />
-                        )}
-
-                        {foreslåttMotpart?.length > 1 && (
-                            <FlereForeslåttMotpartVelger
-                                form={form}
-                                foreslåttMotparter={foreslåttMotpart}
-                                tittel={`Foreslått ${motsattRolle}`}
-                                settMotpartUkjent={settMotpartUkjent}
-                                velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
-                                brukForeslåttMotpart={(forelder) => brukForeslåttMotpart(forelder)}
-                            />
-                        )}
-
-                        {valgteBarn.length > 0 && foreslåttMotpart?.length === 0 && !motpart.erKjent && (
-                            <MotpartVelger
-                                form={form}
-                                tittel="Ingen forelder registrert"
-                                beskrivelse="Dette barnet har ingen registrerte foreldre. Motpart settes til ukjent, men du kan registrere motpart manuelt om nødvendig."
-                                variant="warning"
-                                velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
-                                settMotpartUkjent={settMotpartUkjent}
-                                settMotpartManuelt={settMotpartManuelt}
-                            />
-                        )}
-
-                        <SøskenListe søsken={søsken} form={form} />
-
-                        {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
-                            <Alert variant="error" size="small">
-                                {form.formState.errors.valgteBarn.message}
-                            </Alert>
-                        )}
-                    </VStack>
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <MotpartSection
-                        form={form}
-                        onSettMotpartUkjent={settMotpartUkjent}
-                        onLeggTilMotpartManuell={settMotpartManuelt}
-                        bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
-                        visOppsummering={valgteBarn.length > 0}
-                    />
-
-                    {visValideringsAlerts && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ValideringsAlertsSection
-                                visUfullstendigRelasjonAlert={valgteBarn.length > 0}
-                                visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
-                                visKanIkkeOppretteSakAlert={kanIkkeOpprettSakUtenBm}
-                            />
-                        </>
+                    {eksisterendeSakInfoMelding && (
+                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                            {eksisterendeSakInfoMelding.melding}
+                        </Alert>
                     )}
 
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <EnhetOgSubmitSection
-                        enhet={enhet}
-                        enhetNavn={enhetNavn}
-                        isLoadingEnhet={isLoadingEnhet}
-                        enhetError={enhetError}
-                        disabled={
-                            harEksisterendeSak ||
-                            isLoadingHentSak ||
-                            isLoadingEnhet ||
-                            (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
-                        }
-                        submitError={error}
-                        saksnummer={saksnummer}
+                    <EksisterendeSakSection
+                        harEksisterendeSak={harEksisterendeSak}
+                        eksisterendeSak={eksisterendeSak}
+                        partISakenNavn={partISaken.navn}
+                        motpartNavn={motpart.navn}
                     />
                 </VStack>
+
+                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
+
+                <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnManuell={leggTilBarnManuell} />
+
+                {foreldreinformasjonTilBarnError !== null &&
+                    foreldreinformasjonTilBarnError instanceof TilgangsFeilError && (
+                        <Alert variant="info" size="small">
+                            {foreldreinformasjonTilBarnError.message}. Vennligst legg til motpart manuell
+                        </Alert>
+                    )}
+
+                {infoMelding && (
+                    <Alert variant="info" size="small">
+                        {infoMelding}
+                    </Alert>
+                )}
+
+                <VStack gap="space-4">
+                    <ValgteBarnListe
+                        form={form}
+                        valgteBarn={valgteBarn}
+                        alleBarn={valgteBarn}
+                        fjernBarn={fjernBarn}
+                        tittel="Barn som legges til"
+                        heading={{ size: "medium", level: "2" }}
+                        reellMottakerRegel={{ type: "etter-barn", bidragsmottakerErUkjent }}
+                    />
+
+                    {foreslåttEnkeltMotpart && (
+                        <MotpartVelger
+                            form={form}
+                            tittel={`Foreslått ${motsattRolle}`}
+                            beskrivelse={`Vi fant at ${foreslåttEnkeltMotpart.visningsnavn} (${foreslåttEnkeltMotpart.ident}) er registrert som forelder til ${foreslåttEnkeltMotpart.barnNavn} (${foreslåttEnkeltMotpart.barnIdent}).`}
+                            variant="success"
+                            velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
+                            settMotpartUkjent={settMotpartUkjent}
+                            foreslåttMotpartNavn={foreslåttEnkeltMotpart.visningsnavn}
+                            brukForeslåttMotpart={() => brukForeslåttMotpart(foreslåttEnkeltMotpart)}
+                        />
+                    )}
+
+                    {foreslåttMotpart?.length > 1 && (
+                        <FlereForeslåttMotpartVelger
+                            form={form}
+                            foreslåttMotparter={foreslåttMotpart}
+                            tittel={`Foreslått ${motsattRolle}`}
+                            settMotpartUkjent={settMotpartUkjent}
+                            velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
+                            brukForeslåttMotpart={(forelder) => brukForeslåttMotpart(forelder)}
+                        />
+                    )}
+
+                    {valgteBarn.length > 0 && foreslåttMotpart?.length === 0 && !motpart.erKjent && (
+                        <MotpartVelger
+                            form={form}
+                            tittel="Ingen forelder registrert"
+                            beskrivelse="Dette barnet har ingen registrerte foreldre. Motpart settes til ukjent, men du kan registrere motpart manuelt om nødvendig."
+                            variant="warning"
+                            velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
+                            settMotpartUkjent={settMotpartUkjent}
+                        />
+                    )}
+
+                    <SøskenListe søsken={søsken} form={form} />
+
+                    {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
+                        <Alert variant="error" size="small">
+                            {form.formState.errors.valgteBarn.message}
+                        </Alert>
+                    )}
+                </VStack>
+
+                <MotpartSection
+                    form={form}
+                    onSettMotpartUkjent={settMotpartUkjent}
+                    onLeggTilMotpartManuell={settMotpartManuelt}
+                    bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
+                />
+
+                {visValideringsAlerts && (
+                    <>
+                        {valgteBarn.length > 0 && <UfullstendigRelasjonAlert />}
+                        {erBidragsmottaker && valgteBarn.length === 0 && <BMUtenBarnAlert />}
+                        {kanIkkeOpprettSakUtenBm && <KanIkkeOppretteSakAlert />}
+                    </>
+                )}
+
+                <EnhetOgSubmitSection
+                    enhet={enhet}
+                    enhetNavn={enhetNavn}
+                    isLoadingEnhet={isLoadingEnhet}
+                    enhetError={enhetError}
+                    disabled={
+                        harEksisterendeSak ||
+                        isLoadingHentSak ||
+                        isLoadingEnhet ||
+                        (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
+                    }
+                    submitError={error}
+                    saksnummer={saksnummer}
+                />
             </VStack>
-        </Box>
+        </FlytSkjema>
     );
 }

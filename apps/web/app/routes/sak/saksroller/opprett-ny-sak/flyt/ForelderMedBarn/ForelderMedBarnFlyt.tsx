@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box, VStack } from "@navikt/ds-react";
-import { useEffect, useRef, useState } from "react";
+import { Alert, VStack } from "@navikt/ds-react";
+import { useEffect, useRef } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
-
+import BMUtenBarnAlert from "../../components/BMUtenBarnAlert";
+import KanIkkeOppretteSakAlert from "../../components/KanIkkeOppretteSakAlert";
 import LasterSkeleton from "../../components/LasterSkeleton";
+import FlytSkjema from "../../felles/FlytSkjema";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import { useMotpartHandling } from "../../hooks/useMotpartHandling";
 import useSyncKategori from "../../hooks/useSyncKategori";
@@ -18,7 +20,7 @@ import BarnSection from "../../sections/BarnSection";
 import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import MotpartSection from "../../sections/MotpartSection";
-import ValideringsAlertsSection from "../../sections/ValideringsAlertsSection";
+import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
 import { grupperBarnIKurver, hentMotsattRolle } from "../../utils";
 
 export default function ForelderMedBarnFlyt() {
@@ -55,9 +57,7 @@ function ForelderMedBarnFlytContent() {
     const { partISaken, saksrolleFlyt } = useSaksrolleroversikt();
     const form = useFormContext<ForelderMedBarnSkjemaData>();
     useSyncKategori(form);
-    const [aktivKurvId, settAktivKurvId] = useState<string | null>(null);
     const bidragsmottakerRegistreringRef = useRef<HTMLDialogElement>(null);
-    const errorAlertRef = useRef<HTMLDivElement>(null);
     const rawBarnkurver = saksrolleFlyt?.type === "FORELDER_MED_BARN" ? saksrolleFlyt.barnkurver : [];
     const barnkurver = grupperBarnIKurver(rawBarnkurver);
 
@@ -70,9 +70,7 @@ function ForelderMedBarnFlytContent() {
     const valgteBarn = form.watch("valgteBarn");
     const motpart = form.watch("motpart");
 
-    const { settMotpartUkjent, leggTilMotpartManuell } = useMotpartHandling(form, () => {
-        settAktivKurvId(null);
-    });
+    const { settMotpartUkjent, leggTilMotpartManuell } = useMotpartHandling(form);
 
     const erBidragspliktig = partISaken?.rolle === "bidragspliktig";
     const erBidragsmottaker = partISaken?.rolle === "bidragsmottaker";
@@ -117,26 +115,6 @@ function ForelderMedBarnFlytContent() {
         bidragsmottaker,
     });
 
-    useEffect(() => {
-        if (error && errorAlertRef.current) {
-            errorAlertRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-            errorAlertRef.current.focus();
-        }
-    }, [error]);
-
-    useEffect(() => {
-        const barnFraRelasjon = valgteBarn.filter((b) => !b.manuellLagtTil);
-        const [enesteBarnFraRelasjon] = barnFraRelasjon;
-        if (barnFraRelasjon.length === 0) {
-            settAktivKurvId(null);
-        } else if (barnFraRelasjon.length === 1 && enesteBarnFraRelasjon) {
-            const kurv = barnkurver.find((barn) => barn.barn.some((b) => b.ident === enesteBarnFraRelasjon.ident));
-            if (kurv) {
-                settAktivKurvId(kurv.id);
-            }
-        }
-    }, [valgteBarn.length]);
-
     const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker.erKjent;
     const { data: kanOppretteSakUtenBm, isLoading: sjekkerTilgangUtenBm } =
         useSjekkTilgangOpprettSakUtenBm(bidragsmottakerErUkjent);
@@ -151,82 +129,67 @@ function ForelderMedBarnFlytContent() {
         (erBidragsmottaker && valgteBarn.length === 0);
 
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                <VStack gap="space-6">
-                    <VStack gap="space-12">
-                        {eksisterendeSakInfoMelding && (
-                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                                {eksisterendeSakInfoMelding.melding}
-                            </Alert>
-                        )}
-
-                        <EksisterendeSakSection
-                            harEksisterendeSak={harEksisterendeSak}
-                            eksisterendeSak={eksisterendeSak}
-                            partISakenNavn={partISaken?.navn ?? ""}
-                            motpartNavn={motpart.navn}
-                        />
-                    </VStack>
-
-                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <BarnSection
-                        form={form}
-                        barnkurver={barnkurver}
-                        aktivKurvId={aktivKurvId}
-                        erBidragspliktig={erBidragspliktig}
-                        visReellMottaker={true}
-                        bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                        onResetMotpart={resetMotpart}
-                    />
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <MotpartSection
-                        form={form}
-                        onSettMotpartUkjent={settMotpartUkjent}
-                        onLeggTilMotpartManuell={leggTilMotpartManuell}
-                        bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
-                        visOppsummering={valgteBarn.length > 0}
-                    />
-
-                    {visValideringsAlerts && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ValideringsAlertsSection
-                                visUfullstendigRelasjonAlert={
-                                    valgteBarn.length > 0 &&
-                                    (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart)
-                                }
-                                visBMUtenBarnAlert={erBidragsmottaker && valgteBarn.length === 0}
-                                visKanIkkeOppretteSakAlert={
-                                    bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false
-                                }
-                            />
-                        </>
+        <FlytSkjema onSubmit={onSubmit}>
+            <VStack gap="space-6">
+                <VStack gap="space-12">
+                    {eksisterendeSakInfoMelding && (
+                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                            {eksisterendeSakInfoMelding.melding}
+                        </Alert>
                     )}
 
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <EnhetOgSubmitSection
-                        enhet={enhet}
-                        enhetNavn={enhetNavn}
-                        isLoadingEnhet={isLoadingEnhet}
-                        enhetError={enhetError}
-                        disabled={
-                            harEksisterendeSak ||
-                            isLoadingHentSak ||
-                            isLoadingEnhet ||
-                            (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
-                        }
-                        submitError={error}
-                        saksnummer={saksnummer}
+                    <EksisterendeSakSection
+                        harEksisterendeSak={harEksisterendeSak}
+                        eksisterendeSak={eksisterendeSak}
+                        partISakenNavn={partISaken?.navn ?? ""}
+                        motpartNavn={motpart.navn}
                     />
                 </VStack>
+
+                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
+
+                <BarnSection
+                    form={form}
+                    barnkurver={barnkurver}
+                    erBidragspliktig={erBidragspliktig}
+                    reellMottakerRegel={{ type: "etter-barn", bidragsmottakerErUkjent }}
+                    onResetMotpart={resetMotpart}
+                />
+
+                <MotpartSection
+                    form={form}
+                    onSettMotpartUkjent={settMotpartUkjent}
+                    onLeggTilMotpartManuell={leggTilMotpartManuell}
+                    bidragsmottakerRegistreringRef={bidragsmottakerRegistreringRef}
+                />
+
+                {visValideringsAlerts && (
+                    <>
+                        {valgteBarn.length > 0 && (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart) && (
+                            <UfullstendigRelasjonAlert />
+                        )}
+                        {erBidragsmottaker && valgteBarn.length === 0 && <BMUtenBarnAlert />}
+                        {bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false && (
+                            <KanIkkeOppretteSakAlert />
+                        )}
+                    </>
+                )}
+
+                <EnhetOgSubmitSection
+                    enhet={enhet}
+                    enhetNavn={enhetNavn}
+                    isLoadingEnhet={isLoadingEnhet}
+                    enhetError={enhetError}
+                    disabled={
+                        harEksisterendeSak ||
+                        isLoadingHentSak ||
+                        isLoadingEnhet ||
+                        (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
+                    }
+                    submitError={error}
+                    saksnummer={saksnummer}
+                />
             </VStack>
-        </Box>
+        </FlytSkjema>
     );
 }

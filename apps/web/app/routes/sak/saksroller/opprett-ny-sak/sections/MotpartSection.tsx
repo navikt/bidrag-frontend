@@ -10,19 +10,13 @@ interface MotpartSectionProps {
     onSettMotpartUkjent: () => void;
     onLeggTilMotpartManuell: (person: PersonDto) => void;
     bidragsmottakerRegistreringRef: RefObject<HTMLDialogElement | null>;
-    visOppsummering?: boolean;
 }
 
-/**
- * Section for managing motpart (counterparty) in forelder flows.
- * Combines ParterOppsummering and PartManuellRegistrering components.
- */
 export default function MotpartSection({
     form,
     onSettMotpartUkjent,
     onLeggTilMotpartManuell,
     bidragsmottakerRegistreringRef,
-    visOppsummering = true,
 }: MotpartSectionProps) {
     const valgteBarn = form.watch("valgteBarn");
     const partISaken = form.watch("partISaken");
@@ -31,7 +25,7 @@ export default function MotpartSection({
     const harUkjentForelderIForeldreListe = foreldre?.some((forelder) => forelder?.erKjent === false) ?? false;
     const harUkjentForelder =
         partISaken?.erKjent === false || motpart?.erKjent === false || harUkjentForelderIForeldreListe;
-    const skalViseOppsummering = (visOppsummering && valgteBarn.length > 0) || harUkjentForelder;
+    const skalViseOppsummering = valgteBarn.length > 0 || harUkjentForelder;
 
     return (
         <>

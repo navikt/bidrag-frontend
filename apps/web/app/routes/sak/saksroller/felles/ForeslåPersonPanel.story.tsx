@@ -1,8 +1,10 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
+import { Button } from "@navikt/ds-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import SøkPerson from "../components/SøkPerson.tsx";
 import ForeslåPersonPanel from "./ForeslåPersonPanel.tsx";
 
 const foreslåttPerson: PersonDto = {
@@ -23,22 +25,33 @@ function TestWrapper() {
     );
     const [valgtPerson, setValgtPerson] = useState<PersonDto | null>(null);
     const [bruktForslag, setBruktForslag] = useState(false);
+    const [visSøk, setVisSøk] = useState(false);
 
     return (
         <QueryClientProvider client={queryClient}>
             <BidragCommonsProviderMock>
-                <ForeslåPersonPanel
-                    tittel="Velg bidragsmottaker"
-                    beskrivelse="Velg personen som skal være bidragsmottaker i saken"
-                    variant="warning"
-                    forslagNavn={foreslåttPerson.visningsnavn}
-                    onBrukForslag={() => {
-                        setBruktForslag(true);
-                        setValgtPerson(foreslåttPerson);
-                    }}
-                    onVelgPerson={setValgtPerson}
-                    søkLabel="Søk etter bidragsmottaker"
-                />
+                {visSøk ? (
+                    <SøkPerson label="Søk etter bidragsmottaker" personInformasjon={setValgtPerson} />
+                ) : (
+                    <ForeslåPersonPanel
+                        tittel="Velg bidragsmottaker"
+                        beskrivelse="Velg personen som skal være bidragsmottaker i saken"
+                        variant="warning"
+                        forslag={[
+                            {
+                                navn: foreslåttPerson.visningsnavn ?? "",
+                                onBruk: () => {
+                                    setBruktForslag(true);
+                                    setValgtPerson(foreslåttPerson);
+                                },
+                            },
+                        ]}
+                    >
+                        <Button type="button" size="small" onClick={() => setVisSøk(true)}>
+                            Velg annen person
+                        </Button>
+                    </ForeslåPersonPanel>
+                )}
                 <output data-testid="brukt-forslag">{String(bruktForslag)}</output>
                 <output data-testid="valgt-person">{valgtPerson?.visningsnavn ?? ""}</output>
             </BidragCommonsProviderMock>
@@ -73,14 +86,11 @@ function FlereForslagWrapper() {
                     tittel="Velg motpart"
                     beskrivelse="Velg en av de foreslåtte personene, eller søk etter en annen"
                     variant="warning"
-                    forslagListe={forslagListe.map((person) => ({
-                        ident: person.ident,
+                    forslag={forslagListe.map((person) => ({
                         navn: person.visningsnavn ?? "Ukjent",
                         fødselsdato: person.fødselsdato ?? undefined,
                         onBruk: () => setValgtPerson(person),
                     }))}
-                    onVelgPerson={setValgtPerson}
-                    søkLabel="Søk etter motpart"
                 />
                 <output data-testid="valgt-person">{valgtPerson?.visningsnavn ?? ""}</output>
             </BidragCommonsProviderMock>

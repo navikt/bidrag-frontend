@@ -1,11 +1,9 @@
-import type { PersonDto } from "@bidrag/api/PersonApi";
-import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { BodyLong, Box, Button, HStack } from "@navikt/ds-react";
+import { Button } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-
-import type { ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
 import ForeslåPersonPanel from "../../felles/ForeslåPersonPanel";
+import type { ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
+import ValgtMotpart from "./ValgtMotpart";
 
 type Props = {
     form: UseFormReturn<ForelderUtenBarnSkjemaData>;
@@ -16,7 +14,6 @@ type Props = {
     settMotpartUkjent: () => void;
     foreslåttMotpartNavn?: string;
     brukForeslåttMotpart?: () => void;
-    settMotpartManuelt: (person: PersonDto) => void;
 };
 
 export default function MotpartVelger({
@@ -28,7 +25,6 @@ export default function MotpartVelger({
     settMotpartUkjent,
     foreslåttMotpartNavn,
     brukForeslåttMotpart,
-    settMotpartManuelt,
 }: Props) {
     const [visMotpartInfoPanel, setVisMotpartInfoPanel] = useState(false);
     const motpart = form.watch("motpart");
@@ -53,47 +49,22 @@ export default function MotpartVelger({
         settMotpartUkjent();
     };
 
-    return (
-        <div>
-            {!visMotpartInfoPanel && (
-                <ForeslåPersonPanel
-                    tittel={tittel}
-                    beskrivelse={beskrivelse}
-                    variant={variant}
-                    forslagNavn={harForeslåttMotpart ? foreslåttMotpartNavn : undefined}
-                    onBrukForslag={harForeslåttMotpart ? håndterBrukForeslått : undefined}
-                    onVelgPerson={(person: PersonDto) => {
-                        setVisMotpartInfoPanel(true);
-                        settMotpartManuelt(person);
-                    }}
-                />
-            )}
+    if (!visMotpartInfoPanel) {
+        return (
+            <ForeslåPersonPanel
+                tittel={tittel}
+                beskrivelse={beskrivelse}
+                variant={variant}
+                forslag={
+                    harForeslåttMotpart ? [{ navn: foreslåttMotpartNavn, onBruk: håndterBrukForeslått }] : undefined
+                }
+            >
+                <Button type="button" size="small" onClick={håndterVelgAnnen}>
+                    Velg annen person
+                </Button>
+            </ForeslåPersonPanel>
+        );
+    }
 
-            {visMotpartInfoPanel && (
-                <Box
-                    asChild
-                    background="success-moderate"
-                    borderWidth="1"
-                    borderColor="success-strong"
-                    borderRadius="8"
-                >
-                    <HStack align="center" justify="space-between" marginBlock="space-16 space-0" padding="space-12">
-                        <HStack align="center" gap="space-12">
-                            <PersonIcon fontSize="1.5rem" aria-hidden className="text-ax-success-700" />
-                            <BodyLong size="small" weight="semibold">
-                                Motpart: {visningsnavn}
-                            </BodyLong>
-                        </HStack>
-                        <Button
-                            type="button"
-                            size="xsmall"
-                            variant="secondary"
-                            onClick={håndterFjernMotpart}
-                            icon={<XMarkIcon title="Fjern motpart" />}
-                        />
-                    </HStack>
-                </Box>
-            )}
-        </div>
-    );
+    return <ValgtMotpart visningsnavn={visningsnavn} onFjern={håndterFjernMotpart} />;
 }

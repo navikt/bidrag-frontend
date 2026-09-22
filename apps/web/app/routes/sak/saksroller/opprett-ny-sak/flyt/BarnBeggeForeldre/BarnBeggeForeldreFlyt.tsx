@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box, Button, HStack, VStack } from "@navikt/ds-react";
+import { Alert, Button, HStack, VStack } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
@@ -7,13 +7,14 @@ import FunnetPersonInfo from "../../../components/FunnetPersonInfo";
 import BarnMottakerKort from "../../barn-felles/BarnMottakerKort";
 import ParterOppsummeringBarn from "../../barn-felles/ParterOppsummeringBarn";
 import LasterSkeleton from "../../components/LasterSkeleton";
+import FlytSkjema from "../../felles/FlytSkjema";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import { type BarnBeggForeldreSkjemaData, BarnBeggForeldreSkjemaSchema } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
-import ValideringsAlertsSection from "../../sections/ValideringsAlertsSection";
+import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
 import RolleVelger from "./RollerVelger";
 
 export default function BarnBeggeForeldreFlyt() {
@@ -136,103 +137,67 @@ function BarnBeggeForeldreFlytContent() {
         form.setValue(`foreldre.${bidragsmottakerIndex}.erKjent`, true);
     };
 
-    const visReellMottaker = rollerErValgt;
-    const visOppsummering = rollerErValgt || harUkjentForelder;
-
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                <VStack gap="space-6">
-                    <VStack gap="space-12">
-                        <Alert variant="info" size="small">
-                            Barnet har begge foreldre registrert. Du må velge hvem som skal betale bidrag.
+        <FlytSkjema onSubmit={onSubmit}>
+            <VStack gap="space-6">
+                <VStack gap="space-12">
+                    <Alert variant="info" size="small">
+                        Barnet har begge foreldre registrert. Du må velge hvem som skal betale bidrag.
+                    </Alert>
+
+                    {eksisterendeSakInfoMelding && (
+                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                            {eksisterendeSakInfoMelding.melding}
                         </Alert>
-
-                        {eksisterendeSakInfoMelding && (
-                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                                {eksisterendeSakInfoMelding.melding}
-                            </Alert>
-                        )}
-
-                        <EksisterendeSakSection
-                            harEksisterendeSak={harEksisterendeSak}
-                            eksisterendeSak={eksisterendeSak}
-                            partISakenNavn={bidragspliktig?.navn ?? ""}
-                            motpartNavn={bidragsmottaker?.navn}
-                        />
-                    </VStack>
-
-                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <VStack gap="space-4">
-                        <RolleVelger form={form} foreldre={foreldre} />
-
-                        {rollerErValgt && bidragsmottaker?.erKjent && (
-                            <HStack justify="end">
-                                <Button
-                                    type="button"
-                                    variant="tertiary"
-                                    size="small"
-                                    onClick={settBidragsmottakerUkjent}
-                                >
-                                    Sett bidragsmottaker som ukjent
-                                </Button>
-                            </HStack>
-                        )}
-
-                        {bidragsmottaker?.erKjent === false && (
-                            <FunnetPersonInfo
-                                label="Bidragsmottaker:"
-                                navn="Ukjent"
-                                fjern={settDenAndreForelderSomBidragsmottaker}
-                                bakgrunn="bg-ax-warning-200"
-                                border="border-ax-warning-600"
-                                ikon="text-ax-warning-700"
-                            />
-                        )}
-                    </VStack>
-
-                    {visReellMottaker && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <BarnMottakerKort
-                                form={form}
-                                barn={barn}
-                                visReellMottaker={visReellMottaker}
-                                erPåkrevd={trengerReellMottaker}
-                            />
-                        </>
                     )}
 
-                    {visOppsummering && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ParterOppsummeringBarn form={form} />
-                        </>
-                    )}
-
-                    {bidragsmottakerErUkjent && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ValideringsAlertsSection visUfullstendigRelasjonAlert={bidragsmottakerErUkjent} />
-                        </>
-                    )}
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <EnhetOgSubmitSection
-                        enhet={enhet}
-                        enhetNavn={enhetNavn}
-                        isLoadingEnhet={isLoadingEnhet}
-                        enhetError={enhetError}
-                        disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                        submitError={error}
-                        saksnummer={saksnummer}
+                    <EksisterendeSakSection
+                        harEksisterendeSak={harEksisterendeSak}
+                        eksisterendeSak={eksisterendeSak}
+                        partISakenNavn={bidragspliktig?.navn ?? ""}
+                        motpartNavn={bidragsmottaker?.navn}
                     />
                 </VStack>
+
+                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
+
+                <VStack gap="space-4">
+                    <RolleVelger form={form} foreldre={foreldre} />
+
+                    {rollerErValgt && bidragsmottaker?.erKjent && (
+                        <HStack justify="end">
+                            <Button type="button" variant="tertiary" size="small" onClick={settBidragsmottakerUkjent}>
+                                Sett bidragsmottaker som ukjent
+                            </Button>
+                        </HStack>
+                    )}
+
+                    {bidragsmottaker?.erKjent === false && (
+                        <FunnetPersonInfo
+                            label="Bidragsmottaker:"
+                            navn="Ukjent"
+                            fjern={settDenAndreForelderSomBidragsmottaker}
+                            variant="warning"
+                        />
+                    )}
+                </VStack>
+
+                {rollerErValgt && <BarnMottakerKort form={form} barn={barn} erPåkrevd={trengerReellMottaker} />}
+
+                {(rollerErValgt || harUkjentForelder) && <ParterOppsummeringBarn form={form} />}
+
+                {bidragsmottakerErUkjent && <UfullstendigRelasjonAlert />}
+
+                <EnhetOgSubmitSection
+                    enhet={enhet}
+                    enhetNavn={enhetNavn}
+                    isLoadingEnhet={isLoadingEnhet}
+                    enhetError={enhetError}
+                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    submitError={error}
+                    saksnummer={saksnummer}
+                />
             </VStack>
-        </Box>
+        </FlytSkjema>
     );
 }

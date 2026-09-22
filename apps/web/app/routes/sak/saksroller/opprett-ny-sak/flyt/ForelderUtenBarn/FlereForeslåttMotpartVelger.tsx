@@ -1,10 +1,9 @@
-import { MaskerSensitivInfo } from "@bidrag/common";
-import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Box, Button, HStack, VStack } from "@navikt/ds-react";
+import { Button, HStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import ForeslåPersonPanel from "../../../felles/ForeslåPersonPanel";
+import ValgtMotpart from "../../motpart-felles/ValgtMotpart";
 import type { ForelderUtenBarnSkjemaData } from "../../opprett-sak-schema";
 import type { ForeslåttForelder } from "./ForelderUtenBarnFlyt";
 
@@ -49,8 +48,7 @@ export default function FlereForeslåttMotpartVelger({
         settMotpartUkjent();
     };
 
-    const forslagListe = foreslåttMotparter.map((forelder) => ({
-        ident: forelder.ident,
+    const forslag = foreslåttMotparter.map((forelder) => ({
         navn: forelder.visningsnavn,
         fødselsdato: forelder.fødselsdato ?? undefined,
         onBruk: () => {
@@ -59,62 +57,25 @@ export default function FlereForeslåttMotpartVelger({
         },
     }));
 
-    return (
-        <div>
-            {!visMotpartInfoPanel && (
-                <Alert variant="success" size="small">
-                    <VStack gap="space-12">
-                        <ForeslåPersonPanel
-                            tittel={tittel}
-                            beskrivelse="Vi fant flere foreldre som er registrert som forelder til valgte barn"
-                            variant="success"
-                            forslagListe={forslagListe}
-                            onVelgPerson={() => {
-                                setVisMotpartInfoPanel(true);
-                            }}
-                            onError={() => {}}
-                            søkLabel="Søk etter motpart"
-                        />
+    if (!visMotpartInfoPanel) {
+        return (
+            <ForeslåPersonPanel
+                tittel={tittel}
+                beskrivelse="Vi fant flere foreldre som er registrert som forelder til valgte barn"
+                variant="success"
+                forslag={forslag}
+            >
+                <HStack justify="center" gap="space-8" wrap>
+                    <Button type="button" size="small" onClick={håndterVelgAnnen}>
+                        Velg annen person
+                    </Button>
+                    <Button type="button" size="small" variant="secondary-neutral" onClick={håndterSettUkjent}>
+                        Sett som ukjent
+                    </Button>
+                </HStack>
+            </ForeslåPersonPanel>
+        );
+    }
 
-                        <HStack justify="center" gap="space-8" wrap>
-                            <Button type="button" size="small" onClick={håndterVelgAnnen}>
-                                Velg annen person
-                            </Button>
-                            <Button type="button" size="small" variant="secondary-neutral" onClick={håndterSettUkjent}>
-                                Sett som ukjent
-                            </Button>
-                        </HStack>
-                    </VStack>
-                </Alert>
-            )}
-
-            {visMotpartInfoPanel && (
-                <Box
-                    asChild
-                    background="success-moderate"
-                    borderWidth="1"
-                    borderColor="success-strong"
-                    borderRadius="8"
-                >
-                    <HStack align="center" justify="space-between" marginBlock="space-16 space-0" padding="space-12">
-                        <HStack asChild align="center" gap="space-12">
-                            <MaskerSensitivInfo>
-                                <PersonIcon fontSize="1.5rem" aria-hidden className="text-ax-success-700" />
-                                <BodyLong size="small" weight="semibold">
-                                    Motpart: {visningsnavn}
-                                </BodyLong>
-                            </MaskerSensitivInfo>
-                        </HStack>
-                        <Button
-                            type="button"
-                            size="xsmall"
-                            variant="secondary"
-                            onClick={håndterFjernMotpart}
-                            icon={<XMarkIcon title="Fjern motpart" />}
-                        />
-                    </HStack>
-                </Box>
-            )}
-        </div>
-    );
+    return <ValgtMotpart visningsnavn={visningsnavn} onFjern={håndterFjernMotpart} />;
 }

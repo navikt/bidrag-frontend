@@ -16,6 +16,7 @@ export default function SøkPerson({ label, personInformasjon, compact, onError 
             onResult={personInformasjon}
             compact={compact}
             onError={onError ?? (() => undefined)}
+            søketype="person"
         />
     );
 }

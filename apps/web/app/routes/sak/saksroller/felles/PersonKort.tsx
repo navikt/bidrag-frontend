@@ -7,18 +7,18 @@ import PersonInfo from "../components/PersonInfo";
 
 type Props = {
     person: PersonDto;
-    erValgt?: boolean;
-    onClick?: () => void;
     children?: ReactNode;
 };
 
-function PersonKortInnhold({
+export function PersonKortInnhold({
     person,
     erValgt,
+    visKopieringsknapp = false,
     children,
 }: {
     person: PersonDto;
     erValgt?: boolean;
+    visKopieringsknapp?: boolean;
     children?: ReactNode;
 }) {
     return (
@@ -40,7 +40,7 @@ function PersonKortInnhold({
                         ident={person.ident}
                         fødselsdato={person.fødselsdato ?? undefined}
                         navn={person.visningsnavn}
-                        visKopieringsknapp={false}
+                        visKopieringsknapp={visKopieringsknapp}
                     />
                     {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
                     {children}
@@ -56,27 +56,19 @@ function PersonKortInnhold({
     );
 }
 
-export default function PersonKort({ person, erValgt, onClick, children }: Props) {
-    const erKlikkbart = onClick !== undefined;
-
+export default function PersonKort({ person, children }: Props) {
     return (
         <Box
-            asChild={erKlikkbart}
             width="100%"
             padding="space-16"
             borderRadius="8"
             borderWidth="2"
-            background={erValgt ? "success-soft" : "default"}
-            borderColor={erValgt ? "success-strong" : "neutral"}
-            className={`transition-all ${erValgt ? "" : erKlikkbart ? "hover:border-ax-accent-500 hover:bg-ax-accent-100" : ""}`}
+            background="default"
+            borderColor="neutral"
         >
-            {erKlikkbart ? (
-                <button type="button" onClick={onClick}>
-                    <PersonKortInnhold person={person} erValgt={erValgt} children={children} />
-                </button>
-            ) : (
-                <PersonKortInnhold person={person} erValgt={erValgt} children={children} />
-            )}
+            <PersonKortInnhold person={person} visKopieringsknapp>
+                {children}
+            </PersonKortInnhold>
         </Box>
     );
 }

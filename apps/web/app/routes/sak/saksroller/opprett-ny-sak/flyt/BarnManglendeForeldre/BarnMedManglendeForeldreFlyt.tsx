@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box, VStack } from "@navikt/ds-react";
+import { Alert, VStack } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import BarnMottakerKort from "../../barn-felles/BarnMottakerKort";
 import ParterOppsummeringBarn from "../../barn-felles/ParterOppsummeringBarn";
 import LasterSkeleton from "../../components/LasterSkeleton";
+import FlytSkjema from "../../felles/FlytSkjema";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import {
@@ -15,7 +16,7 @@ import {
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
-import ValideringsAlertsSection from "../../sections/ValideringsAlertsSection";
+import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
 import KjentForelderInfo from "./KjentForelderInfo";
 import LeggTilForelderSeksjon from "./LeggTilForelderSeksjon";
 
@@ -140,100 +141,72 @@ function BarnMedManglendeForeldreFlytContent() {
 
     const antallManglendeforeldre = foreldre.filter((f) => !f.ident || f.ident.trim() === "").length;
 
-    const visReellMottaker = rollerErValgt;
-    const visOppsummering = (foreldreKlareForOppsummering && rollerErValgt) || harUkjentForelder;
-
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                <VStack gap="space-6">
-                    <VStack gap="space-12">
-                        {kjentForelder ? (
-                            <Alert variant="info" size="small">
-                                Dette barnet har én forelder registrert ({kjentForelder.visningsnavn},
-                                {kjentForelder.ident}
-                                ). Du må legge til den andre forelderen manuelt.
-                            </Alert>
-                        ) : (
-                            <Alert variant="warning" size="small">
-                                Dette barnet har ingen registrerte foreldre. Du må legge til begge foreldre manuelt.
-                            </Alert>
-                        )}
-
-                        {eksisterendeSakInfoMelding && (
-                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                                {eksisterendeSakInfoMelding.melding}
-                            </Alert>
-                        )}
-
-                        <EksisterendeSakSection
-                            harEksisterendeSak={harEksisterendeSak}
-                            eksisterendeSak={eksisterendeSak}
-                            partISakenNavn={bidragspliktig?.navn ?? ""}
-                            motpartNavn={bidragsmottaker?.navn}
-                        />
-                    </VStack>
-
-                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    {kjentForelder && (
-                        <KjentForelderInfo
-                            form={form}
-                            forelder={kjentForelder}
-                            onVelgRolle={(rolle) => settRolle(0, rolle)}
-                            valgtRolle={foreldre[0]?.rolle ?? null}
-                        />
+        <FlytSkjema onSubmit={onSubmit}>
+            <VStack gap="space-6">
+                <VStack gap="space-12">
+                    {kjentForelder ? (
+                        <Alert variant="info" size="small">
+                            Dette barnet har én forelder registrert ({kjentForelder.visningsnavn},{kjentForelder.ident}
+                            ). Du må legge til den andre forelderen manuelt.
+                        </Alert>
+                    ) : (
+                        <Alert variant="warning" size="small">
+                            Dette barnet har ingen registrerte foreldre. Du må legge til begge foreldre manuelt.
+                        </Alert>
                     )}
 
-                    <LeggTilForelderSeksjon
-                        form={form}
-                        foreldre={foreldre}
-                        antallManglende={antallManglendeforeldre}
-                        kjentForelderIndex={kjentForelder ? 0 : null}
-                        onVelgRolle={settRolle}
-                    />
-
-                    {visReellMottaker && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <BarnMottakerKort
-                                form={form}
-                                barn={barn}
-                                visReellMottaker={visReellMottaker}
-                                erPåkrevd={trengerReellMottaker}
-                            />
-                        </>
+                    {eksisterendeSakInfoMelding && (
+                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                            {eksisterendeSakInfoMelding.melding}
+                        </Alert>
                     )}
 
-                    {visOppsummering && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ParterOppsummeringBarn form={form} />
-                        </>
-                    )}
-
-                    {foreldreKlareForOppsummering && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ValideringsAlertsSection visUfullstendigRelasjonAlert />
-                        </>
-                    )}
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <EnhetOgSubmitSection
-                        enhet={enhet}
-                        enhetNavn={enhetNavn}
-                        isLoadingEnhet={isLoadingEnhet}
-                        enhetError={enhetError}
-                        disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                        submitError={error}
-                        saksnummer={saksnummer}
+                    <EksisterendeSakSection
+                        harEksisterendeSak={harEksisterendeSak}
+                        eksisterendeSak={eksisterendeSak}
+                        partISakenNavn={bidragspliktig?.navn ?? ""}
+                        motpartNavn={bidragsmottaker?.navn}
                     />
                 </VStack>
+
+                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
+
+                {kjentForelder && (
+                    <KjentForelderInfo
+                        form={form}
+                        forelder={kjentForelder}
+                        onVelgRolle={(rolle) => settRolle(0, rolle)}
+                        valgtRolle={foreldre[0]?.rolle ?? null}
+                    />
+                )}
+
+                <LeggTilForelderSeksjon
+                    form={form}
+                    foreldre={foreldre}
+                    antallManglende={antallManglendeforeldre}
+                    kjentForelderIndex={kjentForelder ? 0 : null}
+                    onVelgRolle={settRolle}
+                />
+
+                {rollerErValgt && <BarnMottakerKort form={form} barn={barn} erPåkrevd={trengerReellMottaker} />}
+
+                {((foreldreKlareForOppsummering && rollerErValgt) || harUkjentForelder) && (
+                    <ParterOppsummeringBarn form={form} />
+                )}
+
+                {foreldreKlareForOppsummering && <UfullstendigRelasjonAlert />}
+
+                <EnhetOgSubmitSection
+                    enhet={enhet}
+                    enhetNavn={enhetNavn}
+                    isLoadingEnhet={isLoadingEnhet}
+                    enhetError={enhetError}
+                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    submitError={error}
+                    saksnummer={saksnummer}
+                />
             </VStack>
-        </Box>
+        </FlytSkjema>
     );
 }

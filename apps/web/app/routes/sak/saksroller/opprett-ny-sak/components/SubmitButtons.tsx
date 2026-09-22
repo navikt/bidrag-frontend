@@ -1,7 +1,7 @@
 import { TilgangsFeilError } from "@bidrag/api";
 import { RedirectTo } from "@bidrag/common";
 import { TasklistSaveIcon, TasklistSendIcon, TasklistStartIcon } from "@navikt/aksel-icons";
-import { Alert, Button, HStack } from "@navikt/ds-react";
+import { Alert, Button, HStack, VStack } from "@navikt/ds-react";
 import type { AxiosError } from "axios";
 import { useEffect, useRef } from "react";
 import { useRouteLoaderData, useSearchParams } from "react-router";
@@ -56,7 +56,6 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
         return (
             <HStack gap="space-2" justify="end">
                 <Button
-                    className="self-end"
                     variant="tertiary"
                     type="submit"
                     size="xsmall"
@@ -69,7 +68,6 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
                     Opprett og ny søknad
                 </Button>
                 <Button
-                    className="self-end"
                     variant="tertiary"
                     type="submit"
                     size="xsmall"
@@ -82,7 +80,6 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
                     Opprett og gå til sak
                 </Button>
                 <Button
-                    className="self-end"
                     variant="primary"
                     type="submit"
                     size="xsmall"
@@ -98,7 +95,7 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
         );
     }
     return (
-        <div>
+        <VStack gap="space-8">
             {error && (
                 <Alert variant="error" ref={errorRef} tabIndex={-1}>
                     {error instanceof TilgangsFeilError
@@ -107,6 +104,6 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
                 </Alert>
             )}
             {renderButtons()}
-        </div>
+        </VStack>
     );
 }

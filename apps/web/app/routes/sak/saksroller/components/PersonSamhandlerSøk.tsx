@@ -11,17 +11,18 @@ export default function PersonSamhandlerSøk({
     label,
     onResult,
     onError,
-    visSamhandlerSøk = false,
+    søketype,
     compact = false,
 }: {
     valgIdent?: string;
     label?: string;
     onResult: (data: PersonDto) => void | Promise<void>;
     onError: (feil: string) => void;
-    visSamhandlerSøk?: boolean;
+    søketype: "person" | "person-og-samhandler";
     compact?: boolean;
 }) {
-    const samhandlerPersonFn = useHentSamhandlerEllerPersonForIdent(visSamhandlerSøk);
+    const inkluderSamhandler = søketype === "person-og-samhandler";
+    const samhandlerPersonFn = useHentSamhandlerEllerPersonForIdent(inkluderSamhandler);
     const [searchErrorMessage, setSearchErrorMessage] = useState<string | undefined>(undefined);
     const [nyttFødselsnummerInfo, setNyttFødselsnummerInfo] = useState<string | undefined>(undefined);
     const [searchValue, setSearchValue] = useState(valgIdent || "");
@@ -86,13 +87,12 @@ export default function PersonSamhandlerSøk({
                         <Search
                             label={label || "Person- eller samhandlerident"}
                             description={
-                                visSamhandlerSøk
+                                inkluderSamhandler
                                     ? "Fødselsnummer, D-nummer (11 siffer) eller samhandler ident"
                                     : "Fødselsnummer eller D-nummer (11 siffer)"
                             }
                             size="small"
                             value={searchValue}
-                            hideLabel={false}
                             onClick={(e) => e.stopPropagation()}
                             onChange={setSearchValue}
                             onSearchClick={onInputChange}
@@ -108,7 +108,7 @@ export default function PersonSamhandlerSøk({
                                 if (data?.ident) onInputChange(data.ident);
                             }}
                         />
-                        {visSamhandlerSøk && (
+                        {inkluderSamhandler && (
                             <>
                                 {" "}
                                 <SamhandlerSokButton

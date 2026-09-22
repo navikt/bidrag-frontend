@@ -12,9 +12,11 @@ test("søker opp barn og foreslår registrert forelder", async ({ mount, page })
     });
     const component = await mount(STORY);
 
-    await component.getByRole("button", { name: "Legg til barn manuelt" }).click();
-    await page.getByRole("searchbox", { name: "Oppgi barn i saken manuelt" }).fill(testpersoner.barnUnder18.ident);
+    await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+    await page.getByRole("searchbox", { name: "Søk etter barn" }).fill(testpersoner.barnUnder18.ident);
     await page.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
+    await expect(component.getByText(testpersoner.barnUnder18.visningsnavn).first()).toBeVisible();
+    await component.getByRole("button", { name: "Legg til", exact: true }).click();
 
     await expect(component.getByText("Barn som legges til")).toBeVisible();
     await expect(component.getByText(/Foreslått bidragsmottaker/)).toBeVisible();

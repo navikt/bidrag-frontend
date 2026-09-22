@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box, VStack } from "@navikt/ds-react";
-import { useEffect, useRef, useState } from "react";
+import { Alert, VStack } from "@navikt/ds-react";
+import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import LasterSkeleton from "../../components/LasterSkeleton";
+import FlytSkjema from "../../felles/FlytSkjema";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import { FarskapsSkjemaSchema, type FarskapsSkjemaSchemaData } from "../../opprett-sak-schema";
@@ -52,8 +53,6 @@ function FarskapsFlytContent() {
     const { saksrolleFlyt, partISaken: partISakenContext } = useSaksrolleroversikt();
     const form = useFormContext<FarskapsSkjemaSchemaData>();
     useSyncKategori(form);
-    const [aktivKurvId, settAktivKurvId] = useState<string | null>(null);
-    const errorAlertRef = useRef<HTMLDivElement>(null);
     const rawBarnkurver = saksrolleFlyt?.type === "FARSKAP" ? saksrolleFlyt.barnkurver : [];
     const barnkurver = grupperBarnIKurver(rawBarnkurver);
 
@@ -97,89 +96,63 @@ function FarskapsFlytContent() {
 
     const erBidragsmottaker = true; // I FARSKAP er partISaken alltid bidragsmottaker
 
-    useEffect(() => {
-        if (error && errorAlertRef.current) {
-            errorAlertRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-            errorAlertRef.current.focus();
-        }
-    }, [error]);
-
-    useEffect(() => {
-        const barnFraRelasjon = valgteBarn.filter((b) => !b.manuellLagtTil);
-        const [enesteBarnFraRelasjon] = barnFraRelasjon;
-        if (barnFraRelasjon.length === 0) {
-            settAktivKurvId(null);
-        } else if (barnFraRelasjon.length === 1 && enesteBarnFraRelasjon) {
-            const kurv = barnkurver.find((barn) => barn.barn.some((b) => b.ident === enesteBarnFraRelasjon.ident));
-            if (kurv) {
-                settAktivKurvId(kurv.id);
-            }
-        }
-    }, [valgteBarn.length]);
-
     const harAlleAlternativerValgt = valgteBarn.length > 0; // For FARSKAP, reellMottaker is NOT required
 
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                <VStack gap="space-12">
-                    {eksisterendeSakInfoMelding && (
-                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                            {eksisterendeSakInfoMelding.melding}
-                        </Alert>
-                    )}
-
-                    <EksisterendeSakSection
-                        harEksisterendeSak={harEksisterendeSak}
-                        eksisterendeSak={eksisterendeSak}
-                        partISakenNavn={partISaken.navn || partISaken.ident}
-                        motpartNavn="Ukjent"
-                    />
-                </VStack>
-
-                {isLoadingHentSak && <LasterSkeleton tekst="Henter barn..." />}
-
-                <BarnSection
-                    form={form}
-                    barnkurver={barnkurver}
-                    aktivKurvId={aktivKurvId}
-                    erBidragspliktig={!erBidragsmottaker}
-                    visReellMottaker={false}
-                />
-
-                {valgteBarn.length > 0 && (
-                    <>
-                        <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                        <OppsummeringSection
-                            bidragspliktig={null}
-                            bidragsmottaker={
-                                partISaken.ident
-                                    ? {
-                                          rolle: "bidragsmottaker",
-                                          ident: partISaken.ident,
-                                          navn: partISaken.navn,
-                                          erKjent: true,
-                                          diskresjonskode: partISaken.diskresjonskode,
-                                      }
-                                    : null
-                            }
-                            barn={valgteBarn}
-                            partISakenRolle="bidragsmottaker"
-                            hideMissingPartCards
-                        />
-                    </>
+        <FlytSkjema onSubmit={onSubmit}>
+            <VStack gap="space-12">
+                {eksisterendeSakInfoMelding && (
+                    <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
+                        {eksisterendeSakInfoMelding.melding}
+                    </Alert>
                 )}
 
-                <EnhetOgSubmitSection
-                    enhet={enhet}
-                    enhetNavn={enhetNavn}
-                    isLoadingEnhet={isLoadingEnhet}
-                    enhetError={enhetError}
-                    disabled={!harAlleAlternativerValgt || harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                    submitError={error}
-                    saksnummer={saksnummer}
+                <EksisterendeSakSection
+                    harEksisterendeSak={harEksisterendeSak}
+                    eksisterendeSak={eksisterendeSak}
+                    partISakenNavn={partISaken.navn || partISaken.ident}
+                    motpartNavn="Ukjent"
                 />
             </VStack>
-        </Box>
+
+            {isLoadingHentSak && <LasterSkeleton tekst="Henter barn..." />}
+
+            <BarnSection
+                form={form}
+                barnkurver={barnkurver}
+                erBidragspliktig={!erBidragsmottaker}
+                reellMottakerRegel={{ type: "skjult" }}
+            />
+
+            {valgteBarn.length > 0 && (
+                <OppsummeringSection
+                    bidragspliktig={null}
+                    bidragsmottaker={
+                        partISaken.ident
+                            ? {
+                                  rolle: "bidragsmottaker",
+                                  ident: partISaken.ident,
+                                  navn: partISaken.navn,
+                                  erKjent: true,
+                                  diskresjonskode: partISaken.diskresjonskode,
+                              }
+                            : null
+                    }
+                    barn={valgteBarn}
+                    partISakenRolle="bidragsmottaker"
+                    hideMissingPartCards
+                />
+            )}
+
+            <EnhetOgSubmitSection
+                enhet={enhet}
+                enhetNavn={enhetNavn}
+                isLoadingEnhet={isLoadingEnhet}
+                enhetError={enhetError}
+                disabled={!harAlleAlternativerValgt || harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                submitError={error}
+                saksnummer={saksnummer}
+            />
+        </FlytSkjema>
     );
 }

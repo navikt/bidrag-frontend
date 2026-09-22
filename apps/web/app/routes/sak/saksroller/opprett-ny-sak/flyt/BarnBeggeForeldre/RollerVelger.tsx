@@ -31,14 +31,14 @@ export default function RolleVelger({ form, foreldre }: Props) {
 
     return (
         <VStack gap="space-16">
-            <div>
-                <Heading level="2" size="medium" spacing>
+            <VStack gap="space-4">
+                <Heading level="2" size="medium">
                     Velg bidragspliktig
                 </Heading>
                 <BodyShort size="small" textColor="subtle">
                     Den andre forelderen blir automatisk bidragsmottaker.
                 </BodyShort>
-            </div>
+            </VStack>
 
             <Controller
                 name="foreldre"
@@ -52,32 +52,18 @@ export default function RolleVelger({ form, foreldre }: Props) {
                         onChange={(value) => håndterValg(value)}
                         error={formState?.errors?.foreldre?.[0]?.rolle?.message}
                     >
-                        <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
+                        <HGrid columns={{ xs: 1, md: 2, xl: 3 }} gap="space-16" align="start">
                             {foreldre.map((forelder, index) => {
                                 const person = valgteRoller[index];
                                 const erBidragspliktig = person?.erKjent && person.rolle === "bidragspliktig";
                                 const erBidragsmottaker = person?.erKjent && person.rolle === "bidragsmottaker";
-                                const erUvalgt = !erBidragspliktig && !erBidragsmottaker;
                                 const alder = beregnAlderForPerson(forelder);
 
                                 return (
-                                    <Box
-                                        key={index}
-                                        asChild
-                                        borderRadius="8"
-                                        background={
-                                            erBidragspliktig
-                                                ? "warning-soft"
-                                                : erBidragsmottaker
-                                                  ? "success-soft"
-                                                  : "default"
-                                        }
-                                        borderWidth={erUvalgt ? "1" : "0"}
-                                        borderColor="neutral"
-                                    >
-                                        <HStack justify="space-between" padding="space-16" className="transition-all">
+                                    <Box key={index} asChild background="raised" borderRadius="12">
+                                        <HStack justify="space-between" padding="space-12">
                                             <Radio value={forelder.ident}>
-                                                <div>
+                                                <VStack gap="space-1">
                                                     {forelder.visningsnavn}{" "}
                                                     <AlderTag
                                                         erMyndig={false}
@@ -87,26 +73,22 @@ export default function RolleVelger({ form, foreldre }: Props) {
                                                     <BodyShort textColor="subtle" size="small">
                                                         <PersonIdent ident={`${forelder.ident}`} />
                                                     </BodyShort>
-                                                </div>
+                                                </VStack>
                                                 {forelder?.diskresjonskode && (
                                                     <DiskresjonAlert diskresjonskode={forelder.diskresjonskode} />
                                                 )}
                                             </Radio>
 
                                             {erBidragspliktig && (
-                                                <div>
-                                                    <Tag size="small" variant="warning">
-                                                        Bidragspliktig
-                                                    </Tag>
-                                                </div>
+                                                <Tag size="small" variant="warning">
+                                                    Bidragspliktig
+                                                </Tag>
                                             )}
 
                                             {erBidragsmottaker && (
-                                                <div>
-                                                    <Tag size="small" variant="success">
-                                                        Bidragsmottaker
-                                                    </Tag>
-                                                </div>
+                                                <Tag size="small" variant="success">
+                                                    Bidragsmottaker
+                                                </Tag>
                                             )}
                                         </HStack>
                                     </Box>
