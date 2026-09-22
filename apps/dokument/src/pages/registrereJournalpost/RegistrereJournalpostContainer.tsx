@@ -26,12 +26,10 @@ function RegistrereJournalpostContainer() {
     const { setError } = useAppContext();
     const onJournalpostError = (error: Error) => {
         const feil = normaliserFeil(error);
-        // throw error
         methods.setError("journalpostId", {
             type: `${feil.status ?? 500}`,
-            message: `Journalposten kunne ikke oppdateres ${feil.message}`,
+            message: `Journalposten kunne ikke oppdateres: ${feil.message}`,
         });
-        // setError(`Journalposten kunne ikke oppdateres ${feil.message}`, "Feil ved registrering av journalpost");
     };
     const registrerJournalpost = useRegistrerJournalpostMutation();
     const [waitingForRegisterJournalpost, setWaitingForRegisterJournalpost] = useState(false);
