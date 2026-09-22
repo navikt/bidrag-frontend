@@ -14,6 +14,9 @@ export function VedtaksType({ vedtaksId }: VedtaksTypeProps) {
     if (error) {
         return vedtaksId;
     }
-    const vedtaksType = data.type;
+    if (!data){
+        return vedtaksId;
+    }
+    const vedtaksType = data.type
     return hentVisningsnavnFraType("vedtakstype", vedtaksType);
 }
