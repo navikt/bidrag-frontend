@@ -1,4 +1,4 @@
-import { AKSEL_MODAL_SECONDARY_KNAPP_KONTRAST, expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
+import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
 import { expect, test } from "@playwright/test";
 
 const INGEN =
@@ -11,14 +11,15 @@ test.describe("Barn med manglende foreldre", () => {
         const component = await mount(INGEN);
 
         await expect(component.getByText(/ingen registrerte foreldre/).first()).toBeVisible();
-        await expect(component.getByRole("button", { name: "Søk forelder" })).toHaveCount(2);
-        await component.getByRole("button", { name: "Søk forelder" }).first().click();
-        await expect(page.getByRole("searchbox", { name: "Søk forelder #1" })).toBeVisible();
-        await expectNoAxeViolations(page, component, { tillattBrudd: [AKSEL_MODAL_SECONDARY_KNAPP_KONTRAST] });
-        await page.getByRole("button", { name: "Avbryt" }).click();
-        await component.getByRole("button", { name: "Søk forelder" }).nth(1).click();
-        await expect(page.getByRole("searchbox", { name: "Søk forelder #2" })).toBeVisible();
-        await page.getByRole("button", { name: "Avbryt" }).click();
+        await expect(component.getByRole("button", { name: "Velg annen person" })).toHaveCount(2);
+
+        await component.getByRole("button", { name: "Velg annen person" }).first().click();
+        await expect(component.getByRole("searchbox", { name: "Søk forelder #1" })).toBeVisible();
+        await expect(component.getByRole("button", { name: "Velg annen person" })).toHaveCount(1);
+
+        await component.getByRole("button", { name: "Velg annen person" }).click();
+        await expect(component.getByRole("searchbox", { name: "Søk forelder #2" })).toBeVisible();
+
         await expectNoAxeViolations(page, component);
     });
 

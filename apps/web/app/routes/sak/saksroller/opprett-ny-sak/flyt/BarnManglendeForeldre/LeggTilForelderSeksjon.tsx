@@ -1,11 +1,10 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { CheckmarkHeavyIcon, PersonPlusIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
-import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import FunnetPersonInfo from "../../../components/FunnetPersonInfo";
-import PersonSøkModal from "../../../components/PersonSøkModal";
+import ForeslåPersonPanel from "../../../felles/ForeslåPersonPanel";
 import type { BarnMedManglendeForeldreSkjemaData, ForelderMedRolle, ForelderPartRolle } from "../../opprett-sak-schema";
 import { hentForelderRolleLabel, hentMotsattRolle } from "../../utils";
 import ForelderRolleVelger from "./ForelderRolleVelger";
@@ -26,7 +25,6 @@ export default function LeggTilForelderSeksjon({
     onVelgRolle,
 }: Props) {
     const errors = form.formState.errors;
-    const [åpenSøkeIndex, setÅpenSøkeIndex] = useState<number | null>(null);
 
     const fjernForelder = (index: number) => {
         form.setValue(`foreldre.${index}.ident`, "");
@@ -117,15 +115,14 @@ export default function LeggTilForelderSeksjon({
 
                             {!erLagtTil && (
                                 <VStack gap="space-12">
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="small"
-                                        onClick={() => setÅpenSøkeIndex(index)}
-                                    >
-                                        Søk forelder
-                                    </Button>
-                                    <HStack justify="center" marginBlock="space-12 space-0">
+                                    <ForeslåPersonPanel
+                                        tittel="Legg til forelder"
+                                        beskrivelse="Søk opp forelderen som skal legges til i saken"
+                                        onVelgPerson={(person) => leggTilForelder(person, index)}
+                                        onError={() => {}}
+                                        søkLabel={`Søk forelder #${index + 1}`}
+                                    />
+                                    <HStack justify="center">
                                         <Button
                                             type="button"
                                             size="small"
@@ -135,18 +132,6 @@ export default function LeggTilForelderSeksjon({
                                             Eller sett som ukjent
                                         </Button>
                                     </HStack>
-                                    {åpenSøkeIndex === index && (
-                                        <PersonSøkModal
-                                            tittel={`Søk forelder #${index + 1}`}
-                                            beskrivelse="Søk opp forelderen som skal legges til i saken"
-                                            søkeLabel={`Søk forelder #${index + 1}`}
-                                            onPersonValgt={async (person) => {
-                                                leggTilForelder(person, index);
-                                                setÅpenSøkeIndex(null);
-                                            }}
-                                            onAvbryt={() => setÅpenSøkeIndex(null)}
-                                        />
-                                    )}
                                 </VStack>
                             )}
 

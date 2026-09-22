@@ -237,7 +237,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
 
     return (
         <FormProvider {...formMethods}>
-            <Page.Block width="xl">
+            <Page.Block width="2xl">
                 <Box padding="space-24">
                     {oppdaterSaksrollerMutation.isPending && (
                         <Box position="fixed" inset="space-0" className="bg-[white]/70 backdrop-blur-sm z-50">
@@ -329,7 +329,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                                     <Alert variant="info">Ingen barn registrert i saken ennå</Alert>
                                                 ) : (
                                                     <HGrid
-                                                        columns={{ xs: 1, md: 2, xl: 3 }}
+                                                        columns={{ xs: 1, lg: 2, xl: 3 }}
                                                         gap="space-24"
                                                         align="start"
                                                     >
