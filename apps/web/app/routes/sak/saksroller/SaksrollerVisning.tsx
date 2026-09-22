@@ -2,7 +2,7 @@ import type { OppdaterRollerISakRequest } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, BodyLong, Box, Heading, HGrid, HStack, Loader, Page, Tag, VStack } from "@navikt/ds-react";
+import { Alert, BodyLong, Box, Heading, HGrid, HStack, Loader, Page, VStack } from "@navikt/ds-react";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, FormProvider, useForm } from "react-hook-form";
 
@@ -11,6 +11,7 @@ import BarnVisning from "./barn-rolle/BarnVisning.tsx";
 import LeggTilBarn from "./barn-rolle/LeggTilBarn.tsx";
 import SakButtons from "./components/SakButtons.tsx";
 import Endringsoppsummering from "./Endringsoppsummering.tsx";
+import { SakstypeTags } from "./felles/SakstypeTags.tsx";
 import ForelderRolleVisning from "./forelder-rolle/ForelderRolleVisning.tsx";
 import { useEndringssporing } from "./hooks/useEndringssporing.ts";
 import { useHentSakMedPersoninfo } from "./hooks/useHentSakMedPersoninfo.ts";
@@ -261,29 +262,13 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                         Saken opprettet: {dateToDDMMYYYYString(new Date(sak.opprettetDato))}
                                     </BodyLong>
                                 )}
-                                <HStack gap="space-8" wrap>
-                                    <Tag size="small" variant="info">
-                                        {sakstype}
-                                    </Tag>
-                                    <Tag size="small" variant="info">
-                                        {sakskategoriTilVisningsnavn(sakskategori)}
-                                    </Tag>
-                                    {sak.eierfogd === EGEN_ANSATT_ENHET && (
-                                        <Tag size="small" variant="warning">
-                                            Egen ansatt
-                                        </Tag>
-                                    )}
-                                    {sak.eierfogd === ADRESSEBESKYTTELSE_ENHET && (
-                                        <Tag size="small" variant="warning">
-                                            Adressebeskyttelse
-                                        </Tag>
-                                    )}
-                                    {sak.avsluttet && (
-                                        <Tag size="small" variant="error">
-                                            Avsluttet sak
-                                        </Tag>
-                                    )}
-                                </HStack>
+                                <SakstypeTags
+                                    sakstype={sakstype}
+                                    sakskategoriVisningsnavn={sakskategoriTilVisningsnavn(sakskategori)}
+                                    erEgenAnsatt={sak.eierfogd === EGEN_ANSATT_ENHET}
+                                    erAdressebeskyttet={sak.eierfogd === ADRESSEBESKYTTELSE_ENHET}
+                                    erAvsluttet={sak.avsluttet}
+                                />
                             </VStack>
 
                             {erEktefellebidrag && (
