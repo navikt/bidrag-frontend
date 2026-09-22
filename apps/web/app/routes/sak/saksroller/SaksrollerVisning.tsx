@@ -329,7 +329,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                                     <Alert variant="info">Ingen barn registrert i saken ennå</Alert>
                                                 ) : (
                                                     <HGrid
-                                                        columns={{ xs: 1, md: 2, lg: 3 }}
+                                                        columns={{ xs: 1, md: 2, xl: 3 }}
                                                         gap="space-24"
                                                         align="start"
                                                     >
@@ -350,15 +350,14 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                                                 saksnummer={saksnummer}
                                                             />
                                                         ))}
+                                                        <LeggTilBarn
+                                                            søsken={muligeBarn}
+                                                            erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
+                                                            setVisSøk={setLeggTilBarnVisSøk}
+                                                            visSøk={leggTilBarnVisSøk}
+                                                        />
                                                     </HGrid>
                                                 )}
-
-                                                <LeggTilBarn
-                                                    søsken={muligeBarn}
-                                                    erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                                                    setVisSøk={setLeggTilBarnVisSøk}
-                                                    visSøk={leggTilBarnVisSøk}
-                                                />
                                             </VStack>
                                         </Box>
 

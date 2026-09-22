@@ -88,7 +88,7 @@ export default function ReellMottakerVelger({
             : !isRequired || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
 
     return (
-        <Box background="brand-beige-soft" padding={"space-8"} borderRadius={"12"}>
+        <Box background="soft" padding={"space-8"} borderRadius={"12"}>
             <VStack gap={"space-16"}>
                 <HStack gap="space-4" align="center" wrap={false}>
                     <PersonPencilIcon aria-hidden />

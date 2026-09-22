@@ -111,7 +111,9 @@ export default function ReellMottakerValgGruppe({
             )}
 
             {!feil && !error && valg.type === "samhandler" && valg.navn && valg.ident && (
-                <FunnetPersonInfo label="Reell mottaker:" navn={valg.navn} ident={valg.ident} disabled={disabled} />
+                <Box borderWidth="2" borderRadius="12">
+                    <FunnetPersonInfo label="Reell mottaker:" navn={valg.navn} ident={valg.ident} disabled={disabled} />
+                </Box>
             )}
         </VStack>
     );

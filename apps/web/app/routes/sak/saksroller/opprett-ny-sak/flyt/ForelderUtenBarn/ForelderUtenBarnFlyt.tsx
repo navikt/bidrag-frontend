@@ -394,6 +394,7 @@ function ForelderUtenBarnFlytContent() {
                                 settMotpartUkjent={settMotpartUkjent}
                                 foreslåttMotpartNavn={foreslåttEnkeltMotpart.visningsnavn}
                                 brukForeslåttMotpart={() => brukForeslåttMotpart(foreslåttEnkeltMotpart)}
+                                settMotpartManuelt={settMotpartManuelt}
                             />
                         )}
 
@@ -416,6 +417,7 @@ function ForelderUtenBarnFlytContent() {
                                 variant="warning"
                                 velgAnnenMotpart={() => bidragsmottakerRegistreringRef.current?.showModal()}
                                 settMotpartUkjent={settMotpartUkjent}
+                                settMotpartManuelt={settMotpartManuelt}
                             />
                         )}
 

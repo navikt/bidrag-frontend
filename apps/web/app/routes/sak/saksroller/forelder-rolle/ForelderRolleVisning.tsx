@@ -76,7 +76,7 @@ export default function ForelderRolleVisning({
     saksnummer,
 }: ForelderRolleVisningProps) {
     return (
-        <HGrid columns={{ xs: 1, md: 2, lg: 3 }} gap="space-24" align="start">
+        <HGrid columns={{ xs: 1, md: 2, xl: 3 }} gap="space-24" align="start">
             <EnkelForelderRolle
                 rolleType="BP"
                 rolle={bp}

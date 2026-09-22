@@ -1,9 +1,11 @@
+import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, Button, HStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import type { ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
+import ForeslåPersonPanel from "../../felles/ForeslåPersonPanel";
 
 type Props = {
     form: UseFormReturn<ForelderUtenBarnSkjemaData>;
@@ -14,6 +16,7 @@ type Props = {
     settMotpartUkjent: () => void;
     foreslåttMotpartNavn?: string;
     brukForeslåttMotpart?: () => void;
+    settMotpartManuelt: (person: PersonDto) => void;
 };
 
 export default function MotpartVelger({
@@ -25,6 +28,7 @@ export default function MotpartVelger({
     settMotpartUkjent,
     foreslåttMotpartNavn,
     brukForeslåttMotpart,
+    settMotpartManuelt,
 }: Props) {
     const [visMotpartInfoPanel, setVisMotpartInfoPanel] = useState(false);
     const motpart = form.watch("motpart");
@@ -52,28 +56,17 @@ export default function MotpartVelger({
     return (
         <div>
             {!visMotpartInfoPanel && (
-                <Alert variant={variant} size="small">
-                    <VStack gap="space-12">
-                        <div>
-                            <Heading level="3" size="small" spacing>
-                                {tittel}
-                            </Heading>
-                            <BodyShort size="small">{beskrivelse}</BodyShort>
-                        </div>
-
-                        <HStack gap="space-8" wrap>
-                            {harForeslåttMotpart && (
-                                <Button type="button" size="small" onClick={håndterBrukForeslått}>
-                                    Bruk {foreslåttMotpartNavn}
-                                </Button>
-                            )}
-
-                            <Button type="button" size="small" onClick={håndterVelgAnnen}>
-                                Velg annen person
-                            </Button>
-                        </HStack>
-                    </VStack>
-                </Alert>
+                <ForeslåPersonPanel
+                    tittel={tittel}
+                    beskrivelse={beskrivelse}
+                    variant={variant}
+                    forslagNavn={harForeslåttMotpart ? foreslåttMotpartNavn : undefined}
+                    onBrukForslag={harForeslåttMotpart ? håndterBrukForeslått : undefined}
+                    onVelgPerson={(person: PersonDto) => {
+                        setVisMotpartInfoPanel(true);
+                        settMotpartManuelt(person);
+                    }}
+                />
             )}
 
             {visMotpartInfoPanel && (
