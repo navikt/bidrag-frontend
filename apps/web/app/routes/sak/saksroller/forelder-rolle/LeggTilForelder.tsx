@@ -1,7 +1,10 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
+import { PersonPlusIcon } from "@navikt/aksel-icons";
+import { BodyLong, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import ForeslåPersonPanel from "../felles/ForeslåPersonPanel.tsx";
+import PersonInfo from "../components/PersonInfo.tsx";
+import PersonSøkWrapper from "../components/PersonSøkWrapper.tsx";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
@@ -21,12 +24,6 @@ export default function LeggTilForelder({
     const [visSøk, setVisSøk] = useState(false);
     useRegistrerÅpenRedigering(`legg-til-forelder-${rolleType}`, visSøk);
     const roller = form.watch("roller") || [];
-
-    const forslagListe = muligeAndreForeldre.map((f) => ({
-        ident: f.ident,
-        navn: f.visningsnavn ?? f.navn ?? "Ukjent",
-        fødselsdato: f.fødselsdato ?? undefined,
-    }));
 
     const handlePersonValgt = (person: PersonDto) => {
         const denAndreForelderenType = rolleType === "BM" ? "BP" : "BM";
@@ -68,15 +65,73 @@ export default function LeggTilForelder({
         setVisSøk(false);
     };
 
+    if (!visSøk) {
+        return (
+            <Box background="warning-soft" borderRadius="12" padding="space-24">
+                <HStack justify="space-between" align="center" gap="space-16">
+                    <VStack gap="space-4">
+                        <Heading level="3" size="xsmall">
+                            {rolleNavn}
+                        </Heading>
+                        <BodyLong size="small" textColor="subtle">
+                            Ukjent - ikke registrert
+                        </BodyLong>
+                    </VStack>
+                    <Button
+                        icon={<PersonPlusIcon aria-hidden />}
+                        variant="secondary"
+                        size="small"
+                        onClick={() => setVisSøk(true)}
+                    >
+                        Legg til person
+                    </Button>
+                </HStack>
+            </Box>
+        );
+    }
+
     return (
-        <ForeslåPersonPanel
+        <PersonSøkWrapper
             tittel={`Legg til ${rolleNavn.toLowerCase()}`}
             beskrivelse={`Søk opp personen som skal være ${rolleNavn.toLowerCase()} i saken`}
-            variant="warning"
-            forslagListe={forslagListe}
-            onVelgPerson={handlePersonValgt}
-            onError={() => {}}
-            søkLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
-        />
+            søkeLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
+            onPersonValgt={handlePersonValgt}
+            onAvbryt={() => setVisSøk(false)}
+        >
+            {muligeAndreForeldre.length > 0 && (
+                <Box
+                    background="raised"
+                    borderColor="neutral-subtleA"
+                    borderWidth="1"
+                    borderRadius="12"
+                    padding="space-16"
+                >
+                    <Heading level="4" size="xsmall" spacing>
+                        Foreslåtte foreldre ({muligeAndreForeldre.length})
+                    </Heading>
+                    <BodyLong size="small" textColor="subtle" spacing>
+                        Klikk på en person for å legge til
+                    </BodyLong>
+                    <VStack gap="space-8">
+                        {muligeAndreForeldre.map((forelder) => (
+                            <Button
+                                key={forelder.ident}
+                                type="button"
+                                variant="tertiary"
+                                size="small"
+                                className="w-full justify-start"
+                                onClick={() => handlePersonValgt(forelder)}
+                            >
+                                <PersonInfo
+                                    navn={forelder.visningsnavn}
+                                    ident={forelder.ident}
+                                    fødselsdato={forelder.fødselsdato || ""}
+                                />
+                            </Button>
+                        ))}
+                    </VStack>
+                </Box>
+            )}
+        </PersonSøkWrapper>
     );
 }

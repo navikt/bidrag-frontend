@@ -1,9 +1,10 @@
 import { MaskerSensitivInfo } from "@bidrag/common";
 import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, BodyShort, Box, Button, Heading, HStack, Select, VStack } from "@navikt/ds-react";
+import { Alert, BodyLong, Box, Button, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
+import ForeslåPersonPanel from "../../../felles/ForeslåPersonPanel";
 import type { ForelderUtenBarnSkjemaData } from "../../opprett-sak-schema";
 import type { ForeslåttForelder } from "./ForelderUtenBarnFlyt";
 
@@ -33,14 +34,6 @@ export default function FlereForeslåttMotpartVelger({
         return null;
     }
 
-    const håndterVelgForeslått = (forelderIdent: string) => {
-        const forelder = foreslåttMotparter.find((f) => f.ident === forelderIdent);
-        if (!forelder) return;
-
-        setVisMotpartInfoPanel(true);
-        brukForeslåttMotpart(forelder);
-    };
-
     const håndterVelgAnnen = () => {
         setVisMotpartInfoPanel(true);
         velgAnnenMotpart();
@@ -56,45 +49,37 @@ export default function FlereForeslåttMotpartVelger({
         settMotpartUkjent();
     };
 
+    const forslagListe = foreslåttMotparter.map((forelder) => ({
+        ident: forelder.ident,
+        navn: forelder.visningsnavn,
+        fødselsdato: forelder.fødselsdato ?? undefined,
+        onBruk: () => {
+            setVisMotpartInfoPanel(true);
+            brukForeslåttMotpart(forelder);
+        },
+    }));
+
     return (
         <div>
             {!visMotpartInfoPanel && (
                 <Alert variant="success" size="small">
                     <VStack gap="space-12">
-                        <div>
-                            <Heading level="3" size="small" spacing>
-                                {tittel}
-                            </Heading>
-                            <BodyShort size="small">
-                                Vi fant flere foreldre som er registrert som forelder til valgte barn
-                            </BodyShort>
-                        </div>
+                        <ForeslåPersonPanel
+                            tittel={tittel}
+                            beskrivelse="Vi fant flere foreldre som er registrert som forelder til valgte barn"
+                            variant="success"
+                            forslagListe={forslagListe}
+                            onVelgPerson={() => {
+                                setVisMotpartInfoPanel(true);
+                            }}
+                            onError={() => {}}
+                            søkLabel="Søk etter motpart"
+                        />
 
-                        <Select
-                            label="Velg foreslått motpart"
-                            onChange={(e) => håndterVelgForeslått(e.target.value)}
-                            size="medium"
-                        >
-                            <option value="">- Velg foreslått motpart -</option>
-                            {foreslåttMotparter.map((forelder) => (
-                                <option key={forelder.ident} value={forelder.ident}>
-                                    {forelder.visningsnavn} ({forelder.ident}) - forelder til {forelder.barnNavn} (
-                                    {forelder.barnIdent})
-                                </option>
-                            ))}
-                        </Select>
-
-                        <HStack justify="center">
-                            <BodyShort size="small" textColor="subtle">
-                                eller
-                            </BodyShort>
-                        </HStack>
-
-                        <HStack gap="space-8" wrap>
+                        <HStack justify="center" gap="space-8" wrap>
                             <Button type="button" size="small" onClick={håndterVelgAnnen}>
                                 Velg annen person
                             </Button>
-
                             <Button type="button" size="small" variant="secondary-neutral" onClick={håndterSettUkjent}>
                                 Sett som ukjent
                             </Button>

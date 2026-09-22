@@ -40,4 +40,15 @@ test.describe("ForeslåPersonPanel", () => {
 
         await expect(component.getByTestId("valgt-person")).toHaveText("Ola Nordmann");
     });
+
+    test("viser flere forslag som egne bruk-knapper", async ({ mount }) => {
+        const component = await mount("routes/sak/saksroller/felles/ForeslåPersonPanel/MedFlereForslag");
+
+        const forslag = component.getByRole("button").filter({ hasText: "Kari Nordmann" });
+        await expect(forslag).toBeVisible();
+        await expect(component.getByText("Foreslåtte personer (2)")).toBeVisible();
+
+        await forslag.click();
+        await expect(component.getByTestId("valgt-person")).toHaveText("Kari Nordmann");
+    });
 });

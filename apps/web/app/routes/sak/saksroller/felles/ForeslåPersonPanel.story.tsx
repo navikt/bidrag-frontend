@@ -47,3 +47,45 @@ function TestWrapper() {
 }
 
 export const Standard = () => <TestWrapper />;
+
+const forslagListe: PersonDto[] = [
+    { ident: genererFnr(), visningsnavn: "Kari Nordmann" },
+    { ident: genererFnr(), visningsnavn: "Ola Nordmann" },
+];
+
+function FlereForslagWrapper() {
+    const queryClient = useMemo(
+        () =>
+            new QueryClient({
+                defaultOptions: {
+                    queries: { retry: false, staleTime: Infinity },
+                    mutations: { retry: false },
+                },
+            }),
+        [],
+    );
+    const [valgtPerson, setValgtPerson] = useState<PersonDto | null>(null);
+
+    return (
+        <QueryClientProvider client={queryClient}>
+            <BidragCommonsProviderMock>
+                <ForeslåPersonPanel
+                    tittel="Velg motpart"
+                    beskrivelse="Velg en av de foreslåtte personene, eller søk etter en annen"
+                    variant="warning"
+                    forslagListe={forslagListe.map((person) => ({
+                        ident: person.ident,
+                        navn: person.visningsnavn ?? "Ukjent",
+                        fødselsdato: person.fødselsdato ?? undefined,
+                        onBruk: () => setValgtPerson(person),
+                    }))}
+                    onVelgPerson={setValgtPerson}
+                    søkLabel="Søk etter motpart"
+                />
+                <output data-testid="valgt-person">{valgtPerson?.visningsnavn ?? ""}</output>
+            </BidragCommonsProviderMock>
+        </QueryClientProvider>
+    );
+}
+
+export const MedFlereForslag = () => <FlereForslagWrapper />;
