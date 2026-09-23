@@ -6,6 +6,8 @@ const STORY_BEGGE_KJENT = "routes/sak/saksroller/forelder-rolle/ForelderRolleVis
 const STORY_BM_MANGLER = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BidragsmottakerMangler";
 const STORY_BP_MANGLER = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BidragspliktigMangler";
 const STORY_NY_BP = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/NyBidragspliktigKanFjernes";
+const STORY_BP_PLASSHOLDER =
+    "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BidragspliktigManglerMedPlassholderRolle";
 
 async function mockPersonInformasjonForIdentFørMount(page: Page, ident: string, visningsnavn: string) {
     await page.route("**/proxy/bidrag-person/informasjon/", async (route) => {
@@ -56,7 +58,7 @@ test.describe("ForelderRolleVisning", () => {
 
         await component.getByRole("button", { name: "Fjern" }).click();
 
-        await expect(component.getByText("Ola Nordmann")).toHaveCount(0);
+        await expect(component.getByText("Ny Bidragspliktig")).toHaveCount(0);
         await expect(component.getByText("Kari Nordmann")).toBeVisible();
         await expect(component.getByRole("button", { name: "Legg til person" })).toHaveCount(1);
     });
@@ -76,6 +78,7 @@ test.describe("ForelderRolleVisning", () => {
         await component.getByRole("button", { name: "Legg til person" }).click();
 
         await expect(component.getByRole("heading", { name: "Legg til bidragsmottaker" })).toBeVisible();
+        await expect(component.getByRole("dialog", { name: "Legg til bidragsmottaker" })).toBeVisible();
     });
 
     test("søker opp og legger til bidragsmottaker - mocker et ekte nettverkskall (ikke context)", async ({
@@ -93,5 +96,29 @@ test.describe("ForelderRolleVisning", () => {
 
         await expect(component.getByText("Kari Nordmann")).toBeVisible();
         await expect(component.getByRole("button", { name: "Legg til person" })).toHaveCount(0);
+    });
+
+    test("bidragspliktig som mangler er en rolle med tomt fødselsnummer (reell API-form) - kan legges til og angres", async ({
+        mount,
+        page,
+    }) => {
+        const bpIdent = genererFnr();
+
+        await mockPersonInformasjonForIdentFørMount(page, bpIdent, "Ny Bidragspliktig");
+        const component = await mount(STORY_BP_PLASSHOLDER);
+
+        await expect(component.getByText("Ukjent - ikke registrert")).toBeVisible();
+        await component.getByRole("button", { name: "Legg til person" }).click();
+        await component.getByRole("searchbox", { name: "Søk etter bidragspliktig" }).fill(bpIdent);
+        await component.getByRole("button", { name: "Søk", exact: true }).click();
+
+        await expect(component.getByText("Ny Bidragspliktig")).toBeVisible();
+        await expect(component.getByRole("button", { name: "Legg til person" })).toHaveCount(0);
+        await expect(component.getByRole("button", { name: "Fjern" })).toBeVisible();
+
+        await component.getByRole("button", { name: "Fjern" }).click();
+
+        await expect(component.getByText("Ny Bidragspliktig")).toHaveCount(0);
+        await expect(component.getByRole("button", { name: "Legg til person" })).toBeVisible();
     });
 });

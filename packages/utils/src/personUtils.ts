@@ -87,6 +87,13 @@ export function beregnAlderFraFnr(fnr: string): number | null {
     return alder;
 }
 
+export function beregnAlderForPerson(person: { fødselsdato?: string | null; ident: string }): number | null {
+    if (person.fødselsdato) {
+        return beregnAlder(person.fødselsdato);
+    }
+    return beregnAlderFraFnr(person.ident);
+}
+
 export function beregnAlder(fødselsdato: string): number {
     const idag = new Date();
     const født = new Date(fødselsdato);

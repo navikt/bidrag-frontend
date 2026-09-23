@@ -1,75 +1,62 @@
 import { PersonPencilIcon } from "@navikt/aksel-icons";
 import { Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react";
 import { useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
 import { useParams } from "react-router";
 
 import ReellMottakerValgGruppe, { type ReellMottakerValg } from "./components/ReellMottakerValgGruppe.tsx";
-import type { BarnRolle, SakRedigeringData } from "./sakvisning-schema.ts";
+
+export type { ReellMottakerValg };
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;
-    rolleIndex: number;
+    barnIdent?: string;
+    verdi: ReellMottakerValg;
     onAvbryt: () => void;
+    onBekreft: (verdi: ReellMottakerValg) => void;
     disabled?: boolean;
-    kanFjerne?: boolean;
-    isRequired?: boolean;
+    regel: "valgfri" | "påkrevd" | "kun-samhandler";
     feil?: string;
-    kunSamhandlerSomReellMottaker?: boolean;
-    onBekreft?: () => void;
 }
 
 export default function ReellMottakerVelger({
     barnNavn,
-    rolleIndex,
+    barnIdent,
+    verdi,
     disabled,
     onAvbryt,
-    feil,
-    kanFjerne = false,
-    isRequired = false,
-    kunSamhandlerSomReellMottaker = false,
     onBekreft,
+    feil,
+    regel,
 }: ReellMottakerVelgerProps) {
-    const form = useFormContext<SakRedigeringData>();
     const { saksnummer } = useParams();
-    const barn = useWatch({
-        control: form.control,
-        name: `roller.${rolleIndex}`,
-    }) as BarnRolle | undefined;
-
+    const [valideringsfeil, setValideringsfeil] = useState<string | undefined>();
+    const påkrevd = regel !== "valgfri";
+    const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
     // Utkast, slik at endringsoppsummeringen bak modalen først oppdateres ved bekreftelse.
     const [utkast, setUtkast] = useState<ReellMottakerValg>(() => {
-        const eksisterendeValg = {
-            type: barn?.reellMottakerType,
-            ident: barn?.reellMottaker,
-            navn: barn?.reellMottakerNavn,
-        };
-
-        if (kunSamhandlerSomReellMottaker && eksisterendeValg.type === "barnet_selv") {
+        if (kunSamhandlerSomReellMottaker && verdi.type === "barnet_selv") {
             return { type: "samhandler" };
         }
 
-        if (isRequired && !eksisterendeValg.type) {
+        if (påkrevd && !verdi.type) {
             return kunSamhandlerSomReellMottaker
                 ? { type: "samhandler" }
-                : { type: "barnet_selv", ident: barn?.fodselsnummer, navn: barnNavn };
+                : { type: "barnet_selv", ident: barnIdent, navn: barnNavn };
         }
 
-        return eksisterendeValg;
+        return verdi;
     });
     const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(() =>
         utkast.type === "samhandler" && utkast.ident && utkast.navn ? { ident: utkast.ident, navn: utkast.navn } : null,
     );
 
-    if (!barn) {
-        return null;
-    }
-
     const handleBekreft = () => {
-        form.setValue(`roller.${rolleIndex}.reellMottakerType`, utkast.type);
-        form.setValue(`roller.${rolleIndex}.reellMottaker`, utkast.ident);
-        form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, utkast.navn, { shouldValidate: true });
-        onBekreft?.();
+        if (!kanBekrefte) {
+            setValideringsfeil("Velg eller søk opp en reell mottaker før du legger til.");
+            return;
+        }
+        setValideringsfeil(undefined);
+        onBekreft(utkast);
     };
 
     const handleValg = (nyttValg: ReellMottakerValg) => {
@@ -82,12 +69,13 @@ export default function ReellMottakerVelger({
         }
 
         setUtkast(nyttValg);
+        setValideringsfeil(undefined);
     };
 
     const kanBekrefte =
         utkast.type === "samhandler"
             ? Boolean(utkast.ident)
-            : !isRequired || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
+            : !påkrevd || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
 
     return (
         <Modal open onClose={onAvbryt} width="medium" aria-label="Endre reell mottaker">
@@ -95,38 +83,36 @@ export default function ReellMottakerVelger({
                 <VStack gap="space-2">
                     {saksnummer && <Detail>Sak {saksnummer}</Detail>}
                     <HStack gap="space-4" align="center" wrap={false}>
-                        <PersonPencilIcon aria-hidden fontSize="1.5rem" />
-                        <Heading level="2" size="medium">
+                        <PersonPencilIcon aria-hidden />
+                        <Heading level="2" size="small">
                             Endre reell mottaker av barnebidraget
                         </Heading>
                     </HStack>
                 </VStack>
             </Modal.Header>
-
             <Modal.Body>
                 <ReellMottakerValgGruppe
                     barnNavn={barnNavn}
-                    barnIdent={barn.fodselsnummer}
-                    barnFødselsdato={barn.fødselsdato}
+                    barnIdent={barnIdent ?? ""}
                     valg={utkast}
                     lagretSamhandler={lagretSamhandler}
                     onValg={handleValg}
-                    visBarnekort
-                    kanFjerne={kanFjerne}
-                    isRequired={isRequired}
-                    kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
+                    regel={regel}
                     disabled={disabled}
-                    feil={feil}
+                    feil={valideringsfeil ?? feil}
                 />
             </Modal.Body>
-
             <Modal.Footer>
-                <Button type="button" onClick={handleBekreft} disabled={disabled || !kanBekrefte}>
-                    Legg til
-                </Button>
-                <Button type="button" variant="secondary" onClick={onAvbryt} disabled={disabled}>
-                    Avbryt
-                </Button>
+                {!disabled && (
+                    <>
+                        <Button type="button" size="small" onClick={handleBekreft}>
+                            Legg til
+                        </Button>
+                        <Button type="button" size="small" variant="secondary" onClick={onAvbryt}>
+                            Avbryt
+                        </Button>
+                    </>
+                )}
             </Modal.Footer>
         </Modal>
     );
