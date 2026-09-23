@@ -1,6 +1,6 @@
-import { type GebyrDtoV3, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { type GebyrDtoV3, type SoknadDetaljerDto, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ModiaLink, PersonNavnIdent, RolleTag, type RolleTypeAbbreviation } from "@bidrag/common";
-import { BodyShort, Box, Heading, Label } from "@navikt/ds-react";
+import { BodyShort, Box, Heading, HStack, Label } from "@navikt/ds-react";
 import { type UseMutationResult, useSuspenseQueries } from "@tanstack/react-query";
 import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { type FieldPathByValue, FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
@@ -14,11 +14,14 @@ import { NewFormLayout } from "../../../../common/components/layout/grid/NewForm
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
 import { PERSON_API } from "../../../../common/constants/api";
 import elementIds from "../../../../common/constants/elementIds";
+import { SOKNAD_LABELS } from "../../../../common/constants/soknadFraLabels";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
 import { type GebyrPayload, useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { useDebounce } from "../../../../common/hooks/useDebounce";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
+import { hentVisningsnavn } from "../../../../common/hooks/useVisningsnavn";
+import { DateToDDMMYYYYString } from "../../../../utils/date-utils";
 import { formatterBeløp } from "../../../../utils/number-utils";
 import { STEPS } from "../../../constants/steps";
 import { BarnebidragStepper } from "../../../enum/BarnebidragStepper";
@@ -132,6 +135,33 @@ const Side = () => {
     );
 };
 
+const SøknadDetaljerHeader = ({ søknad }: { søknad: SoknadDetaljerDto }) => {
+    return (
+        <Box background="default" padding="space-16">
+            <HStack gap="space-48" wrap>
+                <HStack gap="space-8">
+                    <Label size="small">{text.label.søknadfra}:</Label>
+                    <BodyShort size="small">{SOKNAD_LABELS[søknad.søktAvType]}</BodyShort>
+                </HStack>
+                <HStack gap="space-8">
+                    <Label size="small">{text.label.mottattdato}:</Label>
+                    <BodyShort size="small">{DateToDDMMYYYYString(new Date(søknad.mottattDato))}</BodyShort>
+                </HStack>
+                <HStack gap="space-8">
+                    <Label size="small">{text.label.søktfradato}:</Label>
+                    <BodyShort size="small">{DateToDDMMYYYYString(new Date(søknad.søktFomDato))}</BodyShort>
+                </HStack>
+                {søknad.behandlingstype && (
+                    <HStack gap="space-8">
+                        <Label size="small">{text.label.søknadstype}:</Label>
+                        <BodyShort size="small">{hentVisningsnavn(søknad.behandlingstype)}</BodyShort>
+                    </HStack>
+                )}
+            </HStack>
+        </Box>
+    );
+};
+
 const GebyrRoller = ({ fieldArrayName }: { fieldArrayName: FieldPathByValue<GebyrFormValues, GebyrFormRolle[]> }) => {
     const fieldArrayType = fieldArrayName.split(".")[2];
     const { selectedSaksnummer, setSaveErrorState } = useBehandlingProvider();
@@ -202,98 +232,138 @@ const GebyrRoller = ({ fieldArrayName }: { fieldArrayName: FieldPathByValue<Geby
         return () => subscription.unsubscribe();
     }, [debouncedOnSave, watch]);
 
+    const gruppertPerSøknad = useMemo(() => {
+        const grupper = new Map<
+            number | string,
+            { søknad: SoknadDetaljerDto | null; items: typeof controlledFields }
+        >();
+        for (const item of controlledFields) {
+            const søknad = item.gebyrDetaljer?.søknad ?? null;
+            const key = søknad?.søknadsid ?? "ukjent";
+            const eksisterende = grupper.get(key);
+            if (eksisterende) {
+                eksisterende.items.push(item);
+            } else {
+                grupper.set(key, { søknad, items: [item] });
+            }
+        }
+        return Array.from(grupper.values());
+    }, [controlledFields]);
+
     return (
         <>
-            {controlledFields.map((item) => {
-                const avslag = virkningstidspunkt.erAvslagForAlle;
-                return (
-                    <Fragment key={item?.rolle?.id}>
-                        <Box
-                            background="neutral-soft"
-                            className="grid gap-2"
-                            id={`${elementIds.seksjon_gebyr}_${item?.rolle?.id}`}
-                        >
-                            <div className="grid grid-cols-[max-content_max-content_auto] p-4 bg-[white]">
-                                <div>
-                                    <RolleTag
-                                        rolleType={item.rolle.rolletype as unknown as RolleTypeAbbreviation}
-                                        ident={item.rolle.ident}
-                                        stønad18År={item.rolle.stønadstype === Stonadstype.BIDRAG18AAR}
-                                    />
-                                </div>
-                                <PersonNavnIdent ident={item.rolle.ident} />
-                                <div className="pl-2">
-                                    {avslag && (
-                                        <div className="flex gap-x-2">
-                                            <AinntektLink ident={item.rolle.ident} />
-                                            <ModiaLink ident={item.rolle.ident} />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {item.gebyrDetaljer && (
+            {gruppertPerSøknad.map(({ søknad, items }) => (
+                <Box
+                    key={søknad?.søknadsid ?? "ukjent"}
+                    background="neutral-soft"
+                    padding="space-8"
+                    borderColor="neutral-subtle"
+                    borderWidth="1"
+                    borderRadius="4"
+                    className="grid gap-2"
+                >
+                    {søknad && <SøknadDetaljerHeader søknad={søknad} />}
+                    {items.map((item) => {
+                        const avslag = virkningstidspunkt.erAvslagForAlle;
+                        return (
+                            <Fragment key={item?.rolle?.id}>
                                 <Box
-                                    background="default"
-                                    padding="space-8"
-                                    key={item.gebyrDetaljer.søknad.saksnummer}
+                                    background="neutral-soft"
                                     className="grid gap-2"
+                                    id={`${elementIds.seksjon_gebyr}_${item?.rolle?.id}`}
                                 >
-                                    <div className="grid gap-2">
-                                        <div className="flex gap-x-2">
-                                            <Label size="small">{text.label.skattepliktigeInntekt}:</Label>
-                                            <BodyShort size="small">
-                                                {formatterBeløp(item.gebyrDetaljer.inntekt.skattepliktigInntekt)}
-                                            </BodyShort>
-                                        </div>
-                                        {!avslag && (
-                                            <>
-                                                <div className="flex gap-x-2">
-                                                    <Label size="small">{text.label.høyesteBarnetillegg}:</Label>
-                                                    <BodyShort size="small">
-                                                        {formatterBeløp(item.gebyrDetaljer.inntekt.maksBarnetillegg)}
-                                                    </BodyShort>
-                                                </div>
-                                                <div className="flex gap-x-2">
-                                                    <Label size="small">{text.label.totalt}:</Label>
-                                                    <BodyShort size="small">
-                                                        {formatterBeløp(item.gebyrDetaljer.inntekt.totalInntekt)}
-                                                    </BodyShort>
-                                                </div>
-                                            </>
-                                        )}
-                                        <div className="flex items-start gap-x-2">
-                                            <GebyrSelect
-                                                fieldName={`${fieldArrayName}.${item.fieldIndex}.gebyrDetaljer`}
-                                                onSave={onSave}
+                                    <Box background="default" padding="space-16">
+                                        <HStack gap="space-8" align="center">
+                                            <RolleTag
+                                                rolleType={item.rolle.rolletype as unknown as RolleTypeAbbreviation}
+                                                ident={item.rolle.ident}
+                                                stønad18År={item.rolle.stønadstype === Stonadstype.BIDRAG18AAR}
                                             />
-                                            {booleanValueOfEndeligIlagtGebyr[item.gebyrDetaljer.endeligIlagtGebyr] && (
-                                                <div className="h-[60px] flex">
-                                                    <div className="flex self-end gap-x-2">
-                                                        <Label size="small">{text.label.beløp}:</Label>
-                                                        <BodyShort size="small">
-                                                            {formatterBeløp(item.gebyrDetaljer.beløpGebyrsats)}
-                                                        </BodyShort>
-                                                    </div>
-                                                </div>
+                                            <PersonNavnIdent ident={item.rolle.ident} />
+                                            {avslag && (
+                                                <HStack gap="space-8">
+                                                    <AinntektLink ident={item.rolle.ident} />
+                                                    <ModiaLink ident={item.rolle.ident} />
+                                                </HStack>
                                             )}
-                                            {booleanValueOfEndeligIlagtGebyr[item.gebyrDetaljer.endeligIlagtGebyr] !==
-                                                item.gebyrDetaljer.beregnetIlagtGebyr && (
-                                                <div>
-                                                    <Begrunnelse
+                                        </HStack>
+                                    </Box>
+
+                                    {item.gebyrDetaljer && (
+                                        <Box
+                                            background="default"
+                                            padding="space-8"
+                                            key={item.gebyrDetaljer.søknad.saksnummer}
+                                            className="grid gap-2"
+                                        >
+                                            <div className="grid gap-2">
+                                                <HStack gap="space-8">
+                                                    <Label size="small">{text.label.skattepliktigeInntekt}:</Label>
+                                                    <BodyShort size="small">
+                                                        {formatterBeløp(
+                                                            item.gebyrDetaljer.inntekt.skattepliktigInntekt,
+                                                        )}
+                                                    </BodyShort>
+                                                </HStack>
+                                                {!avslag && (
+                                                    <>
+                                                        <HStack gap="space-8">
+                                                            <Label size="small">
+                                                                {text.label.høyesteBarnetillegg}:
+                                                            </Label>
+                                                            <BodyShort size="small">
+                                                                {formatterBeløp(
+                                                                    item.gebyrDetaljer.inntekt.maksBarnetillegg,
+                                                                )}
+                                                            </BodyShort>
+                                                        </HStack>
+                                                        <HStack gap="space-8">
+                                                            <Label size="small">{text.label.totalt}:</Label>
+                                                            <BodyShort size="small">
+                                                                {formatterBeløp(
+                                                                    item.gebyrDetaljer.inntekt.totalInntekt,
+                                                                )}
+                                                            </BodyShort>
+                                                        </HStack>
+                                                    </>
+                                                )}
+                                                <HStack gap="space-8" align="start">
+                                                    <GebyrSelect
                                                         fieldName={`${fieldArrayName}.${item.fieldIndex}.gebyrDetaljer`}
-                                                        mutation={updateGebyr.mutation}
+                                                        onSave={onSave}
                                                     />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                                    {booleanValueOfEndeligIlagtGebyr[
+                                                        item.gebyrDetaljer.endeligIlagtGebyr
+                                                    ] && (
+                                                        <div className="h-[60px] flex">
+                                                            <HStack gap="space-8" align="end">
+                                                                <Label size="small">{text.label.beløp}:</Label>
+                                                                <BodyShort size="small">
+                                                                    {formatterBeløp(item.gebyrDetaljer.beløpGebyrsats)}
+                                                                </BodyShort>
+                                                            </HStack>
+                                                        </div>
+                                                    )}
+                                                    {booleanValueOfEndeligIlagtGebyr[
+                                                        item.gebyrDetaljer.endeligIlagtGebyr
+                                                    ] !== item.gebyrDetaljer.beregnetIlagtGebyr && (
+                                                        <div>
+                                                            <Begrunnelse
+                                                                fieldName={`${fieldArrayName}.${item.fieldIndex}.gebyrDetaljer`}
+                                                                mutation={updateGebyr.mutation}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </HStack>
+                                            </div>
+                                        </Box>
+                                    )}
                                 </Box>
-                            )}
-                        </Box>
-                    </Fragment>
-                );
-            })}
+                            </Fragment>
+                        );
+                    })}
+                </Box>
+            ))}
         </>
     );
 };
@@ -331,7 +401,10 @@ const Main = () => {
             {visibleGebyrSaker.map(({ item, index }) => {
                 return (
                     <Fragment key={item.saksnummer}>
-                        <Box background="neutral-soft" className="grid gap-4 py-2 px-4">
+                        <Box
+                            background={visibleGebyrSaker.length > 1 ? "neutral-soft" : undefined}
+                            className="grid gap-4 py-2 px-4"
+                        >
                             {visibleGebyrSaker.length > 1 && (
                                 <Heading level="3" size="small">
                                     {text.title.sak} {item.saksnummer}
