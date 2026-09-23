@@ -1,6 +1,6 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import type { Page } from "@playwright/test";
-import { expect, test } from "@playwright/test";
 
 const STORY = "routes/sak/saksroller/felles/ForeslåPersonPanel/Standard";
 

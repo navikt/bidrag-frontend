@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
-import { Alert, BodyShort, Box, HStack, Loader, Search, VStack } from "@navikt/ds-react";
+import { BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack } from "@navikt/ds-react";
 import type { KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
@@ -11,6 +11,7 @@ export default function PersonSamhandlerSøk({
     label,
     onResult,
     onError,
+    onQueryChange,
     søketype,
     compact = false,
 }: {
@@ -18,6 +19,7 @@ export default function PersonSamhandlerSøk({
     label?: string;
     onResult: (data: PersonDto) => void | Promise<void>;
     onError: (feil: string) => void;
+    onQueryChange?: () => void;
     søketype: "person" | "person-og-samhandler";
     compact?: boolean;
 }) {
@@ -36,6 +38,7 @@ export default function PersonSamhandlerSøk({
     );
 
     function onInputChange(value: string) {
+        onQueryChange?.();
         setSearchValue(value);
         const søktVerdi = value?.trim();
         const versjon = ++søkeversjon.current;
@@ -45,8 +48,10 @@ export default function PersonSamhandlerSøk({
                 if (søkeversjon.current !== versjon) return;
 
                 if (!data?.isValid) {
-                    setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
+                    const feil = "Finnes ingen person eller samhandler med oppgitt ident";
+                    setSearchErrorMessage(feil);
                     setNyttFødselsnummerInfo(undefined);
+                    onError(feil);
                     return;
                 }
 
@@ -103,6 +108,7 @@ export default function PersonSamhandlerSøk({
                             onClick={(e) => e.stopPropagation()}
                             onChange={(value) => {
                                 søkeversjon.current += 1;
+                                onQueryChange?.();
                                 setSearchValue(value);
                             }}
                             onSearchClick={onInputChange}
@@ -114,7 +120,10 @@ export default function PersonSamhandlerSøk({
                     <BodyShort size="small" textColor="subtle">
                         <PersonSokButton
                             visSomLenke
-                            onError={(feil) => setSearchErrorMessage(feil)}
+                            onError={(feil) => {
+                                setSearchErrorMessage(feil);
+                                onError(feil);
+                            }}
                             onResult={(data) => {
                                 if (data?.ident) onInputChange(data.ident);
                             }}
@@ -140,16 +149,16 @@ export default function PersonSamhandlerSøk({
                 )}
                 {nyttFødselsnummerInfo && !searchErrorMessage && (
                     <Box asChild marginBlock="space-4 space-0">
-                        <Alert variant="info" inline size="small">
+                        <InlineMessage status="info" size="small">
                             {nyttFødselsnummerInfo}
-                        </Alert>
+                        </InlineMessage>
                     </Box>
                 )}
                 {searchErrorMessage && (
                     <Box asChild marginBlock="space-4 space-0">
-                        <Alert variant="warning" inline size="small">
+                        <InlineMessage status="warning" size="small">
                             {searchErrorMessage}
-                        </Alert>
+                        </InlineMessage>
                     </Box>
                 )}
             </Box>

@@ -1,5 +1,5 @@
 import { TilgangsFeilError } from "@bidrag/api";
-import { Alert, BodyLong, Box, ExpansionCard, Heading, Page } from "@navikt/ds-react";
+import { BodyLong, Box, ExpansionCard, GlobalAlert, Page } from "@navikt/ds-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 function TekniskeDetaljer({ error, errorInfo }: { error: Error; errorInfo: ErrorInfo | null }) {
@@ -54,15 +54,15 @@ export default class SakErrorBoundary extends Component<Props, State> {
                 return (
                     <Page.Block width="lg">
                         <Box padding="space-24">
-                            <Alert variant="error">
-                                <Heading level="3" size="small" spacing>
-                                    Ingen tilgang
-                                </Heading>
-                                <BodyLong spacing>
+                            <GlobalAlert status="error" centered={false}>
+                                <GlobalAlert.Header>
+                                    <GlobalAlert.Title as="h2">Ingen tilgang</GlobalAlert.Title>
+                                </GlobalAlert.Header>
+                                <GlobalAlert.Content>
                                     Du har ikke tilgang til sak {this.props.saksnummer}. Dette kan skyldes
                                     diskresjonskode eller manglende rettigheter.
-                                </BodyLong>
-                            </Alert>
+                                </GlobalAlert.Content>
+                            </GlobalAlert>
                         </Box>
                     </Page.Block>
                 );
@@ -72,12 +72,14 @@ export default class SakErrorBoundary extends Component<Props, State> {
                 return (
                     <Page.Block width="lg">
                         <Box padding="space-24">
-                            <Alert variant="error">
-                                <Heading level="3" size="small" spacing>
-                                    Sak ikke funnet
-                                </Heading>
-                                <BodyLong spacing>Fant ingen sak med saksnummer {this.props.saksnummer}</BodyLong>
-                            </Alert>
+                            <GlobalAlert status="error" centered={false}>
+                                <GlobalAlert.Header>
+                                    <GlobalAlert.Title as="h2">Sak ikke funnet</GlobalAlert.Title>
+                                </GlobalAlert.Header>
+                                <GlobalAlert.Content>
+                                    Fant ingen sak med saksnummer {this.props.saksnummer}
+                                </GlobalAlert.Content>
+                            </GlobalAlert>
                         </Box>
                     </Page.Block>
                 );
@@ -86,14 +88,14 @@ export default class SakErrorBoundary extends Component<Props, State> {
             return (
                 <Page.Block width="lg">
                     <Box padding="space-24">
-                        <Alert variant="error">
-                            <Heading level="3" size="small" spacing>
-                                Feil under lasting av sak
-                            </Heading>
-                            <BodyLong spacing>
+                        <GlobalAlert status="error" centered={false}>
+                            <GlobalAlert.Header>
+                                <GlobalAlert.Title as="h2">Feil under lasting av sak</GlobalAlert.Title>
+                            </GlobalAlert.Header>
+                            <GlobalAlert.Content>
                                 Kunne ikke laste sak {this.props.saksnummer}. Vennligst prøv igjen senere.
-                            </BodyLong>
-                        </Alert>
+                            </GlobalAlert.Content>
+                        </GlobalAlert>
                         {import.meta.env.DEV && (
                             <Box paddingBlock="space-16 space-0">
                                 <TekniskeDetaljer error={error} errorInfo={this.state.errorInfo} />

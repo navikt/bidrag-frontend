@@ -7,11 +7,19 @@ export interface PersonSøkInnholdProps {
     beskrivelse: string;
     søkeLabel: string;
     onPersonValgt: (person: PersonDto) => void;
+    onQueryChange?: () => void;
     children?: ReactNode;
     resultat?: ReactNode;
 }
 
-export function PersonSøkInnhold({ beskrivelse, søkeLabel, onPersonValgt, children, resultat }: PersonSøkInnholdProps) {
+export function PersonSøkInnhold({
+    beskrivelse,
+    søkeLabel,
+    onPersonValgt,
+    onQueryChange,
+    children,
+    resultat,
+}: PersonSøkInnholdProps) {
     return (
         <VStack gap="space-16">
             <BodyLong size="small" textColor="subtle">
@@ -19,7 +27,13 @@ export function PersonSøkInnhold({ beskrivelse, søkeLabel, onPersonValgt, chil
             </BodyLong>
             {children}
             {/* PersonSamhandlerSøk viser selv inline feilmelding ved mislykket søk; ikke dupliser den i resultat-slotten. */}
-            <SøkPerson label={søkeLabel} personInformasjon={onPersonValgt} compact />
+            <SøkPerson
+                label={søkeLabel}
+                personInformasjon={onPersonValgt}
+                onQueryChange={onQueryChange}
+                onError={onQueryChange}
+                compact
+            />
             {resultat}
         </VStack>
     );

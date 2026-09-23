@@ -1,6 +1,6 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import type { Page } from "@playwright/test";
-import { expect, test } from "@playwright/test";
 
 const STORY_BEGGE_KJENT = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BeggeRollerISak";
 const STORY_BM_MANGLER = "routes/sak/saksroller/forelder-rolle/ForelderRolleVisning/BidragsmottakerMangler";
