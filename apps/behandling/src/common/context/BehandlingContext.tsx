@@ -489,12 +489,6 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         setActiveTab,
     ]);
 
-    // Sant mens "fatte vedtak" kjører. Da skal ingen navigasjon (steg/fane) eller sidemeny være
-    // mulig, slik at behandlingen ikke endres mens vedtaket fattes i bakgrunnen.
-    // Sant mens "fatte vedtak" kjører, OG etter at det er fullført (status "success") frem til
-    // omdirigeringen til Bisys faktisk har skjedd. Da skal ingen navigasjon (steg/fane) eller
-    // sidemeny være mulig, slik at behandlingen ikke endres mens vedtaket fattes/omdirigerer.
-    // Ved feil ("error") låses ikke noe, slik at saksbehandler kan rette opp og prøve igjen.
     const fatteVedtakStatuser = useMutationState({
         filters: { mutationKey: fatteVedtakMutationKey },
         select: (mutation) => mutation.state.status,
