@@ -1,5 +1,5 @@
 import {
-    type ErSamvaerVirkningLikForAlleForSak,
+    type ErLikForAlleBasertPaSak,
     type RolleDto,
     Stonadstype,
     type TypeBehandling,
@@ -8,7 +8,7 @@ import {
 import type { IRolleDetaljer, RolleTypeAbbreviation } from "@bidrag/common";
 import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
 import { Button, Heading } from "@navikt/ds-react";
-import { useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
+import { useMutationState, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
 import React, {
     createContext,
     type Dispatch,
@@ -38,6 +38,7 @@ import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { PERSON_API } from "../constants/api";
 import urlSearchParams from "../constants/behandlingQueryKeys";
 import behandlingQueryKeys from "../constants/behandlingQueryKeys";
+import { fatteVedtakMutationKey } from "../constants/mutationKeys";
 import text from "../constants/texts";
 import { shouldShowGrunnlagLoadingProgressbar } from "../helpers/shouldShowGrunnlagProgressbar";
 import { QueryKeys, useBehandlingV2, useSjekkLasterGrunnlag } from "../hooks/useApiData";
@@ -110,11 +111,12 @@ interface IBehandlingContext {
     getPreviousStep: (currentStep: stepDef) => number;
     vurderSeparatSamvær?: boolean;
     setVurderSeparatSamvær?: Dispatch<SetStateAction<boolean>>;
-    setVurderSeparatSamværForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
+    setVurderSeparatSamværForSaker?: (saker: ErLikForAlleBasertPaSak[]) => void;
     vurderSeparatVirkningstidspunkt?: boolean;
     setVurderSeparatVirkningstidspunkt?: Dispatch<SetStateAction<boolean>>;
-    setVurderSeparatVirkningstidspunktForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
+    setVurderSeparatVirkningstidspunktForSaker?: (saker: ErLikForAlleBasertPaSak[]) => void;
     isGrunnlagLoading: boolean;
+    erFatterVedtak: boolean;
 }
 
 export const BehandlingContext = createContext<IBehandlingContext | null>(null);
@@ -217,11 +219,11 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     );
 
     const setVurderSeparatSamværForSaker = useCallback(
-        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+        (saker: ErLikForAlleBasertPaSak[]) => {
             setVurderSeparatSamværPerSak?.((prev) => {
                 const next = { ...prev };
                 for (const sak of saker) {
-                    next[sak.saksnummer] = !sak.erLikForAlle;
+                    next[sak.saksnummer] = !sak.kanVurdereSamlet || !sak.erLikForAlle;
                 }
                 return next;
             });
@@ -255,7 +257,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     );
 
     const setVurderSeparatVirkningstidspunktForSaker = useCallback(
-        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+        (saker: ErLikForAlleBasertPaSak[]) => {
             setVurderSeparatVirkningstidspunktPerSak?.((prev) => {
                 const next = { ...prev };
                 for (const sak of saker) {
@@ -487,8 +489,17 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         setActiveTab,
     ]);
 
+    const fatteVedtakStatuser = useMutationState({
+        filters: { mutationKey: fatteVedtakMutationKey },
+        select: (mutation) => mutation.state.status,
+    });
+    const erFatterVedtak = fatteVedtakStatuser.some((status) => status === "pending" || status === "success");
+    const erFatterVedtakRef = useRef(erFatterVedtak);
+    erFatterVedtakRef.current = erFatterVedtak;
+
     const onNavigateToTab = useCallback(
         (nextTab: string) => {
+            if (erFatterVedtakRef.current) return;
             if (mutating || mutationStatusDerived === "pending" || debouncingRef.current) {
                 setNavigatingToNextTab(true);
                 setNextTab(nextTab);
@@ -564,6 +575,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     };
     const onStepChange = useCallback(
         (x: number, query?: Record<string, string>, hash?: string) => {
+            if (erFatterVedtakRef.current) return;
             const currentPageErrors = pageErrorsOrUnsavedState[activeStep];
             setPageTabs(() => []); // Clear tabs when changing step to prevent showing incorrect tabs during transition
             trackStep(x, activeStep);
@@ -669,6 +681,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             setVurderSeparatVirkningstidspunkt,
             setVurderSeparatVirkningstidspunktForSaker,
             isGrunnlagLoading,
+            erFatterVedtak,
         }),
         [
             activeStep,
@@ -700,6 +713,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             vurderSeparatSamvær,
             vurderSeparatVirkningstidspunkt,
             isGrunnlagLoading,
+            erFatterVedtak,
             searchParams,
         ],
     );
