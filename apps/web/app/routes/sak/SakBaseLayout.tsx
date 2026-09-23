@@ -7,10 +7,11 @@ import {
     useBisysLink,
     useTilgangssjekkSak,
 } from "@bidrag/common";
-import { Page, VStack } from "@navikt/ds-react";
+import { HStack, Page, VStack } from "@navikt/ds-react";
 import { useEffect, useMemo } from "react";
 import { Outlet, useMatches } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
+import SakMeny from "~/routes/sak/SakMeny.tsx";
 import type { Route } from "./+types/SakBaseLayout.ts"; // Merk navnebyttet!
 import { type SakSideTittelHandle, SakSideTittelProvider } from "./sakSideTittel";
 
@@ -77,7 +78,10 @@ export default function SakBaseLayout({ params }: Route.ComponentProps) {
                             roller={roller}
                             skjermbilde={tittel ? { navn: tittel, referanse: saksnummer } : undefined}
                         />
-                        <Outlet />
+                        <HStack gap={"space-32"} wrap={false}>
+                            <SakMeny saksnummer={saksnummer} />
+                            <Outlet />
+                        </HStack>
                     </VStack>
                 );
             }}
