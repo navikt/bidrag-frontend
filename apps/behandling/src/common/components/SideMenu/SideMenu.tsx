@@ -7,25 +7,25 @@ import {
     ChevronLeftCircleIcon,
     ExclamationmarkTriangleIcon,
 } from "@navikt/aksel-icons";
-import {BodyShort, Button, VStack} from "@navikt/ds-react";
-import {type ReactElement, type ReactNode, useEffect, useState} from "react";
-import {scrollToHash} from "../../../utils/window-utils";
-import {useBehandlingProvider} from "../../context/BehandlingContext";
+import { BodyShort, Button, VStack } from "@navikt/ds-react";
+import { type ReactElement, type ReactNode, useEffect, useState } from "react";
+import { scrollToHash } from "../../../utils/window-utils";
+import { useBehandlingProvider } from "../../context/BehandlingContext";
 
 export const MenuButton = ({
-                               step,
-                               title,
-                               onStepChange,
-                               subMenu,
-                               hideSubMenu = false,
-                               size,
-                               active,
-                               valideringsfeil,
-                               icon,
-                               unconfirmedUpdates,
-                               loading,
-                               interactive = true,
-                           }: {
+    step,
+    title,
+    onStepChange,
+    subMenu,
+    hideSubMenu = false,
+    size,
+    active,
+    valideringsfeil,
+    icon,
+    unconfirmedUpdates,
+    loading,
+    interactive = true,
+}: {
     step?: string;
     title: string | ReactElement;
     icon?: ReactElement;
@@ -67,21 +67,20 @@ export const MenuButton = ({
                 size={size ?? "medium"}
             >
                 <span className="grid items-center gap-1 grid-cols-[20px_20px_auto_20px]">
-
                     <span>
-                       {icon}
-                        {displayBellIcon && <BellDotIcon title="Info" style={{color: "var(--ax-text-neutral)"}}/>}
+                        {icon}
+                        {displayBellIcon && <BellDotIcon title="Info" style={{ color: "var(--ax-text-neutral)" }} />}
                     </span>
                     {!step && (
                         <span>
                             {displayWarningIcon && (
                                 <ExclamationmarkTriangleIcon
                                     title="Advarsel"
-                                    style={{color: "var(--ax-text-neutral)"}}
+                                    style={{ color: "var(--ax-text-neutral)" }}
                                 />
                             )}
                             {!displayWarningIcon && displayUpdateIcon && (
-                                <ArrowsCirclepathIcon title="Info" style={{color: "var(--ax-text-neutral)"}}/>
+                                <ArrowsCirclepathIcon title="Info" style={{ color: "var(--ax-text-neutral)" }} />
                             )}
                         </span>
                     )}
@@ -118,9 +117,9 @@ interface SideMenuProps {
     otherChildren?: ReactNode;
 }
 
-export const SideMenu = ({children, otherChildren}: SideMenuProps) => {
+export const SideMenu = ({ children, otherChildren }: SideMenuProps) => {
     const [menuOpen, setMenuOpen] = useState<boolean>(true);
-    const {erFatterVedtak} = useBehandlingProvider();
+    const { erFatterVedtak } = useBehandlingProvider();
     const closedMenuCss = "p-0 w-6 min-w-0";
     const openMenuCss = "p-6 w-[298px] min-w-[298px] min-[1440px]:w-[412px]";
 
@@ -136,7 +135,7 @@ export const SideMenu = ({children, otherChildren}: SideMenuProps) => {
                 <fieldset
                     disabled={erFatterVedtak}
                     aria-busy={erFatterVedtak}
-                    style={{display: "contents", border: 0, margin: 0, padding: 0}}
+                    style={{ display: "contents", border: 0, margin: 0, padding: 0 }}
                 >
                     <VStack gap="space-0" className="grid overflow-hidden  border-(--ax-border-neutral-subtle)">
                         {children}
@@ -148,7 +147,7 @@ export const SideMenu = ({children, otherChildren}: SideMenuProps) => {
                     !menuOpen ? "rotate-180" : "rotate-0"
                 }`}
                 variant="tertiary"
-                icon={<ChevronLeftCircleIcon title="sidebar-button" fontSize="2rem"/>}
+                icon={<ChevronLeftCircleIcon title="sidebar-button" fontSize="2rem" />}
                 type="button"
                 onClick={() => setMenuOpen(!menuOpen)}
             />
