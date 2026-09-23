@@ -5,7 +5,8 @@ import { Alert, BodyShort, Select, VStack } from "@navikt/ds-react";
 import { type ChangeEvent, Suspense, useEffect, useState } from "react";
 import { useHentForeldreinformasjonForBarnSuspense, useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
 import LasterSkeleton from "./components/LasterSkeleton";
-import { MAKS_ALDER_BARN, MYNDYG_BARN_ALDER, type PartRolle, PartRolleSchema } from "./opprett-sak-schema";
+import { MAKS_ALDER_BARN, type PartRolle, PartRolleSchema } from "./opprett-sak-schema";
+import { filtrerSaksroller, type SaksrolleAlternativ } from "./saksrolle-regler";
 import { useSaksrolleroversikt } from "./saksrolleroversiktContext";
 import { tilPartISaken } from "./utils";
 
@@ -14,38 +15,6 @@ type Props = {
     enforcedRolle: PartRolle | null;
 };
 
-type SkjemaPartRollerType = {
-    label: string;
-    value: PartRolle;
-};
-
-function getFilteredPartRoller(
-    sakstype: string | null,
-    partISakenAlder: number | null,
-    roles: SkjemaPartRollerType[],
-): SkjemaPartRollerType[] {
-    if (sakstype === "EKTEFELLEBIDRAG") {
-        return roles.filter((valg) => !["barn_over_18", "barn_under_18"].includes(valg.value));
-    }
-
-    if (partISakenAlder === null) {
-        return roles;
-    }
-
-    if (partISakenAlder >= MYNDYG_BARN_ALDER && partISakenAlder <= MAKS_ALDER_BARN) {
-        return roles.filter((valgt) => valgt.value !== "barn_under_18");
-    }
-
-    if (partISakenAlder <= MYNDYG_BARN_ALDER) {
-        return roles.filter((valg) => valg.value !== "barn_over_18");
-    }
-
-    if (partISakenAlder > MAKS_ALDER_BARN) {
-        return roles.filter((valg) => !["barn_over_18", "barn_under_18"].includes(valg.value));
-    }
-
-    return roles;
-}
 export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
     const [feil, settFeil] = useState<string>("");
     const [valgtRolle, settValgtRolle] = useState<PartRolle | null>(null);
@@ -102,7 +71,7 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
         }
     }, [enforcedRolle, partISaken, partISakenSkjemaData?.rolle, nullstillRolleOgFlyt, setPartISaken]);
 
-    const alternativer = getFilteredPartRoller(sakstype, partISakenAlder, skjemaPartRoller);
+    const alternativer = filtrerSaksroller(sakstype, partISakenAlder, skjemaPartRoller);
 
     return (
         <VStack gap="space-4">
@@ -322,7 +291,7 @@ function ForeldreinfoBranch({
     );
 }
 
-const skjemaPartRoller: SkjemaPartRollerType[] = [
+const skjemaPartRoller: SaksrolleAlternativ[] = [
     { label: "Bidragspliktig", value: "bidragspliktig" },
     { label: "Bidragsmottaker", value: "bidragsmottaker" },
     { label: "Barn over 18 år", value: "barn_over_18" },

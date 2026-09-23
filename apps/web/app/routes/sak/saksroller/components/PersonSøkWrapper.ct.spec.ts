@@ -58,13 +58,15 @@ test.describe("PersonSøkWrapper", () => {
         await mockPersonInformasjonFørMount(page, { [ident]: { ident, visningsnavn: "Ola Nordmann" } });
 
         const component = await mount(STORY_MED_ACTIONS);
-        await expect(component.getByRole("button", { name: "Legg til", exact: true })).toBeDisabled();
+        const leggTilKnapp = component.getByRole("button", { name: "Legg til", exact: true });
+        await expect(leggTilKnapp).toBeEnabled();
+        await leggTilKnapp.click();
+        await expect(component.getByRole("alert")).toContainText("Søk opp en person før du legger til.");
 
         await component.getByRole("searchbox", { name: "Søk etter person" }).fill(ident);
         await component.getByRole("searchbox", { name: "Søk etter person" }).press("Enter");
 
-        await expect(component.getByRole("button", { name: "Legg til", exact: true })).toBeEnabled();
-        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await leggTilKnapp.click();
 
         await expect(component.getByText("Ola Nordmann er lagt til")).toBeVisible();
     });

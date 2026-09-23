@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { Controller, type FieldPath, type FieldValues, type PathValue, type UseFormReturn } from "react-hook-form";
-import ReellMottakerValgGruppe, {
-    type ReellMottakerValg,
-    type ReellMottakerValgregel,
-} from "../../components/ReellMottakerValgGruppe";
+import ReellMottakerValgGruppe, { type ReellMottakerValgregel } from "../../components/ReellMottakerValgGruppe";
+import { fraReellMottakerValg, initialiserReellMottaker, tilReellMottakerValg } from "../reell-mottaker-regel";
 
 type Props<TFieldValues extends FieldValues> = {
     form: UseFormReturn<TFieldValues>;
@@ -20,8 +18,6 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     barnNavn,
     regel,
 }: Props<TFieldValues>) {
-    const erPåkrevd = regel !== "valgfri";
-    const kunSamhandler = regel === "kun-samhandler";
     const reellMottakerTypePath = `${fieldPath}.reellMottakerType` as FieldPath<TFieldValues>;
     const reellMottakerPath = `${fieldPath}.reellMottaker` as FieldPath<TFieldValues>;
     const reellMottakerNavnPath = `${fieldPath}.reellMottakerNavn` as FieldPath<TFieldValues>;
@@ -34,24 +30,33 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     const reellMottakerType = form.watch(reellMottakerTypePath);
     const reellMottaker = form.watch(reellMottakerPath);
     const reellMottakerNavn = form.watch(reellMottakerNavnPath);
+    const reellMottakerFeil = form.getFieldState(reellMottakerPath, form.formState).error?.message;
+    const skjemaverdi = {
+        reellMottakerType:
+            reellMottakerType === "ingen" || reellMottakerType === "barnet_selv" || reellMottakerType === "annen_person"
+                ? reellMottakerType
+                : undefined,
+        reellMottaker: typeof reellMottaker === "string" ? reellMottaker : undefined,
+        reellMottakerNavn: typeof reellMottakerNavn === "string" ? reellMottakerNavn : undefined,
+    };
     const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(() =>
         reellMottakerType === "annen_person" && reellMottaker && reellMottakerNavn
             ? { ident: String(reellMottaker), navn: String(reellMottakerNavn) }
             : null,
     );
 
-    const valg: ReellMottakerValg =
-        reellMottakerType === "barnet_selv"
-            ? { type: "barnet_selv", ident: barnIdent, navn: barnNavn }
-            : reellMottakerType === "annen_person"
-              ? {
-                    type: "samhandler",
-                    ident: reellMottaker ? String(reellMottaker) : undefined,
-                    navn: reellMottakerNavn ? String(reellMottakerNavn) : undefined,
-                }
-              : {};
+    const valg = tilReellMottakerValg(skjemaverdi, { ident: barnIdent, navn: barnNavn });
 
-    const oppdaterValg = (nyttValg: ReellMottakerValg) => {
+    const settSkjemaverdi = (
+        nyVerdi: ReturnType<typeof fraReellMottakerValg>,
+        options: Parameters<typeof form.setValue>[2],
+    ) => {
+        setDynamiskFeltVerdi(reellMottakerTypePath, nyVerdi.reellMottakerType ?? "ingen", options);
+        setDynamiskFeltVerdi(reellMottakerPath, nyVerdi.reellMottaker ?? "", options);
+        setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn ?? "", options);
+    };
+
+    const oppdaterValg = (nyttValg: Parameters<typeof fraReellMottakerValg>[0]) => {
         if (
             reellMottakerType === "annen_person" &&
             reellMottaker &&
@@ -65,17 +70,7 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
             setLagretSamhandler({ ident: nyttValg.ident, navn: nyttValg.navn });
         }
 
-        setDynamiskFeltVerdi(
-            reellMottakerTypePath,
-            nyttValg.type === "samhandler" ? "annen_person" : (nyttValg.type ?? "ingen"),
-            { shouldValidate: true, shouldDirty: true, shouldTouch: true },
-        );
-        setDynamiskFeltVerdi(reellMottakerPath, nyttValg.ident ?? "", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerNavnPath, nyttValg.navn ?? "", {
+        settSkjemaverdi(fraReellMottakerValg(nyttValg), {
             shouldValidate: true,
             shouldDirty: true,
             shouldTouch: true,
@@ -84,65 +79,19 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     };
 
     useEffect(() => {
-        if (!kunSamhandler || reellMottakerType !== "barnet_selv") {
+        const initialisert = initialiserReellMottaker(skjemaverdi, regel, {
+            ident: barnIdent,
+            navn: barnNavn,
+        });
+        if (
+            initialisert.reellMottakerType === skjemaverdi.reellMottakerType &&
+            (initialisert.reellMottaker ?? "") === (skjemaverdi.reellMottaker ?? "") &&
+            (initialisert.reellMottakerNavn ?? "") === (skjemaverdi.reellMottakerNavn ?? "")
+        ) {
             return;
         }
 
-        setDynamiskFeltVerdi(reellMottakerTypePath, "annen_person", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerPath, "", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerNavnPath, "", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-    }, [form, kunSamhandler, reellMottakerNavnPath, reellMottakerPath, reellMottakerType, reellMottakerTypePath]);
-
-    useEffect(() => {
-        if (!erPåkrevd) {
-            return;
-        }
-        if (reellMottakerType && reellMottakerType !== "ingen") {
-            return;
-        }
-
-        if (kunSamhandler) {
-            setDynamiskFeltVerdi(reellMottakerTypePath, "annen_person", {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-            });
-            setDynamiskFeltVerdi(reellMottakerPath, "", {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-            });
-            setDynamiskFeltVerdi(reellMottakerNavnPath, "", {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-            });
-            return;
-        }
-
-        setDynamiskFeltVerdi(reellMottakerTypePath, "barnet_selv", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerPath, barnIdent, {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerNavnPath, barnNavn, {
+        settSkjemaverdi(initialisert, {
             shouldValidate: true,
             shouldDirty: true,
             shouldTouch: true,
@@ -151,9 +100,10 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
         barnIdent,
         barnNavn,
         form,
-        erPåkrevd,
-        kunSamhandler,
+        regel,
+        reellMottaker,
         reellMottakerNavnPath,
+        reellMottakerNavn,
         reellMottakerPath,
         reellMottakerType,
         reellMottakerTypePath,
@@ -171,7 +121,7 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                     lagretSamhandler={lagretSamhandler}
                     onValg={oppdaterValg}
                     regel={regel}
-                    feil={fieldState.error?.message}
+                    feil={fieldState.error?.message ?? reellMottakerFeil}
                 />
             )}
         />

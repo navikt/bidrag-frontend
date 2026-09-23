@@ -1,7 +1,8 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Alert, BodyShort, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
+import { Alert, Tag } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import BarnManueltRegistrering from "../BarnManueltRegistrering";
+import SkjemaSeksjon from "../felles/SkjemaSeksjon";
 import BarnkurvListe from "../motpart-felles/BarnkurvListe";
 import ValgteBarnListe from "../motpart-felles/ValgteBarnListe";
 import {
@@ -16,7 +17,6 @@ import type { ReellMottakerRegel } from "../reell-mottaker-regel";
 interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     form: UseFormReturn<T>;
     barnkurver?: Barnkurv[];
-    erBidragspliktig?: boolean;
     reellMottakerRegel: ReellMottakerRegel;
     onResetMotpart?: () => void;
 }
@@ -24,7 +24,6 @@ interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
 export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     form,
     barnkurver = [],
-    erBidragspliktig = false,
     reellMottakerRegel,
     onResetMotpart,
 }: BarnSectionProps<T>) {
@@ -81,21 +80,15 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     };
 
     return (
-        <VStack gap="space-6">
-            <HStack align="center" justify="space-between">
-                <VStack gap="space-4">
-                    <Heading level="2" size="small">
-                        Velg barn saken gjelder for
-                    </Heading>
-                    <BodyShort size="small" textColor="subtle">
-                        Velg alle barn som skal være med i saken
-                    </BodyShort>
-                </VStack>
+        <SkjemaSeksjon
+            tittel="Velg barn saken gjelder for"
+            beskrivelse="Velg alle barn som skal være med i saken"
+            handling={
                 <Tag size="small" variant="info">
                     {valgteBarn.length} valgt
                 </Tag>
-            </HStack>
-
+            }
+        >
             {barnkurver.length > 0 && (
                 <BarnkurvListe
                     barnkurver={barnkurver}
@@ -122,11 +115,11 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                 />
             )}
 
-            {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
+            {valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
                 <Alert variant="error" size="small">
                     {String(form.formState.errors.valgteBarn.message ?? "")}
                 </Alert>
             )}
-        </VStack>
+        </SkjemaSeksjon>
     );
 }

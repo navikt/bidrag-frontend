@@ -1,21 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Button, HStack, VStack } from "@navikt/ds-react";
+import { Alert, Button } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
-import FunnetPersonInfo from "../../../components/FunnetPersonInfo";
 import BarnMottakerKort from "../../barn-felles/BarnMottakerKort";
-import ParterOppsummeringBarn from "../../barn-felles/ParterOppsummeringBarn";
-import LasterSkeleton from "../../components/LasterSkeleton";
-import FlytSkjema from "../../felles/FlytSkjema";
+import ForeldreSeksjon from "../../felles/ForeldreSeksjon";
+import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import { type BarnBeggForeldreSkjemaData, BarnBeggForeldreSkjemaSchema } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
-import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
-import RolleVelger from "./RollerVelger";
 
 export default function BarnBeggeForeldreFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();
@@ -69,9 +65,20 @@ function BarnBeggeForeldreFlytContent() {
     const bidragsmottaker = valgteRoller.find((f) => f.rolle === "bidragsmottaker");
     const bidragspliktig = valgteRoller.find((f) => f.rolle === "bidragspliktig");
     const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
-    const harUkjentForelder = valgteRoller.some((forelder) => forelder.erKjent === false);
 
     const trengerReellMottaker = barnErMyndig || bidragsmottakerErUkjent;
+
+    const settRolle = (index: number, rolle: "bidragspliktig" | "bidragsmottaker") => {
+        valgteRoller.forEach((_person, forelderIndex) => {
+            form.clearErrors(`foreldre.${forelderIndex}`);
+        });
+
+        form.setValue(`foreldre.${index}.rolle`, rolle);
+        form.setValue(
+            `foreldre.${index === 0 ? 1 : 0}.rolle`,
+            rolle === "bidragspliktig" ? "bidragsmottaker" : "bidragspliktig",
+        );
+    };
 
     const {
         enhet,
@@ -138,66 +145,69 @@ function BarnBeggeForeldreFlytContent() {
     };
 
     return (
-        <FlytSkjema onSubmit={onSubmit}>
-            <VStack gap="space-6">
-                <VStack gap="space-12">
+        <RolleFlytSide
+            onSubmit={onSubmit}
+            status={{
+                infoMelding: eksisterendeSakInfoMelding,
+                harEksisterendeSak,
+                eksisterendeSak,
+                isLoading: isLoadingHentSak,
+                partISakenNavn: bidragspliktig?.navn ?? "",
+                motpartNavn: bidragsmottaker?.navn,
+            }}
+            meldinger={
+                <>
                     <Alert variant="info" size="small">
                         Barnet har begge foreldre registrert. Du må velge hvem som skal betale bidrag.
                     </Alert>
-
-                    {eksisterendeSakInfoMelding && (
-                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                            {eksisterendeSakInfoMelding.melding}
-                        </Alert>
-                    )}
-
-                    <EksisterendeSakSection
-                        harEksisterendeSak={harEksisterendeSak}
-                        eksisterendeSak={eksisterendeSak}
-                        partISakenNavn={bidragspliktig?.navn ?? ""}
-                        motpartNavn={bidragsmottaker?.navn}
-                    />
-                </VStack>
-
-                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                <VStack gap="space-4">
-                    <RolleVelger form={form} foreldre={foreldre} />
-
-                    {rollerErValgt && bidragsmottaker?.erKjent && (
-                        <HStack justify="end">
-                            <Button type="button" variant="tertiary" size="small" onClick={settBidragsmottakerUkjent}>
-                                Sett bidragsmottaker som ukjent
-                            </Button>
-                        </HStack>
-                    )}
-
-                    {bidragsmottaker?.erKjent === false && (
-                        <FunnetPersonInfo
-                            label="Bidragsmottaker:"
-                            navn="Ukjent"
-                            fjern={settDenAndreForelderSomBidragsmottaker}
-                            variant="warning"
-                        />
-                    )}
-                </VStack>
-
-                {rollerErValgt && <BarnMottakerKort form={form} barn={barn} erPåkrevd={trengerReellMottaker} />}
-
-                {(rollerErValgt || harUkjentForelder) && <ParterOppsummeringBarn form={form} />}
-
-                {bidragsmottakerErUkjent && <UfullstendigRelasjonAlert />}
-
+                    {bidragsmottakerErUkjent && <UfullstendigRelasjonAlert />}
+                </>
+            }
+            submit={
                 <EnhetOgSubmitSection
                     enhet={enhet}
                     enhetNavn={enhetNavn}
                     isLoadingEnhet={isLoadingEnhet}
                     enhetError={enhetError}
-                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
                     submitError={error}
                     saksnummer={saksnummer}
                 />
-            </VStack>
-        </FlytSkjema>
+            }
+        >
+            <BarnMottakerKort form={form} barn={barn} erPåkrevd={trengerReellMottaker} kanVelge={rollerErValgt} />
+
+            <ForeldreSeksjon
+                foreldre={valgteRoller}
+                beskrivelse="Velg rolle for en av foreldrene. Den andre får motsatt rolle."
+                rollefeil={valgteRoller.map(
+                    (_forelder, index) => form.formState.errors.foreldre?.[index]?.rolle?.message,
+                )}
+                personfeil={valgteRoller.map(
+                    (_forelder, index) => form.formState.errors.foreldre?.[index]?.ident?.message,
+                )}
+                onVelgRolle={settRolle}
+                handling={(forelder) => {
+                    if (forelder.rolle !== "bidragsmottaker") {
+                        return null;
+                    }
+
+                    return forelder.erKjent ? (
+                        <Button type="button" variant="tertiary" size="small" onClick={settBidragsmottakerUkjent}>
+                            Sett bidragsmottaker som ukjent
+                        </Button>
+                    ) : (
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="small"
+                            onClick={settDenAndreForelderSomBidragsmottaker}
+                        >
+                            Bruk registrert forelder
+                        </Button>
+                    );
+                }}
+            />
+        </RolleFlytSide>
     );
 }

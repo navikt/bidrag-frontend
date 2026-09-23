@@ -127,6 +127,7 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel }: 
                                                             diskresjonskode: barn.diskresjonskode,
                                                         }}
                                                         visIkon={false}
+                                                        visKopieringsknapp={false}
                                                     />
                                                 </Checkbox>
                                                 {erValgt &&

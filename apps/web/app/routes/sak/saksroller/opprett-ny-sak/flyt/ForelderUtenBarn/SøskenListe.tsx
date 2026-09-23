@@ -1,9 +1,10 @@
 import { PersonNavn } from "@bidrag/common";
 import { CheckmarkHeavyIcon, PersonGroupIcon } from "@navikt/aksel-icons";
-import { Alert, BodyShort, Button, Heading, HStack, VStack } from "@navikt/ds-react";
+import { BodyShort, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonKort from "../../../felles/PersonKort";
 import AlderTag from "../../components/AlderTag";
+import { SkjemaSeksjonKort } from "../../felles/SkjemaSeksjon";
 import type { BarnMedAlder, ForelderUtenBarnSkjemaData } from "../../opprett-sak-schema";
 
 type Props = {
@@ -25,7 +26,7 @@ export default function SøskenListe({ form, søsken }: Props) {
         }
     };
     return (
-        <Alert variant="info">
+        <SkjemaSeksjonKort>
             <VStack gap="space-12">
                 <VStack gap="space-4">
                     <HStack asChild align="center" gap="space-8">
@@ -71,6 +72,6 @@ export default function SøskenListe({ form, søsken }: Props) {
                     })}
                 </VStack>
             </VStack>
-        </Alert>
+        </SkjemaSeksjonKort>
     );
 }

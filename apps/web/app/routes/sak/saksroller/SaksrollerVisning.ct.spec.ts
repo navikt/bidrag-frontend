@@ -45,6 +45,8 @@ test.describe("SaksrollerVisning", () => {
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
 
         await expect(component.getByText("Kunne ikke oppdatere sak. Vennligst prøv igjen.").first()).toBeVisible();
+        await component.getByRole("button", { name: "Endre reell mottaker" }).click();
+        await expect(component.getByText("Kunne ikke oppdatere sak. Vennligst prøv igjen.")).toHaveCount(0);
     });
 
     test("blokkerer lagring når en redigering ikke er fullført", async ({ mount, page }) => {
@@ -59,6 +61,17 @@ test.describe("SaksrollerVisning", () => {
 
         await expect(component.getByText("Fullfør eller avbryt endringen som er i gang før du lagrer.")).toBeVisible();
         expect(requests.update).toBeFalsy();
+    });
+
+    test("fjerner info om manglende endringer når redigering starter", async ({ mount, page }) => {
+        await mockSaksrollerApi(page);
+        const component = await mount(STORY);
+
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect(component.getByText("Ingen endringer å lagre.")).toBeVisible();
+
+        await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
+        await expect(component.getByText("Ingen endringer å lagre.")).toHaveCount(0);
     });
 
     test("skjuler barneseksjonen for ektefellebidragssaker", async ({ mount, page }) => {

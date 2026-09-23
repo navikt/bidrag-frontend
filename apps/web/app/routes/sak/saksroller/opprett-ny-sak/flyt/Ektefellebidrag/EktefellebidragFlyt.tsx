@@ -1,10 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
-import EnhetInfoAlert from "../../components/EnhetInfoAlert";
-import SubmitButtons from "../../components/SubmitButtons";
-import EksisterendeSakAlert from "../../EksisterendeSakAlert";
-import FlytSkjema from "../../felles/FlytSkjema";
+import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import {
@@ -13,9 +10,9 @@ import {
     type ForelderPartRolle,
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
+import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import { hentMotsattRolle } from "../../utils";
-import EktefellebidragOppsummering from "./EktefellebidragOppsummering";
-import EktefelleMotpartVelger from "./EktefelleMotpartVelger";
+import EktefelleParterSeksjon from "./EktefelleParterSeksjon";
 
 export default function EktefellebidragFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();
@@ -56,6 +53,7 @@ export default function EktefellebidragFlyt() {
         harEksisterendeSak,
         eksisterendeSak,
         isLoadingHentSak,
+        infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
         error: submitError,
         saksnummer,
@@ -81,22 +79,31 @@ export default function EktefellebidragFlyt() {
     });
 
     return (
-        <FlytSkjema onSubmit={onSubmit}>
-            {harEksisterendeSak && eksisterendeSak && (
-                <EksisterendeSakAlert
-                    eksisterendeSak={eksisterendeSak}
-                    partISakenNavn={partISaken.navn}
-                    motpartNavn={motpart.navn}
-                />
-            )}
-            <EktefelleMotpartVelger form={form} forslagMotpart={forslagMotpart ?? []} motsattRolle={motsattRolle} />
-            {motpart.ident && <EktefellebidragOppsummering form={form} />}
-            <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
-            <SubmitButtons
-                disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                error={submitError}
-                saksnummer={saksnummer}
-            />
-        </FlytSkjema>
+        <FormProvider {...form}>
+            <RolleFlytSide
+                onSubmit={onSubmit}
+                status={{
+                    infoMelding: eksisterendeSakInfoMelding,
+                    harEksisterendeSak,
+                    eksisterendeSak,
+                    isLoading: isLoadingHentSak,
+                    partISakenNavn: partISaken.navn,
+                    motpartNavn: motpart.navn,
+                }}
+                submit={
+                    <EnhetOgSubmitSection
+                        enhet={enhet}
+                        enhetNavn={enhetNavn}
+                        isLoadingEnhet={isLoadingEnhet}
+                        enhetError={enhetError}
+                        blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                        submitError={submitError}
+                        saksnummer={saksnummer}
+                    />
+                }
+            >
+                <EktefelleParterSeksjon form={form} forslagMotpart={forslagMotpart ?? []} motsattRolle={motsattRolle} />
+            </RolleFlytSide>
+        </FormProvider>
     );
 }

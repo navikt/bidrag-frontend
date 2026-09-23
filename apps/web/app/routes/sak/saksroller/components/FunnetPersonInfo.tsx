@@ -62,12 +62,11 @@ export default function FunnetPersonInfo({ disabled, fjern, variant = "info", ..
                     />
                     <FunnetPersonInnhold {...innholdProps} />
                 </HStack>
-                {fjern && (
+                {fjern && !disabled && (
                     <Button
                         type="button"
                         variant="tertiary"
                         size="xsmall"
-                        disabled={disabled}
                         icon={<XMarkIcon aria-hidden />}
                         onClick={fjern}
                     >

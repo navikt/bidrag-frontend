@@ -24,7 +24,8 @@ export default function ValgtMotpart({ visningsnavn, onFjern }: Props) {
                     size="xsmall"
                     variant="secondary"
                     onClick={onFjern}
-                    icon={<XMarkIcon title="Fjern motpart" />}
+                    aria-label={`Fjern motpart ${visningsnavn}`}
+                    icon={<XMarkIcon aria-hidden />}
                 />
             </HStack>
         </Box>

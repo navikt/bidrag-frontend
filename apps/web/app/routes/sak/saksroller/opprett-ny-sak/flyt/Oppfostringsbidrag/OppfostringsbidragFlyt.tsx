@@ -1,10 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, VStack } from "@navikt/ds-react";
+import { Alert } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
-import LasterSkeleton from "../../components/LasterSkeleton";
-import FlytSkjema from "../../felles/FlytSkjema";
+import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import {
@@ -14,7 +13,6 @@ import {
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
-import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import OppsummeringSection from "../../sections/OppsummeringSection";
 import { grupperBarnIKurver } from "../../utils";
@@ -98,85 +96,64 @@ function OppfostringsbidragFlytContent() {
         }
     }, [form, partISaken.ident, partISakenContext]);
 
-    const erBidragspliktig = true; // I oppfostringsbidrag er partISaken alltid bidragspliktig
-
     const harBarnMedBarnetSelvSomReellMottaker = valgteBarn.some((b) => b.reellMottakerType === "barnet_selv");
 
-    const harAlleAlternativerValgt =
-        valgteBarn.length > 0 &&
-        valgteBarn.every(
-            (b) =>
-                b.reellMottakerType === "annen_person" &&
-                typeof b.reellMottaker === "string" &&
-                b.reellMottaker.trim().length > 0,
-        );
-
     return (
-        <FlytSkjema onSubmit={onSubmit}>
-            <VStack gap="space-6">
-                <VStack gap="space-12">
-                    {eksisterendeSakInfoMelding && (
-                        <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                            {eksisterendeSakInfoMelding.melding}
+        <RolleFlytSide
+            onSubmit={onSubmit}
+            status={{
+                infoMelding: eksisterendeSakInfoMelding,
+                harEksisterendeSak,
+                eksisterendeSak,
+                isLoading: isLoadingHentSak,
+                partISakenNavn: partISaken.navn || partISaken.ident,
+                motpartNavn: "Ukjent",
+            }}
+            meldinger={
+                <>
+                    {valgteBarn.length > 0 && (
+                        <Alert variant="info" size="small">
+                            Reell mottaker må velges for hvert barn før saken kan opprettes.
                         </Alert>
                     )}
-
-                    {harEksisterendeSak && (
-                        <EksisterendeSakSection
-                            harEksisterendeSak={harEksisterendeSak}
-                            eksisterendeSak={eksisterendeSak}
-                            partISakenNavn={partISaken.navn || partISaken.ident}
-                            motpartNavn="Ukjent"
-                        />
+                    {harBarnMedBarnetSelvSomReellMottaker && (
+                        <Alert variant="warning" size="small">
+                            Barnet selv kan ikke være reell mottaker i oppfostringsbidrag. Velg samhandler som kommune.
+                        </Alert>
                     )}
-                </VStack>
-                {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-                <BarnSection
-                    form={form}
-                    barnkurver={barnkurver}
-                    erBidragspliktig={erBidragspliktig}
-                    reellMottakerRegel={{ type: "alltid-samhandler" }}
-                />
-                {valgteBarn.length > 0 && (
-                    <Alert variant="info" size="small">
-                        Reell mottaker må velges for hvert barn før saken kan opprettes.
-                    </Alert>
-                )}
-                {harBarnMedBarnetSelvSomReellMottaker && (
-                    <Alert variant="warning" size="small">
-                        Barnet selv kan ikke være reell mottaker i oppfostringsbidrag. Velg samhandler som kommune.
-                    </Alert>
-                )}
-
-                {valgteBarn.length > 0 && (
-                    <OppsummeringSection
-                        bidragspliktig={
-                            partISaken.ident
-                                ? {
-                                      rolle: "bidragspliktig",
-                                      ident: partISaken.ident,
-                                      navn: partISaken.navn,
-                                      erKjent: true,
-                                      diskresjonskode: partISaken.diskresjonskode,
-                                  }
-                                : null
-                        }
-                        bidragsmottaker={null}
-                        barn={valgteBarn}
-                        partISakenRolle="bidragspliktig"
-                        hideMissingPartCards
-                    />
-                )}
+                </>
+            }
+            submit={
                 <EnhetOgSubmitSection
                     enhet={enhet}
                     enhetNavn={enhetNavn}
                     isLoadingEnhet={isLoadingEnhet}
                     enhetError={enhetError}
-                    disabled={!harAlleAlternativerValgt || harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
                     submitError={error}
                     saksnummer={saksnummer}
                 />
-            </VStack>
-        </FlytSkjema>
+            }
+        >
+            <BarnSection form={form} barnkurver={barnkurver} reellMottakerRegel={{ type: "alltid-samhandler" }} />
+
+            <OppsummeringSection
+                bidragspliktig={
+                    partISaken.ident
+                        ? {
+                              rolle: "bidragspliktig",
+                              ident: partISaken.ident,
+                              navn: partISaken.navn,
+                              erKjent: true,
+                              diskresjonskode: partISaken.diskresjonskode,
+                          }
+                        : null
+                }
+                bidragsmottaker={null}
+                barn={valgteBarn}
+                partISakenRolle="bidragspliktig"
+                hideMissingPartCards
+            />
+        </RolleFlytSide>
     );
 }

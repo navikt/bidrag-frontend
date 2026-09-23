@@ -1,70 +1,68 @@
-import { Button } from "@navikt/ds-react";
+import { BodyShort, Button, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import ForeslåPersonPanel from "../../felles/ForeslåPersonPanel";
 import type { ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
-import ValgtMotpart from "./ValgtMotpart";
 
 type Props = {
     form: UseFormReturn<ForelderUtenBarnSkjemaData>;
     tittel: string;
     beskrivelse: string;
-    variant: "warning" | "success";
-    velgAnnenMotpart: () => void;
-    settMotpartUkjent: () => void;
-    foreslåttMotpartNavn?: string;
-    brukForeslåttMotpart?: () => void;
+    settMotpartUkjent?: () => void;
+    foreslåtteMotparter?: Array<{
+        ident: string;
+        navn: string;
+        fødselsdato?: string;
+    }>;
+    brukForeslåttMotpart?: (ident: string) => void;
 };
 
 export default function MotpartVelger({
     form,
     tittel,
     beskrivelse,
-    variant,
-    velgAnnenMotpart,
     settMotpartUkjent,
-    foreslåttMotpartNavn,
+    foreslåtteMotparter = [],
     brukForeslåttMotpart,
 }: Props) {
-    const [visMotpartInfoPanel, setVisMotpartInfoPanel] = useState(false);
+    const [ukjentErBekreftet, setUkjentErBekreftet] = useState(false);
     const motpart = form.watch("motpart");
 
-    const visningsnavn = motpart?.erKjent ? `${motpart.navn} (${motpart.ident})` : "Ukjent";
-    const harForeslåttMotpart = !!foreslåttMotpartNavn && !!brukForeslåttMotpart;
-
-    const håndterBrukForeslått = () => {
-        if (!brukForeslåttMotpart) return;
-
-        setVisMotpartInfoPanel(true);
-        brukForeslåttMotpart();
+    const håndterSettUkjent = () => {
+        settMotpartUkjent?.();
+        setUkjentErBekreftet(true);
     };
 
-    const håndterVelgAnnen = () => {
-        setVisMotpartInfoPanel(true);
-        velgAnnenMotpart();
-    };
-
-    const håndterFjernMotpart = () => {
-        setVisMotpartInfoPanel(false);
-        settMotpartUkjent();
-    };
-
-    if (!visMotpartInfoPanel) {
-        return (
-            <ForeslåPersonPanel
-                tittel={tittel}
-                beskrivelse={beskrivelse}
-                variant={variant}
-                forslag={
-                    harForeslåttMotpart ? [{ navn: foreslåttMotpartNavn, onBruk: håndterBrukForeslått }] : undefined
-                }
-            >
-                <Button type="button" size="small" onClick={håndterVelgAnnen}>
-                    Velg annen person
-                </Button>
-            </ForeslåPersonPanel>
-        );
+    if (motpart?.erKjent || ukjentErBekreftet) {
+        return null;
     }
 
-    return <ValgtMotpart visningsnavn={visningsnavn} onFjern={håndterFjernMotpart} />;
+    return (
+        <VStack gap="space-12">
+            <VStack gap="space-4">
+                <BodyShort size="small" weight="semibold">
+                    {tittel}
+                </BodyShort>
+                <BodyShort size="small">{beskrivelse}</BodyShort>
+            </VStack>
+            {foreslåtteMotparter.map((forelder) => (
+                <Button
+                    key={forelder.ident}
+                    type="button"
+                    size="small"
+                    variant="secondary"
+                    onClick={() => brukForeslåttMotpart?.(forelder.ident)}
+                >
+                    Bruk {forelder.navn}
+                    {forelder.fødselsdato && ` (${forelder.fødselsdato})`}
+                </Button>
+            ))}
+            {foreslåtteMotparter.length > 1 && settMotpartUkjent && (
+                <HStack gap="space-8" wrap>
+                    <Button type="button" size="small" variant="secondary-neutral" onClick={håndterSettUkjent}>
+                        Sett som ukjent
+                    </Button>
+                </HStack>
+            )}
+        </VStack>
+    );
 }

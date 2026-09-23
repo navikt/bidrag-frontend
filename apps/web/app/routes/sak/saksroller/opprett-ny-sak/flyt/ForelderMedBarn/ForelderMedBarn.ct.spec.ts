@@ -15,9 +15,12 @@ test.describe("Forelder med barn", () => {
         const andreMotpartTekst = await component.getByText(/Med Test Annen Forelder/).textContent();
         const andreMotpartIdent = andreMotpartTekst?.match(/\d{11}/)?.[0];
 
+        await expect(component.getByRole("heading", { name: "Parter" })).toBeVisible();
+
         await førsteBarn.check();
         await expect(førsteBarn).toBeChecked();
         await expect(andreBarn).toBeEnabled();
+        await expect(component.getByRole("searchbox", { name: /Søk etter bidragsmottaker/ })).toHaveCount(0);
 
         await andreBarn.check();
         await expect(førsteBarn).not.toBeChecked();
@@ -64,8 +67,9 @@ test.describe("Forelder med barn", () => {
 
         // Prøver å legge til det samme barnet på nytt via manuell registrering.
         await component.getByRole("button", { name: "Legg til nytt barn" }).click();
-        await page.getByRole("searchbox", { name: "Søk etter barn" }).fill(selectedChildIdent ?? "");
-        await page.getByRole("button", { name: "Søk", exact: true }).click();
+        const søkEtterBarn = page.getByRole("searchbox", { name: "Søk etter barn" });
+        await søkEtterBarn.fill(selectedChildIdent ?? "");
+        await søkEtterBarn.press("Enter");
 
         // Skjemaet skal bestå og vise feilmelding, ikke sende inn/opprette saken og nullstille alt.
         await expect(page.getByText(/allerede i listen over valgte barn/)).toBeVisible();

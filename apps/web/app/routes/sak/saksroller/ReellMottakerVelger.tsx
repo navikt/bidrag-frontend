@@ -27,6 +27,7 @@ export default function ReellMottakerVelger({
     feil,
     regel,
 }: ReellMottakerVelgerProps) {
+    const [valideringsfeil, setValideringsfeil] = useState<string | undefined>();
     const påkrevd = regel !== "valgfri";
     const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
     // Utkast, slik at endringsoppsummeringen bak modalen først oppdateres ved bekreftelse.
@@ -48,6 +49,11 @@ export default function ReellMottakerVelger({
     );
 
     const handleBekreft = () => {
+        if (!kanBekrefte) {
+            setValideringsfeil("Velg eller søk opp en reell mottaker før du legger til.");
+            return;
+        }
+        setValideringsfeil(undefined);
         onBekreft(utkast);
     };
 
@@ -61,6 +67,7 @@ export default function ReellMottakerVelger({
         }
 
         setUtkast(nyttValg);
+        setValideringsfeil(undefined);
     };
 
     const kanBekrefte =
@@ -84,17 +91,19 @@ export default function ReellMottakerVelger({
                     onValg={handleValg}
                     regel={regel}
                     disabled={disabled}
-                    feil={feil}
+                    feil={valideringsfeil ?? feil}
                 />
 
-                <HStack gap={"space-8"}>
-                    <Button type="button" size="small" onClick={handleBekreft} disabled={disabled || !kanBekrefte}>
-                        Legg til
-                    </Button>
-                    <Button type="button" size="small" variant="secondary" onClick={onAvbryt} disabled={disabled}>
-                        Avbryt
-                    </Button>
-                </HStack>
+                {!disabled && (
+                    <HStack gap={"space-8"}>
+                        <Button type="button" size="small" onClick={handleBekreft}>
+                            Legg til
+                        </Button>
+                        <Button type="button" size="small" variant="secondary" onClick={onAvbryt}>
+                            Avbryt
+                        </Button>
+                    </HStack>
+                )}
             </VStack>
         </Box>
     );

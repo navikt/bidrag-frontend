@@ -27,6 +27,10 @@ export function useMotpartHandling(
     };
 
     const leggTilMotpartManuell = (person: PersonDto) => {
+        if (partISaken?.ident === person.ident) {
+            throw new Error("Samme person kan ikke være begge parter");
+        }
+
         form.setValue("motpart", {
             ident: person.ident,
             navn: person.visningsnavn,

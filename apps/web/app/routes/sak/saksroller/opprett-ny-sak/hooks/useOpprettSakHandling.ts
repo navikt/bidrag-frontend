@@ -31,6 +31,7 @@ type OpprettSakHandlingResult = {
     saksnummer: string | null;
     isLoading: boolean;
     error: AxiosError<string> | TilgangsFeilError | null;
+    nullstillResultat: () => void;
 };
 
 type Props = {
@@ -74,7 +75,13 @@ function lagBaseRequest(
  * ```
  */
 export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): OpprettSakHandlingResult {
-    const { data: saksnummer, error: mutationError, isPending, mutateAsync: opprettSak } = useOpprettSak();
+    const {
+        data: saksnummer,
+        error: mutationError,
+        isPending,
+        mutateAsync: opprettSak,
+        reset: nullstillResultat,
+    } = useOpprettSak();
     const { setIsLoadingOpprettSak } = useSaksrolleroversikt();
 
     useEffect(() => {
@@ -279,5 +286,6 @@ export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): Oppre
         saksnummer: saksnummer || null,
         isLoading: isPending,
         error: mutationError || null,
+        nullstillResultat,
     };
 }

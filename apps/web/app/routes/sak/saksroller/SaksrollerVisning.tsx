@@ -3,7 +3,7 @@ import { Rolletype } from "@bidrag/api/SakApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, BodyLong, Box, Heading, HGrid, HStack, Loader, Page, VStack } from "@navikt/ds-react";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, FormProvider, useForm } from "react-hook-form";
 
 import { useOppdaterSaksroller } from "~/api/useApi.ts";
@@ -74,6 +74,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
     const [valideringsFeil, setValideringsFeil] = useState<string | null>(null);
     const [suksessmelding, setSuksessmelding] = useState<string | null>(null);
     const [barnMedUfullstendigRelasjon, setBarnMedUfullstendigRelasjon] = useState<string[]>([]);
+    const [statusResetKey, setStatusResetKey] = useState(0);
 
     const statusRef = useRef<HTMLDivElement>(null);
     const lastDataUpdateRef = useRef<number>(0);
@@ -104,6 +105,12 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
 
     const sakstype = useMemo(() => utledSakstype(aktiveRoller), [aktiveRoller]);
     const sakskategori = sak.kategori;
+    const nullstillStatusmeldinger = useCallback(() => {
+        setFeilmelding(null);
+        setValideringsFeil(null);
+        setSuksessmelding(null);
+        setStatusResetKey((forrige) => forrige + 1);
+    }, []);
 
     const muligeBarn =
         bp || bm
@@ -117,11 +124,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
         nåværendeRoller: aktiveRoller,
         barnMedUfullstendigRelasjon,
         dataOppdatertNøkkel: dataUpdatedAt,
-        onNyEndring: () => {
-            setFeilmelding(null);
-            setValideringsFeil(null);
-            setSuksessmelding(null);
-        },
+        onNyEndring: nullstillStatusmeldinger,
     });
 
     function initialiserFormMedBerikedeRoller() {
@@ -141,6 +144,14 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
     }
 
     useEffect(initialiserFormMedBerikedeRoller, [berikedeRoller, saksnummer, dataUpdatedAt, reset]);
+
+    const forrigeHarÅpneRedigeringer = useRef(harÅpneRedigeringer);
+    useEffect(() => {
+        if (forrigeHarÅpneRedigeringer.current !== harÅpneRedigeringer) {
+            forrigeHarÅpneRedigeringer.current = harÅpneRedigeringer;
+            nullstillStatusmeldinger();
+        }
+    }, [harÅpneRedigeringer, nullstillStatusmeldinger]);
 
     function scrollTilStatusmelding() {
         if ((feilmelding || suksessmelding) && statusRef.current) {
@@ -284,7 +295,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                             )}
                         </VStack>
 
-                        <form onSubmit={(event) => event.preventDefault()}>
+                        <form onSubmit={(event) => event.preventDefault()} onChangeCapture={nullstillStatusmeldinger}>
                             <VStack gap="space-24">
                                 <Box background="sunken" padding="space-12">
                                     <ForelderRolleVisning
@@ -377,6 +388,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                                 harÅpneRedigeringer={harÅpneRedigeringer}
                                                 suksessmelding={suksessmelding}
                                                 statusRef={statusRef}
+                                                statusResetKey={statusResetKey}
                                             />
                                         </VStack>
                                     </>

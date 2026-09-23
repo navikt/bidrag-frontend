@@ -8,7 +8,7 @@ interface EnhetOgSubmitSectionProps {
     enhetNavn: string | null;
     isLoadingEnhet: boolean;
     enhetError: Error | null;
-    disabled: boolean;
+    blocked: boolean;
     submitError: Error | null;
     saksnummer: string | null;
 }
@@ -22,15 +22,15 @@ export default function EnhetOgSubmitSection({
     enhetNavn,
     isLoadingEnhet,
     enhetError,
-    disabled,
+    blocked,
     submitError,
     saksnummer,
 }: EnhetOgSubmitSectionProps) {
     return (
-        <VStack gap="space-6">
+        <VStack gap="space-12">
             <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
 
-            <SubmitButtons disabled={disabled} error={submitError} saksnummer={saksnummer} />
+            <SubmitButtons blocked={blocked} error={submitError} saksnummer={saksnummer} />
         </VStack>
     );
 }

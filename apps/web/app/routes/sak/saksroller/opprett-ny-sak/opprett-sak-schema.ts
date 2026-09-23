@@ -3,6 +3,11 @@ import { z } from "zod";
 // Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
 // sakvisning i stedet for å dupliseres.
 import { DiskresjonskodeSchema, MYNDYG_BARN_ALDER } from "../sakvisning-schema";
+import {
+    type ReellMottakerSkjemaverdi,
+    type ReellMottakerValideringsgrunn,
+    validerReellMottaker,
+} from "./reell-mottaker-regel";
 
 export { DiskresjonskodeSchema, MYNDYG_BARN_ALDER };
 
@@ -55,6 +60,8 @@ const createForelderSkjemaSchema = () =>
             kategori: z.enum(["Nasjonal", "Utland"]),
         })
         .superRefine((data, ctx) => {
+            validateUlikeParter(data.partISaken, data.motpart, ctx);
+
             if (data.partISaken.rolle === "bidragspliktig" && data.valgteBarn.length === 0) {
                 ctx.addIssue({
                     code: "custom",
@@ -67,30 +74,12 @@ const createForelderSkjemaSchema = () =>
             const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
 
             data.valgteBarn.forEach((barn, index) => {
-                const trengerReellMottaker = barn.erMyndig || bidragsmottakerErUkjent;
-
-                if (trengerReellMottaker) {
-                    if (!barn.reellMottakerType || barn.reellMottakerType === "ingen") {
-                        ctx.addIssue({
-                            code: "custom",
-                            path: ["valgteBarn", index, "reellMottakerType"],
-                            message: barn.erMyndig
-                                ? "Reell mottaker må registreres for barn over 18 år"
-                                : "Reell mottaker må registreres når bidragsmottaker er ukjent",
-                        });
-                    }
-
-                    if (barn.reellMottakerType === "annen_person") {
-                        if (!barn.reellMottaker || barn.reellMottaker.trim() === "") {
-                            ctx.addIssue({
-                                code: "custom",
-                                path: ["valgteBarn", index, "reellMottaker"],
-                                message: "Du må registrere reell mottaker",
-                            });
-                        }
-                    }
-                }
-                // Barn under 18 trenger IKKE reell mottaker (uansett om BM er ukjent)
+                const grunn: ReellMottakerValideringsgrunn | null = barn.erMyndig
+                    ? "myndig-barn"
+                    : bidragsmottakerErUkjent
+                      ? "ukjent-bidragsmottaker"
+                      : null;
+                leggTilReellMottakerFeil(barn, grunn, ["valgteBarn", index], ctx);
             });
         });
 
@@ -129,6 +118,8 @@ export const OppfostringsbidragSkjemaSchema = z
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
     .superRefine((data, ctx) => {
+        validateUlikeParter(data.partISaken, data.motpart, ctx);
+
         if (data.valgteBarn.length === 0) {
             ctx.addIssue({
                 code: "custom",
@@ -137,25 +128,8 @@ export const OppfostringsbidragSkjemaSchema = z
             });
         }
 
-        // For oppfostringsbidrag: ALLE barn må ha reellMottaker valgt (uavhengig av alder)
         data.valgteBarn.forEach((barn, index) => {
-            if (!barn.reellMottakerType || barn.reellMottakerType === "ingen") {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ["valgteBarn", index, "reellMottakerType"],
-                    message: "Reell mottaker må registreres for hvert barn",
-                });
-            }
-
-            if (barn.reellMottakerType === "annen_person") {
-                if (!barn.reellMottaker || barn.reellMottaker.trim() === "") {
-                    ctx.addIssue({
-                        code: "custom",
-                        path: ["valgteBarn", index, "reellMottaker"],
-                        message: "Du må registrere reell mottaker",
-                    });
-                }
-            }
+            leggTilReellMottakerFeil(barn, "alltid", ["valgteBarn", index], ctx);
         });
     });
 // ==================== FARSKAP SCHEMA ====================
@@ -169,6 +143,8 @@ export const FarskapsSkjemaSchema = z
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
     .superRefine((data, ctx) => {
+        validateUlikeParter(data.partISaken, data.motpart, ctx);
+
         if (data.valgteBarn.length === 0) {
             ctx.addIssue({
                 code: "custom",
@@ -190,6 +166,7 @@ export const BarnBeggForeldreSkjemaSchema = z
     .superRefine((data, ctx) => {
         validateForeldreHarRoller(data.foreldre, ctx);
         validateRollerErForskjellige(data.foreldre, ctx);
+        validateForeldreErUlikePersoner(data.foreldre, ctx);
         const bidragsmottaker = data.foreldre.find((forelder) => forelder.rolle === "bidragsmottaker");
         const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
         validateReellMottakerForBarn(data.barn, bidragsmottakerErUkjent, ctx);
@@ -211,6 +188,7 @@ export const BarnMedManglendeForeldreSkjemaSchema = z
     .superRefine((data, ctx) => {
         validateForeldreHarRoller(data.foreldre, ctx);
         validateRollerErForskjellige(data.foreldre, ctx);
+        validateForeldreErUlikePersoner(data.foreldre, ctx);
         const bidragsmottaker = data.foreldre.find((forelder) => forelder.rolle === "bidragsmottaker");
         const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
         validateReellMottakerForBarn(data.barn, bidragsmottakerErUkjent, ctx);
@@ -234,13 +212,7 @@ export const EktefellebidragSkjemaSchema = z
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
     .superRefine((data, ctx) => {
-        if (data.partISaken.ident === data.motpart.ident) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["motpart", "ident"],
-                message: "Partene kan ikke være samme person",
-            });
-        }
+        validateUlikeParter(data.partISaken, data.motpart, ctx);
     });
 
 export type EktefellebidragSkjemaData = z.infer<typeof EktefellebidragSkjemaSchema>;
@@ -278,41 +250,50 @@ const validateRollerErForskjellige = (foreldre: ForelderMedRolle[], ctx: z.Refin
     }
 };
 
-/**
- * Validerer reell mottaker for barn over 18 eller ved ukjent bidragsmottaker
- */
+const validateForeldreErUlikePersoner = (foreldre: ForelderMedRolle[], ctx: z.RefinementCtx) => {
+    if (foreldre[0]?.ident.trim() && foreldre[0].ident === foreldre[1]?.ident) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["foreldre", 1, "ident"],
+            message: "Samme person kan ikke være begge parter",
+        });
+    }
+};
+
+const validateUlikeParter = (partISaken: { ident: string }, motpart: { ident?: string }, ctx: z.RefinementCtx) => {
+    if (motpart.ident?.trim() && partISaken.ident === motpart.ident) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["motpart", "ident"],
+            message: "Samme person kan ikke være begge parter",
+        });
+    }
+};
+
 const validateReellMottakerForBarn = (
     barn: BarnMedReellMottaker,
     bidragsmottakerErUkjent: boolean,
     ctx: z.RefinementCtx,
 ) => {
-    const trengerReellMottaker = barn.rolle === "barn_over_18" || bidragsmottakerErUkjent;
+    const grunn: ReellMottakerValideringsgrunn | null =
+        barn.rolle === "barn_over_18" ? "myndig-barn" : bidragsmottakerErUkjent ? "ukjent-bidragsmottaker" : null;
+    leggTilReellMottakerFeil(barn, grunn, ["barn"], ctx);
+};
 
-    if (!trengerReellMottaker) {
-        return;
-    }
-
-    if (!barn.reellMottakerType || barn.reellMottakerType === "ingen") {
+function leggTilReellMottakerFeil(
+    verdi: ReellMottakerSkjemaverdi,
+    grunn: ReellMottakerValideringsgrunn | null,
+    basePath: Array<string | number>,
+    ctx: z.RefinementCtx,
+) {
+    validerReellMottaker(verdi, grunn).forEach((feil) => {
         ctx.addIssue({
             code: "custom",
-            path: ["barn", "reellMottakerType"],
-            message:
-                barn.rolle === "barn_over_18"
-                    ? "Reell mottaker må registreres for barn over 18 år"
-                    : "Reell mottaker må registreres når bidragsmottaker er ukjent",
+            path: [...basePath, feil.felt],
+            message: feil.melding,
         });
-    }
-
-    if (barn.reellMottakerType === "annen_person") {
-        if (!barn.reellMottaker || barn.reellMottaker.trim() === "") {
-            ctx.addIssue({
-                code: "custom",
-                path: ["barn", "reellMottaker"],
-                message: "Du må registrere reell mottaker",
-            });
-        }
-    }
-};
+    });
+}
 
 // ==================== EXPORTED TYPES ====================
 

@@ -7,6 +7,7 @@ import PersonInfo from "../components/PersonInfo.tsx";
 import PersonSøkWrapper from "../components/PersonSøkWrapper.tsx";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
+import { finnDuplikatForelderFeil } from "./forelder-regler.ts";
 
 interface LeggTilForelderProps {
     form: UseFormReturn<SakRedigeringData>;
@@ -26,20 +27,9 @@ export default function LeggTilForelder({
     const roller = form.watch("roller") || [];
 
     const handlePersonValgt = (person: PersonDto) => {
-        const denAndreForelderenType = rolleType === "BM" ? "BP" : "BM";
-        const denAndreForelderen = roller.find((r) => r.type === denAndreForelderenType);
-        const denAndreForelderenRolle = rolleType === "BM" ? "bidragspliktig" : "bidragsmottaker";
-
-        if (denAndreForelderen?.fodselsnummer && denAndreForelderen.fodselsnummer === person.ident) {
-            const personInfo = person?.visningsnavn
-                ? `${person.visningsnavn} (${person.ident})`
-                : person?.ident
-                  ? `Denne personen (${person.ident})`
-                  : "Denne personen";
-
-            throw new Error(
-                `${personInfo} er allerede registrert som ${denAndreForelderenRolle} og kan ikke legges til på nytt.`,
-            );
+        const duplikatFeil = finnDuplikatForelderFeil(roller, rolleType, person);
+        if (duplikatFeil) {
+            throw new Error(duplikatFeil);
         }
 
         const eksisterendeRolle = roller.find((r) => r.type === rolleType);

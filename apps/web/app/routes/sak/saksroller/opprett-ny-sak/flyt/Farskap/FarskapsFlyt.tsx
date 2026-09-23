@@ -1,16 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, VStack } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
-import LasterSkeleton from "../../components/LasterSkeleton";
-import FlytSkjema from "../../felles/FlytSkjema";
+import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import { FarskapsSkjemaSchema, type FarskapsSkjemaSchemaData } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
-import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import OppsummeringSection from "../../sections/OppsummeringSection";
 import { grupperBarnIKurver } from "../../utils";
@@ -94,65 +91,49 @@ function FarskapsFlytContent() {
         }
     }, [form, partISaken.ident, partISakenContext]);
 
-    const erBidragsmottaker = true; // I FARSKAP er partISaken alltid bidragsmottaker
-
-    const harAlleAlternativerValgt = valgteBarn.length > 0; // For FARSKAP, reellMottaker is NOT required
-
     return (
-        <FlytSkjema onSubmit={onSubmit}>
-            <VStack gap="space-12">
-                {eksisterendeSakInfoMelding && (
-                    <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                        {eksisterendeSakInfoMelding.melding}
-                    </Alert>
-                )}
-
-                <EksisterendeSakSection
-                    harEksisterendeSak={harEksisterendeSak}
-                    eksisterendeSak={eksisterendeSak}
-                    partISakenNavn={partISaken.navn || partISaken.ident}
-                    motpartNavn="Ukjent"
+        <RolleFlytSide
+            onSubmit={onSubmit}
+            status={{
+                infoMelding: eksisterendeSakInfoMelding,
+                harEksisterendeSak,
+                eksisterendeSak,
+                isLoading: isLoadingHentSak,
+                partISakenNavn: partISaken.navn || partISaken.ident,
+                motpartNavn: "Ukjent",
+                lastetekst: "Henter barn...",
+            }}
+            submit={
+                <EnhetOgSubmitSection
+                    enhet={enhet}
+                    enhetNavn={enhetNavn}
+                    isLoadingEnhet={isLoadingEnhet}
+                    enhetError={enhetError}
+                    blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    submitError={error}
+                    saksnummer={saksnummer}
                 />
-            </VStack>
+            }
+        >
+            <BarnSection form={form} barnkurver={barnkurver} reellMottakerRegel={{ type: "skjult" }} />
 
-            {isLoadingHentSak && <LasterSkeleton tekst="Henter barn..." />}
-
-            <BarnSection
-                form={form}
-                barnkurver={barnkurver}
-                erBidragspliktig={!erBidragsmottaker}
-                reellMottakerRegel={{ type: "skjult" }}
+            <OppsummeringSection
+                bidragspliktig={null}
+                bidragsmottaker={
+                    partISaken.ident
+                        ? {
+                              rolle: "bidragsmottaker",
+                              ident: partISaken.ident,
+                              navn: partISaken.navn,
+                              erKjent: true,
+                              diskresjonskode: partISaken.diskresjonskode,
+                          }
+                        : null
+                }
+                barn={valgteBarn}
+                partISakenRolle="bidragsmottaker"
+                hideMissingPartCards
             />
-
-            {valgteBarn.length > 0 && (
-                <OppsummeringSection
-                    bidragspliktig={null}
-                    bidragsmottaker={
-                        partISaken.ident
-                            ? {
-                                  rolle: "bidragsmottaker",
-                                  ident: partISaken.ident,
-                                  navn: partISaken.navn,
-                                  erKjent: true,
-                                  diskresjonskode: partISaken.diskresjonskode,
-                              }
-                            : null
-                    }
-                    barn={valgteBarn}
-                    partISakenRolle="bidragsmottaker"
-                    hideMissingPartCards
-                />
-            )}
-
-            <EnhetOgSubmitSection
-                enhet={enhet}
-                enhetNavn={enhetNavn}
-                isLoadingEnhet={isLoadingEnhet}
-                enhetError={enhetError}
-                disabled={!harAlleAlternativerValgt || harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                submitError={error}
-                saksnummer={saksnummer}
-            />
-        </FlytSkjema>
+        </RolleFlytSide>
     );
 }

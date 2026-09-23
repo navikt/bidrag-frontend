@@ -1,4 +1,4 @@
-import { Box, VStack } from "@navikt/ds-react";
+import { VStack } from "@navikt/ds-react";
 import type { ComponentProps, PropsWithChildren } from "react";
 
 type Props = PropsWithChildren<{
@@ -7,10 +7,8 @@ type Props = PropsWithChildren<{
 
 export default function FlytSkjema({ children, onSubmit }: Props) {
     return (
-        <Box asChild background="sunken">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                {children}
-            </VStack>
-        </Box>
+        <VStack as="form" onSubmit={onSubmit} gap="space-24">
+            {children}
+        </VStack>
     );
 }

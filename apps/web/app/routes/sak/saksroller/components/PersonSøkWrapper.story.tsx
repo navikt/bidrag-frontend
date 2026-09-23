@@ -53,6 +53,7 @@ function MedCustomActionsScenario() {
     const [vis, setVis] = useState(true);
     const [valgtPerson, setValgtPerson] = useState<PersonDto | null>(null);
     const [lagtTil, setLagtTil] = useState(false);
+    const [feil, setFeil] = useState<string | null>(null);
 
     if (!vis) {
         return <p>Lukket</p>;
@@ -64,11 +65,24 @@ function MedCustomActionsScenario() {
                 tittel="Legg til person"
                 beskrivelse="Søk opp personen som skal legges til"
                 søkeLabel="Søk etter person"
-                onPersonValgt={setValgtPerson}
+                onPersonValgt={(person) => {
+                    setValgtPerson(person);
+                    setFeil(null);
+                }}
                 onAvbryt={() => setVis(false)}
                 actions={
                     <>
-                        <Button type="button" size="small" disabled={!valgtPerson} onClick={() => setLagtTil(true)}>
+                        <Button
+                            type="button"
+                            size="small"
+                            onClick={() => {
+                                if (!valgtPerson) {
+                                    setFeil("Søk opp en person før du legger til.");
+                                    return;
+                                }
+                                setLagtTil(true);
+                            }}
+                        >
                             Legg til
                         </Button>
                         <Button type="button" size="small" variant="secondary" onClick={() => setVis(false)}>
@@ -76,7 +90,12 @@ function MedCustomActionsScenario() {
                         </Button>
                     </>
                 }
-                resultat={lagtTil && valgtPerson ? <p>{valgtPerson.visningsnavn} er lagt til</p> : null}
+                resultat={
+                    <>
+                        {feil && <p role="alert">{feil}</p>}
+                        {lagtTil && valgtPerson ? <p>{valgtPerson.visningsnavn} er lagt til</p> : null}
+                    </>
+                }
             />
         </QueryClientProvider>
     );

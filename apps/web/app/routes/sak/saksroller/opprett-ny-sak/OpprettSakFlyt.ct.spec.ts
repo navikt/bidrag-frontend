@@ -4,21 +4,19 @@ import { expect, test } from "@playwright/test";
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt/Standard";
 
-test("endrer sakstype, søker person via nettverk og endrer valgt part", async ({ mount, page }) => {
+test("velger ny sakstype og part direkte i de faste valgpanelene", async ({ mount, page }) => {
     await mockWizardApi(page);
     const component = await mount(STORY);
 
-    await expect(component.getByText("Barnebidrag", { exact: true })).toBeVisible();
-    await component.getByRole("button", { name: "Endre" }).click();
-    await component.getByRole("radio", { name: /Ektefellebidrag/ }).dispatchEvent("click");
+    await expect(component.getByRole("radio", { name: /Barnebidrag/ })).toBeChecked();
+    await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
 
     const search = component.getByRole("searchbox", { name: "Søk etter part" });
     await search.fill(testpersoner.bidragspliktig.ident);
     await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
 
-    await expect(component.getByRole("button", { name: "Endre part" })).toBeVisible();
-    await component.getByRole("button", { name: "Endre part" }).click();
-    await expect(component.getByRole("searchbox", { name: "Søk etter part" })).toBeVisible();
+    await expect(search).toBeVisible();
+    await expect(component.getByText(testpersoner.bidragspliktig.visningsnavn).first()).toBeVisible();
 });
 
 test("nullstiller rolle og underflyt når rolle, part eller sakstype endres", async ({ mount, page }) => {
@@ -35,22 +33,22 @@ test("nullstiller rolle og underflyt når rolle, part eller sakstype endres", as
     const rolleVelger = component.getByRole("combobox", { name: /Hvilken rolle har/ });
     await rolleVelger.selectOption("bidragspliktig");
     await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeVisible();
-    await expect(component.getByRole("button", { name: "Legg til bidragsmottaker" })).toBeVisible();
+    await expect(component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
 
     await rolleVelger.selectOption("bidragsmottaker");
-    await expect(component.getByRole("button", { name: "Legg til bidragspliktig" })).toBeVisible();
-    await component.getByRole("button", { name: "Endre part" }).click();
+    await expect(component.getByRole("searchbox", { name: "Søk etter bidragspliktig" })).toBeVisible();
+    const partSøk = component.getByRole("searchbox", { name: "Søk etter part" });
+    await partSøk.fill(testpersoner.bidragsmottaker.ident);
+    await partSøk.press("Enter");
     await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeHidden();
 
-    await søkOgVelgPart();
     const nyRolleVelger = component.getByRole("combobox", { name: /Hvilken rolle har/ });
     await expect(nyRolleVelger).toHaveValue("");
     await nyRolleVelger.selectOption("bidragspliktig");
     await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeVisible();
 
-    await component.getByRole("button", { name: "Endre", exact: true }).click();
-    await expect(component.getByRole("button", { name: "Endre part" })).toBeHidden();
-    await expect(component.getByRole("combobox", { name: /Hvilken rolle har/ })).toBeHidden();
+    await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
+    await expect(component.getByRole("combobox", { name: /Hvilken rolle har/ })).toHaveValue("");
     await expect(component.getByRole("heading", { name: "Legg til barn" })).toBeHidden();
 });
 
@@ -61,32 +59,26 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
     const requests = await mockWizardApi(page);
     const component = await mount(STORY);
 
-    // Startbilde: sakstype allerede forhåndsvalgt til Barnebidrag av story-oppsettet
-    await expect(component.getByText("Barnebidrag", { exact: true })).toBeVisible();
+    await expect(component.getByRole("radio", { name: /Barnebidrag/ })).toBeChecked();
     await expectNoAxeViolations(page, component);
 
-    await component.getByRole("button", { name: "Endre" }).click();
-    await component.getByRole("radio", { name: /Ektefellebidrag/ }).dispatchEvent("click");
+    await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
 
     const search = component.getByRole("searchbox", { name: "Søk etter part" });
     await search.fill(testpersoner.bidragspliktig.ident);
     await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
-    await expect(component.getByRole("button", { name: "Endre part" })).toBeVisible();
+    await expect(search).toBeVisible();
 
     await component.getByRole("combobox", { name: /Hvilken rolle har/ }).selectOption("bidragspliktig");
 
-    await component.getByRole("button", { name: "Søk etter annen person" }).click();
     const motpartSøk = component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" });
     await motpartSøk.fill(testpersoner.bidragsmottaker.ident);
-    await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
+    await motpartSøk.press("Enter");
     await expect(component.getByText(testpersoner.bidragsmottaker.visningsnavn).first()).toBeVisible();
 
-    // Oppsummeringstilstand: begge parter valgt, klar til innsending
     await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
     await expectNoAxeViolations(page, component);
 
-    // Story-en kjører på createMemoryRouter, så URL-en oppdateres ikke. Markøren nullstilles derimot
-    // ved full reload, og skiller derfor klientsidig oppdatering fra dokumentbytte.
     await page.evaluate(() => {
         (window as unknown as { __sammeDokument?: boolean }).__sammeDokument = true;
     });

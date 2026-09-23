@@ -18,6 +18,7 @@ export default function SakButtons({
     harÅpneRedigeringer,
     suksessmelding,
     statusRef,
+    statusResetKey,
 }: {
     onSubmit: () => Promise<string>;
     onRefetch: () => Promise<unknown>;
@@ -28,6 +29,7 @@ export default function SakButtons({
     harÅpneRedigeringer?: boolean;
     suksessmelding?: string | null;
     statusRef?: RefObject<HTMLDivElement | null>;
+    statusResetKey: number;
 }) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const [bekreftHandling, setBekreftHandling] = useState<Lagrehandling | null>(null);
@@ -39,6 +41,10 @@ export default function SakButtons({
             setIngenEndringer(false);
         }
     }, [harEndringer]);
+
+    useEffect(() => {
+        setIngenEndringer(false);
+    }, [statusResetKey]);
 
     const lagreNySoknad = async () => {
         const saksnummer = await onSubmit();
@@ -122,7 +128,6 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå til ny søknad skjermbildet"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={lagrer}
                     onClick={() => velgLagrehandling("nySoknad", lagreNySoknad)}
                 >
                     Lagre og ny søknad
@@ -133,7 +138,6 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå tilbake til sak"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={lagrer}
                     onClick={() => velgLagrehandling("gaaTilSak", lagreOgGaaTilSak)}
                 >
                     Lagre og gå til sak
@@ -142,7 +146,6 @@ export default function SakButtons({
                     type="button"
                     size="xsmall"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={lagrer}
                     onClick={() => velgLagrehandling("bliVaerende", lagreOgBliVaerende)}
                 >
                     Lagre
@@ -179,20 +182,13 @@ export default function SakButtons({
                             )}
                         </Dialog.Body>
                         <Dialog.Footer>
-                            <Button
-                                type="button"
-                                size="small"
-                                loading={lagrer}
-                                disabled={lagrer}
-                                onClick={() => void bekreftLagring()}
-                            >
+                            <Button type="button" size="small" loading={lagrer} onClick={() => void bekreftLagring()}>
                                 Lagre
                             </Button>
                             <Button
                                 type="button"
                                 size="small"
                                 variant="secondary"
-                                disabled={lagrer}
                                 onClick={() => setBekreftHandling(null)}
                             >
                                 Avbryt
