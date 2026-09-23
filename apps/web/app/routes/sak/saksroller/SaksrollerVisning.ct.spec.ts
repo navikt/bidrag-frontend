@@ -114,7 +114,8 @@ test.describe("SaksrollerVisning", () => {
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
 
-        await expect(component.getByText("Kunne ikke oppdatere sak. Vennligst prøv igjen.").first()).toBeVisible();
+        await expect(component.getByText("Kunne ikke oppdatere sak. Vennligst prøv igjen.")).toHaveCount(1);
+        await expect(component.getByText("Kunne ikke oppdatere sak. Vennligst prøv igjen.")).toBeVisible();
         await component.getByRole("button", { name: "Endre reell mottaker" }).click();
         await expect(component.getByText("Kunne ikke oppdatere sak. Vennligst prøv igjen.")).toHaveCount(0);
     });

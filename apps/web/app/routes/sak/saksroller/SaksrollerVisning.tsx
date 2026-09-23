@@ -2,6 +2,7 @@ import type { OppdaterRollerISakRequest } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, FormProvider, useForm } from "react-hook-form";
@@ -278,17 +279,11 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
 
                             {erEktefellebidrag && (
                                 <InfoCard data-color="info" size="small">
-                                    <InfoCard.Content>
+                                    <InfoCard.Message icon={<InformationSquareIcon aria-hidden />}>
                                         Dette er en ektefellebidragssak og inneholder ikke barn. Saken kan ikke
                                         redigeres.
-                                    </InfoCard.Content>
+                                    </InfoCard.Message>
                                 </InfoCard>
-                            )}
-
-                            {(feilmelding || feil) && (
-                                <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
-                                    <LocalAlert.Content>{feilmelding || feil}</LocalAlert.Content>
-                                </LocalAlert>
                             )}
                         </VStack>
 
@@ -318,10 +313,10 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                                 </Heading>
 
                                                 {barn.length === 0 && (
-                                                    <InfoCard data-color="info">
-                                                        <InfoCard.Content>
+                                                    <InfoCard data-color="info" size="small">
+                                                        <InfoCard.Message icon={<InformationSquareIcon aria-hidden />}>
                                                             Ingen barn registrert i saken ennå
-                                                        </InfoCard.Content>
+                                                        </InfoCard.Message>
                                                     </InfoCard>
                                                 )}
                                                 <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
@@ -375,7 +370,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                             <SakButtons
                                                 onSubmit={handleSubmitAsync}
                                                 onRefetch={refetch}
-                                                feilmelding={feilmelding}
+                                                feilmelding={feilmelding || feil}
                                                 valideringsFeil={valideringsFeil}
                                                 harAdvarsel={barnMedUfullstendigRelasjon.length > 0}
                                                 harEndringer={harEndringer}
@@ -385,6 +380,13 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                             />
                                         </VStack>
                                     </>
+                                )}
+                                {erEktefellebidrag && (feilmelding || feil) && (
+                                    <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
+                                        <LocalAlert.Header>
+                                            <LocalAlert.Title>{feilmelding || feil}</LocalAlert.Title>
+                                        </LocalAlert.Header>
+                                    </LocalAlert>
                                 )}
                             </VStack>
                         </form>

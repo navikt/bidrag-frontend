@@ -113,19 +113,25 @@ export default function SakButtons({
             {suksessmelding && (
                 <div ref={statusRef} tabIndex={-1}>
                     <LocalAlert status="success">
-                        <LocalAlert.Content>{suksessmelding}</LocalAlert.Content>
+                        <LocalAlert.Header>
+                            <LocalAlert.Title>{suksessmelding}</LocalAlert.Title>
+                        </LocalAlert.Header>
                     </LocalAlert>
                 </div>
             )}
             {ingenEndringer && !harEndringer && <InlineMessage status="info">Ingen endringer å lagre.</InlineMessage>}
             {feilmelding && (
-                <LocalAlert status="error" as="div">
-                    <LocalAlert.Content>{feilmelding}</LocalAlert.Content>
+                <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
+                    <LocalAlert.Header>
+                        <LocalAlert.Title>{feilmelding}</LocalAlert.Title>
+                    </LocalAlert.Header>
                 </LocalAlert>
             )}
             {valideringsFeil && (
                 <LocalAlert status="error" as="div">
-                    <LocalAlert.Content>{valideringsFeil}</LocalAlert.Content>
+                    <LocalAlert.Header>
+                        <LocalAlert.Title>{valideringsFeil}</LocalAlert.Title>
+                    </LocalAlert.Header>
                 </LocalAlert>
             )}
 
@@ -182,7 +188,9 @@ export default function SakButtons({
                         <Dialog.Body>
                             {feilmelding && (
                                 <LocalAlert status="error" size="small">
-                                    <LocalAlert.Content>{feilmelding}</LocalAlert.Content>
+                                    <LocalAlert.Header>
+                                        <LocalAlert.Title>{feilmelding}</LocalAlert.Title>
+                                    </LocalAlert.Header>
                                 </LocalAlert>
                             )}
                             {!feilmelding && (
