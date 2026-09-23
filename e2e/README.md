@@ -10,7 +10,7 @@ e2e.config inneholder parametere for å kjøre mot data i Q2/lokalt
 
 ```bash
 # .env
-E2E_USER=brukernavn
+E2E_USERNAME=brukernavn
 E2E_PASSWORD=passord
 ```
 
