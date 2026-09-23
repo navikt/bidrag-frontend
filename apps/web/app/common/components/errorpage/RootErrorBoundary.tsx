@@ -1,10 +1,9 @@
 import type { NavUser } from "@bidrag/common";
-import { LoggerService } from "@bidrag/common";
+import { LoggerService, type NormalisertFeil, normaliserFeil } from "@bidrag/common";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import { QueryClientWrapper } from "~/common/QueryClientWrapper";
 import ErrorPage from "./ErrorPage.tsx";
-import { type NormalisertFeil, normaliserFeil } from "./normaliserFeil";
 
 type Props = { bruker: NavUser | null; bisysUrl?: string } & (
     | { error: unknown; children?: never }

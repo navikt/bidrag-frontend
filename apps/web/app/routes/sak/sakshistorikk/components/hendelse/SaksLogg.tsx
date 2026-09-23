@@ -12,7 +12,7 @@ import { NotatLink } from "./NotatLink";
 import { ResultatLink } from "./ResultatLink";
 import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
 
-const ROWS_PER_PAGE = 5;
+const ROWS_PER_PAGE = 6;
 
 export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string; hendelser: SakshendelseDto[] }) {
     const { sort, handleSort, sortData } = useSort<SakshendelseDto>();

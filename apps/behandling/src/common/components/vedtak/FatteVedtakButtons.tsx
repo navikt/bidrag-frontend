@@ -14,6 +14,7 @@ import { useVedtakProvider } from "../../../barnebidrag/components/vedtak/Vedtak
 import environment from "../../../environment";
 import { BEHANDLING_API_V1 } from "../../constants/api";
 import { MåBekrefteOpplysningerStemmerError } from "../../constants/MåBekrefteOpplysningerStemmerError";
+import { fatteVedtakMutationKey } from "../../constants/mutationKeys";
 import tekster from "../../constants/texts";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 import { useGetBehandlingV2 } from "../../hooks/useApiData";
@@ -22,7 +23,6 @@ import { FlexRow } from "../layout/grid/FlexRow";
 import NotatButton from "../NotatButton";
 
 const utsettDagerListe = [3, 4, 5, 6, 7, 8, 9];
-const fatteVedtakMutationKey = ["fatteVedtak"];
 export const FatteVedtakButtons = ({
     isBeregningError,
     disabled = false,

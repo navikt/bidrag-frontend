@@ -28,9 +28,11 @@ export function useBeløphistorikkfilter(saksnummer: string) {
 
     const vedtakPerVedtaksId = useMemo(() => {
         const map = new Map<number, VedtakDto | undefined>();
-        unikeVedtaksIder.forEach((vedtaksId, i) => {
-            map.set(vedtaksId, vedtakResultater[i]?.data);
-        });
+        unikeVedtaksIder
+            .filter((_, i) => vedtakResultater[i]?.data)
+            .forEach((vedtaksId, i) => {
+                map.set(vedtaksId, vedtakResultater[i]!.data!);
+            });
         return map;
     }, [unikeVedtaksIder, vedtakResultater]);
 
