@@ -21,6 +21,7 @@ import { QueryKeys, useGetBehandlingV2, useGetBeregningBidrag } from "../../../c
 import { DateToDDMMYYYYString, dateOrNull, deductDays } from "../../../utils/date-utils";
 import { formatterBeløpForBeregning } from "../../../utils/number-utils";
 import { STEPS } from "../../constants/steps";
+import { GebyrOppsummering } from "./GebyrOppsummering";
 import {
     ForholdsmessigFordelingVarsel,
     GammelVersjonAvBeregningVarsel,
@@ -94,6 +95,7 @@ const Vedtak = () => {
                 <ForholdsmessigFordelingVarsel />
                 <VedtakUgyldigBeregning resultat={beregning?.resultat?.ugyldigBeregning} />
                 <VedtakResultat />
+                <GebyrOppsummering />
             </div>
 
             {kanViseFatteVedtakKnapp && !isFetching && (
