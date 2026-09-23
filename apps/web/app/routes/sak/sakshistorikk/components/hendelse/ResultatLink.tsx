@@ -1,6 +1,18 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
-import { HStack, Link } from "@navikt/ds-react";
+import { BodyShort, HStack, Link } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
+
+const getResultatTekst = (hendelse: SakshendelseDto) => {
+    if (!hendelse.resultat) {
+        switch (hendelse.type) {
+            case "INDEKSREGULERT":
+            case "INDEKSREGULERT_KOMMUNE":
+            case "INDEKSREGULERT_UTENLANDSKE_MYNDIGHETER":
+                return "Indeksregulert";
+        }
+    }
+    return hendelse.resultat;
+};
 
 export function ResultatLink({
     saksnummer,
@@ -15,18 +27,15 @@ export function ResultatLink({
 }) {
     const visINyLosning = useFlag("bisys.vedtak_lesemodus_ny_losning");
     const visIBegge = useFlag("bisys.vedtak_lesemodus_lenke_begge");
-
-    if (!hendelse.link || !hendelse.resultat) {
-        return null;
-    }
+    const resultatTekst = getResultatTekst(hendelse);
 
     const resultatUrl = generateResultatUrl(hendelse, enhet, sessionState, saksnummer);
     const bisysResultatUrl = generateBisysResultatUrl(hendelse, saksnummer, enhet, sessionState);
 
-    if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
+    if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl && hendelse.link) {
         return (
             <HStack gap={"space-12"}>
-                <Link href={bisysResultatUrl}>{hendelse.resultat}*</Link>
+                <Link href={bisysResultatUrl}>{resultatTekst}*</Link>
                 <Link href={resultatUrl} aria-label="Vis i ny løsning">
                     🦄
                 </Link>
@@ -35,18 +44,18 @@ export function ResultatLink({
     }
 
     if (visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
-        return <Link href={resultatUrl}>{hendelse.resultat}</Link>;
+        return <Link href={resultatUrl}>{resultatTekst}</Link>;
     }
 
     if (hendelse.behandlingsid != null && hendelse.vedtaksid != null && resultatUrl) {
-        return <Link href={resultatUrl}>{hendelse.resultat}</Link>;
+        return <Link href={resultatUrl}>{resultatTekst}</Link>;
     }
 
-    if (hendelse.resultatIBisys) {
-        return <Link href={bisysResultatUrl}>{hendelse.resultat}*</Link>;
+    if (hendelse.resultatIBisys && hendelse.link) {
+        return <Link href={bisysResultatUrl}>{resultatTekst}*</Link>;
     }
 
-    return null;
+    return <BodyShort size={"small"}>{resultatTekst}</BodyShort>;
 }
 
 function generateBisysResultatUrl(
