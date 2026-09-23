@@ -1,3 +1,4 @@
+import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
 import type { Diskresjonskode } from "./sakvisning-schema.ts";
 
 export const ADRESSEBESKYTTELSE_ENHET = "2103";
@@ -15,4 +16,19 @@ const diskresjonskodeForklaringer: Record<Diskresjonskode, string> = {
 
 export function hentDiskresjonskodeForklaring(kode: Diskresjonskode): string {
     return diskresjonskodeForklaringer[kode];
+}
+
+/**
+ * Returnerer en infomelding når oppgitt ident avviker fra identen som faktisk ble funnet
+ * (personen har fått nytt fødselsnummer), slik at brukeren varsles om at det nyeste
+ * fødselsnummeret er tatt i bruk. Returnerer `undefined` når identene er like.
+ */
+export function hentNyttFødselsnummerMelding(
+    treff: Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">,
+): string | undefined {
+    if (!treff.ident || !treff.søktIdent || treff.ident === treff.søktIdent) {
+        return undefined;
+    }
+
+    return `Personen har fått nytt fødselsnummer. Bruker nyeste fødselsnummer ${treff.ident}.`;
 }

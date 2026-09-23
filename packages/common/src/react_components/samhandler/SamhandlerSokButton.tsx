@@ -13,7 +13,7 @@ export default function SamhandlerSøkButton({
     onResult,
     onError,
     ...buttonProps
-}: SamhandlerSokProps & Omit<ButtonProps, "children" | "onError">): ReactNode {
+}: SamhandlerSokProps & { visSomLenke?: boolean } & Omit<ButtonProps, "children" | "onError">): ReactNode {
     return (
         <PopupSøkButton<SamhandlerBroadcastMessage>
             {...buttonProps}
