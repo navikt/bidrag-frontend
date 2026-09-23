@@ -29,7 +29,7 @@ import { shouldShowGrunnlagLoadingProgressbar } from "../../common/helpers/shoul
 import { useGetBehandlingV2 } from "../../common/hooks/useApiData";
 import { STEPS } from "../constants/steps";
 import { BarnebidragStepper } from "../enum/BarnebidragStepper";
-
+import { SackKronerIcon } from '@navikt/aksel-icons';
 const VirkingstidspunktMenuButton = ({ activeButton, step }: { activeButton: string; step: string }) => {
     const { onStepChange, vurderSeparatVirkningstidspunkt, isGrunnlagLoading, selectedSaksnummer } =
         useBehandlingProvider();
@@ -791,14 +791,18 @@ const GebyrMenuButton = ({
     const { onStepChange, lesemodus, isGrunnlagLoading } = useBehandlingProvider();
     const {
         gebyrV3: { saker },
+        roller
     } = useGetBehandlingV2();
     const gebyrValideringsFeil = saker.some(
         (sak) => !!sak.gebyrRoller.some((gebyrRolle) => gebyrRolle?.valideringsfeil?.manglerBegrunnelse),
     );
 
+    const unikeSøknadsIder = new Set(roller.flatMap((rolle) => rolle.søknader.map((søknad) => søknad.søknadsId)));
+    const harFlereSøknader = unikeSøknadsIder.size > 1;
     return (
         <MenuButton
             step={step}
+            icon={harFlereSøknader && <SackKronerIcon/>}
             title={text.title.gebyr}
             onStepChange={() => onStepChange(STEPS[BarnebidragStepper.GEBYR])}
             interactive={interactive}

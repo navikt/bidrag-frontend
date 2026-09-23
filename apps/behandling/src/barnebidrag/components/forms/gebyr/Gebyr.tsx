@@ -137,7 +137,7 @@ const Side = () => {
 
 const SøknadDetaljerHeader = ({ søknad }: { søknad: SoknadDetaljerDto }) => {
     return (
-        <Box background="default" padding="space-16">
+        <Box background={"brand-beige-soft"} padding="space-16">
             <HStack gap="space-48" wrap>
                 <HStack gap="space-8">
                     <Label size="small">{text.label.søknadfra}:</Label>
@@ -247,7 +247,11 @@ const GebyrRoller = ({ fieldArrayName }: { fieldArrayName: FieldPathByValue<Geby
                 grupper.set(key, { søknad, items: [item] });
             }
         }
-        return Array.from(grupper.values());
+        return Array.from(grupper.values()).sort((a, b) => {
+            const aHoved = a.søknad?.erHovedsøknad ? 1 : 0;
+            const bHoved = b.søknad?.erHovedsøknad ? 1 : 0;
+            return bHoved - aHoved;
+        });
     }, [controlledFields]);
 
     return (

@@ -8,6 +8,7 @@ import useFeatureToogle from "../../common/hooks/useFeatureToggle";
 
 import { STEPS as BarnebidragSteps, STEPS } from "../constants/steps";
 import { BarnebidragStepper } from "../enum/BarnebidragStepper";
+import {Stonadstype} from "@bidrag/api/BidragBehandlingApiV1";
 
 export type InntektTables =
     | `småbarnstillegg.${string}`
@@ -157,7 +158,7 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
                 behandling.vedtakstype !== Vedtakstype.ALDERSJUSTERING &&
                 !(behandling.erVedtakUtenBeregning && behandling.lesemodus) &&
                 !erAvvist,
-            interactive:
+            interactive: [Stonadstype.BIDRAG, Stonadstype.BIDRAG18AAR].includes(behandling.stønadstype) ||
                 !behandling.virkningstidspunktV3?.erAvslagForAlle && behandling.vedtakstype !== Vedtakstype.OPPHOR,
         },
         {
