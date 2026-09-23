@@ -1,6 +1,6 @@
 import { IdentUtils } from "@bidrag/common";
 import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, BodyShort, Box, Button, HStack, VStack } from "@navikt/ds-react";
+import { BodyLong, BodyShort, Box, Button, HStack, InlineMessage, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
 import { useHentSamhandler } from "~/api/useApi.ts";
@@ -40,9 +40,9 @@ export function FunnetPersonInnhold({ label, navn, ident, diskresjonskode }: Inn
             <PersonInfo ident={ident ?? ""} navn={navn} compact />
             {diskresjonskode && <DiskresjonAlert diskresjonskode={diskresjonskode} />}
             {samhandlerManglerKontonummer && (
-                <Alert inline size="small" variant="warning">
+                <InlineMessage status="warning" size="small">
                     Samhandler mangler norsk kontonummer eller IBAN
-                </Alert>
+                </InlineMessage>
             )}
         </VStack>
     );
@@ -51,14 +51,14 @@ export function FunnetPersonInnhold({ label, navn, ident, diskresjonskode }: Inn
 export default function FunnetPersonInfo({
     disabled,
     fjern,
-    variant = "info",
+    variant,
     bakgrunn,
     border,
     ikon,
     simple,
     ...innholdProps
 }: Props): ReactNode {
-    if (bakgrunn !== undefined || border !== undefined || ikon !== undefined || simple !== undefined) {
+    if (variant === undefined) {
         return (
             <div
                 className={`border ${simple ? "" : (bakgrunn ?? "bg-ax-accent-100")} ${

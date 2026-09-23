@@ -1,6 +1,6 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { lagRolle, lagSak, testpersoner } from "@ct/saksroller/fixtures.ts";
 import { mockSaksrollerApi } from "@ct/saksroller/network.ts";
-import { expect, test } from "@playwright/test";
 
 const STORY = "routes/sak/saksroller/SaksrollerVisning/Standard";
 
@@ -14,6 +14,25 @@ test.describe("SaksrollerVisning", () => {
         await expect(component.getByText(testpersoner.bidragspliktig.visningsnavn)).toBeVisible();
         await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
         await expect(component.getByText("Barn i saken (1)")).toBeVisible();
+    });
+
+    test("kan legge til første barn når saken ikke har barn", async ({ mount, page }) => {
+        await mockSaksrollerApi(page, {
+            sak: lagSak({
+                roller: [
+                    lagRolle({
+                        fodselsnummer: testpersoner.bidragsmottaker.ident,
+                        type: "BM",
+                        rolleType: "BM",
+                    }),
+                ],
+            }),
+        });
+        const component = await mount(STORY);
+
+        await expect(component.getByText("Ingen barn registrert i saken ennå")).toBeVisible();
+        await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+        await expect(component.getByRole("dialog", { name: "Legg til nytt barn i saken" })).toBeVisible();
     });
 
     test("viser rollehistorikk for forelder og barn i modaler", async ({ mount, page }) => {

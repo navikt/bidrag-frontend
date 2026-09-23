@@ -2,7 +2,7 @@ import type { OppdaterRollerISakRequest } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, BodyLong, Box, Heading, HGrid, HStack, Loader, Page, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, FormProvider, useForm } from "react-hook-form";
 
@@ -277,15 +277,18 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                             </VStack>
 
                             {erEktefellebidrag && (
-                                <Alert variant="info" size="small">
-                                    Dette er en ektefellebidragssak og inneholder ikke barn. Saken kan ikke redigeres.
-                                </Alert>
+                                <InfoCard data-color="info" size="small">
+                                    <InfoCard.Content>
+                                        Dette er en ektefellebidragssak og inneholder ikke barn. Saken kan ikke
+                                        redigeres.
+                                    </InfoCard.Content>
+                                </InfoCard>
                             )}
 
                             {(feilmelding || feil) && (
-                                <Alert variant="error" ref={statusRef} tabIndex={-1}>
-                                    {feilmelding || feil}
-                                </Alert>
+                                <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
+                                    <LocalAlert.Content>{feilmelding || feil}</LocalAlert.Content>
+                                </LocalAlert>
                             )}
                         </VStack>
 
@@ -314,38 +317,37 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                                     Barn i saken ({barn.length})
                                                 </Heading>
 
-                                                {barn.length === 0 ? (
-                                                    <Alert variant="info">Ingen barn registrert i saken ennå</Alert>
-                                                ) : (
-                                                    <HGrid
-                                                        columns={{ xs: 1, lg: 2, xl: 3 }}
-                                                        gap="space-24"
-                                                        align="start"
-                                                    >
-                                                        {barn.map((barnRolle, idx) => (
-                                                            <BarnVisning
-                                                                key={
-                                                                    barnRolle.fodselsnummer ||
-                                                                    barnRolle.objektnummer ||
-                                                                    `${barnRolle.type}-${idx}`
-                                                                }
-                                                                rolle={barnRolle}
-                                                                index={roller.indexOf(barnRolle)}
-                                                                kanFjerneRM={!barnRolle.erMyndig && !!bm}
-                                                                closeEditorSignal={dataUpdatedAt}
-                                                                hentOgNullstillSamhandler={hentOgNullstillSamhandler}
-                                                                erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
-                                                                erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                                                            />
-                                                        ))}
-                                                        <LeggTilBarn
-                                                            søsken={muligeBarn}
-                                                            erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                                                            setVisSøk={setLeggTilBarnVisSøk}
-                                                            visSøk={leggTilBarnVisSøk}
-                                                        />
-                                                    </HGrid>
+                                                {barn.length === 0 && (
+                                                    <InfoCard data-color="info">
+                                                        <InfoCard.Content>
+                                                            Ingen barn registrert i saken ennå
+                                                        </InfoCard.Content>
+                                                    </InfoCard>
                                                 )}
+                                                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
+                                                    {barn.map((barnRolle, idx) => (
+                                                        <BarnVisning
+                                                            key={
+                                                                barnRolle.fodselsnummer ||
+                                                                barnRolle.objektnummer ||
+                                                                `${barnRolle.type}-${idx}`
+                                                            }
+                                                            rolle={barnRolle}
+                                                            index={roller.indexOf(barnRolle)}
+                                                            kanFjerneRM={!barnRolle.erMyndig && !!bm}
+                                                            closeEditorSignal={dataUpdatedAt}
+                                                            hentOgNullstillSamhandler={hentOgNullstillSamhandler}
+                                                            erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
+                                                            erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
+                                                        />
+                                                    ))}
+                                                    <LeggTilBarn
+                                                        søsken={muligeBarn}
+                                                        erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
+                                                        setVisSøk={setLeggTilBarnVisSøk}
+                                                        visSøk={leggTilBarnVisSøk}
+                                                    />
+                                                </HGrid>
                                             </VStack>
                                         </Box>
 

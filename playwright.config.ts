@@ -23,6 +23,16 @@ export default defineConfig({
             testMatch: "**/*.ct.spec.ts",
             use: galleryProjectUse,
         },
+        {
+            name: "components-slow",
+            testDir: ".",
+            testMatch: "**/*.ct.spec.ts",
+            workers: 1,
+            use: {
+                ...galleryProjectUse,
+                launchOptions: { slowMo: 500 },
+            },
+        },
     ],
     webServer: {
         // Rydd opp eventuell hengende prosess.

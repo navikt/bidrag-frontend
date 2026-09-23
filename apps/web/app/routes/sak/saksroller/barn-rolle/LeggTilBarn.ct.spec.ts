@@ -1,6 +1,6 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import type { Page } from "@playwright/test";
-import { expect, test } from "@playwright/test";
 
 const STORY = "routes/sak/saksroller/barn-rolle/LeggTilBarn/MedBidragsmottaker";
 
@@ -62,6 +62,31 @@ test.describe("LeggTilBarn", () => {
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
 
         await expect(component.getByText("Søk opp barnet med fødselsnummer eller D-nummer først")).toBeVisible();
+    });
+
+    test("legger ikke til forrige treff når søket endres eller neste søk feiler", async ({ mount, page }) => {
+        const barnIdent = genererFnr();
+        const ukjentIdent = genererFnr();
+        await mockPersonInformasjonFørMount(page, {
+            [barnIdent]: { ident: barnIdent, visningsnavn: "Lite Barn", fødselsdato: "2015-01-01" },
+        });
+
+        const component = await mount(STORY);
+        await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+        const søkefelt = component.getByRole("searchbox", { name: "Søk etter barn" });
+        await søkefelt.fill(barnIdent);
+        await søkefelt.press("Enter");
+        await expect(component.getByText("Lite Barn")).toBeVisible();
+
+        await søkefelt.fill(ukjentIdent);
+        await expect(component.getByText("Lite Barn")).toHaveCount(0);
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await expect(component.getByText("Søk opp barnet med fødselsnummer eller D-nummer først")).toBeVisible();
+
+        await søkefelt.press("Enter");
+        await expect(component.getByText("Finnes ingen person eller samhandler med oppgitt ident")).toBeVisible();
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await expect(component.getByRole("dialog", { name: "Legg til nytt barn i saken" })).toBeVisible();
     });
 
     test("viser info om nyeste fødselsnummer i forhåndsvisningen når personen har fått nytt fødselsnummer", async ({

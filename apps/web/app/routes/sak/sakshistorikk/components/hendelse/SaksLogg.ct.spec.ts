@@ -1,5 +1,5 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import type { Page } from "@playwright/test";
-import { expect, test } from "@playwright/test";
 
 const STORY = "routes/sak/sakshistorikk/components/hendelse/SaksLogg/ForskjelligeHendelser";
 

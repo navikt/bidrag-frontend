@@ -1,6 +1,6 @@
 import { RedirectTo } from "@bidrag/common";
 import { ExclamationmarkTriangleIcon, FloppydiskIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Button, Dialog, HStack, LocalAlert } from "@navikt/ds-react";
+import { BodyLong, Button, Dialog, HStack, InlineMessage, LocalAlert } from "@navikt/ds-react";
 import { type RefObject, useEffect, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
@@ -112,12 +112,22 @@ export default function SakButtons({
         <>
             {suksessmelding && (
                 <div ref={statusRef} tabIndex={-1}>
-                    <Alert variant="success">{suksessmelding}</Alert>
+                    <LocalAlert status="success">
+                        <LocalAlert.Content>{suksessmelding}</LocalAlert.Content>
+                    </LocalAlert>
                 </div>
             )}
-            {ingenEndringer && !harEndringer && <Alert variant="info">Ingen endringer å lagre.</Alert>}
-            {feilmelding && <Alert variant="error">{feilmelding}</Alert>}
-            {valideringsFeil && <Alert variant="error">{valideringsFeil}</Alert>}
+            {ingenEndringer && !harEndringer && <InlineMessage status="info">Ingen endringer å lagre.</InlineMessage>}
+            {feilmelding && (
+                <LocalAlert status="error" as="div">
+                    <LocalAlert.Content>{feilmelding}</LocalAlert.Content>
+                </LocalAlert>
+            )}
+            {valideringsFeil && (
+                <LocalAlert status="error" as="div">
+                    <LocalAlert.Content>{valideringsFeil}</LocalAlert.Content>
+                </LocalAlert>
+            )}
 
             <HStack justify="end" gap="space-8">
                 <Button

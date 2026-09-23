@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils";
 import { PersonTallShortIcon, PlusIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Box, Button, Heading, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, Button, Heading, InlineMessage, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 
@@ -172,6 +172,10 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
             beskrivelse="Søk opp barnet som skal legges til i saken"
             søkeLabel="Søk etter barn"
             onPersonValgt={handleSøkResultat}
+            onQueryChange={() => {
+                setFunnetPerson(null);
+                setFeil(undefined);
+            }}
             onAvbryt={lukk}
             ikon={<PersonTallShortIcon aria-hidden />}
             actions={
@@ -187,9 +191,9 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
             resultat={
                 <>
                     {feil && (
-                        <Alert variant="warning" inline size="small">
+                        <InlineMessage status="warning" size="small">
                             {feil}
-                        </Alert>
+                        </InlineMessage>
                     )}
 
                     {funnetPerson && (

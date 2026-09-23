@@ -85,14 +85,23 @@ export default function ReellMottakerValgGruppe({
             {valg.type === "samhandler" && (
                 <ReellMottakerSøk
                     valgtSamhandlerId={valg.ident ?? lagretSamhandler?.ident}
-                    onVelg={(ident, navn) => onValg({ type: "samhandler", ident, navn })}
+                    onVelg={(ident, navn) => {
+                        setError(undefined);
+                        onValg({ type: "samhandler", ident, navn });
+                    }}
                     onError={setError}
                 />
             )}
 
             {!feil && !error && valg.type === "samhandler" && valg.navn && valg.ident && (
                 <Box borderWidth="2" borderRadius="12">
-                    <FunnetPersonInfo label="Reell mottaker:" navn={valg.navn} ident={valg.ident} disabled={disabled} />
+                    <FunnetPersonInfo
+                        label="Reell mottaker:"
+                        navn={valg.navn}
+                        ident={valg.ident}
+                        disabled={disabled}
+                        variant="info"
+                    />
                 </Box>
             )}
         </VStack>
