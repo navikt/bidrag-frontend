@@ -4,7 +4,7 @@ import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/ForelderUtenBarn/ForelderUtenBarn/Standard";
 
-test("søker opp barn og foreslår registrert forelder", async ({ mount, page }) => {
+test("søker opp barn og velger entydig registrert forelder automatisk", async ({ mount, page }) => {
     await mockWizardApi(page, {
         parentRelations: {
             [testpersoner.barnUnder18.ident]: [testpersoner.bidragsmottaker.ident],
@@ -12,14 +12,42 @@ test("søker opp barn og foreslår registrert forelder", async ({ mount, page })
     });
     const component = await mount(STORY);
 
-    await component.getByRole("button", { name: "Legg til barn manuelt" }).click();
-    await page.getByRole("searchbox", { name: "Oppgi barn i saken manuelt" }).fill(testpersoner.barnUnder18.ident);
-    await page.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
+    await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+    const søkEtterBarn = page.getByRole("searchbox", { name: "Søk etter barn" });
+    await søkEtterBarn.fill(testpersoner.barnUnder18.ident);
+    await søkEtterBarn.press("Enter");
+    await expect(component.getByText(testpersoner.barnUnder18.visningsnavn).first()).toBeVisible();
+    await component.getByRole("button", { name: "Legg til", exact: true }).click();
 
     await expect(component.getByText("Barn som legges til")).toBeVisible();
-    await expect(component.getByText(/Foreslått bidragsmottaker/)).toBeVisible();
+    await expect(component.getByText(testpersoner.bidragsmottaker.visningsnavn).first()).toBeVisible();
+    await expect(
+        component.getByRole("button", { name: `Bruk ${testpersoner.bidragsmottaker.visningsnavn}` }),
+    ).toHaveCount(0);
+    await expect(component.getByRole("searchbox", { name: /Søk etter bidragsmottaker/ })).toHaveCount(0);
+    await expectNoAxeViolations(page, component);
+});
+
+test("beholder kjente parter når barnet har to registrerte foreldre", async ({ mount, page }) => {
+    await mockWizardApi(page, {
+        parentRelations: {
+            [testpersoner.barnUnder18.ident]: [testpersoner.bidragsmottaker.ident, testpersoner.annenForelder.ident],
+        },
+    });
+    const component = await mount(STORY);
+
+    await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+    const søkEtterBarn = page.getByRole("searchbox", { name: "Søk etter barn" });
+    await søkEtterBarn.fill(testpersoner.barnUnder18.ident);
+    await søkEtterBarn.press("Enter");
+    await component.getByRole("button", { name: "Legg til", exact: true }).click();
+
+    await expect(component.getByText(/har begge foreldre registrert/)).toBeVisible();
     await expect(
         component.getByRole("button", { name: `Bruk ${testpersoner.bidragsmottaker.visningsnavn}` }),
     ).toBeVisible();
-    await expectNoAxeViolations(page, component);
+    await expect(
+        component.getByRole("button", { name: `Bruk ${testpersoner.annenForelder.visningsnavn}` }),
+    ).toBeVisible();
+    await expect(component.getByRole("searchbox", { name: /Søk etter bidragsmottaker/ })).toHaveCount(0);
 });

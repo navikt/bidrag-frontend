@@ -8,20 +8,33 @@ test.describe("Barn med begge foreldre", () => {
         await mockWizardApi(page);
         const component = await mount(STORY);
 
-        await component.getByRole("radio", { name: /Test Bidragspliktig/ }).check();
-        await expect(component.getByRole("radio", { name: /Test Bidragspliktig/ })).toBeChecked();
+        await expect(component.getByRole("heading", { name: "Barn" })).toBeVisible();
+        await expect(component.getByText("Velg roller for foreldrene før du velger reell mottaker.")).toBeVisible();
+        const seksjonsoverskrifter = await component.getByRole("heading", { level: 2 }).allTextContents();
+        expect(seksjonsoverskrifter.indexOf("Barn")).toBeLessThan(seksjonsoverskrifter.indexOf("Foreldre"));
 
-        await component.getByRole("radio", { name: /Test Bidragsmottaker/ }).check();
-        await expect(component.getByRole("radio", { name: /Test Bidragsmottaker/ })).toBeChecked();
+        const førsteForelder = component.getByRole("radiogroup", { name: /Test Bidragspliktig/ });
+        const andreForelder = component.getByRole("radiogroup", { name: /Test Bidragsmottaker/ });
+
+        await førsteForelder.getByRole("radio", { name: "Bidragspliktig" }).check();
+        await expect(andreForelder.getByRole("radio", { name: "Bidragsmottaker" })).toBeChecked();
+
+        await andreForelder.getByRole("radio", { name: "Bidragspliktig" }).check();
+        await expect(førsteForelder.getByRole("radio", { name: "Bidragsmottaker" })).toBeChecked();
+
+        await component.getByRole("button", { name: "Sett bidragsmottaker som ukjent" }).click();
+        await component.getByRole("button", { name: "Bruk registrert forelder" }).click();
+        await expect(component.getByRole("button", { name: "Sett bidragsmottaker som ukjent" })).toBeVisible();
         await expectNoAxeViolations(page, component);
     });
 
     test("eksisterende sak sperrer opprettelse", async ({ mount, page }) => {
         await mockWizardApi(page);
         const component = await mount(STORY);
-        const foreldre = component.getByRole("radio");
-        const bidragspliktigIdent = await foreldre.nth(0).getAttribute("value");
-        const bidragsmottakerIdent = await foreldre.nth(1).getAttribute("value");
+        const bidragspliktigGruppe = component.getByRole("radiogroup", { name: /Test Bidragspliktig/ });
+        const visteIdenter = component.getByText(/^\d{11}$/);
+        const bidragspliktigIdent = await visteIdenter.nth(1).textContent();
+        const bidragsmottakerIdent = await visteIdenter.nth(2).textContent();
         await page.route(/\/proxy\/bidrag-sak\/person\/sak$/, async (route) => {
             const etterspurtIdent = JSON.parse(route.request().postData() ?? '""') as string;
             await route.fulfill({
@@ -37,18 +50,33 @@ test.describe("Barn med begge foreldre", () => {
                 ],
             });
         });
-        await foreldre.nth(0).check();
+        await bidragspliktigGruppe.getByRole("radio", { name: "Bidragspliktig" }).check();
 
         await expect(component.getByText(/7654321/)).toBeVisible();
         expect(bidragspliktigIdent).toBeTruthy();
-        await expect(component.getByRole("button", { name: /Opprett$/ })).toBeDisabled();
+        const opprettKnapp = component.getByRole("button", { name: /Opprett$/ });
+        await expect(opprettKnapp).toBeEnabled();
+        await opprettKnapp.click();
+        await expect(
+            component.getByText("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over."),
+        ).toBeVisible();
+
+        const bidragsmottakerGruppe = component.getByRole("radiogroup", { name: /Test Bidragsmottaker/ });
+        await bidragsmottakerGruppe.getByRole("radio", { name: "Bidragspliktig" }).check();
+        await expect(
+            component.getByText("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over."),
+        ).toHaveCount(0);
+        await expectNoAxeViolations(page, component);
     });
 
     test("eksisterende sak UTEN barn sperrer ikke opprettelse", async ({ mount, page }) => {
         await mockWizardApi(page);
         const component = await mount(STORY);
-        const foreldre = component.getByRole("radio");
-        const bidragsmottakerIdent = await foreldre.nth(1).getAttribute("value");
+        const bidragspliktigGruppe = component.getByRole("radiogroup", { name: /Test Bidragspliktig/ });
+        const bidragsmottakerIdent = await component
+            .getByText(/^\d{11}$/)
+            .nth(2)
+            .textContent();
         await page.route(/\/proxy\/bidrag-sak\/person\/sak$/, async (route) => {
             const etterspurtIdent = JSON.parse(route.request().postData() ?? '""') as string;
             await route.fulfill({
@@ -63,7 +91,7 @@ test.describe("Barn med begge foreldre", () => {
                 ],
             });
         });
-        await foreldre.nth(0).check();
+        await bidragspliktigGruppe.getByRole("radio", { name: "Bidragspliktig" }).check();
 
         await expect(component.getByText(/1234567/)).not.toBeVisible();
         await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();

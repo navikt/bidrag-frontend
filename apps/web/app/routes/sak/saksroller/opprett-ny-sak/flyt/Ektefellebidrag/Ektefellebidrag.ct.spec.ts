@@ -6,16 +6,32 @@ const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/Ektefel
 test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
     await mockWizardApi(page);
     const component = await mount(STORY);
-    const partner = component
-        .getByRole("button")
-        .filter({ hasText: /Test Ukjent Person/ })
-        .first();
+    const brukPartner = component.getByRole("button", { name: "Bruk Test Ektefelle" });
 
-    await partner.click();
-    await expect(component.getByRole("heading", { name: "Oppsummering" })).toBeVisible();
+    await brukPartner.click();
+    const fjernPartner = component.getByRole("button", { name: "Fjern Test Ektefelle" });
+    await expect(fjernPartner).toHaveAttribute("aria-pressed", "true");
+    await expect(component.getByRole("heading", { name: "Parter" })).toBeVisible();
+    await expect(component.getByText("Test Ukjent Person", { exact: true })).toHaveCount(2);
     await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
 
-    await partner.click();
-    await expect(component.getByRole("heading", { name: "Oppsummering" })).toHaveCount(0);
+    await fjernPartner.click();
+    await expect(component.getByRole("button", { name: "Bruk Test Ektefelle" })).toHaveAttribute(
+        "aria-pressed",
+        "false",
+    );
+    await expect(component.getByText("Test Ukjent Person", { exact: true })).toHaveCount(1);
     await expectNoAxeViolations(page, component);
+});
+
+test("fjerner opprettelsesfeil når partene endres", async ({ mount, page }) => {
+    await mockWizardApi(page, { createStatus: 500, createBody: "Kunne ikke opprette sak" });
+    const component = await mount(STORY);
+
+    await component.getByRole("button", { name: "Bruk Test Ektefelle" }).click();
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+    await expect(component.getByText("Kunne ikke opprette sak")).toBeVisible();
+
+    await component.getByRole("button", { name: "Fjern Test Ektefelle" }).click();
+    await expect(component.getByText("Kunne ikke opprette sak")).toHaveCount(0);
 });

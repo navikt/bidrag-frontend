@@ -1,28 +1,23 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import type { RefObject } from "react";
+import { VStack } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import ParterOppsummering from "../motpart-felles/ParterOppsummering";
-import PartManuellRegistrering from "../motpart-felles/PartManuellRegistrering";
-import type { ForelderMedBarnSkjemaData, ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
+import SøkPerson from "../../components/SøkPerson";
+import ParterSeksjon from "../felles/ParterSeksjon";
+import type { ForelderMedBarnSkjemaData, ForelderPartRolle, ForelderUtenBarnSkjemaData } from "../opprett-sak-schema";
 
 interface MotpartSectionProps {
     form: UseFormReturn<ForelderMedBarnSkjemaData | ForelderUtenBarnSkjemaData>;
-    onSettMotpartUkjent: () => void;
     onLeggTilMotpartManuell: (person: PersonDto) => void;
-    bidragsmottakerRegistreringRef: RefObject<HTMLDialogElement | null>;
-    visOppsummering?: boolean;
+    motpartvalg?: ReactNode;
+    visPersonsøk?: boolean;
 }
 
-/**
- * Section for managing motpart (counterparty) in forelder flows.
- * Combines ParterOppsummering and PartManuellRegistrering components.
- */
 export default function MotpartSection({
     form,
-    onSettMotpartUkjent,
     onLeggTilMotpartManuell,
-    bidragsmottakerRegistreringRef,
-    visOppsummering = true,
+    motpartvalg,
+    visPersonsøk = true,
 }: MotpartSectionProps) {
     const valgteBarn = form.watch("valgteBarn");
     const partISaken = form.watch("partISaken");
@@ -31,23 +26,30 @@ export default function MotpartSection({
     const harUkjentForelderIForeldreListe = foreldre?.some((forelder) => forelder?.erKjent === false) ?? false;
     const harUkjentForelder =
         partISaken?.erKjent === false || motpart?.erKjent === false || harUkjentForelderIForeldreListe;
-    const skalViseOppsummering = (visOppsummering && valgteBarn.length > 0) || harUkjentForelder;
+    const skalViseParter = valgteBarn.length > 0 || harUkjentForelder;
+    const partISakenRolle =
+        partISaken.rolle === "bidragspliktig" ? "bidragspliktig" : ("bidragsmottaker" as ForelderPartRolle);
+    const motpartRolle = motpart.rolle === "bidragspliktig" ? "bidragspliktig" : "bidragsmottaker";
+
+    const motpartInnhold =
+        motpart.erKjent === true || !visPersonsøk ? (
+            motpartvalg
+        ) : (
+            <VStack gap="space-12">
+                {motpartvalg}
+                <SøkPerson label={`Søk etter ${motpartRolle}`} personInformasjon={onLeggTilMotpartManuell} compact />
+            </VStack>
+        );
 
     return (
-        <>
-            {skalViseOppsummering && (
-                <ParterOppsummering
-                    form={form as UseFormReturn<ForelderMedBarnSkjemaData>}
-                    onSettMotpartUkjent={onSettMotpartUkjent}
-                    ref={bidragsmottakerRegistreringRef}
-                />
-            )}
-
-            <PartManuellRegistrering
-                ref={bidragsmottakerRegistreringRef}
-                bidragstype="bidragsmottaker"
-                onLeggTil={onLeggTilMotpartManuell}
-            />
-        </>
+        <ParterSeksjon
+            partISaken={{ ...partISaken, erKjent: true }}
+            partISakenRolle={partISakenRolle}
+            motpart={motpart}
+            motpartRolle={motpartRolle}
+            motpartInnhold={motpartInnhold}
+            visParter={skalViseParter}
+            feil={form.formState.errors.motpart?.ident?.message}
+        />
     );
 }

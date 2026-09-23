@@ -1,16 +1,14 @@
-import { Alert, BodyShort, Box, HGrid, HStack, Radio, RadioGroup, Tag } from "@navikt/ds-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, type FieldPath, type FieldValues, type PathValue, type UseFormReturn } from "react-hook-form";
-import FunnetPersonInfo from "../../components/FunnetPersonInfo";
-import ReellMottakerSøk from "../../components/ReellMottakerSøk";
+import ReellMottakerValgGruppe, { type ReellMottakerValgregel } from "../../components/ReellMottakerValgGruppe";
+import { fraReellMottakerValg, initialiserReellMottaker, tilReellMottakerValg } from "../reell-mottaker-regel";
 
 type Props<TFieldValues extends FieldValues> = {
     form: UseFormReturn<TFieldValues>;
     fieldPath: string;
     barnIdent: string;
     barnNavn: string;
-    isRequired: boolean;
-    kunSamhandlerSomReellMottaker?: boolean;
+    regel: ReellMottakerValgregel;
 };
 
 export default function ReellMottakerInline<TFieldValues extends FieldValues>({
@@ -18,15 +16,11 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     fieldPath,
     barnIdent,
     barnNavn,
-    isRequired,
-    kunSamhandlerSomReellMottaker = false,
+    regel,
 }: Props<TFieldValues>) {
     const reellMottakerTypePath = `${fieldPath}.reellMottakerType` as FieldPath<TFieldValues>;
     const reellMottakerPath = `${fieldPath}.reellMottaker` as FieldPath<TFieldValues>;
     const reellMottakerNavnPath = `${fieldPath}.reellMottakerNavn` as FieldPath<TFieldValues>;
-    const kunSamhandlerFeilmelding =
-        "Barnet selv kan ikke velges som reell mottaker i oppfostringsbidrag. Velg samhandler (kommune).";
-
     const setDynamiskFeltVerdi = (
         path: FieldPath<TFieldValues>,
         value: string,
@@ -36,75 +30,68 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     const reellMottakerType = form.watch(reellMottakerTypePath);
     const reellMottaker = form.watch(reellMottakerPath);
     const reellMottakerNavn = form.watch(reellMottakerNavnPath);
+    const reellMottakerFeil = form.getFieldState(reellMottakerPath, form.formState).error?.message;
+    const skjemaverdi = {
+        reellMottakerType:
+            reellMottakerType === "ingen" || reellMottakerType === "barnet_selv" || reellMottakerType === "annen_person"
+                ? reellMottakerType
+                : undefined,
+        reellMottaker: typeof reellMottaker === "string" ? reellMottaker : undefined,
+        reellMottakerNavn: typeof reellMottakerNavn === "string" ? reellMottakerNavn : undefined,
+    };
+    const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(() =>
+        reellMottakerType === "annen_person" && reellMottaker && reellMottakerNavn
+            ? { ident: String(reellMottaker), navn: String(reellMottakerNavn) }
+            : null,
+    );
+
+    const valg = tilReellMottakerValg(skjemaverdi, { ident: barnIdent, navn: barnNavn });
+
+    const settSkjemaverdi = (
+        nyVerdi: ReturnType<typeof fraReellMottakerValg>,
+        options: Parameters<typeof form.setValue>[2],
+    ) => {
+        setDynamiskFeltVerdi(reellMottakerTypePath, nyVerdi.reellMottakerType ?? "ingen", options);
+        setDynamiskFeltVerdi(reellMottakerPath, nyVerdi.reellMottaker ?? "", options);
+        setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn ?? "", options);
+    };
+
+    const oppdaterValg = (nyttValg: Parameters<typeof fraReellMottakerValg>[0]) => {
+        if (
+            reellMottakerType === "annen_person" &&
+            reellMottaker &&
+            reellMottakerNavn &&
+            nyttValg.type !== "samhandler"
+        ) {
+            setLagretSamhandler({ ident: String(reellMottaker), navn: String(reellMottakerNavn) });
+        }
+
+        if (nyttValg.type === "samhandler" && nyttValg.ident && nyttValg.navn) {
+            setLagretSamhandler({ ident: nyttValg.ident, navn: nyttValg.navn });
+        }
+
+        settSkjemaverdi(fraReellMottakerValg(nyttValg), {
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true,
+        });
+        form.trigger(reellMottakerTypePath);
+    };
 
     useEffect(() => {
-        if (!kunSamhandlerSomReellMottaker || reellMottakerType !== "barnet_selv") {
+        const initialisert = initialiserReellMottaker(skjemaverdi, regel, {
+            ident: barnIdent,
+            navn: barnNavn,
+        });
+        if (
+            initialisert.reellMottakerType === skjemaverdi.reellMottakerType &&
+            (initialisert.reellMottaker ?? "") === (skjemaverdi.reellMottaker ?? "") &&
+            (initialisert.reellMottakerNavn ?? "") === (skjemaverdi.reellMottakerNavn ?? "")
+        ) {
             return;
         }
 
-        setDynamiskFeltVerdi(reellMottakerTypePath, "annen_person", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerPath, "", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerNavnPath, "", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-    }, [
-        form,
-        kunSamhandlerFeilmelding,
-        kunSamhandlerSomReellMottaker,
-        reellMottakerNavnPath,
-        reellMottakerPath,
-        reellMottakerType,
-        reellMottakerTypePath,
-    ]);
-
-    useEffect(() => {
-        if (!isRequired) {
-            return;
-        }
-        if (reellMottakerType && reellMottakerType !== "ingen") {
-            return;
-        }
-
-        if (kunSamhandlerSomReellMottaker) {
-            setDynamiskFeltVerdi(reellMottakerTypePath, "annen_person", {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-            });
-            setDynamiskFeltVerdi(reellMottakerPath, "", {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-            });
-            setDynamiskFeltVerdi(reellMottakerNavnPath, "", {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-            });
-            return;
-        }
-
-        setDynamiskFeltVerdi(reellMottakerTypePath, "barnet_selv", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerPath, barnIdent, {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-        });
-        setDynamiskFeltVerdi(reellMottakerNavnPath, barnNavn, {
+        settSkjemaverdi(initialisert, {
             shouldValidate: true,
             shouldDirty: true,
             shouldTouch: true,
@@ -113,9 +100,10 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
         barnIdent,
         barnNavn,
         form,
-        isRequired,
-        kunSamhandlerSomReellMottaker,
+        regel,
+        reellMottaker,
         reellMottakerNavnPath,
+        reellMottakerNavn,
         reellMottakerPath,
         reellMottakerType,
         reellMottakerTypePath,
@@ -125,85 +113,16 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
         <Controller
             name={reellMottakerTypePath}
             control={form.control}
-            render={({ field, fieldState }) => (
-                <RadioGroup
-                    size="small"
-                    legend={
-                        <HStack align="center" justify="space-between" gap="space-8">
-                            <BodyShort size="small" weight="semibold" textColor="default">
-                                Reell mottaker
-                            </BodyShort>
-                            {isRequired ? (
-                                <Tag size="xsmall" variant="warning">
-                                    Påkrevd
-                                </Tag>
-                            ) : (
-                                <BodyShort size="small" textColor="subtle">
-                                    (valgfritt)
-                                </BodyShort>
-                            )}
-                        </HStack>
-                    }
-                    value={field.value ?? "ingen"}
-                    onChange={(value) => {
-                        if (kunSamhandlerSomReellMottaker && value === "barnet_selv") {
-                            setDynamiskFeltVerdi(reellMottakerTypePath, "annen_person", { shouldValidate: true });
-                            setDynamiskFeltVerdi(reellMottakerPath, "", { shouldValidate: true });
-                            setDynamiskFeltVerdi(reellMottakerNavnPath, "", { shouldValidate: true });
-                            form.trigger(reellMottakerTypePath);
-                            return;
-                        }
-
-                        field.onChange(value);
-                        if (value === "barnet_selv") {
-                            setDynamiskFeltVerdi(reellMottakerPath, barnIdent, { shouldValidate: true });
-                            setDynamiskFeltVerdi(reellMottakerNavnPath, barnNavn, { shouldValidate: true });
-                        } else if (value === "annen_person") {
-                            setDynamiskFeltVerdi(reellMottakerPath, "", { shouldValidate: true });
-                            setDynamiskFeltVerdi(reellMottakerNavnPath, "", { shouldValidate: true });
-                        } else if (value === "ingen") {
-                            setDynamiskFeltVerdi(reellMottakerPath, "", { shouldValidate: true });
-                            setDynamiskFeltVerdi(reellMottakerNavnPath, "", { shouldValidate: true });
-                        }
-                        form.trigger(reellMottakerTypePath);
-                    }}
-                    error={fieldState.error?.message}
-                >
-                    <HGrid columns={{ xs: 1, sm: 3 }} gap="space-4" width="max-content">
-                        <Radio value="ingen" disabled={isRequired}>
-                            Ingen
-                        </Radio>
-                        <Radio disabled={kunSamhandlerSomReellMottaker} value="barnet_selv">
-                            Barnet selv
-                        </Radio>
-                        <Radio value="annen_person">Søk samhandler</Radio>
-                    </HGrid>
-                    {kunSamhandlerSomReellMottaker && (
-                        <Box asChild marginBlock="space-8 space-0">
-                            <Alert variant="warning" size="small">
-                                {kunSamhandlerFeilmelding}
-                            </Alert>
-                        </Box>
-                    )}
-                    {reellMottakerType === "annen_person" && (
-                        <Box marginBlock="space-8 space-0" className="-mx-2">
-                            <ReellMottakerSøk
-                                valgtSamhandlerId={reellMottaker}
-                                onVelg={(ident, navn) => {
-                                    setDynamiskFeltVerdi(reellMottakerPath, ident, { shouldValidate: true });
-                                    setDynamiskFeltVerdi(reellMottakerNavnPath, navn ?? "", { shouldValidate: true });
-                                }}
-                            />
-                        </Box>
-                    )}
-                    {reellMottaker && reellMottakerType !== "barnet_selv" && (
-                        <FunnetPersonInfo
-                            label="Reell mottaker:"
-                            navn={reellMottakerNavn || ""}
-                            ident={reellMottaker}
-                        />
-                    )}
-                </RadioGroup>
+            render={({ fieldState }) => (
+                <ReellMottakerValgGruppe
+                    barnNavn={barnNavn}
+                    barnIdent={barnIdent}
+                    valg={valg}
+                    lagretSamhandler={lagretSamhandler}
+                    onValg={oppdaterValg}
+                    regel={regel}
+                    feil={fieldState.error?.message ?? reellMottakerFeil}
+                />
             )}
         />
     );

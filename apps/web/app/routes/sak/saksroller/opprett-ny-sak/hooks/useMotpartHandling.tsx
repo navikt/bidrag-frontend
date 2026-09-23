@@ -9,26 +9,8 @@ type MotpartHandlingResult = {
     leggTilMotpartManuell: (person: PersonDto) => void;
 };
 
-/**
- * Hook for håndtering av motpart (sett ukjent, legg til manuelt)
- *
- * Brukes i:
- * - ForelderMedBarnFlyt
- * - ForelderUtenBarnFlyt
- *
- * @param form - React Hook Form instance
- * @param onMotpartChanged - Callback som kjøres når motpart endres (optional)
- *
- * @example
- * ```typescript
- * const { settMotpartUkjent, leggTilMotpartManuell } = useMotpartHandling(form, () => {
- *     console.log("Motpart ble endret!");
- * });
- * ```
- */
 export function useMotpartHandling(
     form: UseFormReturn<ForelderMedBarnSkjemaData> | UseFormReturn<ForelderUtenBarnSkjemaData>,
-    onMotpartChanged?: () => void,
 ): MotpartHandlingResult {
     const { partISaken } = useSaksrolleroversikt();
     // partISaken er normalt alltid satt når skjemaet vises, men typen er nullable i konteksten
@@ -42,11 +24,13 @@ export function useMotpartHandling(
             rolle: motsattRolle,
             diskresjonskode: undefined,
         });
-
-        onMotpartChanged?.();
     };
 
     const leggTilMotpartManuell = (person: PersonDto) => {
+        if (partISaken?.ident === person.ident) {
+            throw new Error("Samme person kan ikke være begge parter");
+        }
+
         form.setValue("motpart", {
             ident: person.ident,
             navn: person.visningsnavn,
@@ -54,8 +38,6 @@ export function useMotpartHandling(
             rolle: motsattRolle,
             diskresjonskode: person.diskresjonskode,
         });
-
-        onMotpartChanged?.();
     };
 
     return {

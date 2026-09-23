@@ -1,10 +1,11 @@
+import type { PersonDto } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box, VStack } from "@navikt/ds-react";
+import { Alert } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import BarnMottakerKort from "../../barn-felles/BarnMottakerKort";
-import ParterOppsummeringBarn from "../../barn-felles/ParterOppsummeringBarn";
-import LasterSkeleton from "../../components/LasterSkeleton";
+import ForeldreSeksjon from "../../felles/ForeldreSeksjon";
+import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import {
@@ -13,11 +14,9 @@ import {
     type ForelderPartRolle,
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
-import EksisterendeSakSection from "../../sections/EksisterendeSakSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
-import ValideringsAlertsSection from "../../sections/ValideringsAlertsSection";
-import KjentForelderInfo from "./KjentForelderInfo";
-import LeggTilForelderSeksjon from "./LeggTilForelderSeksjon";
+import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
+import { hentMotsattRolle } from "../../utils";
 
 export default function BarnMedManglendeForeldreFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();
@@ -80,9 +79,8 @@ function BarnMedManglendeForeldreFlytContent() {
     const foreldre = form.watch("foreldre");
 
     const barnErMyndig = barn.rolle === "barn_over_18";
-    const foreldreKlareForOppsummering = foreldre.every((f) => f.navn && f.navn.trim() !== "");
+    const alleForeldreHarNavn = foreldre.every((f) => f.navn && f.navn.trim() !== "");
     const rollerErValgt = foreldre.every((f) => f.rolle !== null);
-    const harUkjentForelder = foreldre.some((forelder) => forelder.erKjent === false);
     const bidragspliktig = foreldre.find((f) => f.rolle === "bidragspliktig");
 
     const bidragsmottaker = foreldre.find((f) => f.rolle === "bidragsmottaker");
@@ -100,6 +98,7 @@ function BarnMedManglendeForeldreFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
+        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -138,102 +137,99 @@ function BarnMedManglendeForeldreFlytContent() {
         form.setValue(`foreldre.${andreIndex}.rolle`, motsattRolle);
     };
 
-    const antallManglendeforeldre = foreldre.filter((f) => !f.ident || f.ident.trim() === "").length;
+    const leggTilForelder = (person: PersonDto, index: number) => {
+        const duplikatPerson = foreldre.find(
+            (forelder, forelderIndex) => forelderIndex !== index && forelder.ident === person.ident,
+        );
 
-    const visReellMottaker = rollerErValgt;
-    const visOppsummering = (foreldreKlareForOppsummering && rollerErValgt) || harUkjentForelder;
+        if (duplikatPerson) {
+            const personInfo = person.visningsnavn
+                ? `${person.visningsnavn} (${person.ident})`
+                : person.ident
+                  ? `Denne personen (${person.ident})`
+                  : "Denne personen";
+
+            throw new Error(
+                `${personInfo} er allerede registrert som ${duplikatPerson.rolle} og kan ikke legges til på nytt.`,
+            );
+        }
+
+        const andreForelderRolle = form.getValues(`foreldre.${index === 0 ? 1 : 0}.rolle`);
+        form.setValue(`foreldre.${index}`, {
+            ident: person.ident,
+            navn: person.visningsnavn,
+            erKjent: true,
+            diskresjonskode: person.diskresjonskode,
+            rolle: andreForelderRolle ? hentMotsattRolle(andreForelderRolle) : null,
+        });
+    };
+
+    const settForelderUkjent = (index: number) => {
+        const andreForelderRolle = form.getValues(`foreldre.${index === 0 ? 1 : 0}.rolle`);
+        form.setValue(`foreldre.${index}`, {
+            ident: "",
+            navn: "",
+            erKjent: false,
+            diskresjonskode: undefined,
+            rolle: andreForelderRolle ? hentMotsattRolle(andreForelderRolle) : null,
+        });
+    };
 
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                <VStack gap="space-6">
-                    <VStack gap="space-12">
-                        {kjentForelder ? (
-                            <Alert variant="info" size="small">
-                                Dette barnet har én forelder registrert ({kjentForelder.visningsnavn},
-                                {kjentForelder.ident}
-                                ). Du må legge til den andre forelderen manuelt.
-                            </Alert>
-                        ) : (
-                            <Alert variant="warning" size="small">
-                                Dette barnet har ingen registrerte foreldre. Du må legge til begge foreldre manuelt.
-                            </Alert>
-                        )}
-
-                        {eksisterendeSakInfoMelding && (
-                            <Alert size="small" variant={eksisterendeSakInfoMelding.type}>
-                                {eksisterendeSakInfoMelding.melding}
-                            </Alert>
-                        )}
-
-                        <EksisterendeSakSection
-                            harEksisterendeSak={harEksisterendeSak}
-                            eksisterendeSak={eksisterendeSak}
-                            partISakenNavn={bidragspliktig?.navn ?? ""}
-                            motpartNavn={bidragsmottaker?.navn}
-                        />
-                    </VStack>
-
-                    {isLoadingHentSak && <LasterSkeleton tekst="Henter sak..." />}
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    {kjentForelder && (
-                        <KjentForelderInfo
-                            form={form}
-                            forelder={kjentForelder}
-                            onVelgRolle={(rolle) => settRolle(0, rolle)}
-                            valgtRolle={foreldre[0]?.rolle ?? null}
-                        />
+        <RolleFlytSide
+            onSubmit={onSubmit}
+            status={{
+                infoMelding: eksisterendeSakInfoMelding,
+                harEksisterendeSak,
+                eksisterendeSak,
+                isLoading: isLoadingHentSak,
+                partISakenNavn: bidragspliktig?.navn ?? "",
+                motpartNavn: bidragsmottaker?.navn,
+            }}
+            meldinger={
+                <>
+                    {kjentForelder ? (
+                        <Alert variant="info" size="small">
+                            Dette barnet har én forelder registrert ({kjentForelder.visningsnavn},{kjentForelder.ident}
+                            ). Du må legge til den andre forelderen manuelt.
+                        </Alert>
+                    ) : (
+                        <Alert variant="warning" size="small">
+                            Dette barnet har ingen registrerte foreldre. Du må legge til begge foreldre manuelt.
+                        </Alert>
                     )}
+                    {alleForeldreHarNavn && <UfullstendigRelasjonAlert />}
+                </>
+            }
+            submit={
+                <EnhetOgSubmitSection
+                    enhet={enhet}
+                    enhetNavn={enhetNavn}
+                    isLoadingEnhet={isLoadingEnhet}
+                    enhetError={enhetError}
+                    blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    isLoading={isLoadingOpprettSak}
+                    submitError={error}
+                    saksnummer={saksnummer}
+                />
+            }
+        >
+            <BarnMottakerKort form={form} barn={barn} erPåkrevd={trengerReellMottaker} kanVelge={rollerErValgt} />
 
-                    <LeggTilForelderSeksjon
-                        form={form}
-                        foreldre={foreldre}
-                        antallManglende={antallManglendeforeldre}
-                        kjentForelderIndex={kjentForelder ? 0 : null}
-                        onVelgRolle={settRolle}
-                    />
-
-                    {visReellMottaker && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <BarnMottakerKort
-                                form={form}
-                                barn={barn}
-                                visReellMottaker={visReellMottaker}
-                                erPåkrevd={trengerReellMottaker}
-                            />
-                        </>
-                    )}
-
-                    {visOppsummering && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ParterOppsummeringBarn form={form} />
-                        </>
-                    )}
-
-                    {foreldreKlareForOppsummering && (
-                        <>
-                            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-                            <ValideringsAlertsSection visUfullstendigRelasjonAlert />
-                        </>
-                    )}
-
-                    <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
-                    <EnhetOgSubmitSection
-                        enhet={enhet}
-                        enhetNavn={enhetNavn}
-                        isLoadingEnhet={isLoadingEnhet}
-                        enhetError={enhetError}
-                        disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                        submitError={error}
-                        saksnummer={saksnummer}
-                    />
-                </VStack>
-            </VStack>
-        </Box>
+            <ForeldreSeksjon
+                foreldre={foreldre}
+                beskrivelse={
+                    kjentForelder
+                        ? "Kontroller den registrerte forelderen og legg til den andre."
+                        : "Søk etter begge foreldrene, eller registrer dem som ukjent."
+                }
+                rollefeil={foreldre.map((_forelder, index) => form.formState.errors.foreldre?.[index]?.rolle?.message)}
+                personfeil={foreldre.map((_forelder, index) => form.formState.errors.foreldre?.[index]?.ident?.message)}
+                kanRegistrere={(index) => index !== (kjentForelder ? 0 : -1)}
+                onPersonValgt={leggTilForelder}
+                onSettUkjent={settForelderUkjent}
+                onVelgRolle={settRolle}
+            />
+        </RolleFlytSide>
     );
 }

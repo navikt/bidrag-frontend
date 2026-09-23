@@ -1,5 +1,5 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils/personUtils";
+import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import {
     type Barnkurv,
     type BarnMedAlder,
@@ -11,7 +11,7 @@ import {
 
 export function leggTilAlderPåBarn(barn: PersonDto[]): BarnMedAlder[] {
     return barn.map((person) => {
-        const alder = person?.fødselsdato ? beregnAlder(person.fødselsdato) : (beregnAlderFraFnr(person.ident) ?? 0);
+        const alder = beregnAlderForPerson(person) ?? 0;
 
         return {
             ident: person.ident,
@@ -43,14 +43,6 @@ export function grupperBarnIKurver(relasjoner: MotpartBarnRelasjon[]): Barnkurv[
             barn: sorterteBarn,
         };
     });
-}
-
-export function erKurvDeaktivert(kurvId: string, aktivKurvId: string | null, harValgteBarn: boolean): boolean {
-    if (!harValgteBarn || !aktivKurvId) {
-        return false;
-    }
-
-    return kurvId !== aktivKurvId;
 }
 
 export function tilPartISaken(person: PersonDto, rolle: PartRolle): PartISaken {

@@ -1,7 +1,8 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Alert, BodyShort, Box, Heading, HStack, Tag, VStack } from "@navikt/ds-react";
+import { Alert, Tag } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
 import BarnManueltRegistrering from "../BarnManueltRegistrering";
+import SkjemaSeksjon from "../felles/SkjemaSeksjon";
 import BarnkurvListe from "../motpart-felles/BarnkurvListe";
 import ValgteBarnListe from "../motpart-felles/ValgteBarnListe";
 import {
@@ -11,29 +12,22 @@ import {
     type ForelderMedBarnSkjemaData,
     MYNDYG_BARN_ALDER,
 } from "../opprett-sak-schema";
+import type { ReellMottakerRegel } from "../reell-mottaker-regel";
 
 interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     form: UseFormReturn<T>;
     barnkurver?: Barnkurv[];
-    aktivKurvId?: string | null;
-    erBidragspliktig?: boolean;
-    visReellMottaker?: boolean;
-    bidragsmottakerErUkjent?: boolean;
-    reellMottakerAlltidPåkrevd?: boolean;
-    kunSamhandlerSomReellMottaker?: boolean;
+    reellMottakerRegel: ReellMottakerRegel;
     onResetMotpart?: () => void;
+    oppdaterMotpart?: boolean;
 }
 
 export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     form,
     barnkurver = [],
-    aktivKurvId = null,
-    erBidragspliktig = false,
-    visReellMottaker = true,
-    bidragsmottakerErUkjent = false,
-    reellMottakerAlltidPåkrevd = false,
-    kunSamhandlerSomReellMottaker = false,
+    reellMottakerRegel,
     onResetMotpart,
+    oppdaterMotpart,
 }: BarnSectionProps<T>) {
     const forelderBarnForm = form as unknown as UseFormReturn<{
         valgteBarn: BarnMedAlder[];
@@ -88,40 +82,27 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     };
 
     return (
-        <VStack gap="space-6">
-            <HStack align="center" justify="space-between">
-                <div>
-                    <Heading level="2" size="medium">
-                        Velg barn saken gjelder for
-                    </Heading>
-                    <Box asChild marginBlock="space-4 space-0">
-                        <BodyShort size="small" textColor="subtle">
-                            Velg alle barn som skal være med i saken
-                        </BodyShort>
-                    </Box>
-                </div>
+        <SkjemaSeksjon
+            tittel="Velg barn saken gjelder for"
+            beskrivelse="Velg alle barn som skal være med i saken"
+            handling={
                 <Tag size="small" variant="info">
                     {valgteBarn.length} valgt
                 </Tag>
-            </HStack>
-
+            }
+        >
             {barnkurver.length > 0 && (
                 <BarnkurvListe
                     barnkurver={barnkurver}
-                    aktivKurvId={aktivKurvId}
                     form={forelderBarnForm as unknown as UseFormReturn<ForelderMedBarnSkjemaData>}
-                    visReellMottaker={visReellMottaker}
-                    bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                    reellMottakerAlltidPåkrevd={reellMottakerAlltidPåkrevd}
-                    kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
+                    reellMottakerRegel={reellMottakerRegel}
+                    oppdaterMotpart={oppdaterMotpart}
                 />
             )}
 
-            <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" />
-
             <BarnManueltRegistrering
                 form={forelderBarnForm as unknown as UseFormReturn<ForelderMedBarnSkjemaData>}
-                leggTilBarnMauell={leggTilBarnManuell}
+                leggTilBarnManuell={leggTilBarnManuell}
                 barnkurver={barnkurver}
             />
 
@@ -133,18 +114,15 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                     fjernBarn={fjernBarn}
                     tittel="Barn som legges til manuelt"
                     heading={{ size: "small", level: "3" }}
-                    visReellMottaker={visReellMottaker}
-                    bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                    reellMottakerAlltidPåkrevd={reellMottakerAlltidPåkrevd}
-                    kunSamhandlerSomReellMottaker={kunSamhandlerSomReellMottaker}
+                    reellMottakerRegel={reellMottakerRegel}
                 />
             )}
 
-            {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
+            {valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
                 <Alert variant="error" size="small">
                     {String(form.formState.errors.valgteBarn.message ?? "")}
                 </Alert>
             )}
-        </VStack>
+        </SkjemaSeksjon>
     );
 }

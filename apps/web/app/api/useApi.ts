@@ -504,7 +504,7 @@ export function useHentFlerePersoninformasjon(identer: string[], enabled: boolea
     });
 }
 
-function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
+export function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
     return {
         queryKey: ["hent_person_motpart_barn_relasjon", request?.ident],
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {

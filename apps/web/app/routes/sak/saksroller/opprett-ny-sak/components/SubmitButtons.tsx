@@ -1,31 +1,45 @@
 import { TilgangsFeilError } from "@bidrag/api";
 import { RedirectTo } from "@bidrag/common";
 import { TasklistSaveIcon, TasklistSendIcon, TasklistStartIcon } from "@navikt/aksel-icons";
-import { Alert, Button, HStack } from "@navikt/ds-react";
+import { Alert, Button, HStack, VStack } from "@navikt/ds-react";
 import type { AxiosError } from "axios";
-import { useEffect, useRef } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { useRouteLoaderData, useSearchParams } from "react-router";
 import type { loader as rootLoader } from "~/root.tsx";
 
 type Props = {
-    disabled?: boolean;
+    blocked?: boolean;
     isLoading?: boolean;
     error?: AxiosError<string> | TilgangsFeilError | null;
     saksnummer?: string | null;
 };
 
-export default function SubmitButtons({ disabled = false, isLoading = false, error, saksnummer }: Props) {
+export default function SubmitButtons({ blocked = false, isLoading = false, error, saksnummer }: Props) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const [, setSearchParams] = useSearchParams();
     const errorRef = useRef<HTMLDivElement>(null);
     const afterSubmitRedirect = useRef<"sak" | "soknad" | null>(null);
+    const [blockedError, setBlockedError] = useState<string | null>(null);
+    const form = useFormContext();
 
     useEffect(() => {
-        if (error && errorRef.current) {
+        if ((error || blockedError) && errorRef.current) {
             errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
             errorRef.current.focus();
         }
-    }, [error]);
+    }, [error, blockedError]);
+
+    useEffect(() => {
+        if (!blocked) {
+            setBlockedError(null);
+        }
+    }, [blocked]);
+
+    useEffect(() => {
+        const abonnement = form.watch(() => setBlockedError(null));
+        return () => abonnement.unsubscribe();
+    }, [form]);
 
     useEffect(() => {
         if (!saksnummer) return;
@@ -45,6 +59,18 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
         }
     }, [saksnummer, bisysUrl, setSearchParams]);
 
+    const velgHandling = (event: MouseEvent<HTMLButtonElement>, handling: "sak" | "soknad" | null) => {
+        if (blocked || isLoading || saksnummer) {
+            event.preventDefault();
+            if (blocked && !isLoading && !saksnummer) {
+                setBlockedError("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over.");
+            }
+            return;
+        }
+        setBlockedError(null);
+        afterSubmitRedirect.current = handling;
+    };
+
     function renderButtons() {
         if (saksnummer && afterSubmitRedirect.current) {
             return (
@@ -56,41 +82,35 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
         return (
             <HStack gap="space-2" justify="end">
                 <Button
-                    className="self-end"
                     variant="tertiary"
                     type="submit"
                     size="xsmall"
                     title="Opprett sak og gå til ny søknad skjermbildet"
                     icon={<TasklistStartIcon title="lagre" fontSize="1.5rem" />}
                     loading={isLoading}
-                    onClick={() => (afterSubmitRedirect.current = "soknad")}
-                    disabled={disabled || isLoading}
+                    onClick={(event) => velgHandling(event, "soknad")}
                 >
                     Opprett og ny søknad
                 </Button>
                 <Button
-                    className="self-end"
                     variant="tertiary"
                     type="submit"
                     size="xsmall"
                     icon={<TasklistSendIcon title="lagre" fontSize="1.5rem" />}
                     loading={isLoading}
                     title="Opprett og gå til sak"
-                    onClick={() => (afterSubmitRedirect.current = "sak")}
-                    disabled={disabled || isLoading}
+                    onClick={(event) => velgHandling(event, "sak")}
                 >
                     Opprett og gå til sak
                 </Button>
                 <Button
-                    className="self-end"
                     variant="primary"
                     type="submit"
                     size="xsmall"
                     title="Opprett sak uten navigering"
                     icon={<TasklistSaveIcon title="lagre" fontSize="1.5rem" />}
                     loading={isLoading}
-                    onClick={() => (afterSubmitRedirect.current = null)}
-                    disabled={disabled || isLoading}
+                    onClick={(event) => velgHandling(event, null)}
                 >
                     Opprett
                 </Button>
@@ -98,15 +118,16 @@ export default function SubmitButtons({ disabled = false, isLoading = false, err
         );
     }
     return (
-        <div>
-            {error && (
+        <VStack gap="space-8">
+            {(error || blockedError) && (
                 <Alert variant="error" ref={errorRef} tabIndex={-1}>
-                    {error instanceof TilgangsFeilError
-                        ? error.message
-                        : error?.response?.data || "Kunne ikke opprette sak"}
+                    {blockedError ??
+                        (error instanceof TilgangsFeilError
+                            ? error.message
+                            : error?.response?.data || "Kunne ikke opprette sak")}
                 </Alert>
             )}
             {renderButtons()}
-        </div>
+        </VStack>
     );
 }
