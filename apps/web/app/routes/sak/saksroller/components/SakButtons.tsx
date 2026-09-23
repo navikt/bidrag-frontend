@@ -205,6 +205,7 @@ export default function SakButtons({
                                 type="button"
                                 size="small"
                                 variant="secondary"
+                                disabled={lagrer}
                                 onClick={() => setBekreftHandling(null)}
                             >
                                 Avbryt
