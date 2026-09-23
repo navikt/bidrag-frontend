@@ -341,13 +341,13 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                                             erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
                                                         />
                                                     ))}
-                                                    <LeggTilBarn
-                                                        søsken={muligeBarn}
-                                                        erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                                                        setVisSøk={setLeggTilBarnVisSøk}
-                                                        visSøk={leggTilBarnVisSøk}
-                                                    />
                                                 </HGrid>
+                                                <LeggTilBarn
+                                                    søsken={muligeBarn}
+                                                    erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
+                                                    setVisSøk={setLeggTilBarnVisSøk}
+                                                    visSøk={leggTilBarnVisSøk}
+                                                />
                                             </VStack>
                                         </Box>
 
