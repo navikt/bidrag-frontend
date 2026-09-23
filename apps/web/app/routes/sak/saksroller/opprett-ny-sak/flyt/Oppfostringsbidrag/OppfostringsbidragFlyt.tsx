@@ -72,6 +72,7 @@ function OppfostringsbidragFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
+        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -131,11 +132,12 @@ function OppfostringsbidragFlytContent() {
                     enhetError={enhetError}
                     blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
                     submitError={error}
+                    isLoading={isLoadingOpprettSak}
                     saksnummer={saksnummer}
                 />
             }
         >
-            <BarnSection form={form} barnkurver={barnkurver} reellMottakerRegel={{ type: "alltid-samhandler" }} />
+            <BarnSection form={form} barnkurver={barnkurver} reellMottakerRegel={{ type: "alltid-samhandler" }} oppdaterMotpart={false} />
 
             <OppsummeringSection
                 bidragspliktig={

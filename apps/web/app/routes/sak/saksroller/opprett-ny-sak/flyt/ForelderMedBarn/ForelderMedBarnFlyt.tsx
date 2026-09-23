@@ -93,6 +93,7 @@ function ForelderMedBarnFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
+        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -161,6 +162,7 @@ function ForelderMedBarnFlytContent() {
                         (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
                     }
                     submitError={error}
+                    isLoading={isLoadingOpprettSak}
                     saksnummer={saksnummer}
                 />
             }

@@ -1,6 +1,6 @@
 import { arbeidsfordelingMap } from "@bidrag/utils/organisasjonUtils";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import type {
     BarnMedAlder,
@@ -107,6 +107,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
         saksnummer,
         nullstillResultat,
     } = useOpprettSakHandling({ enhet: enhet ?? "", arbeidsfordeling: arbeidsfordeling ?? "EEN" });
+    const senderInn = useRef(false);
 
     useEffect(() => {
         const abonnement = form.watch(() => {
@@ -118,12 +119,18 @@ export function useFlowSubmission<T extends FormMedKategori>({
     }, [form, nullstillResultat]);
 
     const onSubmit = form.handleSubmit(async (data) => {
-        if (arbeidsfordeling === arbeidsfordelingMap.EKTEFELLLESAK.kode) {
-            await opprettEktefellebidragSak(data as unknown as EktefellebidragSkjemaData);
-            return;
-        }
+        if (senderInn.current || isLoadingOpprettSak || saksnummer) return;
+        senderInn.current = true;
+        try {
+            if (arbeidsfordeling === arbeidsfordelingMap.EKTEFELLLESAK.kode) {
+                await opprettEktefellebidragSak(data as unknown as EktefellebidragSkjemaData);
+                return;
+            }
 
-        await opprettSakFraSkjema(data as never);
+            await opprettSakFraSkjema(data as never);
+        } finally {
+            senderInn.current = false;
+        }
     });
 
     return {

@@ -98,6 +98,7 @@ function BarnMedManglendeForeldreFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
+        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -207,6 +208,7 @@ function BarnMedManglendeForeldreFlytContent() {
                     isLoadingEnhet={isLoadingEnhet}
                     enhetError={enhetError}
                     blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
+                    isLoading={isLoadingOpprettSak}
                     submitError={error}
                     saksnummer={saksnummer}
                 />

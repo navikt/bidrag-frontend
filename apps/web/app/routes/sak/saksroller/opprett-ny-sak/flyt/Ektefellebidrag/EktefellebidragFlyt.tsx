@@ -55,6 +55,7 @@ export default function EktefellebidragFlyt() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
+        isLoadingOpprettSak,
         error: submitError,
         saksnummer,
     } = useFlowSubmission({
@@ -98,6 +99,7 @@ export default function EktefellebidragFlyt() {
                         enhetError={enhetError}
                         blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
                         submitError={submitError}
+                        isLoading={isLoadingOpprettSak}
                         saksnummer={saksnummer}
                     />
                 }

@@ -12,9 +12,10 @@ type Props = {
     barnkurver: Barnkurv[];
     form: UseFormReturn<ForelderMedBarnSkjemaData>;
     reellMottakerRegel: ReellMottakerRegel;
+    oppdaterMotpart?: boolean;
 };
 
-export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel }: Props) {
+export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, oppdaterMotpart = true }: Props) {
     const valgteBarn = form.watch("valgteBarn") || [];
 
     const erBarnValgt = (barnIdent: string) => valgteBarn.some((b) => b.ident === barnIdent);
@@ -51,7 +52,7 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel }: 
         const oppdaterteBarn = [...forblirValgt, ...nyeBarn];
         form.setValue("valgteBarn", oppdaterteBarn);
 
-        if (oppdaterteBarn.length === 0) {
+        if (oppdaterteBarn.length === 0 && oppdaterMotpart) {
             form.setValue("motpart", {
                 ident: "",
                 navn: "",
@@ -62,7 +63,7 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel }: 
             return;
         }
 
-        if (valgteIdenter.length > 0 && aktivKurv?.id !== kurvId) {
+        if (oppdaterMotpart && valgteIdenter.length > 0 && aktivKurv?.id !== kurvId) {
             const erMotpartUkjent = kurv.id.toLowerCase().includes("ukjent");
 
             if (!erMotpartUkjent && kurv.motpart) {

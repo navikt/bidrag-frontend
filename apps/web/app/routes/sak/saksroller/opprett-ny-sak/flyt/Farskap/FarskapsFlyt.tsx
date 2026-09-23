@@ -67,6 +67,7 @@ function FarskapsFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
+        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -111,11 +112,12 @@ function FarskapsFlytContent() {
                     enhetError={enhetError}
                     blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
                     submitError={error}
+                    isLoading={isLoadingOpprettSak}
                     saksnummer={saksnummer}
                 />
             }
         >
-            <BarnSection form={form} barnkurver={barnkurver} reellMottakerRegel={{ type: "skjult" }} />
+            <BarnSection form={form} barnkurver={barnkurver} reellMottakerRegel={{ type: "skjult" }} oppdaterMotpart={false} />
 
             <OppsummeringSection
                 bidragspliktig={null}

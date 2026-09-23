@@ -4,7 +4,7 @@ import { SecureLoggerService } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils/datoUtils";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, BodyShort, Heading, VStack } from "@navikt/ds-react";
+import { Alert, Tag } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
@@ -16,6 +16,7 @@ import BarnManueltRegistrering from "../../BarnManueltRegistrering";
 import BMUtenBarnAlert from "../../components/BMUtenBarnAlert";
 import KanIkkeOppretteSakAlert from "../../components/KanIkkeOppretteSakAlert";
 import RolleFlytSide from "../../felles/RolleFlytSide";
+import SkjemaSeksjon from "../../felles/SkjemaSeksjon";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import { useMotpartHandling } from "../../hooks/useMotpartHandling";
 import useSyncKategori from "../../hooks/useSyncKategori";
@@ -130,6 +131,7 @@ function ForelderUtenBarnFlytContent() {
         isLoadingHentSak,
         infoMelding: eksisterendeSakInfoMelding,
         onSubmit,
+        isLoadingOpprettSak,
         error,
         saksnummer,
     } = useFlowSubmission({
@@ -350,23 +352,6 @@ function ForelderUtenBarnFlytContent() {
                 partISakenNavn: partISaken.navn,
                 motpartNavn: motpart.navn,
             }}
-            innledning={
-                <VStack gap="space-4">
-                    <Heading level="2" size="medium" spacing>
-                        Legg til barn
-                    </Heading>
-                    <BodyShort size="small" textColor="subtle">
-                        Ingen barn funnet i registeret. Vi finner ingen registrerte barn for denne personen. Du kan
-                        legge til barn og den andre forelderen manuelt.
-                    </BodyShort>
-
-                    {feil && (
-                        <Alert size="small" variant="error">
-                            {feil}
-                        </Alert>
-                    )}
-                </VStack>
-            }
             meldinger={
                 <>
                     {foreldreinformasjonTilBarnError !== null &&
@@ -402,20 +387,25 @@ function ForelderUtenBarnFlytContent() {
                         (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
                     }
                     submitError={error}
+                    isLoading={isLoadingOpprettSak}
                     saksnummer={saksnummer}
                 />
             }
         >
-            <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnManuell={leggTilBarnManuell} />
-
-            <VStack gap="space-4">
+            <SkjemaSeksjon
+                tittel="Velg barn saken gjelder for"
+                beskrivelse="Ingen barn funnet i registeret. Legg til barn manuelt."
+                handling={<Tag size="small" variant="info">{valgteBarn.length} valgt</Tag>}
+            >
+                {feil && <Alert size="small" variant="error">{feil}</Alert>}
+                <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnManuell={leggTilBarnManuell} />
                 <ValgteBarnListe
                     form={form}
                     valgteBarn={valgteBarn}
                     alleBarn={valgteBarn}
                     fjernBarn={fjernBarn}
                     tittel="Barn som legges til"
-                    heading={{ size: "medium", level: "2" }}
+                    heading={{ size: "small", level: "3" }}
                     reellMottakerRegel={{ type: "etter-barn", bidragsmottakerErUkjent }}
                 />
 
@@ -426,7 +416,7 @@ function ForelderUtenBarnFlytContent() {
                         {form.formState.errors.valgteBarn.message}
                     </Alert>
                 )}
-            </VStack>
+            </SkjemaSeksjon>
 
             <MotpartSection
                 form={form}

@@ -19,6 +19,7 @@ interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     barnkurver?: Barnkurv[];
     reellMottakerRegel: ReellMottakerRegel;
     onResetMotpart?: () => void;
+    oppdaterMotpart?: boolean;
 }
 
 export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
@@ -26,6 +27,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     barnkurver = [],
     reellMottakerRegel,
     onResetMotpart,
+    oppdaterMotpart,
 }: BarnSectionProps<T>) {
     const forelderBarnForm = form as unknown as UseFormReturn<{
         valgteBarn: BarnMedAlder[];
@@ -94,6 +96,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                     barnkurver={barnkurver}
                     form={forelderBarnForm as unknown as UseFormReturn<ForelderMedBarnSkjemaData>}
                     reellMottakerRegel={reellMottakerRegel}
+                    oppdaterMotpart={oppdaterMotpart}
                 />
             )}
 

@@ -60,9 +60,11 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
     }, [saksnummer, bisysUrl, setSearchParams]);
 
     const velgHandling = (event: MouseEvent<HTMLButtonElement>, handling: "sak" | "soknad" | null) => {
-        if (blocked) {
+        if (blocked || isLoading || saksnummer) {
             event.preventDefault();
-            setBlockedError("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over.");
+            if (blocked && !isLoading && !saksnummer) {
+                setBlockedError("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over.");
+            }
             return;
         }
         setBlockedError(null);

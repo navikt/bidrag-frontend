@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
 import { Alert, BodyShort, Box, HStack, Loader, Search, VStack } from "@navikt/ds-react";
 import type { KeyboardEvent } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
 import { hentNyttFødselsnummerMelding } from "../utils.ts";
 
@@ -26,16 +26,23 @@ export default function PersonSamhandlerSøk({
     const [searchErrorMessage, setSearchErrorMessage] = useState<string | undefined>(undefined);
     const [nyttFødselsnummerInfo, setNyttFødselsnummerInfo] = useState<string | undefined>(undefined);
     const [searchValue, setSearchValue] = useState(valgIdent || "");
-    const sisteSøkVerdi = useRef<string | undefined>(undefined);
+    const søkeversjon = useRef(0);
+
+    useEffect(
+        () => () => {
+            søkeversjon.current += 1;
+        },
+        [],
+    );
 
     function onInputChange(value: string) {
         setSearchValue(value);
         const søktVerdi = value?.trim();
-        sisteSøkVerdi.current = søktVerdi;
+        const versjon = ++søkeversjon.current;
         samhandlerPersonFn
             .mutateAsync({ ident: søktVerdi })
             .then(async (data) => {
-                if (sisteSøkVerdi.current !== søktVerdi) return;
+                if (søkeversjon.current !== versjon) return;
 
                 if (!data?.isValid) {
                     setSearchErrorMessage("Finnes ingen person eller samhandler med oppgitt ident");
@@ -54,7 +61,7 @@ export default function PersonSamhandlerSøk({
                 }
             })
             .catch((err) => {
-                if (sisteSøkVerdi.current !== søktVerdi) return;
+                if (søkeversjon.current !== versjon) return;
 
                 const erTilgangsfeil = err instanceof Error && !(err as { isAxiosError?: boolean }).isAxiosError;
                 const feil = erTilgangsfeil ? err.message : "Finnes ingen person eller samhandler med oppgitt ident";
@@ -94,7 +101,10 @@ export default function PersonSamhandlerSøk({
                             size="small"
                             value={searchValue}
                             onClick={(e) => e.stopPropagation()}
-                            onChange={setSearchValue}
+                            onChange={(value) => {
+                                søkeversjon.current += 1;
+                                setSearchValue(value);
+                            }}
                             onSearchClick={onInputChange}
                             onKeyDown={handleSearchKeyDown}
                         >

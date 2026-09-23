@@ -1,7 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { BodyLong, Box, Heading, HStack, Loader, VStack } from "@navikt/ds-react";
-import { Suspense, useMemo, useRef, useState } from "react";
+import { Suspense, useMemo } from "react";
 import DiskresjonAlert from "../components/DiskresjonAlert";
 import PersonInfo from "../components/PersonInfo";
 import SøkPerson from "../components/SøkPerson";
@@ -19,7 +18,6 @@ import SakskategoriVelger from "./SakskategoriVelger";
 import SaksrolleVelger from "./SaksrolleVelger";
 import SakstypeVelger from "./SakstypeVelger";
 import { type Sakstype, sakstypeTilBeskrivelse, useSaksrolleroversikt } from "./saksrolleroversiktContext";
-import { tilPartISaken } from "./utils";
 
 const AUTO_ASSIGNED_ROLES: Partial<Record<Sakstype, PartRolle>> = {
     OPPFOSTRINGSBIDRAG: "bidragspliktig",
@@ -66,20 +64,18 @@ function partSøkLabel(sakstype: Sakstype) {
 }
 
 export default function OpprettSakFlyt() {
-    const [partISaken, setPartISaken] = useState<PersonDto | null>();
     const {
+        valgtPerson: partISaken,
         sakstype,
-        setSakstype,
         sakskategori,
-        setSakskategori,
+        velgKategori,
         saksrolleFlyt,
         isLoadingOpprettSak,
-        setPartISaken: setPartISakenSkjemaData,
-        setSaksrolleFlyt,
-        setPartISakenAlder,
+        velgPerson,
+        velgSakstype: settSakstypeOgNullstill,
+        velgRolle,
+        settFlytHvisGjeldende,
         hentBarnkurver,
-        nullstillRolleOgFlyt,
-        nullstillPartOgFlyt,
     } = useSaksrolleroversikt();
 
     const FlytKomponent = useMemo(() => {
@@ -100,58 +96,28 @@ export default function OpprettSakFlyt() {
         return map[saksrolleFlyt.type];
     }, [saksrolleFlyt]);
 
-    const barnkurverRequestIdRef = useRef(0);
     const oppdaterFlytForSakstypeOgPart = (person: PersonDto, valgtSakstype: Sakstype | null) => {
         const autoRole = getAutoAssignedRole(valgtSakstype);
 
         if (!autoRole) {
-            barnkurverRequestIdRef.current += 1;
-            nullstillRolleOgFlyt();
             return;
         }
 
-        setPartISakenSkjemaData(tilPartISaken(person, autoRole));
+        const versjon = velgRolle(autoRole);
 
-        if (valgtSakstype === "OPPFOSTRINGSBIDRAG") {
-            barnkurverRequestIdRef.current += 1;
-            const requestId = barnkurverRequestIdRef.current;
+        if (valgtSakstype === "OPPFOSTRINGSBIDRAG" || valgtSakstype === "FARSKAP") {
             hentBarnkurver(person.ident)
                 .then((barnkurver) => {
-                    if (barnkurverRequestIdRef.current !== requestId) return;
-                    setSaksrolleFlyt({
+                    settFlytHvisGjeldende(versjon, {
                         key: Date.now(),
-                        type: "OPPFOSTRINGSBIDRAG",
+                        type: valgtSakstype,
                         barnkurver,
                     });
                 })
                 .catch(() => {
-                    if (barnkurverRequestIdRef.current !== requestId) return;
-                    setSaksrolleFlyt({
+                    settFlytHvisGjeldende(versjon, {
                         key: Date.now(),
-                        type: "OPPFOSTRINGSBIDRAG",
-                        barnkurver: [],
-                    });
-                });
-            return;
-        }
-
-        if (valgtSakstype === "FARSKAP") {
-            barnkurverRequestIdRef.current += 1;
-            const requestId = barnkurverRequestIdRef.current;
-            hentBarnkurver(person.ident)
-                .then((barnkurver) => {
-                    if (barnkurverRequestIdRef.current !== requestId) return;
-                    setSaksrolleFlyt({
-                        key: Date.now(),
-                        type: "FARSKAP",
-                        barnkurver,
-                    });
-                })
-                .catch(() => {
-                    if (barnkurverRequestIdRef.current !== requestId) return;
-                    setSaksrolleFlyt({
-                        key: Date.now(),
-                        type: "FARSKAP",
+                        type: valgtSakstype,
                         barnkurver: [],
                     });
                 });
@@ -159,29 +125,22 @@ export default function OpprettSakFlyt() {
     };
 
     const velgSakstype = (type: Sakstype) => {
-        if (type === sakstype) {
+        if (type === sakstype || isLoadingOpprettSak) {
             return;
         }
 
-        setSakstype(type);
-        setSakskategori("Nasjonal");
-
-        if (partISaken) {
-            oppdaterFlytForSakstypeOgPart(partISaken, type);
-        } else {
-            barnkurverRequestIdRef.current += 1;
-            nullstillPartOgFlyt();
-        }
+        settSakstypeOgNullstill(type);
     };
 
     const leggTilPartISaken = (person: PersonDto) => {
-        barnkurverRequestIdRef.current += 1;
-        nullstillPartOgFlyt();
-        setPartISaken(person);
-        const partISakAlder = beregnAlderForPerson(person);
-        setPartISakenAlder(partISakAlder);
-
+        if (!sakstype || isLoadingOpprettSak) return;
+        velgPerson(person);
         oppdaterFlytForSakstypeOgPart(person, sakstype);
+    };
+
+    const velgSakskategori = (kategori: typeof sakskategori) => {
+        if (kategori === sakskategori || isLoadingOpprettSak) return;
+        velgKategori(kategori);
     };
 
     return (
@@ -211,13 +170,13 @@ export default function OpprettSakFlyt() {
                         Opprett ny sak
                     </Heading>
 
-                    <VStack gap="space-24">
+                    <VStack gap="space-24" aria-busy={isLoadingOpprettSak}>
                         <SkjemaSeksjon tittel="Type sak">
                             <SkjemaSeksjonKort>
                                 <SakstypeVelger value={sakstype} onVelg={velgSakstype} />
                             </SkjemaSeksjonKort>
                             <SkjemaSeksjonKort>
-                                <SakskategoriVelger value={sakskategori} onChange={setSakskategori} />
+                                <SakskategoriVelger value={sakskategori} onChange={velgSakskategori} />
                             </SkjemaSeksjonKort>
                         </SkjemaSeksjon>
 
@@ -228,6 +187,7 @@ export default function OpprettSakFlyt() {
                             >
                                 <SkjemaSeksjonKort>
                                     <SøkPerson
+                                        key={`${sakstype}-${sakskategori}`}
                                         label={partSøkLabel(sakstype)}
                                         personInformasjon={(person) => leggTilPartISaken(person)}
                                         compact
