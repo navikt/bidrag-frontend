@@ -10,6 +10,7 @@ import {
 import { BodyShort, Button, VStack } from "@navikt/ds-react";
 import { type ReactElement, type ReactNode, useEffect, useState } from "react";
 import { scrollToHash } from "../../../utils/window-utils";
+import { useBehandlingProvider } from "../../context/BehandlingContext";
 
 export const MenuButton = ({
     step,
@@ -114,6 +115,7 @@ interface SideMenuProps {
 }
 export const SideMenu = ({ children, otherChildren }: SideMenuProps) => {
     const [menuOpen, setMenuOpen] = useState<boolean>(true);
+    const { erFatterVedtak } = useBehandlingProvider();
     const closedMenuCss = "p-0 w-6 min-w-0";
     const openMenuCss = "p-6 w-[298px] min-w-[298px] min-[1440px]:w-[412px]";
 
@@ -124,9 +126,17 @@ export const SideMenu = ({ children, otherChildren }: SideMenuProps) => {
             }`}
         >
             {menuOpen && (
-                <VStack gap="space-0" className="grid overflow-hidden  border-(--ax-border-neutral-subtle)">
-                    {children}
-                </VStack>
+                // `fieldset[disabled]` deaktiverer alle knapper i menyen (både mus og tastatur) mens
+                // vedtaket fattes, uten å endre layouten (`display: contents`).
+                <fieldset
+                    disabled={erFatterVedtak}
+                    aria-busy={erFatterVedtak}
+                    style={{ display: "contents", border: 0, margin: 0, padding: 0 }}
+                >
+                    <VStack gap="space-0" className="grid overflow-hidden  border-(--ax-border-neutral-subtle)">
+                        {children}
+                    </VStack>
+                </fieldset>
             )}
             <Button
                 className={`absolute -right-4 top-[40%] p-0 rounded-full bg-[white] z-10 duration-500 ${
