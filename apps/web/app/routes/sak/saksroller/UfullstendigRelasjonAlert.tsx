@@ -16,10 +16,13 @@ export default function UfullstendigRelasjonAlert({ barnIdenter, roller }: Props
 
     return (
         <LocalAlert status="warning" size="small" as="div">
+            <LocalAlert.Header>
+                <LocalAlert.Title>Ufullstendig relasjon</LocalAlert.Title>
+            </LocalAlert.Header>
             <LocalAlert.Content>
                 <BodyLong size="small">
-                    OBS: {navn.join(", ")} har manglende eller ufullstendig relasjon til partene. Dobbeltsjekk
-                    relasjoner før du lagrer.
+                    {navn.join(", ")} har manglende eller ufullstendig relasjon til partene. Kontroller relasjonene før
+                    du lagrer.
                 </BodyLong>
             </LocalAlert.Content>
         </LocalAlert>
