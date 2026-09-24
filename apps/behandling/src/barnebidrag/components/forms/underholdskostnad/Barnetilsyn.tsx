@@ -213,11 +213,13 @@ export const Barnetilsyn = ({ index }: { index: number }) => {
     const { getValues, setValue, setError, clearErrors } = useFormContext<UnderholdskostnadFormValues>();
     const underhold = getValues(underholdFieldName);
     const aktivePerioder = aktiveOpplysninger?.grunnlag[underhold.gjelderBarn.ident] ?? [];
+    // Forpleining teller ikke med her. Variabelen styrer tabellene for tilsynsordningen, og
+    // den styrer om bryteren «Barn har tilsynsordning» vises som på. En forpleiningsperiode
+    // sier ingenting om tilsynsordningen, og skal derfor ikke slå den på.
     const hasAtLeastOnePeriod =
         !!underhold.stønadTilBarnetilsyn.length ||
         !!underhold.faktiskTilsynsutgift.length ||
-        !!underhold.tilleggsstønad.length ||
-        !!underhold.forpleining.length;
+        !!underhold.tilleggsstønad.length;
     const hasAtLeastOnePeriodOrActiveOpplysninger = hasAtLeastOnePeriod || !!aktivePerioder.length;
     const updateTilysnsordning = useOnUpdateHarTilysnsordning(underhold.id);
     const underholdsValideringsFeil = underholdskostnader.find((u) => u.id === underhold.id).valideringsfeil;
@@ -312,9 +314,13 @@ export const Barnetilsyn = ({ index }: { index: number }) => {
                     <BarnetilsynTabel underholdFieldName={underholdFieldName} />
                     <FaktiskeTilsynsutgifterTabel underholdFieldName={underholdFieldName} />
                     {!erBisysVedtak && <TilleggstønadTabel underholdFieldName={underholdFieldName} />}
-                    {!erBisysVedtak && <ForpleiningTabel underholdFieldName={underholdFieldName} />}
                 </>
             )}
+            {/* Forpleining ligger utenfor blokka over med vilje. Forpleining er kost og losji
+                betalt av kommunen, barnevernet eller en institusjon, og henger ikke sammen med
+                tilsynsordningen. Lå den inne i blokka, forsvant seksjonen for et barn uten
+                tilsynsordning, og saksbehandler kunne ikke registrere forpleining i det hele tatt. */}
+            {!erBisysVedtak && <ForpleiningTabel underholdFieldName={underholdFieldName} />}
             <BeregnetUnderholdskostnad underholdFieldName={underholdFieldName} />
         </div>
     );
