@@ -2,11 +2,13 @@ import { useBisysLink, useTilgangssjekkSak } from "@bidrag/common";
 import { Page, VStack } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router";
+import { useHentSak } from "~/api/useApi.ts";
 
 export default function SakBaseLayout() {
     const { saksnummer = "" } = useParams();
     const { setBisysLinkTarget } = useBisysLink();
     const { harTilgang, TilgangAlert } = useTilgangssjekkSak(saksnummer);
+    const { data: sak } = useHentSak(saksnummer, false, harTilgang);
 
     useEffect(() => {
         setBisysLinkTarget("sak", { saksnr: saksnummer });
@@ -22,5 +24,5 @@ export default function SakBaseLayout() {
         );
     }
 
-    return <Outlet />;
+    return <Outlet context={sak} />;
 }

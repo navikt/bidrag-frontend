@@ -1,12 +1,11 @@
-import type { RolleDto } from "@bidrag/api/SakApi";
+import type { BidragssakDto, RolleDto } from "@bidrag/api/SakApi";
 import { type IRolleDetaljer, type RolleTypeAbbreviation, SakHeader } from "@bidrag/common";
-import { Outlet, useMatches, useParams } from "react-router";
-import { useHentSak } from "~/api/useApi.ts";
+import { Outlet, useMatches, useOutletContext, useParams } from "react-router";
 import { type SakSideTittelHandle, SakSideTittelProvider } from "./sakSideTittel";
 
 export default function SakHeaderLayout() {
     const { saksnummer = "" } = useParams();
-    const { data: sak } = useHentSak(saksnummer);
+    const sak = useOutletContext<BidragssakDto | undefined>();
     const matches = useMatches();
     const routeTittel = matches
         .map((match) => (match.handle as SakSideTittelHandle | undefined)?.sakSideTittel)

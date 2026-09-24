@@ -3,6 +3,7 @@ import { expect, type Locator, type Page, test } from "@playwright/test";
 const STANDARD_STORY = "routes/sak/SakLayouts/StandardMedSidemeny";
 const DOKUMENTER_STORY = "routes/sak/SakLayouts/DokumenterMedSidemeny";
 const UTEN_FELLES_HEADER_STORY = "routes/sak/SakLayouts/UtenFellesHeader";
+const UTEN_TILGANG_STORY = "routes/sak/SakLayouts/UtenTilgang";
 
 async function mockSakHeaderKall(page: Page) {
     await page.route("**/proxy/**", async (route) => {
@@ -108,5 +109,13 @@ test.describe("sakslayouter", () => {
         await expect(component.getByRole("navigation", { name: "Sakmeny" })).toHaveCount(0);
         await expect(component.getByRole("heading", { name: "Side uten sidemeny" })).toBeVisible();
         await expect(component.locator(".aksel-pageblock")).toHaveCount(0);
+    });
+
+    test("henter ikke sak når saksbehandler mangler tilgang", async ({ mount, page }) => {
+        await mockSakHeaderKall(page);
+        const component = await mount(UTEN_TILGANG_STORY);
+
+        await expect(component.getByText("Du har ikke tilgang til sak 2024-1234")).toBeVisible();
+        await expect(component.getByText("Kari Nordmann")).toHaveCount(0);
     });
 });

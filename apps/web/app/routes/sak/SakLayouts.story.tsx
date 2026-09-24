@@ -29,7 +29,7 @@ function FargetInnhold({ type }: { type: "standard" | "dokumenter" | "uten-sidem
     );
 }
 
-function StoryProviders({ children }: { children: ReactNode }) {
+function StoryProviders({ children, harTilgang = true }: { children: ReactNode; harTilgang?: boolean }) {
     const [queryClient] = useState(() => {
         const client = new QueryClient({
             defaultOptions: {
@@ -40,29 +40,32 @@ function StoryProviders({ children }: { children: ReactNode }) {
                 },
             },
         });
-        client.setQueryData(["hent_sak", "2024-1234", false], {
-            eierfogd: "4803",
-            saksnummer: "2024-1234",
-            saksstatus: "AK",
-            kategori: "N",
-            begrensetTilgang: false,
-            opprettetDato: "2024-01-01",
-            levdeAdskilt: false,
-            ukjentPart: false,
-            vedtakssperre: false,
-            avsluttet: false,
-            arbeidsfordeling: {},
-            roller: [
-                { type: "BM", fodselsnummer: bidragsmottakerIdent },
-                { type: "BP", fodselsnummer: bidragspliktigIdent },
-                { type: "BA", fodselsnummer: barnIdent },
-            ],
-        });
+        if (harTilgang) {
+            client.setQueryData(["hent_sak", "2024-1234", false], {
+                eierfogd: "4803",
+                saksnummer: "2024-1234",
+                saksstatus: "AK",
+                kategori: "N",
+                begrensetTilgang: false,
+                opprettetDato: "2024-01-01",
+                levdeAdskilt: false,
+                ukjentPart: false,
+                vedtakssperre: false,
+                avsluttet: false,
+                arbeidsfordeling: {},
+                roller: [
+                    { type: "BM", fodselsnummer: bidragsmottakerIdent },
+                    { type: "BP", fodselsnummer: bidragspliktigIdent },
+                    { type: "BA", fodselsnummer: barnIdent },
+                ],
+            });
+        }
         client.setQueryData(["fodselsdatoer", barnIdent], {
             identerTilDatoer: { [barnIdent]: "2015-01-01" },
         });
         client.setQueryData(["sjekkTilgangSakV2", "2024-1234"], {
-            harTilgang: true,
+            harTilgang,
+            detaljer: [],
         });
         return client;
     });
@@ -149,3 +152,9 @@ export const UtenFellesHeader = () => {
         </StoryProviders>
     );
 };
+
+export const UtenTilgang = () => (
+    <StoryProviders harTilgang={false}>
+        <RouterProvider router={createStoryRouter("standard")} />
+    </StoryProviders>
+);
