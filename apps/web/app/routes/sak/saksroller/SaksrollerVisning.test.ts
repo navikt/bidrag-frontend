@@ -1,8 +1,9 @@
 import type { FieldErrors } from "react-hook-form";
 import { describe, expect, it } from "vitest";
 
-import { finnFørsteValideringsfeil, utledSakstype } from "./saksroller-visning-utils.ts";
+import { finnFørsteValideringsfeil } from "./finn-forste-valideringsfeil.ts";
 import type { SakRedigeringData } from "./sakvisning-schema.ts";
+import { utledSakstype } from "./utled-sakstype.ts";
 
 describe("finnFørsteValideringsfeil", () => {
     it("returnerer undefined når det ikke finnes noen feil", () => {

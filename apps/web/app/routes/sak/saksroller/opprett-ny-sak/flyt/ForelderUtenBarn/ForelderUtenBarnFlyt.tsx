@@ -183,17 +183,14 @@ function ForelderUtenBarnFlytContent() {
         settFeil("");
         settInfoMelding("");
         settSøkteBarn(barn);
-
-        // Legg til barn med alder - bruk barn-parameteren direkte, ikke søkteBarn (state er asynkron)
         const nyttBarn: BarnMedAlder = {
             ident: barn.ident,
             navn: barn.visningsnavn,
             fødselsdato: formaterDato(barn.fødselsdato),
-            alder: alder,
+            alder,
             erMyndig: alder >= MYNDYG_BARN_ALDER,
             diskresjonskode: barn.diskresjonskode,
         };
-
         form.setValue("valgteBarn", [...form.getValues("valgteBarn"), nyttBarn]);
     };
 
