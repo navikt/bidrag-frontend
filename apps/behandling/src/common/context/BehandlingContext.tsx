@@ -5,10 +5,10 @@ import {
     type TypeBehandling,
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import type {IRolleDetaljer, RolleTypeAbbreviation} from "@bidrag/common";
-import {XMarkOctagonFillIcon} from "@navikt/aksel-icons";
-import {Button, Heading} from "@navikt/ds-react";
-import {useMutationState, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
+import type { IRolleDetaljer, RolleTypeAbbreviation } from "@bidrag/common";
+import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
+import { Button, Heading } from "@navikt/ds-react";
+import { useMutationState, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
 import {
     createContext,
     type Dispatch,
@@ -21,34 +21,30 @@ import {
     useRef,
     useState,
 } from "react";
-import {useLocation, useNavigate, useParams, useSearchParams} from "react-router";
-import type {BarnebidragPageErrorsOrUnsavedState} from "../../barnebidrag/context/BarnebidragProviderWrapper";
-import {BarnebidragStepper} from "../../barnebidrag/enum/BarnebidragStepper";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
+import type { BarnebidragPageErrorsOrUnsavedState } from "../../barnebidrag/context/BarnebidragProviderWrapper";
+import { BarnebidragStepper } from "../../barnebidrag/enum/BarnebidragStepper";
 import environment from "../../environment";
-import type {
-    PageErrorsOrUnsavedState as ForskuddPageErrorsOrUnsavedState
-} from "../../forskudd/context/ForskuddBehandlingProviderWrapper";
-import type {ForskuddStepper} from "../../forskudd/enum/ForskuddStepper";
-import type {
-    PageErrorsOrUnsavedState as SærligeutgifterPageErrorsOrUnsavedState
-} from "../../særbidrag/context/SærligeugifterProviderWrapper";
-import type {SærligeutgifterStepper} from "../../særbidrag/enum/SærligeutgifterStepper";
-import {dateOrNull, firstDayOfMonth, isAfterEqualsDate} from "../../utils/date-utils";
-import {getAllSearchParamsExcludingKeys} from "../../utils/window-utils";
+import type { PageErrorsOrUnsavedState as ForskuddPageErrorsOrUnsavedState } from "../../forskudd/context/ForskuddBehandlingProviderWrapper";
+import type { ForskuddStepper } from "../../forskudd/enum/ForskuddStepper";
+import type { PageErrorsOrUnsavedState as SærligeutgifterPageErrorsOrUnsavedState } from "../../særbidrag/context/SærligeugifterProviderWrapper";
+import type { SærligeutgifterStepper } from "../../særbidrag/enum/SærligeutgifterStepper";
+import { dateOrNull, firstDayOfMonth, isAfterEqualsDate } from "../../utils/date-utils";
+import { getAllSearchParamsExcludingKeys } from "../../utils/window-utils";
 import ErrorConfirmationModal from "../components/ErrorConfirmationModal";
-import type {FloatingBottomToolbarTab} from "../components/FloatingBottomToolbar";
+import type { FloatingBottomToolbarTab } from "../components/FloatingBottomToolbar";
 import UserFeedbackDialog from "../components/feedback/FeedbackFab";
-import {ConfirmationModal} from "../components/modal/ConfirmationModal";
-import {PERSON_API} from "../constants/api";
+import { ConfirmationModal } from "../components/modal/ConfirmationModal";
+import { PERSON_API } from "../constants/api";
 import urlSearchParams from "../constants/behandlingQueryKeys";
 import behandlingQueryKeys from "../constants/behandlingQueryKeys";
-import {fatteVedtakMutationKey} from "../constants/mutationKeys";
+import { fatteVedtakMutationKey } from "../constants/mutationKeys";
 import text from "../constants/texts";
-import {shouldShowGrunnlagLoadingProgressbar} from "../helpers/shouldShowGrunnlagProgressbar";
-import {QueryKeys, useBehandlingV2, useSjekkLasterGrunnlag} from "../hooks/useApiData";
+import { shouldShowGrunnlagLoadingProgressbar } from "../helpers/shouldShowGrunnlagProgressbar";
+import { QueryKeys, useBehandlingV2, useSjekkLasterGrunnlag } from "../hooks/useApiData";
 import useFeatureToogle from "../hooks/useFeatureToggle";
-import {useMutationStatus} from "../hooks/useMutationStatus";
-import {useQueryParams} from "../hooks/useQueryParams";
+import { useMutationStatus } from "../hooks/useMutationStatus";
+import { useQueryParams } from "../hooks/useQueryParams";
 
 interface SaveErrorState {
     error: boolean;
