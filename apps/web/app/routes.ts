@@ -55,15 +55,17 @@ export default [
         ...behandlingSakRoutes,
         ...forsendelseSakRoutes,
         ...dokumentSakRoutes,
-        route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),
-
-        layout("routes/sak/SakStandardLayout.tsx", [
-            route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
-            route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
-            route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),
-            route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
+        layout("routes/sak/SakHeaderLayout.tsx", [
+            layout("routes/sak/SakStandardLayout.tsx", [
+                route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
+                route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
+                route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),
+                route("reskontro", "routes/sak/reskontro/SakReskontroOversiktPage.tsx"),
+                route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
+            ]),
+            layout("routes/sak/SakFullbreddeLayout.tsx", [
+                route("dokumenter", "routes/sak/dokumenter/SaksdokumenterPage.tsx"),
+            ]),
         ]),
-
-        route("saksroller", "routes/sak/saksroller/SaksrollerPage.tsx"),
     ]),
 ] satisfies RouteConfig;

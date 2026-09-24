@@ -38,8 +38,11 @@ export default function ReellMottakerValgGruppe({
 }: Props) {
     const påkrevd = regel !== "valgfri";
     const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
+    const [error, setError] = useState<string>();
 
     const handleRadioChange = (value: string) => {
+        setError(undefined);
+
         if (value === "ingen") {
             onValg({});
             return;
@@ -52,8 +55,6 @@ export default function ReellMottakerValgGruppe({
 
         onValg({ type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn });
     };
-
-    const [error, setError] = useState<string>();
 
     return (
         <VStack gap="space-24">

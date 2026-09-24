@@ -173,6 +173,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                 await finnBarnMedUfullstendigRelasjon(barnIdenter, bm?.fodselsnummer, bp?.fodselsnummer),
             );
         }
+
         sjekkUfullstendigRelasjon();
     }, [bp?.fodselsnummer, bm?.fodselsnummer, barnIdenterKey, sak, finnBarnMedUfullstendigRelasjon]);
 

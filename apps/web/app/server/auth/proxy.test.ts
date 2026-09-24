@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { kjørMedLoggerKontekst } from "~/server/logger/loggerContext.ts";
+import { loader } from "./proxy.ts";
 
 const mocks = vi.hoisted(() => ({
     authTokenContext: Symbol("authTokenContext"),
@@ -16,9 +18,6 @@ vi.mock("~/server/auth/auth.utils.server.ts", () => ({ getOnBehalfOfToken: mocks
 vi.mock("~/server/logger/navLogger.ts", () => ({
     navCombinedLogger: { debug: mocks.debug, trace: mocks.trace, warn: mocks.warn, error: mocks.error },
 }));
-
-import { kjørMedLoggerKontekst } from "~/server/logger/loggerContext.ts";
-import { loader } from "./proxy.ts";
 
 describe("proxy", () => {
     beforeEach(() => {
