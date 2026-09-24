@@ -1,4 +1,4 @@
-import React, { createContext, type ReactNode, useContext } from "react";
+import { createContext, type ReactNode, useContext, useState } from "react";
 
 import { useHentJournalpost } from "../hooks/useDokumentApi";
 import { useHentGjelder } from "../hooks/usePersonApi";
@@ -17,7 +17,7 @@ const JournalpostContext = createContext<JournalpostContextType | undefined>(und
 export const JournalpostProvider = ({ children }: { children: ReactNode }) => {
     const journalpost = useHentJournalpost();
     const person = useHentGjelder();
-    const [avvikState, setAvvikState] = React.useState<AvvikState>("idle");
+    const [avvikState, setAvvikState] = useState<AvvikState>("idle");
 
     // Init queries
     useHentSakerForFødselsnummer();

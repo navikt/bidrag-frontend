@@ -1,5 +1,5 @@
 import { PaperplaneIcon as Send } from "@navikt/aksel-icons";
-import React, { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import AvvikshandteringModal from "../../../../common/components/avvik/components/AvvikshandteringModal";
 import IkonKnapp from "../../../../common/components/icons/IkonKnapp";
@@ -33,7 +33,7 @@ export default function OverforSakButton({ sak, onModalStateChange }: OverforSak
                 className={"overfor-button"}
                 onClick={openAvvikModal}
             />
-            <React.Suspense fallback={null}>
+            <Suspense fallback={null}>
                 {isAvvikModalOpen && (
                     <AvvikshandteringModal
                         closeModal={closeAvvikModal}
@@ -45,7 +45,7 @@ export default function OverforSakButton({ sak, onModalStateChange }: OverforSak
                         }}
                     />
                 )}
-            </React.Suspense>
+            </Suspense>
         </>
     );
 }

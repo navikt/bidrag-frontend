@@ -2,7 +2,7 @@ import type { DistribuerTilAdresse } from "@bidrag/api/BidragDokumentApi";
 import { StringUtils } from "@bidrag/common";
 import { XMarkIcon as Cancel, PadlockLockedIcon as Locked } from "@navikt/aksel-icons";
 import { Button, Loader, Select, TextField } from "@navikt/ds-react";
-import React, { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, Suspense, useState } from "react";
 import { Controller, type FieldErrors, FormProvider, useForm, useFormContext, useWatch } from "react-hook-form";
 import { useHentLandkoder, useHentPostnummere } from "../hooks/kodeverkQueries";
 import type { IMottakerAdresse } from "../types/Adresse";
@@ -121,7 +121,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
                         validate: (value: string) => (value.length !== 4 ? "Postnummer må ha 4 tegn" : true),
                     }}
                     render={({ field: { name, onChange, value, ref }, fieldState: { error } }) => (
-                        <React.Suspense fallback={<Loader size="xsmall" />}>
+                        <Suspense fallback={<Loader size="xsmall" />}>
                             <PostnummerInput
                                 defaultValue={value}
                                 inputRef={ref}
@@ -133,7 +133,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
                                     clearErrors(poststedFormKey as "poststed");
                                 }}
                             />
-                        </React.Suspense>
+                        </Suspense>
                     )}
                 />
             )}

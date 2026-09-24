@@ -1,6 +1,6 @@
 import type { DistribuerTilAdresse } from "@bidrag/api/BidragDokumentApi";
 import { Alert, BodyShort, Button, Heading, Loader, Modal } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { RedirectTo } from "../../../../common/utils/RedirectUtils";
 import { useDistribuerJournalpost } from "../../../../hooks/useDistribusjonApi";
 import { useHentJournalpost } from "../../../../hooks/useDokumentApi";
@@ -86,7 +86,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
         const cancelButtonDisabled = submitState === "pending" || submitState === "succesfull";
         return (
             <>
-                <React.Suspense fallback={<Loader variant="neutral" size="small" />}>
+                <Suspense fallback={<Loader variant="neutral" size="small" />}>
                     <BestillDistribusjonInfo
                         mottakerId={mottaker.ident}
                         mottakerNavn={mottaker.navn}
@@ -95,7 +95,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                         onEditModeChanged={setOnEditMode}
                         onAdresseChanged={setAdresse}
                     />
-                </React.Suspense>
+                </Suspense>
                 <div className="flex items-center pt-4 gap-2">
                     <Button
                         size="small"

@@ -1,6 +1,6 @@
-import type React from "react";
+import type { FormEvent } from "react";
 
-export const handleSubmitPreventPropagation = (handleSubmit: (e) => void) => (e: React.FormEvent) => {
+export const handleSubmitPreventPropagation = (handleSubmit: (e) => void) => (e: FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     handleSubmit(e);

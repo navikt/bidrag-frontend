@@ -2,7 +2,7 @@ import type { MottakerAdresseTo } from "@bidrag/api/BidragForsendelseApi";
 import { IdentUtils, ObjectUtils } from "@bidrag/common";
 import { PencilIcon as Edit, MagnifyingGlassIcon, PersonIcon, PersonPencilIcon } from "@navikt/aksel-icons";
 import { Alert, Button, Heading, Loader, Panel, Tabs, TextField } from "@navikt/ds-react";
-import React, { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
 import AdresseInfo from "../../components/AdresseInfo";
 import { EditAddress, validerMaks128Tegn } from "../../components/EditAddress";
@@ -142,9 +142,9 @@ function MottakerFritekst() {
                 })}
                 error={errors?.mottaker?.navn?.message}
             />
-            <React.Suspense fallback={<Loader />}>
+            <Suspense fallback={<Loader />}>
                 <EditAddress formPrefix="mottaker.adresse" />
-            </React.Suspense>
+            </Suspense>
         </div>
     );
 }
@@ -246,9 +246,9 @@ function MottakerAdresse({ adresse: mottakerAdresse }: MottakerAdresseProps) {
         }
 
         return (
-            <React.Suspense fallback={<Loader />}>
+            <Suspense fallback={<Loader />}>
                 <EditAddress formPrefix="mottaker.adresse" />
-            </React.Suspense>
+            </Suspense>
         );
     }
 

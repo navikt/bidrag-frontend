@@ -1,8 +1,16 @@
 import "./WrappingTabs.css";
 
 import { Tabs as AkselTabs, type TabsProps as AkselTabsProps } from "@navikt/ds-react";
-import type React from "react";
-import { forwardRef, useRef } from "react";
+import {
+    type ForwardRefExoticComponent,
+    forwardRef,
+    type HTMLAttributes,
+    type KeyboardEvent,
+    type MutableRefObject,
+    type ReactNode,
+    type RefAttributes,
+    useRef,
+} from "react";
 
 /**
  * Drop-in replacement for Aksel's `Tabs.List` that wraps tabs onto multiple
@@ -11,8 +19,8 @@ import { forwardRef, useRef } from "react";
  * Keeps the same accessibility semantics (role="tablist", arrow-key/Home/End
  * navigation between tabs) as the original Aksel implementation.
  */
-export interface WrappingTabsListProps extends React.HTMLAttributes<HTMLDivElement> {
-    children: React.ReactNode;
+export interface WrappingTabsListProps extends HTMLAttributes<HTMLDivElement> {
+    children: ReactNode;
 }
 
 const WrappingTabsList = forwardRef<HTMLDivElement, WrappingTabsListProps>(
@@ -24,11 +32,11 @@ const WrappingTabsList = forwardRef<HTMLDivElement, WrappingTabsListProps>(
             if (typeof ref === "function") {
                 ref(node);
             } else if (ref) {
-                (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+                (ref as MutableRefObject<HTMLDivElement | null>).current = node;
             }
         };
 
-        const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
             onKeyDown?.(event);
             if (event.defaultPrevented) {
                 return;
@@ -79,8 +87,7 @@ const WrappingTabsList = forwardRef<HTMLDivElement, WrappingTabsListProps>(
 );
 WrappingTabsList.displayName = "WrappingTabsList";
 
-interface WrappingTabsComponent
-    extends React.ForwardRefExoticComponent<AkselTabsProps & React.RefAttributes<HTMLDivElement>> {
+interface WrappingTabsComponent extends ForwardRefExoticComponent<AkselTabsProps & RefAttributes<HTMLDivElement>> {
     Tab: typeof AkselTabs.Tab;
     List: typeof WrappingTabsList;
     Panel: typeof AkselTabs.Panel;

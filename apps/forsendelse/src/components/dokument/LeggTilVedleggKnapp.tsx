@@ -1,7 +1,7 @@
 import type { DokumentMalDetaljer } from "@bidrag/api/BidragForsendelseApi";
 import { PlusIcon as Add } from "@navikt/aksel-icons";
 import { Button, Loader, Modal, Select } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 type DokumentMalDetaljerInnholdTypeEnum = NonNullable<DokumentMalDetaljer["innholdType"]>;
@@ -81,9 +81,9 @@ function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps
                             minWidth: "max-content",
                         }}
                     >
-                        <React.Suspense fallback={<Loader size={"medium"} />}>
+                        <Suspense fallback={<Loader size={"medium"} />}>
                             <DokumentValgVedlegg />
-                        </React.Suspense>
+                        </Suspense>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="small" type="submit">

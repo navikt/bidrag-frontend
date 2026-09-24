@@ -4,7 +4,7 @@ import type { Avvikshendelse } from "@bidrag/api/BidragForsendelseApi";
 import { ArrowLeftIcon as Left } from "@navikt/aksel-icons";
 import { Button, Heading, Loader, Modal } from "@navikt/ds-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { createContext, Suspense, useContext, useEffect, useMemo, useState } from "react";
 import { useBidragForsendelseApi } from "../../../../api/api";
 import { UseForsendelseApiKeys } from "../../../../hooks/useForsendelseApi";
 import useHarTilgangTilTemaFar from "../../../../hooks/useTilgangskontrollApi";
@@ -31,7 +31,7 @@ interface AvvikStateContextProps {
     sendAvvikStatus: "idle" | "error" | "loading";
 }
 export const useAvvikStateContext = () => useContext(AvvikStateContext);
-const AvvikStateContext = React.createContext<AvvikStateContextProps>({} as AvvikStateContextProps);
+const AvvikStateContext = createContext<AvvikStateContextProps>({} as AvvikStateContextProps);
 function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     const { onCancel } = useAvvikModalContext();
     return (
@@ -43,9 +43,9 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
             closeOnBackdropClick
         >
             <Modal.Body>
-                <React.Suspense fallback={<Loader size="medium" />}>
+                <Suspense fallback={<Loader size="medium" />}>
                     <AvvikshandteringModalContent {...props} />
-                </React.Suspense>
+                </Suspense>
             </Modal.Body>
         </Modal>
     );
@@ -140,7 +140,7 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
                 <Heading level={"3"} size={"medium"} spacing>
                     {getTitle()}
                 </Heading>
-                <React.Suspense fallback={<Loader size="small" />}>
+                <Suspense fallback={<Loader size="small" />}>
                     {activeStep > 0 && sendAvvikFn.isIdle && <PreviousStepButton onPrevious={onPrevious} />}
                     <AvvikStep
                         selectedAvvik={selectedAvvik}
@@ -152,16 +152,16 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
                         }
                         {...props}
                     />
-                </React.Suspense>
+                </Suspense>
             </>
         );
     }
 
     return (
-        <React.Suspense fallback={<Loader size="medium" />}>
+        <Suspense fallback={<Loader size="medium" />}>
             <Heading size="large">Avvikshåndtering</Heading>
             {renderAvvik()}
-        </React.Suspense>
+        </Suspense>
     );
 }
 

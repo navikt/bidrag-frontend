@@ -1,5 +1,5 @@
 import { Loader } from "@navikt/ds-react";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 
 import { useBidragCommons } from "../../api/BidragCommonsContext";
 

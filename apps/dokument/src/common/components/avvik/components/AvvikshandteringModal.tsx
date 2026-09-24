@@ -2,7 +2,7 @@ import "./AvvikshandteringModal.css";
 
 import { ArrowLeftIcon as Left } from "@navikt/aksel-icons";
 import { Button, Heading, Loader, Modal } from "@navikt/ds-react";
-import React, { useContext, useEffect, useState } from "react";
+import { createContext, Suspense, useContext, useEffect, useState } from "react";
 
 import { useSendAvvikMutation } from "../../../../hooks/useAvvikApi";
 import {
@@ -44,7 +44,7 @@ interface AvvikProviderProps {
     onCancel: () => void;
 }
 export const useAvvikModalContext = () => useContext(AvvikModalContext);
-const AvvikModalContext = React.createContext<AvvikProviderProps>({} as AvvikProviderProps);
+const AvvikModalContext = createContext<AvvikProviderProps>({} as AvvikProviderProps);
 
 interface AvvikshandteringModalProps {
     closeModal: () => void;
@@ -162,7 +162,7 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                     </Heading>
                 </Modal.Header>
                 <Modal.Body className="w-full">
-                    <React.Suspense fallback={<Loader />}>
+                    <Suspense fallback={<Loader />}>
                         {selectedAvvik ? (
                             <>
                                 <StepIndicator
@@ -176,7 +176,7 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                                         {selectedAvvik.title}
                                     </Heading>
                                 )}
-                                <React.Suspense fallback={<Loader />}>
+                                <Suspense fallback={<Loader />}>
                                     {activeStep > 0 && avvikConfirmed === false && (
                                         <PreviousStepButton onPrevious={onPrevious} />
                                     )}
@@ -188,7 +188,7 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                                         sendAvvik={performSendAvvik}
                                         {...props}
                                     />
-                                </React.Suspense>
+                                </Suspense>
                                 {!shouldBeAbleToReturnToMainPage() && (
                                     <div className="pt-2">
                                         <BisysLink />
@@ -198,7 +198,7 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                         ) : (
                             <MainMenu avvikViewModels={avvikStateValue} onClick={selectAvvik} />
                         )}
-                    </React.Suspense>
+                    </Suspense>
                 </Modal.Body>
             </Modal>
         </AvvikModalContext.Provider>

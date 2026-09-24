@@ -1,6 +1,6 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { type ReactNode, useEffect, useMemo } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import BarnBeggeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnBeggeForeldre/BarnBeggeForeldreFlyt";
 import BarnMedManglendeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/BarnMedManglendeForeldreFlyt";
@@ -120,7 +120,7 @@ export function WizardPageStory() {
     return <StoryRouter content={<OpprettSakFlyt />} />;
 }
 
-function StoryRouter({ content }: { content: React.ReactNode }) {
+function StoryRouter({ content }: { content: ReactNode }) {
     const queryClient = useMemo(() => {
         const client = new QueryClient({
             defaultOptions: {

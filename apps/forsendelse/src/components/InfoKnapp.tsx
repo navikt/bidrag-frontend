@@ -2,8 +2,7 @@ import "./InfoKnapp.css";
 
 import { QuestionmarkIcon } from "@navikt/aksel-icons";
 import { Button, Modal } from "@navikt/ds-react";
-import type React from "react";
-import { type PropsWithChildren, useRef } from "react";
+import { type MouseEvent, type PropsWithChildren, useRef } from "react";
 
 type InfoKnappProps = {
     buttonClassName?: string;
@@ -25,7 +24,7 @@ export default function InfoKnapp({
         ref.current?.close();
         // cleanupAfterClosedModal();
     };
-    const openModal = (e: React.MouseEvent) => {
+    const openModal = (e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         ref.current?.showModal();

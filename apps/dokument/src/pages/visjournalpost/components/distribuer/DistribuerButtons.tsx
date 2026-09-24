@@ -1,5 +1,5 @@
 import { Button } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { useKanDistribuereJournalpost } from "../../../../hooks/useDistribusjonApi";
 import { useHentJournalpost } from "../../../../hooks/useDokumentApi";
@@ -14,12 +14,12 @@ export default function DistribuerButtons() {
     }
 
     return (
-        <React.Suspense fallback={null}>
+        <Suspense fallback={null}>
             <div id={"distribuer_buttons"} className={"flex flex-row gap-5"}>
                 {!journalpost.isJoarkJournalpost && <SendManueltButton />}
                 <BestillDistribusjonButton />
             </div>
-        </React.Suspense>
+        </Suspense>
     );
 }
 
@@ -46,9 +46,9 @@ function BestillDistribusjonButton() {
     return (
         <>
             {modalOpen && (
-                <React.Suspense fallback={null}>
+                <Suspense fallback={null}>
                     <BestillDistribusjonModal onCancel={() => setModalOpen(false)} />
-                </React.Suspense>
+                </Suspense>
             )}
             <Button
                 size="small"

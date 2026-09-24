@@ -1,5 +1,5 @@
 import { EditorConfigStorage, FileUtils, LoggerService, objectsDeepEqual, queryParams } from "@bidrag/common";
-import React, { type PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
 
 import StateHistory from "../../../components/history/StateHistory";
 import { MaskingContainer, useMaskingContainer } from "../../../components/masking/MaskingContainer";
@@ -47,7 +47,7 @@ interface PdfEditorContextProps {
 }
 
 export const usePdfEditorContext = () => useContext(PdfEditorContext);
-export const PdfEditorContext = React.createContext<PdfEditorContextProps>({} as PdfEditorContextProps);
+export const PdfEditorContext = createContext<PdfEditorContextProps>({} as PdfEditorContextProps);
 export type SaveState = "PENDING" | "ERROR" | "IDLE";
 interface IPdfEditorContextProviderProps {
     mode: PdfEditorMode;

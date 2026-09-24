@@ -1,8 +1,7 @@
 import { Resultatkode } from "@bidrag/api/BidragBehandlingApiV1";
 import { Accordion, Alert, BodyShort, Heading, HStack, VStack } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import type React from "react";
-import { useEffect } from "react";
+import { useEffect, type FC } from "react";
 import { VedtakProvider } from "../../../barnebidrag/components/vedtak/VedtakCommon";
 import { QueryErrorWrapper } from "../../../common/components/query-error-boundary/QueryErrorWrapper";
 import { AdminButtons } from "../../../common/components/vedtak/AdminButtons";
@@ -205,7 +204,7 @@ const VedtakResultat = () => {
         </VedtakWrapper>
     );
 };
-const UtgifterLagtTilGrunnAccordion: React.FC = () => {
+const UtgifterLagtTilGrunnAccordion: FC = () => {
     return (
         <Accordion size="small">
             <Accordion.Item>
@@ -217,7 +216,7 @@ const UtgifterLagtTilGrunnAccordion: React.FC = () => {
         </Accordion>
     );
 };
-const BeregningsdetaljerAccordion: React.FC = () => {
+const BeregningsdetaljerAccordion: FC = () => {
     return (
         <Accordion size="small">
             <Accordion.Item>
