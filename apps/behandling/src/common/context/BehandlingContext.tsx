@@ -1,14 +1,14 @@
 import {
-    type ErSamvaerVirkningLikForAlleForSak,
+    type ErLikForAlleBasertPaSak,
     type RolleDto,
     Stonadstype,
     type TypeBehandling,
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import type { IRolleDetaljer, RolleTypeAbbreviation } from "@bidrag/common";
-import { XMarkOctagonFillIcon } from "@navikt/aksel-icons";
-import { Button, Heading } from "@navikt/ds-react";
-import { useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
+import type {IRolleDetaljer, RolleTypeAbbreviation} from "@bidrag/common";
+import {XMarkOctagonFillIcon} from "@navikt/aksel-icons";
+import {Button, Heading} from "@navikt/ds-react";
+import {useMutationState, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
 import {
     createContext,
     type Dispatch,
@@ -21,29 +21,34 @@ import {
     useRef,
     useState,
 } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
-import type { BarnebidragPageErrorsOrUnsavedState } from "../../barnebidrag/context/BarnebidragProviderWrapper";
-import { BarnebidragStepper } from "../../barnebidrag/enum/BarnebidragStepper";
+import {useLocation, useNavigate, useParams, useSearchParams} from "react-router";
+import type {BarnebidragPageErrorsOrUnsavedState} from "../../barnebidrag/context/BarnebidragProviderWrapper";
+import {BarnebidragStepper} from "../../barnebidrag/enum/BarnebidragStepper";
 import environment from "../../environment";
-import type { PageErrorsOrUnsavedState as ForskuddPageErrorsOrUnsavedState } from "../../forskudd/context/ForskuddBehandlingProviderWrapper";
-import type { ForskuddStepper } from "../../forskudd/enum/ForskuddStepper";
-import type { PageErrorsOrUnsavedState as SærligeutgifterPageErrorsOrUnsavedState } from "../../særbidrag/context/SærligeugifterProviderWrapper";
-import type { SærligeutgifterStepper } from "../../særbidrag/enum/SærligeutgifterStepper";
-import { dateOrNull, firstDayOfMonth, isAfterEqualsDate } from "../../utils/date-utils";
-import { getAllSearchParamsExcludingKeys } from "../../utils/window-utils";
+import type {
+    PageErrorsOrUnsavedState as ForskuddPageErrorsOrUnsavedState
+} from "../../forskudd/context/ForskuddBehandlingProviderWrapper";
+import type {ForskuddStepper} from "../../forskudd/enum/ForskuddStepper";
+import type {
+    PageErrorsOrUnsavedState as SærligeutgifterPageErrorsOrUnsavedState
+} from "../../særbidrag/context/SærligeugifterProviderWrapper";
+import type {SærligeutgifterStepper} from "../../særbidrag/enum/SærligeutgifterStepper";
+import {dateOrNull, firstDayOfMonth, isAfterEqualsDate} from "../../utils/date-utils";
+import {getAllSearchParamsExcludingKeys} from "../../utils/window-utils";
 import ErrorConfirmationModal from "../components/ErrorConfirmationModal";
-import type { FloatingBottomToolbarTab } from "../components/FloatingBottomToolbar";
+import type {FloatingBottomToolbarTab} from "../components/FloatingBottomToolbar";
 import UserFeedbackDialog from "../components/feedback/FeedbackFab";
-import { ConfirmationModal } from "../components/modal/ConfirmationModal";
-import { PERSON_API } from "../constants/api";
+import {ConfirmationModal} from "../components/modal/ConfirmationModal";
+import {PERSON_API} from "../constants/api";
 import urlSearchParams from "../constants/behandlingQueryKeys";
 import behandlingQueryKeys from "../constants/behandlingQueryKeys";
+import {fatteVedtakMutationKey} from "../constants/mutationKeys";
 import text from "../constants/texts";
-import { shouldShowGrunnlagLoadingProgressbar } from "../helpers/shouldShowGrunnlagProgressbar";
-import { QueryKeys, useBehandlingV2, useSjekkLasterGrunnlag } from "../hooks/useApiData";
+import {shouldShowGrunnlagLoadingProgressbar} from "../helpers/shouldShowGrunnlagProgressbar";
+import {QueryKeys, useBehandlingV2, useSjekkLasterGrunnlag} from "../hooks/useApiData";
 import useFeatureToogle from "../hooks/useFeatureToggle";
-import { useMutationStatus } from "../hooks/useMutationStatus";
-import { useQueryParams } from "../hooks/useQueryParams";
+import {useMutationStatus} from "../hooks/useMutationStatus";
+import {useQueryParams} from "../hooks/useQueryParams";
 
 interface SaveErrorState {
     error: boolean;
@@ -110,11 +115,12 @@ interface IBehandlingContext {
     getPreviousStep: (currentStep: stepDef) => number;
     vurderSeparatSamvær?: boolean;
     setVurderSeparatSamvær?: Dispatch<SetStateAction<boolean>>;
-    setVurderSeparatSamværForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
+    setVurderSeparatSamværForSaker?: (saker: ErLikForAlleBasertPaSak[]) => void;
     vurderSeparatVirkningstidspunkt?: boolean;
     setVurderSeparatVirkningstidspunkt?: Dispatch<SetStateAction<boolean>>;
-    setVurderSeparatVirkningstidspunktForSaker?: (saker: ErSamvaerVirkningLikForAlleForSak[]) => void;
+    setVurderSeparatVirkningstidspunktForSaker?: (saker: ErLikForAlleBasertPaSak[]) => void;
     isGrunnlagLoading: boolean;
+    erFatterVedtak: boolean;
 }
 
 export const BehandlingContext = createContext<IBehandlingContext | null>(null);
@@ -217,11 +223,11 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     );
 
     const setVurderSeparatSamværForSaker = useCallback(
-        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+        (saker: ErLikForAlleBasertPaSak[]) => {
             setVurderSeparatSamværPerSak?.((prev) => {
                 const next = { ...prev };
                 for (const sak of saker) {
-                    next[sak.saksnummer] = !sak.erLikForAlle;
+                    next[sak.saksnummer] = !sak.kanVurdereSamlet || !sak.erLikForAlle;
                 }
                 return next;
             });
@@ -255,7 +261,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     );
 
     const setVurderSeparatVirkningstidspunktForSaker = useCallback(
-        (saker: ErSamvaerVirkningLikForAlleForSak[]) => {
+        (saker: ErLikForAlleBasertPaSak[]) => {
             setVurderSeparatVirkningstidspunktPerSak?.((prev) => {
                 const next = { ...prev };
                 for (const sak of saker) {
@@ -487,8 +493,17 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
         setActiveTab,
     ]);
 
+    const fatteVedtakStatuser = useMutationState({
+        filters: { mutationKey: fatteVedtakMutationKey },
+        select: (mutation) => mutation.state.status,
+    });
+    const erFatterVedtak = fatteVedtakStatuser.some((status) => status === "pending" || status === "success");
+    const erFatterVedtakRef = useRef(erFatterVedtak);
+    erFatterVedtakRef.current = erFatterVedtak;
+
     const onNavigateToTab = useCallback(
         (nextTab: string) => {
+            if (erFatterVedtakRef.current) return;
             if (mutating || mutationStatusDerived === "pending" || debouncingRef.current) {
                 setNavigatingToNextTab(true);
                 setNextTab(nextTab);
@@ -564,6 +579,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
     };
     const onStepChange = useCallback(
         (x: number, query?: Record<string, string>, hash?: string) => {
+            if (erFatterVedtakRef.current) return;
             const currentPageErrors = pageErrorsOrUnsavedState[activeStep];
             setPageTabs(() => []); // Clear tabs when changing step to prevent showing incorrect tabs during transition
             trackStep(x, activeStep);
@@ -669,6 +685,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             setVurderSeparatVirkningstidspunkt,
             setVurderSeparatVirkningstidspunktForSaker,
             isGrunnlagLoading,
+            erFatterVedtak,
         }),
         [
             activeStep,
@@ -700,6 +717,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
             vurderSeparatSamvær,
             vurderSeparatVirkningstidspunkt,
             isGrunnlagLoading,
+            erFatterVedtak,
             searchParams,
         ],
     );

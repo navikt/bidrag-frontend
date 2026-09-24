@@ -5,6 +5,7 @@ import RegistrereJournalpostHeader from "../../../pages/registrereJournalpost/co
 import { useAppContext } from "../../../store/AppContext";
 import BisysLink from "../bisys/BisysLink";
 
+// TODO heller bruke felles feilhåndtering for dette.
 export default function FeilmeldingVeilederPanel({ children }: PropsWithChildren<unknown>): ReactElement {
     const { error } = useAppContext();
 

@@ -428,57 +428,55 @@ function HeaderRenderer({
     );
 
     return (
-        <div>
-            <Box
-                style={{
-                    background: "var(--ax-bg-neutral-soft)",
-                    borderBottom: "1px solid var(--ax-border-neutral-subtle)",
-                }}
-            >
-                {/* Title and tabs */}
-                <Box>
+        <Box
+            style={{
+                background: "var(--ax-bg-neutral-soft)",
+                borderBottom: "1px solid var(--ax-border-neutral-subtle)",
+            }}
+        >
+            {/* Title and tabs */}
+            <Box>
+                <Box
+                    style={{
+                        display: "flex",
+                        padding: "0rem 1rem",
+                        background: "var(--ax-bg-neutral-soft)",
+                    }}
+                >
                     <Box
                         style={{
                             display: "flex",
-                            padding: "0rem 1rem",
-                            background: "var(--ax-bg-neutral-soft)",
+                            alignItems: "center",
+                            flexShrink: 0,
+                            padding: "0.5rem 1.5rem 0.5rem 0",
                         }}
                     >
-                        <Box
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                flexShrink: 0,
-                                padding: "0.5rem 1.5rem 0.5rem 0",
-                            }}
-                        >
-                            <HeaderTittel
-                                type={type}
-                                style={{ color: "var(--ax-bg-brand-beige-strong)", whiteSpace: "nowrap" }}
-                            />
-                        </Box>
-
-                        <Box style={{ display: "flex", minWidth: 0 }}>
-                            {saksnummerRoller.map((item) => (
-                                <SaksnummerTab
-                                    key={item.saksnummer}
-                                    item={item}
-                                    isSelected={aktivtSaksnummer === item.saksnummer}
-                                    isExpanded={expandedSaksnummer === item.saksnummer}
-                                    harFlereSaksnummer={harFlereSaksnummer}
-                                    harValideringsfeil={saksnummerMedValideringsfeil?.has(item.saksnummer) ?? false}
-                                    harNyeOpplysninger={saksnummerMedNyeOpplysninger?.has(item.saksnummer) ?? false}
-                                    onSelect={onSelectSaksnummer}
-                                    onToggleExpand={onToggleExpanded}
-                                />
-                            ))}
-                        </Box>
+                        <HeaderTittel
+                            type={type}
+                            style={{ color: "var(--ax-bg-brand-beige-strong)", whiteSpace: "nowrap" }}
+                        />
                     </Box>
 
-                    {/* Expanded roles panel */}
-                    <ExpandedRoles saksnummerRoller={expandedSaksnummerRoller} />
+                    <Box style={{ display: "flex", minWidth: 0 }}>
+                        {saksnummerRoller.map((item) => (
+                            <SaksnummerTab
+                                key={item.saksnummer}
+                                item={item}
+                                isSelected={aktivtSaksnummer === item.saksnummer}
+                                isExpanded={expandedSaksnummer === item.saksnummer}
+                                harFlereSaksnummer={harFlereSaksnummer}
+                                harValideringsfeil={saksnummerMedValideringsfeil?.has(item.saksnummer) ?? false}
+                                harNyeOpplysninger={saksnummerMedNyeOpplysninger?.has(item.saksnummer) ?? false}
+                                onSelect={onSelectSaksnummer}
+                                onToggleExpand={onToggleExpanded}
+                            />
+                        ))}
+                    </Box>
                 </Box>
+
+                {/* Expanded roles panel */}
+                <ExpandedRoles saksnummerRoller={expandedSaksnummerRoller} />
             </Box>
-        </div>
+        </Box>
     );
 }

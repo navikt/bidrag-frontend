@@ -230,6 +230,7 @@ const Main = () => {
         selectedRoller,
         selectedSaksnummer,
     } = useBehandlingProvider();
+    const { samværV2 } = useGetBehandlingV2();
     const mergeSamværMutation = useOnMergeSamvær();
     const ref = useRef<HTMLDialogElement>(null);
     const visibleSamværBarn = useMemo(() => {
@@ -275,6 +276,7 @@ const Main = () => {
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
 
+    const samværSak = samværV2.erSammeForAlleSaker.find((i)=>i.saksnummer === selectedSaksnummer) ?? samværV2.erSammeForAlleSaker?.[0]
     return (
         <div>
             <ConfirmationModal
@@ -302,7 +304,7 @@ const Main = () => {
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
-                    readOnly={lesemodus}
+                    readOnly={lesemodus || !samværSak.kanVurdereSamlet}
                     onChange={(e) => {
                         if (e.target.checked) {
                             setVurderSeparat(e.target.checked);
