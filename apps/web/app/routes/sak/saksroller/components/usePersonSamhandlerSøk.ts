@@ -74,12 +74,18 @@ export function usePersonSamhandlerSøk({
         setSearchValue(value);
     };
 
+    const onSearchError = (feil: string) => {
+        setSearchErrorMessage(feil);
+        onError(feil);
+    };
+
     return {
         samhandlerPersonFn,
         searchErrorMessage,
         nyttFødselsnummerInfo,
         searchValue,
         onInputChange,
+        onSearchError,
         onSearchValueChange,
     };
 }

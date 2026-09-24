@@ -28,6 +28,7 @@ export default function PersonSamhandlerSøk({
         nyttFødselsnummerInfo,
         searchValue,
         onInputChange,
+        onSearchError,
         onSearchValueChange,
     } = usePersonSamhandlerSøk({
         valgIdent,
@@ -79,10 +80,7 @@ export default function PersonSamhandlerSøk({
                     <BodyShort size="small" textColor="subtle">
                         <PersonSokButton
                             visSomLenke
-                            onError={(feil) => {
-                                setSearchErrorMessage(feil);
-                                onError(feil);
-                            }}
+                            onError={onSearchError}
                             onResult={(data) => {
                                 if (data?.ident) onInputChange(data.ident);
                             }}

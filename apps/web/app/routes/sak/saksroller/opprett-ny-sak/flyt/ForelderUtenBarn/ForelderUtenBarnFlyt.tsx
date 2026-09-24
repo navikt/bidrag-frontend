@@ -32,14 +32,14 @@ import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import MotpartSection from "../../sections/MotpartSection";
 import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
 import { hentMotsattRolle } from "../../utils";
+import {
+    type ForeslåttForelder,
+    utledForelderUtenBarnParter,
+    utledForelderUtenBarnStatus,
+} from "./forelder-uten-barn-visningsmodell";
 import SøskenListe from "./SøskenListe";
 import { useForeldreForslag } from "./useForeldreForslag";
 import { useSøsken } from "./useSøsken";
-
-type ForeslåttForelder = {
-    barnIdent: string;
-    barnNavn: string;
-} & PersonDto;
 
 export default function ForelderUtenBarnFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();
@@ -94,18 +94,14 @@ function ForelderUtenBarnFlytContent() {
     const valgteBarn = form.watch("valgteBarn");
     const motpart = form.watch("motpart");
 
-    const erBidragspliktig = partISaken.rolle === "bidragspliktig";
-    const erBidragsmottaker = partISaken.rolle === "bidragsmottaker";
-    const bidragsmottaker = erBidragsmottaker ? partISaken : motpart;
-    const bidragspliktig = erBidragspliktig ? partISaken : motpart;
-    const normalisertMotpart = {
-        ident: motpart.ident ?? "",
-        navn: motpart.navn ?? "",
-        rolle: motpart.rolle ?? motsattRolle,
-        erKjent: motpart.erKjent,
-    };
-
-    const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker.erKjent;
+    const {
+        erBidragspliktig,
+        erBidragsmottaker,
+        bidragsmottaker,
+        bidragspliktig,
+        bidragsmottakerErUkjent,
+        normalisertMotpart,
+    } = utledForelderUtenBarnParter(partISaken, motpart);
     const { data: kanOppretteSakUtenBm, isLoading: sjekkerTilgangUtenBm } =
         useSjekkTilgangOpprettSakUtenBm(bidragsmottakerErUkjent);
 
@@ -134,12 +130,12 @@ function ForelderUtenBarnFlytContent() {
         saksnummer,
     } = useFlowSubmission({
         form,
-        partISaken: { ...form.watch("partISaken"), erKjent: true },
+        partISaken: { ...partISaken, erKjent: true },
         motpart: normalisertMotpart,
         valgteBarn,
         bidragspliktig,
         bidragsmottaker,
-        eksisterendeSakPartISaken: { ...form.watch("partISaken"), erKjent: true },
+        eksisterendeSakPartISaken: { ...partISaken, erKjent: true },
         eksisterendeSakMotpart: normalisertMotpart,
     });
 
@@ -152,7 +148,6 @@ function ForelderUtenBarnFlytContent() {
     useForeldreForslag({
         barn: søkteBarn,
         foreldreinformasjon: foreldreinformasjonTilBarn,
-        foreslåttMotpart,
         form,
         motpart,
         motpartErManueltValgt,
@@ -230,9 +225,16 @@ function ForelderUtenBarnFlytContent() {
         settInfoMelding("");
     };
 
-    const kanIkkeOpprettSakUtenBm = bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false;
-    const visValideringsAlerts =
-        valgteBarn.length > 0 || (erBidragsmottaker && valgteBarn.length === 0) || kanIkkeOpprettSakUtenBm;
+    const status = utledForelderUtenBarnStatus({
+        antallValgteBarn: valgteBarn.length,
+        erBidragsmottaker,
+        bidragsmottakerErUkjent,
+        sjekkerTilgangUtenBm,
+        kanOppretteSakUtenBm,
+        harEksisterendeSak,
+        lasterEksisterendeSak: isLoadingHentSak,
+        lasterEnhet: isLoadingEnhet,
+    });
 
     return (
         <RolleFlytSide
@@ -249,10 +251,9 @@ function ForelderUtenBarnFlytContent() {
                 <ForelderUtenBarnMeldinger
                     tilgangsfeil={foreldreinformasjonTilBarnError}
                     infoMelding={infoMelding}
-                    visValideringsAlerts={visValideringsAlerts}
-                    harValgteBarn={valgteBarn.length > 0}
-                    erBidragsmottaker={erBidragsmottaker}
-                    kanIkkeOppretteSakUtenBm={kanIkkeOpprettSakUtenBm}
+                    visUfullstendigRelasjon={status.visUfullstendigRelasjon}
+                    visBidragsmottakerUtenBarn={status.visBidragsmottakerUtenBarn}
+                    kanIkkeOppretteSakUtenBm={status.kanIkkeOppretteSakUtenBm}
                 />
             }
             submit={
@@ -261,12 +262,7 @@ function ForelderUtenBarnFlytContent() {
                     enhetNavn={enhetNavn}
                     isLoadingEnhet={isLoadingEnhet}
                     enhetError={enhetError}
-                    blocked={
-                        harEksisterendeSak ||
-                        isLoadingHentSak ||
-                        isLoadingEnhet ||
-                        (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
-                    }
+                    blocked={status.submitBlokkert}
                     submitError={error}
                     isLoading={isLoadingOpprettSak}
                     saksnummer={saksnummer}
@@ -300,16 +296,14 @@ function ForelderUtenBarnFlytContent() {
 function ForelderUtenBarnMeldinger({
     tilgangsfeil,
     infoMelding,
-    visValideringsAlerts,
-    harValgteBarn,
-    erBidragsmottaker,
+    visUfullstendigRelasjon,
+    visBidragsmottakerUtenBarn,
     kanIkkeOppretteSakUtenBm,
 }: {
     tilgangsfeil: unknown;
     infoMelding: string;
-    visValideringsAlerts: boolean;
-    harValgteBarn: boolean;
-    erBidragsmottaker: boolean;
+    visUfullstendigRelasjon: boolean;
+    visBidragsmottakerUtenBarn: boolean;
     kanIkkeOppretteSakUtenBm: boolean;
 }) {
     return (
@@ -324,13 +318,9 @@ function ForelderUtenBarnMeldinger({
                     {infoMelding}
                 </Alert>
             )}
-            {visValideringsAlerts && (
-                <>
-                    {harValgteBarn && <UfullstendigRelasjonAlert />}
-                    {erBidragsmottaker && !harValgteBarn && <BMUtenBarnAlert />}
-                    {kanIkkeOppretteSakUtenBm && <KanIkkeOppretteSakAlert />}
-                </>
-            )}
+            {visUfullstendigRelasjon && <UfullstendigRelasjonAlert />}
+            {visBidragsmottakerUtenBarn && <BMUtenBarnAlert />}
+            {kanIkkeOppretteSakUtenBm && <KanIkkeOppretteSakAlert />}
         </>
     );
 }

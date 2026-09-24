@@ -51,3 +51,39 @@ test("beholder kjente parter når barnet har to registrerte foreldre", async ({ 
     ).toBeVisible();
     await expect(component.getByRole("searchbox", { name: /Søk etter bidragsmottaker/ })).toHaveCount(0);
 });
+
+test("viser datakvalitetsfeil når barnet har mer enn to registrerte foreldre", async ({ mount, page }) => {
+    await mockWizardApi(page, {
+        parentRelations: {
+            [testpersoner.barnUnder18.ident]: [
+                testpersoner.bidragspliktig.ident,
+                testpersoner.bidragsmottaker.ident,
+                testpersoner.annenForelder.ident,
+            ],
+        },
+    });
+    const component = await mount(STORY);
+
+    await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+    const søkEtterBarn = page.getByRole("searchbox", { name: "Søk etter barn" });
+    await søkEtterBarn.fill(testpersoner.barnUnder18.ident);
+    await søkEtterBarn.press("Enter");
+    await component.getByRole("button", { name: "Legg til", exact: true }).click();
+
+    await expect(component.getByText(/har flere enn 2 registrerte foreldre/)).toBeVisible();
+});
+
+test("blokkerer opprettelse med ukjent bidragsmottaker når tilgang mangler", async ({ mount, page }) => {
+    await mockWizardApi(page, { accessAllowed: false });
+    const component = await mount(STORY);
+
+    await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+    const søkEtterBarn = page.getByRole("searchbox", { name: "Søk etter barn" });
+    await søkEtterBarn.fill(testpersoner.barnUnder18.ident);
+    await søkEtterBarn.press("Enter");
+    await component.getByRole("button", { name: "Legg til", exact: true }).click();
+
+    await expect(component.getByText(/ikke tilgang til å opprette sak uten bidragsmottaker/)).toBeVisible();
+    await component.getByRole("button", { name: "lagre Opprett", exact: true }).click();
+    await expect(component.getByText(/Kan ikke opprette saken ennå/)).toBeVisible();
+});
