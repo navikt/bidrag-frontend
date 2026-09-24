@@ -1,8 +1,7 @@
 import "./CopyToClipboard.css";
 
 import copy from "copy-to-clipboard";
-import type React from "react";
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { Popover } from "react-tiny-popover";
 
 import File from "../icons/File";
@@ -19,7 +18,7 @@ export default function CopyToClipboard({ value }: CopyToClipboardProps) {
         });
     }
 
-    function onCopyButtonClick(e: React.MouseEvent) {
+    function onCopyButtonClick(e: MouseEvent) {
         e.preventDefault();
         copyCode(value);
         setIsPopoverOpen(true);

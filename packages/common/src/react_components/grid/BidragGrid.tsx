@@ -1,6 +1,6 @@
-import type { PropsWithChildren } from "react";
+import type { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from "react";
 
-type GridProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+type GridProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 export default function BidragGrid({ children, ...otherProps }: PropsWithChildren<GridProps>) {
     return (
         <div {...otherProps} className={`grid grid-cols-12 gap-6 ${otherProps.className}`}>

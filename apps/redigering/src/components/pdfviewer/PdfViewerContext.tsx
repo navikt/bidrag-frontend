@@ -1,4 +1,4 @@
-import React, { type MutableRefObject, type PropsWithChildren, useContext, useRef, useState } from "react";
+import { createContext, type MutableRefObject, type PropsWithChildren, useContext, useRef, useState } from "react";
 import { useControls, useTransformContext, useTransformEffect, useTransformInit } from "react-zoom-pan-pinch";
 
 import type { PdfDocumentRef } from "../pdfcore/PdfDocument";
@@ -30,7 +30,7 @@ export const usePdfViewerContext = () => {
     }
     return context;
 };
-export const PdfViewerContext = React.createContext<PdfViewerContextProps>({} as PdfViewerContextProps);
+export const PdfViewerContext = createContext<PdfViewerContextProps>({} as PdfViewerContextProps);
 
 interface IPdfViewerContextProviderProps {
     pages?: number[];

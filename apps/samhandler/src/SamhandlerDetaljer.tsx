@@ -14,7 +14,7 @@ import {
     Tag,
     VStack,
 } from "@navikt/ds-react";
-import { memo, Suspense, useState } from "react";
+import { memo, type ReactNode, Suspense, useState } from "react";
 import { QueryErrorWrapper } from "./QueryErrorBoundary";
 import styles from "./SamhandlerDetaljer.module.css";
 import SamhandlerForm from "./SamhandlerForm";
@@ -27,7 +27,7 @@ import {
     useOppdaterSamhandler,
 } from "./utils/useApiData";
 
-type InfoRowProps = { label: string; value: React.ReactNode };
+type InfoRowProps = { label: string; value: ReactNode };
 
 function InfoRow({ label, value }: InfoRowProps) {
     return (

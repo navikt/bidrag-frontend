@@ -17,7 +17,7 @@ import {
 } from "@bidrag/common";
 import { useQueryClient, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError, type AxiosResponse, HttpStatusCode } from "axios";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useBidragDokumentApi, useBidragForsendelseApi, usePersonApi, useSakApi } from "../api/api";
 import { DokumentStatus } from "../constants/DokumentStatus";
 import type { SAKSNUMMER } from "../constants/fellestyper";
@@ -332,7 +332,7 @@ export const useVedleggListe = () => {
     return useSuspenseQuery({
         queryKey: [`vedlegg_liste`, enhet],
         queryFn: () => bidragForsendelseApi.api.stottedeDokumentmalDetaljer(),
-        select: React.useCallback(
+        select: useCallback(
             (response: AxiosResponse): VedleggListe => {
                 const dokumentmaler = response.data as Record<string, DokumentMalDetaljer>;
                 return Object.entries(dokumentmaler)

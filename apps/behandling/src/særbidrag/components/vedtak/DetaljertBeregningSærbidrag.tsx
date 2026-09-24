@@ -1,12 +1,13 @@
 import { Resultatkode } from "@bidrag/api/BidragBehandlingApiV1";
 import { Table } from "@navikt/ds-react";
+import type { FC } from "react";
 import { BPsEvne } from "../../../common/components/vedtak/BPsEvneTabell";
 import { BpsBeregnedeTotalbidragTabellSærbidrag } from "../../../common/components/vedtak/BpsBeregnedeTotalbidragTabell";
 import { useGetBehandlingV2, useGetBeregningSærbidrag } from "../../../common/hooks/useApiData";
 import { formatterBeløp } from "../../../utils/number-utils";
 import { BPsAndelUtgifter } from "./BPsAndelUtgifter";
 
-export const DetaljertBeregningSærbidrag: React.FC = () => {
+export const DetaljertBeregningSærbidrag: FC = () => {
     const { data: beregnetSærbidrag } = useGetBeregningSærbidrag();
 
     return (

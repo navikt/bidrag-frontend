@@ -1,8 +1,9 @@
 import type { RenderTask } from "pdfjs-dist";
 import type { PDFPageProxy } from "pdfjs-dist/types/web/pdf_viewer";
-import React, {
+import {
     type CSSProperties,
     type MutableRefObject,
+    memo,
     type PropsWithChildren,
     useEffect,
     useRef,
@@ -30,7 +31,7 @@ const PdfPage = (props: PropsWithChildren<PdfPageProps>) => {
 };
 
 type PdfPageMemoProps = PdfPageProps & PdfDocumentContextProps;
-const PdfPageMemo = React.memo(
+const PdfPageMemo = memo(
     ({
         pdfDocument,
         renderPageIndexes,

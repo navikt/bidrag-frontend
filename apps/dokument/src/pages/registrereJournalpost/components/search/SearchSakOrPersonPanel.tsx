@@ -1,6 +1,6 @@
 import { TextField } from "@navikt/ds-react";
 import lodash from "lodash";
-import React, { type ChangeEvent, type ReactElement, useRef, useState } from "react";
+import { type ChangeEvent, type KeyboardEvent, type ReactElement, Suspense, useRef, useState } from "react";
 
 import AvansertSok from "../../../../common/components/person/AvansertSok";
 import { useStartPersonOrSakSearchCallback } from "../../../../hooks/useSakApi";
@@ -40,7 +40,7 @@ export default function SearchSakOrPersonPanel(): ReactElement {
         setSearchValue(undefined);
     }
 
-    function onKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
         if (e.code === "Enter") {
             e.preventDefault();
             e.stopPropagation();
@@ -63,9 +63,9 @@ export default function SearchSakOrPersonPanel(): ReactElement {
                 />
                 <AvansertSok onResult={(data) => doSearch(data.ident)} />
             </div>
-            <React.Suspense fallback={null}>
+            <Suspense fallback={null}>
                 <SearchFailurePanel resetSearch={resetSearch} failedSearchValue={failedSearchValue} />
-            </React.Suspense>
+            </Suspense>
         </div>
     );
 }

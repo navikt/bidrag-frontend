@@ -1,7 +1,7 @@
 import { IdentUtils } from "@bidrag/common";
 import { PencilIcon as Edit } from "@navikt/aksel-icons";
 import { BodyShort, Button, Heading, Loader } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 
 import AdresseInfo from "../../../components/AdresseInfo";
 import { EditAddressForm } from "../../../components/EditAddress";
@@ -68,7 +68,7 @@ function Adresse({ editable = true, adresse, onAdresseChanged, onEditModeChanged
             <Heading size="xsmall">{adressEditable ? "Endre adresse" : "Til følgende adresse"}</Heading>
             <div className={"flex w-full"}>
                 {adressEditable ? (
-                    <React.Suspense fallback={<Loader variant="neutral" size="small" fr="true" />}>
+                    <Suspense fallback={<Loader variant="neutral" size="small" fr="true" />}>
                         <EditAddressForm
                             address={adresse}
                             onSubmit={(adresse) => {
@@ -77,7 +77,7 @@ function Adresse({ editable = true, adresse, onAdresseChanged, onEditModeChanged
                             }}
                             onCancel={() => changeAdressEditable(false)}
                         />
-                    </React.Suspense>
+                    </Suspense>
                 ) : (
                     <div>
                         <AdresseInfo adresse={adresse} />
