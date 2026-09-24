@@ -1,4 +1,4 @@
-import React, { type PropsWithChildren, useContext, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useState } from "react";
 
 type ErrorContextProps = {
     warningMessage?: string;
@@ -22,7 +22,7 @@ export const useErrorContext = () => {
     }
     return context;
 };
-export const ErrorContext = React.createContext<ErrorContextProps>({} as ErrorContextProps);
+export const ErrorContext = createContext<ErrorContextProps>({} as ErrorContextProps);
 
 export default function ErrorProvider({ children }: PropsWithChildren<unknown>) {
     const [error, setError] = useState<IForsendelseApiError>();

@@ -1,7 +1,7 @@
 import type { DistribuerTilAdresse } from "@bidrag/api/BidragDokumentApi";
 import { PencilIcon as Edit } from "@navikt/aksel-icons";
 import { Button, Heading, Loader } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 import AvsenderMottaker from "../../../../common/components/person/AvsenderMottaker";
 import AdresseInfo from "../AdresseInfo";
 import EditAddress from "./EditAddress";
@@ -43,7 +43,7 @@ export default function BestillDistribusjonInfo({
                 </Heading>
                 <div className={"flex w-full"}>
                     {adressEditable ? (
-                        <React.Suspense fallback={<Loader variant="neutral" size="small" />}>
+                        <Suspense fallback={<Loader variant="neutral" size="small" />}>
                             <EditAddress
                                 address={adresse}
                                 onSubmit={(adresse) => {
@@ -52,7 +52,7 @@ export default function BestillDistribusjonInfo({
                                 }}
                                 onCancel={() => changeAdressEditable(false)}
                             />
-                        </React.Suspense>
+                        </Suspense>
                     ) : (
                         <div className="pt-2">
                             <AdresseInfo adresse={adresse} />

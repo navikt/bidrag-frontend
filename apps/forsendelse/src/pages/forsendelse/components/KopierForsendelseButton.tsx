@@ -1,7 +1,7 @@
 import { DokumentArkivSystemDto, type JournalTema } from "@bidrag/api/BidragForsendelseApi";
 import { BodyShort, Button, Checkbox, Heading, Loader, Modal, Table } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useBidragForsendelseApi } from "../../../api/api";
@@ -145,7 +145,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                             <br />
                             Det vil bli opprettet en "Fritekstbrev" som forside i forsendelsen
                         </BodyShort>
-                        <React.Suspense fallback={<Loader size={"medium"} />}>
+                        <Suspense fallback={<Loader size={"medium"} />}>
                             <GjelderSelect roller={roller} />
                             <MottakerSelect />
                             <div className="w-max">
@@ -153,7 +153,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                             </div>
                             <Heading size="small">Kopier dokumenter</Heading>
                             <DokumentValgTable />
-                        </React.Suspense>
+                        </Suspense>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="small" type="submit" loading={opprettForsendelseFn.isPending}>

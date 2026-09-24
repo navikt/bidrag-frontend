@@ -1,6 +1,5 @@
 import { Select } from "@navikt/ds-react";
-import type React from "react";
-import type { PropsWithChildren } from "react";
+import type { ChangeEvent, PropsWithChildren } from "react";
 import { useController, useFormContext } from "react-hook-form";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 
@@ -35,7 +34,7 @@ export const FormControlledSelectField = ({
     const { field, fieldState } = useController({ name, control });
 
     const { lesemodus } = useBehandlingProvider();
-    const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const onChange = (e: ChangeEvent<HTMLSelectElement>) => {
         onBeforeSelect?.(field.value);
         const value = e.target.value;
         field.onChange(value);

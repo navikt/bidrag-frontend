@@ -1,8 +1,7 @@
 import { TypeBehandling } from "@bidrag/api/BidragBehandlingApiV1";
 import { BodyShort, Button, Loader } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import type React from "react";
-import { Suspense, useEffect } from "react";
+import { type FC, Suspense, useEffect } from "react";
 import { formatterBeløp } from "../../../utils/number-utils";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 import { QueryKeys, useGetBehandlingV2, useGetBeregningInnteksgrenseSærbidrag } from "../../hooks/useApiData";
@@ -38,7 +37,7 @@ export function AdminButtons() {
     );
 }
 
-const BPsLavesteInntektForEvneWrapper: React.FC = () => {
+const BPsLavesteInntektForEvneWrapper: FC = () => {
     return (
         <Suspense
             fallback={
@@ -52,7 +51,7 @@ const BPsLavesteInntektForEvneWrapper: React.FC = () => {
         </Suspense>
     );
 };
-const BPsLavesteInntektForEvne: React.FC = () => {
+const BPsLavesteInntektForEvne: FC = () => {
     const { data: innteksgrense } = useGetBeregningInnteksgrenseSærbidrag();
     const { activeStep } = useBehandlingProvider();
     const queryClient = useQueryClient();

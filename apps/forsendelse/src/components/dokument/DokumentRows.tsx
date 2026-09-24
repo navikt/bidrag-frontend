@@ -4,7 +4,7 @@ import type { DragEndEvent, DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { TrashIcon as Delete, DragVerticalIcon, EyeIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Checkbox, Modal, Table, Textarea } from "@navikt/ds-react";
-import React, { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, forwardRef, type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import {
@@ -66,7 +66,7 @@ interface IDokumentRowProps {
     listeners: SyntheticListenerMap;
     style: CSSProperties;
 }
-const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
+const DokumentRow = forwardRef<HTMLTableRowElement, IDokumentRowProps>(
     ({ dokument, forsendelseId, index: rowIndex, listeners, attributes, style }: IDokumentRowProps, ref) => {
         const { index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
         const {
@@ -239,7 +239,7 @@ function EditableDokumentTitleRow({ dokument, index }: IEditableDokumentTitleRow
         updateTitle(removeNonPrintableCharachters(value), dokument.dokumentreferanse);
     }
 
-    function onKeyDown(e: React.KeyboardEvent) {
+    function onKeyDown(e: KeyboardEvent) {
         if (e.code === "Escape") {
             setInEditMode(false);
             setIsEditingTittel(false);
