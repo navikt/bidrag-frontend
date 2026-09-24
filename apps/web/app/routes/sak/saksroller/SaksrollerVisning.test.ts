@@ -1,7 +1,7 @@
 import type { FieldErrors } from "react-hook-form";
 import { describe, expect, it } from "vitest";
 
-import { finnFørsteValideringsfeil, utledSakstype } from "./SaksrollerVisning.tsx";
+import { finnFørsteValideringsfeil, utledSakstype } from "./saksroller-visning-utils.ts";
 import type { SakRedigeringData } from "./sakvisning-schema.ts";
 
 describe("finnFørsteValideringsfeil", () => {

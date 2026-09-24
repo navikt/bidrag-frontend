@@ -71,5 +71,3 @@ export default function BarnKort({ barn, ...resten }: FellesProps) {
         />
     );
 }
-
-export { alderForBarn };

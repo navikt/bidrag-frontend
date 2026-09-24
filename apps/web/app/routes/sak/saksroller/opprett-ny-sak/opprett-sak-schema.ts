@@ -15,11 +15,11 @@ export { DiskresjonskodeSchema, MYNDYG_BARN_ALDER };
 
 export const MAKS_ALDER_BARN = 24;
 
-export const ArbeidsfordelingSchema = z.enum(["BBF", "EEN", "EFS", "FRS", "INH", "OPS"]);
-export const RolleForOpprettSakSchema = z.enum(["BA", "BM", "BP", "FR", "RM"]);
+const ArbeidsfordelingSchema = z.enum(["BBF", "EEN", "EFS", "FRS", "INH", "OPS"]);
+const RolleForOpprettSakSchema = z.enum(["BA", "BM", "BP", "FR", "RM"]);
 export const PartRolleSchema = z.enum(["bidragspliktig", "bidragsmottaker", "barn_over_18", "barn_under_18"]);
 export const ForelderPartRolleSchema = z.enum(["bidragspliktig", "bidragsmottaker"]);
-export const PartISakenSchema = z.object({
+const PartISakenSchema = z.object({
     ident: z.string(),
     navn: z.string(),
     rolle: PartRolleSchema,
@@ -41,7 +41,7 @@ export const BarnMedAlderSchema = z.object({
     diskresjonskode: DiskresjonskodeSchema.optional(),
 });
 
-export const MotpartSchema = z.object({
+const MotpartSchema = z.object({
     ident: z.string().optional(),
     navn: z.string().optional(),
     erKjent: z.boolean().optional(),
@@ -91,7 +91,7 @@ export type ForelderUtenBarnSkjemaData = z.infer<typeof ForelderUtenBarnSkjemaSc
 
 // ==================== BARN BEGGE FORELDRE FLYT ====================
 
-export const ForelderMedRolleSchema = z.object({
+const ForelderMedRolleSchema = z.object({
     ident: z.string(),
     navn: z.string(),
     rolle: ForelderPartRolleSchema.nullable(),

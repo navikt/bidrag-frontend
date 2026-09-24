@@ -67,7 +67,7 @@ type SaksrolleFlyt =
     | { key: number; type: "FARSKAP"; barnkurver: MotpartBarnRelasjon[] }
     | { key: number; type: "EKTEFELLEBIDRAG"; motpart: PersonDto[] | null };
 
-export const SaksrolleroversiktContext = createContext<SaksrolleroversiktContext>({} as SaksrolleroversiktContext);
+const SaksrolleroversiktContext = createContext<SaksrolleroversiktContext>({} as SaksrolleroversiktContext);
 
 function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
     const [valgtPerson, setValgtPerson] = useState<PersonDto | null>(null);

@@ -10,7 +10,7 @@ type Props = {
     children?: ReactNode;
 };
 
-export function PersonKortInnhold({
+function PersonKortInnhold({
     person,
     erValgt,
     visKopieringsknapp = false,

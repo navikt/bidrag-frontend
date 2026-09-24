@@ -15,9 +15,9 @@ import {
     type PartISaken,
 } from "../opprett-sak-schema";
 
-export const ADRESSEBESKYTTELSE_ENHET = "2103";
-export const EGEN_ANSATT_ENHET = "4883";
-export const UTLAND_ENHET = "4865";
+const ADRESSEBESKYTTELSE_ENHET = "2103";
+const EGEN_ANSATT_ENHET = "4883";
+const UTLAND_ENHET = "4865";
 
 /**
  * Normaliserer sakskategori til de gyldige verdiene HentEnhetRequest forventer.

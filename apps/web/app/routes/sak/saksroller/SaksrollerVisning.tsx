@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { type FieldErrors, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import { useOppdaterSaksroller } from "~/api/useApi.ts";
 import BarnVisning from "./barn-rolle/BarnVisning.tsx";
@@ -20,39 +20,10 @@ import { useSakForslag } from "./hooks/useSakForslag.tsx";
 import { useSakvisningSamhandlerHandling } from "./hooks/useSakvisningSamhandlerHandling.ts";
 import { useUfullstendigRelasjonSjekk } from "./hooks/useUfullstendigRelasjonSjekk.ts";
 import { RedigeringRegisterProvider, useHarÅpneRedigeringer } from "./RedigeringRegisterContext.tsx";
+import { finnFørsteValideringsfeil, utledSakstype } from "./saksroller-visning-utils.ts";
 import { type BarnRolle, erBarn, type SakRedigeringData, SakRedigeringSchema } from "./sakvisning-schema.ts";
 import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "./utils.ts";
-
-export type SakstypeVisning = "Barnebidrag" | "Ektefellebidrag" | "Oppfostringsbidrag" | "Farskap";
-
-export function finnFørsteValideringsfeil(feil: FieldErrors<SakRedigeringData>): string | undefined {
-    const verdier: unknown[] = [feil];
-
-    while (verdier.length > 0) {
-        const verdi = verdier.shift();
-        if (!verdi || typeof verdi !== "object") {
-            continue;
-        }
-
-        if ("message" in verdi && typeof verdi.message === "string" && "type" in verdi && verdi.type === "custom") {
-            return verdi.message;
-        }
-
-        verdier.push(...Object.values(verdi));
-    }
-}
-
-export function utledSakstype(roller: SakRedigeringData["roller"]): SakstypeVisning {
-    const harBarn = roller.some((r) => r.type === "BA");
-    const harBP = roller.some((r) => r.type === "BP");
-    const harBM = roller.some((r) => r.type === "BM");
-
-    if (!harBarn && harBP && harBM) return "Ektefellebidrag";
-    if (harBarn && harBP && !harBM) return "Oppfostringsbidrag";
-    if (harBarn && !harBP && harBM) return "Farskap";
-    return "Barnebidrag";
-}
 
 function sakskategoriTilVisningsnavn(kategori: "U" | "N"): string {
     return kategori === "U" ? "Utland" : "Nasjonal";

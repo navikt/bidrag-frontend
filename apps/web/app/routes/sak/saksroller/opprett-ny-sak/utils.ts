@@ -9,7 +9,7 @@ import {
     type PartRolle,
 } from "./opprett-sak-schema";
 
-export function leggTilAlderPåBarn(barn: PersonDto[]): BarnMedAlder[] {
+function leggTilAlderPåBarn(barn: PersonDto[]): BarnMedAlder[] {
     return barn.map((person) => {
         const alder = beregnAlderForPerson(person) ?? 0;
 
@@ -58,39 +58,7 @@ export function hentMotsattRolle(rolle: ForelderPartRolle): ForelderPartRolle {
     return rolle === "bidragspliktig" ? "bidragsmottaker" : "bidragspliktig";
 }
 
-export function fødselsnummerTilDato(fnr: string): string | null {
-    if (fnr?.length !== 11) {
-        return null;
-    }
-
-    try {
-        const dag = fnr.substring(0, 2);
-        const måned = fnr.substring(2, 4);
-        const år = fnr.substring(4, 6);
-
-        // Bestem århundre basert på individnummer (pos 6-8)
-        const individnummer = parseInt(fnr.substring(6, 9), 10);
-
-        let århundre: string;
-        if (individnummer >= 0 && individnummer <= 499) {
-            århundre = "19";
-        } else if (individnummer >= 500 && individnummer <= 749) {
-            århundre = "18";
-        } else if (individnummer >= 900 && individnummer <= 999) {
-            århundre = "19";
-        } else {
-            århundre = "20";
-        }
-
-        const fullÅr = århundre + år;
-        return `${dag}/${måned}/${fullÅr}`;
-    } catch {
-        return null;
-    }
-}
-
 // Forklaringstekstene er de samme for nye og eksisterende saker.
-export { hentDiskresjonskodeForklaring } from "../utils";
 
 const forelderRolleLabels: Record<ForelderPartRolle, string> = {
     bidragspliktig: "Bidragspliktig",
