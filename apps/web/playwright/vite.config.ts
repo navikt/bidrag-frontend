@@ -21,11 +21,9 @@ export default defineConfig({
         // goto() resolver på load-eventet, så et full-reload fra Vite i
         // mellomtiden river ned JS-konteksten og gir "Execution context was
         // destroyed, most likely because of a navigation". Galleriet har ingen
-        // nytte av HMR — hver mount() laster siden på nytt uansett — så vi
-        // fjerner hot-kanalen og filovervåkingen helt i stedet for å redusere
-        // sannsynligheten for at de slår til.
+        // nytte av HMR fordi hver mount() laster siden på nytt. Filovervåking
+        // må likevel være aktiv, slik at neste mount bruker oppdaterte stories.
         hmr: false,
-        watch: null,
         // Forhåndstransformerer galleri-inngangen og story-filene ved oppstart
         // slik at første mount() ikke venter på lazy kompilering.
         warmup: {
