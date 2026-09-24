@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const MYNDYG_BARN_ALDER = 18;
+export const MAKS_ALDER_BARN = 24;
 
 const RolleTypeSchema = z.enum(["BP", "BM", "BA", "RM"]);
 

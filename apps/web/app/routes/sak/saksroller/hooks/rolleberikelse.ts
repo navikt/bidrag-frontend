@@ -9,54 +9,70 @@ export function berikRoller(
     roller: RolleDto[],
     personInfoMap: Map<string | undefined, PersonDto | undefined>,
 ): Rolle[] {
-    return [...roller]
-        .sort((a, b) => a.fodselsnummer?.localeCompare(b.fodselsnummer || "") || a.type.localeCompare(b.type))
-        .map((rolle): Rolle => {
-            const personInfo = rolle.fodselsnummer ? personInfoMap.get(rolle.fodselsnummer) : undefined;
-            const alder = beregnAlderForPerson({
-                fødselsdato: personInfo?.fødselsdato,
-                ident: rolle.fodselsnummer ?? "",
-            });
+    return [...roller].sort(sammenlignRoller).map((rolle) => berikRolle(rolle, personInfoMap));
+}
 
-            if (rolle.type === "BA" && rolle.fodselsnummer) {
-                const erMyndig = (alder ?? 0) >= MYNDYG_BARN_ALDER;
-                return {
-                    ...rolle,
-                    rolleType: "BA",
-                    fodselsnummer: rolle.fodselsnummer,
-                    objektnummer: rolle.objektnummer ?? "",
-                    reellMottager: rolle.reellMottager ?? undefined,
-                    foedselsnummer: rolle.foedselsnummer ?? undefined,
-                    mottagerErVerge: rolle.mottagerErVerge ?? false,
-                    fødselsdato: personInfo?.fødselsdato,
-                    navn: personInfo?.visningsnavn,
-                    diskresjonskode: personInfo?.diskresjonskode,
-                    reellMottaker: rolle.reellMottaker?.ident,
-                    reellMottakerType: rolle.reellMottaker?.ident?.trim()
-                        ? rolle.fodselsnummer === rolle.reellMottaker.ident
-                            ? "barnet_selv"
-                            : "samhandler"
-                        : undefined,
-                    alder: alder ?? undefined,
-                    erMyndig,
-                    rollehistorikk: mapRollehistorikk(rolle),
-                } as BarnRolle;
-            }
+const sammenlignRoller = (a: RolleDto, b: RolleDto): number =>
+    a.fodselsnummer?.localeCompare(b.fodselsnummer || "") || a.type.localeCompare(b.type);
 
-            return {
-                ...rolle,
-                objektnummer: rolle.objektnummer ?? "",
-                reellMottaker: undefined,
-                reellMottager: undefined,
-                foedselsnummer: rolle.foedselsnummer ?? undefined,
-                fødselsdato: personInfo?.fødselsdato,
-                fodselsnummer: rolle.fodselsnummer || "",
-                mottagerErVerge: rolle.mottagerErVerge ?? false,
-                navn: personInfo?.visningsnavn,
-                diskresjonskode: personInfo?.diskresjonskode,
-                rollehistorikk: mapRollehistorikk(rolle),
-            } as Rolle;
-        });
+function berikRolle(rolle: RolleDto, personInfoMap: Map<string | undefined, PersonDto | undefined>): Rolle {
+    const personInfo = rolle.fodselsnummer ? personInfoMap.get(rolle.fodselsnummer) : undefined;
+    const alder = beregnAlderForPerson({
+        fødselsdato: personInfo?.fødselsdato,
+        ident: rolle.fodselsnummer ?? "",
+    });
+
+    if (rolle.type === "BA" && rolle.fodselsnummer) {
+        return berikBarnRolle(rolle, personInfo, alder);
+    }
+
+    return berikStandardRolle(rolle, personInfo);
+}
+
+function berikBarnRolle(
+    rolle: RolleDto,
+    personInfo: PersonDto | undefined,
+    alder: number | null | undefined,
+): BarnRolle {
+    return {
+        ...rolle,
+        ...fellesRollefelter(rolle, personInfo),
+        rolleType: "BA",
+        fodselsnummer: rolle.fodselsnummer,
+        reellMottager: rolle.reellMottager ?? undefined,
+        reellMottaker: rolle.reellMottaker?.ident,
+        reellMottakerType: utledReellMottakerType(rolle),
+        alder: alder ?? undefined,
+        erMyndig: (alder ?? 0) >= MYNDYG_BARN_ALDER,
+    } as BarnRolle;
+}
+
+function utledReellMottakerType(rolle: RolleDto): BarnRolle["reellMottakerType"] {
+    const reellMottakerIdent = rolle.reellMottaker?.ident?.trim();
+    if (!reellMottakerIdent) return undefined;
+    return rolle.fodselsnummer === reellMottakerIdent ? "barnet_selv" : "samhandler";
+}
+
+function fellesRollefelter(rolle: RolleDto, personInfo: PersonDto | undefined) {
+    return {
+        objektnummer: rolle.objektnummer ?? "",
+        foedselsnummer: rolle.foedselsnummer ?? undefined,
+        mottagerErVerge: rolle.mottagerErVerge ?? false,
+        fødselsdato: personInfo?.fødselsdato,
+        navn: personInfo?.visningsnavn,
+        diskresjonskode: personInfo?.diskresjonskode,
+        rollehistorikk: mapRollehistorikk(rolle),
+    };
+}
+
+function berikStandardRolle(rolle: RolleDto, personInfo: PersonDto | undefined): Rolle {
+    return {
+        ...rolle,
+        ...fellesRollefelter(rolle, personInfo),
+        reellMottaker: undefined,
+        reellMottager: undefined,
+        fodselsnummer: rolle.fodselsnummer || "",
+    } as Rolle;
 }
 
 const mapRollehistorikk = (rolle: RolleDto): Rolle["rollehistorikk"] =>

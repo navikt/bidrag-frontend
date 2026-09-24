@@ -48,66 +48,62 @@ export function FunnetPersonInnhold({ label, navn, ident, diskresjonskode }: Inn
     );
 }
 
-export default function FunnetPersonInfo({
-    disabled,
-    fjern,
-    variant,
-    bakgrunn,
-    border,
-    ikon,
-    simple,
-    ...innholdProps
-}: Props): ReactNode {
-    if (variant === undefined) {
-        return (
-            <div
-                className={`border ${simple ? "" : (bakgrunn ?? "bg-ax-accent-100")} ${
-                    simple ? "" : "mt-2 p-3"
-                } rounded-lg ${simple ? "" : "border-solid"} ${
-                    simple ? "" : (border ?? "border-ax-bg-info-soft")
-                } flex items-center justify-between`}
-            >
-                <div className="flex gap-3 w-[stretch] justify-between">
-                    <div className="flex gap-3">
-                        {!simple && (
-                            <PersonIcon fontSize="1.5rem" aria-hidden className={ikon ?? "text-ax-success-700"} />
+type EnkelProps = Omit<Props, "variant">;
+
+function EnkelFunnetPersonInfo({ disabled, fjern, bakgrunn, border, ikon, simple, ...innholdProps }: EnkelProps) {
+    const rammeklasser = simple
+        ? "border rounded-lg"
+        : `border ${bakgrunn ?? "bg-ax-accent-100"} mt-2 p-3 rounded-lg border-solid ${border ?? "border-ax-bg-info-soft"}`;
+
+    return (
+        <div className={`${rammeklasser} flex items-center justify-between`}>
+            <div className="flex gap-3 w-[stretch] justify-between">
+                <div className="flex gap-3">
+                    {!simple && <PersonIcon fontSize="1.5rem" aria-hidden className={ikon ?? "text-ax-success-700"} />}
+                    <div className="flex flex-col">
+                        <BodyLong size="small" className="font-semibold">
+                            {innholdProps.label}{" "}
+                            <PersonInfo
+                                ident={innholdProps.ident ?? ""}
+                                navn={innholdProps.navn}
+                                visKopieringsknapp={false}
+                            />
+                        </BodyLong>
+                        {innholdProps.diskresjonskode && (
+                            <DiskresjonAlert diskresjonskode={innholdProps.diskresjonskode} />
                         )}
-                        <div className="flex flex-col">
-                            <BodyLong size="small" className="font-semibold">
-                                {innholdProps.label}{" "}
-                                <PersonInfo
-                                    ident={innholdProps.ident ?? ""}
-                                    navn={innholdProps.navn}
-                                    visKopieringsknapp={false}
-                                />
-                            </BodyLong>
-                            {innholdProps.diskresjonskode && (
-                                <DiskresjonAlert diskresjonskode={innholdProps.diskresjonskode} />
-                            )}
-                        </div>
                     </div>
-                    {fjern && (
-                        <Button
-                            type="button"
-                            variant="tertiary"
-                            size="xsmall"
-                            className="h-max"
-                            disabled={disabled}
-                            icon={<XMarkIcon aria-hidden />}
-                            onClick={fjern}
-                        >
-                            Fjern
-                        </Button>
-                    )}
                 </div>
+                {fjern && (
+                    <Button
+                        type="button"
+                        variant="tertiary"
+                        size="xsmall"
+                        className="h-max"
+                        disabled={disabled}
+                        icon={<XMarkIcon aria-hidden />}
+                        onClick={fjern}
+                    >
+                        Fjern
+                    </Button>
+                )}
             </div>
-        );
+        </div>
+    );
+}
+
+export default function FunnetPersonInfo({ variant, ...props }: Props): ReactNode {
+    if (variant === undefined) {
+        return <EnkelFunnetPersonInfo {...props} />;
     }
+
+    const { disabled, fjern, label, navn, ident, diskresjonskode } = props;
+    const erAdvarsel = variant === "warning";
 
     return (
         <Box
-            background={variant === "warning" ? "warning-soft" : "info-soft"}
-            borderColor={variant === "warning" ? "warning" : "info"}
+            background={erAdvarsel ? "warning-soft" : "info-soft"}
+            borderColor={erAdvarsel ? "warning" : "info"}
             borderWidth="1"
             borderRadius="8"
             padding="space-12"
@@ -117,9 +113,9 @@ export default function FunnetPersonInfo({
                     <PersonIcon
                         fontSize="1.5rem"
                         aria-hidden
-                        className={variant === "warning" ? "text-ax-warning-700" : "text-ax-accent-700"}
+                        className={erAdvarsel ? "text-ax-warning-700" : "text-ax-accent-700"}
                     />
-                    <FunnetPersonInnhold {...innholdProps} />
+                    <FunnetPersonInnhold label={label} navn={navn} ident={ident} diskresjonskode={diskresjonskode} />
                 </HStack>
                 {fjern && !disabled && (
                     <Button

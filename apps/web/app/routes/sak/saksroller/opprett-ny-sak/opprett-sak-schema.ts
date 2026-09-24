@@ -2,18 +2,16 @@ import { z } from "zod";
 
 // Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
 // sakvisning i stedet for å dupliseres.
-import { DiskresjonskodeSchema, MYNDYG_BARN_ALDER } from "../sakvisning-schema";
+import { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER } from "../sakvisning-schema";
 import {
     type ReellMottakerSkjemaverdi,
     type ReellMottakerValideringsgrunn,
     validerReellMottaker,
 } from "./reell-mottaker-regel";
 
-export { DiskresjonskodeSchema, MYNDYG_BARN_ALDER };
+export { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER };
 
 // ==================== BASE SCHEMAS ====================
-
-export const MAKS_ALDER_BARN = 24;
 
 const ArbeidsfordelingSchema = z.enum(["BBF", "EEN", "EFS", "FRS", "INH", "OPS"]);
 export const PartRolleSchema = z.enum(["bidragspliktig", "bidragsmottaker", "barn_over_18", "barn_under_18"]);
@@ -59,15 +57,7 @@ const createForelderSkjemaSchema = () =>
             kategori: z.enum(["Nasjonal", "Utland"]),
         })
         .superRefine((data, ctx) => {
-            validateUlikeParter(data.partISaken, data.motpart, ctx);
-
-            if (data.partISaken.rolle === "bidragspliktig" && data.valgteBarn.length === 0) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ["valgteBarn"],
-                    message: "Du må velge minst ett barn.",
-                });
-            }
+            validateParterOgBarn(data, data.partISaken.rolle === "bidragspliktig", ctx);
 
             const bidragsmottaker = data.partISaken.rolle === "bidragsmottaker" ? data.partISaken : data.motpart;
             const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
@@ -108,68 +98,52 @@ export const BarnMedReellMottakerSchema = z.object({
     reellMottakerNavn: z.string().optional(),
     diskresjonskode: DiskresjonskodeSchema.optional(),
 });
-export const OppfostringsbidragSkjemaSchema = z
-    .object({
-        arbeidsfordeling: ArbeidsfordelingSchema,
-        partISaken: PartISakenSchema,
-        valgteBarn: z.array(BarnMedAlderSchema),
-        motpart: MotpartSchema,
-        kategori: z.enum(["Nasjonal", "Utland"]),
-    })
-    .superRefine((data, ctx) => {
-        validateUlikeParter(data.partISaken, data.motpart, ctx);
 
-        if (data.valgteBarn.length === 0) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["valgteBarn"],
-                message: "Du må velge minst ett barn.",
+const createSakMedBarnSkjemaSchema = (
+    validateBarn?: (barn: z.infer<typeof BarnMedAlderSchema>, index: number, ctx: z.RefinementCtx) => void,
+) =>
+    z
+        .object({
+            arbeidsfordeling: ArbeidsfordelingSchema,
+            partISaken: PartISakenSchema,
+            valgteBarn: z.array(BarnMedAlderSchema),
+            motpart: MotpartSchema,
+            kategori: z.enum(["Nasjonal", "Utland"]),
+        })
+        .superRefine((data, ctx) => {
+            validateParterOgBarn(data, true, ctx);
+
+            data.valgteBarn.forEach((barn, index) => {
+                validateBarn?.(barn, index, ctx);
             });
-        }
-
-        data.valgteBarn.forEach((barn, index) => {
-            leggTilReellMottakerFeil(barn, "alltid", ["valgteBarn", index], ctx);
         });
-    });
+
+export const OppfostringsbidragSkjemaSchema = createSakMedBarnSkjemaSchema((barn, index, ctx) =>
+    leggTilReellMottakerFeil(barn, "alltid", ["valgteBarn", index], ctx),
+);
 // ==================== FARSKAP SCHEMA ====================
 // Similar to OPPFOSTRINGSBIDRAG but does NOT require reellMottaker selection
-export const FarskapsSkjemaSchema = z
-    .object({
-        arbeidsfordeling: ArbeidsfordelingSchema,
-        partISaken: PartISakenSchema,
-        valgteBarn: z.array(BarnMedAlderSchema),
-        motpart: MotpartSchema,
-        kategori: z.enum(["Nasjonal", "Utland"]),
-    })
-    .superRefine((data, ctx) => {
-        validateUlikeParter(data.partISaken, data.motpart, ctx);
-
-        if (data.valgteBarn.length === 0) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["valgteBarn"],
-                message: "Du må velge minst ett barn.",
-            });
-        }
-        // For farskap: reellMottaker is NOT required
-    });
+export const FarskapsSkjemaSchema = createSakMedBarnSkjemaSchema();
 
 export type FarskapsSkjemaSchemaData = z.infer<typeof FarskapsSkjemaSchema>;
 
-export const BarnBeggForeldreSkjemaSchema = z
-    .object({
-        barn: BarnMedReellMottakerSchema,
-        foreldre: z.array(ForelderMedRolleSchema).length(2, "Det må være nøyaktig 2 foreldre"),
-        kategori: z.enum(["Nasjonal", "Utland"]),
-    })
-    .superRefine((data, ctx) => {
-        validateForeldreHarRoller(data.foreldre, ctx);
-        validateRollerErForskjellige(data.foreldre, ctx);
-        validateForeldreErUlikePersoner(data.foreldre, ctx);
-        const bidragsmottaker = data.foreldre.find((forelder) => forelder.rolle === "bidragsmottaker");
-        const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
-        validateReellMottakerForBarn(data.barn, bidragsmottakerErUkjent, ctx);
-    });
+const createBarnForeldreSkjemaSchema = () =>
+    z
+        .object({
+            barn: BarnMedReellMottakerSchema,
+            foreldre: z.array(ForelderMedRolleSchema).length(2, "Det må være nøyaktig 2 foreldre"),
+            kategori: z.enum(["Nasjonal", "Utland"]),
+        })
+        .superRefine((data, ctx) => {
+            validateForeldreHarRoller(data.foreldre, ctx);
+            validateRollerErForskjellige(data.foreldre, ctx);
+            validateForeldreErUlikePersoner(data.foreldre, ctx);
+            const bidragsmottaker = data.foreldre.find((forelder) => forelder.rolle === "bidragsmottaker");
+            const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
+            validateReellMottakerForBarn(data.barn, bidragsmottakerErUkjent, ctx);
+        });
+
+export const BarnBeggForeldreSkjemaSchema = createBarnForeldreSkjemaSchema();
 
 export type OppfostringsbidragSkjemaSchemaData = z.infer<typeof OppfostringsbidragSkjemaSchema>;
 export type BarnBeggForeldreSkjemaData = z.infer<typeof BarnBeggForeldreSkjemaSchema>;
@@ -178,20 +152,7 @@ export type BarnMedReellMottaker = z.infer<typeof BarnMedReellMottakerSchema>;
 
 // ==================== BARN MANGLENDE FORELDRE FLYT ====================
 
-export const BarnMedManglendeForeldreSkjemaSchema = z
-    .object({
-        barn: BarnMedReellMottakerSchema,
-        foreldre: z.array(ForelderMedRolleSchema).length(2, "Det må være nøyaktig 2 foreldre"),
-        kategori: z.enum(["Nasjonal", "Utland"]),
-    })
-    .superRefine((data, ctx) => {
-        validateForeldreHarRoller(data.foreldre, ctx);
-        validateRollerErForskjellige(data.foreldre, ctx);
-        validateForeldreErUlikePersoner(data.foreldre, ctx);
-        const bidragsmottaker = data.foreldre.find((forelder) => forelder.rolle === "bidragsmottaker");
-        const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker?.erKjent;
-        validateReellMottakerForBarn(data.barn, bidragsmottakerErUkjent, ctx);
-    });
+export const BarnMedManglendeForeldreSkjemaSchema = createBarnForeldreSkjemaSchema();
 
 export type BarnMedManglendeForeldreSkjemaData = z.infer<typeof BarnMedManglendeForeldreSkjemaSchema>;
 
@@ -255,6 +216,21 @@ const validateForeldreErUlikePersoner = (foreldre: ForelderMedRolle[], ctx: z.Re
             code: "custom",
             path: ["foreldre", 1, "ident"],
             message: "Samme person kan ikke være begge parter",
+        });
+    }
+};
+
+const validateParterOgBarn = (
+    data: { partISaken: { ident: string }; motpart: { ident?: string }; valgteBarn: unknown[] },
+    kreverBarn: boolean,
+    ctx: z.RefinementCtx,
+) => {
+    validateUlikeParter(data.partISaken, data.motpart, ctx);
+    if (kreverBarn && data.valgteBarn.length === 0) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["valgteBarn"],
+            message: "Du må velge minst ett barn.",
         });
     }
 };

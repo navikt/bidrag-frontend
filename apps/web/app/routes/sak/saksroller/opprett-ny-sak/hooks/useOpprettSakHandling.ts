@@ -1,5 +1,5 @@
 import type { TilgangsFeilError } from "@bidrag/api";
-import { type Arbeidsfordeling, type OpprettSakRequest, Rolletype } from "@bidrag/api/SakApi";
+import { Arbeidsfordeling, type OpprettSakRequest, type RolleDto, Rolletype } from "@bidrag/api/SakApi";
 import { arbeidsfordelingMap } from "@bidrag/utils/organisasjonUtils";
 import type { AxiosError } from "axios";
 import { useEffect } from "react";
@@ -10,23 +10,29 @@ import {
     type BarnMedManglendeForeldreSkjemaData,
     BarnMedManglendeForeldreSkjemaSchema,
     type EktefellebidragSkjemaData,
+    FarskapsSkjemaSchema,
     type FarskapsSkjemaSchemaData,
     type ForelderMedBarnSkjemaData,
     ForelderMedBarnSkjemaSchema,
     type ForelderUtenBarnSkjemaData,
     ForelderUtenBarnSkjemaSchema,
+    OppfostringsbidragSkjemaSchema,
     type OppfostringsbidragSkjemaSchemaData,
 } from "../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
 
-type SakSkjemaData =
-    | ForelderMedBarnSkjemaData
-    | ForelderUtenBarnSkjemaData
-    | BarnBeggForeldreSkjemaData
-    | BarnMedManglendeForeldreSkjemaData;
+type SaksrollerArbeidsfordeling = "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
+type OpprettetSakRolle = Omit<RolleDto, "rollehistorikk">;
+type ForelderSakSkjemaData = ForelderMedBarnSkjemaData | ForelderUtenBarnSkjemaData;
+type BarnSakSkjemaData = BarnBeggForeldreSkjemaData | BarnMedManglendeForeldreSkjemaData;
+type ParsedSakSkjema =
+    | { type: "FARSKAP"; data: FarskapsSkjemaSchemaData }
+    | { type: "OPPFOSTRINGSBIDRAG"; data: OppfostringsbidragSkjemaSchemaData }
+    | { type: "FORELDER"; data: ForelderSakSkjemaData }
+    | { type: "BARN"; data: BarnSakSkjemaData };
 
 type OpprettSakHandlingResult = {
-    opprettSakFraSkjema: (data: SakSkjemaData) => Promise<void>;
+    opprettSakFraSkjema: (data: unknown) => Promise<void>;
     opprettEktefellebidragSak: (data: EktefellebidragSkjemaData) => Promise<void>;
     saksnummer: string | null;
     isLoading: boolean;
@@ -36,23 +42,113 @@ type OpprettSakHandlingResult = {
 
 type Props = {
     enhet: string;
-    arbeidsfordeling: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
+    arbeidsfordeling: SaksrollerArbeidsfordeling;
+};
+
+const arbeidsfordelingTilEnum: Record<SaksrollerArbeidsfordeling, Arbeidsfordeling> = {
+    BBF: Arbeidsfordeling.BBF,
+    EEN: Arbeidsfordeling.EEN,
+    EFS: Arbeidsfordeling.EFS,
+    FRS: Arbeidsfordeling.FRS,
+    INH: Arbeidsfordeling.INH,
+    OPS: Arbeidsfordeling.OPS,
 };
 
 function lagBaseRequest(
     enhet: string,
     kategori: "Nasjonal" | "Utland",
-    arbeidsfordeling: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS" = "EEN",
-): Partial<OpprettSakRequest> {
+    arbeidsfordeling: SaksrollerArbeidsfordeling = "EEN",
+): Omit<OpprettSakRequest, "roller"> {
     return {
         eierfogd: enhet,
-
         kategori: kategori === "Nasjonal" ? "N" : "U",
-        arbeidsfordeling: arbeidsfordeling as Arbeidsfordeling,
+        arbeidsfordeling: arbeidsfordelingTilEnum[arbeidsfordeling],
         ansatt: false,
         inhabilitet: false,
         levdeAdskilt: false,
     };
+}
+
+function lagPersonRolle(fodselsnummer: string | undefined, type: Rolletype): OpprettetSakRolle {
+    return {
+        fodselsnummer,
+        type,
+        mottagerErVerge: false,
+        rolleType: type,
+    };
+}
+
+function lagBarnRolle(barn: { ident: string; reellMottaker?: string }): OpprettetSakRolle {
+    return {
+        fodselsnummer: barn.ident,
+        type: Rolletype.BA,
+        rolleType: Rolletype.BA,
+        reellMottaker: barn.reellMottaker
+            ? {
+                  ident: barn.reellMottaker,
+                  verge: false,
+              }
+            : null,
+        mottagerErVerge: false,
+    };
+}
+
+function lagOpprettSakRequest(base: Omit<OpprettSakRequest, "roller">, roller: OpprettetSakRolle[]): OpprettSakRequest {
+    return { ...base, roller } as OpprettSakRequest;
+}
+
+function lagForelderRequest(enhet: string, data: ForelderSakSkjemaData): OpprettSakRequest {
+    const [bidragsmottaker, bidragspliktig] =
+        data.motpart.rolle === "bidragsmottaker" ? [data.motpart, data.partISaken] : [data.partISaken, data.motpart];
+
+    return lagOpprettSakRequest(lagBaseRequest(enhet, data.kategori, "EEN"), [
+        lagPersonRolle(bidragspliktig.ident, Rolletype.BP),
+        lagPersonRolle(bidragsmottaker.ident, Rolletype.BM),
+        ...data.valgteBarn.map(lagBarnRolle),
+    ]);
+}
+
+function lagBarnRequest(enhet: string, arbeidsfordeling: SaksrollerArbeidsfordeling, data: BarnSakSkjemaData) {
+    const bidragspliktig = data.foreldre.find((f) => f.rolle === "bidragspliktig");
+    const bidragsmottaker = data.foreldre.find((f) => f.rolle === "bidragsmottaker");
+
+    if (!bidragspliktig || !bidragsmottaker) {
+        throw new Error("Mangler bidragspliktig eller bidragsmottaker");
+    }
+
+    return lagOpprettSakRequest(lagBaseRequest(enhet, data.kategori, arbeidsfordeling), [
+        lagPersonRolle(bidragspliktig.ident, Rolletype.BP),
+        lagPersonRolle(bidragsmottaker.ident, Rolletype.BM),
+        lagBarnRolle(data.barn),
+    ]);
+}
+
+function parseSakSkjema(data: unknown, arbeidsfordeling: SaksrollerArbeidsfordeling): ParsedSakSkjema {
+    if (arbeidsfordeling === arbeidsfordelingMap.FARSKAP.kode) {
+        const result = FarskapsSkjemaSchema.safeParse(data);
+        if (result.success) return { type: "FARSKAP", data: result.data };
+        throw new Error("Ukjent skjematype");
+    }
+
+    if (arbeidsfordeling === arbeidsfordelingMap.OPPFOSTRINGSSAK.kode) {
+        const result = OppfostringsbidragSkjemaSchema.safeParse(data);
+        if (result.success) return { type: "OPPFOSTRINGSBIDRAG", data: result.data };
+        throw new Error("Ukjent skjematype");
+    }
+
+    const forelderMedBarnResult = ForelderMedBarnSkjemaSchema.safeParse(data);
+    if (forelderMedBarnResult.success) return { type: "FORELDER", data: forelderMedBarnResult.data };
+
+    const forelderUtenBarnResult = ForelderUtenBarnSkjemaSchema.safeParse(data);
+    if (forelderUtenBarnResult.success) return { type: "FORELDER", data: forelderUtenBarnResult.data };
+
+    const barnBeggForeldreResult = BarnBeggForeldreSkjemaSchema.safeParse(data);
+    if (barnBeggForeldreResult.success) return { type: "BARN", data: barnBeggForeldreResult.data };
+
+    const barnManglendeForeldreResult = BarnMedManglendeForeldreSkjemaSchema.safeParse(data);
+    if (barnManglendeForeldreResult.success) return { type: "BARN", data: barnManglendeForeldreResult.data };
+
+    throw new Error("Ukjent skjematype");
 }
 
 /**
@@ -88,103 +184,25 @@ export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): Oppre
         setIsLoadingOpprettSak(isPending);
     }, [isPending, setIsLoadingOpprettSak]);
 
-    const opprettSakFraSkjema = async (data: SakSkjemaData) => {
-        let request: OpprettSakRequest;
+    const opprettSakFraSkjema = async (data: unknown) => {
+        const skjema = parseSakSkjema(data, arbeidsfordeling);
+        const request =
+            skjema.type === "FORELDER"
+                ? lagForelderRequest(enhet, skjema.data)
+                : skjema.type === "BARN"
+                  ? lagBarnRequest(enhet, arbeidsfordeling, skjema.data)
+                  : null;
 
-        if (arbeidsfordeling === arbeidsfordelingMap.FARSKAP.kode) {
-            await opprettFarskapSak(data as FarskapsSkjemaSchemaData);
+        if (skjema.type === "FARSKAP") {
+            await opprettFarskapSak(skjema.data);
             return;
         }
-        if (arbeidsfordeling === arbeidsfordelingMap.OPPFOSTRINGSSAK.kode) {
-            await opprettOppfostringssak(data as OppfostringsbidragSkjemaSchemaData);
+        if (skjema.type === "OPPFOSTRINGSBIDRAG") {
+            await opprettOppfostringssak(skjema.data);
             return;
         }
-        const forelderMedBarnResult = ForelderMedBarnSkjemaSchema.safeParse(data);
-        const forelderUtenBarnResult = ForelderUtenBarnSkjemaSchema.safeParse(data);
-
-        if (forelderMedBarnResult.success || forelderUtenBarnResult.success) {
-            const forelderData = data as ForelderMedBarnSkjemaData | ForelderUtenBarnSkjemaData;
-
-            const [bidragsmottaker, bidragspliktig] =
-                forelderData.motpart.rolle === "bidragsmottaker"
-                    ? [forelderData.motpart, forelderData.partISaken]
-                    : [forelderData.partISaken, forelderData.motpart];
-
-            request = {
-                ...lagBaseRequest(enhet, forelderData.kategori, "EEN"),
-                roller: [
-                    {
-                        fodselsnummer: bidragspliktig.ident,
-                        type: Rolletype.BP,
-                        mottagerErVerge: false,
-                        rolleType: Rolletype.BP,
-                    },
-                    {
-                        fodselsnummer: bidragsmottaker.ident,
-                        type: Rolletype.BM,
-                        mottagerErVerge: false,
-                        rolleType: Rolletype.BM,
-                    },
-                    ...forelderData.valgteBarn.map((barn) => ({
-                        fodselsnummer: barn.ident,
-                        type: Rolletype.BA,
-                        rolleType: Rolletype.BA,
-                        reellMottaker: barn?.reellMottaker
-                            ? {
-                                  ident: barn.reellMottaker ?? "",
-                                  verge: false,
-                              }
-                            : null,
-                        mottagerErVerge: false,
-                    })),
-                ],
-            } as OpprettSakRequest;
-        } else {
-            const barnBeggForeldreResult = BarnBeggForeldreSkjemaSchema.safeParse(data);
-            const barnManglendeForeldreResult = BarnMedManglendeForeldreSkjemaSchema.safeParse(data);
-
-            if (barnBeggForeldreResult.success || barnManglendeForeldreResult.success) {
-                const barnData = data as BarnBeggForeldreSkjemaData | BarnMedManglendeForeldreSkjemaData;
-
-                const bidragspliktig = barnData.foreldre.find((f) => f.rolle === "bidragspliktig");
-                const bidragsmottaker = barnData.foreldre.find((f) => f.rolle === "bidragsmottaker");
-
-                if (!bidragspliktig || !bidragsmottaker) {
-                    throw new Error("Mangler bidragspliktig eller bidragsmottaker");
-                }
-
-                request = {
-                    ...lagBaseRequest(enhet, barnData.kategori, arbeidsfordeling),
-                    roller: [
-                        {
-                            fodselsnummer: bidragspliktig.ident,
-                            type: Rolletype.BP,
-                            mottagerErVerge: false,
-                            rolleType: Rolletype.BP,
-                        },
-                        {
-                            fodselsnummer: bidragsmottaker.ident,
-                            type: Rolletype.BM,
-                            mottagerErVerge: false,
-                            rolleType: Rolletype.BM,
-                        },
-                        {
-                            fodselsnummer: barnData.barn.ident,
-                            type: Rolletype.BA,
-                            rolleType: Rolletype.BA,
-                            reellMottaker: barnData.barn?.reellMottaker
-                                ? {
-                                      ident: barnData.barn.reellMottaker ?? "",
-                                      verge: false,
-                                  }
-                                : null,
-                            mottagerErVerge: false,
-                        },
-                    ],
-                } as OpprettSakRequest;
-            } else {
-                throw new Error("Ukjent skjematype");
-            }
+        if (!request) {
+            throw new Error("Ukjent skjematype");
         }
 
         await opprettSak({
@@ -195,29 +213,10 @@ export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): Oppre
 
     const opprettOppfostringssak = async (data: OppfostringsbidragSkjemaSchemaData) => {
         setIsLoadingOpprettSak(true);
-        const request = {
-            ...lagBaseRequest(enhet, data.kategori, data.arbeidsfordeling),
-            roller: [
-                {
-                    fodselsnummer: data.partISaken.ident,
-                    type: Rolletype.BP,
-                    mottagerErVerge: false,
-                    rolleType: Rolletype.BP,
-                },
-                ...data.valgteBarn.map((barn) => ({
-                    fodselsnummer: barn.ident,
-                    type: Rolletype.BA,
-                    rolleType: Rolletype.BA,
-                    reellMottaker: barn?.reellMottaker
-                        ? {
-                              ident: barn.reellMottaker ?? "",
-                              verge: false,
-                          }
-                        : null,
-                    mottagerErVerge: false,
-                })),
-            ],
-        } as OpprettSakRequest;
+        const request = lagOpprettSakRequest(lagBaseRequest(enhet, data.kategori, data.arbeidsfordeling), [
+            lagPersonRolle(data.partISaken.ident, Rolletype.BP),
+            ...data.valgteBarn.map(lagBarnRolle),
+        ]);
 
         await opprettSak({
             ...request,
@@ -226,29 +225,10 @@ export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): Oppre
 
     const opprettFarskapSak = async (data: FarskapsSkjemaSchemaData) => {
         setIsLoadingOpprettSak(true);
-        const request = {
-            ...lagBaseRequest(enhet, data.kategori, data.arbeidsfordeling),
-            roller: [
-                {
-                    fodselsnummer: data.partISaken.ident,
-                    type: Rolletype.BM,
-                    mottagerErVerge: false,
-                    rolleType: Rolletype.BM,
-                },
-                ...data.valgteBarn.map((barn) => ({
-                    fodselsnummer: barn.ident,
-                    type: Rolletype.BA,
-                    rolleType: Rolletype.BA,
-                    reellMottaker: barn?.reellMottaker
-                        ? {
-                              ident: barn.reellMottaker ?? "",
-                              verge: false,
-                          }
-                        : null,
-                    mottagerErVerge: false,
-                })),
-            ],
-        } as OpprettSakRequest;
+        const request = lagOpprettSakRequest(lagBaseRequest(enhet, data.kategori, data.arbeidsfordeling), [
+            lagPersonRolle(data.partISaken.ident, Rolletype.BM),
+            ...data.valgteBarn.map(lagBarnRolle),
+        ]);
 
         await opprettSak({
             ...request,
@@ -257,23 +237,13 @@ export function useOpprettSakHandling({ enhet, arbeidsfordeling }: Props): Oppre
 
     const opprettEktefellebidragSak = async (data: EktefellebidragSkjemaData) => {
         setIsLoadingOpprettSak(true);
-        const request = {
-            ...lagBaseRequest(enhet, data.kategori, data.arbeidsfordeling),
-            roller: [
-                {
-                    fodselsnummer: data.partISaken.ident,
-                    type: data.partISaken.rolle === "bidragspliktig" ? Rolletype.BP : Rolletype.BM,
-                    mottagerErVerge: false,
-                    rolleType: data.partISaken.rolle === "bidragspliktig" ? Rolletype.BP : Rolletype.BM,
-                },
-                {
-                    fodselsnummer: data.motpart.ident,
-                    type: data.motpart.rolle === "bidragspliktig" ? Rolletype.BP : Rolletype.BM,
-                    mottagerErVerge: false,
-                    rolleType: data.motpart.rolle === "bidragspliktig" ? Rolletype.BP : Rolletype.BM,
-                },
-            ],
-        } as OpprettSakRequest;
+        const request = lagOpprettSakRequest(lagBaseRequest(enhet, data.kategori, data.arbeidsfordeling), [
+            lagPersonRolle(
+                data.partISaken.ident,
+                data.partISaken.rolle === "bidragspliktig" ? Rolletype.BP : Rolletype.BM,
+            ),
+            lagPersonRolle(data.motpart.ident, data.motpart.rolle === "bidragspliktig" ? Rolletype.BP : Rolletype.BM),
+        ]);
 
         await opprettSak({
             ...request,

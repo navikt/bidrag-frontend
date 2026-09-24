@@ -1,29 +1,19 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
-import { type ComponentProps, type RefObject, Suspense, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { type ComponentProps, Suspense, useState } from "react";
+import { FormProvider } from "react-hook-form";
 
 import BarnVisning from "./barn-rolle/BarnVisning.tsx";
 import LeggTilBarn from "./barn-rolle/LeggTilBarn.tsx";
-import SakButtons from "./components/SakButtons.tsx";
+import SakButtons, { type SakButtonsProps } from "./components/SakButtons.tsx";
 import Endringsoppsummering from "./Endringsoppsummering.tsx";
 import type { Endringsrad } from "./endringsoppsummering-utils.ts";
 import { SakstypeTags } from "./felles/SakstypeTags.tsx";
 import ForelderRolleVisning from "./forelder-rolle/ForelderRolleVisning.tsx";
-import { useEndringssporing } from "./hooks/useEndringssporing.ts";
-import { useHentSakMedPersoninfo } from "./hooks/useHentSakMedPersoninfo.ts";
-import { useInitialiserSaksrollerForm } from "./hooks/useInitialiserSaksrollerForm.ts";
-import { useSakForslag } from "./hooks/useSakForslag.tsx";
-import { useSaksrollerRollerData } from "./hooks/useSaksrollerRollerData.ts";
-import { useSaksrollerStatus } from "./hooks/useSaksrollerStatus.ts";
-import { useSaksrollerSubmit } from "./hooks/useSaksrollerSubmit.ts";
-import { useSaksrollerUfullstendigRelasjon } from "./hooks/useSaksrollerUfullstendigRelasjon.ts";
-import { useSakvisningSamhandlerHandling } from "./hooks/useSakvisningSamhandlerHandling.ts";
-import { useUfullstendigRelasjonSjekk } from "./hooks/useUfullstendigRelasjonSjekk.ts";
-import { RedigeringRegisterProvider, useHarÅpneRedigeringer } from "./RedigeringRegisterContext.tsx";
-import { type BarnRolle, type SakRedigeringData, SakRedigeringSchema } from "./sakvisning-schema.ts";
+import { useSaksrollerVisning } from "./hooks/useSaksrollerVisning.ts";
+import { RedigeringRegisterProvider } from "./RedigeringRegisterContext.tsx";
+import type { BarnRolle, SakRedigeringData } from "./sakvisning-schema.ts";
 import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "./utils.ts";
 
@@ -95,89 +85,101 @@ export default function SaksrollerVisning({ saksnummer }: SaksrollerVisningProps
     );
 }
 
-type SaksrollerBarnInnholdProps = {
+function barnnøkkel(barnRolle: BarnRolle, idx: number) {
+    return barnRolle.fodselsnummer || barnRolle.objektnummer || `${barnRolle.type}-${idx}`;
+}
+
+function IngenBarnMelding() {
+    return (
+        <InfoCard data-color="info" size="small">
+            <InfoCard.Message icon={<InformationSquareIcon aria-hidden />}>
+                Ingen barn registrert i saken ennå
+            </InfoCard.Message>
+        </InfoCard>
+    );
+}
+
+function LagrerOverlay() {
+    return (
+        <Box position="fixed" inset="space-0" className="bg-[white]/70 backdrop-blur-sm z-50">
+            <HStack align="center" justify="center" height="100%">
+                <VStack align="center" gap="space-12">
+                    <Loader size="2xlarge" title="Lagrer endringer..." />
+                    <BodyLong textColor="subtle">Lagrer endringer...</BodyLong>
+                </VStack>
+            </HStack>
+        </Box>
+    );
+}
+
+type BarnISakenProps = {
     barn: BarnRolle[];
     roller: SakRedigeringData["roller"];
-    bm: SakRedigeringData["roller"][number] | undefined;
+    harBm: boolean;
     dataUpdatedAt: number;
     hentOgNullstillSamhandler: ComponentProps<typeof BarnVisning>["hentOgNullstillSamhandler"];
-    sakstype: string;
+    erOppfostringsbidrag: boolean;
     muligeBarn: ComponentProps<typeof LeggTilBarn>["søsken"];
-    setLeggTilBarnVisSøk: (visSøk: boolean) => void;
-    leggTilBarnVisSøk: boolean;
-    endringsliste: Endringsrad[];
-    barnMedUfullstendigRelasjon: string[];
-    aktiveRoller: SakRedigeringData["roller"];
-    onSubmit: () => Promise<string>;
-    onRefetch: () => Promise<unknown>;
-    feilmelding: string | null;
-    valideringsFeil: string | null;
-    harEndringer: boolean;
-    suksessmelding: string | null;
-    statusRef: RefObject<HTMLDivElement | null>;
-    statusResetKey: number;
     funnetPersonISak: (fnr: string) => boolean;
 };
 
-function SaksrollerBarnInnhold({
+function BarnISaken({
     barn,
     roller,
-    bm,
+    harBm,
     dataUpdatedAt,
     hentOgNullstillSamhandler,
-    sakstype,
+    erOppfostringsbidrag,
     muligeBarn,
-    setLeggTilBarnVisSøk,
-    leggTilBarnVisSøk,
+    funnetPersonISak,
+}: BarnISakenProps) {
+    const [visSøk, setVisSøk] = useState(false);
+
+    return (
+        <Box background="sunken" padding="space-12">
+            <VStack gap="space-4">
+                <Heading level="2" size="small">
+                    Barn i saken ({barn.length})
+                </Heading>
+                {barn.length === 0 && <IngenBarnMelding />}
+                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
+                    {barn.map((barnRolle, idx) => (
+                        <BarnVisning
+                            key={barnnøkkel(barnRolle, idx)}
+                            rolle={barnRolle}
+                            index={roller.indexOf(barnRolle)}
+                            kanFjerneRM={!barnRolle.erMyndig && harBm}
+                            closeEditorSignal={dataUpdatedAt}
+                            hentOgNullstillSamhandler={hentOgNullstillSamhandler}
+                            erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
+                            erOppfostringsbidrag={erOppfostringsbidrag}
+                        />
+                    ))}
+                </HGrid>
+                <LeggTilBarn
+                    søsken={muligeBarn}
+                    erOppfostringsbidrag={erOppfostringsbidrag}
+                    setVisSøk={setVisSøk}
+                    visSøk={visSøk}
+                />
+            </VStack>
+        </Box>
+    );
+}
+
+function EndringerOgLagring({
     endringsliste,
     barnMedUfullstendigRelasjon,
     aktiveRoller,
-    onSubmit,
-    onRefetch,
-    feilmelding,
-    valideringsFeil,
-    harEndringer,
-    suksessmelding,
-    statusRef,
-    statusResetKey,
-    funnetPersonISak,
-}: SaksrollerBarnInnholdProps) {
+    sakButtons,
+}: {
+    endringsliste: Endringsrad[];
+    barnMedUfullstendigRelasjon: string[];
+    aktiveRoller: SakRedigeringData["roller"];
+    sakButtons: SakButtonsProps;
+}) {
     return (
         <>
-            <Box background="sunken" padding="space-12">
-                <VStack gap="space-4">
-                    <Heading level="2" size="small">
-                        Barn i saken ({barn.length})
-                    </Heading>
-                    {barn.length === 0 && (
-                        <InfoCard data-color="info" size="small">
-                            <InfoCard.Message icon={<InformationSquareIcon aria-hidden />}>
-                                Ingen barn registrert i saken ennå
-                            </InfoCard.Message>
-                        </InfoCard>
-                    )}
-                    <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
-                        {barn.map((barnRolle, idx) => (
-                            <BarnVisning
-                                key={barnRolle.fodselsnummer || barnRolle.objektnummer || `${barnRolle.type}-${idx}`}
-                                rolle={barnRolle}
-                                index={roller.indexOf(barnRolle)}
-                                kanFjerneRM={!barnRolle.erMyndig && !!bm}
-                                closeEditorSignal={dataUpdatedAt}
-                                hentOgNullstillSamhandler={hentOgNullstillSamhandler}
-                                erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
-                                erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                            />
-                        ))}
-                    </HGrid>
-                    <LeggTilBarn
-                        søsken={muligeBarn}
-                        erOppfostringsbidrag={sakstype === "Oppfostringsbidrag"}
-                        setVisSøk={setLeggTilBarnVisSøk}
-                        visSøk={leggTilBarnVisSøk}
-                    />
-                </VStack>
-            </Box>
             <Suspense
                 fallback={
                     <Box
@@ -195,168 +197,77 @@ function SaksrollerBarnInnhold({
             </Suspense>
             <VStack gap="space-12">
                 <UfullstendigRelasjonAlert barnIdenter={barnMedUfullstendigRelasjon} roller={aktiveRoller} />
-                <SakButtons
-                    onSubmit={onSubmit}
-                    onRefetch={onRefetch}
-                    feilmelding={feilmelding || undefined}
-                    valideringsFeil={valideringsFeil}
-                    harAdvarsel={barnMedUfullstendigRelasjon.length > 0}
-                    harEndringer={harEndringer}
-                    suksessmelding={suksessmelding}
-                    statusRef={statusRef}
-                    statusResetKey={statusResetKey}
-                />
+                <SakButtons {...sakButtons} />
             </VStack>
         </>
     );
 }
 
 function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
-    const { sak, berikedeRoller, erEktefellebidrag, refetch, dataUpdatedAt } = useHentSakMedPersoninfo(saksnummer);
-
-    const harÅpneRedigeringer = useHarÅpneRedigeringer();
-    const {
-        feilmelding,
-        setFeilmelding,
-        valideringsFeil,
-        setValideringsFeil,
-        suksessmelding,
-        setSuksessmelding,
-        statusResetKey,
-        statusRef,
-        nullstillStatusmeldinger,
-    } = useSaksrollerStatus(harÅpneRedigeringer);
-    const { feil, muligeAndreForeldre, muligeBarnPerMotpart } = useSakForslag({ sak });
-    const { finnBarnMedUfullstendigRelasjon } = useUfullstendigRelasjonSjekk();
-    const { hentOgNullstillSamhandler } = useSakvisningSamhandlerHandling();
-
-    const formMethods = useForm<SakRedigeringData>({
-        resolver: zodResolver(SakRedigeringSchema),
-        mode: "onChange",
-    });
-
-    const { reset, watch } = formMethods;
-    const roller = watch("roller") || [];
-
-    const { bp, bm, barn, barnIdenter, barnIdenterKey, aktiveRoller, sakstype, muligeBarn } = useSaksrollerRollerData({
-        roller,
-        berikedeRoller,
-        muligeBarnPerMotpart,
-    });
-    const [leggTilBarnVisSøk, setLeggTilBarnVisSøk] = useState(false);
-    const sakskategori = sak.kategori;
-
-    useInitialiserSaksrollerForm({
-        berikedeRoller,
-        dataUpdatedAt,
-        reset,
-        saksnummer,
-        onDataReset: () => {
-            setFeilmelding(null);
-            setValideringsFeil(null);
-        },
-    });
-
-    const barnMedUfullstendigRelasjon = useSaksrollerUfullstendigRelasjon({
-        barnIdenter,
-        barnIdenterKey,
-        bidragspliktigIdent: bp?.fodselsnummer,
-        bidragsmottakerIdent: bm?.fodselsnummer,
-        finnBarnMedUfullstendigRelasjon,
-        harSak: !!sak,
-    });
-
-    const { endringsliste, harEndringer } = useEndringssporing({
-        opprinneligeRoller: berikedeRoller,
-        nåværendeRoller: aktiveRoller,
-        barnMedUfullstendigRelasjon,
-        dataOppdatertNøkkel: dataUpdatedAt,
-        onNyEndring: nullstillStatusmeldinger,
-    });
-
-    const { handleSubmitAsync, isPending } = useSaksrollerSubmit(saksnummer, formMethods, {
-        setFeilmelding,
-        setValideringsFeil,
-        setSuksessmelding,
-    });
-
-    const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
+    const visning = useSaksrollerVisning(saksnummer);
+    const { sak, erEktefellebidrag, formMethods, bp, bm, samletFeilmelding } = visning;
 
     return (
         <FormProvider {...formMethods}>
             <Page.Block width="2xl">
                 <Box padding="space-24">
-                    {isPending && (
-                        <Box position="fixed" inset="space-0" className="bg-[white]/70 backdrop-blur-sm z-50">
-                            <HStack align="center" justify="center" height="100%">
-                                <VStack align="center" gap="space-12">
-                                    <Loader size="2xlarge" title="Lagrer endringer..." />
-                                    <BodyLong textColor="subtle">Lagrer endringer...</BodyLong>
-                                </VStack>
-                            </HStack>
-                        </Box>
-                    )}
+                    {visning.isPending && <LagrerOverlay />}
 
                     <VStack gap="space-24">
                         <SaksrollerVisningHeader
                             saksnummer={saksnummer}
                             opprettetDato={sak.opprettetDato}
-                            sakskategori={sakskategori}
-                            sakstype={sakstype}
+                            sakskategori={sak.kategori}
+                            sakstype={visning.sakstype}
                             erEgenAnsatt={sak.eierfogd === EGEN_ANSATT_ENHET}
                             erAdressebeskyttet={sak.eierfogd === ADRESSEBESKYTTELSE_ENHET}
                             erAvsluttet={sak.avsluttet}
                             erEktefellebidrag={erEktefellebidrag}
                         />
 
-                        <form onSubmit={(event) => event.preventDefault()} onChangeCapture={nullstillStatusmeldinger}>
+                        <form
+                            onSubmit={(event) => event.preventDefault()}
+                            onChangeCapture={visning.nullstillStatusmeldinger}
+                        >
                             <VStack gap="space-24">
                                 <Box background="sunken" padding="space-12">
                                     <ForelderRolleVisning
                                         bp={bp}
                                         bm={bm}
-                                        erNyForelderBp={
-                                            bp?.fodselsnummer ? !funnetPersonISak(bp.fodselsnummer) : undefined
-                                        }
-                                        erNyForelderBm={
-                                            bm?.fodselsnummer ? !funnetPersonISak(bm.fodselsnummer) : undefined
-                                        }
+                                        erNyForelderBp={visning.erNyPerson(bp?.fodselsnummer)}
+                                        erNyForelderBm={visning.erNyPerson(bm?.fodselsnummer)}
                                         form={formMethods}
-                                        muligeAndreForeldre={muligeAndreForeldre}
+                                        muligeAndreForeldre={visning.muligeAndreForeldre}
                                     />
                                 </Box>
 
-                                {!erEktefellebidrag && (
-                                    <SaksrollerBarnInnhold
-                                        barn={barn}
-                                        roller={roller}
-                                        bm={bm}
-                                        dataUpdatedAt={dataUpdatedAt}
-                                        hentOgNullstillSamhandler={hentOgNullstillSamhandler}
-                                        sakstype={sakstype}
-                                        muligeBarn={muligeBarn}
-                                        setLeggTilBarnVisSøk={setLeggTilBarnVisSøk}
-                                        leggTilBarnVisSøk={leggTilBarnVisSøk}
-                                        endringsliste={endringsliste}
-                                        barnMedUfullstendigRelasjon={barnMedUfullstendigRelasjon}
-                                        aktiveRoller={aktiveRoller}
-                                        onSubmit={handleSubmitAsync}
-                                        onRefetch={refetch}
-                                        feilmelding={feilmelding || feil}
-                                        valideringsFeil={valideringsFeil}
-                                        harEndringer={harEndringer}
-                                        suksessmelding={suksessmelding}
-                                        statusRef={statusRef}
-                                        statusResetKey={statusResetKey}
-                                        funnetPersonISak={funnetPersonISak}
-                                    />
-                                )}
-                                {erEktefellebidrag && (feilmelding || feil) && (
-                                    <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
-                                        <LocalAlert.Header>
-                                            <LocalAlert.Title>{feilmelding || feil}</LocalAlert.Title>
-                                        </LocalAlert.Header>
-                                    </LocalAlert>
+                                {erEktefellebidrag ? (
+                                    samletFeilmelding && (
+                                        <LocalAlert status="error" ref={visning.statusRef} tabIndex={-1}>
+                                            <LocalAlert.Header>
+                                                <LocalAlert.Title>{samletFeilmelding}</LocalAlert.Title>
+                                            </LocalAlert.Header>
+                                        </LocalAlert>
+                                    )
+                                ) : (
+                                    <>
+                                        <BarnISaken
+                                            barn={visning.barn}
+                                            roller={visning.roller}
+                                            harBm={!!bm}
+                                            dataUpdatedAt={visning.dataUpdatedAt}
+                                            hentOgNullstillSamhandler={visning.hentOgNullstillSamhandler}
+                                            erOppfostringsbidrag={visning.sakstype === "Oppfostringsbidrag"}
+                                            muligeBarn={visning.muligeBarn}
+                                            funnetPersonISak={visning.funnetPersonISak}
+                                        />
+                                        <EndringerOgLagring
+                                            endringsliste={visning.endringsliste}
+                                            barnMedUfullstendigRelasjon={visning.barnMedUfullstendigRelasjon}
+                                            aktiveRoller={visning.aktiveRoller}
+                                            sakButtons={visning.sakButtons}
+                                        />
+                                    </>
                                 )}
                             </VStack>
                         </form>

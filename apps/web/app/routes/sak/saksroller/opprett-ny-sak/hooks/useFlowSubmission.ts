@@ -2,19 +2,27 @@ import { arbeidsfordelingMap } from "@bidrag/utils/organisasjonUtils";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
 import { useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
-import type {
-    BarnMedAlder,
-    BarnMedReellMottaker,
-    EktefellebidragSkjemaData,
-    ForelderMedRolle,
-    Motpart,
-    PartISaken,
+import {
+    type BarnMedAlder,
+    type BarnMedReellMottaker,
+    EktefellebidragSkjemaSchema,
+    type ForelderMedRolle,
+    type Motpart,
+    type PartISaken,
 } from "../opprett-sak-schema";
+import type { EnhetOgSubmitSectionProps } from "../sections/EnhetOgSubmitSection";
 import { useBestemEnhet } from "./useBestemEnhet";
 import { useEksisterendeSakSjekk } from "./useEksisterendeSakSjekk";
 import { useOpprettSakHandling } from "./useOpprettSakHandling";
 
 type FormMedKategori = FieldValues & { kategori?: string };
+
+export type EksisterendeSakPart = {
+    ident: string;
+    navn: string;
+    rolle: string;
+    erKjent: boolean | undefined;
+};
 
 interface UseFlowSubmissionProps<T extends FormMedKategori> {
     form: UseFormReturn<T>;
@@ -37,8 +45,24 @@ interface UseFlowSubmissionProps<T extends FormMedKategori> {
     erEktefellebidrag?: boolean;
     bidragspliktig?: PartISaken | Motpart | ForelderMedRolle | null;
     bidragsmottaker?: PartISaken | Motpart | ForelderMedRolle | null;
-    eksisterendeSakPartISaken?: { ident: string; navn: string; rolle: string; erKjent: boolean | undefined } | null;
-    eksisterendeSakMotpart?: { ident: string; navn: string; rolle: string; erKjent: boolean | undefined } | null;
+    eksisterendeSakPartISaken?: EksisterendeSakPart | null;
+    eksisterendeSakMotpart?: EksisterendeSakPart | null;
+}
+
+export function lagEksisterendeSakPart(
+    person: { ident?: string; navn?: string; erKjent?: boolean },
+    rolle: string,
+): EksisterendeSakPart {
+    return {
+        ident: person.ident ?? "",
+        navn: person.navn ?? "",
+        rolle,
+        erKjent: person.erKjent,
+    };
+}
+
+function partMedRolle(rolle: PartISaken["rolle"], partISaken: PartISaken, motpart?: Motpart) {
+    return (partISaken.rolle === rolle ? partISaken : motpart) ?? null;
 }
 
 /**
@@ -58,10 +82,8 @@ export function useFlowSubmission<T extends FormMedKategori>({
     eksisterendeSakPartISaken,
     eksisterendeSakMotpart,
 }: UseFlowSubmissionProps<T>) {
-    const resolvedBidragspliktig =
-        bidragspliktig ?? (partISaken.rolle === "bidragspliktig" ? partISaken : motpart) ?? null;
-    const resolvedBidragsmottaker =
-        bidragsmottaker ?? (partISaken.rolle === "bidragsmottaker" ? partISaken : motpart) ?? null;
+    const resolvedBidragspliktig = bidragspliktig ?? partMedRolle("bidragspliktig", partISaken, motpart);
+    const resolvedBidragsmottaker = bidragsmottaker ?? partMedRolle("bidragsmottaker", partISaken, motpart);
 
     const {
         enhet,
@@ -76,18 +98,8 @@ export function useFlowSubmission<T extends FormMedKategori>({
         sakskategori: sakskategoriTilEnum((form as UseFormReturn<FormMedKategori>).getValues("kategori")) || undefined,
     });
 
-    const safePartISaken = eksisterendeSakPartISaken ?? {
-        ident: partISaken.ident,
-        navn: partISaken.navn,
-        rolle: partISaken.rolle,
-        erKjent: partISaken.erKjent,
-    };
-    const safeMotpart = eksisterendeSakMotpart ?? {
-        ident: motpart?.ident ?? "",
-        navn: motpart?.navn ?? "",
-        rolle: motpart?.rolle ?? "",
-        erKjent: motpart?.erKjent,
-    };
+    const safePartISaken = eksisterendeSakPartISaken ?? lagEksisterendeSakPart(partISaken, partISaken.rolle);
+    const safeMotpart = eksisterendeSakMotpart ?? lagEksisterendeSakPart(motpart ?? {}, motpart?.rolle ?? "");
     const {
         harEksisterendeSak,
         eksisterendeSak,
@@ -123,28 +135,37 @@ export function useFlowSubmission<T extends FormMedKategori>({
         senderInn.current = true;
         try {
             if (arbeidsfordeling === arbeidsfordelingMap.EKTEFELLLESAK.kode) {
-                await opprettEktefellebidragSak(data as unknown as EktefellebidragSkjemaData);
+                const result = EktefellebidragSkjemaSchema.safeParse(data);
+                if (!result.success) {
+                    throw new Error("Ukjent skjematype");
+                }
+                await opprettEktefellebidragSak(result.data);
                 return;
             }
 
-            await opprettSakFraSkjema(data as never);
+            await opprettSakFraSkjema(data);
         } finally {
             senderInn.current = false;
         }
     });
 
-    return {
+    const innsending: EnhetOgSubmitSectionProps = {
         enhet,
         enhetNavn,
         isLoadingEnhet,
         enhetError,
-        harEksisterendeSak,
-        eksisterendeSak,
-        isLoadingHentSak,
-        infoMelding,
-        onSubmit,
-        isLoadingOpprettSak,
-        error,
+        blocked: harEksisterendeSak || isLoadingHentSak || isLoadingEnhet,
+        submitError: error,
+        isLoading: isLoadingOpprettSak,
         saksnummer,
+    };
+
+    return {
+        onSubmit,
+        harEksisterendeSak,
+        isLoadingHentSak,
+        isLoadingEnhet,
+        sakStatus: { infoMelding, harEksisterendeSak, eksisterendeSak, isLoading: isLoadingHentSak },
+        innsending,
     };
 }

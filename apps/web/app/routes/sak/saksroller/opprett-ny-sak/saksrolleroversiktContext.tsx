@@ -69,19 +69,9 @@ type SaksrolleFlyt =
 
 const SaksrolleroversiktContext = createContext<SaksrolleroversiktContext>({} as SaksrolleroversiktContext);
 
-function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
-    const [valgtPerson, setValgtPerson] = useState<PersonDto | null>(null);
-    const valgtPersonRef = useRef<PersonDto | null>(null);
+function useValgVersjon() {
     const versjonRef = useRef(0);
     const [valgVersjon, setValgVersjon] = useState(0);
-    const [partISaken, setPartISaken] = useState<PartISaken | null>(null);
-    const [partISakenAlder, setPartISakenAlder] = useState<number | null>(null);
-    const [saksrolleFlyt, setSaksrolleFlyt] = useState<SaksrolleFlyt | null>(null);
-    const [isLoadingOpprettSak, setIsLoadingOpprettSak] = useState<boolean>(false);
-    const [sakstype, setSakstype] = useState<Sakstype | null>("BARNEBIDRAG");
-    const [sakskategori, setSakskategori] = useState<Sakskategori>("Nasjonal");
-
-    const queryClient = useQueryClient();
 
     const nesteVersjon = useCallback(() => {
         versjonRef.current += 1;
@@ -89,39 +79,23 @@ function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
         return versjonRef.current;
     }, []);
 
-    const velgPerson = useCallback(
-        (person: PersonDto) => {
+    return { versjonRef, valgVersjon, nesteVersjon };
+}
+
+function useSaksrollevalg() {
+    const { versjonRef, valgVersjon, nesteVersjon } = useValgVersjon();
+    const [valgtPerson, setValgtPerson] = useState<PersonDto | null>(null);
+    const valgtPersonRef = useRef<PersonDto | null>(null);
+    const [partISaken, setPartISaken] = useState<PartISaken | null>(null);
+    const [partISakenAlder, setPartISakenAlder] = useState<number | null>(null);
+    const [saksrolleFlyt, setSaksrolleFlyt] = useState<SaksrolleFlyt | null>(null);
+
+    const velgPersonOgNullstillRolle = useCallback(
+        (person: PersonDto | null) => {
             nesteVersjon();
             valgtPersonRef.current = person;
             setValgtPerson(person);
-            setPartISakenAlder(beregnAlderForPerson(person));
-            setPartISaken(null);
-            setSaksrolleFlyt(null);
-        },
-        [nesteVersjon],
-    );
-
-    const velgSakstype = useCallback(
-        (type: Sakstype) => {
-            nesteVersjon();
-            valgtPersonRef.current = null;
-            setSakstype(type);
-            setSakskategori("Nasjonal");
-            setValgtPerson(null);
-            setPartISakenAlder(null);
-            setPartISaken(null);
-            setSaksrolleFlyt(null);
-        },
-        [nesteVersjon],
-    );
-
-    const velgKategori = useCallback(
-        (kategori: Sakskategori) => {
-            nesteVersjon();
-            valgtPersonRef.current = null;
-            setSakskategori(kategori);
-            setValgtPerson(null);
-            setPartISakenAlder(null);
+            setPartISakenAlder(person ? beregnAlderForPerson(person) : null);
             setPartISaken(null);
             setSaksrolleFlyt(null);
         },
@@ -143,6 +117,24 @@ function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
     const settFlytHvisGjeldende = useCallback((versjon: number, flyt: SaksrolleFlyt) => {
         if (versjonRef.current === versjon) setSaksrolleFlyt(flyt);
     }, []);
+
+    return {
+        valgtPerson,
+        valgVersjon,
+        partISaken,
+        partISakenAlder,
+        saksrolleFlyt,
+        setPartISaken,
+        setPartISakenAlder,
+        setSaksrolleFlyt,
+        velgPersonOgNullstillRolle,
+        velgRolle,
+        settFlytHvisGjeldende,
+    };
+}
+
+function useRelasjonsoppslag() {
+    const queryClient = useQueryClient();
 
     const hentBarnkurver = async (ident: string) => {
         const data = await queryClient.fetchQuery(hentPersonMotpartBarnRelasjonQueryOptions({ ident }));
@@ -171,47 +163,61 @@ function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
         const resultat = await Promise.all(
             barn.map(async (barnIdent) => {
                 const relasjon = await hentForelderBarnRelasjon(barnIdent);
-
                 const foreldreIdent = relasjon.forelderBarnRelasjon
                     .filter((i) => i.minRolleForPerson === "BARN")
                     .map((i) => i.relatertPersonsIdent);
 
-                if (foreldreIdent.length < 2) {
-                    return true;
-                }
-
-                const harBidragsmottaker = foreldreIdent.includes(bidragsmottaker);
-                const harBidragspliktig = foreldreIdent.includes(bidragspliktig);
-
-                return !harBidragsmottaker || !harBidragspliktig;
+                return (
+                    foreldreIdent.length < 2 ||
+                    !foreldreIdent.includes(bidragsmottaker) ||
+                    !foreldreIdent.includes(bidragspliktig)
+                );
             }),
         );
 
         return resultat.some((erUfullstendig) => erUfullstendig);
     };
 
+    return { hentBarnkurver, harUfullstendigRelasjon };
+}
+
+function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
+    const { velgPersonOgNullstillRolle, ...valg } = useSaksrollevalg();
+    const { hentBarnkurver, harUfullstendigRelasjon } = useRelasjonsoppslag();
+    const [isLoadingOpprettSak, setIsLoadingOpprettSak] = useState<boolean>(false);
+    const [sakstype, setSakstype] = useState<Sakstype | null>("BARNEBIDRAG");
+    const [sakskategori, setSakskategori] = useState<Sakskategori>("Nasjonal");
+
+    const velgSakstype = useCallback(
+        (type: Sakstype) => {
+            velgPersonOgNullstillRolle(null);
+            setSakstype(type);
+            setSakskategori("Nasjonal");
+        },
+        [velgPersonOgNullstillRolle],
+    );
+
+    const velgKategori = useCallback(
+        (kategori: Sakskategori) => {
+            velgPersonOgNullstillRolle(null);
+            setSakskategori(kategori);
+        },
+        [velgPersonOgNullstillRolle],
+    );
+
     return (
         <SaksrolleroversiktContext
             value={{
-                valgtPerson,
-                valgVersjon,
-                partISaken,
-                partISakenAlder,
-                saksrolleFlyt,
+                ...valg,
                 isLoadingOpprettSak,
                 sakstype,
                 sakskategori,
                 setSakstype,
                 setSakskategori,
                 setIsLoadingOpprettSak,
-                setSaksrolleFlyt,
-                setPartISaken,
-                setPartISakenAlder,
-                velgPerson,
+                velgPerson: velgPersonOgNullstillRolle,
                 velgSakstype,
                 velgKategori,
-                velgRolle,
-                settFlytHvisGjeldende,
                 harUfullstendigRelasjon,
                 hentBarnkurver,
             }}

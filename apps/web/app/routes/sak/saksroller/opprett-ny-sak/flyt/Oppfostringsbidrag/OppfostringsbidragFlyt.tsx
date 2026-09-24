@@ -1,21 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
-import { useEffect } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import RolleFlytSide from "../../felles/RolleFlytSide";
-import { useFlowSubmission } from "../../hooks/useFlowSubmission";
-import useSyncKategori from "../../hooks/useSyncKategori";
-import {
-    type ForelderMedBarnSkjemaData,
-    OppfostringsbidragSkjemaSchema,
-    type OppfostringsbidragSkjemaSchemaData,
-} from "../../opprett-sak-schema";
+import { useEnPartMedBarnFlyt } from "../../hooks/useEnPartMedBarnFlyt";
+import { OppfostringsbidragSkjemaSchema, type OppfostringsbidragSkjemaSchemaData } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
 import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import OppsummeringSection from "../../sections/OppsummeringSection";
-import { grupperBarnIKurver } from "../../utils";
 
 export default function OppfostringsbidragFlyt() {
     const context = useSaksrolleroversikt();
@@ -52,64 +45,18 @@ export default function OppfostringsbidragFlyt() {
 }
 
 function OppfostringsbidragFlytContent() {
-    const { saksrolleFlyt, partISaken: partISakenContext } = useSaksrolleroversikt();
-    const form = useFormContext<ForelderMedBarnSkjemaData>();
-    useSyncKategori(form);
-    const rawBarnkurver = saksrolleFlyt?.type === "OPPFOSTRINGSBIDRAG" ? saksrolleFlyt.barnkurver : [];
-    const barnkurver = grupperBarnIKurver(rawBarnkurver);
-
-    const valgteBarn = form.watch("valgteBarn");
-    const partISaken = form.watch("partISaken");
-    const motpart = form.watch("motpart");
-
-    const {
-        enhet,
-        enhetNavn,
-        isLoadingEnhet,
-        enhetError,
-        harEksisterendeSak,
-        eksisterendeSak,
-        isLoadingHentSak,
-        infoMelding: eksisterendeSakInfoMelding,
-        onSubmit,
-        isLoadingOpprettSak,
-        error,
-        saksnummer,
-    } = useFlowSubmission({
-        form,
-        partISaken: { ...partISaken, erKjent: !!partISaken.ident },
-        motpart,
+    const { form, barnkurver, valgteBarn, kjentPart, onSubmit, innsending, status } = useEnPartMedBarnFlyt({
+        flytType: "OPPFOSTRINGSBIDRAG",
         arbeidsfordeling: "OPS",
-        valgteBarn,
+        rolle: "bidragspliktig",
     });
-
-    useEffect(() => {
-        if (!partISaken.ident && partISakenContext?.ident) {
-            form.setValue(
-                "partISaken",
-                {
-                    ...partISakenContext,
-                    rolle: "bidragspliktig",
-                    erKjent: true,
-                },
-                { shouldDirty: true, shouldValidate: true },
-            );
-        }
-    }, [form, partISaken.ident, partISakenContext]);
 
     const harBarnMedBarnetSelvSomReellMottaker = valgteBarn.some((b) => b.reellMottakerType === "barnet_selv");
 
     return (
         <RolleFlytSide
             onSubmit={onSubmit}
-            status={{
-                infoMelding: eksisterendeSakInfoMelding,
-                harEksisterendeSak,
-                eksisterendeSak,
-                isLoading: isLoadingHentSak,
-                partISakenNavn: partISaken.navn || partISaken.ident,
-                motpartNavn: "Ukjent",
-            }}
+            status={status}
             meldinger={
                 <>
                     {valgteBarn.length > 0 && (
@@ -124,18 +71,7 @@ function OppfostringsbidragFlytContent() {
                     )}
                 </>
             }
-            submit={
-                <EnhetOgSubmitSection
-                    enhet={enhet}
-                    enhetNavn={enhetNavn}
-                    isLoadingEnhet={isLoadingEnhet}
-                    enhetError={enhetError}
-                    blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                    submitError={error}
-                    isLoading={isLoadingOpprettSak}
-                    saksnummer={saksnummer}
-                />
-            }
+            submit={<EnhetOgSubmitSection {...innsending} />}
         >
             <BarnSection
                 form={form}
@@ -145,17 +81,7 @@ function OppfostringsbidragFlytContent() {
             />
 
             <OppsummeringSection
-                bidragspliktig={
-                    partISaken.ident
-                        ? {
-                              rolle: "bidragspliktig",
-                              ident: partISaken.ident,
-                              navn: partISaken.navn,
-                              erKjent: true,
-                              diskresjonskode: partISaken.diskresjonskode,
-                          }
-                        : null
-                }
+                bidragspliktig={kjentPart}
                 bidragsmottaker={null}
                 barn={valgteBarn}
                 partISakenRolle="bidragspliktig"

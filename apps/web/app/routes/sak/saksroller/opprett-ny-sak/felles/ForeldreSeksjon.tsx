@@ -34,70 +34,97 @@ export default function ForeldreSeksjon({
     return (
         <SkjemaSeksjon tittel="Foreldre" beskrivelse={beskrivelse}>
             <HGrid columns={{ xs: 1, md: 2 }} gap="space-16" align="start">
-                {foreldre.map((forelder, index) => {
-                    const erValgt = typeof forelder.erKjent === "boolean";
-                    const erUkjent = forelder.erKjent === false;
-                    const kanEndrePerson = kanRegistrere(index);
-                    const forelderNavn = forelder.navn || `forelder ${index + 1}`;
-                    const søk =
-                        kanEndrePerson && onPersonValgt ? (
-                            <VStack gap="space-12">
-                                <SøkPerson
-                                    label={`Søk etter forelder ${index + 1}`}
-                                    personInformasjon={(person) => onPersonValgt(person, index)}
-                                    compact
-                                />
-                                {!erUkjent && onSettUkjent && (
-                                    <HStack>
-                                        <Button
-                                            type="button"
-                                            size="small"
-                                            variant="secondary-neutral"
-                                            onClick={() => onSettUkjent(index)}
-                                        >
-                                            Registrer forelder {index + 1} som ukjent
-                                        </Button>
-                                    </HStack>
-                                )}
-                            </VStack>
-                        ) : undefined;
-
-                    return (
-                        <RollePersonKort
-                            key={index}
-                            person={{ ...forelder, rolle: forelder.rolle ?? undefined }}
-                            tittel={`Forelder ${index + 1}`}
-                            førInnhold={søk}
-                        >
-                            {erValgt && (
-                                <VStack gap="space-12">
-                                    {personfeil?.[index] && <Alert variant="error">{personfeil[index]}</Alert>}
-                                    <RadioGroup
-                                        legend={`Velg rolle for ${forelderNavn}`}
-                                        size="small"
-                                        value={forelder.rolle ?? ""}
-                                        onChange={(rolle) => onVelgRolle(index, rolle as ForelderPartRolle)}
-                                        error={rollefeil?.[index]}
-                                    >
-                                        <Stack
-                                            gap="space-0 space-24"
-                                            direction={{ xs: "column", sm: "row" }}
-                                            wrap={false}
-                                        >
-                                            {ForelderPartRolleSchema.options.map((rolle) => (
-                                                <Radio key={rolle} value={rolle}>
-                                                    {hentForelderRolleLabel(rolle)}
-                                                </Radio>
-                                            ))}
-                                        </Stack>
-                                    </RadioGroup>
-                                    {handling?.(forelder, index)}
-                                </VStack>
-                            )}
-                        </RollePersonKort>
-                    );
-                })}
+                {foreldre.map((forelder, index) => (
+                    <RollePersonKort
+                        key={index}
+                        person={{ ...forelder, rolle: forelder.rolle ?? undefined }}
+                        tittel={`Forelder ${index + 1}`}
+                        førInnhold={
+                            <ForelderSøk
+                                forelder={forelder}
+                                index={index}
+                                kanRegistrere={kanRegistrere(index)}
+                                onPersonValgt={onPersonValgt}
+                                onSettUkjent={onSettUkjent}
+                            />
+                        }
+                    >
+                        <ForelderRollevalg
+                            forelder={forelder}
+                            index={index}
+                            personfeil={personfeil}
+                            rollefeil={rollefeil}
+                            onVelgRolle={onVelgRolle}
+                            handling={handling}
+                        />
+                    </RollePersonKort>
+                ))}
             </HGrid>
         </SkjemaSeksjon>
+    );
+}
+
+type ForelderProps = { forelder: ForelderMedRolle; index: number };
+
+function ForelderSøk({
+    forelder,
+    index,
+    kanRegistrere,
+    onPersonValgt,
+    onSettUkjent,
+}: ForelderProps & Pick<Props, "onPersonValgt" | "onSettUkjent"> & { kanRegistrere: boolean }) {
+    if (!kanRegistrere || !onPersonValgt) return null;
+    const nummer = index + 1;
+    const kanSettesUkjent = forelder.erKjent !== false && onSettUkjent;
+
+    return (
+        <VStack gap="space-12">
+            <SøkPerson
+                label={`Søk etter forelder ${nummer}`}
+                personInformasjon={(person) => onPersonValgt(person, index)}
+                compact
+            />
+            {kanSettesUkjent && (
+                <HStack>
+                    <Button type="button" size="small" variant="secondary-neutral" onClick={() => onSettUkjent(index)}>
+                        Registrer forelder {nummer} som ukjent
+                    </Button>
+                </HStack>
+            )}
+        </VStack>
+    );
+}
+
+function ForelderRollevalg({
+    forelder,
+    index,
+    personfeil,
+    rollefeil,
+    onVelgRolle,
+    handling,
+}: ForelderProps & Pick<Props, "personfeil" | "rollefeil" | "onVelgRolle" | "handling">) {
+    if (typeof forelder.erKjent !== "boolean") return null;
+    const feil = personfeil?.[index];
+
+    return (
+        <VStack gap="space-12">
+            {feil && <Alert variant="error">{feil}</Alert>}
+            <RadioGroup
+                legend={`Velg rolle for ${forelder.navn || `forelder ${index + 1}`}`}
+                size="small"
+                value={forelder.rolle ?? ""}
+                onChange={(rolle) => onVelgRolle(index, rolle as ForelderPartRolle)}
+                error={rollefeil?.[index]}
+            >
+                <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }} wrap={false}>
+                    {ForelderPartRolleSchema.options.map((rolle) => (
+                        <Radio key={rolle} value={rolle}>
+                            {hentForelderRolleLabel(rolle)}
+                        </Radio>
+                    ))}
+                </Stack>
+            </RadioGroup>
+            {handling?.(forelder, index)}
+        </VStack>
     );
 }

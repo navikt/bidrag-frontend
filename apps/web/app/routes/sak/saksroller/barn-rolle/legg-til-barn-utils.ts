@@ -1,17 +1,12 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils";
-import { MYNDYG_BARN_ALDER, type BarnRolle, type SakRedigeringData } from "../sakvisning-schema.ts";
-
-export const MAKS_ALDER_BARN = 24;
+import { type BarnRolle, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER, type SakRedigeringData } from "../sakvisning-schema.ts";
 
 export function alderForBarn(person: PersonDto): number {
     return beregnAlderForPerson(person) ?? 0;
 }
 
-export function finnValideringsfeilForBarn(
-    person: PersonDto,
-    roller: SakRedigeringData["roller"],
-): string | undefined {
+export function finnValideringsfeilForBarn(person: PersonDto, roller: SakRedigeringData["roller"]): string | undefined {
     if (roller.some((rolle) => rolle.fodselsnummer === person.ident)) {
         return person.visningsnavn
             ? `${person.visningsnavn} (${person.ident}) er allerede lagt til i saken`

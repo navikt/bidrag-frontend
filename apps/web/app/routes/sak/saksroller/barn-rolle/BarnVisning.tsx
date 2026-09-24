@@ -1,7 +1,7 @@
 import { XMarkIcon } from "@navikt/aksel-icons";
 import { Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
-
+import type { ReellMottakerValgregel } from "../components/ReellMottakerValgGruppe.tsx";
 import { BarnKortInnhold } from "../felles/BarnKort.tsx";
 import { KortRamme } from "../felles/PersonRolleKort.tsx";
 import ReellMottakerRad from "../felles/ReellMottakerRad.tsx";
@@ -30,9 +30,6 @@ export default function BarnVisning({
     erOppfostringsbidrag = false,
 }: BarnVisningProps) {
     const form = useFormContext<SakRedigeringData>();
-    const errors = form.formState.errors;
-
-    const roller = form.watch("roller") || [];
     const {
         visReellMottaker,
         harReellMottaker,
@@ -42,7 +39,7 @@ export default function BarnVisning({
         handleLukkReellMottaker,
         handleBekreftReellMottaker,
     } = useBarnReellMottaker({ rolle, index, closeEditorSignal, hentOgNullstillSamhandler });
-    const visRmFeil = Boolean(errors.roller?.[index]?.reellMottaker) && !visReellMottaker;
+    const reellMottakerFeil = form.formState.errors.roller?.[index]?.reellMottaker?.message;
 
     return (
         <KortRamme>
@@ -57,24 +54,7 @@ export default function BarnVisning({
                         diskresjonskode: rolle.diskresjonskode,
                     }}
                     visIkon={false}
-                    headingActions={
-                        erNyttBarn && (
-                            <HStack gap="space-12" align="center" flexShrink="0" marginInline="auto space-0">
-                                <Tag variant="alt1" size="xsmall">
-                                    Nytt barn
-                                </Tag>
-                                <Button
-                                    type="button"
-                                    variant="tertiary"
-                                    size="small"
-                                    icon={<XMarkIcon aria-hidden />}
-                                    onClick={handleFjernBarn}
-                                >
-                                    Fjern
-                                </Button>
-                            </HStack>
-                        )
-                    }
+                    headingActions={erNyttBarn && <NyttBarnHandlinger onFjern={handleFjernBarn} />}
                 >
                     {!visReellMottaker && (
                         <ReellMottakerRad
@@ -85,11 +65,7 @@ export default function BarnVisning({
                         />
                     )}
 
-                    {visRmFeil && (
-                        <Box asChild marginBlock="space-8 space-0">
-                            <ErrorMessage size="small">{errors.roller?.[index]?.reellMottaker?.message}</ErrorMessage>
-                        </Box>
-                    )}
+                    {!visReellMottaker && <ReellMottakerFeil melding={reellMottakerFeil} />}
                 </BarnKortInnhold>
 
                 {visReellMottaker && (
@@ -102,10 +78,8 @@ export default function BarnVisning({
                             navn: rolle.reellMottakerNavn,
                         }}
                         onAvbryt={handleLukkReellMottaker}
-                        onBekreft={(valg) => {
-                            handleBekreftReellMottaker(valg);
-                        }}
-                        regel={erOppfostringsbidrag ? "kun-samhandler" : kanFjerneRM ? "valgfri" : "påkrevd"}
+                        onBekreft={handleBekreftReellMottaker}
+                        regel={reellMottakerRegel(erOppfostringsbidrag, kanFjerneRM)}
                     />
                 )}
                 <RollehistorikkVisning
@@ -115,5 +89,32 @@ export default function BarnVisning({
                 />
             </VStack>
         </KortRamme>
+    );
+}
+
+function reellMottakerRegel(erOppfostringsbidrag: boolean, kanFjerneRM: boolean): ReellMottakerValgregel {
+    if (erOppfostringsbidrag) return "kun-samhandler";
+    return kanFjerneRM ? "valgfri" : "påkrevd";
+}
+
+function NyttBarnHandlinger({ onFjern }: { onFjern: () => void }) {
+    return (
+        <HStack gap="space-12" align="center" flexShrink="0" marginInline="auto space-0">
+            <Tag variant="alt1" size="xsmall">
+                Nytt barn
+            </Tag>
+            <Button type="button" variant="tertiary" size="small" icon={<XMarkIcon aria-hidden />} onClick={onFjern}>
+                Fjern
+            </Button>
+        </HStack>
+    );
+}
+
+function ReellMottakerFeil({ melding }: { melding?: string }) {
+    if (!melding) return null;
+    return (
+        <Box asChild marginBlock="space-8 space-0">
+            <ErrorMessage size="small">{melding}</ErrorMessage>
+        </Box>
     );
 }

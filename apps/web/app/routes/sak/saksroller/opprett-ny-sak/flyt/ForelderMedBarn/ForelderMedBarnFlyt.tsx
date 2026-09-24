@@ -1,3 +1,4 @@
+import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -68,11 +69,8 @@ function ForelderMedBarnFlytContent() {
 
     const { leggTilMotpartManuell } = useMotpartHandling(form);
 
-    const erBidragspliktig = partISaken?.rolle === "bidragspliktig";
     const erBidragsmottaker = partISaken?.rolle === "bidragsmottaker";
-
-    const bidragsmottaker = erBidragsmottaker ? partISaken : motpart;
-    const bidragspliktig = erBidragspliktig ? partISaken : motpart;
+    const { bidragsmottaker, bidragspliktig } = fordelRoller(partISaken, motpart);
 
     const resetMotpart = () => {
         form.setValue("motpart", {
@@ -83,82 +81,38 @@ function ForelderMedBarnFlytContent() {
             diskresjonskode: undefined,
         });
     };
-    const {
-        enhet,
-        enhetNavn,
-        isLoadingEnhet,
-        enhetError,
-        harEksisterendeSak,
-        eksisterendeSak,
-        isLoadingHentSak,
-        infoMelding: eksisterendeSakInfoMelding,
-        onSubmit,
-        isLoadingOpprettSak,
-        error,
-        saksnummer,
-    } = useFlowSubmission({
+    const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
         partISaken: { ...form.watch("partISaken"), erKjent: true },
-        motpart: { ident: motpart.ident, erKjent: motpart.erKjent, rolle: motpart.rolle, navn: motpart.navn },
+        motpart,
         valgteBarn,
-        eksisterendeSakPartISaken: { ...form.watch("partISaken"), erKjent: true },
-        eksisterendeSakMotpart: {
-            ident: motpart.ident ?? "",
-            erKjent: motpart.erKjent,
-            rolle: motpart.rolle ?? "",
-            navn: motpart.navn ?? "",
-        },
         bidragspliktig,
         bidragsmottaker,
     });
 
-    const bidragsmottakerErUkjent = typeof bidragsmottaker?.erKjent === "boolean" && !bidragsmottaker.erKjent;
-    const { data: kanOppretteSakUtenBm, isLoading: sjekkerTilgangUtenBm } =
-        useSjekkTilgangOpprettSakUtenBm(bidragsmottakerErUkjent);
-    const harValgteBarnRelasjonTilMotpart =
-        rawBarnkurver.find((kurv) => {
-            const identer = kurv.fellesBarn.map((barn) => barn.ident);
-            return valgteBarn.some((lagtTilBarn) => identer.includes(lagtTilBarn.ident));
-        })?.motpart?.ident === motpart?.ident;
+    const bidragsmottakerErUkjent = bidragsmottaker?.erKjent === false;
+    const tilgangUtenBm = useTilgangUtenBm(bidragsmottakerErUkjent);
 
     return (
         <RolleFlytSide
             onSubmit={onSubmit}
             status={{
-                infoMelding: eksisterendeSakInfoMelding,
-                harEksisterendeSak,
-                eksisterendeSak,
-                isLoading: isLoadingHentSak,
-                partISakenNavn: partISaken?.navn ?? "",
+                ...sakStatus,
+                partISakenNavn: partISaken?.navn || "",
                 motpartNavn: motpart.navn,
             }}
             meldinger={
                 <ForelderMedBarnMeldinger
                     harValgteBarn={valgteBarn.length > 0}
                     erBidragsmottaker={erBidragsmottaker}
-                    bidragsmottakerErUkjent={bidragsmottakerErUkjent}
-                    harValgteBarnRelasjonTilMotpart={harValgteBarnRelasjonTilMotpart}
-                    sjekkerTilgangUtenBm={sjekkerTilgangUtenBm}
-                    kanOppretteSakUtenBm={kanOppretteSakUtenBm}
-                />
-            }
-            submit={
-                <EnhetOgSubmitSection
-                    enhet={enhet}
-                    enhetNavn={enhetNavn}
-                    isLoadingEnhet={isLoadingEnhet}
-                    enhetError={enhetError}
-                    blocked={
-                        harEksisterendeSak ||
-                        isLoadingHentSak ||
-                        isLoadingEnhet ||
-                        (bidragsmottakerErUkjent && (sjekkerTilgangUtenBm || kanOppretteSakUtenBm !== true))
+                    harFullstendigRelasjon={
+                        !bidragsmottakerErUkjent &&
+                        finnMotpartIdentForValgteBarn(rawBarnkurver, valgteBarn) === motpart.ident
                     }
-                    submitError={error}
-                    isLoading={isLoadingOpprettSak}
-                    saksnummer={saksnummer}
+                    manglerTilgangUtenBm={tilgangUtenBm.avslått}
                 />
             }
+            submit={<EnhetOgSubmitSection {...innsending} blocked={innsending.blocked || tilgangUtenBm.blokkerer} />}
         >
             <BarnSection
                 form={form}
@@ -172,26 +126,43 @@ function ForelderMedBarnFlytContent() {
     );
 }
 
+function finnMotpartIdentForValgteBarn(barnkurver: MotpartBarnRelasjon[], valgteBarn: { ident: string }[]) {
+    const valgteIdenter = new Set(valgteBarn.map((barn) => barn.ident));
+    return barnkurver.find((kurv) => kurv.fellesBarn.some((barn) => valgteIdenter.has(barn.ident)))?.motpart?.ident;
+}
+
+function fordelRoller<P extends { rolle?: string | null }, M>(partISaken: P | null | undefined, motpart: M) {
+    const partErBidragsmottaker = partISaken?.rolle === "bidragsmottaker";
+    const partErBidragspliktig = partISaken?.rolle === "bidragspliktig";
+    return {
+        bidragsmottaker: partErBidragsmottaker ? partISaken : motpart,
+        bidragspliktig: partErBidragspliktig ? partISaken : motpart,
+    };
+}
+
+function useTilgangUtenBm(bidragsmottakerErUkjent: boolean) {
+    const { data: kanOpprette, isLoading } = useSjekkTilgangOpprettSakUtenBm(bidragsmottakerErUkjent);
+    return {
+        blokkerer: bidragsmottakerErUkjent && (isLoading || kanOpprette !== true),
+        avslått: bidragsmottakerErUkjent && !isLoading && kanOpprette === false,
+    };
+}
+
 function ForelderMedBarnMeldinger({
     harValgteBarn,
     erBidragsmottaker,
-    bidragsmottakerErUkjent,
-    harValgteBarnRelasjonTilMotpart,
-    sjekkerTilgangUtenBm,
-    kanOppretteSakUtenBm,
+    harFullstendigRelasjon,
+    manglerTilgangUtenBm,
 }: {
     harValgteBarn: boolean;
     erBidragsmottaker: boolean;
-    bidragsmottakerErUkjent: boolean;
-    harValgteBarnRelasjonTilMotpart: boolean;
-    sjekkerTilgangUtenBm: boolean;
-    kanOppretteSakUtenBm?: boolean;
+    harFullstendigRelasjon: boolean;
+    manglerTilgangUtenBm: boolean;
 }) {
-    const visUfullstendigRelasjon = harValgteBarn && (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart);
+    const visUfullstendigRelasjon = harValgteBarn && !harFullstendigRelasjon;
     const visManglendeBarn = erBidragsmottaker && !harValgteBarn;
-    const visManglendeTilgang = bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false;
 
-    if (!visUfullstendigRelasjon && !visManglendeBarn && !visManglendeTilgang) {
+    if (!visUfullstendigRelasjon && !visManglendeBarn && !manglerTilgangUtenBm) {
         return undefined;
     }
 
@@ -199,7 +170,7 @@ function ForelderMedBarnMeldinger({
         <>
             {visUfullstendigRelasjon && <UfullstendigRelasjonAlert />}
             {visManglendeBarn && <BMUtenBarnAlert />}
-            {visManglendeTilgang && <KanIkkeOppretteSakAlert />}
+            {manglerTilgangUtenBm && <KanIkkeOppretteSakAlert />}
         </>
     );
 }

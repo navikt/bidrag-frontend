@@ -65,29 +65,39 @@ export function RollePersonKort({
                 <HStack align="center" gap="space-8">
                     <PersonIcon aria-hidden fontSize="1.5rem" />
                     <BodyLong size="small" weight="semibold">
-                        {tittel ?? (person.rolle ? hentForelderRolleLabel(person.rolle) : "Person")}
+                        {tittel ?? rolletittel(person.rolle)}
                     </BodyLong>
                 </HStack>
                 {førInnhold}
-                <MaskerSensitivInfo>
-                    {erUkjent ? (
-                        <BodyLong size="small" textColor="subtle" className="italic">
-                            Ukjent
-                        </BodyLong>
-                    ) : (
-                        <VStack gap="space-4">
-                            <PersonInfo
-                                ident={person.ident ?? ""}
-                                navn={person.navn}
-                                fødselsdato={person.fødselsdato}
-                                visKopieringsknapp={false}
-                            />
-                            {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
-                        </VStack>
-                    )}
-                </MaskerSensitivInfo>
+                <MaskerSensitivInfo>{erUkjent ? <UkjentPerson /> : <KjentPerson person={person} />}</MaskerSensitivInfo>
                 {children}
             </VStack>
         </SkjemaSeksjonKort>
+    );
+}
+
+function rolletittel(rolle?: ForelderPartRolle) {
+    return rolle ? hentForelderRolleLabel(rolle) : "Person";
+}
+
+function UkjentPerson() {
+    return (
+        <BodyLong size="small" textColor="subtle" className="italic">
+            Ukjent
+        </BodyLong>
+    );
+}
+
+function KjentPerson({ person }: { person: RollePerson }) {
+    return (
+        <VStack gap="space-4">
+            <PersonInfo
+                ident={person.ident ?? ""}
+                navn={person.navn}
+                fødselsdato={person.fødselsdato}
+                visKopieringsknapp={false}
+            />
+            {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
+        </VStack>
     );
 }

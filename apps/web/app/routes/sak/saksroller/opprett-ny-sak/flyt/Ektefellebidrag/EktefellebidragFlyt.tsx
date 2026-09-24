@@ -45,20 +45,7 @@ export default function EktefellebidragFlyt() {
 
     const motpart = form.watch("motpart");
 
-    const {
-        enhet,
-        enhetNavn,
-        isLoadingEnhet,
-        enhetError,
-        harEksisterendeSak,
-        eksisterendeSak,
-        isLoadingHentSak,
-        infoMelding: eksisterendeSakInfoMelding,
-        onSubmit,
-        isLoadingOpprettSak,
-        error: submitError,
-        saksnummer,
-    } = useFlowSubmission({
+    const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
         partISaken: { ...partISaken, erKjent: true },
         motpart,
@@ -84,25 +71,11 @@ export default function EktefellebidragFlyt() {
             <RolleFlytSide
                 onSubmit={onSubmit}
                 status={{
-                    infoMelding: eksisterendeSakInfoMelding,
-                    harEksisterendeSak,
-                    eksisterendeSak,
-                    isLoading: isLoadingHentSak,
+                    ...sakStatus,
                     partISakenNavn: partISaken.navn,
                     motpartNavn: motpart.navn,
                 }}
-                submit={
-                    <EnhetOgSubmitSection
-                        enhet={enhet}
-                        enhetNavn={enhetNavn}
-                        isLoadingEnhet={isLoadingEnhet}
-                        enhetError={enhetError}
-                        blocked={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                        submitError={submitError}
-                        isLoading={isLoadingOpprettSak}
-                        saksnummer={saksnummer}
-                    />
-                }
+                submit={<EnhetOgSubmitSection {...innsending} />}
             >
                 <EktefelleParterSeksjon form={form} forslagMotpart={forslagMotpart ?? []} motsattRolle={motsattRolle} />
             </RolleFlytSide>

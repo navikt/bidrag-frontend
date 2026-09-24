@@ -3,7 +3,7 @@ import { VStack } from "@navikt/ds-react";
 import EnhetInfoAlert from "../components/EnhetInfoAlert";
 import SubmitButtons from "../components/SubmitButtons";
 
-interface EnhetOgSubmitSectionProps {
+export interface EnhetOgSubmitSectionProps {
     enhet: string | null;
     enhetNavn: string | null;
     isLoadingEnhet: boolean;

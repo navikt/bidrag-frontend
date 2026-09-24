@@ -23,13 +23,9 @@ export default function MotpartSection({
     const partISaken = form.watch("partISaken");
     const motpart = form.watch("motpart");
     const foreldre = form.watch("foreldre" as never) as Array<{ erKjent?: boolean }> | undefined;
-    const harUkjentForelderIForeldreListe = foreldre?.some((forelder) => forelder?.erKjent === false) ?? false;
-    const harUkjentForelder =
-        partISaken?.erKjent === false || motpart?.erKjent === false || harUkjentForelderIForeldreListe;
-    const skalViseParter = valgteBarn.length > 0 || harUkjentForelder;
-    const partISakenRolle =
-        partISaken.rolle === "bidragspliktig" ? "bidragspliktig" : ("bidragsmottaker" as ForelderPartRolle);
-    const motpartRolle = motpart.rolle === "bidragspliktig" ? "bidragspliktig" : "bidragsmottaker";
+    const skalViseParter = valgteBarn.length > 0 || harUkjentForelder([partISaken, motpart, ...(foreldre ?? [])]);
+    const partISakenRolle = tilForelderPartRolle(partISaken.rolle);
+    const motpartRolle = tilForelderPartRolle(motpart.rolle);
 
     const motpartInnhold =
         motpart.erKjent === true || !visPersonsøk ? (
@@ -52,4 +48,12 @@ export default function MotpartSection({
             feil={form.formState.errors.motpart?.ident?.message}
         />
     );
+}
+
+function harUkjentForelder(personer: Array<{ erKjent?: boolean } | undefined>) {
+    return personer.some((person) => person?.erKjent === false);
+}
+
+function tilForelderPartRolle(rolle?: string): ForelderPartRolle {
+    return rolle === "bidragspliktig" ? "bidragspliktig" : "bidragsmottaker";
 }

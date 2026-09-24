@@ -44,12 +44,11 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
 
         form.setValue("roller", [...roller, nyttBarn], { shouldValidate: true });
 
-        const bm = roller.find((rolle) => rolle.type === "BM");
-        const reellMottakerPåkrevd = nyttBarn.erMyndig || !bm?.fodselsnummer;
+        const harBidragsmottaker = roller.some((rolle) => rolle.type === "BM" && rolle.fodselsnummer);
 
         setFunnetPerson(null);
 
-        if (reellMottakerPåkrevd) {
+        if (nyttBarn.erMyndig || !harBidragsmottaker) {
             setValgtBarn(person);
             setVisReellMottaker(true);
             setVisSøk(false);
@@ -95,9 +94,6 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
 
     if (visReellMottaker && valgtBarn) {
         const rolleIndex = roller.findIndex((rolle) => rolle.fodselsnummer === valgtBarn.ident);
-        const bm = roller.find((rolle) => rolle.type === "BM");
-        const reellMottakerPåkrevd = alderForBarn(valgtBarn) >= MYNDYG_BARN_ALDER || !bm?.fodselsnummer;
-
         return (
             <ReellMottakerVelger
                 barnNavn={valgtBarn.visningsnavn ?? "Barnet"}
@@ -110,7 +106,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
                     form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, valg.navn, { shouldValidate: true });
                     resetEtterReellMottaker();
                 }}
-                regel={erOppfostringsbidrag ? "kun-samhandler" : reellMottakerPåkrevd ? "påkrevd" : "valgfri"}
+                regel={utledReellMottakerRegel(valgtBarn, roller, erOppfostringsbidrag)}
             />
         );
     }
@@ -131,8 +127,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
         );
     }
 
-    const bp = roller.find((i) => i.type === "BP");
-    const bm = roller.find((i) => i.type === "BM");
+    const harBeggeForeldre = roller.some((i) => i.type === "BP") && roller.some((i) => i.type === "BM");
 
     return (
         <PersonSøkModal
@@ -156,62 +151,89 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
                     </Button>
                 </>
             }
-            resultat={
-                <>
-                    {feil && (
-                        <InlineMessage status="warning" size="small">
-                            {feil}
-                        </InlineMessage>
-                    )}
-
-                    {funnetPerson && (
-                        <Box padding="space-16" borderRadius="8" background="neutral-soft">
-                            <PersonInfo
-                                navn={funnetPerson.visningsnavn}
-                                ident={funnetPerson.ident}
-                                rolle="BA"
-                                alder={alderForBarn(funnetPerson)}
-                                fødselsdato={funnetPerson.fødselsdato || ""}
-                            />
-                        </Box>
-                    )}
-                </>
-            }
+            resultat={<Søkeresultat feil={feil} funnetPerson={funnetPerson} />}
         >
             <VStack gap="space-16">
                 {tilgjengeligeSøsken.length > 0 && (
-                    <VStack gap="space-8">
-                        <Heading level="3" size="xsmall">
-                            Andre barn som kan legges til ({tilgjengeligeSøsken.length})
-                        </Heading>
-                        <BodyLong size="small" textColor="subtle">
-                            {bp && bm
-                                ? "Andre barn som har begge foreldrene til felles"
-                                : "Andre barn som deler forelder med barn i saken"}
-                        </BodyLong>
-                        <VStack gap="space-2">
-                            {tilgjengeligeSøsken.map((søskenBarn) => (
-                                <Button
-                                    key={søskenBarn.ident}
-                                    type="button"
-                                    variant="tertiary"
-                                    size="small"
-                                    className="w-full justify-start"
-                                    onClick={() => leggTil(søskenBarn)}
-                                >
-                                    <PersonInfo
-                                        navn={søskenBarn?.visningsnavn}
-                                        ident={søskenBarn?.ident}
-                                        rolle="BA"
-                                        alder={alderForBarn(søskenBarn)}
-                                        fødselsdato={søskenBarn?.fødselsdato || ""}
-                                    />
-                                </Button>
-                            ))}
-                        </VStack>
-                    </VStack>
+                    <SøskenListe søsken={tilgjengeligeSøsken} harBeggeForeldre={harBeggeForeldre} onVelg={leggTil} />
                 )}
             </VStack>
         </PersonSøkModal>
+    );
+}
+
+function utledReellMottakerRegel(
+    barn: PersonDto,
+    roller: SakRedigeringData["roller"],
+    erOppfostringsbidrag?: boolean,
+): "kun-samhandler" | "påkrevd" | "valgfri" {
+    if (erOppfostringsbidrag) return "kun-samhandler";
+    const bm = roller.find((rolle) => rolle.type === "BM");
+    return alderForBarn(barn) >= MYNDYG_BARN_ALDER || !bm?.fodselsnummer ? "påkrevd" : "valgfri";
+}
+
+function BarnPersonInfo({ barn }: { barn: PersonDto }) {
+    return (
+        <PersonInfo
+            navn={barn.visningsnavn}
+            ident={barn.ident}
+            rolle="BA"
+            alder={alderForBarn(barn)}
+            fødselsdato={barn.fødselsdato || ""}
+        />
+    );
+}
+
+function Søkeresultat({ feil, funnetPerson }: { feil?: string; funnetPerson: PersonDto | null }) {
+    return (
+        <>
+            {feil && (
+                <InlineMessage status="warning" size="small">
+                    {feil}
+                </InlineMessage>
+            )}
+            {funnetPerson && (
+                <Box padding="space-16" borderRadius="8" background="neutral-soft">
+                    <BarnPersonInfo barn={funnetPerson} />
+                </Box>
+            )}
+        </>
+    );
+}
+
+function SøskenListe({
+    søsken,
+    harBeggeForeldre,
+    onVelg,
+}: {
+    søsken: PersonDto[];
+    harBeggeForeldre: boolean;
+    onVelg: (barn: PersonDto) => void;
+}) {
+    return (
+        <VStack gap="space-8">
+            <Heading level="3" size="xsmall">
+                Andre barn som kan legges til ({søsken.length})
+            </Heading>
+            <BodyLong size="small" textColor="subtle">
+                {harBeggeForeldre
+                    ? "Andre barn som har begge foreldrene til felles"
+                    : "Andre barn som deler forelder med barn i saken"}
+            </BodyLong>
+            <VStack gap="space-2">
+                {søsken.map((søskenBarn) => (
+                    <Button
+                        key={søskenBarn.ident}
+                        type="button"
+                        variant="tertiary"
+                        size="small"
+                        className="w-full justify-start"
+                        onClick={() => onVelg(søskenBarn)}
+                    >
+                        <BarnPersonInfo barn={søskenBarn} />
+                    </Button>
+                ))}
+            </VStack>
+        </VStack>
     );
 }

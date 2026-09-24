@@ -5,22 +5,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Tag } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { FormProvider, type UseFormReturn, useForm, useFormContext } from "react-hook-form";
-import {
-    useHentForeldreinformasjonForBarn,
-    useHentPersonMotpartBarnRelasjon,
-    useSjekkTilgangOpprettSakUtenBm,
-} from "~/api/useApi.ts";
+import { useHentForeldreinformasjonForBarn, useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
 import BarnManueltRegistrering from "../../BarnManueltRegistrering";
 import BMUtenBarnAlert from "../../components/BMUtenBarnAlert";
 import KanIkkeOppretteSakAlert from "../../components/KanIkkeOppretteSakAlert";
 import RolleFlytSide from "../../felles/RolleFlytSide";
 import SkjemaSeksjon from "../../felles/SkjemaSeksjon";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
-import { useMotpartHandling } from "../../hooks/useMotpartHandling";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import MotpartVelger from "../../motpart-felles/MotpartVelger";
 import ValgteBarnListe from "../../motpart-felles/ValgteBarnListe";
-import type { BarnMedAlder } from "../../opprett-sak-schema";
+import type { BarnMedAlder, PartISaken } from "../../opprett-sak-schema";
 import {
     type ForelderPartRolle,
     type ForelderUtenBarnSkjemaData,
@@ -39,6 +34,7 @@ import {
 } from "./forelder-uten-barn-visningsmodell";
 import SøskenListe from "./SøskenListe";
 import { useForeldreForslag } from "./useForeldreForslag";
+import { useMotpartValg } from "./useMotpartValg";
 import { useSøsken } from "./useSøsken";
 
 export default function ForelderUtenBarnFlyt() {
@@ -76,16 +72,17 @@ function ForelderUtenBarnFlytContent() {
     if (!partISaken) {
         return null;
     }
+    return <ForelderUtenBarnSkjema partISaken={partISaken} />;
+}
 
+function ForelderUtenBarnSkjema({ partISaken }: { partISaken: PartISaken }) {
     const form = useFormContext<ForelderUtenBarnSkjemaData>();
     useSyncKategori(form);
     const [søkteBarn, settSøkteBarn] = useState<PersonDto | null>(null);
     const [feil, settFeil] = useState<string>("");
     const [infoMelding, settInfoMelding] = useState<string>("");
-    const [foreslåttMotpart, settForeslåttMotpart] = useState<ForeslåttForelder[]>([]);
-    const [motpartErManueltValgt, settMotpartErManueltValgt] = useState(false);
-    const [motpartIdentForSøskenSøk, settMotpartIdentForSøskenSøk] = useState<string | null>(null);
     const motsattRolle = hentMotsattRolle(partISaken.rolle as ForelderPartRolle);
+    const motpartValg = useMotpartValg(form, motsattRolle, settInfoMelding);
 
     useEffect(() => {
         form.setValue("partISaken.rolle", partISaken.rolle);
@@ -108,41 +105,23 @@ function ForelderUtenBarnFlytContent() {
     const { data: foreldreinformasjonTilBarn, error: foreldreinformasjonTilBarnError } =
         useHentForeldreinformasjonForBarn(søkteBarn ? { ident: søkteBarn.ident } : null, søkteBarn !== null);
 
-    const { data: motpartBarnRelasjon } = useHentPersonMotpartBarnRelasjon(
-        motpartIdentForSøskenSøk ? { ident: motpartIdentForSøskenSøk } : null,
-        !!motpartIdentForSøskenSøk,
+    const { onSubmit, sakStatus, innsending, harEksisterendeSak, isLoadingHentSak, isLoadingEnhet } = useFlowSubmission(
+        {
+            form,
+            partISaken: { ...partISaken, erKjent: true },
+            motpart: normalisertMotpart,
+            valgteBarn,
+            bidragspliktig,
+            bidragsmottaker,
+            eksisterendeSakPartISaken: { ...partISaken, erKjent: true },
+            eksisterendeSakMotpart: normalisertMotpart,
+        },
     );
 
-    const { settMotpartUkjent: settMotpartUkjentBase, leggTilMotpartManuell } = useMotpartHandling(form);
-
-    const {
-        enhet,
-        enhetNavn,
-        isLoadingEnhet,
-        enhetError,
-        harEksisterendeSak,
-        eksisterendeSak,
-        isLoadingHentSak,
-        infoMelding: eksisterendeSakInfoMelding,
-        onSubmit,
-        isLoadingOpprettSak,
-        error,
-        saksnummer,
-    } = useFlowSubmission({
-        form,
-        partISaken: { ...partISaken, erKjent: true },
-        motpart: normalisertMotpart,
-        valgteBarn,
-        bidragspliktig,
-        bidragsmottaker,
-        eksisterendeSakPartISaken: { ...partISaken, erKjent: true },
-        eksisterendeSakMotpart: normalisertMotpart,
-    });
-
     const { søsken, settSøsken } = useSøsken({
-        motpartBarnRelasjon,
+        motpartBarnRelasjon: motpartValg.motpartBarnRelasjon,
         valgteBarn,
-        onMotpartSøkFerdig: () => settMotpartIdentForSøskenSøk(null),
+        onMotpartSøkFerdig: () => motpartValg.settMotpartIdentForSøskenSøk(null),
     });
 
     useForeldreForslag({
@@ -150,29 +129,15 @@ function ForelderUtenBarnFlytContent() {
         foreldreinformasjon: foreldreinformasjonTilBarn,
         form,
         motpart,
-        motpartErManueltValgt,
+        motpartErManueltValgt: motpartValg.motpartErManueltValgt,
         motsattRolle,
         onFeil: settFeil,
         onInfoMelding: settInfoMelding,
-        onMotpartSøk: settMotpartIdentForSøskenSøk,
-        onMotpartValgt: settMotpartErManueltValgt,
-        onForeslåtteForeldre: settForeslåttMotpart,
+        onMotpartSøk: motpartValg.settMotpartIdentForSøskenSøk,
+        onMotpartValgt: motpartValg.settMotpartErManueltValgt,
+        onForeslåtteForeldre: motpartValg.settForeslåttMotpart,
         partISaken,
     });
-
-    const settMotpartUkjent = () => {
-        settMotpartUkjentBase();
-        settMotpartIdentForSøskenSøk(null);
-        settMotpartErManueltValgt(false);
-        settInfoMelding("Motpart satt som ukjent. Du kan nå legge til barn fra forskjellige medforeldre.");
-    };
-
-    const settMotpartManuelt = (person: PersonDto) => {
-        leggTilMotpartManuell(person);
-        settMotpartIdentForSøskenSøk(person.ident);
-        settMotpartErManueltValgt(true);
-        settInfoMelding("");
-    };
 
     const leggTilBarnManuell = async (barn: PersonDto, alder: number) => {
         settFeil("");
@@ -196,33 +161,11 @@ function ForelderUtenBarnFlytContent() {
         form.setValue("valgteBarn", oppdaterteBarn);
 
         if (oppdaterteBarn.length === 0) {
-            settForeslåttMotpart([]);
             settSøsken([]);
-            settMotpartErManueltValgt(false);
-            form.setValue("motpart", {
-                ident: "",
-                navn: "",
-                erKjent: false,
-                rolle: motsattRolle,
-                diskresjonskode: undefined,
-            });
+            motpartValg.nullstillMotpart();
         } else {
-            const oppdaterteSøsken = søsken.filter((s) => !oppdaterteBarn.some((b) => b.ident === s.ident));
-            settSøsken(oppdaterteSøsken);
+            settSøsken(søsken.filter((s) => !oppdaterteBarn.some((b) => b.ident === s.ident)));
         }
-    };
-
-    const brukForeslåttMotpart = (forelder: ForeslåttForelder) => {
-        form.setValue("motpart", {
-            ident: forelder.ident,
-            navn: forelder.visningsnavn,
-            erKjent: true,
-            rolle: motsattRolle,
-            diskresjonskode: forelder.diskresjonskode,
-        });
-        settMotpartIdentForSøskenSøk(forelder.ident);
-        settMotpartErManueltValgt(false);
-        settInfoMelding("");
     };
 
     const status = utledForelderUtenBarnStatus({
@@ -240,10 +183,7 @@ function ForelderUtenBarnFlytContent() {
         <RolleFlytSide
             onSubmit={onSubmit}
             status={{
-                infoMelding: eksisterendeSakInfoMelding,
-                harEksisterendeSak,
-                eksisterendeSak,
-                isLoading: isLoadingHentSak,
+                ...sakStatus,
                 partISakenNavn: partISaken.navn,
                 motpartNavn: motpart.navn,
             }}
@@ -256,18 +196,7 @@ function ForelderUtenBarnFlytContent() {
                     kanIkkeOppretteSakUtenBm={status.kanIkkeOppretteSakUtenBm}
                 />
             }
-            submit={
-                <EnhetOgSubmitSection
-                    enhet={enhet}
-                    enhetNavn={enhetNavn}
-                    isLoadingEnhet={isLoadingEnhet}
-                    enhetError={enhetError}
-                    blocked={status.submitBlokkert}
-                    submitError={error}
-                    isLoading={isLoadingOpprettSak}
-                    saksnummer={saksnummer}
-                />
-            }
+            submit={<EnhetOgSubmitSection {...innsending} blocked={status.submitBlokkert} />}
         >
             <ForelderUtenBarnBarnSeksjon
                 form={form}
@@ -283,11 +212,11 @@ function ForelderUtenBarnFlytContent() {
             <ForelderUtenBarnMotpartSeksjon
                 form={form}
                 valgteBarn={valgteBarn}
-                foreslåttMotpart={foreslåttMotpart}
+                foreslåttMotpart={motpartValg.foreslåttMotpart}
                 motsattRolle={motsattRolle}
-                settMotpartUkjent={settMotpartUkjent}
-                settMotpartManuelt={settMotpartManuelt}
-                brukForeslåttMotpart={brukForeslåttMotpart}
+                settMotpartUkjent={motpartValg.settMotpartUkjent}
+                settMotpartManuelt={motpartValg.settMotpartManuelt}
+                brukForeslåttMotpart={motpartValg.brukForeslåttMotpart}
             />
         </RolleFlytSide>
     );

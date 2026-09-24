@@ -1,7 +1,8 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useTestQueryClient } from "@ct/saksroller/useTestQueryClient.ts";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { createRoutesStub } from "react-router";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
@@ -17,16 +18,7 @@ const bmKjentFraStart: Rolle = {
 };
 
 function LeggTilBarnScenario({ initialRoller }: { initialRoller: Rolle[] }) {
-    const queryClient = useMemo(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: { retry: false, staleTime: Infinity },
-                    mutations: { retry: false },
-                },
-            }),
-        [],
-    );
+    const queryClient = useTestQueryClient();
     const form = useForm<SakRedigeringData>({
         defaultValues: { saksnummer: "2024/1", roller: initialRoller },
     });

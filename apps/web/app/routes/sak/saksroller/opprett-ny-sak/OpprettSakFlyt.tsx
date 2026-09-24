@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { MaskerSensitivInfo, PersonIdent } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
 import { BodyLong, BodyShort, Box, Heading, HGrid, HStack, InlineMessage, Loader, VStack } from "@navikt/ds-react";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useState } from "react";
 import DiskresjonAlert from "../components/DiskresjonAlert";
 import PersonInfo from "../components/PersonInfo";
 import SøkPerson from "../components/SøkPerson";
@@ -87,6 +87,16 @@ function partSøkLabel(sakstype: Sakstype) {
     return "Søk etter person";
 }
 
+const flytkomponenter = {
+    FORELDER_MED_BARN: ForelderMedBarnFlyt,
+    FORELDER_UTEN_BARN: ForelderUtenBarnFlyt,
+    BARN_BEGGE_FORELDRE: BarnBeggeForeldreFlyt,
+    BARN_MANGLENDE_FORELDRE: BarnMedManglendeForeldreFlyt,
+    EKTEFELLEBIDRAG: EktefellebidragFlyt,
+    FARSKAP: FarskapsFlyt,
+    OPPFOSTRINGSBIDRAG: OppfostringsbidragFlyt,
+} as const;
+
 export default function OpprettSakFlyt() {
     const {
         valgtPerson: partISaken,
@@ -104,23 +114,7 @@ export default function OpprettSakFlyt() {
     } = useSaksrolleroversikt();
     const [barnkurvFeil, settBarnkurvFeil] = useState<{ versjon: number; tekst: string } | null>(null);
 
-    const FlytKomponent = useMemo(() => {
-        if (!saksrolleFlyt) {
-            return null;
-        }
-
-        const map = {
-            FORELDER_MED_BARN: ForelderMedBarnFlyt,
-            FORELDER_UTEN_BARN: ForelderUtenBarnFlyt,
-            BARN_BEGGE_FORELDRE: BarnBeggeForeldreFlyt,
-            BARN_MANGLENDE_FORELDRE: BarnMedManglendeForeldreFlyt,
-            EKTEFELLEBIDRAG: EktefellebidragFlyt,
-            FARSKAP: FarskapsFlyt,
-            OPPFOSTRINGSBIDRAG: OppfostringsbidragFlyt,
-        } as const;
-
-        return map[saksrolleFlyt.type];
-    }, [saksrolleFlyt]);
+    const FlytKomponent = saksrolleFlyt ? flytkomponenter[saksrolleFlyt.type] : null;
 
     const oppdaterFlytForSakstypeOgPart = (person: PersonDto, valgtSakstype: Sakstype | null) => {
         const autoRole = getAutoAssignedRole(valgtSakstype);
@@ -176,22 +170,7 @@ export default function OpprettSakFlyt() {
     return (
         <Box maxWidth="80rem" marginInline="auto" paddingBlock="space-32" paddingInline="space-16">
             <VStack gap="space-24">
-                {isLoadingOpprettSak && (
-                    <Box
-                        background="raised"
-                        borderColor="neutral-subtleA"
-                        borderWidth="1"
-                        borderRadius="12"
-                        padding="space-24"
-                        role="status"
-                        aria-live="polite"
-                    >
-                        <VStack align="center" gap="space-12">
-                            <Loader size="2xlarge" title="Oppretter sak..." />
-                            <BodyLong>Oppretter sak...</BodyLong>
-                        </VStack>
-                    </Box>
-                )}
+                {isLoadingOpprettSak && <OppretterSak />}
 
                 <Heading level="1" size="large">
                     Opprett ny sak
@@ -210,35 +189,12 @@ export default function OpprettSakFlyt() {
                     </SkjemaSeksjon>
 
                     {sakstype && (
-                        <SkjemaSeksjon
-                            tittel={partSeksjonTittel(sakstype)}
-                            beskrivelse={sakstypeTilBeskrivelse(sakstype)}
-                        >
-                            <HGrid gap="space-24" columns={{ xs: 1, sm: 2 }}>
-                                <SkjemaSeksjonKort>
-                                    <SøkPerson
-                                        key={`${sakstype}-${sakskategori}`}
-                                        label={partSøkLabel(sakstype)}
-                                        personInformasjon={(person) => leggTilPartISaken(person)}
-                                        compact
-                                    />
-                                </SkjemaSeksjonKort>
-                                {partISaken && (
-                                    <SkjemaSeksjonKort>
-                                        <ValgtPart person={partISaken} />
-                                    </SkjemaSeksjonKort>
-                                )}
-                            </HGrid>
-                            {partISaken && (
-                                <SkjemaSeksjonKort>
-                                    <SaksrolleVelger
-                                        key={`${partISaken.ident}-${sakstype}`}
-                                        partISaken={partISaken}
-                                        enforcedRolle={getAutoAssignedRole(sakstype)}
-                                    />
-                                </SkjemaSeksjonKort>
-                            )}
-                        </SkjemaSeksjon>
+                        <PartSeksjon
+                            sakstype={sakstype}
+                            sakskategori={sakskategori}
+                            partISaken={partISaken}
+                            onPersonValgt={leggTilPartISaken}
+                        />
                     )}
                 </VStack>
 
@@ -253,11 +209,71 @@ export default function OpprettSakFlyt() {
                             <InlineMessage status="warning">{barnkurvFeil.tekst}</InlineMessage>
                         )}
                         <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>
-                            {!!saksrolleFlyt && FlytKomponent && <FlytKomponent key={saksrolleFlyt.key} />}
+                            {FlytKomponent && <FlytKomponent key={saksrolleFlyt?.key} />}
                         </Suspense>
                     </>
                 )}
             </VStack>
         </Box>
+    );
+}
+
+function OppretterSak() {
+    return (
+        <Box
+            background="raised"
+            borderColor="neutral-subtleA"
+            borderWidth="1"
+            borderRadius="12"
+            padding="space-24"
+            role="status"
+            aria-live="polite"
+        >
+            <VStack align="center" gap="space-12">
+                <Loader size="2xlarge" title="Oppretter sak..." />
+                <BodyLong>Oppretter sak...</BodyLong>
+            </VStack>
+        </Box>
+    );
+}
+
+function PartSeksjon({
+    sakstype,
+    sakskategori,
+    partISaken,
+    onPersonValgt,
+}: {
+    sakstype: Sakstype;
+    sakskategori: unknown;
+    partISaken?: PersonDto | null;
+    onPersonValgt: (person: PersonDto) => void;
+}) {
+    return (
+        <SkjemaSeksjon tittel={partSeksjonTittel(sakstype)} beskrivelse={sakstypeTilBeskrivelse(sakstype)}>
+            <HGrid gap="space-24" columns={{ xs: 1, sm: 2 }}>
+                <SkjemaSeksjonKort>
+                    <SøkPerson
+                        key={`${sakstype}-${sakskategori}`}
+                        label={partSøkLabel(sakstype)}
+                        personInformasjon={onPersonValgt}
+                        compact
+                    />
+                </SkjemaSeksjonKort>
+                {partISaken && (
+                    <SkjemaSeksjonKort>
+                        <ValgtPart person={partISaken} />
+                    </SkjemaSeksjonKort>
+                )}
+            </HGrid>
+            {partISaken && (
+                <SkjemaSeksjonKort>
+                    <SaksrolleVelger
+                        key={`${partISaken.ident}-${sakstype}`}
+                        partISaken={partISaken}
+                        enforcedRolle={getAutoAssignedRole(sakstype)}
+                    />
+                </SkjemaSeksjonKort>
+            )}
+        </SkjemaSeksjon>
     );
 }
