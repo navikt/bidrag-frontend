@@ -1,6 +1,6 @@
 import { RedirectTo } from "@bidrag/common";
 import { ExclamationmarkTriangleIcon, FloppydiskIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Button, Dialog, HStack, LocalAlert } from "@navikt/ds-react";
+import { BodyLong, Button, Dialog, HStack, InlineMessage, LocalAlert } from "@navikt/ds-react";
 import { type RefObject, useEffect, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
@@ -17,6 +17,7 @@ export default function SakButtons({
     harEndringer,
     suksessmelding,
     statusRef,
+    statusResetKey,
 }: {
     onSubmit: () => Promise<string>;
     onRefetch: () => Promise<unknown>;
@@ -26,6 +27,7 @@ export default function SakButtons({
     harEndringer: boolean;
     suksessmelding?: string | null;
     statusRef?: RefObject<HTMLDivElement | null>;
+    statusResetKey: number;
 }) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const [bekreftHandling, setBekreftHandling] = useState<Lagrehandling | null>(null);
@@ -37,6 +39,10 @@ export default function SakButtons({
             setIngenEndringer(false);
         }
     }, [harEndringer]);
+
+    useEffect(() => {
+        setIngenEndringer(false);
+    }, [statusResetKey]);
 
     const lagreNySoknad = async () => {
         const saksnummer = await onSubmit();
@@ -106,12 +112,28 @@ export default function SakButtons({
         <>
             {suksessmelding && (
                 <div ref={statusRef} tabIndex={-1}>
-                    <Alert variant="success">{suksessmelding}</Alert>
+                    <LocalAlert status="success">
+                        <LocalAlert.Header>
+                            <LocalAlert.Title>{suksessmelding}</LocalAlert.Title>
+                        </LocalAlert.Header>
+                    </LocalAlert>
                 </div>
             )}
-            {ingenEndringer && !harEndringer && <Alert variant="info">Ingen endringer å lagre.</Alert>}
-            {feilmelding && <Alert variant="error">{feilmelding}</Alert>}
-            {valideringsFeil && <Alert variant="error">{valideringsFeil}</Alert>}
+            {ingenEndringer && !harEndringer && <InlineMessage status="info">Ingen endringer å lagre.</InlineMessage>}
+            {feilmelding && (
+                <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
+                    <LocalAlert.Header>
+                        <LocalAlert.Title>{feilmelding}</LocalAlert.Title>
+                    </LocalAlert.Header>
+                </LocalAlert>
+            )}
+            {valideringsFeil && (
+                <LocalAlert status="error" as="div">
+                    <LocalAlert.Header>
+                        <LocalAlert.Title>{valideringsFeil}</LocalAlert.Title>
+                    </LocalAlert.Header>
+                </LocalAlert>
+            )}
 
             <HStack justify="end" gap="space-8">
                 <Button
@@ -120,7 +142,6 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå til ny søknad skjermbildet"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={lagrer}
                     onClick={() => velgLagrehandling("nySoknad", lagreNySoknad)}
                 >
                     Lagre og ny søknad
@@ -131,7 +152,6 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå tilbake til sak"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={lagrer}
                     onClick={() => velgLagrehandling("gaaTilSak", lagreOgGaaTilSak)}
                 >
                     Lagre og gå til sak
@@ -140,7 +160,6 @@ export default function SakButtons({
                     type="button"
                     size="xsmall"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={lagrer}
                     onClick={() => velgLagrehandling("bliVaerende", lagreOgBliVaerende)}
                 >
                     Lagre
@@ -169,7 +188,9 @@ export default function SakButtons({
                         <Dialog.Body>
                             {feilmelding && (
                                 <LocalAlert status="error" size="small">
-                                    <LocalAlert.Content>{feilmelding}</LocalAlert.Content>
+                                    <LocalAlert.Header>
+                                        <LocalAlert.Title>{feilmelding}</LocalAlert.Title>
+                                    </LocalAlert.Header>
                                 </LocalAlert>
                             )}
                             {!feilmelding && (
@@ -177,16 +198,12 @@ export default function SakButtons({
                             )}
                         </Dialog.Body>
                         <Dialog.Footer>
-                            <Button
-                                type="button"
-                                loading={lagrer}
-                                disabled={lagrer}
-                                onClick={() => void bekreftLagring()}
-                            >
+                            <Button type="button" size="small" loading={lagrer} onClick={() => void bekreftLagring()}>
                                 Lagre
                             </Button>
                             <Button
                                 type="button"
+                                size="small"
                                 variant="secondary"
                                 disabled={lagrer}
                                 onClick={() => setBekreftHandling(null)}

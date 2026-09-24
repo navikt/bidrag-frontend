@@ -3,7 +3,7 @@ import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { SecureLoggerService } from "@bidrag/common";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
+import { beregnAlderForPerson } from "@bidrag/utils";
 import { useEffect, useState } from "react";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 
@@ -104,7 +104,7 @@ export function beregnSakForslag({
     andreForelderIdent: string | undefined;
 }): { muligeAndreForeldre: PersonDto[]; muligeBarnPerMotpart: Map<string, PersonDto[]> } {
     const erBarnUnderMaksAlder = (barn: PersonDto) => {
-        const alder = barn.fødselsdato ? beregnAlder(barn.fødselsdato) : beregnAlderFraFnr(barn.ident);
+        const alder = beregnAlderForPerson(barn);
 
         return alder != null && alder <= MAKS_ALDER_BARN;
     };

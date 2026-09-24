@@ -16,7 +16,7 @@ export default function PersonSøkButton({
     onResult,
     onError,
     ...buttonProps
-}: PersonSøkProps & Omit<ButtonProps, "children" | "onError">): ReactNode {
+}: PersonSøkProps & { visSomLenke?: boolean } & Omit<ButtonProps, "children" | "onError">): ReactNode {
     return (
         <PopupSøkButton<PersonSøkResult>
             {...buttonProps}

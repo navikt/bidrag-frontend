@@ -16,7 +16,6 @@ interface EnkelForelderRolleProps {
     form: UseFormReturn<SakRedigeringData>;
     erNyForelderForKjentRolle?: boolean;
     muligeAndreForeldre?: PersonDto[];
-    saksnummer?: string;
 }
 
 function EnkelForelderRolle({
@@ -25,7 +24,6 @@ function EnkelForelderRolle({
     form,
     erNyForelderForKjentRolle = false,
     muligeAndreForeldre,
-    saksnummer,
 }: EnkelForelderRolleProps) {
     const rolleNavn = ROLLE_NAVN[rolleType];
     const rolleErKjent = Boolean(rolle?.fodselsnummer);
@@ -37,19 +35,13 @@ function EnkelForelderRolle({
             </Heading>
             <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-12">
                 {rolleErKjent ? (
-                    <ForelderVisning
-                        form={form}
-                        rolle={rolle as Rolle}
-                        erNyForelder={erNyForelderForKjentRolle}
-                        saksnummer={saksnummer}
-                    />
+                    <ForelderVisning form={form} rolle={rolle as Rolle} erNyForelder={erNyForelderForKjentRolle} />
                 ) : (
                     <LeggTilForelder
                         rolleType={rolleType}
                         rolleNavn={rolleNavn}
                         form={form}
                         muligeAndreForeldre={muligeAndreForeldre}
-                        saksnummer={saksnummer}
                     />
                 )}
             </Box>
@@ -64,7 +56,6 @@ interface ForelderRolleVisningProps {
     erNyForelderBp?: boolean;
     erNyForelderBm?: boolean;
     muligeAndreForeldre?: PersonDto[];
-    saksnummer?: string;
 }
 
 export default function ForelderRolleVisning({
@@ -74,17 +65,15 @@ export default function ForelderRolleVisning({
     erNyForelderBp,
     erNyForelderBm,
     muligeAndreForeldre,
-    saksnummer,
 }: ForelderRolleVisningProps) {
     return (
-        <HGrid columns={{ xs: 1, md: 2 }} gap="space-24">
+        <HGrid columns={{ xs: 1, md: 2, xl: 3 }} gap="space-24" align="start">
             <EnkelForelderRolle
                 rolleType="BP"
                 rolle={bp}
                 erNyForelderForKjentRolle={erNyForelderBp}
                 form={form}
                 muligeAndreForeldre={muligeAndreForeldre}
-                saksnummer={saksnummer}
             />
             <EnkelForelderRolle
                 rolleType="BM"
@@ -92,7 +81,6 @@ export default function ForelderRolleVisning({
                 erNyForelderForKjentRolle={erNyForelderBm}
                 form={form}
                 muligeAndreForeldre={muligeAndreForeldre}
-                saksnummer={saksnummer}
             />
         </HGrid>
     );

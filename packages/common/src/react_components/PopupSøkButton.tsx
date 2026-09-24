@@ -1,10 +1,12 @@
-import { Button, type ButtonProps, HStack, Loader } from "@navikt/ds-react";
-import type { ReactNode } from "react";
+import { ExternalLinkIcon } from "@navikt/aksel-icons";
+import { Button, type ButtonProps, HStack, Link, Loader } from "@navikt/ds-react";
+import type { MouseEvent, ReactNode } from "react";
 
 import { type UsePopupSøkProps, usePopupSøk } from "./hooks/usePopupSøk";
 
 type PopupSøkButtonProps<T> = Omit<UsePopupSøkProps<T>, "søkNavn"> & {
     tekst: string;
+    visSomLenke?: boolean;
 } & Omit<ButtonProps, "children" | "onError">;
 
 export default function PopupSøkButton<T>({
@@ -14,6 +16,7 @@ export default function PopupSøkButton<T>({
     parseResultat,
     onResult,
     onError,
+    visSomLenke = false,
     ...buttonProps
 }: PopupSøkButtonProps<T>): ReactNode {
     const søkenavn = tekst.toLowerCase();
@@ -25,28 +28,61 @@ export default function PopupSøkButton<T>({
         onResult,
         onError,
     });
-    const åpneTittel = `Åpne ${søkenavn}`;
+    const åpneTittel = `Åpne ${søkenavn} i nytt vindu`;
     const ventetittel = `Venter på resultat fra ${søkenavn}`;
 
-    return (
-        <div className="pdlSearchButton whitespace-nowrap self-end">
-            <Button
-                {...buttonProps}
-                variant={buttonProps.variant ?? "secondary"}
-                size={buttonProps.size ?? "small"}
-                type="button"
-                title={venter ? ventetittel : åpneTittel}
-                onClick={venter ? avbryt : åpne}
-            >
-                {venter ? (
-                    <HStack gap="space-4" align="center" wrap={false}>
-                        <span>Avbryt</span>
-                        <Loader size="xsmall" title={ventetittel} />
-                    </HStack>
-                ) : (
-                    tekst
-                )}
+    const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();
+        åpne();
+    };
+
+    if (!visSomLenke) {
+        return (
+            <div className="pdlSearchButton whitespace-nowrap self-end">
+                <Button
+                    {...buttonProps}
+                    variant={buttonProps.variant ?? "secondary"}
+                    size={buttonProps.size ?? "small"}
+                    type="button"
+                    title={venter ? ventetittel : `Åpne ${søkenavn}`}
+                    onClick={venter ? avbryt : åpne}
+                >
+                    {venter ? (
+                        <HStack gap="space-4" align="center" wrap={false}>
+                            <span>Avbryt</span>
+                            <Loader size="xsmall" title={ventetittel} />
+                        </HStack>
+                    ) : (
+                        tekst
+                    )}
+                </Button>
+            </div>
+        );
+    }
+
+    if (venter) {
+        return (
+            <Button type="button" variant="tertiary" size="small" onClick={avbryt} title={ventetittel}>
+                <HStack gap="space-4" align="center" wrap={false}>
+                    <span>Avbryt</span>
+                    <Loader size="xsmall" title={ventetittel} />
+                </HStack>
             </Button>
-        </div>
+        );
+    }
+
+    return (
+        <Link
+            href={søkPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={åpneTittel}
+            aria-label={åpneTittel}
+            className={buttonProps.className}
+            onClick={handleClick}
+            inlineText
+        >
+            {tekst} <ExternalLinkIcon aria-hidden />
+        </Link>
     );
 }

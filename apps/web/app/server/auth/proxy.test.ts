@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { kjørMedLoggerKontekst } from "~/server/logger/loggerContext.ts";
 import { loader } from "./proxy.ts";
 
@@ -24,6 +24,10 @@ describe("proxy", () => {
         vi.clearAllMocks();
         mocks.getApiConfig.mockReturnValue({ audience: "api://backend", url: "https://backend.example/api" });
         mocks.getOnBehalfOfToken.mockResolvedValue("obo-token");
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
     });
 
     /** Middleware har normalt åpnet konteksten før proxyen kjører. */

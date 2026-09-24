@@ -1,6 +1,6 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
 import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
-import { expect, test } from "@playwright/test";
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/ForelderUtenBarn/ForelderUtenBarn/Standard";
 

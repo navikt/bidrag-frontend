@@ -312,7 +312,17 @@ pnpm test:ct -- packages/common
 
 # Visuell inspeksjon av stories/komponenter (Playwright UI-modus)
 pnpm test:ct:ui
+
+# Kjør én test om gangen, med 500 ms slowMo og ett sekund pause etter hver test
+pnpm test:ct:slow
+
+# Filtrer den langsomme profilen på filsti
+pnpm test:ct:slow -- apps/web/app/routes/sak/saksroller
 ```
+
+Velg prosjektet `components-slow` i Playwright UI eller kjør
+`pnpm test:ct:slow` for å følge testene steg for steg. `pnpm test:ct`
+kjører fortsatt bare standardprosjektet `components`.
 
 **VS Code:** Installer den anbefalte "Playwright Test for VSCode"-extensionen
 (`ms-playwright.playwright`, se `.vscode/extensions.json`) for å kjøre og se

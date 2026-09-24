@@ -4,15 +4,16 @@ import { BodyLong, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonInfo from "../components/PersonInfo.tsx";
-import PersonSøkWrapper from "../PersonSøkWrapper.tsx";
+import PersonSøkModal from "../components/PersonSøkModal.tsx";
+import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
+import { finnDuplikatForelderFeil } from "./forelder-regler.ts";
 
 interface LeggTilForelderProps {
     form: UseFormReturn<SakRedigeringData>;
     rolleType: "BP" | "BM";
     rolleNavn: string;
     muligeAndreForeldre?: PersonDto[];
-    saksnummer?: string;
 }
 
 export default function LeggTilForelder({
@@ -20,29 +21,20 @@ export default function LeggTilForelder({
     rolleType,
     rolleNavn,
     muligeAndreForeldre = [],
-    saksnummer,
 }: LeggTilForelderProps) {
     const [visSøk, setVisSøk] = useState(false);
+    useRegistrerÅpenRedigering(`legg-til-forelder-${rolleType}`, visSøk);
     const roller = form.watch("roller") || [];
 
     const handlePersonValgt = (person: PersonDto) => {
-        const denAndreForelderenType = rolleType === "BM" ? "BP" : "BM";
-        const denAndreForelderen = roller.find((r) => r.type === denAndreForelderenType);
-        const denAndreForelderenRolle = rolleType === "BM" ? "bidragspliktig" : "bidragsmottaker";
-
-        if (denAndreForelderen?.fodselsnummer && denAndreForelderen.fodselsnummer === person.ident) {
-            const personInfo = person?.visningsnavn
-                ? `${person.visningsnavn} (${person.ident})`
-                : person?.ident
-                  ? `Denne personen (${person.ident})`
-                  : "Denne personen";
-
-            throw new Error(
-                `${personInfo} er allerede registrert som ${denAndreForelderenRolle} og kan ikke legges til på nytt.`,
-            );
+        const duplikatFeil = finnDuplikatForelderFeil(roller, rolleType, person);
+        if (duplikatFeil) {
+            throw new Error(duplikatFeil);
         }
 
+        const eksisterendeRolle = roller.find((r) => r.type === rolleType);
         const nyForelder: Rolle = {
+            ...eksisterendeRolle,
             fodselsnummer: person.ident,
             foedselsnummer: person.ident,
             navn: person.visningsnavn ?? undefined,
@@ -50,13 +42,16 @@ export default function LeggTilForelder({
             diskresjonskode: person.diskresjonskode ?? undefined,
             type: rolleType,
             rolleType,
-            objektnummer: "",
+            objektnummer: eksisterendeRolle?.objektnummer ?? "",
             reellMottager: undefined,
             reellMottaker: undefined,
             mottagerErVerge: false,
             samhandlerIdent: undefined,
         };
-        form.setValue("roller", [...roller, nyForelder], { shouldValidate: true });
+        const oppdaterteRoller = eksisterendeRolle
+            ? roller.map((r) => (r.type === rolleType ? nyForelder : r))
+            : [...roller, nyForelder];
+        form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
         setVisSøk(false);
     };
 
@@ -86,13 +81,12 @@ export default function LeggTilForelder({
     }
 
     return (
-        <PersonSøkWrapper
+        <PersonSøkModal
             tittel={`Legg til ${rolleNavn.toLowerCase()}`}
             beskrivelse={`Søk opp personen som skal være ${rolleNavn.toLowerCase()} i saken`}
             søkeLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
             onPersonValgt={handlePersonValgt}
             onAvbryt={() => setVisSøk(false)}
-            saksnummer={saksnummer}
         >
             {muligeAndreForeldre.length > 0 && (
                 <Box
@@ -114,6 +108,7 @@ export default function LeggTilForelder({
                                 key={forelder.ident}
                                 type="button"
                                 variant="tertiary"
+                                size="small"
                                 className="w-full justify-start"
                                 onClick={() => handlePersonValgt(forelder)}
                             >
@@ -127,6 +122,6 @@ export default function LeggTilForelder({
                     </VStack>
                 </Box>
             )}
-        </PersonSøkWrapper>
+        </PersonSøkModal>
     );
 }

@@ -1,6 +1,7 @@
 import { IdentUtils } from "@bidrag/common";
 import { PersonIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Alert, BodyLong, Button } from "@navikt/ds-react";
+import { BodyLong, BodyShort, Box, Button, HStack, InlineMessage, VStack } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 
 import { useHentSamhandler } from "~/api/useApi.ts";
 import type { Diskresjonskode } from "../sakvisning-schema.ts";
@@ -13,63 +14,125 @@ type Props = {
     label?: string;
     ident?: string;
     fjern?: () => void;
+    variant?: "info" | "warning";
     bakgrunn?: string;
     border?: string;
     ikon?: string;
     simple?: boolean;
     diskresjonskode?: Diskresjonskode;
 };
-export default function FunnetPersonInfo({
-    label,
-    disabled,
-    navn,
-    ident,
-    fjern,
-    bakgrunn,
-    simple,
-    border,
-    ikon,
-    diskresjonskode,
-}: Props) {
+
+type InnholdProps = Pick<Props, "label" | "navn" | "ident" | "diskresjonskode">;
+
+export function FunnetPersonInnhold({ label, navn, ident, diskresjonskode }: InnholdProps) {
     const erSamhandlerIdent = ident ? IdentUtils.isSamhandlerId(ident) : false;
     const { data } = useHentSamhandler(ident ?? "", erSamhandlerIdent);
-    const samhandlerManglerKontonummer = () =>
-        erSamhandlerIdent && data && !data?.kontonummer?.norskKontonummer && !data?.kontonummer?.iban;
+    const samhandlerManglerKontonummer =
+        erSamhandlerIdent && data && !data.kontonummer?.norskKontonummer && !data.kontonummer?.iban;
+
     return (
-        <div
-            className={`border ${simple ? "" : (bakgrunn ?? `bg-ax-accent-100`)} ${simple ? "" : `mt-2 p-3`}  rounded-lg ${simple ? "" : `border-solid`} ${simple ? "" : (border ?? `border-ax-bg-info-soft`)} flex items-center justify-between`}
-        >
-            <div className="flex gap-3 w-[stretch] justify-between">
-                <div className="flex gap-3">
-                    {simple ? null : (
-                        <PersonIcon fontSize="1.5rem" aria-hidden className={ikon ?? `text-ax-success-700`} />
-                    )}
-                    <div className="flex flex-col">
-                        <BodyLong size="small" className="font-semibold">
-                            {label} <PersonInfo ident={ident ?? ""} navn={navn} />
-                        </BodyLong>
-                        {diskresjonskode && <DiskresjonAlert diskresjonskode={diskresjonskode} />}
-                        {samhandlerManglerKontonummer() && (
-                            <Alert inline size="small" variant="warning" className="mt-2">
-                                Samhandler mangler norsk kontonummer eller IBAN
-                            </Alert>
+        <VStack gap="space-4">
+            {label && (
+                <BodyShort size="small" weight="semibold">
+                    {label}
+                </BodyShort>
+            )}
+            <PersonInfo ident={ident ?? ""} navn={navn} compact />
+            {diskresjonskode && <DiskresjonAlert diskresjonskode={diskresjonskode} />}
+            {samhandlerManglerKontonummer && (
+                <InlineMessage status="warning" size="small">
+                    Samhandler mangler norsk kontonummer eller IBAN
+                </InlineMessage>
+            )}
+        </VStack>
+    );
+}
+
+export default function FunnetPersonInfo({
+    disabled,
+    fjern,
+    variant,
+    bakgrunn,
+    border,
+    ikon,
+    simple,
+    ...innholdProps
+}: Props): ReactNode {
+    if (variant === undefined) {
+        return (
+            <div
+                className={`border ${simple ? "" : (bakgrunn ?? "bg-ax-accent-100")} ${
+                    simple ? "" : "mt-2 p-3"
+                } rounded-lg ${simple ? "" : "border-solid"} ${
+                    simple ? "" : (border ?? "border-ax-bg-info-soft")
+                } flex items-center justify-between`}
+            >
+                <div className="flex gap-3 w-[stretch] justify-between">
+                    <div className="flex gap-3">
+                        {!simple && (
+                            <PersonIcon fontSize="1.5rem" aria-hidden className={ikon ?? "text-ax-success-700"} />
                         )}
+                        <div className="flex flex-col">
+                            <BodyLong size="small" className="font-semibold">
+                                {innholdProps.label}{" "}
+                                <PersonInfo
+                                    ident={innholdProps.ident ?? ""}
+                                    navn={innholdProps.navn}
+                                    visKopieringsknapp={false}
+                                />
+                            </BodyLong>
+                            {innholdProps.diskresjonskode && (
+                                <DiskresjonAlert diskresjonskode={innholdProps.diskresjonskode} />
+                            )}
+                        </div>
                     </div>
+                    {fjern && (
+                        <Button
+                            type="button"
+                            variant="tertiary"
+                            size="xsmall"
+                            className="h-max"
+                            disabled={disabled}
+                            icon={<XMarkIcon aria-hidden />}
+                            onClick={fjern}
+                        >
+                            Fjern
+                        </Button>
+                    )}
                 </div>
-                {fjern && (
+            </div>
+        );
+    }
+
+    return (
+        <Box
+            background={variant === "warning" ? "warning-soft" : "info-soft"}
+            borderColor={variant === "warning" ? "warning" : "info"}
+            borderWidth="1"
+            borderRadius="8"
+            padding="space-12"
+        >
+            <HStack gap="space-12" align="start" justify="space-between" wrap={false}>
+                <HStack gap="space-12" align="start" minWidth="0" wrap={false}>
+                    <PersonIcon
+                        fontSize="1.5rem"
+                        aria-hidden
+                        className={variant === "warning" ? "text-ax-warning-700" : "text-ax-accent-700"}
+                    />
+                    <FunnetPersonInnhold {...innholdProps} />
+                </HStack>
+                {fjern && !disabled && (
                     <Button
                         type="button"
                         variant="tertiary"
                         size="xsmall"
-                        className="h-max"
-                        disabled={disabled}
                         icon={<XMarkIcon aria-hidden />}
                         onClick={fjern}
                     >
                         Fjern
                     </Button>
                 )}
-            </div>
-        </div>
+            </HStack>
+        </Box>
     );
 }

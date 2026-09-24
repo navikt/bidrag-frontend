@@ -1,4 +1,4 @@
-import { Alert, BodyLong } from "@navikt/ds-react";
+import { BodyLong, LocalAlert } from "@navikt/ds-react";
 
 import type { SakRedigeringData } from "./sakvisning-schema.ts";
 
@@ -15,11 +15,16 @@ export default function UfullstendigRelasjonAlert({ barnIdenter, roller }: Props
     const navn = barnIdenter.map((ident) => roller.find((r) => r.fodselsnummer === ident)?.navn ?? ident);
 
     return (
-        <Alert variant="warning" size="small">
-            <BodyLong size="small">
-                OBS: {navn.join(", ")} har manglende eller ufullstendig relasjon til partene. Dobbeltsjekk relasjoner
-                før du lagrer.
-            </BodyLong>
-        </Alert>
+        <LocalAlert status="warning" size="small" as="div">
+            <LocalAlert.Header>
+                <LocalAlert.Title>Ufullstendig relasjon</LocalAlert.Title>
+            </LocalAlert.Header>
+            <LocalAlert.Content>
+                <BodyLong size="small">
+                    {navn.join(", ")} har manglende eller ufullstendig relasjon til partene. Kontroller relasjonene før
+                    du lagrer.
+                </BodyLong>
+            </LocalAlert.Content>
+        </LocalAlert>
     );
 }
