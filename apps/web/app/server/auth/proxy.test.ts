@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { kjørMedLoggerKontekst } from "~/server/logger/loggerContext.ts";
+import { loader } from "./proxy.ts";
 
 const mocks = vi.hoisted(() => ({
     authTokenContext: Symbol("authTokenContext"),
@@ -17,8 +19,6 @@ vi.mock("~/server/logger/navLogger.ts", () => ({
     navCombinedLogger: { debug: mocks.debug, trace: mocks.trace, warn: mocks.warn, error: mocks.error },
 }));
 
-import { kjørMedLoggerKontekst } from "~/server/logger/loggerContext.ts";
-
 describe("proxy", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -28,8 +28,6 @@ describe("proxy", () => {
 
     /** Middleware har normalt åpnet konteksten før proxyen kjører. */
     async function proxyRequest(request: Request, correlationId = "ABCDE-12345") {
-        const { loader } = await import("./proxy.ts");
-
         return kjørMedLoggerKontekst({ correlationId, user: "Z994321" }, () =>
             loader({
                 params: { app: "bidrag-sak" },
@@ -60,7 +58,6 @@ describe("proxy", () => {
         const fetchMock = vi.fn().mockResolvedValue(new Response("ok"));
         vi.stubGlobal("fetch", fetchMock);
 
-        const { loader } = await import("./proxy.ts");
         const response = (await loader({
             params: { app: "bidrag-sak" },
             request: new Request("http://frontend/proxy/bidrag-sak/vedtak"),
