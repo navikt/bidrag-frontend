@@ -14,14 +14,11 @@ import { NewFormLayout } from "../../../../common/components/layout/grid/NewForm
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
 import { PERSON_API } from "../../../../common/constants/api";
 import elementIds from "../../../../common/constants/elementIds";
-import { SOKNAD_LABELS } from "../../../../common/constants/soknadFraLabels";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";
 import { type GebyrPayload, useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { useDebounce } from "../../../../common/hooks/useDebounce";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
-import { hentVisningsnavn } from "../../../../common/hooks/useVisningsnavn";
-import { DateToDDMMYYYYString } from "../../../../utils/date-utils";
 import { formatterBeløp } from "../../../../utils/number-utils";
 import { STEPS } from "../../../constants/steps";
 import { BarnebidragStepper } from "../../../enum/BarnebidragStepper";
@@ -33,6 +30,7 @@ import {
     type GebyrFormRolle,
     type GebyrFormValues,
 } from "../../../types/gebyrFormValues";
+import { SøknadDetaljerHeader } from "../../gebyr/SøknadDetaljerHeader";
 import { createInitialValues } from "../helpers/GebryFormHelpers";
 
 type GebyrDetailPath = FieldPathByValue<GebyrFormValues, GebyrDetaljer>;
@@ -132,33 +130,6 @@ const Side = () => {
                 }
             />
         </>
-    );
-};
-
-const SøknadDetaljerHeader = ({ søknad }: { søknad: SoknadDetaljerDto }) => {
-    return (
-        <Box background={"brand-beige-soft"} padding="space-16">
-            <HStack gap="space-48" wrap>
-                <HStack gap="space-8">
-                    <Label size="small">{text.label.søknadfra}:</Label>
-                    <BodyShort size="small">{SOKNAD_LABELS[søknad.søktAvType]}</BodyShort>
-                </HStack>
-                <HStack gap="space-8">
-                    <Label size="small">{text.label.mottattdato}:</Label>
-                    <BodyShort size="small">{DateToDDMMYYYYString(new Date(søknad.mottattDato))}</BodyShort>
-                </HStack>
-                <HStack gap="space-8">
-                    <Label size="small">{text.label.søktfradato}:</Label>
-                    <BodyShort size="small">{DateToDDMMYYYYString(new Date(søknad.søktFomDato))}</BodyShort>
-                </HStack>
-                {søknad.behandlingstype && (
-                    <HStack gap="space-8">
-                        <Label size="small">{text.label.søknadstype}:</Label>
-                        <BodyShort size="small">{hentVisningsnavn(søknad.behandlingstype)}</BodyShort>
-                    </HStack>
-                )}
-            </HStack>
-        </Box>
     );
 };
 
