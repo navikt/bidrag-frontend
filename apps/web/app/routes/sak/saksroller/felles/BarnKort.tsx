@@ -3,7 +3,7 @@ import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import type { ReactNode } from "react";
 import PersonRolleKort, { PersonRolleKortInnhold } from "./PersonRolleKort";
 
-export type BarnKortPerson = {
+type BarnKortPerson = {
     ident: string;
     navn?: string | null;
     fødselsdato?: string | null;

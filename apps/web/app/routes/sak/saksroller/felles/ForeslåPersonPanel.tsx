@@ -2,7 +2,7 @@ import { PersonPlusIcon } from "@navikt/aksel-icons";
 import { Alert, BodyLong, BodyShort, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
-export type Personforslag = {
+type Personforslag = {
     navn: string;
     fødselsdato?: string;
     onBruk: () => void;

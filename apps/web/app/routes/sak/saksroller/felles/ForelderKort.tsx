@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import type { ReactNode } from "react";
 import PersonRolleKort, { PersonRolleKortInnhold } from "./PersonRolleKort";
 
-export type ForelderKortPerson = {
+type ForelderKortPerson = {
     ident: string;
     navn?: string | null;
     fødselsdato?: string | null;

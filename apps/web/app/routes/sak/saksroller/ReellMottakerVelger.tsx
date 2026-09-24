@@ -5,8 +5,6 @@ import { useParams } from "react-router";
 
 import ReellMottakerValgGruppe, { type ReellMottakerValg } from "./components/ReellMottakerValgGruppe.tsx";
 
-export type { ReellMottakerValg };
-
 interface ReellMottakerVelgerProps {
     barnNavn: string;
     barnIdent?: string;

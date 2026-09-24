@@ -1,10 +1,8 @@
-import type { OppdaterRollerISakRequest } from "@bidrag/api/SakApi";
-import { Rolletype } from "@bidrag/api/SakApi";
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { useOppdaterSaksroller } from "~/api/useApi.ts";
@@ -16,11 +14,14 @@ import { SakstypeTags } from "./felles/SakstypeTags.tsx";
 import ForelderRolleVisning from "./forelder-rolle/ForelderRolleVisning.tsx";
 import { useEndringssporing } from "./hooks/useEndringssporing.ts";
 import { useHentSakMedPersoninfo } from "./hooks/useHentSakMedPersoninfo.ts";
+import { useInitialiserSaksrollerForm } from "./hooks/useInitialiserSaksrollerForm.ts";
 import { useSakForslag } from "./hooks/useSakForslag.tsx";
+import { useSaksrollerStatus } from "./hooks/useSaksrollerStatus.ts";
+import { useSaksrollerUfullstendigRelasjon } from "./hooks/useSaksrollerUfullstendigRelasjon.ts";
 import { useSakvisningSamhandlerHandling } from "./hooks/useSakvisningSamhandlerHandling.ts";
 import { useUfullstendigRelasjonSjekk } from "./hooks/useUfullstendigRelasjonSjekk.ts";
 import { RedigeringRegisterProvider, useHarÅpneRedigeringer } from "./RedigeringRegisterContext.tsx";
-import { finnFørsteValideringsfeil, utledSakstype } from "./saksroller-visning-utils.ts";
+import { finnFørsteValideringsfeil, lagOppdaterRollerRequest, utledSakstype } from "./saksroller-visning-utils.ts";
 import { type BarnRolle, erBarn, type SakRedigeringData, SakRedigeringSchema } from "./sakvisning-schema.ts";
 import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "./utils.ts";
@@ -42,18 +43,20 @@ export default function SaksrollerVisning({ saksnummer }: SaksrollerVisningProps
 }
 
 function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
-    const [feilmelding, setFeilmelding] = useState<string | null>(null);
-    const [valideringsFeil, setValideringsFeil] = useState<string | null>(null);
-    const [suksessmelding, setSuksessmelding] = useState<string | null>(null);
-    const [barnMedUfullstendigRelasjon, setBarnMedUfullstendigRelasjon] = useState<string[]>([]);
-    const [statusResetKey, setStatusResetKey] = useState(0);
-
-    const statusRef = useRef<HTMLDivElement>(null);
-    const lastDataUpdateRef = useRef<number>(0);
-
     const { sak, berikedeRoller, erEktefellebidrag, refetch, dataUpdatedAt } = useHentSakMedPersoninfo(saksnummer);
 
     const harÅpneRedigeringer = useHarÅpneRedigeringer();
+    const {
+        feilmelding,
+        setFeilmelding,
+        valideringsFeil,
+        setValideringsFeil,
+        suksessmelding,
+        setSuksessmelding,
+        statusResetKey,
+        statusRef,
+        nullstillStatusmeldinger,
+    } = useSaksrollerStatus(harÅpneRedigeringer);
     const oppdaterSaksrollerMutation = useOppdaterSaksroller();
     const { feil, muligeAndreForeldre, muligeBarnPerMotpart } = useSakForslag({ sak });
     const { finnBarnMedUfullstendigRelasjon } = useUfullstendigRelasjonSjekk();
@@ -77,19 +80,32 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
 
     const sakstype = useMemo(() => utledSakstype(aktiveRoller), [aktiveRoller]);
     const sakskategori = sak.kategori;
-    const nullstillStatusmeldinger = useCallback(() => {
-        setFeilmelding(null);
-        setValideringsFeil(null);
-        setSuksessmelding(null);
-        setStatusResetKey((forrige) => forrige + 1);
-    }, []);
-
     const muligeBarn =
         bp || bm
             ? (muligeBarnPerMotpart.get(bp?.fodselsnummer ?? "") ??
               muligeBarnPerMotpart.get(bm?.fodselsnummer ?? "") ??
               [])
             : [];
+
+    useInitialiserSaksrollerForm({
+        berikedeRoller,
+        dataUpdatedAt,
+        reset,
+        saksnummer,
+        onDataReset: () => {
+            setFeilmelding(null);
+            setValideringsFeil(null);
+        },
+    });
+
+    const barnMedUfullstendigRelasjon = useSaksrollerUfullstendigRelasjon({
+        barnIdenter,
+        barnIdenterKey,
+        bidragspliktigIdent: bp?.fodselsnummer,
+        bidragsmottakerIdent: bm?.fodselsnummer,
+        finnBarnMedUfullstendigRelasjon,
+        harSak: !!sak,
+    });
 
     const { endringsliste, harEndringer } = useEndringssporing({
         opprinneligeRoller: berikedeRoller,
@@ -99,89 +115,15 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
         onNyEndring: nullstillStatusmeldinger,
     });
 
-    function initialiserFormMedBerikedeRoller() {
-        if (berikedeRoller.length === 0) {
-            return;
-        }
-
-        if (lastDataUpdateRef.current !== dataUpdatedAt) {
-            lastDataUpdateRef.current = dataUpdatedAt;
-            setFeilmelding(null);
-            setValideringsFeil(null);
-            reset({
-                saksnummer,
-                roller: berikedeRoller,
-            });
-        }
-    }
-
-    useEffect(initialiserFormMedBerikedeRoller, [berikedeRoller, saksnummer, dataUpdatedAt, reset]);
-
-    const forrigeHarÅpneRedigeringer = useRef(harÅpneRedigeringer);
-    useEffect(() => {
-        if (forrigeHarÅpneRedigeringer.current !== harÅpneRedigeringer) {
-            forrigeHarÅpneRedigeringer.current = harÅpneRedigeringer;
-            nullstillStatusmeldinger();
-        }
-    }, [harÅpneRedigeringer, nullstillStatusmeldinger]);
-
-    function scrollTilStatusmelding() {
-        if ((feilmelding || suksessmelding) && statusRef.current) {
-            statusRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-            statusRef.current.focus();
-        }
-    }
-
-    useEffect(scrollTilStatusmelding, [feilmelding, suksessmelding]);
-
-    useEffect(() => {
-        async function sjekkUfullstendigRelasjon() {
-            if (!sak || barnIdenter.length === 0) {
-                setBarnMedUfullstendigRelasjon([]);
-                return;
-            }
-            setBarnMedUfullstendigRelasjon(
-                await finnBarnMedUfullstendigRelasjon(barnIdenter, bm?.fodselsnummer, bp?.fodselsnummer),
-            );
-        }
-
-        sjekkUfullstendigRelasjon();
-    }, [bp?.fodselsnummer, bm?.fodselsnummer, barnIdenterKey, sak, finnBarnMedUfullstendigRelasjon]);
-
     const onSubmit = async (data: SakRedigeringData): Promise<string> => {
         try {
             setSuksessmelding(null);
             setFeilmelding(null);
             setValideringsFeil(null);
 
-            const request: OppdaterRollerISakRequest = {
-                saksnummer: data.saksnummer,
-                roller: data.roller.map((rolle) => {
-                    const barnRolle = rolle as BarnRolle;
-                    const bidragSakRolle = {
-                        BA: Rolletype.BA,
-                        BM: Rolletype.BM,
-                        BP: Rolletype.BP,
-                        RM: Rolletype.RM,
-                    }[rolle.rolleType];
-                    return {
-                        fodselsnummer: rolle.fodselsnummer || "",
-                        type: bidragSakRolle,
-                        objektnummer: rolle.objektnummer || "",
-                        reellMottaker:
-                            rolle.rolleType === "BA" && barnRolle?.reellMottaker
-                                ? { ident: barnRolle.reellMottaker || "", verge: false }
-                                : null,
-                        mottagerErVerge: rolle.mottagerErVerge,
-                        rolleType: bidragSakRolle,
-                        rollehistorikk: [],
-                    };
-                }),
-            };
-
             oppdaterSaksrollerMutation.reset();
 
-            await oppdaterSaksrollerMutation.mutateAsync(request);
+            await oppdaterSaksrollerMutation.mutateAsync(lagOppdaterRollerRequest(data));
             setSuksessmelding("Saken ble oppdatert");
             return saksnummer;
         } catch (err) {

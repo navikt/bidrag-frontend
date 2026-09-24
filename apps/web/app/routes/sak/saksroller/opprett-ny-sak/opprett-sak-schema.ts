@@ -16,7 +16,6 @@ export { DiskresjonskodeSchema, MYNDYG_BARN_ALDER };
 export const MAKS_ALDER_BARN = 24;
 
 const ArbeidsfordelingSchema = z.enum(["BBF", "EEN", "EFS", "FRS", "INH", "OPS"]);
-const RolleForOpprettSakSchema = z.enum(["BA", "BM", "BP", "FR", "RM"]);
 export const PartRolleSchema = z.enum(["bidragspliktig", "bidragsmottaker", "barn_over_18", "barn_under_18"]);
 export const ForelderPartRolleSchema = z.enum(["bidragspliktig", "bidragsmottaker"]);
 const PartISakenSchema = z.object({
@@ -302,7 +301,6 @@ export type Motpart = z.infer<typeof MotpartSchema>;
 export type PartISaken = z.infer<typeof PartISakenSchema>;
 export type PartRolle = z.infer<typeof PartRolleSchema>;
 export type ForelderPartRolle = z.infer<typeof ForelderPartRolleSchema>;
-export type RolleForOpprettSak = z.infer<typeof RolleForOpprettSakSchema>;
 export type Diskresjonskode = z.infer<typeof DiskresjonskodeSchema>;
 
 // ==================== HELPER TYPES ====================
@@ -327,10 +325,4 @@ export type Barnkurv = {
         | "UKJENT"
         | null;
     barn: BarnMedAlder[];
-};
-
-export type ForeslåttMotpart = {
-    ident: string;
-    navn: string;
-    fødselsdato: string;
 };

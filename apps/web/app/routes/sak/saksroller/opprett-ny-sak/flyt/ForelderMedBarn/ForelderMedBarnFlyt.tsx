@@ -121,10 +121,6 @@ function ForelderMedBarnFlytContent() {
             return valgteBarn.some((lagtTilBarn) => identer.includes(lagtTilBarn.ident));
         })?.motpart?.ident === motpart?.ident;
 
-    const visValideringsAlerts =
-        (valgteBarn.length > 0 && (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart)) ||
-        (erBidragsmottaker && valgteBarn.length === 0);
-
     return (
         <RolleFlytSide
             onSubmit={onSubmit}
@@ -137,17 +133,14 @@ function ForelderMedBarnFlytContent() {
                 motpartNavn: motpart.navn,
             }}
             meldinger={
-                visValideringsAlerts ? (
-                    <>
-                        {valgteBarn.length > 0 && (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart) && (
-                            <UfullstendigRelasjonAlert />
-                        )}
-                        {erBidragsmottaker && valgteBarn.length === 0 && <BMUtenBarnAlert />}
-                        {bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false && (
-                            <KanIkkeOppretteSakAlert />
-                        )}
-                    </>
-                ) : undefined
+                <ForelderMedBarnMeldinger
+                    harValgteBarn={valgteBarn.length > 0}
+                    erBidragsmottaker={erBidragsmottaker}
+                    bidragsmottakerErUkjent={bidragsmottakerErUkjent}
+                    harValgteBarnRelasjonTilMotpart={harValgteBarnRelasjonTilMotpart}
+                    sjekkerTilgangUtenBm={sjekkerTilgangUtenBm}
+                    kanOppretteSakUtenBm={kanOppretteSakUtenBm}
+                />
             }
             submit={
                 <EnhetOgSubmitSection
@@ -176,5 +169,37 @@ function ForelderMedBarnFlytContent() {
 
             <MotpartSection form={form} onLeggTilMotpartManuell={leggTilMotpartManuell} />
         </RolleFlytSide>
+    );
+}
+
+function ForelderMedBarnMeldinger({
+    harValgteBarn,
+    erBidragsmottaker,
+    bidragsmottakerErUkjent,
+    harValgteBarnRelasjonTilMotpart,
+    sjekkerTilgangUtenBm,
+    kanOppretteSakUtenBm,
+}: {
+    harValgteBarn: boolean;
+    erBidragsmottaker: boolean;
+    bidragsmottakerErUkjent: boolean;
+    harValgteBarnRelasjonTilMotpart: boolean;
+    sjekkerTilgangUtenBm: boolean;
+    kanOppretteSakUtenBm?: boolean;
+}) {
+    const visUfullstendigRelasjon = harValgteBarn && (bidragsmottakerErUkjent || !harValgteBarnRelasjonTilMotpart);
+    const visManglendeBarn = erBidragsmottaker && !harValgteBarn;
+    const visManglendeTilgang = bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false;
+
+    if (!visUfullstendigRelasjon && !visManglendeBarn && !visManglendeTilgang) {
+        return undefined;
+    }
+
+    return (
+        <>
+            {visUfullstendigRelasjon && <UfullstendigRelasjonAlert />}
+            {visManglendeBarn && <BMUtenBarnAlert />}
+            {visManglendeTilgang && <KanIkkeOppretteSakAlert />}
+        </>
     );
 }

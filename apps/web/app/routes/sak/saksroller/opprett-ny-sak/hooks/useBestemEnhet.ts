@@ -205,52 +205,104 @@ export function useBestemEnhet({
         error: egenAnsattEnhetError,
     } = useHentEnhetInfomasjon(EGEN_ANSATT_ENHET, egenAnsattInfo.harEgenAnsatt && !harFortroligAdresseVerdi);
 
+    return velgEnhet({
+        erSakskategoriUtenlandssak,
+        harFortroligAdresse: harFortroligAdresseVerdi,
+        harEgenAnsatt: egenAnsattInfo.harEgenAnsatt,
+        identForArbeidsfordeling,
+        standardEnhet: bmEllerBarnEnhet,
+        standardLoading: isLoading,
+        standardError: error,
+        utland: {
+            navn: utlandEnhetInfo?.navn,
+            isLoading: isLoadingUtlandEnhet || isFetchingUtlandEnhet,
+            error: utlandEnhetError,
+        },
+        fortrolig: {
+            navn: fortroligEnhetInfo?.navn,
+            isLoading: isLoadingFortroligEnhet || isFetchingFortroligEnhet,
+            error: fortroligEnhetError,
+        },
+        egenAnsatt: {
+            navn: egenAnsattEnhetInfo?.navn,
+            isLoading: isLoading || isLoadingEgenAnsattEnhet || isFetchingEgenAnsattEnhet,
+            error: egenAnsattEnhetError ?? error,
+        },
+    });
+}
+
+type EnhetInfo = {
+    navn?: string | null;
+    isLoading: boolean;
+    error: BestemEnhetResult["error"];
+};
+
+function velgEnhet({
+    erSakskategoriUtenlandssak,
+    harFortroligAdresse,
+    harEgenAnsatt,
+    identForArbeidsfordeling,
+    standardEnhet,
+    standardLoading,
+    standardError,
+    utland,
+    fortrolig,
+    egenAnsatt,
+}: {
+    erSakskategoriUtenlandssak: boolean;
+    harFortroligAdresse: boolean;
+    harEgenAnsatt: boolean;
+    identForArbeidsfordeling: string | null;
+    standardEnhet: { nummer?: string | null; navn?: string | null } | null;
+    standardLoading: boolean;
+    standardError: BestemEnhetResult["error"];
+    utland: EnhetInfo;
+    fortrolig: EnhetInfo;
+    egenAnsatt: EnhetInfo;
+}): BestemEnhetResult {
     if (erSakskategoriUtenlandssak) {
         return {
             enhet: UTLAND_ENHET,
-            enhetNavn: utlandEnhetInfo?.navn ?? null,
-            isLoading: isLoadingUtlandEnhet || isFetchingUtlandEnhet,
+            enhetNavn: utland.navn ?? null,
+            isLoading: utland.isLoading,
             harFortroligAdresse: true,
             harEgenAnsatt: false,
             identForArbeidsfordeling: null,
-            error: utlandEnhetError,
+            error: utland.error,
         };
     }
 
-    // 1. Returner fortrolig adresse enhet hvis noen har fortrolig adresse
-    if (harFortroligAdresseVerdi) {
+    if (harFortroligAdresse) {
         return {
             enhet: ADRESSEBESKYTTELSE_ENHET,
-            enhetNavn: fortroligEnhetInfo?.navn ?? "NAV Vikafossen",
-            isLoading: isLoadingFortroligEnhet || isFetchingFortroligEnhet,
+            enhetNavn: fortrolig.navn ?? "NAV Vikafossen",
+            isLoading: fortrolig.isLoading,
             harFortroligAdresse: true,
             harEgenAnsatt: false,
             identForArbeidsfordeling: null,
-            error: fortroligEnhetError,
+            error: fortrolig.error,
         };
     }
 
-    // 2. Returner egen ansatt enhet hvis noen har enhet 4883
-    if (egenAnsattInfo.harEgenAnsatt) {
+    if (harEgenAnsatt) {
         return {
             enhet: EGEN_ANSATT_ENHET,
-            enhetNavn: egenAnsattEnhetInfo?.navn ?? "NAV Egne ansatte",
-            isLoading: isLoading || isLoadingEgenAnsattEnhet || isFetchingEgenAnsattEnhet,
+            enhetNavn: egenAnsatt.navn ?? "NAV Egne ansatte",
+            isLoading: egenAnsatt.isLoading,
             harFortroligAdresse: false,
             harEgenAnsatt: true,
             identForArbeidsfordeling,
-            error: egenAnsattEnhetError ?? error,
+            error: egenAnsatt.error,
         };
     }
 
-    // 3. Returner BM sin enhet, eller yngste barn hvis BM er ukjent
     return {
-        enhet: bmEllerBarnEnhet?.nummer ?? null,
-        enhetNavn: bmEllerBarnEnhet?.navn ?? null,
-        isLoading,
+        enhet: standardEnhet?.nummer ?? null,
+        enhetNavn: standardEnhet?.navn ?? null,
+        isLoading: standardLoading,
         harFortroligAdresse: false,
         harEgenAnsatt: false,
         identForArbeidsfordeling,
-        error,
+        error: standardError,
     };
 }

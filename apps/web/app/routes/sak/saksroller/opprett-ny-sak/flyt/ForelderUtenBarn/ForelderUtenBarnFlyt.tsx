@@ -1,12 +1,10 @@
 import { TilgangsFeilError } from "@bidrag/api";
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { SecureLoggerService } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils/datoUtils";
-import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Tag } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, type UseFormReturn, useForm, useFormContext } from "react-hook-form";
 import {
     useHentForeldreinformasjonForBarn,
     useHentPersonMotpartBarnRelasjon,
@@ -22,12 +20,11 @@ import { useMotpartHandling } from "../../hooks/useMotpartHandling";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import MotpartVelger from "../../motpart-felles/MotpartVelger";
 import ValgteBarnListe from "../../motpart-felles/ValgteBarnListe";
+import type { BarnMedAlder } from "../../opprett-sak-schema";
 import {
-    type BarnMedAlder,
     type ForelderPartRolle,
     type ForelderUtenBarnSkjemaData,
     ForelderUtenBarnSkjemaSchema,
-    MAKS_ALDER_BARN,
     MYNDYG_BARN_ALDER,
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
@@ -36,8 +33,10 @@ import MotpartSection from "../../sections/MotpartSection";
 import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
 import { hentMotsattRolle } from "../../utils";
 import SøskenListe from "./SøskenListe";
+import { useForeldreForslag } from "./useForeldreForslag";
+import { useSøsken } from "./useSøsken";
 
-export type ForeslåttForelder = {
+type ForeslåttForelder = {
     barnIdent: string;
     barnNavn: string;
 } & PersonDto;
@@ -84,7 +83,6 @@ function ForelderUtenBarnFlytContent() {
     const [feil, settFeil] = useState<string>("");
     const [infoMelding, settInfoMelding] = useState<string>("");
     const [foreslåttMotpart, settForeslåttMotpart] = useState<ForeslåttForelder[]>([]);
-    const [søsken, settSøsken] = useState<BarnMedAlder[]>([]);
     const [motpartErManueltValgt, settMotpartErManueltValgt] = useState(false);
     const [motpartIdentForSøskenSøk, settMotpartIdentForSøskenSøk] = useState<string | null>(null);
     const motsattRolle = hentMotsattRolle(partISaken.rolle as ForelderPartRolle);
@@ -145,128 +143,27 @@ function ForelderUtenBarnFlytContent() {
         eksisterendeSakMotpart: normalisertMotpart,
     });
 
-    useEffect(() => {
-        if (!motpartBarnRelasjon || valgteBarn.length === 0) {
-            return;
-        }
+    const { søsken, settSøsken } = useSøsken({
+        motpartBarnRelasjon,
+        valgteBarn,
+        onMotpartSøkFerdig: () => settMotpartIdentForSøskenSøk(null),
+    });
 
-        try {
-            const relasjonerMedAlleBarn = motpartBarnRelasjon.personensMotpartBarnRelasjon.filter((relasjon) => {
-                const barnIRelasjon = relasjon.fellesBarn.map((b) => b.ident);
-                return valgteBarn.every((b) => barnIRelasjon.includes(b.ident));
-            });
-
-            const søskenMedAlder: BarnMedAlder[] = relasjonerMedAlleBarn
-                .flatMap((x) => x.fellesBarn)
-                .flatMap((enkeltBarn) => {
-                    const alder = beregnAlderForPerson(enkeltBarn);
-
-                    if (
-                        alder === null ||
-                        valgteBarn.some((b) => b.ident === enkeltBarn.ident) ||
-                        alder > MAKS_ALDER_BARN
-                    ) {
-                        return [];
-                    }
-
-                    return [
-                        {
-                            ident: enkeltBarn.ident,
-                            navn: enkeltBarn.visningsnavn,
-                            fødselsdato: formaterDato(enkeltBarn.fødselsdato),
-                            alder,
-                            erMyndig: alder >= MYNDYG_BARN_ALDER,
-                        },
-                    ];
-                });
-
-            settSøsken(søskenMedAlder);
-
-            settMotpartIdentForSøskenSøk(null);
-        } catch (error) {
-            SecureLoggerService.warn(
-                "Feil ved prosessering av søsken:",
-                error instanceof Error ? error : new Error(String(error)),
-            );
-            settSøsken([]);
-        }
-    }, [motpartBarnRelasjon, valgteBarn]);
-
-    useEffect(() => {
-        const handleForeldreinformasjon = async () => {
-            if (!foreldreinformasjonTilBarn || !søkteBarn) {
-                return;
-            }
-
-            try {
-                if (foreldreinformasjonTilBarn.length > 2) {
-                    settFeil(
-                        `Dette barnet (${søkteBarn.ident}) har flere enn 2 registrerte foreldre i systemet. Dette kan skyldes feil i data. Kontakt support.`,
-                    );
-                } else if (
-                    foreldreinformasjonTilBarn.length === 2 &&
-                    !foreldreinformasjonTilBarn.some((forelder) => forelder.ident === partISaken.ident)
-                ) {
-                    settFeil(
-                        `Er du sikker på at dette er riktig barn? Dette barnet (${søkteBarn.ident}) har begge foreldre registrert, men ${partISaken.navn} (${partISaken.ident}) har ingen barn registrert.`,
-                    );
-                }
-
-                const muligeMotparter = foreldreinformasjonTilBarn.filter(
-                    (forelder) => forelder.ident !== partISaken.ident,
-                );
-                const foreslåtteForeldre = muligeMotparter.map((forelder) => ({
-                    ...forelder,
-                    barnIdent: søkteBarn.ident,
-                    barnNavn: søkteBarn.visningsnavn,
-                }));
-                const enesteMuligeMotpart = foreslåtteForeldre.length === 1 ? foreslåtteForeldre[0] : undefined;
-
-                if (motpartErManueltValgt && enesteMuligeMotpart && enesteMuligeMotpart.ident !== motpart?.ident) {
-                    settInfoMelding(
-                        `Merk: Dette barnet (${søkteBarn.ident}) har ${enesteMuligeMotpart.visningsnavn} som forelder, men du har allerede valgt ${motpart.navn} som motpart. Motparten endres ikke.`,
-                    );
-                }
-
-                if (enesteMuligeMotpart && !motpart?.ident) {
-                    form.setValue("motpart", {
-                        ident: enesteMuligeMotpart.ident,
-                        navn: enesteMuligeMotpart.visningsnavn,
-                        erKjent: true,
-                        rolle: motsattRolle,
-                        diskresjonskode: enesteMuligeMotpart.diskresjonskode,
-                    });
-                    settMotpartIdentForSøskenSøk(enesteMuligeMotpart.ident);
-                    settMotpartErManueltValgt(false);
-                    settForeslåttMotpart([]);
-                } else if (foreslåtteForeldre.length > 0) {
-                    settForeslåttMotpart(
-                        foreslåttMotpart && foreslåttMotpart.length > 0
-                            ? [
-                                  ...foreslåttMotpart,
-                                  ...foreslåtteForeldre.filter(
-                                      (forelder) =>
-                                          !foreslåttMotpart.some(
-                                              (eksisterendeForslag) => eksisterendeForslag.ident === forelder.ident,
-                                          ),
-                                  ),
-                              ]
-                            : foreslåtteForeldre,
-                    );
-                } else {
-                    settForeslåttMotpart([]);
-                }
-            } catch (error) {
-                settFeil("Noe gikk galt ved søk");
-                await SecureLoggerService.error(
-                    "Noe gikk galt ved søk",
-                    error instanceof Error ? error : new Error(String(error)),
-                );
-            }
-        };
-
-        handleForeldreinformasjon();
-    }, [foreldreinformasjonTilBarn, foreldreinformasjonTilBarnError]);
+    useForeldreForslag({
+        barn: søkteBarn,
+        foreldreinformasjon: foreldreinformasjonTilBarn,
+        foreslåttMotpart,
+        form,
+        motpart,
+        motpartErManueltValgt,
+        motsattRolle,
+        onFeil: settFeil,
+        onInfoMelding: settInfoMelding,
+        onMotpartSøk: settMotpartIdentForSøskenSøk,
+        onMotpartValgt: settMotpartErManueltValgt,
+        onForeslåtteForeldre: settForeslåttMotpart,
+        partISaken,
+    });
 
     const settMotpartUkjent = () => {
         settMotpartUkjentBase();
@@ -336,7 +233,6 @@ function ForelderUtenBarnFlytContent() {
         settInfoMelding("");
     };
 
-    const enesteForeslåtteMotpart = foreslåttMotpart.length === 1 ? foreslåttMotpart[0] : undefined;
     const kanIkkeOpprettSakUtenBm = bidragsmottakerErUkjent && !sjekkerTilgangUtenBm && kanOppretteSakUtenBm === false;
     const visValideringsAlerts =
         valgteBarn.length > 0 || (erBidragsmottaker && valgteBarn.length === 0) || kanIkkeOpprettSakUtenBm;
@@ -353,26 +249,14 @@ function ForelderUtenBarnFlytContent() {
                 motpartNavn: motpart.navn,
             }}
             meldinger={
-                <>
-                    {foreldreinformasjonTilBarnError !== null &&
-                        foreldreinformasjonTilBarnError instanceof TilgangsFeilError && (
-                            <Alert variant="info" size="small">
-                                {foreldreinformasjonTilBarnError.message}. Legg til motpart manuelt.
-                            </Alert>
-                        )}
-                    {infoMelding && (
-                        <Alert variant="info" size="small">
-                            {infoMelding}
-                        </Alert>
-                    )}
-                    {visValideringsAlerts && (
-                        <>
-                            {valgteBarn.length > 0 && <UfullstendigRelasjonAlert />}
-                            {erBidragsmottaker && valgteBarn.length === 0 && <BMUtenBarnAlert />}
-                            {kanIkkeOpprettSakUtenBm && <KanIkkeOppretteSakAlert />}
-                        </>
-                    )}
-                </>
+                <ForelderUtenBarnMeldinger
+                    tilgangsfeil={foreldreinformasjonTilBarnError}
+                    infoMelding={infoMelding}
+                    visValideringsAlerts={visValideringsAlerts}
+                    harValgteBarn={valgteBarn.length > 0}
+                    erBidragsmottaker={erBidragsmottaker}
+                    kanIkkeOppretteSakUtenBm={kanIkkeOpprettSakUtenBm}
+                />
             }
             submit={
                 <EnhetOgSubmitSection
@@ -392,74 +276,173 @@ function ForelderUtenBarnFlytContent() {
                 />
             }
         >
-            <SkjemaSeksjon
-                tittel="Velg barn saken gjelder for"
-                beskrivelse="Ingen barn funnet i registeret. Legg til barn manuelt."
-                handling={
-                    <Tag size="small" variant="info">
-                        {valgteBarn.length} valgt
-                    </Tag>
-                }
-            >
-                {feil && (
-                    <Alert size="small" variant="error">
-                        {feil}
-                    </Alert>
-                )}
-                <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnManuell={leggTilBarnManuell} />
-                <ValgteBarnListe
-                    form={form}
-                    valgteBarn={valgteBarn}
-                    alleBarn={valgteBarn}
-                    fjernBarn={fjernBarn}
-                    tittel="Barn som legges til"
-                    heading={{ size: "small", level: "3" }}
-                    reellMottakerRegel={{ type: "etter-barn", bidragsmottakerErUkjent }}
-                />
-
-                <SøskenListe søsken={søsken} form={form} />
-
-                {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
-                    <Alert variant="error" size="small">
-                        {form.formState.errors.valgteBarn.message}
-                    </Alert>
-                )}
-            </SkjemaSeksjon>
-
-            <MotpartSection
+            <ForelderUtenBarnBarnSeksjon
                 form={form}
-                onLeggTilMotpartManuell={settMotpartManuelt}
-                visPersonsøk={foreslåttMotpart.length === 0}
-                motpartvalg={
-                    valgteBarn.length > 0 ? (
-                        <MotpartVelger
-                            form={form}
-                            tittel={
-                                foreslåttMotpart.length > 0 ? `Foreslått ${motsattRolle}` : "Ingen forelder registrert"
-                            }
-                            beskrivelse={
-                                enesteForeslåtteMotpart
-                                    ? `Vi fant at ${enesteForeslåtteMotpart.visningsnavn} (${enesteForeslåtteMotpart.ident}) er registrert som forelder til ${enesteForeslåtteMotpart.barnNavn} (${enesteForeslåtteMotpart.barnIdent}).`
-                                    : foreslåttMotpart.length > 1
-                                      ? "Vi fant flere foreldre som er registrert som forelder til valgte barn."
-                                      : "Valgte barn har ingen registrerte foreldre. Motpart er foreløpig ukjent, men du kan registrere en person."
-                            }
-                            settMotpartUkjent={settMotpartUkjent}
-                            foreslåtteMotparter={foreslåttMotpart.map((forelder) => ({
-                                ident: forelder.ident,
-                                navn: forelder.visningsnavn,
-                                fødselsdato: forelder.fødselsdato ?? undefined,
-                            }))}
-                            brukForeslåttMotpart={(ident) => {
-                                const forelder = foreslåttMotpart.find((forslag) => forslag.ident === ident);
-                                if (forelder) {
-                                    brukForeslåttMotpart(forelder);
-                                }
-                            }}
-                        />
-                    ) : undefined
-                }
+                valgteBarn={valgteBarn}
+                feil={feil}
+                leggTilBarnManuell={leggTilBarnManuell}
+                fjernBarn={fjernBarn}
+                søsken={søsken}
+                bidragsmottakerErUkjent={bidragsmottakerErUkjent}
+                erBidragspliktig={erBidragspliktig}
+            />
+
+            <ForelderUtenBarnMotpartSeksjon
+                form={form}
+                valgteBarn={valgteBarn}
+                foreslåttMotpart={foreslåttMotpart}
+                motsattRolle={motsattRolle}
+                settMotpartUkjent={settMotpartUkjent}
+                settMotpartManuelt={settMotpartManuelt}
+                brukForeslåttMotpart={brukForeslåttMotpart}
             />
         </RolleFlytSide>
+    );
+}
+
+function ForelderUtenBarnMeldinger({
+    tilgangsfeil,
+    infoMelding,
+    visValideringsAlerts,
+    harValgteBarn,
+    erBidragsmottaker,
+    kanIkkeOppretteSakUtenBm,
+}: {
+    tilgangsfeil: unknown;
+    infoMelding: string;
+    visValideringsAlerts: boolean;
+    harValgteBarn: boolean;
+    erBidragsmottaker: boolean;
+    kanIkkeOppretteSakUtenBm: boolean;
+}) {
+    return (
+        <>
+            {tilgangsfeil instanceof TilgangsFeilError && (
+                <Alert variant="info" size="small">
+                    {tilgangsfeil.message}. Legg til motpart manuelt.
+                </Alert>
+            )}
+            {infoMelding && (
+                <Alert variant="info" size="small">
+                    {infoMelding}
+                </Alert>
+            )}
+            {visValideringsAlerts && (
+                <>
+                    {harValgteBarn && <UfullstendigRelasjonAlert />}
+                    {erBidragsmottaker && !harValgteBarn && <BMUtenBarnAlert />}
+                    {kanIkkeOppretteSakUtenBm && <KanIkkeOppretteSakAlert />}
+                </>
+            )}
+        </>
+    );
+}
+
+function ForelderUtenBarnBarnSeksjon({
+    form,
+    valgteBarn,
+    feil,
+    leggTilBarnManuell,
+    fjernBarn,
+    søsken,
+    bidragsmottakerErUkjent,
+    erBidragspliktig,
+}: {
+    form: UseFormReturn<ForelderUtenBarnSkjemaData>;
+    valgteBarn: BarnMedAlder[];
+    feil: string;
+    leggTilBarnManuell: (barn: PersonDto, alder: number) => Promise<void>;
+    fjernBarn: (barnIdent: string) => void;
+    søsken: BarnMedAlder[];
+    bidragsmottakerErUkjent: boolean;
+    erBidragspliktig: boolean;
+}) {
+    return (
+        <SkjemaSeksjon
+            tittel="Velg barn saken gjelder for"
+            beskrivelse="Ingen barn funnet i registeret. Legg til barn manuelt."
+            handling={
+                <Tag size="small" variant="info">
+                    {valgteBarn.length} valgt
+                </Tag>
+            }
+        >
+            {feil && (
+                <Alert size="small" variant="error">
+                    {feil}
+                </Alert>
+            )}
+            <BarnManueltRegistrering barnkurver={[]} form={form} leggTilBarnManuell={leggTilBarnManuell} />
+            <ValgteBarnListe
+                form={form}
+                valgteBarn={valgteBarn}
+                alleBarn={valgteBarn}
+                fjernBarn={fjernBarn}
+                tittel="Barn som legges til"
+                heading={{ size: "small", level: "3" }}
+                reellMottakerRegel={{ type: "etter-barn", bidragsmottakerErUkjent }}
+            />
+            <SøskenListe søsken={søsken} form={form} />
+            {erBidragspliktig && valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
+                <Alert variant="error" size="small">
+                    {form.formState.errors.valgteBarn.message}
+                </Alert>
+            )}
+        </SkjemaSeksjon>
+    );
+}
+
+function ForelderUtenBarnMotpartSeksjon({
+    form,
+    valgteBarn,
+    foreslåttMotpart,
+    motsattRolle,
+    settMotpartUkjent,
+    settMotpartManuelt,
+    brukForeslåttMotpart,
+}: {
+    form: UseFormReturn<ForelderUtenBarnSkjemaData>;
+    valgteBarn: BarnMedAlder[];
+    foreslåttMotpart: ForeslåttForelder[];
+    motsattRolle: ForelderPartRolle;
+    settMotpartUkjent: () => void;
+    settMotpartManuelt: (person: PersonDto) => void;
+    brukForeslåttMotpart: (forelder: ForeslåttForelder) => void;
+}) {
+    const enesteForeslåtteMotpart = foreslåttMotpart.length === 1 ? foreslåttMotpart[0] : undefined;
+
+    return (
+        <MotpartSection
+            form={form}
+            onLeggTilMotpartManuell={settMotpartManuelt}
+            visPersonsøk={foreslåttMotpart.length === 0}
+            motpartvalg={
+                valgteBarn.length > 0 ? (
+                    <MotpartVelger
+                        form={form}
+                        tittel={foreslåttMotpart.length > 0 ? `Foreslått ${motsattRolle}` : "Ingen forelder registrert"}
+                        beskrivelse={
+                            enesteForeslåtteMotpart
+                                ? `Vi fant at ${enesteForeslåtteMotpart.visningsnavn} (${enesteForeslåtteMotpart.ident}) er registrert som forelder til ${enesteForeslåtteMotpart.barnNavn} (${enesteForeslåtteMotpart.barnIdent}).`
+                                : foreslåttMotpart.length > 1
+                                  ? "Vi fant flere foreldre som er registrert som forelder til valgte barn."
+                                  : "Valgte barn har ingen registrerte foreldre. Motpart er foreløpig ukjent, men du kan registrere en person."
+                        }
+                        settMotpartUkjent={settMotpartUkjent}
+                        foreslåtteMotparter={foreslåttMotpart.map((forelder) => ({
+                            ident: forelder.ident,
+                            navn: forelder.visningsnavn,
+                            fødselsdato: forelder.fødselsdato ?? undefined,
+                        }))}
+                        brukForeslåttMotpart={(ident) => {
+                            const forelder = foreslåttMotpart.find((forslag) => forslag.ident === ident);
+                            if (forelder) {
+                                brukForeslåttMotpart(forelder);
+                            }
+                        }}
+                    />
+                ) : undefined
+            }
+        />
     );
 }

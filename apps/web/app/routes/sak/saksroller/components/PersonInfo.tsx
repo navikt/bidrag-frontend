@@ -43,90 +43,149 @@ function PersonInfoContent({
     const fødselsdatoPerson = fødselsdato ?? data?.fødselsdato;
     const personAlder = alder ?? (fødselsdatoPerson ? beregnAlder(fødselsdatoPerson) : undefined);
 
-    if (!compact) {
-        return (
-            <HStack gap="space-8" align="start" wrap={false}>
-                {rolle && <RolleTag rolleType={rolle as RolleType} ident={ident} stønad18År={stønad18År} />}
+    const commonProps = {
+        ident,
+        navn,
+        personAlder,
+        rolle,
+        stønad18År,
+        tags,
+        headingActions,
+        visModiaLenke,
+        visKopieringsknapp,
+        erSamhandlerIdent,
+        samhandlerNavn: samhandlerData?.navn,
+        visningsnavn: data?.visningsnavn,
+        children,
+    };
 
-                <VStack minWidth="0" flexGrow="1">
-                    <HStack gap="space-8" align="center">
-                        {!erSamhandlerIdent && (
-                            <Box asChild minWidth="0">
-                                <BodyShort
-                                    size="small"
-                                    weight="semibold"
-                                    truncate
-                                    className="personnavn"
-                                    title={data?.visningsnavn ?? navn}
-                                >
-                                    {data?.visningsnavn ?? navn}
-                                </BodyShort>
-                            </Box>
-                        )}
-                        {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} />}
-                        {tags}
-                        {headingActions}
-                    </HStack>
+    return compact ? <CompactPersonInfo {...commonProps} /> : <StandardPersonInfo {...commonProps} />;
+}
 
-                    <HStack asChild align="center">
-                        <BodyShort textColor="subtle" size="small">
-                            {erSamhandlerIdent ? (
-                                <HStack gap="space-1">
-                                    <BodyShort size="small" className="personnavn">
-                                        {navn ?? samhandlerData?.navn}
-                                    </BodyShort>
-                                    <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
-                                        <PersonIdent ident={ident} />
-                                    </Link>
-                                </HStack>
-                            ) : (
-                                <PersonNavnIdent variant="ident" showCopyButton={visKopieringsknapp} ident={ident} />
-                            )}
+type PersonInfoContentProps = Omit<Props, "fødselsdato" | "alder" | "compact" | "fallback"> & {
+    personAlder?: number;
+    erSamhandlerIdent: boolean;
+    samhandlerNavn?: string;
+    visningsnavn?: string;
+};
 
-                            {personAlder !== undefined && ` (${personAlder} år)`}
-                        </BodyShort>
-                    </HStack>
+function RolleTagForPerson({
+    rolle,
+    ident,
+    stønad18År,
+}: Pick<PersonInfoContentProps, "rolle" | "ident" | "stønad18År">) {
+    return rolle ? <RolleTag rolleType={rolle as RolleType} ident={ident} stønad18År={stønad18År} /> : null;
+}
 
-                    {children}
-                </VStack>
-            </HStack>
-        );
-    }
+function SamhandlerIdent({
+    ident,
+    navn,
+    samhandlerNavn,
+    compact,
+}: Pick<PersonInfoContentProps, "ident" | "navn" | "samhandlerNavn"> & { compact?: boolean }) {
+    return (
+        <HStack gap="space-1">
+            <BodyShort size="small" className={compact ? undefined : "personnavn"}>
+                {navn ?? samhandlerNavn}
+            </BodyShort>
+            <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
+                <PersonIdent ident={ident} />
+            </Link>
+        </HStack>
+    );
+}
 
+function PersonIdentLine({
+    ident,
+    navn,
+    samhandlerNavn,
+    erSamhandlerIdent,
+    personAlder,
+    visKopieringsknapp,
+    compact = false,
+}: Pick<
+    PersonInfoContentProps,
+    "ident" | "navn" | "samhandlerNavn" | "erSamhandlerIdent" | "personAlder" | "visKopieringsknapp"
+> & { compact?: boolean }) {
+    return (
+        <HStack asChild align="center">
+            <BodyShort textColor="subtle" size="small">
+                {erSamhandlerIdent ? (
+                    <SamhandlerIdent ident={ident} navn={navn} samhandlerNavn={samhandlerNavn} compact={compact} />
+                ) : (
+                    <PersonNavnIdent
+                        variant="ident"
+                        ident={ident}
+                        {...(!compact && { showCopyButton: visKopieringsknapp })}
+                    />
+                )}
+                {personAlder !== undefined && ` (${personAlder} år)`}
+            </BodyShort>
+        </HStack>
+    );
+}
+
+function StandardPersonInfo(props: PersonInfoContentProps) {
+    const { ident, navn, visningsnavn, erSamhandlerIdent, visModiaLenke, tags, headingActions, children } = props;
+    return (
+        <HStack gap="space-8" align="start" wrap={false}>
+            <RolleTagForPerson {...props} />
+            <VStack minWidth="0" flexGrow="1">
+                <HStack gap="space-8" align="center">
+                    {!erSamhandlerIdent && (
+                        <Box asChild minWidth="0">
+                            <BodyShort
+                                size="small"
+                                weight="semibold"
+                                truncate
+                                className="personnavn"
+                                title={visningsnavn ?? navn}
+                            >
+                                {visningsnavn ?? navn}
+                            </BodyShort>
+                        </Box>
+                    )}
+                    {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} />}
+                    {tags}
+                    {headingActions}
+                </HStack>
+                <PersonIdentLine {...props} />
+                {children}
+            </VStack>
+        </HStack>
+    );
+}
+
+function CompactPersonInfo(props: PersonInfoContentProps) {
+    const {
+        ident,
+        navn,
+        visningsnavn,
+        erSamhandlerIdent,
+        visModiaLenke,
+        tags,
+        headingActions,
+        children,
+        visKopieringsknapp,
+    } = props;
     return (
         <HStack gap="space-4" align="start" wrap={false}>
-            {rolle && <RolleTag rolleType={rolle as RolleType} ident={ident} stønad18År={stønad18År} />}
-            <VStack flexGrow={"1"}>
-                <HStack justify={"space-between"}>
+            <RolleTagForPerson {...props} />
+            <VStack flexGrow="1">
+                <HStack justify="space-between">
                     <VStack gap="space-1">
                         <HStack gap="space-4" align="center">
                             {!erSamhandlerIdent && (
                                 <Box asChild minWidth="0">
-                                    <BodyShort size="small" weight="semibold" title={data?.visningsnavn ?? navn}>
-                                        {data?.visningsnavn ?? navn}
+                                    <BodyShort size="small" weight="semibold" title={visningsnavn ?? navn}>
+                                        {visningsnavn ?? navn}
                                     </BodyShort>
                                 </Box>
                             )}
                             {tags}
                             {headingActions}
                         </HStack>
-
-                        <HStack asChild align="center">
-                            <BodyShort textColor="subtle" size="small">
-                                {erSamhandlerIdent ? (
-                                    <HStack gap="space-1">
-                                        <BodyShort size="small">{navn ?? samhandlerData?.navn}</BodyShort>
-                                        <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
-                                            <PersonIdent ident={ident} />
-                                        </Link>
-                                    </HStack>
-                                ) : (
-                                    <PersonNavnIdent variant="ident" ident={ident} />
-                                )}
-
-                                {personAlder !== undefined && ` (${personAlder} år)`}
-                            </BodyShort>
-                        </HStack>
+                        <PersonIdentLine {...props} compact />
                     </VStack>
                     <HStack>
                         {visKopieringsknapp && <CopyButton copyText={ident} size="small" style={{ zIndex: 10000 }} />}

@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
-import {Alert, BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack} from "@navikt/ds-react";
+import { BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack } from "@navikt/ds-react";
 import type { KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";

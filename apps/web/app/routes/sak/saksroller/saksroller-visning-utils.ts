@@ -1,7 +1,37 @@
+import type { OppdaterRollerISakRequest } from "@bidrag/api/SakApi";
+import { Rolletype } from "@bidrag/api/SakApi";
 import type { FieldErrors } from "react-hook-form";
-import type { SakRedigeringData } from "./sakvisning-schema.ts";
+import type { BarnRolle, SakRedigeringData } from "./sakvisning-schema.ts";
 
 export type SakstypeVisning = "Barnebidrag" | "Ektefellebidrag" | "Oppfostringsbidrag" | "Farskap";
+
+export function lagOppdaterRollerRequest(data: SakRedigeringData): OppdaterRollerISakRequest {
+    return {
+        saksnummer: data.saksnummer,
+        roller: data.roller.map((rolle) => {
+            const barnRolle = rolle as BarnRolle;
+            const bidragSakRolle = {
+                BA: Rolletype.BA,
+                BM: Rolletype.BM,
+                BP: Rolletype.BP,
+                RM: Rolletype.RM,
+            }[rolle.rolleType];
+
+            return {
+                fodselsnummer: rolle.fodselsnummer || "",
+                type: bidragSakRolle,
+                objektnummer: rolle.objektnummer || "",
+                reellMottaker:
+                    rolle.rolleType === "BA" && barnRolle?.reellMottaker
+                        ? { ident: barnRolle.reellMottaker || "", verge: false }
+                        : null,
+                mottagerErVerge: rolle.mottagerErVerge,
+                rolleType: bidragSakRolle,
+                rollehistorikk: [],
+            };
+        }),
+    };
+}
 
 export function finnFørsteValideringsfeil(feil: FieldErrors<SakRedigeringData>): string | undefined {
     const verdier: unknown[] = [feil];
