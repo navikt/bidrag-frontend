@@ -2,9 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
 import { BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack } from "@navikt/ds-react";
 import type { KeyboardEvent } from "react";
-import { useEffect, useRef, useState } from "react";
-import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
-import { hentNyttFødselsnummerMelding } from "../utils.ts";
+import { usePersonSamhandlerSøk } from "./usePersonSamhandlerSøk.ts";
 
 export default function PersonSamhandlerSøk({
     valgIdent,
@@ -24,57 +22,20 @@ export default function PersonSamhandlerSøk({
     compact?: boolean;
 }) {
     const inkluderSamhandler = søketype === "person-og-samhandler";
-    const samhandlerPersonFn = useHentSamhandlerEllerPersonForIdent(inkluderSamhandler);
-    const [searchErrorMessage, setSearchErrorMessage] = useState<string | undefined>(undefined);
-    const [nyttFødselsnummerInfo, setNyttFødselsnummerInfo] = useState<string | undefined>(undefined);
-    const [searchValue, setSearchValue] = useState(valgIdent || "");
-    const søkeversjon = useRef(0);
-
-    useEffect(
-        () => () => {
-            søkeversjon.current += 1;
-        },
-        [],
-    );
-
-    function onInputChange(value: string) {
-        onQueryChange?.();
-        setSearchValue(value);
-        const søktVerdi = value?.trim();
-        const versjon = ++søkeversjon.current;
-        samhandlerPersonFn
-            .mutateAsync({ ident: søktVerdi })
-            .then(async (data) => {
-                if (søkeversjon.current !== versjon) return;
-
-                if (!data?.isValid) {
-                    const feil = "Finnes ingen person eller samhandler med oppgitt ident";
-                    setSearchErrorMessage(feil);
-                    setNyttFødselsnummerInfo(undefined);
-                    onError(feil);
-                    return;
-                }
-
-                setSearchErrorMessage(undefined);
-                setNyttFødselsnummerInfo(hentNyttFødselsnummerMelding(data));
-                try {
-                    return await onResult(data);
-                } catch (err) {
-                    const feil = err instanceof Error ? err.message : "En feil oppstod";
-                    setSearchErrorMessage(feil);
-                    onError(feil);
-                }
-            })
-            .catch((err) => {
-                if (søkeversjon.current !== versjon) return;
-
-                const erTilgangsfeil = err instanceof Error && !(err as { isAxiosError?: boolean }).isAxiosError;
-                const feil = erTilgangsfeil ? err.message : "Finnes ingen person eller samhandler med oppgitt ident";
-                setSearchErrorMessage(feil);
-                setNyttFødselsnummerInfo(undefined);
-                onError(feil);
-            });
-    }
+    const {
+        samhandlerPersonFn,
+        searchErrorMessage,
+        nyttFødselsnummerInfo,
+        searchValue,
+        onInputChange,
+        onSearchValueChange,
+    } = usePersonSamhandlerSøk({
+        valgIdent,
+        onResult,
+        onError,
+        onQueryChange,
+        inkluderSamhandler,
+    });
 
     function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
         if (event.key === "Enter" && searchValue.trim()) {
@@ -107,9 +68,7 @@ export default function PersonSamhandlerSøk({
                             value={searchValue}
                             onClick={(e) => e.stopPropagation()}
                             onChange={(value) => {
-                                søkeversjon.current += 1;
-                                onQueryChange?.();
-                                setSearchValue(value);
+                                onSearchValueChange(value);
                             }}
                             onSearchClick={onInputChange}
                             onKeyDown={handleSearchKeyDown}

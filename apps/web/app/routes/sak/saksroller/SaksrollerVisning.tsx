@@ -5,14 +5,12 @@ import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Pa
 import { type ComponentProps, type RefObject, Suspense, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { useOppdaterSaksroller } from "~/api/useApi.ts";
 import BarnVisning from "./barn-rolle/BarnVisning.tsx";
 import LeggTilBarn from "./barn-rolle/LeggTilBarn.tsx";
 import SakButtons from "./components/SakButtons.tsx";
 import Endringsoppsummering from "./Endringsoppsummering.tsx";
 import type { Endringsrad } from "./endringsoppsummering-utils.ts";
 import { SakstypeTags } from "./felles/SakstypeTags.tsx";
-import { finnFørsteValideringsfeil } from "./finn-forste-valideringsfeil.ts";
 import ForelderRolleVisning from "./forelder-rolle/ForelderRolleVisning.tsx";
 import { useEndringssporing } from "./hooks/useEndringssporing.ts";
 import { useHentSakMedPersoninfo } from "./hooks/useHentSakMedPersoninfo.ts";
@@ -20,10 +18,10 @@ import { useInitialiserSaksrollerForm } from "./hooks/useInitialiserSaksrollerFo
 import { useSakForslag } from "./hooks/useSakForslag.tsx";
 import { useSaksrollerRollerData } from "./hooks/useSaksrollerRollerData.ts";
 import { useSaksrollerStatus } from "./hooks/useSaksrollerStatus.ts";
+import { useSaksrollerSubmit } from "./hooks/useSaksrollerSubmit.ts";
 import { useSaksrollerUfullstendigRelasjon } from "./hooks/useSaksrollerUfullstendigRelasjon.ts";
 import { useSakvisningSamhandlerHandling } from "./hooks/useSakvisningSamhandlerHandling.ts";
 import { useUfullstendigRelasjonSjekk } from "./hooks/useUfullstendigRelasjonSjekk.ts";
-import { lagOppdaterRollerRequest } from "./lag-oppdater-roller-request.ts";
 import { RedigeringRegisterProvider, useHarÅpneRedigeringer } from "./RedigeringRegisterContext.tsx";
 import { type BarnRolle, type SakRedigeringData, SakRedigeringSchema } from "./sakvisning-schema.ts";
 import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
@@ -228,7 +226,6 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
         statusRef,
         nullstillStatusmeldinger,
     } = useSaksrollerStatus(harÅpneRedigeringer);
-    const oppdaterSaksrollerMutation = useOppdaterSaksroller();
     const { feil, muligeAndreForeldre, muligeBarnPerMotpart } = useSakForslag({ sak });
     const { finnBarnMedUfullstendigRelasjon } = useUfullstendigRelasjonSjekk();
     const { hentOgNullstillSamhandler } = useSakvisningSamhandlerHandling();
@@ -238,7 +235,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
         mode: "onChange",
     });
 
-    const { reset, watch, handleSubmit } = formMethods;
+    const { reset, watch } = formMethods;
     const roller = watch("roller") || [];
 
     const { bp, bm, barn, barnIdenter, barnIdenterKey, aktiveRoller, sakstype, muligeBarn } = useSaksrollerRollerData({
@@ -277,44 +274,11 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
         onNyEndring: nullstillStatusmeldinger,
     });
 
-    const onSubmit = async (data: SakRedigeringData): Promise<string> => {
-        try {
-            setSuksessmelding(null);
-            setFeilmelding(null);
-            setValideringsFeil(null);
-
-            oppdaterSaksrollerMutation.reset();
-
-            await oppdaterSaksrollerMutation.mutateAsync(lagOppdaterRollerRequest(data));
-            setSuksessmelding("Saken ble oppdatert");
-            return saksnummer;
-        } catch (err) {
-            const axiosError = err as { response?: { data?: string } };
-            setFeilmelding(axiosError?.response?.data || "Kunne ikke oppdatere sak. Vennligst prøv igjen.");
-            throw err;
-        }
-    };
-
-    function handleSubmitAsync() {
-        return new Promise<string>((resolve, reject) => {
-            handleSubmit(
-                async (data) => {
-                    try {
-                        resolve(await onSubmit(data));
-                    } catch (error) {
-                        reject(error);
-                    }
-                },
-                (e) => {
-                    setValideringsFeil(
-                        finnFørsteValideringsfeil(e) ??
-                            "Kan ikke lagre saken. Kontroller feltene som er markert med feil.",
-                    );
-                    reject(new Error("Validation failed", { cause: e }));
-                },
-            )();
-        });
-    }
+    const { handleSubmitAsync, isPending } = useSaksrollerSubmit(saksnummer, formMethods, {
+        setFeilmelding,
+        setValideringsFeil,
+        setSuksessmelding,
+    });
 
     const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
 
@@ -322,7 +286,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
         <FormProvider {...formMethods}>
             <Page.Block width="2xl">
                 <Box padding="space-24">
-                    {oppdaterSaksrollerMutation.isPending && (
+                    {isPending && (
                         <Box position="fixed" inset="space-0" className="bg-[white]/70 backdrop-blur-sm z-50">
                             <HStack align="center" justify="center" height="100%">
                                 <VStack align="center" gap="space-12">

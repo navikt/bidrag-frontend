@@ -1,5 +1,4 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlderForPerson } from "@bidrag/utils";
 import { PersonTallShortIcon, PlusIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Button, Heading, InlineMessage, VStack } from "@navikt/ds-react";
 import { useState } from "react";
@@ -9,9 +8,8 @@ import PersonInfo from "../components/PersonInfo.tsx";
 import PersonSøkModal from "../components/PersonSøkModal.tsx";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import ReellMottakerVelger from "../ReellMottakerVelger.tsx";
-import { type BarnRolle, MYNDYG_BARN_ALDER, type SakRedigeringData } from "../sakvisning-schema.ts";
-
-const MAKS_ALDER_BARN = 24;
+import { MYNDYG_BARN_ALDER, type SakRedigeringData } from "../sakvisning-schema.ts";
+import { alderForBarn, finnValideringsfeilForBarn, lagBarnRolle } from "./legg-til-barn-utils.ts";
 
 interface LeggTilBarnProps {
     søsken?: PersonDto[];
@@ -35,44 +33,14 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
         (søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident),
     );
 
-    const alderFor = (person: PersonDto) => beregnAlderForPerson(person) ?? 0;
-
-    const finnValideringsfeil = (person: PersonDto): string | undefined => {
-        if (roller.some((b) => b.fodselsnummer === person.ident)) {
-            return person.visningsnavn
-                ? `${person.visningsnavn} (${person.ident}) er allerede lagt til i saken`
-                : `Dette barnet (${person.ident}) er allerede lagt til`;
-        }
-
-        const personAlder = alderFor(person);
-        if (personAlder > MAKS_ALDER_BARN) {
-            return `${person.visningsnavn ?? "Barnet"} er ${personAlder} år og kan ikke legges til. Maks alder er ${MAKS_ALDER_BARN} år.`;
-        }
-
-        return undefined;
-    };
-
     const leggTil = (person: PersonDto) => {
-        const valideringsfeil = finnValideringsfeil(person);
+        const valideringsfeil = finnValideringsfeilForBarn(person, roller);
         if (valideringsfeil) {
             setFeil(valideringsfeil);
             return;
         }
 
-        const personAlder = alderFor(person);
-        const nyttBarn: BarnRolle = {
-            fodselsnummer: person.ident,
-            foedselsnummer: person.ident,
-            type: "BA",
-            rolleType: "BA",
-            objektnummer: "",
-            mottagerErVerge: false,
-            navn: person.visningsnavn ?? undefined,
-            fødselsdato: person.fødselsdato ?? undefined,
-            diskresjonskode: person.diskresjonskode ?? undefined,
-            alder: personAlder,
-            erMyndig: personAlder >= MYNDYG_BARN_ALDER,
-        };
+        const nyttBarn = lagBarnRolle(person);
 
         form.setValue("roller", [...roller, nyttBarn], { shouldValidate: true });
 
@@ -94,7 +62,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
     };
 
     const handleSøkResultat = (person: PersonDto) => {
-        const valideringsfeil = finnValideringsfeil(person);
+        const valideringsfeil = finnValideringsfeilForBarn(person, roller);
         if (valideringsfeil) {
             setFunnetPerson(null);
             throw new Error(valideringsfeil);
@@ -128,7 +96,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
     if (visReellMottaker && valgtBarn) {
         const rolleIndex = roller.findIndex((rolle) => rolle.fodselsnummer === valgtBarn.ident);
         const bm = roller.find((rolle) => rolle.type === "BM");
-        const reellMottakerPåkrevd = alderFor(valgtBarn) >= MYNDYG_BARN_ALDER || !bm?.fodselsnummer;
+        const reellMottakerPåkrevd = alderForBarn(valgtBarn) >= MYNDYG_BARN_ALDER || !bm?.fodselsnummer;
 
         return (
             <ReellMottakerVelger
@@ -202,7 +170,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
                                 navn={funnetPerson.visningsnavn}
                                 ident={funnetPerson.ident}
                                 rolle="BA"
-                                alder={alderFor(funnetPerson)}
+                                alder={alderForBarn(funnetPerson)}
                                 fødselsdato={funnetPerson.fødselsdato || ""}
                             />
                         </Box>
@@ -235,7 +203,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
                                         navn={søskenBarn?.visningsnavn}
                                         ident={søskenBarn?.ident}
                                         rolle="BA"
-                                        alder={alderFor(søskenBarn)}
+                                        alder={alderForBarn(søskenBarn)}
                                         fødselsdato={søskenBarn?.fødselsdato || ""}
                                     />
                                 </Button>
