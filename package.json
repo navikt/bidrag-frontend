@@ -33,6 +33,7 @@
         "@playwright/test": "^1.62.1",
         "@types/node": "^25.9.3",
         "@types/react": "catalog:",
+        "fallow": "^3.28.0",
         "playwright": "^1.62.1",
         "tsx": "^4.22.4",
         "typescript": "catalog:",
