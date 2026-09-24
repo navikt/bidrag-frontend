@@ -3,7 +3,7 @@ import "./LeggTilDokumentButton.css";
 import { dateToDDMMYYYYString, PersonNavnIdent, type RolleType, RolleTypeAbbreviation } from "@bidrag/common";
 import { PlusIcon as Add, ChevronUpIcon as Collapse, ChevronDownIcon as Expand } from "@navikt/aksel-icons";
 import { Accordion, Button, Checkbox, Loader, Modal, Table, Tabs, Tag } from "@navikt/ds-react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import useIsDebugMode from "../../hooks/useDebugMode";
@@ -121,13 +121,13 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
         >
             <Modal.Body className="legg_til_dokument_modal">
                 {hasOpened && (
-                    <React.Suspense fallback={<Loader size={"medium"} />}>
+                    <Suspense fallback={<Loader size={"medium"} />}>
                         <VelgDokumentTabs
                             selectDocument={selectDocument}
                             unselectDocument={unselectDocument}
                             selectedDocuments={selectedDocuments}
                         />
-                    </React.Suspense>
+                    </Suspense>
                 )}
             </Modal.Body>
             <Modal.Footer>
@@ -175,18 +175,18 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                 <Tabs.Tab value="bp" label={renderLabel("Fra BP saker", null, RolleTypeAbbreviation.BP)} />
             </Tabs.List>
             <Tabs.Panel value="fra_samme_sak" className="">
-                <React.Suspense fallback={<Loader size={"small"} />}>
+                <Suspense fallback={<Loader size={"small"} />}>
                     <DokumenterForSakTabell
                         saksnummer={forsendelse.saksnummer}
                         selectedDocuments={selectedDocuments}
                         selectDocument={selectDocument}
                         unselectDocument={unselectDocument}
                     />
-                </React.Suspense>
+                </Suspense>
             </Tabs.Panel>
             <Tabs.Panel value="bm" className="h-24 w-full overflow-auto">
                 <Accordion style={{ width: "100%", height: "100%" }} size="small" headingSize="xsmall">
-                    <React.Suspense fallback={<Loader size={"small"} />}>
+                    <Suspense fallback={<Loader size={"small"} />}>
                         <DokumenterForPerson
                             rolle={RolleTypeAbbreviation.BM}
                             selectedDocuments={selectedDocuments}
@@ -196,12 +196,12 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                             }
                             ident={roller.find((r) => r.rolleType === RolleTypeAbbreviation.BM)?.ident}
                         />
-                    </React.Suspense>
+                    </Suspense>
                 </Accordion>
             </Tabs.Panel>
             <Tabs.Panel value="bp" className="w-full overflow-auto">
                 <Accordion style={{ width: "100%" }} size="small" headingSize="xsmall">
-                    <React.Suspense fallback={<Loader size={"small"} />}>
+                    <Suspense fallback={<Loader size={"small"} />}>
                         <DokumenterForPerson
                             rolle={RolleTypeAbbreviation.BP}
                             selectedDocuments={selectedDocuments}
@@ -211,7 +211,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                             }
                             ident={roller.find((r) => r.rolleType === RolleTypeAbbreviation.BP)?.ident}
                         />
-                    </React.Suspense>
+                    </Suspense>
                 </Accordion>
             </Tabs.Panel>
         </Tabs>

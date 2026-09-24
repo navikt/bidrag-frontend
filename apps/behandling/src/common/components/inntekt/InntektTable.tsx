@@ -9,8 +9,7 @@ import {
 import { ObjectUtils, toISODateString } from "@bidrag/common";
 import { Buildings2Icon, FloppydiskIcon, PencilIcon, PersonIcon } from "@navikt/aksel-icons";
 import { BodyShort, Button, Heading } from "@navikt/ds-react";
-import type React from "react";
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import type { OppdatereInntektRequestLosnet } from "../../../types/apiSpecFix";
 import { DateToDDMMYYYYString, dateOrNull, isAfterDate } from "../../../utils/date-utils";
@@ -241,7 +240,7 @@ export const InntektTabel = ({
 }: {
     fieldName: InntektTables;
     customRowValidation?: (fieldName: string) => void;
-    children: (props: InntektTabelChildrenProps) => React.ReactNode;
+    children: (props: InntektTabelChildrenProps) => ReactNode;
 }) => {
     const [inntektType, gjelderRolleId, gjelderBarnRolleId] = fieldName.split(".");
     const gjelderBarnRolleIdNumber = Number(gjelderBarnRolleId);

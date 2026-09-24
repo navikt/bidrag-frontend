@@ -1,7 +1,6 @@
 import type { Graderingsinfo, PersonDto } from "@bidrag/api/PersonApi";
 import { QueryClient, QueryClientProvider, type UseSuspenseQueryResult } from "@tanstack/react-query";
-import type React from "react";
-import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { createContext, type FC, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { useHentPersonData, useHentPersonSkjermingInfo } from "./useApiData";
 
 // Define context type
@@ -40,7 +39,7 @@ const createClient = () => {
 };
 
 // Create provider component
-export const BidragCommonsProvider: React.FC<BidragCommonsProviderProps> = ({
+export const BidragCommonsProvider: FC<BidragCommonsProviderProps> = ({
     children,
     client,
     useHentPersonData: useHentPersonDataInput,

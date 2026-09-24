@@ -1,5 +1,5 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { AKSEL_MODAL_SECONDARY_KNAPP_KONTRAST, expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
-import { expect, test } from "@playwright/test";
 
 const INGEN =
     "routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/BarnManglendeForeldre/IngenKjenteForeldre";

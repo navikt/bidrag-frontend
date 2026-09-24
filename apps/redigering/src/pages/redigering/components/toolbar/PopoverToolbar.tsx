@@ -14,7 +14,7 @@ import {
     ShrinkIcon,
 } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
-import type React from "react";
+import type { SyntheticEvent } from "react";
 
 import { useMaskingContainer } from "../../../../components/masking/MaskingContainer";
 import { usePdfViewerContext } from "../../../../components/pdfviewer/PdfViewerContext";
@@ -37,7 +37,7 @@ export default function PopoverToolbar() {
     const isEditable = dokumentMetadata?.state === "EDITABLE" || mode === "remove_pages_only";
     const editedPagesCount = pagesCount - removedPages.length;
 
-    function stopSidebarClose(e: React.SyntheticEvent) {
+    function stopSidebarClose(e: SyntheticEvent) {
         e.stopPropagation();
     }
 

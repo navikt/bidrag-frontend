@@ -1,8 +1,8 @@
 import { Alert, type AlertProps } from "@navikt/ds-react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 type ForskuddAlertProps = {
-    children?: React.ReactNode;
+    children?: ReactNode;
 };
 
 export const BehandlingAlert = ({ children, ...alertProps }: ForskuddAlertProps & AlertProps) => {

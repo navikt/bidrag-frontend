@@ -39,4 +39,5 @@ export type ISamhandlerPersonInfo = PersonDto & {
     navn?: string;
     offentligId?: string;
     isValid: boolean;
+    søktIdent?: string;
 };

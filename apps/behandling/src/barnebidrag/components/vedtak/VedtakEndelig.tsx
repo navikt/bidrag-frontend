@@ -9,7 +9,7 @@ import {
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Alert, BodyShort, Heading, HStack, Link, Skeleton, Table, VStack } from "@navikt/ds-react";
 import { useIsFetching, useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import InnkrevingIkon from "../../../assets/Innkreving";
 import { QueryErrorWrapper } from "../../../common/components/query-error-boundary/QueryErrorWrapper";
 import { AdminButtons } from "../../../common/components/vedtak/AdminButtons";
@@ -43,8 +43,8 @@ const VedtakEndelig = () => {
     const queryClient = useQueryClient();
     const { data: beregning, isError: isBeregningError } = useGetBeregningBidrag(true);
     const lastetFørstegang = useRef(false);
-    const [fatteVedtakRevurderingsbarn, setFatteVedtakRevurderingsbarn] = React.useState<FatteVedtakRevurderingsbarn>();
-    const [erRevurderingsbarnOverstyringUgyldig, setErRevurderingsbarnOverstyringUgyldig] = React.useState(false);
+    const [fatteVedtakRevurderingsbarn, setFatteVedtakRevurderingsbarn] = useState<FatteVedtakRevurderingsbarn>();
+    const [erRevurderingsbarnOverstyringUgyldig, setErRevurderingsbarnOverstyringUgyldig] = useState(false);
     const isFetching = useIsFetching({ queryKey: ["beregning_barnebidrag"] }) > 0;
 
     const kanViseFatteVedtakKnapp =

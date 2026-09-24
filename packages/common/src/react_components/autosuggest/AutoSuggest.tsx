@@ -1,6 +1,13 @@
 import { TextField } from "@navikt/ds-react";
-import type React from "react";
-import { type ChangeEvent, type ReactElement, useEffect, useRef, useState } from "react";
+import {
+    type ChangeEvent,
+    type KeyboardEvent,
+    type MouseEvent,
+    type ReactElement,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 
 import { removeNonPrintableCharachters } from "../../utils/StringUtils";
 
@@ -130,7 +137,7 @@ export default function AutoSuggest(props: AutoSuggestProps) {
         }
     }
 
-    function onOptionClick(e: React.MouseEvent<HTMLLIElement>) {
+    function onOptionClick(e: MouseEvent<HTMLLIElement>) {
         avoidBlur();
         const eventTarget = e.target as HTMLElement;
         const value = eventTarget.innerText;
@@ -138,7 +145,7 @@ export default function AutoSuggest(props: AutoSuggestProps) {
         hideOptions();
     }
 
-    function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
         if (e.code === "Escape") {
             setActiveOption(0);
             setShowOptions(false);
@@ -210,7 +217,7 @@ interface SelectableOptionsProps {
     activeOption: number;
     avoidBlur: () => void;
     onHover: (optionIndex: number) => void;
-    onSelect: (e: React.MouseEvent<HTMLLIElement>) => void;
+    onSelect: (e: MouseEvent<HTMLLIElement>) => void;
 }
 
 function SelectableOptions({ show, options, activeOption, onSelect, avoidBlur, onHover }: SelectableOptionsProps) {

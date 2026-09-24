@@ -2,7 +2,7 @@ import { Rolletype } from "@bidrag/api/SakApi";
 import { LoggerService, PersonNavnIdent, RolleTag } from "@bidrag/common";
 import { Alert, BodyShort, Button, Checkbox, CheckboxGroup, Heading, HGrid, Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import { useState } from "react";
 import { calculateAge } from "../../../utils/date-utils";
 import { SAK_API } from "../../constants/api";
 import { MåBekrefteOpplysningerStemmerError } from "../../constants/MåBekrefteOpplysningerStemmerError";
@@ -21,7 +21,7 @@ interface SakstilknytningTableProps {
 const columns: ColumnData[] = [{ label: "" }, { label: "Sak" }, { label: "Motpart" }, { label: "Enhet" }];
 
 export function SakstilknytningModal({ gjelderBarnIdent }: { gjelderBarnIdent: string }) {
-    const [isOpen, setIsOpen] = React.useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
@@ -38,7 +38,7 @@ export function SakstilknytningModal({ gjelderBarnIdent }: { gjelderBarnIdent: s
     );
 }
 export default function SakstilknytningTable({ gjelderBarnIdent, onClose }: SakstilknytningTableProps) {
-    const [oppdaterSak, setOppdaterSak] = React.useState<Sak>();
+    const [oppdaterSak, setOppdaterSak] = useState<Sak>();
     const [bekreftetSakstilknytning, setBekreftetSakstilknytning] = useState(false);
     const saker = useGetSakerForBp(gjelderBarnIdent);
     const person = useHentPersonData(gjelderBarnIdent)?.data;

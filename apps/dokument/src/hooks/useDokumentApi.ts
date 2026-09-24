@@ -1,4 +1,5 @@
 import { HentAvvikEnum, IdentType, type JournalpostDto, type JournalpostResponse } from "@bidrag/api/BidragDokumentApi";
+import { LoggerService } from "@bidrag/common";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { BIDRAG_DOKUMENT_API } from "../api/api";
@@ -21,7 +22,6 @@ import {
     SlettJournalpostViewModel,
     TrekkJournalpostViewModel,
 } from "../common/components/avvik/model/AvvikViewModel";
-import { showErrorPage } from "../common/components/errorhandling/ErrorUtils";
 import { isEmpty } from "../common/utils/ObjectUtils";
 import { RedirectTo } from "../common/utils/RedirectUtils";
 import { useAppContext } from "../store/AppContext";
@@ -29,6 +29,7 @@ import type { LagreJournalpostRequest, RegistrerJournalpostRequest } from "../ty
 import { HTTPStatus } from "../types/enum/HttpStatus";
 import { type Journalpost, JournalpostMapper } from "../types/journalpost";
 import { hentPerson } from "./usePersonApi";
+
 export const DokumentQueryKeys = {
     dokument: "dokument",
     hentJournalpost: (journalpostId: string, _saksummer?: string) => ["hentJournalpost", journalpostId],
@@ -181,6 +182,10 @@ export function useRegistrerJournalpostMutation() {
         onSuccess: (_, { journalpost }) => {
             redirectToBehandleSak(journalpost);
         },
+        onError: (error, params) => {
+            LoggerService.error("Feil ved oppdatering av journalpost", error, { journalpostId: params.journalpostId });
+            return Promise.reject(error);
+        },
         mutationFn: async ({
             journalpost,
             journalpostId,
@@ -190,26 +195,22 @@ export function useRegistrerJournalpostMutation() {
             påloggetEnhet: string;
             journalpost: RegistrerJournalpostRequest;
         }) => {
-            try {
-                const response = await BIDRAG_DOKUMENT_API.journal.patchJournalpost(
-                    journalpostId,
-                    {
-                        ...journalpost,
-                        tilknyttSaker: journalpost.tilknyttSaker ?? [],
-                        endreDokumenter: journalpost.endreDokumenter ?? [],
-                        endreReturDetaljer: journalpost.endreReturDetaljer ?? [],
-                        gjelderType: (journalpost.gjelderType as IdentType) ?? IdentType.FNR,
+            const response = await BIDRAG_DOKUMENT_API.journal.patchJournalpost(
+                journalpostId,
+                {
+                    ...journalpost,
+                    tilknyttSaker: journalpost.tilknyttSaker ?? [],
+                    endreDokumenter: journalpost.endreDokumenter ?? [],
+                    endreReturDetaljer: journalpost.endreReturDetaljer ?? [],
+                    gjelderType: (journalpost.gjelderType as IdentType) ?? IdentType.FNR,
+                },
+                {
+                    headers: {
+                        "X-Enhet": påloggetEnhet,
                     },
-                    {
-                        headers: {
-                            "X-Enhet": påloggetEnhet,
-                        },
-                    },
-                );
-                return response.data;
-            } catch (error) {
-                showErrorPage(error);
-            }
+                },
+            );
+            return response.data;
         },
     });
 }

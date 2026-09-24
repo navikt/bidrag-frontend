@@ -1,5 +1,5 @@
 import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import React, { type PropsWithChildren, useRef, useState } from "react";
+import { type PropsWithChildren, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import text from "../../common/constants/texts";
 import { BehandlingProvider } from "../../common/context/BehandlingContext";
@@ -79,7 +79,9 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
         const result: Record<string, boolean> = {};
         for (const saksnummer of saksnummerListe) {
             const sak = perSak.find((s) => s.saksnummer === saksnummer);
-            result[saksnummer] = sak ? !sak.erLikForAlle : !behandling.samværV2?.erSammeForAlle;
+            result[saksnummer] = sak
+                ? !sak.kanVurdereSamlet || !sak.erLikForAlle
+                : !behandling.samværV2?.erSammeForAlle;
         }
         return result;
     });
@@ -215,7 +217,7 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
         };
     }
 
-    const value = React.useMemo(
+    const value = useMemo(
         () => ({
             formSteps,
             getPageErrorTexts,

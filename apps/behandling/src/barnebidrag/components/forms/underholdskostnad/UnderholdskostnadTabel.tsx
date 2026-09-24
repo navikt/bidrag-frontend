@@ -10,7 +10,7 @@ import {
 import { firstDayOfMonth, toISODateString } from "@bidrag/common";
 import { BodyShort, Heading } from "@navikt/ds-react";
 import type { UseMutationResult } from "@tanstack/react-query";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { OverlayLoader } from "../../../../common/components/OverlayLoader";
@@ -71,7 +71,7 @@ export const UnderholdskostnadTabel = ({
     createPayload: (
         index: number,
     ) => StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto | ForpleiningDto;
-    children: (props: UnderholdskostnadTableChildrenProps) => React.ReactNode;
+    children: (props: UnderholdskostnadTableChildrenProps) => ReactNode;
 }) => {
     const { underholdskostnader } = useGetBehandlingV2();
     const { lesemodus, setSaveErrorState, setErrorMessage, setErrorModalOpen, setPageErrorsOrUnsavedState } =

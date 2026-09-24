@@ -9,8 +9,7 @@ import {
 import { deductDays, PersonNavn, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
 import { FloppydiskIcon, PencilIcon, TrashIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, Button, Heading, Switch, Table } from "@navikt/ds-react";
-import type React from "react";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FC } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
@@ -231,6 +230,7 @@ const Main = () => {
         selectedRoller,
         selectedSaksnummer,
     } = useBehandlingProvider();
+    const { samværV2 } = useGetBehandlingV2();
     const mergeSamværMutation = useOnMergeSamvær();
     const ref = useRef<HTMLDialogElement>(null);
     const visibleSamværBarn = useMemo(() => {
@@ -276,6 +276,7 @@ const Main = () => {
         enabled: vurderSeparat && visibleSamværBarn.length > 1 && activeStep === BarnebidragStepper.SAMVÆR,
     });
 
+    const samværSak = samværV2.erSammeForAlleSaker.find((i)=>i.saksnummer === selectedSaksnummer) ?? samværV2.erSammeForAlleSaker?.[0]
     return (
         <div>
             <ConfirmationModal
@@ -303,7 +304,7 @@ const Main = () => {
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
-                    readOnly={lesemodus}
+                    readOnly={lesemodus || !samværSak.kanVurdereSamlet}
                     onChange={(e) => {
                         if (e.target.checked) {
                             setVurderSeparat(e.target.checked);
@@ -716,7 +717,7 @@ interface SamværsperiodeTableProps {
     onRemovePeriode: (index: number) => void;
 }
 
-const SamværsperiodeTable: React.FC<SamværsperiodeTableProps> = ({
+const SamværsperiodeTable: FC<SamværsperiodeTableProps> = ({
     editableRowIndex,
     controlledFields,
     fieldName,

@@ -1,4 +1,4 @@
-import React, { createContext, type ReactNode, useContext, useEffect } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 
 import { useHentJournalpost } from "../hooks/useDokumentApi";
 import type { Sak } from "../types/sak";
@@ -16,9 +16,9 @@ interface SearchContextType {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider = ({ children }: { children: ReactNode }) => {
-    const [enkelSak, setEnkelSak] = React.useState<Sak | undefined>(undefined);
-    const [searchValue, setSearchValue] = React.useState<string>("");
-    const [searchState, setSearchState] = React.useState<SearchState>("idle");
+    const [enkelSak, setEnkelSak] = useState<Sak | undefined>(undefined);
+    const [searchValue, setSearchValue] = useState<string>("");
+    const [searchState, setSearchState] = useState<SearchState>("idle");
     const journalpost = useHentJournalpost();
 
     useEffect(() => {

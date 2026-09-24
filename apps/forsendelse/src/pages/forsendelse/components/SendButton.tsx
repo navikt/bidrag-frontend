@@ -1,5 +1,5 @@
 import { Button } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { usePrefetchPostnummere } from "../../../hooks/kodeverkQueries";
 import { useDokumenterForm } from "../context/DokumenterFormContext";
@@ -33,12 +33,12 @@ export default function SendButton() {
                     Send lokalt
                 </Button>
             </div>
-            <React.Suspense fallback={""}>
+            <Suspense fallback={""}>
                 {isDistribuerModalOpen && <BestillDistribusjonModal onCancel={() => setIsDistribuerModalOpen(false)} />}
                 {isDistribuerManueltModalOpen && (
                     <ManuellUtsendingModal onCancel={() => setIsDistribuerManueltModalOpen(false)} />
                 )}
-            </React.Suspense>
+            </Suspense>
         </>
     );
 }

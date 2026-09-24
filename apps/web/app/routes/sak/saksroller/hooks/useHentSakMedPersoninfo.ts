@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import type { BidragssakDto, RolleDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
-import { beregnAlder, beregnAlderFraFnr } from "@bidrag/utils";
+import { beregnAlderForPerson } from "@bidrag/utils";
 import { useMemo } from "react";
 import { useHentFlerePersoninformasjonSuspense, useHentSakSuspense } from "~/api/useApi.ts";
 import type { BarnRolle, Rolle } from "../sakvisning-schema.ts";
@@ -56,9 +56,10 @@ export function berikRoller(
         .sort((a, b) => a.fodselsnummer?.localeCompare(b.fodselsnummer || "") || a.type.localeCompare(b.type))
         .map((rolle): Rolle => {
             const personInfo = rolle.fodselsnummer ? personInfoMap.get(rolle.fodselsnummer) : undefined;
-            const alder = personInfo?.fødselsdato
-                ? beregnAlder(personInfo.fødselsdato)
-                : beregnAlderFraFnr(rolle.fodselsnummer ?? "");
+            const alder = beregnAlderForPerson({
+                fødselsdato: personInfo?.fødselsdato,
+                ident: rolle.fodselsnummer ?? "",
+            });
 
             if (rolle.type === "BA" && rolle.fodselsnummer) {
                 const erMyndig = (alder ?? 0) >= MYNDYG_BARN_ALDER;

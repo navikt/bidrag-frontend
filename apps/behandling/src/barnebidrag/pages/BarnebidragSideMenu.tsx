@@ -7,8 +7,7 @@ import {
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, StringUtils } from "@bidrag/common";
 import { Alert, Heading } from "@navikt/ds-react";
-import type React from "react";
-import { Fragment, useEffect, useMemo, useRef } from "react";
+import { type ComponentType, Fragment, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { MenuButton, SideMenu } from "../../common/components/SideMenu/SideMenu";
 import behandlingQueryKeys, {
@@ -937,7 +936,7 @@ const menuButtonMap = {
     [BarnebidragStepper.VEDTAK]: VedtakMenuButton,
     [BarnebidragStepper.VEDTAK_ENDELIG]: VedtakEndeligMenuButton,
     [BarnebidragStepper.KLAGEVEDTAK]: KlageVedtakMenuButton,
-} satisfies Record<string, React.ComponentType<never>>;
+} satisfies Record<string, ComponentType<never>>;
 
 export const BarnebidragSideMenu = () => {
     const { sideMenu, setSelectedSaksnummer } = useBehandlingProvider();

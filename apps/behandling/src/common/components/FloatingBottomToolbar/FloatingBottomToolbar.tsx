@@ -1,5 +1,5 @@
 import { Button, HStack } from "@navikt/ds-react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { AdminPanel } from "../../../barnebidrag/admin/AdminPanel";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
@@ -11,7 +11,7 @@ export interface FloatingBottomToolbarTab {
 }
 
 interface FloatingBottomToolbarProps {
-    BrukerveiledningKnapper: () => React.ReactNode;
+    BrukerveiledningKnapper: () => ReactNode;
 }
 
 /**

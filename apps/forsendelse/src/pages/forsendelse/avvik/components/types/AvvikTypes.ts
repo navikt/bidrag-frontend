@@ -1,4 +1,5 @@
 import type { Avvikshendelse } from "@bidrag/api/BidragForsendelseApi";
+import type { FormEvent } from "react";
 import type { UseFormRegister } from "react-hook-form";
 import { type Avvik, AvvikType } from "../../../../../types/AvvikTypes";
 
@@ -38,7 +39,7 @@ export function mapToAvvikRequest(avvik: Avvik, saksnummer: string): Avvikshende
     }
 }
 
-export const handleSubmitPreventPropagation = (handleSubmit: (e) => void) => (e: React.FormEvent) => {
+export const handleSubmitPreventPropagation = (handleSubmit: (e) => void) => (e: FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     handleSubmit(e);

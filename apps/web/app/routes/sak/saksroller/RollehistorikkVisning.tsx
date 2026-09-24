@@ -38,12 +38,12 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
 
             {isOpen && (
                 <Modal open onClose={() => setIsOpen(false)} width="medium" aria-label="Rollehistorikk">
-                    <Modal.Header>
+                    <Modal.Header closeButton>
                         <VStack gap="space-2">
                             {saksnummer && <Detail>Sak {saksnummer}</Detail>}
                             <HStack gap="space-4" align="center" wrap={false}>
-                                <ClockDashedIcon aria-hidden fontSize="1.5rem" />
-                                <Heading level="2" size="medium">
+                                <ClockDashedIcon aria-hidden />
+                                <Heading level="2" size="small">
                                     Rollehistorikk
                                 </Heading>
                             </HStack>
@@ -68,19 +68,19 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
                                 </Box>
                             )}
 
-                            <Table size="medium" className="w-full">
+                            <Table size="small" className="w-full">
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell textSize="medium" scope="col">
+                                        <Table.HeaderCell textSize="small" scope="col">
                                             Ny reell mottaker
                                         </Table.HeaderCell>
-                                        <Table.HeaderCell textSize="medium" scope="col">
+                                        <Table.HeaderCell textSize="small" scope="col">
                                             Type endring
                                         </Table.HeaderCell>
-                                        <Table.HeaderCell textSize="medium" scope="col">
+                                        <Table.HeaderCell textSize="small" scope="col">
                                             Endret av
                                         </Table.HeaderCell>
-                                        <Table.HeaderCell textSize="medium" scope="col">
+                                        <Table.HeaderCell textSize="small" scope="col">
                                             Dato
                                         </Table.HeaderCell>
                                     </Table.Row>
@@ -88,16 +88,16 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
                                 <Table.Body>
                                     {sortertHistorikk.map((historikk, index) => (
                                         <Table.Row key={index}>
-                                            <Table.DataCell textSize="medium">
+                                            <Table.DataCell textSize="small">
                                                 <span className="personident">{historikk.reellMottaker || "-"}</span>
                                             </Table.DataCell>
-                                            <Table.DataCell textSize="medium">
+                                            <Table.DataCell textSize="small">
                                                 {historikk.typeEndring || "-"}
                                             </Table.DataCell>
-                                            <Table.DataCell textSize="medium">
+                                            <Table.DataCell textSize="small">
                                                 {historikk.opprettetAv || "-"}
                                             </Table.DataCell>
-                                            <Table.DataCell textSize="medium">
+                                            <Table.DataCell textSize="small">
                                                 {historikk.opprettetDato
                                                     ? dateToDDMMYYYYString(historikk.opprettetDato)
                                                     : "-"}

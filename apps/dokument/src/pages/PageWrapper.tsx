@@ -1,7 +1,5 @@
 import { Loader } from "@navikt/ds-react";
 import { type PropsWithChildren, type ReactElement, Suspense, useEffect } from "react";
-
-import { ErrorBoundaryWrapper } from "../common/components/errorhandling/ErrorBoundary";
 import FeilmeldingVeilederPanel from "../common/components/feilmelding/FeilmeldingVeilederPanel";
 import PageLoadingSpinner from "../common/components/loadingspinner/PageLoadingSpinner";
 import { AppProvider, type PageType, useAppContext } from "../store/AppContext";
@@ -31,9 +29,7 @@ export default function PageWrapper(props: PropsWithChildren<PageWrapperProps>):
                     <JournalpostProvider>
                         <SearchProvider>
                             <FeilmeldingVeilederPanel>
-                                <ErrorBoundaryWrapper>
-                                    <PageStateWrapper {...otherProps}>{children}</PageStateWrapper>
-                                </ErrorBoundaryWrapper>
+                                <PageStateWrapper {...otherProps}>{children}</PageStateWrapper>
                             </FeilmeldingVeilederPanel>
                         </SearchProvider>
                     </JournalpostProvider>

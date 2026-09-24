@@ -1125,9 +1125,10 @@ export interface EksisterendeOpphorsvedtakDto {
   vedtaksdato: string;
 }
 
-export interface ErSamvaerVirkningLikForAlleForSak {
+export interface ErLikForAlleBasertPaSak {
   saksnummer: string;
   erLikForAlle: boolean;
+  kanVurdereSamlet: boolean;
 }
 
 export interface EtterfolgendeVedtakDto {
@@ -1432,14 +1433,14 @@ export interface InntektDtoV2 {
   /** @uniqueItems true */
   inntektstyper: Inntektstype[];
   historisk?: boolean | null;
+  /** Avrundet dagsats for barnetillegg */
+  dagsats?: number | null;
+  beløpstype?: InntektBelopstype | null;
+  skatteprosent?: number | null;
   /** Avrundet månedsbeløp for barnetillegg */
   beløpMånedDagsats?: number | null;
   /** Avrundet månedsbeløp for barnetillegg */
   månedsbeløp?: number | null;
-  skatteprosent?: number | null;
-  /** Avrundet dagsats for barnetillegg */
-  dagsats?: number | null;
-  beløpstype?: InntektBelopstype | null;
 }
 
 export interface InntektPerBarnDto {
@@ -1701,9 +1702,9 @@ export interface PrivatAvtaleValideringsfeilDto {
   ingenLøpendePeriode: boolean;
   /** @uniqueItems true */
   overlappendePerioder: OverlappendePeriode[];
-  gjelderBarnNavn?: string | null;
   gjelderBarn?: string | null;
   harPeriodiseringsfeil: boolean;
+  gjelderBarnNavn?: string | null;
 }
 
 export interface RolleDto {
@@ -1750,7 +1751,7 @@ export interface SamvaerBarnDto {
 
 export interface SamvaerDtoV2 {
   erSammeForAlle: boolean;
-  erSammeForAlleSaker: ErSamvaerVirkningLikForAlleForSak[];
+  erSammeForAlleSaker: ErLikForAlleBasertPaSak[];
   barn: SamvaerBarnDto[];
 }
 
@@ -1766,9 +1767,9 @@ export interface SamvaerValideringsfeilDto {
   overlappendePerioder: OverlappendePeriode[];
   /** Liste med perioder hvor det mangler inntekter. Vil alltid være tom liste for ytelser */
   hullIPerioder: Datoperiode[];
-  gjelderBarnNavn?: string | null;
   gjelderBarn?: string | null;
   harPeriodiseringsfeil: boolean;
+  gjelderBarnNavn?: string | null;
 }
 
 export interface SamvaerskalkulatorDetaljer {
@@ -2285,9 +2286,9 @@ export interface VirkningstidspunktBarnDtoV2 {
 
 export interface VirkningstidspunktDtoV3 {
   erLikForAlle: boolean;
-  erLikForAlleBasertPåSak: ErSamvaerVirkningLikForAlleForSak[];
+  erLikForAlleBasertPåSak: ErLikForAlleBasertPaSak[];
   erVirkningstidspunktLiktForAlle: boolean;
-  erVirkningstidspunktLiktForAlleSaker: ErSamvaerVirkningLikForAlleForSak[];
+  erVirkningstidspunktLiktForAlleSaker: ErLikForAlleBasertPaSak[];
   erAvslagForAlle: boolean;
   beregnTil?: BeregnTil | null;
   beregnTilDato?: string | null;
@@ -2519,7 +2520,7 @@ export interface OppdaterSamvaerResponsDto {
    */
   oppdatertSamvær?: SamvaerBarnDto | null;
   erSammeForAlle: boolean;
-  erSammeForAlleSaker: ErSamvaerVirkningLikForAlleForSak[];
+  erSammeForAlleSaker: ErLikForAlleBasertPaSak[];
   samværBarn: SamvaerBarnDto[];
 }
 
@@ -3447,10 +3448,10 @@ export interface ResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
+  inntektBarnMånedlig?: number | null;
   totalEndeligInntekt: number;
   inntektBPMånedlig?: number | null;
   inntektBMMånedlig?: number | null;
-  inntektBarnMånedlig?: number | null;
 }
 
 export interface ResultatSaerbidragsberegningDto {
@@ -3481,10 +3482,10 @@ export interface Skatt {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattMånedsbeløp: number;
   skattAlminneligInntektMånedsbeløp: number;
-  trinnskattMånedsbeløp: number;
+  skattMånedsbeløp: number;
   trygdeavgiftMånedsbeløp: number;
+  trinnskattMånedsbeløp: number;
 }
 
 export interface UnderholdEgneBarnIHusstand {
@@ -3775,8 +3776,8 @@ export interface ResultatBarnebidragsberegningPeriodeDto {
   vedtakstype: Vedtakstype;
   klageOmgjøringDetaljer?: KlageOmgjoringDetaljer | null;
   resultatFraVedtak?: ResultatFraVedtakGrunnlag | null;
-  resultatkodeVisningsnavn?: string | null;
   delvedtakstypeVisningsnavn: string;
+  resultatkodeVisningsnavn?: string | null;
 }
 
 export interface ResultatBidragberegningDto {
@@ -3999,10 +4000,10 @@ export interface HusstandsmedlemDto {
 export interface MaBekrefteNyeOpplysninger {
   type: OpplysningerType;
   rolle: RolleDto;
-  /** @format int64 */
-  underholdskostnadId?: number | null;
   /** Barn som det må bekreftes nye opplysninger for. Vil bare være satt hvis type = BOFORHOLD */
   gjelderBarn?: HusstandsmedlemDto | null;
+  /** @format int64 */
+  underholdskostnadId?: number | null;
 }
 
 export interface ArbeidOgInntektLenkeRequest {
@@ -4351,10 +4352,10 @@ export interface DokumentmalResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
+  inntektBarnMånedlig?: number | null;
   totalEndeligInntekt: number;
   inntektBPMånedlig?: number | null;
   inntektBMMånedlig?: number | null;
-  inntektBarnMånedlig?: number | null;
 }
 
 export type DokumentmalResultatBidragsberegningBarnDto = UtilRequiredKeys<
@@ -4378,10 +4379,10 @@ export interface DokumentmalSkattBeregning {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattMånedsbeløp: number;
   skattAlminneligInntektMånedsbeløp: number;
-  trinnskattMånedsbeløp: number;
+  skattMånedsbeløp: number;
   trygdeavgiftMånedsbeløp: number;
+  trinnskattMånedsbeløp: number;
 }
 
 export interface DokumentmalUnderholdEgneBarnIHusstand {
@@ -4458,10 +4459,10 @@ export interface NotatBehandlingDetaljerDto {
    * @deprecated
    */
   avslag?: Resultatkode | null;
-  avslagVisningsnavn?: string | null;
-  avslagVisningsnavnUtenPrefiks?: string | null;
   erAvvisning: boolean;
   vedtakstypeVisningsnavn?: string | null;
+  avslagVisningsnavnUtenPrefiks?: string | null;
+  avslagVisningsnavn?: string | null;
   kategoriVisningsnavn?: string | null;
 }
 
@@ -4501,6 +4502,11 @@ export interface NotatBoforholdTilBMMedSoknadsbarn {
   perioder: OpplysningerFraFolkeregisteretMedDetaljerBostatuskodeUnit[];
 }
 
+export interface NotatErLikForAlleBasertPaSak {
+  saksnummer: string;
+  erLikForAlle: boolean;
+}
+
 export interface NotatFaktiskTilsynsutgiftDto {
   periode: DatoperiodeDto;
   utgift: number;
@@ -4524,8 +4530,8 @@ export interface NotatGebyrDetaljerDto {
   beløpGebyrsats: number;
   /** @deprecated */
   rolle: DokumentmalPersonDto;
-  erManueltOverstyrt: boolean;
   gebyrResultatVisningsnavn: string;
+  erManueltOverstyrt: boolean;
 }
 
 export interface NotatGebyrInntektDto {
@@ -4579,15 +4585,15 @@ export interface NotatInntektDto {
   gjelderBarn?: DokumentmalPersonDto | null;
   historisk: boolean;
   inntektsposter: NotatInntektspostDto[];
+  /** Avrundet dagsats for barnetillegg */
+  dagsats?: number | null;
+  beløpstype?: InntektBelopstype | null;
+  visningsnavn: string;
+  skattefaktor?: number | null;
   /** Avrundet månedsbeløp for barnetillegg */
   beløpMånedDagsats?: number | null;
   /** Avrundet månedsbeløp for barnetillegg */
   månedsbeløp?: number | null;
-  skattefaktor?: number | null;
-  visningsnavn: string;
-  /** Avrundet dagsats for barnetillegg */
-  dagsats?: number | null;
-  beløpstype?: InntektBelopstype | null;
   beløpstypeVisningsnavn: string;
 }
 
@@ -4675,8 +4681,8 @@ export interface NotatResultatPeriodeDto {
   vedtakstype?: Vedtakstype | null;
   /** @format int32 */
   antallBarnIHusstanden: number;
-  resultatKodeVisningsnavn: string;
   sivilstandVisningsnavn?: string | null;
+  resultatKodeVisningsnavn: string;
 }
 
 export type NotatResultatSaerbidragsberegningDto = UtilRequiredKeys<
@@ -4700,8 +4706,8 @@ export type NotatResultatSaerbidragsberegningDto = UtilRequiredKeys<
   enesteVoksenIHusstandenErEgetBarn?: boolean | null;
   erDirekteAvslag: boolean;
   bpHarEvne: boolean;
-  beløpSomInnkreves: number;
   resultatVisningsnavn: string;
+  beløpSomInnkreves: number;
 };
 
 export interface NotatSamvaerBarnDto {
@@ -4712,6 +4718,7 @@ export interface NotatSamvaerBarnDto {
 
 export interface NotatSamvaerDto {
   erSammeForAlle: boolean;
+  sammeSamværForAlleSaker: NotatErLikForAlleBasertPaSak[];
   barn: NotatSamvaerBarnDto[];
 }
 
@@ -4929,9 +4936,9 @@ export interface NotatVirkningstidspunktBarnDto {
    * @deprecated
    */
   notat: NotatBegrunnelseDto;
-  avslagVisningsnavn?: string | null;
-  avslagVisningsnavnUtenPrefiks?: string | null;
   erAvvisning: boolean;
+  avslagVisningsnavnUtenPrefiks?: string | null;
+  avslagVisningsnavn?: string | null;
   behandlingstypeVisningsnavn?: string | null;
   årsakVisningsnavn?: string | null;
 }
@@ -4939,7 +4946,9 @@ export interface NotatVirkningstidspunktBarnDto {
 export interface NotatVirkningstidspunktDto {
   /** Hvis det er likt for alle bruk avslag/årsak fra ett av barna */
   erLikForAlle: boolean;
+  erLikForAlleBasertPåSak: NotatErLikForAlleBasertPaSak[];
   erVirkningstidspunktLikForAlle: boolean;
+  erVirkningstidspunktLiktForAlleSaker: NotatErLikForAlleBasertPaSak[];
   erAvslagForAlle: boolean;
   eldsteVirkningstidspunkt: string;
   barn: NotatVirkningstidspunktBarnDto[];
