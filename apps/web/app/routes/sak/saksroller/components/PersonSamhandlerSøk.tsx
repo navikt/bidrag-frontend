@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
-import { BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack } from "@navikt/ds-react";
+import { BodyShort, Box, HStack, InlineMessage, Search, VStack } from "@navikt/ds-react";
 import type { KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
@@ -114,7 +114,7 @@ export default function PersonSamhandlerSøk({
                             onSearchClick={onInputChange}
                             onKeyDown={handleSearchKeyDown}
                         >
-                            <Search.Button type="button" />
+                            <Search.Button type="button" loading={samhandlerPersonFn.isPending} />
                         </Search>
                     </Box>
                     <BodyShort size="small" textColor="subtle">
@@ -141,12 +141,6 @@ export default function PersonSamhandlerSøk({
                         )}
                     </BodyShort>
                 </VStack>
-                {samhandlerPersonFn.isPending && (
-                    <HStack gap="space-8">
-                        <Loader size="small" title="Søker…" />
-                        <BodyShort>Søker…</BodyShort>
-                    </HStack>
-                )}
                 {nyttFødselsnummerInfo && !searchErrorMessage && (
                     <Box asChild marginBlock="space-4 space-0">
                         <InlineMessage status="info" size="small">

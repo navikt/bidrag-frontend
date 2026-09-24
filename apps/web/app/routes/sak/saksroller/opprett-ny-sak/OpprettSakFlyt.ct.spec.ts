@@ -12,7 +12,7 @@ test("velger ny sakstype og part direkte i de faste valgpanelene", async ({ moun
     await expect(component.getByRole("radio", { name: "Nasjonal" })).toBeChecked();
     await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
 
-    const search = component.getByRole("searchbox", { name: "Søk etter part" });
+    const search = component.getByRole("searchbox", { name: "Søk etter person" });
     await search.fill(testpersoner.bidragspliktig.ident);
     await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
 
@@ -25,37 +25,37 @@ test("nullstiller rolle og underflyt når rolle, part eller sakstype endres", as
     const component = await mount(STORY);
 
     const søkOgVelgPart = async () => {
-        const search = component.getByRole("searchbox", { name: "Søk etter part" });
+        const search = component.getByRole("searchbox", { name: "Søk etter person" });
         await search.fill(testpersoner.bidragspliktig.ident);
         await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
     };
 
     await søkOgVelgPart();
     await component
-        .getByRole("radiogroup", { name: /Rolle i saken/ })
+        .getByRole("radiogroup", { name: /Hvilken rolle har/ })
         .getByRole("radio", { name: "Bidragspliktig" })
         .check();
     await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toBeVisible();
     await expect(component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
 
     await component
-        .getByRole("radiogroup", { name: /Rolle i saken/ })
+        .getByRole("radiogroup", { name: /Hvilken rolle har/ })
         .getByRole("radio", { name: "Bidragsmottaker" })
         .check();
     await expect(component.getByRole("searchbox", { name: "Søk etter bidragspliktig" })).toBeVisible();
-    const partSøk = component.getByRole("searchbox", { name: "Søk etter part" });
+    const partSøk = component.getByRole("searchbox", { name: "Søk etter person" });
     await partSøk.fill(testpersoner.bidragsmottaker.ident);
     await partSøk.press("Enter");
     await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toHaveCount(0);
 
-    const nyRolleVelger = component.getByRole("radiogroup", { name: /Rolle i saken/ });
+    const nyRolleVelger = component.getByRole("radiogroup", { name: /Hvilken rolle har/ });
     await expect(nyRolleVelger.getByRole("radio", { checked: true })).toHaveCount(0);
     await nyRolleVelger.getByRole("radio", { name: "Bidragspliktig" }).check();
     await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toBeVisible();
 
     await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
-    await expect(component.getByRole("searchbox", { name: "Søk etter part" })).toBeVisible();
-    await expect(component.getByRole("radiogroup", { name: /Rolle i saken/ })).toHaveCount(0);
+    await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toBeVisible();
+    await expect(component.getByRole("radiogroup", { name: /Hvilken rolle har/ })).toHaveCount(0);
     await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toHaveCount(0);
     await expect(component.getByRole("radio", { name: "Nasjonal" })).toBeChecked();
 });
@@ -64,12 +64,12 @@ test("beholder sakstype ved kategoribytte, men nullstiller person og flyt", asyn
     await mockWizardApi(page);
     const component = await mount(STORY);
 
-    const søk = component.getByRole("searchbox", { name: "Søk etter part" });
+    const søk = component.getByRole("searchbox", { name: "Søk etter person" });
     await søk.fill(testpersoner.bidragspliktig.ident);
     await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
-    await expect(component.getByRole("radiogroup", { name: /Rolle i saken/ })).toBeVisible();
+    await expect(component.getByRole("radiogroup", { name: /Hvilken rolle har/ })).toBeVisible();
     await component
-        .getByRole("radiogroup", { name: /Rolle i saken/ })
+        .getByRole("radiogroup", { name: /Hvilken rolle har/ })
         .getByRole("radio", { name: "Bidragspliktig" })
         .check();
     await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toBeVisible();
@@ -77,7 +77,7 @@ test("beholder sakstype ved kategoribytte, men nullstiller person og flyt", asyn
     await component.getByRole("radio", { name: "Utland" }).check();
     await expect(component.getByRole("radio", { name: "Barnebidrag" })).toBeChecked();
     await expect(component.getByRole("radio", { name: "Utland" })).toBeChecked();
-    await expect(component.getByRole("radiogroup", { name: /Rolle i saken/ })).toHaveCount(0);
+    await expect(component.getByRole("radiogroup", { name: /Hvilken rolle har/ })).toHaveCount(0);
     await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toHaveCount(0);
 });
 
@@ -113,13 +113,13 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
 
     await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
 
-    const search = component.getByRole("searchbox", { name: "Søk etter part" });
+    const search = component.getByRole("searchbox", { name: "Søk etter person" });
     await search.fill(testpersoner.bidragspliktig.ident);
     await component.getByRole("button", { name: "Søk", exact: true }).dispatchEvent("click");
     await expect(search).toBeVisible();
 
     await component
-        .getByRole("radiogroup", { name: /Rolle i saken/ })
+        .getByRole("radiogroup", { name: /Hvilken rolle har/ })
         .getByRole("radio", { name: "Bidragspliktig" })
         .check();
 

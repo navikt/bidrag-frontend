@@ -12,8 +12,8 @@ export default function SkjemaSeksjon({ tittel, beskrivelse, handling, children 
         <Box asChild background="sunken" borderRadius="12" padding="space-12">
             <section>
                 <VStack gap="space-16">
-                    <HStack align="start" justify="space-between" gap="space-16">
-                        <VStack gap="space-4">
+                    <HStack align="start" justify="space-between" gap="space-16" wrap={false}>
+                        <VStack gap="space-4" minWidth="0">
                             <Heading level="2" size="medium">
                                 {tittel}
                             </Heading>

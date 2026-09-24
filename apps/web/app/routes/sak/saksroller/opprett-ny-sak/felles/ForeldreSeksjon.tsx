@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Alert, Button, HGrid, HStack, Radio, RadioGroup, VStack } from "@navikt/ds-react";
+import { Alert, Button, HGrid, HStack, Radio, RadioGroup, Stack, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import SøkPerson from "../../components/SøkPerson";
 import type { ForelderMedRolle, ForelderPartRolle } from "../opprett-sak-schema";
@@ -79,13 +79,17 @@ export default function ForeldreSeksjon({
                                         onChange={(rolle) => onVelgRolle(index, rolle as ForelderPartRolle)}
                                         error={rollefeil?.[index]}
                                     >
-                                        <HStack gap="space-12">
+                                        <Stack
+                                            gap="space-0 space-24"
+                                            direction={{ xs: "column", sm: "row" }}
+                                            wrap={false}
+                                        >
                                             {ForelderPartRolleSchema.options.map((rolle) => (
                                                 <Radio key={rolle} value={rolle}>
                                                     {hentForelderRolleLabel(rolle)}
                                                 </Radio>
                                             ))}
-                                        </HStack>
+                                        </Stack>
                                     </RadioGroup>
                                     {handling?.(forelder, index)}
                                 </VStack>

@@ -1,6 +1,6 @@
 import { IdentUtils, ModiaLink, PersonIdent, PersonNavnIdent, RolleTag, type RolleType } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
-import { BodyShort, Box, CopyButton, HStack, Link, Loader, VStack } from "@navikt/ds-react";
+import { BodyShort, Box, CopyButton, HStack, Link, Skeleton, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
@@ -20,6 +20,7 @@ type Props = {
     visKopieringsknapp?: boolean;
     compact?: boolean;
     children?: ReactNode;
+    fallback?: ReactNode;
 };
 
 function PersonInfoContent({
@@ -138,10 +139,19 @@ function PersonInfoContent({
     );
 }
 
-export default function PersonInfo(props: Props) {
+export default function PersonInfo({ fallback, ...props }: Props) {
     return (
-        <Suspense fallback={<Loader size="xsmall" />}>
+        <Suspense fallback={fallback ?? <PersonInfoSkeleton compact={props.compact} />}>
             <PersonInfoContent {...props} />
         </Suspense>
+    );
+}
+
+function PersonInfoSkeleton({ compact = false }: Pick<Props, "compact">) {
+    return (
+        <VStack gap="space-4" width={compact ? "12rem" : "16rem"} aria-label="Laster personinformasjon">
+            <Skeleton variant="text" width="70%" />
+            <Skeleton variant="text" width="100%" />
+        </VStack>
     );
 }

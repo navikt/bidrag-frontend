@@ -5,7 +5,7 @@ import { SaksrolleroversiktProvider } from "../saksrolleroversiktContext";
 export default function NySaksrollerPage() {
     return (
         <SaksrolleroversiktProvider>
-            <Box maxWidth="64rem" marginInline="auto">
+            <Box maxWidth="80rem" marginInline="auto">
                 <OpprettSakFlyt />
             </Box>
         </SaksrolleroversiktProvider>

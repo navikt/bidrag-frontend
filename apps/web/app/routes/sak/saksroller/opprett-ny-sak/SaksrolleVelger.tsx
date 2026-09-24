@@ -15,10 +15,8 @@ type Props = {
 };
 
 export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
-    const [feil, settFeil] = useState<string>("");
     const {
         velgRolle,
-        valgVersjon,
         partISakenAlder,
         partISaken: partISakenSkjemaData,
         sakstype,
@@ -26,9 +24,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
     } = useSaksrolleroversikt();
 
     const valgtRolle = partISakenSkjemaData?.rolle ?? null;
-    const erBarnRolle = valgtRolle === "barn_over_18" || valgtRolle === "barn_under_18";
-    const trengerRelasjon = !!valgtRolle && !erBarnRolle && !enforcedRolle;
-    const trengerForeldreinfo = !!valgtRolle && erBarnRolle;
     const alternativer = filtrerSaksroller(sakstype, partISakenAlder, skjemaPartRoller);
 
     const velgSaksrolle = (valgteRolle: string) => {
@@ -43,7 +38,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
             return;
         }
 
-        settFeil("");
         velgRolle(result.data);
     };
 
@@ -58,26 +52,39 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
     }, [enforcedRolle, partISakenSkjemaData?.rolle, velgRolle]);
 
     return (
-        <VStack gap="space-4">
-            <RadioGroup
-                legend="Rolle i saken"
-                description={`Hvilken rolle har ${partISaken.visningsnavn}?`}
-                value={valgtRolle ?? undefined}
-                onChange={velgSaksrolle}
-                size="small"
-                readOnly={!!enforcedRolle || isLoadingOpprettSak}
-            >
-                <Stack gap="space-4" direction={{ xs: "column", sm: "row" }} wrap>
-                    {alternativer.map((alternativ) => (
-                        <Radio key={alternativ.value} value={alternativ.value}>
-                            {alternativ.label}
-                        </Radio>
-                    ))}
-                </Stack>
-            </RadioGroup>
+        <RadioGroup
+            legend={`Hvilken rolle har ${partISaken.visningsnavn}?`}
+            value={valgtRolle ?? undefined}
+            onChange={velgSaksrolle}
+            size="small"
+            readOnly={!!enforcedRolle || isLoadingOpprettSak}
+        >
+            <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }} wrap={false}>
+                {alternativer.map((alternativ) => (
+                    <Radio key={alternativ.value} value={alternativ.value}>
+                        {alternativ.label}
+                    </Radio>
+                ))}
+            </Stack>
+        </RadioGroup>
+    );
+}
 
+export function SaksrolleFlytResolver({ partISaken, enforcedRolle }: Props) {
+    const [feil, settFeil] = useState("");
+    const { valgVersjon, partISaken: partISakenSkjemaData, sakstype } = useSaksrolleroversikt();
+    const valgtRolle = partISakenSkjemaData?.rolle ?? null;
+    const erBarnRolle = valgtRolle === "barn_over_18" || valgtRolle === "barn_under_18";
+    const trengerRelasjon = !!valgtRolle && !erBarnRolle && !enforcedRolle;
+    const trengerForeldreinfo = !!valgtRolle && erBarnRolle;
+
+    if (!trengerRelasjon && !trengerForeldreinfo) {
+        return null;
+    }
+
+    return (
+        <VStack gap="space-8">
             {feil && <Alert variant="error">{feil}</Alert>}
-
             {trengerRelasjon && (
                 <Suspense fallback={<LasterSkeleton tekst="Henter relasjoner..." />}>
                     <RelasjonTilBarnBranch
@@ -89,7 +96,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
                     />
                 </Suspense>
             )}
-
             {trengerForeldreinfo && (
                 <Suspense fallback={<LasterSkeleton tekst="Henter foreldreinformasjon..." />}>
                     <ForeldreinfoBranch

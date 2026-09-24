@@ -16,6 +16,7 @@ type FellesProps = {
     barn: BarnKortPerson | null;
     visIkon?: boolean;
     visKopieringsknapp?: boolean;
+    visRolleTag?: boolean;
     tags?: ReactNode;
     headingActions?: ReactNode;
     actions?: ReactNode;
@@ -44,25 +45,29 @@ function alderForBarn(barn: BarnKortPerson | null): number | undefined {
 }
 
 export function BarnKortInnhold({ barn, ...resten }: FellesProps) {
+    const { visRolleTag = true, ...kortProps } = resten;
+
     return (
         <PersonRolleKortInnhold
             person={tilPerson(barn)}
-            rolle="BA"
+            rolle={visRolleTag ? "BA" : undefined}
             alder={alderForBarn(barn)}
             stønad18År={barn?.erMyndig}
-            {...resten}
+            {...kortProps}
         />
     );
 }
 
 export default function BarnKort({ barn, ...resten }: FellesProps) {
+    const { visRolleTag = true, ...kortProps } = resten;
+
     return (
         <PersonRolleKort
             person={tilPerson(barn)}
-            rolle="BA"
+            rolle={visRolleTag ? "BA" : undefined}
             alder={alderForBarn(barn)}
             stønad18År={barn?.erMyndig}
-            {...resten}
+            {...kortProps}
         />
     );
 }

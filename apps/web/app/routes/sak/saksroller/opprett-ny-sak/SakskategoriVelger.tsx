@@ -17,7 +17,7 @@ export default function SakskategoriVelger({ value, onChange, error }: Props) {
             onChange={(nyVerdi) => onChange(nyVerdi as Sakskategori)}
             error={error}
         >
-            <Stack gap="space-4" direction={{ xs: "column", sm: "row" }} wrap={false}>
+            <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }} wrap={false}>
                 <Radio value="Nasjonal">Nasjonal</Radio>
                 <Radio value="Utland">Utland</Radio>
             </Stack>

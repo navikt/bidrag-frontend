@@ -118,7 +118,20 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, op
                                     return (
                                         <KortRamme key={barn.ident}>
                                             <VStack gap="space-16">
-                                                <Checkbox value={barn.ident}>
+                                                <HStack
+                                                    align="start"
+                                                    justify="space-between"
+                                                    gap="space-8"
+                                                    wrap={false}
+                                                    className="cursor-pointer"
+                                                    onClick={(event) => {
+                                                        const checkbox =
+                                                            event.currentTarget.querySelector<HTMLInputElement>(
+                                                                'input[type="checkbox"]',
+                                                            );
+                                                        checkbox?.click();
+                                                    }}
+                                                >
                                                     <BarnKortInnhold
                                                         barn={{
                                                             ident: barn.ident,
@@ -129,8 +142,17 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, op
                                                         }}
                                                         visIkon={false}
                                                         visKopieringsknapp={false}
+                                                        visRolleTag={false}
                                                     />
-                                                </Checkbox>
+                                                    <Checkbox
+                                                        value={barn.ident}
+                                                        hideLabel
+                                                        aria-label={`Velg ${barn.navn ?? barn.ident}`}
+                                                        onClick={(event) => event.stopPropagation()}
+                                                    >
+                                                        {" "}
+                                                    </Checkbox>
+                                                </HStack>
                                                 {erValgt &&
                                                     reellMottakerRegel.type !== "skjult" &&
                                                     barnIndex !== -1 && (

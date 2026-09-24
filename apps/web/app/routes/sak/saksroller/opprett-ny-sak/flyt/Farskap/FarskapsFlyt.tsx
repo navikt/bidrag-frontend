@@ -122,6 +122,7 @@ function FarskapsFlytContent() {
                 barnkurver={barnkurver}
                 reellMottakerRegel={{ type: "skjult" }}
                 oppdaterMotpart={false}
+                beskrivelse="Velg barnet saken gjelder. Den andre forelderen registreres når farskapet er avklart."
             />
 
             <OppsummeringSection

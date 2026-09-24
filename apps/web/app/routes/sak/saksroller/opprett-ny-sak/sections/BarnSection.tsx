@@ -20,6 +20,7 @@ interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     reellMottakerRegel: ReellMottakerRegel;
     onResetMotpart?: () => void;
     oppdaterMotpart?: boolean;
+    beskrivelse?: string;
 }
 
 export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
@@ -28,6 +29,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     reellMottakerRegel,
     onResetMotpart,
     oppdaterMotpart,
+    beskrivelse = "Velg alle barn som skal være med i saken",
 }: BarnSectionProps<T>) {
     const forelderBarnForm = form as unknown as UseFormReturn<{
         valgteBarn: BarnMedAlder[];
@@ -84,7 +86,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     return (
         <SkjemaSeksjon
             tittel="Velg barn saken gjelder for"
-            beskrivelse="Velg alle barn som skal være med i saken"
+            beskrivelse={beskrivelse}
             handling={
                 <Tag size="small" variant="info">
                     {valgteBarn.length} valgt

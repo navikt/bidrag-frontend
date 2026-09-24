@@ -31,7 +31,7 @@ export function sakstypeTilBeskrivelse(sakstype: Sakstype) {
         case "OPPFOSTRINGSBIDRAG":
             return "Søk opp en av foreldrene.";
         case "FARSKAP":
-            return "Søk opp en av foreldrene.";
+            return "Søk opp bidragsmottakeren.";
     }
 }
 type SaksrolleroversiktContext = {
