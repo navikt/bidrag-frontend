@@ -24,13 +24,13 @@ export type ForelderKortProps = {
  */
 export default function ParterSeksjon({
     kort,
-    beskrivelse = "Kontroller bidragspliktig og bidragsmottaker.",
+    beskrivelse,
 }: {
     kort: ForelderKortProps[];
     beskrivelse?: string;
 }) {
     return (
-        <SkjemaSeksjon tittel="Parter" beskrivelse={beskrivelse}>
+        <SkjemaSeksjon tittel="Kontroller bidragspliktig og bidragsmottaker" beskrivelse={beskrivelse}>
             <HGrid columns={{ xs: 1, md: 2 }} gap="space-16" align="start">
                 {kort.map((props) => (
                     <ForelderKort key={props.rolle} {...props} />

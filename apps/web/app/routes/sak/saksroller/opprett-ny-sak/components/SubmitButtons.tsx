@@ -93,9 +93,11 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
                     {blockedError ?? feilmeldingTekst(error)}
                 </Alert>
             )}
-            {saksnummer && afterSubmitRedirect.current ? (
-                <Alert variant="success" size="small">
-                    Sak opprettet med saksnummer {saksnummer}! Omdirigerer...
+            {saksnummer ? (
+                <Alert variant="success" size="small" role="status">
+                    {afterSubmitRedirect.current
+                        ? `Sak opprettet med saksnummer ${saksnummer}. Omdirigerer...`
+                        : `Sak opprettet med saksnummer ${saksnummer}.`}
                 </Alert>
             ) : (
                 <Opprettknapper isLoading={isLoading} onVelg={velgHandling} />

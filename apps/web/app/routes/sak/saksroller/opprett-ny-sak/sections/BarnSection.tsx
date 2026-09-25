@@ -22,7 +22,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     reellMottakerRegel,
     onKurvByttet,
     låsteIdenter,
-    beskrivelse = "Velg alle barn som skal være med i saken",
+    beskrivelse,
 }: BarnSectionProps<T>) {
     const forelderBarnForm = form as unknown as UseFormReturn<{
         valgteBarn: BarnMedAlder[];

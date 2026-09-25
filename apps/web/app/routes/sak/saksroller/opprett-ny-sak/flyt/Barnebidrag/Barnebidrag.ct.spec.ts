@@ -28,7 +28,7 @@ test.describe("Start fra forelder med barn", () => {
         const førsteBarnIdent = await førsteBarn.getAttribute("value");
         const andreBarnIdent = await andreBarn.getAttribute("value");
 
-        await expect(component.getByRole("heading", { name: "Parter" })).toBeVisible();
+        await expect(component.getByRole("heading", { name: "Kontroller bidragspliktig og bidragsmottaker" })).toBeVisible();
         const bidragspliktigKort = component.getByRole("group", { name: "Bidragspliktig" });
         await expect(bidragspliktigKort.getByRole("button")).toHaveCount(0);
 
@@ -46,6 +46,8 @@ test.describe("Start fra forelder med barn", () => {
         expect(roller.map((r) => r.type)).toEqual(["BP", "BM", "BA"]);
         expect(roller[2]?.fodselsnummer).toBe(andreBarnIdent);
         expect(JSON.stringify(requests.create)).not.toContain(førsteBarnIdent);
+        await expect(component.getByText("Sak opprettet med saksnummer 1234567.")).toBeVisible();
+        await expect(component.getByRole("button", { name: /^Opprett/ })).toHaveCount(0);
     });
 
     test("viser relasjons- og tilgangsadvarsel når bidragsmottaker er ukjent", async ({ mount, page }) => {

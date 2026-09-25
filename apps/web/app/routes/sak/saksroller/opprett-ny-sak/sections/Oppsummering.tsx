@@ -1,10 +1,11 @@
-import { BodyShort, FormSummary, VStack } from "@navikt/ds-react";
-import DiskresjonAlert from "../../components/DiskresjonAlert";
+import { BodyShort, Heading, HGrid, HStack, Label, Tag, VStack } from "@navikt/ds-react";
 import PersonInfo from "../../components/PersonInfo";
-import type { Diskresjonskode } from "../opprett-sak-schema";
+import type { Diskresjonskode } from "../../sakvisning-schema";
+import { hentDiskresjonskodeForklaring } from "../../utils";
+import SkjemaSeksjon, { SkjemaSeksjonKort } from "../felles/SkjemaSeksjon";
 import { sakstypeTilTekst, useSaksrolleroversikt } from "../saksrolleroversiktContext";
 
-type Person = { ident?: string; navn?: string; diskresjonskode?: Diskresjonskode | string };
+type Person = { ident?: string; navn?: string; diskresjonskode?: string };
 type Barn = Person & {
     ident: string;
     reellMottakerType?: string | null;
@@ -24,42 +25,55 @@ export type OppsummeringParter = {
  */
 export default function Oppsummering({ bidragspliktig, bidragsmottaker, barn }: OppsummeringParter) {
     const { sakstype, sakskategori } = useSaksrolleroversikt();
+    const sakTekst = sakstype ? sakstypeTilTekst(sakstype) : "Ikke valgt";
 
     return (
-        <FormSummary>
-            <FormSummary.Header>
-                <FormSummary.Heading level="2">Oppsummering</FormSummary.Heading>
-            </FormSummary.Header>
-            <FormSummary.Answers>
-                <Rad label="Sakstype">{sakstype ? sakstypeTilTekst(sakstype) : "Ikke valgt"}</Rad>
-                <Rad label="Sakskategori">{sakskategori}</Rad>
-                <Rad label="Bidragspliktig">
+        <SkjemaSeksjon tittel="Oppsummering">
+            <HGrid columns={{ xs: 1, sm: 2, lg: 3 }} gap="space-16">
+                <Felt label="Sak">
+                    <BodyShort size="small">{sakTekst}</BodyShort>
+                    {sakskategori && (
+                        <BodyShort size="small" textColor="subtle">
+                            {sakskategori}
+                        </BodyShort>
+                    )}
+                </Felt>
+                <Felt label="Bidragspliktig">
                     <PersonVerdi person={bidragspliktig} />
-                </Rad>
-                <Rad label="Bidragsmottaker">
+                </Felt>
+                <Felt label="Bidragsmottaker">
                     <PersonVerdi person={bidragsmottaker} />
-                </Rad>
-                {barn.map((b) => (
-                    <Rad key={b.ident} label="Barn">
-                        <VStack gap="space-4">
-                            <PersonVerdi person={b} />
-                            <BodyShort size="small" textColor="subtle">
-                                Reell mottaker: {reellMottakerTekst(b)}
-                            </BodyShort>
-                        </VStack>
-                    </Rad>
-                ))}
-            </FormSummary.Answers>
-        </FormSummary>
+                </Felt>
+            </HGrid>
+            {barn.length > 0 && (
+                <VStack gap="space-8">
+                    <Heading level="3" size="xsmall">
+                        Barn
+                    </Heading>
+                    <HGrid columns="repeat(auto-fill, minmax(min(16rem, 100%), 1fr))" gap="space-16">
+                        {barn.map((b) => (
+                            <Felt key={b.ident}>
+                                <PersonVerdi person={b} />
+                                <BodyShort size="small" textColor="subtle">
+                                    Reell mottaker: {reellMottakerTekst(b)}
+                                </BodyShort>
+                            </Felt>
+                        ))}
+                    </HGrid>
+                </VStack>
+            )}
+        </SkjemaSeksjon>
     );
 }
 
-function Rad({ label, children }: { label: string; children: React.ReactNode }) {
+function Felt({ label, children }: { label?: string; children: React.ReactNode }) {
     return (
-        <FormSummary.Answer>
-            <FormSummary.Label>{label}</FormSummary.Label>
-            <FormSummary.Value>{children}</FormSummary.Value>
-        </FormSummary.Answer>
+        <SkjemaSeksjonKort>
+            <VStack gap="space-4" minWidth="0">
+                {label && <Label size="small">{label}</Label>}
+                {children}
+            </VStack>
+        </SkjemaSeksjonKort>
     );
 }
 
@@ -68,10 +82,14 @@ function PersonVerdi({ person }: { person?: Person | null }) {
         return <>Ukjent</>;
     }
     return (
-        <VStack gap="space-4">
+        <HStack gap="space-8" wrap align="center">
             <PersonInfo ident={person.ident} navn={person.navn} compact visKopieringsknapp={false} />
-            {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode as Diskresjonskode} />}
-        </VStack>
+            {person.diskresjonskode && (
+                <Tag size="xsmall" variant="warning">
+                    {hentDiskresjonskodeForklaring(person.diskresjonskode as Diskresjonskode)}
+                </Tag>
+            )}
+        </HStack>
     );
 }
 
