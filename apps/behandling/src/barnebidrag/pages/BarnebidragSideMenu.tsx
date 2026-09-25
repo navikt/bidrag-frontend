@@ -219,7 +219,9 @@ const UnderholdskostnadMenuButton = ({
             !!valideringsfeil?.faktiskTilsynsutgift ||
             !!valideringsfeil?.stønadTilBarnetilsyn ||
             !!valideringsfeil?.tilleggsstønad ||
-            !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length
+            !!valideringsfeil?.forpleining ||
+            !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length ||
+            !!valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length
         );
     });
 
@@ -262,7 +264,10 @@ const UnderholdskostnadMenuButton = ({
                                     !!underhold.valideringsfeil?.faktiskTilsynsutgift ||
                                     !!underhold.valideringsfeil?.stønadTilBarnetilsyn ||
                                     !!underhold.valideringsfeil?.tilleggsstønad ||
-                                    !!underhold.valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length)
+                                    !!underhold.valideringsfeil?.forpleining ||
+                                    !!underhold.valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift
+                                        .length ||
+                                    !!underhold.valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length)
                             }
                             active={
                                 activeButton ===
@@ -361,6 +366,36 @@ const UnderholdskostnadMenuButton = ({
                                                             ?.overlappendePerioder.length ||
                                                         !!underhold?.valideringsfeil?.tilleggsstønad?.fremtidigePerioder
                                                             .length)
+                                                }
+                                                size="small"
+                                                active={
+                                                    activeButton ===
+                                                    `${BarnebidragStepper.UNDERHOLDSKOSTNAD}.${toUnderholdskostnadTabQueryParameterForUnderhold(underhold)}`
+                                                }
+                                            />
+                                            <MenuButton
+                                                title={text.title.forpleining}
+                                                onStepChange={() =>
+                                                    onStepChange(
+                                                        STEPS[BarnebidragStepper.UNDERHOLDSKOSTNAD],
+                                                        {
+                                                            [behandlingQueryKeys.tab]:
+                                                                toUnderholdskostnadTabQueryParameterForUnderhold(
+                                                                    underhold,
+                                                                ),
+                                                        },
+                                                        elementIds.seksjon_underholdskostnad_forpleining,
+                                                    )
+                                                }
+                                                interactive={interactive}
+                                                valideringsfeil={
+                                                    !lesemodus &&
+                                                    (!!underhold?.valideringsfeil?.forpleining?.overlappendePerioder
+                                                        .length ||
+                                                        !!underhold?.valideringsfeil?.forpleining?.fremtidigePerioder
+                                                            .length ||
+                                                        !!underhold.valideringsfeil
+                                                            ?.forpleiningOverstigerUnderholdskostnad.length)
                                                 }
                                                 size="small"
                                                 active={

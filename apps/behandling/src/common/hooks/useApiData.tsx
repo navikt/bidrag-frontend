@@ -15,6 +15,7 @@ import {
     type OppdatereBegrunnelseRequest,
     type OppdatereBoforholdRequestV2,
     type OppdatereBoforholdResponse,
+    type OppdatereForpleiningRequest,
     type OppdatereInntektBegrunnelseRequest,
     type OppdatereInntektBegrunnelseRespons,
     type OppdatereInntektRequest,
@@ -111,6 +112,7 @@ export const MutationKeys = {
     updateStonadTilBarnetilsyn: (behandlingId: string) => ["mutation", "stonadTilBarnetilsyn", behandlingId],
     updateFaktiskeTilsynsutgifter: (behandlingId: string) => ["mutation", "faktiskeTilsynsutgifter", behandlingId],
     updateTilleggstønad: (behandlingId: string) => ["mutation", "tilleggstønad", behandlingId],
+    updateForpleining: (behandlingId: string) => ["mutation", "forpleining", behandlingId],
     slettUnderholdsElement: (behandlingId: string) => ["mutation", "slettUnderholdsElement", behandlingId],
     oppdaterePrivatAvtale: (behandlingId: string) => ["mutation", "oppdaterePrivatAvtale", behandlingId],
     slettePrivatAvtale: (behandlingId: string) => ["mutation", "slettePrivatAvtale", behandlingId],
@@ -1306,6 +1308,26 @@ export const useUpdateTilleggstønad = (underholdsid: number) => {
         onError: (error) => {
             console.log("onError", error);
             LoggerService.error("Feil ved oppdatering av tillegstønad", error);
+        },
+    });
+};
+
+export const useUpdateForpleining = (underholdsid: number) => {
+    const { behandlingId } = useBehandlingProvider();
+
+    return useMutation({
+        mutationKey: MutationKeys.updateForpleining(behandlingId),
+        mutationFn: async (payload: OppdatereForpleiningRequest): Promise<OppdatereUnderholdResponse> => {
+            const { data } = await BEHANDLING_API_V1.api.oppdatereForpleining(
+                Number(behandlingId),
+                underholdsid,
+                payload,
+            );
+            return data;
+        },
+        networkMode: "always",
+        onError: (error) => {
+            LoggerService.error("Feil ved oppdatering av forpleining", error);
         },
     });
 };

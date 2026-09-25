@@ -9,11 +9,8 @@ import { formatterBeløpForBeregning } from "../../../../utils/number-utils";
 import type { UnderholdskostnadFormValues } from "../../../types/underholdskostnadFormValues";
 import BeregningsdetaljerUnderholdskostnad from "./BeregningsdetaljerUnderholdskostnad";
 
-const calculateStønadTilBarnetilsynWidth = (erBisysVedtak: boolean, hasBeregningsdetaljer: boolean) => {
-    let width = 250;
-    if (erBisysVedtak) {
-        width -= 95;
-    }
+const calculateStønadTilBarnetilsynWidth = (hasBeregningsdetaljer: boolean) => {
+    let width = 250 - 95;
     if (hasBeregningsdetaljer) {
         width -= 50;
     }
@@ -25,12 +22,12 @@ export const BeregnetUnderholdskostnad = ({
 }: {
     underholdFieldName: `underholdskostnaderMedIBehandling.${number}`;
 }) => {
-    const { underholdskostnader, erBisysVedtak } = useGetBehandlingV2();
+    const { underholdskostnader } = useGetBehandlingV2();
     const { getValues } = useFormContext<UnderholdskostnadFormValues>();
     const underhold = getValues(underholdFieldName);
     const beregnetUnderholdskostnad = underholdskostnader.find((u) => u.id === underhold.id).beregnetUnderholdskostnad;
     const hasBeregningsdetaljer = beregnetUnderholdskostnad.some((u) => u.beregningsdetaljer);
-    const stønadTilBarnetilsynWidth = calculateStønadTilBarnetilsynWidth(erBisysVedtak, hasBeregningsdetaljer);
+    const stønadTilBarnetilsynWidth = calculateStønadTilBarnetilsynWidth(hasBeregningsdetaljer);
 
     return (
         <Box background="neutral-soft" className="grid gap-y-2 px-4 py-2 w-full">
@@ -69,11 +66,9 @@ export const BeregnetUnderholdskostnad = ({
                             <Table.HeaderCell textSize="small" scope="col" align="right" className="w-[95px]">
                                 {text.label.barnetrygd}
                             </Table.HeaderCell>
-                            {erBisysVedtak && (
-                                <Table.HeaderCell textSize="small" scope="col" align="right" className="w-[95px]">
-                                    {text.label.forpleining}
-                                </Table.HeaderCell>
-                            )}
+                            <Table.HeaderCell textSize="small" scope="col" align="right" className="w-[95px]">
+                                {text.label.forpleining}
+                            </Table.HeaderCell>
                             <Table.HeaderCell textSize="small" scope="col" align="right" className="w-[70px]">
                                 {text.label.underholdskostnad}
                             </Table.HeaderCell>
@@ -135,13 +130,11 @@ export const BeregnetUnderholdskostnad = ({
                                         {formatterBeløpForBeregning(underholdskostnad.barnetrygd)}
                                     </BodyShort>
                                 </Table.DataCell>
-                                {erBisysVedtak && (
-                                    <Table.DataCell align="right">
-                                        <BodyShort size="small">
-                                            {formatterBeløpForBeregning(underholdskostnad.forpleining)}
-                                        </BodyShort>
-                                    </Table.DataCell>
-                                )}
+                                <Table.DataCell align="right">
+                                    <BodyShort size="small">
+                                        {formatterBeløpForBeregning(underholdskostnad.forpleining)}
+                                    </BodyShort>
+                                </Table.DataCell>
                                 <Table.DataCell align="right">
                                     <BodyShort size="small">
                                         {formatterBeløpForBeregning(underholdskostnad.total)}

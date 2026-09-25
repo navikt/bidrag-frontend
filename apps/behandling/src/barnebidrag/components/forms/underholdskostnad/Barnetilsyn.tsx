@@ -30,6 +30,7 @@ import { displayOver12Alert } from "../helpers/UnderholdskostnadFormHelpers";
 import { BarnetilsynTabel } from "./BarnetilsynTabel";
 import { BeregnetUnderholdskostnad } from "./BeregnetUnderholdskostnad";
 import { FaktiskeTilsynsutgifterTabel } from "./FaktiskeTilsynsutgifterTabel";
+import { ForpleiningTabel } from "./ForpleiningTabel";
 import { TilleggstønadTabel } from "./TilleggstønadTabel";
 
 export const EditOrSaveButton = ({
@@ -91,6 +92,7 @@ export const UnderholdskostnadPeriode = ({
         | `underholdskostnaderMedIBehandling.${number}.stønadTilBarnetilsyn.${number}`
         | `underholdskostnaderMedIBehandling.${number}.faktiskTilsynsutgift.${number}`
         | `underholdskostnaderMedIBehandling.${number}.tilleggsstønad.${number}`
+        | `underholdskostnaderMedIBehandling.${number}.forpleining.${number}`
         | `underholdskostnaderAndreBarn.${number}.faktiskTilsynsutgift.${number}`;
     label: string;
     field: "datoFom" | "datoTom";
@@ -214,7 +216,8 @@ export const Barnetilsyn = ({ index }: { index: number }) => {
     const hasAtLeastOnePeriod =
         !!underhold.stønadTilBarnetilsyn.length ||
         !!underhold.faktiskTilsynsutgift.length ||
-        !!underhold.tilleggsstønad.length;
+        !!underhold.tilleggsstønad.length ||
+        !!underhold.forpleining.length;
     const hasAtLeastOnePeriodOrActiveOpplysninger = hasAtLeastOnePeriod || !!aktivePerioder.length;
     const updateTilysnsordning = useOnUpdateHarTilysnsordning(underhold.id);
     const underholdsValideringsFeil = underholdskostnader.find((u) => u.id === underhold.id).valideringsfeil;
@@ -309,6 +312,7 @@ export const Barnetilsyn = ({ index }: { index: number }) => {
                     <BarnetilsynTabel underholdFieldName={underholdFieldName} />
                     <FaktiskeTilsynsutgifterTabel underholdFieldName={underholdFieldName} />
                     {!erBisysVedtak && <TilleggstønadTabel underholdFieldName={underholdFieldName} />}
+                    {!erBisysVedtak && <ForpleiningTabel underholdFieldName={underholdFieldName} />}
                 </>
             )}
             <BeregnetUnderholdskostnad underholdFieldName={underholdFieldName} />

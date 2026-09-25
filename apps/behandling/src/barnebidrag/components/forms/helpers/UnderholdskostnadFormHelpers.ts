@@ -1,6 +1,7 @@
 import type {
     BeregnetUnderholdskostnad,
     FaktiskTilsynsutgiftDto,
+    ForpleiningDto,
     StonadTilBarnetilsynDto,
     TilleggsstonadDto,
     UnderholdDto,
@@ -9,6 +10,7 @@ import { isAfterDate } from "../../../../utils/date-utils";
 
 import type {
     FaktiskTilsynsutgiftPeriode,
+    ForpleiningPeriode,
     StønadTilBarnetilsynPeriode,
     TilleggsstonadPeriode,
     UnderholdskostnadFormValues,
@@ -33,7 +35,7 @@ export const mapBeregnetUnderholdskostnadToRole =
     };
 
 export const transformUnderholdskostnadPeriode = (
-    periode: StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto,
+    periode: StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto | ForpleiningDto,
 ) => {
     return {
         ...periode,
@@ -62,6 +64,9 @@ export const createInitialValues = (underholdskostnader: UnderholdDto[]): Underh
             })),
             tilleggsstønad: underhold.tilleggsstønad.map((tillegsstonad) => ({
                 ...(transformUnderholdskostnadPeriode(tillegsstonad) as TilleggsstonadPeriode),
+            })),
+            forpleining: underhold.forpleining.map((forpleining) => ({
+                ...(transformUnderholdskostnadPeriode(forpleining) as ForpleiningPeriode),
             })),
         })),
         underholdskostnaderAndreBarn: underholdskostnaderAndreBarn.map((underhold) => ({
