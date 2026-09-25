@@ -15,6 +15,8 @@ interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     beskrivelse?: string;
 }
 
+type BarnForm = UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
+
 export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     form,
     barnkurver = [],
@@ -22,18 +24,8 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     onKurvByttet,
     beskrivelse,
 }: BarnSectionProps<T>) {
-    const forelderBarnForm = form as unknown as UseFormReturn<{
-        valgteBarn: BarnMedAlder[];
-        motpart?: {
-            ident?: string;
-            navn?: string;
-            erKjent?: boolean;
-            rolle?: string;
-            diskresjonskode?: string;
-        };
-    }>;
-    const valgteBarnForm = form as unknown as UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
-    const valgteBarn = forelderBarnForm.watch("valgteBarn") as BarnMedAlder[];
+    const barnForm = form as unknown as BarnForm;
+    const valgteBarn = barnForm.watch("valgteBarn");
 
     const leggTilBarnManuell = async (person: PersonDto, alder: number) => {
         const nyttBarn: BarnMedAlder = {
@@ -55,9 +47,9 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
             throw new Error("Kunne ikke validere barn som ble lagt til manuelt");
         }
 
-        const oppdaterteBarn = [...(forelderBarnForm.getValues("valgteBarn") as BarnMedAlder[]), barnValidation.data];
+        const oppdaterteBarn = [...barnForm.getValues("valgteBarn"), barnValidation.data];
 
-        forelderBarnForm.setValue("valgteBarn", oppdaterteBarn, {
+        barnForm.setValue("valgteBarn", oppdaterteBarn, {
             shouldValidate: barnValidation.data.erMyndig,
             shouldDirty: true,
             shouldTouch: true,
@@ -76,16 +68,12 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
         >
             <BarnkurvListe
                 barnkurver={barnkurver}
-                form={valgteBarnForm}
+                form={barnForm}
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
             />
 
-            <BarnManueltRegistrering
-                form={valgteBarnForm}
-                leggTilBarnManuell={leggTilBarnManuell}
-                barnkurver={barnkurver}
-            />
+            <BarnManueltRegistrering form={barnForm} leggTilBarnManuell={leggTilBarnManuell} barnkurver={barnkurver} />
 
             {valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
                 <Alert variant="error" size="small">

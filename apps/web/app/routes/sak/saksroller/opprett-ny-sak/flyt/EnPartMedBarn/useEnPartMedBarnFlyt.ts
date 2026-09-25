@@ -1,12 +1,9 @@
-import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { FarskapsSkjemaSchemaData, ForelderPartRolle } from "../../skjema/opprett-sak-schema";
-
-const UKJENT = { ident: "", navn: "", erKjent: false };
 
 /**
  * Felles oppsett for flyter der saken opprettes med én kjent part og valgte barn,
@@ -21,7 +18,13 @@ export function useEnPartMedBarnFlyt({
 }) {
     const form = useFormContext<FarskapsSkjemaSchemaData>();
     const valgteBarn = form.watch("valgteBarn");
-    const partISaken = form.watch("partISaken");
+    const roller = form.watch("roller");
+    const partType = rolle === "bidragspliktig" ? "BP" : "BM";
+    const partISaken = roller.find((part) => part.type === partType) ?? {
+        ident: "",
+        navn: "",
+        erKjent: undefined,
+    };
 
     const { data, isLoading, isError } = useHentPersonMotpartBarnRelasjon(
         partISaken.ident ? { ident: partISaken.ident } : null,
@@ -30,11 +33,9 @@ export function useEnPartMedBarnFlyt({
 
     useFjernBarnUtenforKurver(form, barnkurver, isLoading);
 
-    const part = { ...partISaken, erKjent: !!partISaken.ident };
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
-        bidragspliktig: rolle === "bidragspliktig" ? part : UKJENT,
-        bidragsmottaker: rolle === "bidragsmottaker" ? part : UKJENT,
+        roller,
         arbeidsfordeling,
         valgteBarn,
     });

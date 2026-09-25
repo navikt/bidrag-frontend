@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
 import { useEksisterendeSakSjekk } from "../eksisterende-sak/useEksisterendeSakSjekk";
-import type { BarnMedAlder, ForelderPartRolle, Motpart } from "../skjema/opprett-sak-schema";
+import type { BarnebidragForelderRolle, BarnMedAlder, ForelderPartRolle, Motpart } from "../skjema/opprett-sak-schema";
 import type { EnhetOgSubmitSectionProps } from "./EnhetOgSubmitSection";
 import type { OpprettSakParter, OpprettSakRolle } from "./opprett-sak-request";
 import { useBestemEnhet } from "./useBestemEnhet";
@@ -12,18 +12,17 @@ import { useOpprettSakHandling } from "./useOpprettSakHandling";
 
 type FormMedKategori = FieldValues & { kategori: "Nasjonal" | "Utland" };
 
-interface UseFlowSubmissionProps<T extends FormMedKategori> {
+type UseFlowSubmissionProps<T extends FormMedKategori> = {
     form: UseFormReturn<T>;
     /**
      * `erKjent` styrer duplikatsjekken: `true`/`false` er avklart (kjent part / bevisst ukjent part)
      * og lar sjekken kjøre, mens `undefined` betyr «ikke avklart ennå» og holder den av.
      */
-    bidragspliktig: Motpart;
-    bidragsmottaker: Motpart;
     valgteBarn?: BarnMedAlder[];
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     erEktefellebidrag?: boolean;
-}
+    roller: BarnebidragForelderRolle[];
+};
 
 function tilEksisterendeSakPart(part: Motpart, rolle: ForelderPartRolle) {
     return { ident: part.ident ?? "", navn: part.navn ?? "", rolle, erKjent: part.erKjent };
@@ -84,40 +83,43 @@ function useSendInn<T extends FormMedKategori>(
  */
 export function useFlowSubmission<T extends FormMedKategori>({
     form,
-    bidragspliktig,
-    bidragsmottaker,
+    roller,
     valgteBarn = [],
     arbeidsfordeling,
     erEktefellebidrag,
 }: UseFlowSubmissionProps<T>) {
+    const { bidragspliktig: valgtBidragspliktig, bidragsmottaker: valgtBidragsmottaker } = parterFraRoller(roller);
     const {
         enhet,
         enhetNavn,
         isLoading: isLoadingEnhet,
         error: enhetError,
     } = useBestemEnhet({
-        bidragspliktig: bidragspliktig,
-        bidragsmottaker: bidragsmottaker,
+        bidragspliktig: valgtBidragspliktig,
+        bidragsmottaker: valgtBidragsmottaker,
         barn: valgteBarn,
         arbeidsfordeling,
         sakskategori: sakskategoriTilEnum((form as UseFormReturn<FormMedKategori>).watch("kategori")) || undefined,
     });
 
-    const tilgangUtenBm = useTilgangUtenBm(bidragsmottaker, arbeidsfordeling);
+    const tilgangUtenBm = useTilgangUtenBm(valgtBidragsmottaker, arbeidsfordeling);
 
     const {
         harEksisterendeSak,
         eksisterendeSak,
         isLoading: isLoadingHentSak,
         infoMelding,
-    } = useEksisterendeSakSjekk({ ...eksisterendeSakParter(bidragspliktig, bidragsmottaker), erEktefellebidrag });
+    } = useEksisterendeSakSjekk({
+        ...eksisterendeSakParter(valgtBidragspliktig, valgtBidragsmottaker),
+        erEktefellebidrag,
+    });
 
     const opprettSak = useOpprettSakHandling({ enhet: enhet ?? "", arbeidsfordeling: arbeidsfordeling ?? "EEN" });
     const parter = {
-        bidragspliktig: bidragspliktig,
-        bidragsmottaker: bidragsmottaker,
+        bidragspliktig: valgtBidragspliktig,
+        bidragsmottaker: valgtBidragsmottaker,
         barn: valgteBarn,
-        roller: lagRoller(bidragspliktig, bidragsmottaker, valgteBarn),
+        roller: lagRoller(roller, valgteBarn),
     };
     const onSubmit = useSendInn(form, opprettSak, parter);
 
@@ -141,10 +143,29 @@ export function useFlowSubmission<T extends FormMedKategori>({
     };
 }
 
-function lagRoller(bidragspliktig: Motpart, bidragsmottaker: Motpart, barn: BarnMedAlder[]): OpprettSakRolle[] {
+function parterFraRoller(roller: BarnebidragForelderRolle[]) {
+    return {
+        bidragspliktig: partFraRolle(roller.find((rolle) => rolle.type === "BP")),
+        bidragsmottaker: partFraRolle(roller.find((rolle) => rolle.type === "BM")),
+    };
+}
+
+function partFraRolle(rolle: BarnebidragForelderRolle | undefined): Motpart {
+    return {
+        ident: rolle?.ident,
+        navn: rolle?.navn,
+        erKjent: rolle?.erKjent,
+        diskresjonskode: rolle?.diskresjonskode,
+    };
+}
+
+function lagRoller(barnebidragRoller: BarnebidragForelderRolle[], barn: BarnMedAlder[]): OpprettSakRolle[] {
+    const foreldre = barnebidragRoller.map((rolle) => ({
+        type: rolle.type === "BP" ? Rolletype.BP : Rolletype.BM,
+        fodselsnummer: rolle.ident,
+    }));
     return [
-        { type: Rolletype.BP, fodselsnummer: bidragspliktig.ident },
-        { type: Rolletype.BM, fodselsnummer: bidragsmottaker.ident },
+        ...foreldre,
         ...barn.map((barnRolle) => ({
             type: Rolletype.BA,
             fodselsnummer: barnRolle.ident,

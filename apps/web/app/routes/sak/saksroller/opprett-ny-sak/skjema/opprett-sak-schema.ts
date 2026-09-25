@@ -49,6 +49,9 @@ const ForelderPartSchema = MotpartSchema.omit({ rolle: true });
 const BarnebidragForelderRolleSchema = ForelderPartSchema.extend({
     type: z.enum(["BP", "BM"]),
 });
+const EnPartMedBarnRolleSchema = ForelderPartSchema.extend({
+    type: z.enum(["BP", "BM"]),
+});
 
 /**
  * Samme skjema uansett om saken startes fra en forelder eller fra barnet. Alle parter kan endres.
@@ -75,26 +78,28 @@ function validerForeldre(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
     const foreldre = ["BP", "BM"] as const;
     for (const type of foreldre) {
         const rolle = data.roller.find((r) => r.type === type);
+        const rolleIndex = data.roller.findIndex((r) => r.type === type);
         const ident = rolle?.ident;
         const erKjent = rolle?.erKjent;
         if (erKjent === undefined) {
             ctx.addIssue({
                 code: "custom",
-                path: ["roller", type === "BP" ? 0 : 1, "ident"],
+                path: ["roller", rolleIndex >= 0 ? rolleIndex : 0, "ident"],
                 message: `Du må registrere ${type === "BP" ? "bidragspliktig" : "bidragsmottaker"} eller velge ukjent`,
             });
         }
         if (ident?.trim() && data.valgteBarn.some((barn) => barn.ident === ident)) {
             ctx.addIssue({
                 code: "custom",
-                path: ["roller", type === "BP" ? 0 : 1, "ident"],
+                path: ["roller", rolleIndex >= 0 ? rolleIndex : 0, "ident"],
                 message: "Et barn kan ikke være forelder i saken",
             });
         }
     }
     const bp = data.roller.find((r) => r.type === "BP");
     const bm = data.roller.find((r) => r.type === "BM");
-    validateUlikeParter({ ident: bp?.ident ?? "" }, bm ?? {}, ctx, ["roller", 1]);
+    const bmIndex = data.roller.findIndex((r) => r.type === "BM");
+    validateUlikeParter({ ident: bp?.ident ?? "" }, bm ?? {}, ctx, ["roller", bmIndex >= 0 ? bmIndex : 0]);
 }
 
 /** Parten er valgt i skjemaet og ikke satt som ukjent. */
@@ -119,6 +124,7 @@ function validerBarnebidragBarn(data: BarnebidragSkjemaInput, ctx: z.RefinementC
 export type BarnebidragSkjemaData = z.infer<typeof BarnebidragSkjemaSchema>;
 export type ForelderPart = z.infer<typeof ForelderPartSchema>;
 export type BarnebidragForelderRolle = z.infer<typeof BarnebidragForelderRolleSchema>;
+export type EnPartMedBarnRolle = z.infer<typeof EnPartMedBarnRolleSchema>;
 
 const createSakMedBarnSkjemaSchema = (
     validateBarn?: (barn: z.infer<typeof BarnMedAlderSchema>, index: number, ctx: z.RefinementCtx) => void,
@@ -126,13 +132,19 @@ const createSakMedBarnSkjemaSchema = (
     z
         .object({
             arbeidsfordeling: ArbeidsfordelingSchema,
-            partISaken: PartISakenSchema,
+            roller: z.array(EnPartMedBarnRolleSchema),
             valgteBarn: z.array(BarnMedAlderSchema),
-            motpart: MotpartSchema,
             kategori: z.enum(["Nasjonal", "Utland"]),
         })
         .superRefine((data, ctx) => {
-            validateParterOgBarn(data, true, ctx);
+            validerEnPartMedBarnRoller(data.roller, ctx);
+            if (data.valgteBarn.length === 0) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["valgteBarn"],
+                    message: "Du må velge minst ett barn.",
+                });
+            }
 
             data.valgteBarn.forEach((barn, index) => {
                 validateBarn?.(barn, index, ctx);
@@ -152,44 +164,66 @@ export type FarskapsSkjemaSchemaData = z.infer<typeof FarskapsSkjemaSchema>;
 export const EktefellebidragSkjemaSchema = z
     .object({
         arbeidsfordeling: ArbeidsfordelingSchema,
-        partISaken: PartISakenSchema,
-        motpart: z.object({
-            ident: z.string().min(11, "Du må registrere ektefelle/samboer"),
-            navn: z.string(),
-            rolle: ForelderPartRolleSchema,
-            erKjent: z.literal(true), // Alltid true for ektefellebidrag
-            diskresjonskode: DiskresjonskodeSchema.optional(),
-        }),
+        roller: z.array(
+            z.object({
+                ident: z.string(),
+                navn: z.string(),
+                type: z.enum(["BP", "BM"]),
+                erKjent: z.literal(true),
+                diskresjonskode: DiskresjonskodeSchema.optional(),
+            }),
+        ),
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
     .superRefine((data, ctx) => {
-        validerPartISaken(data.partISaken, ctx);
-        validateUlikeParter(data.partISaken, data.motpart, ctx);
+        const bp = data.roller.find((rolle) => rolle.type === "BP");
+        const bm = data.roller.find((rolle) => rolle.type === "BM");
+        const bpIndex = data.roller.findIndex((rolle) => rolle.type === "BP");
+        const bmIndex = data.roller.findIndex((rolle) => rolle.type === "BM");
+        if (!bp?.ident.trim()) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["roller", bpIndex >= 0 ? bpIndex : 0, "ident"],
+                message: "Du må registrere bidragspliktig",
+            });
+        }
+        if (!bm?.ident.trim()) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["roller", bmIndex >= 0 ? bmIndex : 0, "ident"],
+                message: "Du må registrere bidragsmottaker",
+            });
+        }
+        if (bp?.ident && bp.ident === bm?.ident) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["roller", bmIndex >= 0 ? bmIndex : 0, "ident"],
+                message: "Samme person kan ikke være begge parter",
+            });
+        }
     });
 
 export type EktefellebidragSkjemaData = z.infer<typeof EktefellebidragSkjemaSchema>;
-const validateParterOgBarn = (
-    data: { partISaken: { ident: string; rolle: string }; motpart: { ident?: string }; valgteBarn: unknown[] },
-    kreverBarn: boolean,
-    ctx: z.RefinementCtx,
-) => {
-    validerPartISaken(data.partISaken, ctx);
-    validateUlikeParter(data.partISaken, data.motpart, ctx);
-    if (kreverBarn && data.valgteBarn.length === 0) {
+function validerEnPartMedBarnRoller(roller: EnPartMedBarnRolle[], ctx: z.RefinementCtx) {
+    const kjentRolle = roller.find((rolle) => rolle.erKjent === true && rolle.ident?.trim());
+    const ikkeValgtRolle = roller.find((rolle) => rolle.erKjent === undefined);
+    const manglendeRolle = ikkeValgtRolle ?? (!kjentRolle ? roller[0] : undefined);
+    if (manglendeRolle) {
+        const indeks = roller.indexOf(manglendeRolle);
         ctx.addIssue({
             code: "custom",
-            path: ["valgteBarn"],
-            message: "Du må velge minst ett barn.",
+            path: ["roller", indeks, "ident"],
+            message: `Du må registrere ${manglendeRolle.type === "BP" ? "bidragspliktig" : "bidragsmottaker"}`,
         });
     }
-};
-
-function validerPartISaken(partISaken: { ident: string; rolle: string }, ctx: z.RefinementCtx) {
-    if (!partISaken.ident.trim()) {
+    const bp = roller.find((rolle) => rolle.type === "BP");
+    const bm = roller.find((rolle) => rolle.type === "BM");
+    if (bp?.ident?.trim() && bp.ident === bm?.ident) {
+        const bmIndex = bm ? roller.indexOf(bm) : 0;
         ctx.addIssue({
             code: "custom",
-            path: ["partISaken", "ident"],
-            message: `Du må registrere ${partISaken.rolle}`,
+            path: ["roller", bmIndex, "ident"],
+            message: "Samme person kan ikke være begge parter",
         });
     }
 }

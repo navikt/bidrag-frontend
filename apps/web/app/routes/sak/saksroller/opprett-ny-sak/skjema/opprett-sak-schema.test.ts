@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { type BarnebidragSkjemaData, BarnebidragSkjemaSchema, EktefellebidragSkjemaSchema } from "./opprett-sak-schema";
+import {
+    type BarnebidragSkjemaData,
+    BarnebidragSkjemaSchema,
+    EktefellebidragSkjemaSchema,
+    FarskapsSkjemaSchema,
+    OppfostringsbidragSkjemaSchema,
+} from "./opprett-sak-schema";
 
 const bp = "11111111111";
 const bm = "22222222222";
@@ -73,6 +79,18 @@ describe("BarnebidragSkjemaSchema", () => {
         ).toEqual([]);
     });
 
+    it("validerer roller uavhengig av rekkefølgen i listen", () => {
+        expect(
+            BarnebidragSkjemaSchema.safeParse({
+                ...gyldig,
+                roller: [
+                    { ...kjent(bm), type: "BM" },
+                    { ...kjent(bp), type: "BP" },
+                ],
+            }).success,
+        ).toBe(true);
+    });
+
     it("krever RM når BM er ukjent", () => {
         expect(
             feilFor({
@@ -102,24 +120,61 @@ describe("EktefellebidragSkjemaSchema", () => {
     it("krever parten i saken", () => {
         const resultat = EktefellebidragSkjemaSchema.safeParse({
             arbeidsfordeling: "EFS",
-            partISaken: { ident: "", navn: "", rolle: "bidragspliktig", erKjent: true },
-            motpart: { ident: bm, navn: "Andre", rolle: "bidragsmottaker", erKjent: true },
+            roller: [
+                { ident: "", navn: "", type: "BP", erKjent: true },
+                { ident: bm, navn: "Andre", type: "BM", erKjent: true },
+            ],
             kategori: "Nasjonal",
         });
         expect(resultat.error?.issues[0]).toEqual(
-            expect.objectContaining({ path: ["partISaken", "ident"], message: "Du må registrere bidragspliktig" }),
+            expect.objectContaining({ path: ["roller", 0, "ident"], message: "Du må registrere bidragspliktig" }),
         );
     });
 
     it("avviser samme person som begge parter", () => {
         const resultat = EktefellebidragSkjemaSchema.safeParse({
             arbeidsfordeling: "EFS",
-            partISaken: { ident: bp, navn: "Første", rolle: "bidragspliktig", erKjent: true },
-            motpart: { ident: bp, navn: "Andre", rolle: "bidragsmottaker", erKjent: true },
+            roller: [
+                { ident: bp, navn: "Første", type: "BP", erKjent: true },
+                { ident: bp, navn: "Andre", type: "BM", erKjent: true },
+            ],
             kategori: "Nasjonal",
         });
         expect(resultat.error?.issues[0]).toEqual(
-            expect.objectContaining({ path: ["motpart", "ident"], message: "Samme person kan ikke være begge parter" }),
+            expect.objectContaining({
+                path: ["roller", 1, "ident"],
+                message: "Samme person kan ikke være begge parter",
+            }),
+        );
+    });
+});
+
+describe("EnPartMedBarn-skjemaene", () => {
+    const roller = [
+        { ident: bp, navn: "Part", type: "BP" as const, erKjent: true },
+        { ident: "", navn: "", type: "BM" as const, erKjent: false },
+    ];
+
+    it("godtar farskap med én kjent part og barn", () => {
+        expect(
+            FarskapsSkjemaSchema.safeParse({
+                arbeidsfordeling: "FRS",
+                roller,
+                valgteBarn: [barn],
+                kategori: "Nasjonal",
+            }).success,
+        ).toBe(true);
+    });
+
+    it("krever reell mottaker for oppfostringsbidrag", () => {
+        const resultat = OppfostringsbidragSkjemaSchema.safeParse({
+            arbeidsfordeling: "OPS",
+            roller,
+            valgteBarn: [barn],
+            kategori: "Nasjonal",
+        });
+        expect(resultat.error?.issues).toEqual(
+            expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn", 0, "reellMottakerType"] })]),
         );
     });
 });

@@ -4,7 +4,7 @@ import { filtrerBortValgteForeldre } from "../../parter/part-utils";
 import {
     harFullstendigRelasjon,
     harMotpartMedUlikeForelderroller,
-    parterEtterValg,
+    rollerEtterValg,
     utledBarnkurverForForelder,
     utledFellesBarn,
     utledForelderforslag,
@@ -84,7 +84,7 @@ describe("utledFellesBarn", () => {
     });
 });
 
-describe("parterEtterValg", () => {
+describe("rollerEtterValg", () => {
     const ikkeValgt = { ident: "", navn: "", erKjent: undefined };
     const part = (p: PersonDto) => ({
         ident: p.ident,
@@ -94,36 +94,62 @@ describe("parterEtterValg", () => {
     });
 
     it("fyller ut det andre kortet når ett forslag gjenstår", () => {
-        const nye = parterEtterValg({ bidragspliktig: ikkeValgt, bidragsmottaker: ikkeValgt }, "bidragspliktig", far, [
+        const nye = rollerEtterValg(
+            [
+                { ...ikkeValgt, type: "BP" },
+                { ...ikkeValgt, type: "BM" },
+            ],
+            "bidragspliktig",
             far,
-            mor,
+            [far, mor],
+        );
+        expect(nye).toEqual([
+            { ...part(far), type: "BP" },
+            { ...part(mor), type: "BM" },
         ]);
-        expect(nye).toEqual({ bidragspliktig: part(far), bidragsmottaker: part(mor) });
     });
 
     it("bytter roller når personen står i det andre kortet", () => {
-        const nye = parterEtterValg({ bidragspliktig: part(far), bidragsmottaker: part(mor) }, "bidragspliktig", mor, [
-            far,
+        const nye = rollerEtterValg(
+            [
+                { ...part(far), type: "BP" },
+                { ...part(mor), type: "BM" },
+            ],
+            "bidragspliktig",
             mor,
+            [far, mor],
+        );
+        expect(nye).toEqual([
+            { ...part(mor), type: "BP" },
+            { ...part(far), type: "BM" },
         ]);
-        expect(nye).toEqual({ bidragspliktig: part(mor), bidragsmottaker: part(far) });
     });
 
     it("endrer ikke et utfylt kort", () => {
-        const nye = parterEtterValg({ bidragspliktig: part(far), bidragsmottaker: ikkeValgt }, "bidragsmottaker", mor, [
+        const nye = rollerEtterValg(
+            [
+                { ...part(far), type: "BP" },
+                { ...ikkeValgt, type: "BM" },
+            ],
+            "bidragsmottaker",
             mor,
-            annen,
-        ]);
-        expect(nye.bidragspliktig).toEqual(part(far));
+            [mor, annen],
+        );
+        expect(nye.find((rolle) => rolle.type === "BP")).toEqual({ ...part(far), type: "BP" });
     });
 
     it("beholder et ukjent kort", () => {
         const ukjent = { ...ikkeValgt, erKjent: false };
-        const nye = parterEtterValg({ bidragspliktig: ikkeValgt, bidragsmottaker: ukjent }, "bidragspliktig", far, [
+        const nye = rollerEtterValg(
+            [
+                { ...ikkeValgt, type: "BP" },
+                { ...ukjent, type: "BM" },
+            ],
+            "bidragspliktig",
             far,
-            mor,
-        ]);
-        expect(nye.bidragsmottaker).toEqual(ukjent);
+            [far, mor],
+        );
+        expect(nye.find((rolle) => rolle.type === "BM")).toEqual({ ...ukjent, type: "BM" });
     });
 });
 

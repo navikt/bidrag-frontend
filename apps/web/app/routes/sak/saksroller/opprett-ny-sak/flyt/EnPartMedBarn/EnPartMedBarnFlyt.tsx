@@ -8,6 +8,7 @@ import { hentForelderRolleLabel } from "../../parter/part-utils";
 import LasterSkeleton from "../../skjema/LasterSkeleton";
 import {
     type Diskresjonskode,
+    type EnPartMedBarnRolle,
     FarskapsSkjemaSchema,
     type FarskapsSkjemaSchemaData,
     type ForelderPartRolle,
@@ -64,9 +65,8 @@ function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken:
         resolver: zodResolver(schema),
         defaultValues: {
             arbeidsfordeling,
-            partISaken: { ...partISaken, rolle, erKjent: true },
+            roller: lagStartroller(partISaken, rolle),
             valgteBarn: [],
-            motpart: { ident: "", navn: "", erKjent: false },
             kategori: "Nasjonal",
         },
         mode: "onChange",
@@ -84,12 +84,27 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
     const { form, barnkurver, valgteBarn, onSubmit, innsending, status, lasterKurver, kurvfeil } = useEnPartMedBarnFlyt(
         { arbeidsfordeling, rolle },
     );
-    const partISaken = form.watch("partISaken");
+    const partISaken = form
+        .watch("roller")
+        .find((part) => part.type === (rolle === "bidragspliktig" ? "BP" : "BM")) ?? {
+        ident: "",
+        navn: "",
+        erKjent: undefined,
+    };
+    const rolleIndex = form
+        .getValues("roller")
+        .findIndex((part) => part.type === (rolle === "bidragspliktig" ? "BP" : "BM"));
     const { låstIdent } = useSaksrolleroversikt();
     const settPart = (part: { ident: string; navn: string; diskresjonskode?: Diskresjonskode }) =>
         form.setValue(
-            "partISaken",
-            { ...part, rolle, erKjent: !!part.ident },
+            "roller",
+            form
+                .getValues("roller")
+                .map((eksisterende) =>
+                    eksisterende.type === (rolle === "bidragspliktig" ? "BP" : "BM")
+                        ? { ...eksisterende, ...part, erKjent: part.ident ? true : undefined }
+                        : eksisterende,
+                ),
             { shouldDirty: true, shouldValidate: form.formState.isSubmitted },
         );
     const erOppfostring = type === "OPPFOSTRINGSBIDRAG";
@@ -97,7 +112,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
     return (
         <RolleFlytSide
             onSubmit={onSubmit}
-            status={{ ...status, lastetekst: "Henter barn..." }}
+            status={{ ...status, partISakenNavn: status.partISakenNavn ?? "", lastetekst: "Henter barn..." }}
             meldinger={<Meldinger kurvfeil={kurvfeil} erOppfostring={erOppfostring} valgteBarn={valgteBarn} />}
             innsending={innsending}
         >
@@ -109,7 +124,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                         part: { ...partISaken, erKjent: partISaken.ident ? true : undefined },
                         kanSettesUkjent: false,
                         låst: !!låstIdent && partISaken.ident === låstIdent,
-                        feil: form.formState.errors.partISaken?.ident?.message,
+                        feil: rolleIndex >= 0 ? form.formState.errors.roller?.[rolleIndex]?.ident?.message : undefined,
                         onVelg: (person) =>
                             settPart({
                                 ident: person.ident,
@@ -133,6 +148,15 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
             )}
         </RolleFlytSide>
     );
+}
+
+function lagStartroller(partISaken: PartISaken, kjentRolle: ForelderPartRolle): EnPartMedBarnRolle[] {
+    const kjentType = kjentRolle === "bidragspliktig" ? "BP" : "BM";
+    const ukjentType = kjentType === "BP" ? "BM" : "BP";
+    return [
+        { ...partISaken, type: kjentType, erKjent: true },
+        { ident: "", navn: "", type: ukjentType, erKjent: false },
+    ];
 }
 
 function Meldinger({

@@ -61,6 +61,7 @@ function ForelderKort(props: ForelderKortProps) {
                 }
                 rolle={rolle === "bidragspliktig" ? "BP" : "BM"}
                 visIkon={false}
+                ukjentTekst={part.erKjent === undefined ? "Ikke valgt" : "Ukjent - ikke registrert"}
                 actions={!props.låst && <Handlinger {...props} />}
             />
         </VStack>

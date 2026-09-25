@@ -1,5 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
@@ -41,39 +42,56 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
         resolver: zodResolver(EktefellebidragSkjemaSchema),
         defaultValues: {
             arbeidsfordeling: "EFS",
-            partISaken: { ...start, erKjent: true },
-            motpart: { ident: "", navn: "", rolle: motsattRolle, erKjent: true },
+            roller: [
+                {
+                    ident: start.rolle === "bidragspliktig" ? start.ident : "",
+                    navn: start.rolle === "bidragspliktig" ? start.navn : "",
+                    type: "BP",
+                    erKjent: true,
+                },
+                {
+                    ident: start.rolle === "bidragsmottaker" ? start.ident : "",
+                    navn: start.rolle === "bidragsmottaker" ? start.navn : "",
+                    type: "BM",
+                    erKjent: true,
+                },
+            ],
             kategori: "Nasjonal",
         },
         mode: "onChange",
     });
 
-    const partISaken = form.watch("partISaken");
-    const motpart = form.watch("motpart");
+    const roller = form.watch("roller");
+    const partISaken = roller.find((rolle) => rolle.type === (startrolle === "bidragspliktig" ? "BP" : "BM")) ?? {
+        ident: "",
+        navn: "",
+    };
+    const motpart = roller.find((rolle) => rolle.type === (motsattRolle === "bidragspliktig" ? "BP" : "BM")) ?? {
+        ident: "",
+        navn: "",
+    };
+    const [redigerer, setRedigerer] = useState<ForelderPartRolle>();
     const forslagTilMotpart = useMotparterTil(partISaken.ident);
     const forslagTilPartISaken = useMotparterTil(motpart.ident);
 
-    const settPartISaken = ({ ident, navn, diskresjonskode }: Part) =>
+    const settRolle = (rolle: ForelderPartRolle, part: Part) => {
+        const type = rolle === "bidragspliktig" ? "BP" : "BM";
         form.setValue(
-            "partISaken",
-            { ident, navn, rolle: startrolle, erKjent: true, diskresjonskode },
+            "roller",
+            form
+                .getValues("roller")
+                .map((eksisterende) =>
+                    eksisterende.type === type ? { ...eksisterende, ...part, erKjent: true } : eksisterende,
+                ),
             { shouldDirty: true, shouldValidate: true },
         );
-    const settMotpart = ({ ident, navn, diskresjonskode }: Part) =>
-        form.setValue(
-            "motpart",
-            { ident, navn, rolle: motsattRolle, erKjent: true, diskresjonskode },
-            { shouldDirty: true, shouldValidate: true },
-        );
+    };
+    const settPartISaken = (part: Part) => settRolle(startrolle, part);
+    const settMotpart = (part: Part) => settRolle(motsattRolle, part);
 
-    const parter: Record<ForelderPartRolle, Part> =
-        startrolle === "bidragspliktig"
-            ? { bidragspliktig: partISaken, bidragsmottaker: motpart }
-            : { bidragspliktig: motpart, bidragsmottaker: partISaken };
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
-        bidragspliktig: { ...parter.bidragspliktig, erKjent: true },
-        bidragsmottaker: { ...parter.bidragsmottaker, erKjent: true },
+        roller,
         arbeidsfordeling: "EFS",
         erEktefellebidrag: true,
     });
@@ -87,20 +105,25 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
     ): ForelderKortProps => ({
         rolle,
         part: { ...part, erKjent: part.ident ? true : undefined },
-        forslag: filtrerBortValgteForeldre(forslag, [partISaken, motpart]).filter(
+        forslag: filtrerBortValgteForeldre(forslag, redigerer === rolle ? [part] : [partISaken, motpart]).filter(
             (person) => person.ident !== låstIdent,
         ),
         kanSettesUkjent: false,
         låst: !!låstIdent && part.ident === låstIdent,
         feil,
-        onVelg: (person) =>
+        onVelg: (person) => {
             sett({
                 ident: person.ident,
                 navn: person.visningsnavn,
                 diskresjonskode: person.diskresjonskode as Diskresjonskode,
-            }),
+            });
+            setRedigerer(undefined);
+        },
         onUkjent: () => undefined,
-        onEndre: () => sett({ ident: "", navn: "" }),
+        onEndre: () => {
+            setRedigerer(rolle);
+            sett({ ident: "", navn: "" });
+        },
     });
 
     return (
@@ -118,14 +141,14 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
                             partISaken,
                             forslagTilPartISaken,
                             settPartISaken,
-                            form.formState.errors.partISaken?.ident?.message,
+                            form.formState.errors.roller?.[startrolle === "bidragspliktig" ? 0 : 1]?.ident?.message,
                         ),
                         kort(
                             motsattRolle,
                             motpart,
                             forslagTilMotpart,
                             settMotpart,
-                            form.formState.errors.motpart?.ident?.message,
+                            form.formState.errors.roller?.[motsattRolle === "bidragspliktig" ? 0 : 1]?.ident?.message,
                         ),
                     ]}
                 />
