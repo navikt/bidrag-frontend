@@ -25,6 +25,7 @@ export default [
     route("aapnedokument", "./routes/dokument/ÅpneDokumentRedirect.ts"),
     route("aapnedokument/:journalpostId/:dokumentreferanse", "./routes/dokument/ÅpneDokumentMedReferanseRedirect.ts"),
     route("dokument/:journalpostId/:dokumentreferanse?", "./routes/dokument/journalpost/JournalpostPage.tsx"),
+    route("dokumenter", "./routes/dokument/dokumenter/DokumenterPage.tsx"),
 
     index("routes/_index.tsx"),
     ...prefix("admin", adminroutes),
