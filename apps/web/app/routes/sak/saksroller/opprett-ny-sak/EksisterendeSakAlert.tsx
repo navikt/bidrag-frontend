@@ -28,23 +28,21 @@ export default function EksisterendeSakAlert({ eksisterendeSak, partISakenNavn, 
             <Heading level="3" size="xsmall" spacing>
                 Eksisterende sak funnet
             </Heading>
-            <div>
-                <BodyShort spacing>
-                    Det finnes allerede en sak (saksnr:{" "}
-                    <Link
-                        data-color="accent"
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            RedirectTo.behandleSak(eksisterendeSak.saksnummer, bisysUrl, true);
-                        }}
-                    >
-                        {eksisterendeSak.saksnummer} <ExternalLinkIcon aria-hidden />
-                    </Link>
-                    ) mellom <strong>{partISakenNavn}</strong> og <strong>{motpartNavn || "ukjent motpart"}</strong> med
-                    samme roller. Du kan ikke opprette en ny sak med identiske parter og roller.
-                </BodyShort>
-            </div>
+            <BodyShort spacing>
+                Det finnes allerede en sak (saksnr:{" "}
+                <Link
+                    data-color="accent"
+                    href="#"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        RedirectTo.behandleSak(eksisterendeSak.saksnummer, bisysUrl, true);
+                    }}
+                >
+                    {eksisterendeSak.saksnummer} <ExternalLinkIcon aria-hidden />
+                </Link>
+                ) mellom <strong>{partISakenNavn}</strong> og <strong>{motpartNavn || "ukjent motpart"}</strong> med
+                samme roller. Du kan ikke opprette en ny sak med identiske parter og roller.
+            </BodyShort>
         </Alert>
     );
 }

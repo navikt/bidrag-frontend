@@ -1,12 +1,13 @@
 import { z } from "zod";
 
 export const MYNDYG_BARN_ALDER = 18;
+export const MAKS_ALDER_BARN = 24;
 
-export const RolleTypeSchema = z.enum(["BP", "BM", "BA", "RM"]);
+const RolleTypeSchema = z.enum(["BP", "BM", "BA", "RM"]);
 
 export const DiskresjonskodeSchema = z.enum(["SPSF", "SPFO", "URIK", "MILI", "PEND", "SVAL", "P19"]);
 
-export const RollehistorikkSchema = z.object({
+const RollehistorikkSchema = z.object({
     fodselsnummer: z.string().optional(),
     type: z.string().optional(),
     reellMottaker: z.string().optional(),
@@ -15,7 +16,7 @@ export const RollehistorikkSchema = z.object({
     opprettetDato: z.date().optional(),
 });
 
-export const RolleSchema = z.object({
+const RolleSchema = z.object({
     fodselsnummer: z.string(),
     type: RolleTypeSchema,
     objektnummer: z.string(),
@@ -35,7 +36,7 @@ export const RolleSchema = z.object({
     erMyndig: z.boolean().optional(),
 });
 
-export const BarnRolleSchema = RolleSchema.extend({
+const BarnRolleSchema = RolleSchema.extend({
     reellMottakerType: z.enum(["barnet_selv", "samhandler"]).optional(),
     reellMottakerNavn: z.string().optional(),
 });

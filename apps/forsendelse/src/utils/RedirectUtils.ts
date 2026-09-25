@@ -1,5 +1,3 @@
-import { RedirectTo as CommonRedirectTo } from "@bidrag/common";
-
 import environment from "../environment";
 
 export function getSessionStateFromParam() {
@@ -19,7 +17,9 @@ export const RedirectTo = {
             window.location.href = url;
         }
     },
-    sakshistorikk: (saksnr: string) => CommonRedirectTo.sakshistorikk(saksnr),
+    sakshistorikk: (saksnr: string) => {
+        window.location.href = withParams(environment.url.bisysSakshistorikk, `saksnr=${saksnr}`);
+    },
     joarkJournalpostId: (journalpostId: string, joarkJournalpostId: string) => {
         window.location.href = window.location.href.replace(journalpostId, joarkJournalpostId);
     },

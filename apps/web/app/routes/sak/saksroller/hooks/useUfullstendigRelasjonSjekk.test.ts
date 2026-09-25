@@ -1,7 +1,7 @@
 import type { ForelderBarnRelasjon, ForelderBarnRelasjonDto } from "@bidrag/api/PersonApi";
 import { describe, expect, it, vi } from "vitest";
 
-import { beregnBarnMedUfullstendigRelasjon } from "./useUfullstendigRelasjonSjekk.ts";
+import { beregnBarnMedUfullstendigRelasjon } from "./ufullstendig-relasjon-utils.ts";
 
 function lagRelasjon(foreldre: string[]): ForelderBarnRelasjonDto {
     return {

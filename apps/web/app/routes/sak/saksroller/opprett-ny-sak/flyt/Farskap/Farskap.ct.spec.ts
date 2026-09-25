@@ -8,9 +8,12 @@ test.describe("Farskap", () => {
         const requests = await mockWizardApi(page);
         const component = await mount(STORY);
 
-        await expect(component.getByRole("button", { name: /Opprett$/ })).toBeDisabled();
+        const opprettKnapp = component.getByRole("button", { name: /Opprett$/ });
+        await expect(opprettKnapp).toBeEnabled();
+        await opprettKnapp.click();
+        await expect(component.getByText("Du må velge minst ett barn.")).toBeVisible();
+
         await component.getByRole("checkbox").first().check();
-        await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
         await expect.poll(() => requests.unit.some((request) => request.arbeidsfordeling === "FRS")).toBe(true);
         await expectNoAxeViolations(page, component);
     });

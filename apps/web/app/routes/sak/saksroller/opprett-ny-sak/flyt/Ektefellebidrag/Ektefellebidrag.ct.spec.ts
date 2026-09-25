@@ -6,16 +6,32 @@ const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/Ektefel
 test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
     await mockWizardApi(page);
     const component = await mount(STORY);
-    const partner = component
-        .getByRole("button")
-        .filter({ hasText: /Test Ukjent Person/ })
-        .first();
+    const brukPartner = component.getByRole("button", { name: "Bruk Test Ektefelle" });
 
-    await partner.click();
+    await brukPartner.click();
+    const endrePartner = component.getByRole("button", { name: "Endre bidragsmottaker" });
+    await expect(
+        component.getByRole("heading", { name: "Kontroller bidragspliktig og bidragsmottaker" }),
+    ).toBeVisible();
+    const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
+    await expect(bmKort.getByText("Test Ukjent Person", { exact: true })).toBeVisible();
     await expect(component.getByRole("heading", { name: "Oppsummering" })).toBeVisible();
     await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
 
-    await partner.click();
-    await expect(component.getByRole("heading", { name: "Oppsummering" })).toHaveCount(0);
+    await endrePartner.click();
+    await expect(component.getByRole("button", { name: "Bruk Test Ektefelle" })).toBeVisible();
+    await expect(bmKort.getByText("Ikke valgt")).toBeVisible();
     await expectNoAxeViolations(page, component);
+});
+
+test("fjerner opprettelsesfeil når partene endres", async ({ mount, page }) => {
+    await mockWizardApi(page, { createStatus: 500, createBody: "Kunne ikke opprette sak" });
+    const component = await mount(STORY);
+
+    await component.getByRole("button", { name: "Bruk Test Ektefelle" }).click();
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+    await expect(component.getByText("Kunne ikke opprette sak")).toBeVisible();
+
+    await component.getByRole("button", { name: "Endre bidragsmottaker" }).click();
+    await expect(component.getByText("Kunne ikke opprette sak")).toHaveCount(0);
 });

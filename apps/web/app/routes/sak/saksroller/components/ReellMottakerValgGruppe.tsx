@@ -42,18 +42,7 @@ export default function ReellMottakerValgGruppe({
 
     const handleRadioChange = (value: string) => {
         setError(undefined);
-
-        if (value === "ingen") {
-            onValg({});
-            return;
-        }
-
-        if (value === "barnet_selv") {
-            onValg({ type: "barnet_selv", ident: barnIdent, navn: barnNavn });
-            return;
-        }
-
-        onValg({ type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn });
+        onValg(valgForRadio(value, { ident: barnIdent, navn: barnNavn }, lagretSamhandler));
     };
 
     return (
@@ -84,8 +73,11 @@ export default function ReellMottakerValgGruppe({
             )}
 
             {valg.type === "samhandler" && (
-                <ReellMottakerSøk
-                    valgtSamhandlerId={valg.ident ?? lagretSamhandler?.ident}
+                <SamhandlerValg
+                    valg={valg}
+                    lagretSamhandlerIdent={lagretSamhandler?.ident}
+                    skjulValgt={Boolean(feil || error)}
+                    disabled={disabled}
                     onVelg={(ident, navn) => {
                         setError(undefined);
                         onValg({ type: "samhandler", ident, navn });
@@ -93,8 +85,43 @@ export default function ReellMottakerValgGruppe({
                     onError={setError}
                 />
             )}
+        </VStack>
+    );
+}
 
-            {!feil && !error && valg.type === "samhandler" && valg.navn && valg.ident && (
+function valgForRadio(
+    value: string,
+    barn: { ident: string; navn: string },
+    lagretSamhandler: { ident: string; navn: string } | null,
+): ReellMottakerValg {
+    if (value === "ingen") return {};
+    if (value === "barnet_selv") return { type: "barnet_selv", ...barn };
+    return { type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn };
+}
+
+function SamhandlerValg({
+    valg,
+    lagretSamhandlerIdent,
+    skjulValgt,
+    disabled,
+    onVelg,
+    onError,
+}: {
+    valg: ReellMottakerValg;
+    lagretSamhandlerIdent?: string;
+    skjulValgt: boolean;
+    disabled?: boolean;
+    onVelg: (ident: string, navn?: string) => void;
+    onError: (feil: string) => void;
+}) {
+    return (
+        <>
+            <ReellMottakerSøk
+                valgtSamhandlerId={valg.ident ?? lagretSamhandlerIdent}
+                onVelg={onVelg}
+                onError={onError}
+            />
+            {!skjulValgt && valg.navn && valg.ident && (
                 <Box borderWidth="2" borderRadius="12">
                     <FunnetPersonInfo
                         label="Reell mottaker:"
@@ -105,6 +132,6 @@ export default function ReellMottakerValgGruppe({
                     />
                 </Box>
             )}
-        </VStack>
+        </>
     );
 }

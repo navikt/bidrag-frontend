@@ -55,7 +55,8 @@ jobs:
 
   deploy_q1:
     needs: build-and-push
-    if: ${{ github.event.inputs.miljo == 'q1' || github.event.inputs.miljo == 'q1_og_q2' }}
+    # Kjører hvis kalt fra main.yml ELLER hvis valgt manuelt
+    if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.miljo == 'q1' || github.event.inputs.miljo == 'q1_og_q2' }}
     name: "Deploy til q1"
     runs-on: ubuntu-latest
     permissions:
@@ -75,7 +76,7 @@ jobs:
 
   deploy_q2:
     needs: build-and-push
-    if: ${{ github.event.inputs.miljo == 'q2' || github.event.inputs.miljo == 'q1_og_q2' }}
+    if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.miljo == 'q2' || github.event.inputs.miljo == 'q1_og_q2' }}
     name: "Deploy til q2"
     runs-on: ubuntu-latest
     permissions:

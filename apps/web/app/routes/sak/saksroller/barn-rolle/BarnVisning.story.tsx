@@ -1,8 +1,8 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
+import { useTestQueryClient } from "@ct/saksroller/useTestQueryClient.ts";
 import { VStack } from "@navikt/ds-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
 import type { BarnRolle, SakRedigeringData } from "../sakvisning-schema.ts";
 import BarnVisning from "./BarnVisning.tsx";
@@ -35,16 +35,7 @@ function BarnVisningScenario({
     erNyttBarnIndex,
     erOppfostringsbidrag = false,
 }: BarnVisningScenarioProps) {
-    const queryClient = useMemo(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: { retry: false, staleTime: Infinity },
-                    mutations: { retry: false },
-                },
-            }),
-        [],
-    );
+    const queryClient = useTestQueryClient();
     const form = useForm<SakRedigeringData>({
         defaultValues: { saksnummer: "2024/1", roller: initialRoller },
     });

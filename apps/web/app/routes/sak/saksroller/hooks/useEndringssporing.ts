@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
-import { lagEndringsoppsummering } from "../Endringsoppsummering.tsx";
+import { lagEndringsoppsummering } from "../endringsoppsummering-utils.ts";
+import { skalRapportereEndring } from "../endringssporing-utils.ts";
 import type { SakRedigeringData } from "../sakvisning-schema.ts";
 
 type Props = {
@@ -13,10 +14,6 @@ type Props = {
 
 function lagRolleEndringSignaturUtenAdvarsel(endringsliste: ReturnType<typeof lagEndringsoppsummering>): string {
     return JSON.stringify(endringsliste.map(({ harUfullstendigRelasjon, ...rolleEndring }) => rolleEndring));
-}
-
-export function skalRapportereEndring(harEndringer: boolean, hopperOverTilbakestilling: boolean): boolean {
-    return !hopperOverTilbakestilling || harEndringer;
 }
 
 export function useEndringssporing({

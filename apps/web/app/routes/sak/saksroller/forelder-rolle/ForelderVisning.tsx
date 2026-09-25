@@ -30,22 +30,7 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
             diskresjonskode: person.diskresjonskode ?? undefined,
         };
 
-        const finnesAllerede = roller.some((r) => r.type === rolle.type);
-
-        if (finnesAllerede) {
-            const oppdaterteRoller = roller.map((r) => {
-                if (r.type === rolle.type) {
-                    return nyForelder;
-                }
-                return r;
-            });
-
-            form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
-        } else {
-            const oppdaterteRoller = [...roller, nyForelder];
-            form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
-        }
-
+        form.setValue("roller", erstattForelder(roller, nyForelder), { shouldValidate: true });
         setVisSøk(false);
     };
 
@@ -63,7 +48,7 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
                     fødselsdato: rolle.fødselsdato,
                     diskresjonskode: rolle.diskresjonskode,
                 }}
-                rolle={rolle.type === "BP" || rolle.type === "BM" ? rolle.type : undefined}
+                rolle={forelderRolletype(rolle)}
                 visModiaLenke
                 visIkon={false}
                 tags={
@@ -80,32 +65,9 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
                     saksnummer={form.getValues("saksnummer")}
                 />
             </ForelderKortInnhold>
-            <HStack gap="space-4">
-                <HStack gap="space-8" wrap={false}>
-                    {!visSøk && erNyForelder && (
-                        <Button
-                            variant="tertiary"
-                            type="button"
-                            size="small"
-                            icon={<PencilIcon aria-hidden />}
-                            onClick={() => setVisSøk(true)}
-                        >
-                            Endre
-                        </Button>
-                    )}
-                    {erNyForelder && (
-                        <Button
-                            type="button"
-                            size="small"
-                            variant="tertiary"
-                            icon={<XMarkIcon aria-hidden />}
-                            onClick={handleFjernForelder}
-                        >
-                            Fjern
-                        </Button>
-                    )}
-                </HStack>
-            </HStack>
+            {erNyForelder && (
+                <ForelderHandlinger visEndre={!visSøk} onEndre={() => setVisSøk(true)} onFjern={handleFjernForelder} />
+            )}
 
             {visSøk && (
                 <PersonSøkModal
@@ -117,5 +79,44 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
                 />
             )}
         </VStack>
+    );
+}
+
+function erstattForelder(roller: Rolle[], nyForelder: Rolle) {
+    const finnesAllerede = roller.some((r) => r.type === nyForelder.type);
+    if (!finnesAllerede) return [...roller, nyForelder];
+    return roller.map((r) => (r.type === nyForelder.type ? nyForelder : r));
+}
+
+function forelderRolletype(rolle: Rolle) {
+    return rolle.type === "BP" || rolle.type === "BM" ? rolle.type : undefined;
+}
+
+function ForelderHandlinger({
+    visEndre,
+    onEndre,
+    onFjern,
+}: {
+    visEndre: boolean;
+    onEndre: () => void;
+    onFjern: () => void;
+}) {
+    return (
+        <HStack gap="space-8" wrap={false}>
+            {visEndre && (
+                <Button
+                    variant="tertiary"
+                    type="button"
+                    size="small"
+                    icon={<PencilIcon aria-hidden />}
+                    onClick={onEndre}
+                >
+                    Endre
+                </Button>
+            )}
+            <Button type="button" size="small" variant="tertiary" icon={<XMarkIcon aria-hidden />} onClick={onFjern}>
+                Fjern
+            </Button>
+        </HStack>
     );
 }

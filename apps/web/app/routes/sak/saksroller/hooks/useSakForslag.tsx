@@ -1,13 +1,11 @@
-import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
+import type { PersonDto } from "@bidrag/api/PersonApi";
 
 import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { SecureLoggerService } from "@bidrag/common";
-import { beregnAlderForPerson } from "@bidrag/utils";
 import { useEffect, useState } from "react";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
-
-const MAKS_ALDER_BARN = 24;
+import { beregnSakForslag } from "./sak-forslag-utils.ts";
 
 type SakForslag = {
     muligeBarnPerMotpart: Map<string, PersonDto[]>;
@@ -84,91 +82,4 @@ export function useSakForslag({ sak }: { sak: BidragssakDto | undefined }): SakF
         isLoading,
         feil: feil || (error ? "Kunne ikke hente data" : null),
     };
-}
-
-type MotpartBarnRelasjonDto = {
-    personensMotpartBarnRelasjon?: MotpartBarnRelasjon[];
-};
-
-export function beregnSakForslag({
-    motpartRelasjon,
-    barnListe,
-    barnIdenter,
-    ukjentForelder,
-    andreForelderIdent,
-}: {
-    motpartRelasjon: MotpartBarnRelasjonDto;
-    barnListe: { fodselsnummer?: string }[];
-    barnIdenter: (string | undefined)[];
-    ukjentForelder: boolean;
-    andreForelderIdent: string | undefined;
-}): { muligeAndreForeldre: PersonDto[]; muligeBarnPerMotpart: Map<string, PersonDto[]> } {
-    const erBarnUnderMaksAlder = (barn: PersonDto) => {
-        const alder = beregnAlderForPerson(barn);
-
-        return alder != null && alder <= MAKS_ALDER_BARN;
-    };
-
-    const relasjoner = motpartRelasjon.personensMotpartBarnRelasjon ?? [];
-    const barnMap = new Map<string, PersonDto[]>();
-    const muligeAndreForeldre: PersonDto[] = [];
-
-    function leggTilAlleMotparterOgDerasBarn() {
-        relasjoner.forEach((rel: MotpartBarnRelasjon) => {
-            if (rel.motpart) {
-                muligeAndreForeldre.push(rel.motpart);
-                barnMap.set(rel.motpart.ident, rel.fellesBarn);
-            }
-        });
-    }
-
-    function leggTilMotparterMedFellesBarnISaken() {
-        const relevanteRelasjoner = relasjoner.filter((rel: MotpartBarnRelasjon) => {
-            const barnIRelasjon = rel.fellesBarn.map((b) => b.ident);
-            return barnIdenter.some((barnIdent) => barnIdent && barnIRelasjon.includes(barnIdent));
-        });
-
-        relevanteRelasjoner.forEach((rel: MotpartBarnRelasjon) => {
-            if (rel.motpart) {
-                muligeAndreForeldre.push(rel.motpart);
-                const søskenIkkeISaken = rel.fellesBarn.filter((barn) => !barnIdenter.includes(barn.ident));
-                barnMap.set(rel.motpart.ident, søskenIkkeISaken);
-            }
-        });
-    }
-
-    function leggTilSøskenForKjentAndreForelder() {
-        if (!andreForelderIdent || barnListe.length === 0) {
-            return;
-        }
-
-        const relasjonMedAndreForelder = relasjoner.find(
-            (rel: MotpartBarnRelasjon) => rel.motpart?.ident === andreForelderIdent,
-        );
-
-        if (relasjonMedAndreForelder) {
-            const søskenIkkeISaken = relasjonMedAndreForelder.fellesBarn.filter(
-                (barn) => !barnIdenter.includes(barn.ident),
-            );
-            barnMap.set(andreForelderIdent, søskenIkkeISaken);
-        }
-    }
-
-    if (ukjentForelder) {
-        if (barnListe.length === 0) {
-            leggTilAlleMotparterOgDerasBarn();
-        } else {
-            leggTilMotparterMedFellesBarnISaken();
-        }
-    } else {
-        leggTilSøskenForKjentAndreForelder();
-    }
-
-    const muligeBarnPerMotpart = new Map<string, PersonDto[]>(
-        Array.from(barnMap.entries())
-            .map(([motpartIdent, liste]): [string, PersonDto[]] => [motpartIdent, liste.filter(erBarnUnderMaksAlder)])
-            .filter(([, liste]) => liste.length > 0),
-    );
-
-    return { muligeAndreForeldre, muligeBarnPerMotpart };
 }

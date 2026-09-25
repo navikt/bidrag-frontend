@@ -2,7 +2,7 @@ import { TilgangsFeilError } from "@bidrag/api";
 import type { BidragssakDto, RolleDto } from "@bidrag/api/SakApi";
 import { Arbeidsfordeling, Rolletype } from "@bidrag/api/SakApi";
 import { describe, expect, it } from "vitest";
-import { beregnEksisterendeSakSjekk } from "./useEksisterendeSakSjekk.ts";
+import { beregnEksisterendeSakSjekk } from "./eksisterende-sak-utils.ts";
 
 const bidragspliktigIdent = "11111111111";
 const bidragsmottakerIdent = "22222222222";

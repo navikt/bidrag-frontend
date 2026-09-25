@@ -1,21 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, VStack } from "@navikt/ds-react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
-import EnhetInfoAlert from "../../components/EnhetInfoAlert";
-import SubmitButtons from "../../components/SubmitButtons";
-import EksisterendeSakAlert from "../../EksisterendeSakAlert";
+import ParterSeksjon from "../../felles/ParterSeksjon";
+import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import {
+    type Diskresjonskode,
     type EktefellebidragSkjemaData,
     EktefellebidragSkjemaSchema,
     type ForelderPartRolle,
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import { hentMotsattRolle } from "../../utils";
-import EktefellebidragOppsummering from "./EktefellebidragOppsummering";
-import EktefelleMotpartVelger from "./EktefelleMotpartVelger";
+
+const ingenHandling = { onVelg: () => undefined, onUkjent: () => undefined, onEndre: () => undefined };
 
 export default function EktefellebidragFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();
@@ -47,19 +46,14 @@ export default function EktefellebidragFlyt() {
     useSyncKategori(form);
 
     const motpart = form.watch("motpart");
+    const settMotpart = (ident: string, navn: string, diskresjonskode: string | undefined) =>
+        form.setValue(
+            "motpart",
+            { ident, navn, rolle: motsattRolle, erKjent: true, diskresjonskode: diskresjonskode as Diskresjonskode },
+            { shouldDirty: true, shouldValidate: true },
+        );
 
-    const {
-        enhet,
-        enhetNavn,
-        isLoadingEnhet,
-        enhetError,
-        harEksisterendeSak,
-        eksisterendeSak,
-        isLoadingHentSak,
-        onSubmit,
-        error: submitError,
-        saksnummer,
-    } = useFlowSubmission({
+    const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
         partISaken: { ...partISaken, erKjent: true },
         motpart,
@@ -81,24 +75,38 @@ export default function EktefellebidragFlyt() {
     });
 
     return (
-        <Box asChild borderRadius="2" background="default">
-            <VStack as="form" onSubmit={onSubmit} gap="space-16" padding="space-12">
-                {harEksisterendeSak && eksisterendeSak && (
-                    <EksisterendeSakAlert
-                        eksisterendeSak={eksisterendeSak}
-                        partISakenNavn={partISaken.navn}
-                        motpartNavn={motpart.navn}
-                    />
-                )}
-                <EktefelleMotpartVelger form={form} forslagMotpart={forslagMotpart ?? []} motsattRolle={motsattRolle} />
-                {motpart.ident && <EktefellebidragOppsummering form={form} />}
-                <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
-                <SubmitButtons
-                    disabled={harEksisterendeSak || isLoadingHentSak || isLoadingEnhet}
-                    error={submitError}
-                    saksnummer={saksnummer}
+        <FormProvider {...form}>
+            <RolleFlytSide
+                onSubmit={onSubmit}
+                status={{
+                    ...sakStatus,
+                    partISakenNavn: partISaken.navn,
+                    motpartNavn: motpart.navn,
+                }}
+                innsending={innsending}
+            >
+                <ParterSeksjon
+                    beskrivelse="Velg ektefelle eller partner og kontroller rollene i saken."
+                    kort={[
+                        {
+                            rolle: partISaken.rolle as ForelderPartRolle,
+                            part: { ...partISaken, erKjent: true },
+                            låst: true,
+                            ...ingenHandling,
+                        },
+                        {
+                            rolle: motsattRolle,
+                            part: motpart.ident ? motpart : { ...motpart, erKjent: undefined },
+                            forslag: (forslagMotpart ?? []).filter((person) => person.ident !== motpart.ident),
+                            kanSettesUkjent: false,
+                            feil: form.formState.errors.motpart?.ident?.message,
+                            onVelg: (person) => settMotpart(person.ident, person.visningsnavn, person.diskresjonskode),
+                            onUkjent: () => undefined,
+                            onEndre: () => settMotpart("", "", undefined),
+                        },
+                    ]}
                 />
-            </VStack>
-        </Box>
+            </RolleFlytSide>
+        </FormProvider>
     );
 }

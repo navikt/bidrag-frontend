@@ -1,19 +1,22 @@
-import { arbeidsfordelingMap } from "@bidrag/utils/organisasjonUtils";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
+import { useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
-import type {
-    BarnMedAlder,
-    BarnMedReellMottaker,
-    EktefellebidragSkjemaData,
-    ForelderMedRolle,
-    Motpart,
-    PartISaken,
-} from "../opprett-sak-schema";
+import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
+import type { OpprettSakParter } from "../opprett-sak-request";
+import type { BarnMedAlder, Motpart, PartISaken } from "../opprett-sak-schema";
+import type { EnhetOgSubmitSectionProps } from "../sections/EnhetOgSubmitSection";
 import { useBestemEnhet } from "./useBestemEnhet";
 import { useEksisterendeSakSjekk } from "./useEksisterendeSakSjekk";
 import { useOpprettSakHandling } from "./useOpprettSakHandling";
 
-type FormMedKategori = FieldValues & { kategori?: string };
+type FormMedKategori = FieldValues & { kategori: "Nasjonal" | "Utland" };
+
+export type EksisterendeSakPart = {
+    ident: string;
+    navn: string;
+    rolle: string;
+    erKjent: boolean | undefined;
+};
 
 interface UseFlowSubmissionProps<T extends FormMedKategori> {
     form: UseFormReturn<T>;
@@ -31,19 +34,78 @@ interface UseFlowSubmissionProps<T extends FormMedKategori> {
      * ukjent (jf. Farskap og Oppfostringsbidrag).
      */
     motpart?: Motpart;
-    valgteBarn?: BarnMedAlder[] | BarnMedReellMottaker;
+    valgteBarn?: BarnMedAlder[];
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     erEktefellebidrag?: boolean;
-    bidragspliktig?: PartISaken | Motpart | ForelderMedRolle | null;
-    bidragsmottaker?: PartISaken | Motpart | ForelderMedRolle | null;
-    eksisterendeSakPartISaken?: { ident: string; navn: string; rolle: string; erKjent: boolean | undefined } | null;
-    eksisterendeSakMotpart?: { ident: string; navn: string; rolle: string; erKjent: boolean | undefined } | null;
+    bidragspliktig?: Motpart | null;
+    bidragsmottaker?: Motpart | null;
+    eksisterendeSakPartISaken?: EksisterendeSakPart | null;
+    eksisterendeSakMotpart?: EksisterendeSakPart | null;
+}
+
+export function lagEksisterendeSakPart(
+    person: { ident?: string; navn?: string; erKjent?: boolean },
+    rolle: string,
+): EksisterendeSakPart {
+    return {
+        ident: person.ident ?? "",
+        navn: person.navn ?? "",
+        rolle,
+        erKjent: person.erKjent,
+    };
+}
+
+function partMedRolle(rolle: PartISaken["rolle"], partISaken: PartISaken, motpart?: Motpart) {
+    return (partISaken.rolle === rolle ? partISaken : motpart) ?? null;
+}
+
+function useTilgangUtenBm(
+    bidragsmottaker: { erKjent?: boolean } | null,
+    arbeidsfordeling: UseFlowSubmissionProps<FormMedKategori>["arbeidsfordeling"],
+) {
+    const erBarnebidrag = !arbeidsfordeling || arbeidsfordeling === "EEN";
+    const erUkjent = erBarnebidrag && bidragsmottaker?.erKjent === false;
+    const { data: kanOpprette, isLoading } = useSjekkTilgangOpprettSakUtenBm(erUkjent);
+    return {
+        blokkert: erUkjent && (isLoading || kanOpprette !== true),
+        mangler: erUkjent && !isLoading && kanOpprette === false,
+    };
+}
+
+function useSendInn<T extends FormMedKategori>(
+    form: UseFormReturn<T>,
+    innsending: ReturnType<typeof useOpprettSakHandling>,
+    parter: Omit<OpprettSakParter, "kategori">,
+) {
+    const { opprettSak, isLoading, saksnummer, nullstillResultat } = innsending;
+    const senderInn = useRef(false);
+
+    useEffect(() => {
+        const abonnement = form.watch(() => {
+            form.clearErrors();
+            nullstillResultat();
+        });
+        return () => abonnement.unsubscribe();
+    }, [form, nullstillResultat]);
+
+    return form.handleSubmit(async (data) => {
+        if (senderInn.current || isLoading || saksnummer) return;
+        senderInn.current = true;
+        try {
+            await opprettSak({ kategori: data.kategori, ...parter });
+        } finally {
+            senderInn.current = false;
+        }
+    });
 }
 
 /**
  * Reusable hook for flow submission logic.
  * Handles enhet determination, existing case check, and form submission.
  * Type-safe and works with any form schema.
+ *
+ * 🔴 Tilgang til å opprette barnebidragssak uten BM håndheves bare her, ikke i bidrag-sak.
+ * Sjekken gjelder bare EEN: oppfostring (OPS) har aldri BM, og farskap og ektefelle har alltid BM.
  */
 export function useFlowSubmission<T extends FormMedKategori>({
     form,
@@ -57,10 +119,8 @@ export function useFlowSubmission<T extends FormMedKategori>({
     eksisterendeSakPartISaken,
     eksisterendeSakMotpart,
 }: UseFlowSubmissionProps<T>) {
-    const resolvedBidragspliktig =
-        bidragspliktig ?? (partISaken.rolle === "bidragspliktig" ? partISaken : motpart) ?? null;
-    const resolvedBidragsmottaker =
-        bidragsmottaker ?? (partISaken.rolle === "bidragsmottaker" ? partISaken : motpart) ?? null;
+    const resolvedBidragspliktig = bidragspliktig ?? partMedRolle("bidragspliktig", partISaken, motpart);
+    const resolvedBidragsmottaker = bidragsmottaker ?? partMedRolle("bidragsmottaker", partISaken, motpart);
 
     const {
         enhet,
@@ -75,18 +135,10 @@ export function useFlowSubmission<T extends FormMedKategori>({
         sakskategori: sakskategoriTilEnum((form as UseFormReturn<FormMedKategori>).getValues("kategori")) || undefined,
     });
 
-    const safePartISaken = eksisterendeSakPartISaken ?? {
-        ident: partISaken.ident,
-        navn: partISaken.navn,
-        rolle: partISaken.rolle,
-        erKjent: partISaken.erKjent,
-    };
-    const safeMotpart = eksisterendeSakMotpart ?? {
-        ident: motpart?.ident ?? "",
-        navn: motpart?.navn ?? "",
-        rolle: motpart?.rolle ?? "",
-        erKjent: motpart?.erKjent,
-    };
+    const tilgangUtenBm = useTilgangUtenBm(resolvedBidragsmottaker, arbeidsfordeling);
+
+    const safePartISaken = eksisterendeSakPartISaken ?? lagEksisterendeSakPart(partISaken, partISaken.rolle);
+    const safeMotpart = eksisterendeSakMotpart ?? lagEksisterendeSakPart(motpart ?? {}, motpart?.rolle ?? "");
     const {
         harEksisterendeSak,
         eksisterendeSak,
@@ -98,35 +150,30 @@ export function useFlowSubmission<T extends FormMedKategori>({
         erEktefellebidrag,
     });
 
-    const {
-        opprettSakFraSkjema,
-        opprettEktefellebidragSak,
-        isLoading: isLoadingOpprettSak,
-        error,
-        saksnummer,
-    } = useOpprettSakHandling({ enhet: enhet ?? "", arbeidsfordeling: arbeidsfordeling ?? "EEN" });
+    const opprettSak = useOpprettSakHandling({ enhet: enhet ?? "", arbeidsfordeling: arbeidsfordeling ?? "EEN" });
+    const parter = {
+        bidragspliktig: resolvedBidragspliktig,
+        bidragsmottaker: resolvedBidragsmottaker,
+        barn: valgteBarn,
+    };
+    const onSubmit = useSendInn(form, opprettSak, parter);
 
-    const onSubmit = form.handleSubmit(async (data) => {
-        if (arbeidsfordeling === arbeidsfordelingMap.EKTEFELLLESAK.kode) {
-            await opprettEktefellebidragSak(data as unknown as EktefellebidragSkjemaData);
-            return;
-        }
-
-        await opprettSakFraSkjema(data as never);
-    });
-
-    return {
+    const innsending: EnhetOgSubmitSectionProps = {
         enhet,
         enhetNavn,
         isLoadingEnhet,
         enhetError,
-        harEksisterendeSak,
-        eksisterendeSak,
-        isLoadingHentSak,
-        infoMelding,
+        blocked: harEksisterendeSak || isLoadingHentSak || isLoadingEnhet || tilgangUtenBm.blokkert,
+        manglerTilgangUtenBm: tilgangUtenBm.mangler,
+        oppsummering: parter,
+        submitError: opprettSak.error,
+        isLoading: opprettSak.isLoading,
+        saksnummer: opprettSak.saksnummer,
+    };
+
+    return {
         onSubmit,
-        isLoadingOpprettSak,
-        error,
-        saksnummer,
+        sakStatus: { infoMelding, harEksisterendeSak, eksisterendeSak, isLoading: isLoadingHentSak },
+        innsending,
     };
 }

@@ -20,6 +20,12 @@ export { default as RolleDetaljer } from "./roller/RolleDetaljer";
 export { default as RolleTag } from "./roller/RolleTag";
 export { default as SaveStatusIndicator } from "./SaveStatusIndicator";
 export {
+    NyOpprettSakFlytContext,
+    type NyOpprettSakFlytProps,
+    OpprettSakFlytModal,
+    useHarNyOpprettSakFlyt,
+} from "./sak/opprett-sak/NyOpprettSakFlyt";
+export {
     type IOpprettSakPageProps,
     SakProvider as OpprettSakProvider,
     useSakContext as useOpprettSakContext,

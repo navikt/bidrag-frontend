@@ -3,7 +3,7 @@ import type { RolleDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { describe, expect, it } from "vitest";
 import type { BarnRolle } from "../sakvisning-schema.ts";
-import { berikRoller } from "./useHentSakMedPersoninfo.ts";
+import { berikRoller } from "./rolleberikelse.ts";
 
 function lagRolleDto(overrides: Partial<RolleDto>): RolleDto {
     return {

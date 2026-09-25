@@ -1,17 +1,18 @@
+import { NyOpprettSakFlytContext, OpprettSakFlytModal } from "@bidrag/common";
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
+import { Button } from "@navikt/ds-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { type ReactNode, useEffect, useMemo } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import BarnBeggeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnBeggeForeldre/BarnBeggeForeldreFlyt";
-import BarnMedManglendeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/BarnMedManglendeForeldreFlyt";
+import BarnebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/EktefellebidragFlyt";
-import FarskapsFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Farskap/FarskapsFlyt";
-import ForelderMedBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/ForelderMedBarnFlyt";
-import ForelderUtenBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderUtenBarn/ForelderUtenBarnFlyt";
-import OppfostringsbidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Oppfostringsbidrag/OppfostringsbidragFlyt";
+import EnPartMedBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/EnPartMedBarn/EnPartMedBarnFlyt";
+import type { InngangRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/inngang";
 import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt";
+import OpprettSakFlytInnbygget from "../../app/routes/sak/saksroller/opprett-ny-sak/OpprettSakFlytInnbygget";
 import type { PartISaken } from "../../app/routes/sak/saksroller/opprett-ny-sak/opprett-sak-schema";
 import {
+    type OpprettSakFlytValg,
     SaksrolleroversiktProvider,
     useSaksrolleroversikt,
 } from "../../app/routes/sak/saksroller/opprett-ny-sak/saksrolleroversiktContext";
@@ -19,26 +20,11 @@ import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
 type Scenario =
-    | { sakstype: "BARNEBIDRAG"; partISaken: PartISaken; flow: "FORELDER_UTEN_BARN" }
     | {
           sakstype: "BARNEBIDRAG";
           partISaken: PartISaken;
-          flow: "FORELDER_MED_BARN";
-          barnkurver: Parameters<ReturnType<typeof useSaksrolleroversikt>["setSaksrolleFlyt"]>[0] extends infer _T
-              ? import("@bidrag/api/PersonApi").MotpartBarnRelasjon[]
-              : never;
-      }
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "BARN_BEGGE_FORELDRE";
-          foreldre: import("@bidrag/api/PersonApi").PersonDto[];
-      }
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "BARN_MANGLENDE_FORELDRE";
-          forelder: import("@bidrag/api/PersonApi").PersonDto | null;
+          flow: "BARNEBIDRAG";
+          barnkurver: import("@bidrag/api/PersonApi").MotpartBarnRelasjon[];
       }
     | {
           sakstype: "EKTEFELLEBIDRAG";
@@ -72,17 +58,8 @@ function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
         );
 
         switch (scenario.flow) {
-            case "FORELDER_MED_BARN":
+            case "BARNEBIDRAG":
                 setSaksrolleFlyt({ key: 1, type: scenario.flow, barnkurver: scenario.barnkurver });
-                break;
-            case "FORELDER_UTEN_BARN":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow });
-                break;
-            case "BARN_BEGGE_FORELDRE":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, foreldre: scenario.foreldre });
-                break;
-            case "BARN_MANGLENDE_FORELDRE":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, forelder: scenario.forelder });
                 break;
             case "EKTEFELLEBIDRAG":
                 setSaksrolleFlyt({ key: 1, type: scenario.flow, motpart: scenario.motpart });
@@ -95,20 +72,13 @@ function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
     }, [scenario, setPartISaken, setPartISakenAlder, setSakskategori, setSakstype, setSaksrolleFlyt]);
 
     switch (scenario.flow) {
-        case "FORELDER_MED_BARN":
-            return <ForelderMedBarnFlyt />;
-        case "FORELDER_UTEN_BARN":
-            return <ForelderUtenBarnFlyt />;
-        case "BARN_BEGGE_FORELDRE":
-            return <BarnBeggeForeldreFlyt />;
-        case "BARN_MANGLENDE_FORELDRE":
-            return <BarnMedManglendeForeldreFlyt />;
+        case "BARNEBIDRAG":
+            return <BarnebidragFlyt />;
         case "EKTEFELLEBIDRAG":
             return <EktefellebidragFlyt />;
         case "FARSKAP":
-            return <FarskapsFlyt />;
         case "OPPFOSTRINGSBIDRAG":
-            return <OppfostringsbidragFlyt />;
+            return <EnPartMedBarnFlyt />;
     }
 }
 
@@ -120,7 +90,77 @@ export function WizardPageStory() {
     return <StoryRouter content={<OpprettSakFlyt />} />;
 }
 
-function StoryRouter({ content }: { content: ReactNode }) {
+/** Flyten bygd inn av en kaller. Callbacks lagres i skjulte felt, siden CT-props må kunne serialiseres. */
+export function WizardInnbyggetStory({ ident, rolle }: { ident: string; rolle?: InngangRolle }) {
+    const [saksnummer, settSaksnummer] = useState("");
+    const [avbrutt, settAvbrutt] = useState(false);
+    const valg = useMemo<OpprettSakFlytValg>(
+        () => ({
+            inngang: { ident, rolle },
+            onOpprettet: settSaksnummer,
+            onAvbryt: () => settAvbrutt(true),
+        }),
+        [ident, rolle],
+    );
+
+    return (
+        <>
+            <form hidden>
+                <input data-testid="opprettet-saksnummer" readOnly value={saksnummer} />
+                <input data-testid="avbrutt" readOnly value={String(avbrutt)} />
+            </form>
+            <StoryRouter content={<OpprettSakFlyt />} valg={valg} />
+        </>
+    );
+}
+
+type ModalStoryProps = {
+    ident: string;
+    rolle?: InngangRolle;
+    initialForelderIdent?: string;
+    eierfogd?: string;
+    medNyFlyt?: boolean;
+};
+
+/** Modalen slik behandling og dokument åpner den. Resultatet lagres i skjulte felt. */
+export function WizardModalStory(props: ModalStoryProps) {
+    return <StoryRouter content={<ModalHarness {...props} />} />;
+}
+
+function ModalHarness({ ident, rolle, initialForelderIdent, eierfogd, medNyFlyt = true }: ModalStoryProps) {
+    const [open, settOpen] = useState(false);
+    const [saksnummer, settSaksnummer] = useState("");
+    const [lukket, settLukket] = useState(false);
+
+    return (
+        <NyOpprettSakFlytContext value={medNyFlyt ? OpprettSakFlytInnbygget : null}>
+            <form hidden>
+                <input data-testid="opprettet-saksnummer" readOnly value={saksnummer} />
+                <input data-testid="lukket" readOnly value={String(lukket)} />
+            </form>
+            <Button type="button" onClick={() => settOpen(true)}>
+                Åpne opprett sak
+            </Button>
+            <OpprettSakFlytModal
+                open={open}
+                onClose={() => {
+                    settOpen(false);
+                    settLukket(true);
+                }}
+                ident={ident}
+                rolle={rolle}
+                initialForelder={initialForelderIdent ? { ident: initialForelderIdent, rolle: "BP" } : undefined}
+                eierfogd={eierfogd}
+                onOpprettet={(nytt) => {
+                    settSaksnummer(nytt);
+                    settOpen(false);
+                }}
+            />
+        </NyOpprettSakFlytContext>
+    );
+}
+
+function StoryRouter({ content, valg }: { content: ReactNode; valg?: OpprettSakFlytValg }) {
     const queryClient = useMemo(() => {
         const client = new QueryClient({
             defaultOptions: {
@@ -146,15 +186,15 @@ function StoryRouter({ content }: { content: ReactNode }) {
                                         Object.values(testpersoner).map((person) => [person.ident, person]),
                                     )}
                                 >
-                                    <SaksrolleroversiktProvider>{content}</SaksrolleroversiktProvider>
+                                    <SaksrolleroversiktProvider {...valg}>{content}</SaksrolleroversiktProvider>
                                 </BidragCommonsProviderMock>
                             </QueryClientProvider>
                         ),
                     },
                 ],
-                { initialEntries: ["/sak/ny/saksroller"] },
+                { initialEntries: ["/sak/ny"] },
             ),
-        [content, queryClient],
+        [content, queryClient, valg],
     );
 
     return <RouterProvider router={router} />;

@@ -5,19 +5,11 @@ import { useQueries } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useMemo } from "react";
 import { hentPersonGeografiskEnhetQueryOptions, useHentEnhetInfomasjon } from "~/api/useApi.ts";
-import {
-    type BarnMedAlder,
-    type BarnMedReellMottaker,
-    BarnMedReellMottakerSchema,
-    DiskresjonskodeSchema,
-    type ForelderMedRolle,
-    type Motpart,
-    type PartISaken,
-} from "../opprett-sak-schema";
+import { type BarnMedAlder, DiskresjonskodeSchema } from "../opprett-sak-schema";
 
-export const ADRESSEBESKYTTELSE_ENHET = "2103";
-export const EGEN_ANSATT_ENHET = "4883";
-export const UTLAND_ENHET = "4865";
+const ADRESSEBESKYTTELSE_ENHET = "2103";
+const EGEN_ANSATT_ENHET = "4883";
+const UTLAND_ENHET = "4865";
 
 /**
  * Normaliserer sakskategori til de gyldige verdiene HentEnhetRequest forventer.
@@ -28,10 +20,12 @@ function tilGyldigSakskategori(sakskategori?: string): "U" | "N" | undefined {
     return sakskategori === "U" || sakskategori === "N" ? sakskategori : undefined;
 }
 
+type Part = { ident?: string; diskresjonskode?: string } | null;
+
 type BestemEnhetParams = {
-    bidragspliktig: PartISaken | Motpart | ForelderMedRolle | null;
-    bidragsmottaker: PartISaken | Motpart | ForelderMedRolle | null;
-    barn: BarnMedAlder[] | BarnMedReellMottaker;
+    bidragspliktig: Part;
+    bidragsmottaker: Part;
+    barn: BarnMedAlder[];
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     sakskategori?: string;
 };
@@ -51,41 +45,72 @@ function harFortroligAdresse(diskresjonskode?: string): boolean {
     return DiskresjonskodeSchema.safeParse(diskresjonskode).success;
 }
 
-function sjekkFortroligAdresseForParter(
-    bidragspliktig: PartISaken | Motpart | ForelderMedRolle | null,
-    bidragsmottaker: PartISaken | Motpart | ForelderMedRolle | null,
-    barn: BarnMedAlder[] | BarnMedReellMottaker,
-): boolean {
-    const barnArray = Array.isArray(barn) ? barn : [barn];
-    const harBPFortroligAdresse = harFortroligAdresse(bidragspliktig?.diskresjonskode);
-    const harBMFortroligAdresse = harFortroligAdresse(bidragsmottaker?.diskresjonskode);
-    const harBarnFortroligAdresse = barnArray.some((b) => harFortroligAdresse(b.diskresjonskode));
-
-    return harBPFortroligAdresse || harBMFortroligAdresse || harBarnFortroligAdresse;
+function sjekkFortroligAdresseForParter(bidragspliktig: Part, bidragsmottaker: Part, barn: BarnMedAlder[]): boolean {
+    return [bidragspliktig, bidragsmottaker, ...barn].some((person) => harFortroligAdresse(person?.diskresjonskode));
 }
 
 // Bruker bidragsmottaker hvis kjent, ellers yngste barn
-function finnIdentForArbeidsfordeling(
-    bidragsmottaker: PartISaken | Motpart | ForelderMedRolle | null,
-    barn: BarnMedAlder[] | BarnMedReellMottaker,
-): string | null {
-    if (bidragsmottaker?.ident && bidragsmottaker.ident.trim() !== "") {
+function finnIdentForArbeidsfordeling(bidragsmottaker: Part, barn: BarnMedAlder[]): string | null {
+    if (bidragsmottaker?.ident?.trim()) {
         return bidragsmottaker.ident;
     }
+    const [yngsteBarn] = [...barn].sort((a, b) => a.alder - b.alder);
+    return yngsteBarn?.ident ?? null;
+}
 
-    const valideringBarnMedReellMottaker = BarnMedReellMottakerSchema.safeParse(barn);
-    if (valideringBarnMedReellMottaker.success) {
-        return (barn as BarnMedReellMottaker).ident;
-    }
+type PersonIdent = { ident: string; rolle: "bp" | "bm" | "barn" };
 
-    if (Array.isArray(barn) && barn.length > 0) {
-        const [yngsteBarn] = [...barn].sort((a, b) => a.alder - b.alder);
-        if (yngsteBarn) {
-            return yngsteBarn.ident;
-        }
-    }
+function harIdent(ident?: string): ident is string {
+    return !!ident && ident.trim() !== "";
+}
 
-    return null;
+function samleIdenter(bidragspliktig: Part, bidragsmottaker: Part, barn: BestemEnhetParams["barn"]): PersonIdent[] {
+    const kandidater: { ident?: string; rolle: PersonIdent["rolle"] }[] = [
+        { ident: bidragspliktig?.ident, rolle: "bp" },
+        { ident: bidragsmottaker?.ident, rolle: "bm" },
+        ...barn.map((b) => ({ ident: b.ident, rolle: "barn" as const })),
+    ];
+    return kandidater.filter((p): p is PersonIdent => harIdent(p.ident));
+}
+
+function useSpesialenhet(enhetsnummer: string, aktiv: boolean): EnhetInfo {
+    const { data, isLoading, isFetching, error } = useHentEnhetInfomasjon(enhetsnummer, aktiv);
+    return { navn: data?.navn, isLoading: isLoading || isFetching, error };
+}
+
+function useGeografiskeEnheter(
+    identer: PersonIdent[],
+    identForArbeidsfordeling: string | null,
+    { sakskategori, arbeidsfordeling }: Pick<BestemEnhetParams, "sakskategori" | "arbeidsfordeling">,
+    aktiv: boolean,
+) {
+    const enhetQueries = useQueries({
+        queries: identer.map((person) =>
+            hentPersonGeografiskEnhetQueryOptions(
+                {
+                    ident: person.ident,
+                    biidenter: [],
+                    tema: "BID",
+                    sakskategori: tilGyldigSakskategori(sakskategori),
+                    arbeidsfordeling: (arbeidsfordeling ?? "EEN") as Arbeidsfordeling,
+                },
+                aktiv,
+            ),
+        ),
+    });
+
+    const egenAnsattEnhet = enhetQueries.find((query) => query.data?.nummer === EGEN_ANSATT_ENHET)?.data;
+    // 🔴 Sikring hvis diskresjonskode mangler i skjemaet: NORG svarer 2103 for graderte personer.
+    const harFortroligEnhet = enhetQueries.some((query) => query.data?.nummer === ADRESSEBESKYTTELSE_ENHET);
+    const index = identer.findIndex((p) => p.ident === identForArbeidsfordeling);
+
+    return {
+        harEgenAnsatt: !!egenAnsattEnhet,
+        harFortroligEnhet,
+        standardEnhet: identForArbeidsfordeling && index !== -1 ? (enhetQueries[index]?.data ?? null) : null,
+        isLoading: enhetQueries.some((q) => q.isLoading || q.isFetching),
+        error: enhetQueries.find((q) => q.error)?.error ?? null,
+    };
 }
 
 /**
@@ -93,7 +118,8 @@ function finnIdentForArbeidsfordeling(
  * Henter enhet basert på parter og arbeidsfordeling.
  *
  * Prioritering:
- * 1. Hvis noen av partene har fortrolig adresse, returneres enhet 2103
+ * 1. Hvis noen av partene har fortrolig adresse, returneres enhet 2103.
+ *    🔴 Svarer NORG 2103 for en part, regnes den som fortrolig selv om diskresjonskode mangler i skjemaet.
  * 2. Hvis noen av partene har enhet 4883 (egen ansatt), returneres enhet 4883
  * 3. Ellers brukes enhet til bidragsmottaker, eller yngste barn hvis BM er ukjent
  *
@@ -121,136 +147,115 @@ export function useBestemEnhet({
         () => sjekkFortroligAdresseForParter(bidragspliktig, bidragsmottaker, barn),
         [bidragspliktig, bidragsmottaker, barn],
     );
-
-    const erSakskategoriUtenlandssak = useMemo(
-        () => sakskategoriTilEnum(sakskategori as unknown as string) === "U",
-        [sakskategori],
+    const erSakskategoriUtenlandssak = sakskategoriTilEnum(sakskategori as unknown as string) === "U";
+    const alleIdenter = useMemo(
+        () => samleIdenter(bidragspliktig, bidragsmottaker, barn),
+        [bidragspliktig?.ident, bidragsmottaker?.ident, barn],
     );
-    const alleIdenter = useMemo(() => {
-        const barnArray = Array.isArray(barn) ? barn : [barn];
-        const identer: { ident: string; rolle: "bp" | "bm" | "barn" }[] = [];
-
-        if (bidragspliktig?.ident && bidragspliktig.ident.trim() !== "") {
-            identer.push({ ident: bidragspliktig.ident, rolle: "bp" });
-        }
-        if (bidragsmottaker?.ident && bidragsmottaker.ident.trim() !== "") {
-            identer.push({ ident: bidragsmottaker.ident, rolle: "bm" });
-        }
-        barnArray.forEach((b: BarnMedAlder | BarnMedReellMottaker) => {
-            if (b.ident && b.ident.trim() !== "") {
-                identer.push({ ident: b.ident, rolle: "barn" });
-            }
-        });
-
-        return identer;
-    }, [bidragspliktig?.ident, bidragsmottaker?.ident, barn]);
-
-    const enhetQueries = useQueries({
-        queries: alleIdenter.map((person) =>
-            hentPersonGeografiskEnhetQueryOptions(
-                {
-                    ident: person.ident,
-                    biidenter: [],
-                    tema: "BID",
-                    sakskategori: tilGyldigSakskategori(sakskategori),
-                    arbeidsfordeling: (arbeidsfordeling ?? "EEN") as Arbeidsfordeling,
-                },
-                !harFortroligAdresseVerdi,
-            ),
-        ),
-    });
-
     const identForArbeidsfordeling = useMemo(
         () => finnIdentForArbeidsfordeling(bidragsmottaker, barn),
         [bidragsmottaker?.ident, barn],
     );
 
-    const egenAnsattInfo = useMemo(() => {
-        for (let i = 0; i < enhetQueries.length; i++) {
-            const query = enhetQueries[i];
-            if (!query) continue;
-            if (query.data?.nummer === EGEN_ANSATT_ENHET) {
-                return { harEgenAnsatt: true, enhetNavn: query.data.navn };
-            }
-        }
-        return { harEgenAnsatt: false, enhetNavn: null };
-    }, [enhetQueries]);
+    const geografisk = useGeografiskeEnheter(
+        alleIdenter,
+        identForArbeidsfordeling,
+        { sakskategori, arbeidsfordeling },
+        !harFortroligAdresseVerdi,
+    );
 
-    const bmEllerBarnEnhet = useMemo(() => {
-        if (!identForArbeidsfordeling) return null;
-        const index = alleIdenter.findIndex((p) => p.ident === identForArbeidsfordeling);
-        if (index === -1) return null;
-        return enhetQueries[index]?.data ?? null;
-    }, [alleIdenter, enhetQueries, identForArbeidsfordeling]);
+    const utland = useSpesialenhet(UTLAND_ENHET, erSakskategoriUtenlandssak);
+    const erFortrolig = harFortroligAdresseVerdi || geografisk.harFortroligEnhet;
+    const fortrolig = useSpesialenhet(ADRESSEBESKYTTELSE_ENHET, erFortrolig);
+    const egenAnsatt = useSpesialenhet(EGEN_ANSATT_ENHET, geografisk.harEgenAnsatt && !erFortrolig);
 
-    const isLoading = enhetQueries.some((q) => q.isLoading || q.isFetching);
-    const error = enhetQueries.find((q) => q.error)?.error ?? null;
-    const {
-        data: utlandEnhetInfo,
-        isLoading: isLoadingUtlandEnhet,
-        isFetching: isFetchingUtlandEnhet,
-        error: utlandEnhetError,
-    } = useHentEnhetInfomasjon(UTLAND_ENHET, erSakskategoriUtenlandssak);
-    const {
-        data: fortroligEnhetInfo,
-        isLoading: isLoadingFortroligEnhet,
-        isFetching: isFetchingFortroligEnhet,
-        error: fortroligEnhetError,
-    } = useHentEnhetInfomasjon(ADRESSEBESKYTTELSE_ENHET, harFortroligAdresseVerdi);
+    return velgEnhet({
+        erSakskategoriUtenlandssak,
+        harFortroligAdresse: erFortrolig,
+        harEgenAnsatt: geografisk.harEgenAnsatt,
+        identForArbeidsfordeling,
+        standardEnhet: geografisk.standardEnhet,
+        standardLoading: geografisk.isLoading,
+        standardError: geografisk.error,
+        utland,
+        fortrolig,
+        egenAnsatt: {
+            navn: egenAnsatt.navn,
+            isLoading: geografisk.isLoading || egenAnsatt.isLoading,
+            error: egenAnsatt.error ?? geografisk.error,
+        },
+    });
+}
 
-    const {
-        data: egenAnsattEnhetInfo,
-        isLoading: isLoadingEgenAnsattEnhet,
-        isFetching: isFetchingEgenAnsattEnhet,
-        error: egenAnsattEnhetError,
-    } = useHentEnhetInfomasjon(EGEN_ANSATT_ENHET, egenAnsattInfo.harEgenAnsatt && !harFortroligAdresseVerdi);
+type EnhetInfo = {
+    navn?: string | null;
+    isLoading: boolean;
+    error: BestemEnhetResult["error"];
+};
 
+function spesialenhet(
+    enhet: string,
+    info: EnhetInfo,
+    standardNavn: string | null,
+    flagg: Partial<Pick<BestemEnhetResult, "harFortroligAdresse" | "harEgenAnsatt" | "identForArbeidsfordeling">>,
+): BestemEnhetResult {
+    return {
+        enhet,
+        enhetNavn: info.navn ?? standardNavn,
+        isLoading: info.isLoading,
+        harFortroligAdresse: false,
+        harEgenAnsatt: false,
+        identForArbeidsfordeling: null,
+        error: info.error,
+        ...flagg,
+    };
+}
+
+function velgEnhet({
+    erSakskategoriUtenlandssak,
+    harFortroligAdresse,
+    harEgenAnsatt,
+    identForArbeidsfordeling,
+    standardEnhet,
+    standardLoading,
+    standardError,
+    utland,
+    fortrolig,
+    egenAnsatt,
+}: {
+    erSakskategoriUtenlandssak: boolean;
+    harFortroligAdresse: boolean;
+    harEgenAnsatt: boolean;
+    identForArbeidsfordeling: string | null;
+    standardEnhet: { nummer?: string | null; navn?: string | null } | null;
+    standardLoading: boolean;
+    standardError: BestemEnhetResult["error"];
+    utland: EnhetInfo;
+    fortrolig: EnhetInfo;
+    egenAnsatt: EnhetInfo;
+}): BestemEnhetResult {
     if (erSakskategoriUtenlandssak) {
-        return {
-            enhet: UTLAND_ENHET,
-            enhetNavn: utlandEnhetInfo?.navn ?? null,
-            isLoading: isLoadingUtlandEnhet || isFetchingUtlandEnhet,
-            harFortroligAdresse: true,
-            harEgenAnsatt: false,
-            identForArbeidsfordeling: null,
-            error: utlandEnhetError,
-        };
+        return spesialenhet(UTLAND_ENHET, utland, null, { harFortroligAdresse: true });
     }
 
-    // 1. Returner fortrolig adresse enhet hvis noen har fortrolig adresse
-    if (harFortroligAdresseVerdi) {
-        return {
-            enhet: ADRESSEBESKYTTELSE_ENHET,
-            enhetNavn: fortroligEnhetInfo?.navn ?? "NAV Vikafossen",
-            isLoading: isLoadingFortroligEnhet || isFetchingFortroligEnhet,
-            harFortroligAdresse: true,
-            harEgenAnsatt: false,
-            identForArbeidsfordeling: null,
-            error: fortroligEnhetError,
-        };
+    if (harFortroligAdresse) {
+        return spesialenhet(ADRESSEBESKYTTELSE_ENHET, fortrolig, "NAV Vikafossen", { harFortroligAdresse: true });
     }
 
-    // 2. Returner egen ansatt enhet hvis noen har enhet 4883
-    if (egenAnsattInfo.harEgenAnsatt) {
-        return {
-            enhet: EGEN_ANSATT_ENHET,
-            enhetNavn: egenAnsattEnhetInfo?.navn ?? "NAV Egne ansatte",
-            isLoading: isLoading || isLoadingEgenAnsattEnhet || isFetchingEgenAnsattEnhet,
-            harFortroligAdresse: false,
+    if (harEgenAnsatt) {
+        return spesialenhet(EGEN_ANSATT_ENHET, egenAnsatt, "NAV Egne ansatte", {
             harEgenAnsatt: true,
             identForArbeidsfordeling,
-            error: egenAnsattEnhetError ?? error,
-        };
+        });
     }
 
-    // 3. Returner BM sin enhet, eller yngste barn hvis BM er ukjent
     return {
-        enhet: bmEllerBarnEnhet?.nummer ?? null,
-        enhetNavn: bmEllerBarnEnhet?.navn ?? null,
-        isLoading,
+        enhet: standardEnhet?.nummer ?? null,
+        enhetNavn: standardEnhet?.navn ?? null,
+        isLoading: standardLoading,
         harFortroligAdresse: false,
         harEgenAnsatt: false,
         identForArbeidsfordeling,
-        error,
+        error: standardError,
     };
 }

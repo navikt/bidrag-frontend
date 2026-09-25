@@ -74,7 +74,6 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
         headers.delete("host");
 
         const backendResponse = await fetch(backendUrl.toString(), {
-            signal: AbortSignal.timeout(30_000),
             method: request.method,
             headers,
             body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,

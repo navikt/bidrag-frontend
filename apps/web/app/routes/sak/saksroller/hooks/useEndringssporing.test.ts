@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { skalRapportereEndring } from "./useEndringssporing.ts";
+import { skalRapportereEndring } from "../endringssporing-utils.ts";
 
 describe("skalRapportereEndring", () => {
     it("rapporterer en reell endring selv etter en dataoppdatering", () => {

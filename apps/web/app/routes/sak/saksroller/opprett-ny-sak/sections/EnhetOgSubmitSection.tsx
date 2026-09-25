@@ -1,16 +1,21 @@
-import { VStack } from "@navikt/ds-react";
-
+import { InlineMessage, VStack } from "@navikt/ds-react";
 import EnhetInfoAlert from "../components/EnhetInfoAlert";
+import KanIkkeOppretteSakAlert from "../components/KanIkkeOppretteSakAlert";
 import SubmitButtons from "../components/SubmitButtons";
+import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
+import type { OppsummeringParter } from "./Oppsummering";
 
-interface EnhetOgSubmitSectionProps {
+export interface EnhetOgSubmitSectionProps {
     enhet: string | null;
     enhetNavn: string | null;
     isLoadingEnhet: boolean;
     enhetError: Error | null;
-    disabled: boolean;
+    blocked: boolean;
+    isLoading?: boolean;
     submitError: Error | null;
     saksnummer: string | null;
+    manglerTilgangUtenBm?: boolean;
+    oppsummering?: OppsummeringParter;
 }
 
 /**
@@ -22,15 +27,26 @@ export default function EnhetOgSubmitSection({
     enhetNavn,
     isLoadingEnhet,
     enhetError,
-    disabled,
+    blocked,
+    isLoading,
     submitError,
     saksnummer,
+    manglerTilgangUtenBm = false,
 }: EnhetOgSubmitSectionProps) {
-    return (
-        <VStack gap="space-6">
-            <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
+    const eierfogd = useSaksrolleroversikt().inngang?.eierfogd;
+    const avvikerFraEierfogd = !isLoadingEnhet && !!enhet && !!eierfogd && enhet !== eierfogd;
 
-            <SubmitButtons disabled={disabled} error={submitError} saksnummer={saksnummer} />
+    return (
+        <VStack gap="space-12">
+            {manglerTilgangUtenBm && <KanIkkeOppretteSakAlert />}
+            <EnhetInfoAlert enhet={enhet} enhetNavn={enhetNavn} isLoading={isLoadingEnhet} error={enhetError} />
+            {avvikerFraEierfogd && (
+                <InlineMessage status="warning" size="small">
+                    Arbeidsfordelingen gir en annen enhet enn {eierfogd}. Saken sendes til enheten over.
+                </InlineMessage>
+            )}
+
+            <SubmitButtons blocked={blocked} isLoading={isLoading} error={submitError} saksnummer={saksnummer} />
         </VStack>
     );
 }
