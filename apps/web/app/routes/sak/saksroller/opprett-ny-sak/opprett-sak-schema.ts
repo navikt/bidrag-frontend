@@ -1,13 +1,12 @@
 import { z } from "zod";
-
-// Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
-// sakvisning i stedet for å dupliseres.
-import { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER } from "../sakvisning-schema";
 import {
     type ReellMottakerSkjemaverdi,
     type ReellMottakerValideringsgrunn,
     validerReellMottaker,
-} from "./reell-mottaker-regel";
+} from "../reell-mottaker-regel";
+// Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
+// sakvisning i stedet for å dupliseres.
+import { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER } from "../sakvisning-schema";
 
 export { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER };
 

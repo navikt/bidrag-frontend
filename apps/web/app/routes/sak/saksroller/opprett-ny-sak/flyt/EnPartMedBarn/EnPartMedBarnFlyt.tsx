@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
+import type { ReellMottakerRegel } from "../../../reell-mottaker-regel";
 import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useEnPartMedBarnFlyt } from "../../hooks/useEnPartMedBarnFlyt";
 import {
@@ -9,7 +10,6 @@ import {
     type ForelderPartRolle,
     OppfostringsbidragSkjemaSchema,
 } from "../../opprett-sak-schema";
-import type { ReellMottakerRegel } from "../../reell-mottaker-regel";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
 

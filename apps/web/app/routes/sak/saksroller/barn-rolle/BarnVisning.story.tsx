@@ -7,6 +7,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import type { BarnRolle, SakRedigeringData } from "../sakvisning-schema.ts";
 import BarnVisning from "./BarnVisning.tsx";
 
+const BM_IDENT = genererFnr();
+
 function lagBarn(overrides: Partial<BarnRolle> = {}): BarnRolle {
     return {
         fodselsnummer: genererFnr(),
@@ -24,14 +26,14 @@ function lagBarn(overrides: Partial<BarnRolle> = {}): BarnRolle {
 
 interface BarnVisningScenarioProps {
     initialRoller: BarnRolle[];
-    kanFjerneRM?: boolean;
+    bidragsmottakerIdent?: string;
     erNyttBarnIndex?: number;
     erOppfostringsbidrag?: boolean;
 }
 
 function BarnVisningScenario({
     initialRoller,
-    kanFjerneRM = true,
+    bidragsmottakerIdent = BM_IDENT,
     erNyttBarnIndex,
     erOppfostringsbidrag = false,
 }: BarnVisningScenarioProps) {
@@ -51,7 +53,7 @@ function BarnVisningScenario({
                                 key={rolle.fodselsnummer}
                                 rolle={rolle}
                                 index={index}
-                                kanFjerneRM={kanFjerneRM}
+                                bidragsmottakerIdent={bidragsmottakerIdent}
                                 erNyttBarn={index === erNyttBarnIndex}
                                 hentOgNullstillSamhandler={() => null}
                                 erOppfostringsbidrag={erOppfostringsbidrag}
@@ -66,15 +68,6 @@ function BarnVisningScenario({
 
 export const UtenReellMottaker = () => <BarnVisningScenario initialRoller={[lagBarn()]} />;
 
-export const MedReellMottakerBarnetSelv = () => {
-    const ident = genererFnr();
-    return (
-        <BarnVisningScenario
-            initialRoller={[lagBarn({ fodselsnummer: ident, reellMottakerType: "barnet_selv", reellMottaker: ident })]}
-        />
-    );
-};
-
 export const NyttBarnKanFjernes = () => (
     <BarnVisningScenario
         initialRoller={[lagBarn({ navn: "Nytt Barn" }), lagBarn({ navn: "Eksisterende Barn" })]}
@@ -83,8 +76,5 @@ export const NyttBarnKanFjernes = () => (
 );
 
 export const PåkrevdReellMottaker = () => (
-    <BarnVisningScenario
-        initialRoller={[lagBarn({ navn: "Myndig Barn", alder: 19, erMyndig: true })]}
-        kanFjerneRM={false}
-    />
+    <BarnVisningScenario initialRoller={[lagBarn({ navn: "Myndig Barn", alder: 19, erMyndig: true })]} />
 );

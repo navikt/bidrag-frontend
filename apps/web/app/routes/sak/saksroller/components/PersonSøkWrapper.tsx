@@ -39,14 +39,16 @@ export function PersonSøkInnhold({
     );
 }
 
-interface PersonSøkWrapperProps extends PersonSøkInnholdProps {
+export interface PersonSøkRammeProps {
     tittel: string;
     onAvbryt: () => void;
     ikon?: ReactNode;
     actions?: ReactNode;
+    children: ReactNode;
 }
 
-export default function PersonSøkWrapper({ tittel, onAvbryt, ikon, actions, ...innholdProps }: PersonSøkWrapperProps) {
+/** Inline ramme for søk. Brukes der innholdet selv kan ligge i en modal. */
+export default function PersonSøkWrapper({ tittel, onAvbryt, ikon, actions, children }: PersonSøkRammeProps) {
     return (
         <Box background="accent-soft" borderColor="accent" borderWidth="1" borderRadius="12" padding="space-16">
             <VStack gap="space-16">
@@ -56,7 +58,7 @@ export default function PersonSøkWrapper({ tittel, onAvbryt, ikon, actions, ...
                         {tittel}
                     </Heading>
                 </HStack>
-                <PersonSøkInnhold {...innholdProps} />
+                {children}
                 <HStack gap="space-8">
                     {actions ?? (
                         <Button type="button" size="small" variant="tertiary" onClick={onAvbryt}>

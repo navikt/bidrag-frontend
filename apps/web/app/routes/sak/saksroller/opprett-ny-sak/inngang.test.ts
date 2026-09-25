@@ -2,22 +2,15 @@ import { describe, expect, test } from "vitest";
 import { tilPartRolle } from "./inngang";
 
 describe("tilPartRolle", () => {
-    test("BP og BM oversettes direkte", () => {
-        expect(tilPartRolle("BP", 40)).toBe("bidragspliktig");
-        expect(tilPartRolle("BM", null)).toBe("bidragsmottaker");
-    });
-
-    test("BA oversettes etter alder", () => {
-        expect(tilPartRolle("BA", 10)).toBe("barn_under_18");
-        expect(tilPartRolle("BA", 19)).toBe("barn_over_18");
-    });
-
-    test("BA uten kjent alder eller over maksalder lar saksbehandler velge", () => {
-        expect(tilPartRolle("BA", null)).toBeNull();
-        expect(tilPartRolle("BA", 40)).toBeNull();
-    });
-
-    test("uten rolle gir ingen rolle", () => {
-        expect(tilPartRolle(undefined, 10)).toBeNull();
+    test.each([
+        { rolle: "BP", alder: 40, forventet: "bidragspliktig" },
+        { rolle: "BM", alder: null, forventet: "bidragsmottaker" },
+        { rolle: "BA", alder: 10, forventet: "barn_under_18" },
+        { rolle: "BA", alder: 19, forventet: "barn_over_18" },
+        { rolle: "BA", alder: null, forventet: null },
+        { rolle: "BA", alder: 40, forventet: null },
+        { rolle: undefined, alder: 10, forventet: null },
+    ] as const)("$rolle med alder $alder gir $forventet", ({ rolle, alder, forventet }) => {
+        expect(tilPartRolle(rolle, alder)).toBe(forventet);
     });
 });

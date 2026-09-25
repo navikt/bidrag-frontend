@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonInfo from "../components/PersonInfo.tsx";
 import PersonSøkModal from "../components/PersonSøkModal.tsx";
+import { PersonSøkInnhold } from "../components/PersonSøkWrapper.tsx";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 import { finnDuplikatForelderFeil } from "./forelder-regler.ts";
@@ -81,47 +82,47 @@ export default function LeggTilForelder({
     }
 
     return (
-        <PersonSøkModal
-            tittel={`Legg til ${rolleNavn.toLowerCase()}`}
-            beskrivelse={`Søk opp personen som skal være ${rolleNavn.toLowerCase()} i saken`}
-            søkeLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
-            onPersonValgt={handlePersonValgt}
-            onAvbryt={() => setVisSøk(false)}
-        >
-            {muligeAndreForeldre.length > 0 && (
-                <Box
-                    background="raised"
-                    borderColor="neutral-subtleA"
-                    borderWidth="1"
-                    borderRadius="12"
-                    padding="space-16"
-                >
-                    <Heading level="4" size="xsmall" spacing>
-                        Foreslåtte foreldre ({muligeAndreForeldre.length})
-                    </Heading>
-                    <BodyLong size="small" textColor="subtle" spacing>
-                        Klikk på en person for å legge til
-                    </BodyLong>
-                    <VStack gap="space-8">
-                        {muligeAndreForeldre.map((forelder) => (
-                            <Button
-                                key={forelder.ident}
-                                type="button"
-                                variant="tertiary"
-                                size="small"
-                                className="w-full justify-start"
-                                onClick={() => handlePersonValgt(forelder)}
-                            >
-                                <PersonInfo
-                                    navn={forelder.visningsnavn}
-                                    ident={forelder.ident}
-                                    fødselsdato={forelder.fødselsdato || ""}
-                                />
-                            </Button>
-                        ))}
-                    </VStack>
-                </Box>
-            )}
+        <PersonSøkModal tittel={`Legg til ${rolleNavn.toLowerCase()}`} onAvbryt={() => setVisSøk(false)}>
+            <PersonSøkInnhold
+                beskrivelse={`Søk opp personen som skal være ${rolleNavn.toLowerCase()} i saken`}
+                søkeLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
+                onPersonValgt={handlePersonValgt}
+            >
+                {muligeAndreForeldre.length > 0 && (
+                    <Box
+                        background="raised"
+                        borderColor="neutral-subtleA"
+                        borderWidth="1"
+                        borderRadius="12"
+                        padding="space-16"
+                    >
+                        <Heading level="4" size="xsmall" spacing>
+                            Foreslåtte foreldre ({muligeAndreForeldre.length})
+                        </Heading>
+                        <BodyLong size="small" textColor="subtle" spacing>
+                            Klikk på en person for å legge til
+                        </BodyLong>
+                        <VStack gap="space-8">
+                            {muligeAndreForeldre.map((forelder) => (
+                                <Button
+                                    key={forelder.ident}
+                                    type="button"
+                                    variant="tertiary"
+                                    size="small"
+                                    className="w-full justify-start"
+                                    onClick={() => handlePersonValgt(forelder)}
+                                >
+                                    <PersonInfo
+                                        navn={forelder.visningsnavn}
+                                        ident={forelder.ident}
+                                        fødselsdato={forelder.fødselsdato || ""}
+                                    />
+                                </Button>
+                            ))}
+                        </VStack>
+                    </Box>
+                )}
+            </PersonSøkInnhold>
         </PersonSøkModal>
     );
 }

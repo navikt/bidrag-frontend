@@ -1,19 +1,19 @@
 import { XMarkIcon } from "@navikt/aksel-icons";
 import { Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
-import type { ReellMottakerValgregel } from "../components/ReellMottakerValgGruppe.tsx";
 import { BarnKortInnhold } from "../felles/BarnKort.tsx";
 import { KortRamme } from "../felles/PersonRolleKort.tsx";
 import ReellMottakerRad from "../felles/ReellMottakerRad.tsx";
 import ReellMottakerVelger from "../ReellMottakerVelger.tsx";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
+import { reellMottakerRegelForSak, reellMottakerValgregel } from "../reell-mottaker-regel.ts";
 import type { BarnRolle, SakRedigeringData } from "../sakvisning-schema.ts";
 import { useBarnReellMottaker } from "./useBarnReellMottaker.tsx";
 
 interface BarnVisningProps {
     rolle: BarnRolle;
     index: number;
-    kanFjerneRM: boolean;
+    bidragsmottakerIdent: string | undefined;
     erNyttBarn?: boolean;
     hentOgNullstillSamhandler: (barnIndex: number, isLeggTilBarn: boolean) => { ident: string; navn: string } | null;
     closeEditorSignal?: number;
@@ -23,7 +23,7 @@ interface BarnVisningProps {
 export default function BarnVisning({
     rolle,
     index,
-    kanFjerneRM,
+    bidragsmottakerIdent,
     erNyttBarn,
     hentOgNullstillSamhandler,
     closeEditorSignal,
@@ -79,7 +79,10 @@ export default function BarnVisning({
                         }}
                         onAvbryt={handleLukkReellMottaker}
                         onBekreft={handleBekreftReellMottaker}
-                        regel={reellMottakerRegel(erOppfostringsbidrag, kanFjerneRM)}
+                        regel={reellMottakerValgregel(
+                            reellMottakerRegelForSak(erOppfostringsbidrag, bidragsmottakerIdent),
+                            rolle.erMyndig ?? false,
+                        )}
                     />
                 )}
                 <RollehistorikkVisning
@@ -90,11 +93,6 @@ export default function BarnVisning({
             </VStack>
         </KortRamme>
     );
-}
-
-function reellMottakerRegel(erOppfostringsbidrag: boolean, kanFjerneRM: boolean): ReellMottakerValgregel {
-    if (erOppfostringsbidrag) return "kun-samhandler";
-    return kanFjerneRM ? "valgfri" : "påkrevd";
 }
 
 function NyttBarnHandlinger({ onFjern }: { onFjern: () => void }) {

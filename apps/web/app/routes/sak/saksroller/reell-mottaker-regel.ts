@@ -1,4 +1,4 @@
-import type { ReellMottakerValg, ReellMottakerValgregel } from "../components/ReellMottakerValgGruppe";
+import type { ReellMottakerValg, ReellMottakerValgregel } from "./components/ReellMottakerValgGruppe";
 
 export type ReellMottakerRegel =
     | { type: "skjult" }
@@ -22,6 +22,16 @@ export type ReellMottakerFeil = {
     felt: "reellMottakerType" | "reellMottaker";
     melding: string;
 };
+
+/** Rollebildet: oppfostringsbidrag krever samhandler. Ellers avgjør barnets alder og om BM har ident. */
+export function reellMottakerRegelForSak(
+    erOppfostringsbidrag: boolean,
+    bidragsmottakerIdent: string | undefined,
+): Exclude<ReellMottakerRegel, { type: "skjult" }> {
+    return erOppfostringsbidrag
+        ? { type: "alltid-samhandler" }
+        : { type: "etter-barn", bidragsmottakerErUkjent: !bidragsmottakerIdent };
+}
 
 export function reellMottakerValgregel(
     regel: Exclude<ReellMottakerRegel, { type: "skjult" }>,
@@ -58,28 +68,27 @@ export function fraReellMottakerValg(valg: ReellMottakerValg): ReellMottakerSkje
     };
 }
 
+/** Startvalg når regelen krever reell mottaker. Beholder valget når det allerede oppfyller regelen. */
+export function initialiserValg(valg: ReellMottakerValg, regel: ReellMottakerValgregel, barn: Barn): ReellMottakerValg {
+    if (regel === "valgfri") {
+        return valg;
+    }
+
+    if (regel === "kun-samhandler") {
+        return valg.type === "samhandler" ? valg : { type: "samhandler" };
+    }
+
+    return valg.type ? valg : { type: "barnet_selv", ident: barn.ident, navn: barn.navn };
+}
+
 export function initialiserReellMottaker(
     verdi: ReellMottakerSkjemaverdi,
     regel: ReellMottakerValgregel,
     barn: Barn,
 ): ReellMottakerSkjemaverdi {
-    if (regel === "valgfri") {
-        return verdi;
-    }
-
-    if (regel === "kun-samhandler") {
-        if (verdi.reellMottakerType === "annen_person") {
-            return verdi;
-        }
-
-        return fraReellMottakerValg({ type: "samhandler" });
-    }
-
-    if (verdi.reellMottakerType && verdi.reellMottakerType !== "ingen") {
-        return verdi;
-    }
-
-    return fraReellMottakerValg({ type: "barnet_selv", ident: barn.ident, navn: barn.navn });
+    const valg = tilReellMottakerValg(verdi, barn);
+    const initialisert = initialiserValg(valg, regel, barn);
+    return initialisert === valg ? verdi : fraReellMottakerValg(initialisert);
 }
 
 export function validerReellMottaker(

@@ -26,22 +26,16 @@ function lagBarn(overrides: Partial<BarnRolle> = {}): BarnRolle {
 }
 
 describe("lagEndringsoppsummering – advarsel om ufullstendig relasjon", () => {
-    it("merker en endringsrad med harUfullstendigRelasjon=true når barnets ident er i listen", () => {
+    it.each([
+        { ufullstendige: ["10987654321"], forventet: true },
+        { ufullstendige: ["99999999999"], forventet: false },
+    ])("barn i listen $ufullstendige gir harUfullstendigRelasjon=$forventet", ({ ufullstendige, forventet }) => {
         const opprinnelige = [lagBarn({ reellMottaker: undefined })];
         const nåværende = [lagBarn({ reellMottaker: "12345678901", reellMottakerType: "barnet_selv" })];
 
-        const [endring] = lagEndringsoppsummering(opprinnelige, nåværende, ["10987654321"]);
+        const [endring] = lagEndringsoppsummering(opprinnelige, nåværende, ufullstendige);
 
-        expect(endring?.harUfullstendigRelasjon).toBe(true);
-    });
-
-    it("setter harUfullstendigRelasjon=false når barnets ident ikke er i listen", () => {
-        const opprinnelige = [lagBarn({ reellMottaker: undefined })];
-        const nåværende = [lagBarn({ reellMottaker: "12345678901", reellMottakerType: "barnet_selv" })];
-
-        const [endring] = lagEndringsoppsummering(opprinnelige, nåværende, ["99999999999"]);
-
-        expect(endring?.harUfullstendigRelasjon).toBe(false);
+        expect(endring?.harUfullstendigRelasjon).toBe(forventet);
     });
 
     it("setter harUfullstendigRelasjon=false som standard når parameteren utelates", () => {

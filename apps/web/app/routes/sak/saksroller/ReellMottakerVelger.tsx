@@ -3,7 +3,12 @@ import { Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react
 import { useState } from "react";
 import { useParams } from "react-router";
 
-import ReellMottakerValgGruppe, { type ReellMottakerValg } from "./components/ReellMottakerValgGruppe.tsx";
+import ReellMottakerValgGruppe, {
+    type ReellMottakerValg,
+    type ReellMottakerValgregel,
+    useLagretSamhandler,
+} from "./components/ReellMottakerValgGruppe.tsx";
+import { initialiserValg } from "./reell-mottaker-regel.ts";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;
@@ -12,7 +17,7 @@ interface ReellMottakerVelgerProps {
     onAvbryt: () => void;
     onBekreft: (verdi: ReellMottakerValg) => void;
     disabled?: boolean;
-    regel: "valgfri" | "påkrevd" | "kun-samhandler";
+    regel: ReellMottakerValgregel;
     feil?: string;
 }
 
@@ -29,24 +34,11 @@ export default function ReellMottakerVelger({
     const { saksnummer } = useParams();
     const [valideringsfeil, setValideringsfeil] = useState<string | undefined>();
     const påkrevd = regel !== "valgfri";
-    const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
     // Utkast, slik at endringsoppsummeringen bak modalen først oppdateres ved bekreftelse.
-    const [utkast, setUtkast] = useState<ReellMottakerValg>(() => {
-        if (kunSamhandlerSomReellMottaker && verdi.type === "barnet_selv") {
-            return { type: "samhandler" };
-        }
-
-        if (påkrevd && !verdi.type) {
-            return kunSamhandlerSomReellMottaker
-                ? { type: "samhandler" }
-                : { type: "barnet_selv", ident: barnIdent, navn: barnNavn };
-        }
-
-        return verdi;
-    });
-    const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(() =>
-        utkast.type === "samhandler" && utkast.ident && utkast.navn ? { ident: utkast.ident, navn: utkast.navn } : null,
+    const [utkast, setUtkast] = useState<ReellMottakerValg>(() =>
+        initialiserValg(verdi, regel, { ident: barnIdent ?? "", navn: barnNavn }),
     );
+    const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(utkast);
 
     const handleBekreft = () => {
         if (!kanBekrefte) {
@@ -58,14 +50,7 @@ export default function ReellMottakerVelger({
     };
 
     const handleValg = (nyttValg: ReellMottakerValg) => {
-        if (utkast.type === "samhandler" && utkast.ident && utkast.navn && nyttValg.type !== "samhandler") {
-            setLagretSamhandler({ ident: utkast.ident, navn: utkast.navn });
-        }
-
-        if (nyttValg.type === "samhandler" && nyttValg.ident && nyttValg.navn) {
-            setLagretSamhandler({ ident: nyttValg.ident, navn: nyttValg.navn });
-        }
-
+        huskSamhandler(utkast, nyttValg);
         setUtkast(nyttValg);
         setValideringsfeil(undefined);
     };

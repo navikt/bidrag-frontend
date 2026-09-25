@@ -70,23 +70,13 @@ describe("utledSakstype", () => {
         } as SakRedigeringData["roller"][number];
     }
 
-    it("returnerer Ektefellebidrag når saken har BP og BM, men ingen barn", () => {
-        expect(utledSakstype([rolle("BP"), rolle("BM")])).toBe("Ektefellebidrag");
-    });
-
-    it("returnerer Oppfostringsbidrag når saken har barn og BP, men ingen BM", () => {
-        expect(utledSakstype([rolle("BA"), rolle("BP")])).toBe("Oppfostringsbidrag");
-    });
-
-    it("returnerer Farskap når saken har barn og BM, men ingen BP", () => {
-        expect(utledSakstype([rolle("BA"), rolle("BM")])).toBe("Farskap");
-    });
-
-    it("returnerer Barnebidrag som standard når saken har barn, BP og BM", () => {
-        expect(utledSakstype([rolle("BA"), rolle("BP"), rolle("BM")])).toBe("Barnebidrag");
-    });
-
-    it("returnerer Barnebidrag for en tom rolleliste", () => {
-        expect(utledSakstype([])).toBe("Barnebidrag");
+    it.each([
+        { roller: ["BP", "BM"], forventet: "Ektefellebidrag" },
+        { roller: ["BA", "BP"], forventet: "Oppfostringsbidrag" },
+        { roller: ["BA", "BM"], forventet: "Farskap" },
+        { roller: ["BA", "BP", "BM"], forventet: "Barnebidrag" },
+        { roller: [], forventet: "Barnebidrag" },
+    ] as const)("$roller gir $forventet", ({ roller, forventet }) => {
+        expect(utledSakstype(roller.map(rolle))).toBe(forventet);
     });
 });

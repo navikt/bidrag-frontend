@@ -1,15 +1,6 @@
 import { Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react";
-import type { ReactNode } from "react";
 import { useParams } from "react-router";
-import { PersonSøkInnhold, type PersonSøkInnholdProps } from "./PersonSøkWrapper.tsx";
-
-interface PersonSøkModalProps extends PersonSøkInnholdProps {
-    tittel: string;
-    onAvbryt: () => void;
-    ikon?: ReactNode;
-    saksnummer?: string;
-    actions?: ReactNode;
-}
+import type { PersonSøkRammeProps } from "./PersonSøkWrapper.tsx";
 
 export default function PersonSøkModal({
     tittel,
@@ -17,8 +8,8 @@ export default function PersonSøkModal({
     ikon,
     saksnummer,
     actions,
-    ...innholdProps
-}: PersonSøkModalProps) {
+    children,
+}: PersonSøkRammeProps & { saksnummer?: string }) {
     const { saksnummer: saksnummerFraRute } = useParams();
     const sak = saksnummer ?? saksnummerFraRute;
 
@@ -35,9 +26,7 @@ export default function PersonSøkModal({
                     </HStack>
                 </VStack>
             </Modal.Header>
-            <Modal.Body>
-                <PersonSøkInnhold {...innholdProps} />
-            </Modal.Body>
+            <Modal.Body>{children}</Modal.Body>
             <Modal.Footer>
                 {actions ?? (
                     <Button type="button" size="small" variant="secondary" onClick={onAvbryt}>

@@ -4,8 +4,10 @@ import { Button, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonSøkModal from "../components/PersonSøkModal.tsx";
+import { PersonSøkInnhold } from "../components/PersonSøkWrapper.tsx";
 import { ForelderKortInnhold } from "../felles/ForelderKort.tsx";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
+import { fjernRolle } from "../rolle-endringer.ts";
 import type { Rolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 interface ForelderVisningProps {
@@ -32,11 +34,6 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
 
         form.setValue("roller", erstattForelder(roller, nyForelder), { shouldValidate: true });
         setVisSøk(false);
-    };
-
-    const handleFjernForelder = () => {
-        const oppdaterteRoller = roller.filter((r) => r.fodselsnummer !== rolle.fodselsnummer);
-        form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
     };
 
     return (
@@ -66,17 +63,21 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
                 />
             </ForelderKortInnhold>
             {erNyForelder && (
-                <ForelderHandlinger visEndre={!visSøk} onEndre={() => setVisSøk(true)} onFjern={handleFjernForelder} />
+                <ForelderHandlinger
+                    visEndre={!visSøk}
+                    onEndre={() => setVisSøk(true)}
+                    onFjern={() => fjernRolle(form, rolle.fodselsnummer)}
+                />
             )}
 
             {visSøk && (
-                <PersonSøkModal
-                    tittel={`Endre ${forelderRolleNavn}`}
-                    beskrivelse={`Søk opp personen som skal være ${forelderRolleNavn} i saken`}
-                    søkeLabel={`Søk etter ${forelderRolleNavn}`}
-                    onPersonValgt={handlePersonValgt}
-                    onAvbryt={() => setVisSøk(false)}
-                />
+                <PersonSøkModal tittel={`Endre ${forelderRolleNavn}`} onAvbryt={() => setVisSøk(false)}>
+                    <PersonSøkInnhold
+                        beskrivelse={`Søk opp personen som skal være ${forelderRolleNavn} i saken`}
+                        søkeLabel={`Søk etter ${forelderRolleNavn}`}
+                        onPersonValgt={handlePersonValgt}
+                    />
+                </PersonSøkModal>
             )}
         </VStack>
     );

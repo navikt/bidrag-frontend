@@ -1,13 +1,21 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { PersonTallShortIcon, PlusIcon } from "@navikt/aksel-icons";
-import { BodyLong, Box, Button, Heading, InlineMessage, VStack } from "@navikt/ds-react";
+import { BodyLong, Button, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 
-import PersonInfo from "../components/PersonInfo.tsx";
+import {
+    BarnPersonInfo,
+    BarnSøkHandlinger,
+    BarnSøkIkon,
+    BarnSøkInnhold,
+    barnSøkTittel,
+    LeggTilBarnKnapp,
+    useBarnSøk,
+} from "../components/BarnSøk.tsx";
 import PersonSøkModal from "../components/PersonSøkModal.tsx";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import ReellMottakerVelger from "../ReellMottakerVelger.tsx";
+import { reellMottakerRegelForSak, reellMottakerValgregel } from "../reell-mottaker-regel.ts";
 import { MYNDYG_BARN_ALDER, type SakRedigeringData } from "../sakvisning-schema.ts";
 import { alderForBarn, finnValideringsfeilForBarn, lagBarnRolle } from "./legg-til-barn-utils.ts";
 
@@ -19,10 +27,8 @@ interface LeggTilBarnProps {
 }
 
 export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSøk, setVisSøk }: LeggTilBarnProps) {
-    const [feil, setFeil] = useState<string | undefined>(undefined);
     const [valgtBarn, setValgtBarn] = useState<PersonDto | null>(null);
     const [visReellMottaker, setVisReellMottaker] = useState(false);
-    const [funnetPerson, setFunnetPerson] = useState<PersonDto | null>(null);
 
     useRegistrerÅpenRedigering("legg-til-barn", visSøk || visReellMottaker);
 
@@ -33,10 +39,20 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
         (søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident),
     );
 
+    const søk = useBarnSøk({
+        valider: (person) => {
+            const valideringsfeil = finnValideringsfeilForBarn(person, roller);
+            if (valideringsfeil) throw new Error(valideringsfeil);
+            return alderForBarn(person);
+        },
+        onLeggTil: ({ person }) => leggTil(person),
+        onLukk: () => setVisSøk(false),
+    });
+
     const leggTil = (person: PersonDto) => {
         const valideringsfeil = finnValideringsfeilForBarn(person, roller);
         if (valideringsfeil) {
-            setFeil(valideringsfeil);
+            søk.setFeil(valideringsfeil);
             return;
         }
 
@@ -46,50 +62,21 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
 
         const harBidragsmottaker = roller.some((rolle) => rolle.type === "BM" && rolle.fodselsnummer);
 
-        setFunnetPerson(null);
+        søk.nullstill();
 
         if (nyttBarn.erMyndig || !harBidragsmottaker) {
             setValgtBarn(person);
             setVisReellMottaker(true);
             setVisSøk(false);
-            setFeil(undefined);
         } else if (tilgjengeligeSøsken.length <= 1) {
-            lukk();
-        } else {
-            setFeil(undefined);
+            søk.lukk();
         }
-    };
-
-    const handleSøkResultat = (person: PersonDto) => {
-        const valideringsfeil = finnValideringsfeilForBarn(person, roller);
-        if (valideringsfeil) {
-            setFunnetPerson(null);
-            throw new Error(valideringsfeil);
-        }
-
-        setFeil(undefined);
-        setFunnetPerson(person);
-    };
-
-    const handleLeggTil = () => {
-        if (!funnetPerson) {
-            setFeil("Søk opp barnet med fødselsnummer eller D-nummer først");
-            return;
-        }
-        leggTil(funnetPerson);
-    };
-
-    const lukk = () => {
-        setVisSøk(false);
-        setFeil(undefined);
-        setFunnetPerson(null);
     };
 
     const resetEtterReellMottaker = () => {
         setVisReellMottaker(false);
         setValgtBarn(null);
-        setFeil(undefined);
-        setFunnetPerson(null);
+        søk.nullstill();
     };
 
     if (visReellMottaker && valgtBarn) {
@@ -106,98 +93,36 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
                     form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, valg.navn, { shouldValidate: true });
                     resetEtterReellMottaker();
                 }}
-                regel={utledReellMottakerRegel(valgtBarn, roller, erOppfostringsbidrag)}
+                regel={reellMottakerValgregel(
+                    reellMottakerRegelForSak(
+                        Boolean(erOppfostringsbidrag),
+                        roller.find((rolle) => rolle.type === "BM")?.fodselsnummer,
+                    ),
+                    alderForBarn(valgtBarn) >= MYNDYG_BARN_ALDER,
+                )}
             />
         );
     }
 
     if (!visSøk) {
-        return (
-            <Box marginBlock="space-16 space-0">
-                <Button
-                    icon={<PlusIcon aria-hidden />}
-                    variant="secondary"
-                    size="small"
-                    type="button"
-                    onClick={() => setVisSøk(true)}
-                >
-                    Legg til nytt barn
-                </Button>
-            </Box>
-        );
+        return <LeggTilBarnKnapp onClick={() => setVisSøk(true)} />;
     }
 
     const harBeggeForeldre = roller.some((i) => i.type === "BP") && roller.some((i) => i.type === "BM");
 
     return (
         <PersonSøkModal
-            tittel="Legg til nytt barn i saken"
-            beskrivelse="Søk opp barnet som skal legges til i saken"
-            søkeLabel="Søk etter barn"
-            onPersonValgt={handleSøkResultat}
-            onQueryChange={() => {
-                setFunnetPerson(null);
-                setFeil(undefined);
-            }}
-            onAvbryt={lukk}
-            ikon={<PersonTallShortIcon aria-hidden />}
-            actions={
-                <>
-                    <Button type="button" size="small" onClick={handleLeggTil}>
-                        Legg til
-                    </Button>
-                    <Button type="button" size="small" variant="secondary" onClick={lukk}>
-                        Avbryt
-                    </Button>
-                </>
-            }
-            resultat={<Søkeresultat feil={feil} funnetPerson={funnetPerson} />}
+            tittel={barnSøkTittel}
+            ikon={<BarnSøkIkon />}
+            onAvbryt={søk.lukk}
+            actions={<BarnSøkHandlinger søk={søk} />}
         >
-            <VStack gap="space-16">
+            <BarnSøkInnhold søk={søk}>
                 {tilgjengeligeSøsken.length > 0 && (
                     <SøskenListe søsken={tilgjengeligeSøsken} harBeggeForeldre={harBeggeForeldre} onVelg={leggTil} />
                 )}
-            </VStack>
+            </BarnSøkInnhold>
         </PersonSøkModal>
-    );
-}
-
-function utledReellMottakerRegel(
-    barn: PersonDto,
-    roller: SakRedigeringData["roller"],
-    erOppfostringsbidrag?: boolean,
-): "kun-samhandler" | "påkrevd" | "valgfri" {
-    if (erOppfostringsbidrag) return "kun-samhandler";
-    const bm = roller.find((rolle) => rolle.type === "BM");
-    return alderForBarn(barn) >= MYNDYG_BARN_ALDER || !bm?.fodselsnummer ? "påkrevd" : "valgfri";
-}
-
-function BarnPersonInfo({ barn }: { barn: PersonDto }) {
-    return (
-        <PersonInfo
-            navn={barn.visningsnavn}
-            ident={barn.ident}
-            rolle="BA"
-            alder={alderForBarn(barn)}
-            fødselsdato={barn.fødselsdato || ""}
-        />
-    );
-}
-
-function Søkeresultat({ feil, funnetPerson }: { feil?: string; funnetPerson: PersonDto | null }) {
-    return (
-        <>
-            {feil && (
-                <InlineMessage status="warning" size="small">
-                    {feil}
-                </InlineMessage>
-            )}
-            {funnetPerson && (
-                <Box padding="space-16" borderRadius="8" background="neutral-soft">
-                    <BarnPersonInfo barn={funnetPerson} />
-                </Box>
-            )}
-        </>
     );
 }
 
@@ -230,7 +155,7 @@ function SøskenListe({
                         className="w-full justify-start"
                         onClick={() => onVelg(søskenBarn)}
                     >
-                        <BarnPersonInfo barn={søskenBarn} />
+                        <BarnPersonInfo person={søskenBarn} alder={alderForBarn(søskenBarn)} />
                     </Button>
                 ))}
             </VStack>

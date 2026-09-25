@@ -1,5 +1,4 @@
-import { BIDRAG_PERSON_API } from "@bidrag/api";
-import type { ForelderBarnRelasjonDto, MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
+import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { useQueryClient } from "@tanstack/react-query";
 import { createContext, type PropsWithChildren, useCallback, useContext, useRef, useState } from "react";
@@ -62,7 +61,6 @@ type SaksrolleroversiktContext = OpprettSakFlytValg & {
     velgKategori: (kategori: Sakskategori) => void;
     velgRolle: (rolle: PartISaken["rolle"]) => number;
     settFlytHvisGjeldende: (versjon: number, flyt: SaksrolleFlyt) => void;
-    harUfullstendigRelasjon: (barn: string[], bidragsmottaker?: string, bidragspliktig?: string) => Promise<boolean>;
     hentBarnkurver: (ident: string) => Promise<MotpartBarnRelasjon[]>;
 };
 
@@ -138,52 +136,13 @@ function useSaksrollevalg() {
     };
 }
 
-function useRelasjonsoppslag() {
+function useHentBarnkurver() {
     const queryClient = useQueryClient();
 
-    const hentBarnkurver = async (ident: string) => {
+    return async (ident: string) => {
         const data = await queryClient.fetchQuery(hentPersonMotpartBarnRelasjonQueryOptions({ ident }));
         return data?.personensMotpartBarnRelasjon ?? [];
     };
-
-    const hentForelderBarnRelasjon = async (ident: string): Promise<ForelderBarnRelasjonDto> => {
-        return queryClient.fetchQuery({
-            queryKey: ["hent_forelder_barn_relasjon", ident],
-            queryFn: async () => {
-                const { data } = await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1({ ident });
-                return data;
-            },
-        });
-    };
-
-    const harUfullstendigRelasjon = async (
-        barn: string[],
-        bidragsmottaker?: string,
-        bidragspliktig?: string,
-    ): Promise<boolean> => {
-        if (!bidragsmottaker || !bidragspliktig) {
-            return true;
-        }
-
-        const resultat = await Promise.all(
-            barn.map(async (barnIdent) => {
-                const relasjon = await hentForelderBarnRelasjon(barnIdent);
-                const foreldreIdent = relasjon.forelderBarnRelasjon
-                    .filter((i) => i.minRolleForPerson === "BARN")
-                    .map((i) => i.relatertPersonsIdent);
-
-                return (
-                    foreldreIdent.length < 2 ||
-                    !foreldreIdent.includes(bidragsmottaker) ||
-                    !foreldreIdent.includes(bidragspliktig)
-                );
-            }),
-        );
-
-        return resultat.some((erUfullstendig) => erUfullstendig);
-    };
-
-    return { hentBarnkurver, harUfullstendigRelasjon };
 }
 
 function SaksrolleroversiktProvider({
@@ -193,7 +152,7 @@ function SaksrolleroversiktProvider({
     onAvbryt,
 }: PropsWithChildren<OpprettSakFlytValg>) {
     const { velgPersonOgNullstillRolle, ...valg } = useSaksrollevalg();
-    const { hentBarnkurver, harUfullstendigRelasjon } = useRelasjonsoppslag();
+    const hentBarnkurver = useHentBarnkurver();
     const [isLoadingOpprettSak, setIsLoadingOpprettSak] = useState<boolean>(false);
     const [sakstype, setSakstype] = useState<Sakstype | null>("BARNEBIDRAG");
     const [sakskategori, setSakskategori] = useState<Sakskategori>("Nasjonal");
@@ -228,7 +187,6 @@ function SaksrolleroversiktProvider({
                 velgPerson: velgPersonOgNullstillRolle,
                 velgSakstype,
                 velgKategori,
-                harUfullstendigRelasjon,
                 hentBarnkurver,
                 inngang,
                 onOpprettet,

@@ -1,21 +1,11 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { lagRolle, lagSak, testpersoner } from "@ct/saksroller/fixtures.ts";
 import { mockSaksrollerApi } from "@ct/saksroller/network.ts";
 
 const STORY = "routes/sak/saksroller/SaksrollerVisning/Standard";
 
 test.describe("SaksrollerVisning", () => {
-    test("viser roller for saken hentet fra nettverket", async ({ mount, page }) => {
-        await mockSaksrollerApi(page);
-        const component = await mount(STORY);
-
-        await expect(component.getByRole("heading", { name: "Rollebilde for sak 2024/1" })).toBeVisible();
-        await expect(component.getByText(testpersoner.bidragsmottaker.visningsnavn)).toBeVisible();
-        await expect(component.getByText(testpersoner.bidragspliktig.visningsnavn)).toBeVisible();
-        await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
-        await expect(component.getByText("Barn i saken (1)")).toBeVisible();
-    });
-
     test("kan legge til første barn når saken ikke har barn", async ({ mount, page }) => {
         await mockSaksrollerApi(page, {
             sak: lagSak({
@@ -86,19 +76,57 @@ test.describe("SaksrollerVisning", () => {
         await expect(barnHistorikk.getByRole("cell", { name: "Endret RM manuelt" })).toBeVisible();
     });
 
-    test("lagrer endringer og viser suksessmelding", async ({ mount, page }) => {
-        const { requests } = await mockSaksrollerApi(page);
+    test("fullflyt: setter reell mottaker, legger til barn, lagrer og sender riktig request", async ({
+        mount,
+        page,
+    }) => {
+        const nyttBarn = { ident: genererFnr(), visningsnavn: "Nytt Barn", fødselsdato: "2016-05-01" };
+        const { requests } = await mockSaksrollerApi(page, { personOverrides: { [nyttBarn.ident]: nyttBarn } });
         const component = await mount(STORY);
 
+        await expect(component.getByRole("heading", { name: "Rollebilde for sak 2024/1" })).toBeVisible();
+        await expect(component.getByText(testpersoner.bidragsmottaker.visningsnavn)).toBeVisible();
+        await expect(component.getByText(testpersoner.bidragspliktig.visningsnavn)).toBeVisible();
         await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
+        await expect(component.getByText("Barn i saken (1)")).toBeVisible();
+
         await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
         await component.getByRole("radio", { name: "Barnet selv" }).check();
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await expect(component.getByText("Barnet selv", { exact: true })).toBeVisible();
+        await expect(component.getByRole("button", { name: "Endre reell mottaker" })).toBeVisible();
+
+        await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+        const søkefelt = component.getByRole("searchbox", { name: "Søk etter barn" });
+        await søkefelt.fill(nyttBarn.ident);
+        await søkefelt.press("Enter");
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await expect(component.getByText("Barn i saken (2)")).toBeVisible();
 
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
 
         await expect(component.getByText("Saken ble oppdatert")).toBeVisible();
-        expect(requests.update).toBeTruthy();
+        expect(requests.update?.saksnummer).toBe("2024/1");
+        const roller = requests.update?.roller as Record<string, unknown>[];
+        expect(roller).toHaveLength(4);
+        expect(roller).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM" }),
+                expect.objectContaining({ fodselsnummer: testpersoner.bidragspliktig.ident, type: "BP" }),
+                expect.objectContaining({
+                    fodselsnummer: testpersoner.barn.ident,
+                    type: "BA",
+                    objektnummer: "1",
+                    reellMottaker: { ident: testpersoner.barn.ident, verge: false },
+                }),
+                expect.objectContaining({
+                    fodselsnummer: nyttBarn.ident,
+                    type: "BA",
+                    objektnummer: "",
+                    reellMottaker: null,
+                }),
+            ]),
+        );
     });
 
     test("viser feilmelding når lagring feiler", async ({ mount, page }) => {
@@ -120,7 +148,10 @@ test.describe("SaksrollerVisning", () => {
         await expect(component.getByText("Kunne ikke oppdatere sak. Vennligst prøv igjen.")).toHaveCount(0);
     });
 
-    test("avbryter valg av reell mottaker uten å lagre", async ({ mount, page }) => {
+    test("avbrutt valg av reell mottaker lagrer ingenting, og ny redigering fjerner meldingen", async ({
+        mount,
+        page,
+    }) => {
         const { requests } = await mockSaksrollerApi(page);
         const component = await mount(STORY);
 
@@ -135,14 +166,6 @@ test.describe("SaksrollerVisning", () => {
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
         await expect(component.getByText("Ingen endringer å lagre.")).toBeVisible();
         expect(requests.update).toBeFalsy();
-    });
-
-    test("fjerner info om manglende endringer når redigering starter", async ({ mount, page }) => {
-        await mockSaksrollerApi(page);
-        const component = await mount(STORY);
-
-        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
-        await expect(component.getByText("Ingen endringer å lagre.")).toBeVisible();
 
         await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
         await expect(component.getByText("Ingen endringer å lagre.")).toHaveCount(0);

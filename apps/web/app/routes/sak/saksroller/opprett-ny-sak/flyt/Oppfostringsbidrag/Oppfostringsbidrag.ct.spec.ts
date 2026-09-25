@@ -4,10 +4,7 @@ import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Oppfostringsbidrag/Oppfostringsbidrag/Standard";
 
-test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppretter sak", async ({
-    mount,
-    page,
-}) => {
+test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppretter sak", async ({ mount, page }) => {
     const requests = await mockWizardApi(page);
     const component = await mount(STORY);
 

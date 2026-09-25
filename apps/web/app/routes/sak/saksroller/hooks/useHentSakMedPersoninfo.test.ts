@@ -45,9 +45,12 @@ describe("berikRoller", () => {
         expect(resultat?.foedselsnummer).toBeUndefined();
     });
 
-    it("beregner alder og erMyndig=true for barn på 18 år eller eldre basert på fødselsdato", () => {
+    it.each([
+        { år: 20, erMyndig: true },
+        { år: 10, erMyndig: false },
+    ])("barn født for $år år siden får erMyndig=$erMyndig og beregnet alder", ({ år, erMyndig }) => {
         const iDag = new Date();
-        const fødselsdato = new Date(iDag.getFullYear() - 20, iDag.getMonth(), iDag.getDate())
+        const fødselsdato = new Date(iDag.getFullYear() - år, iDag.getMonth(), iDag.getDate())
             .toISOString()
             .slice(0, 10);
 
@@ -58,54 +61,26 @@ describe("berikRoller", () => {
 
         const barn = berikRoller(roller, personInfoMap).at(0) as BarnRolle | undefined;
 
-        expect(barn?.erMyndig).toBe(true);
-        expect(barn?.alder).toBeGreaterThanOrEqual(18);
+        expect(barn?.erMyndig).toBe(erMyndig);
+        expect(barn?.alder).toBe(år);
     });
 
-    it("setter erMyndig=false for barn under 18 år", () => {
-        const iDag = new Date();
-        const fødselsdato = new Date(iDag.getFullYear() - 10, iDag.getMonth(), iDag.getDate())
-            .toISOString()
-            .slice(0, 10);
-
-        const roller: RolleDto[] = [
-            lagRolleDto({ fodselsnummer: "10987654321", type: Rolletype.BA, rolleType: Rolletype.BA }),
-        ];
-        const personInfoMap = new Map([["10987654321", lagPersonDto({ ident: "10987654321", fødselsdato })]]);
-
-        const barn = berikRoller(roller, personInfoMap).at(0) as BarnRolle | undefined;
-
-        expect(barn?.erMyndig).toBe(false);
-    });
-
-    it("setter reellMottakerType til 'barnet_selv' når reell mottaker er barnet selv", () => {
+    it.each([
+        { reellMottakerIdent: "10987654321", forventet: "barnet_selv" },
+        { reellMottakerIdent: "80000000001", forventet: "samhandler" },
+    ])("reell mottaker $reellMottakerIdent gir reellMottakerType=$forventet", ({ reellMottakerIdent, forventet }) => {
         const roller: RolleDto[] = [
             lagRolleDto({
                 fodselsnummer: "10987654321",
                 type: Rolletype.BA,
                 rolleType: Rolletype.BA,
-                reellMottaker: { ident: "10987654321", verge: false },
+                reellMottaker: { ident: reellMottakerIdent, verge: false },
             }),
         ];
 
         const barn = berikRoller(roller, new Map()).at(0) as BarnRolle | undefined;
 
-        expect(barn?.reellMottakerType).toBe("barnet_selv");
-    });
-
-    it("setter reellMottakerType til 'samhandler' når reell mottaker er en annen ident", () => {
-        const roller: RolleDto[] = [
-            lagRolleDto({
-                fodselsnummer: "10987654321",
-                type: Rolletype.BA,
-                rolleType: Rolletype.BA,
-                reellMottaker: { ident: "80000000001", verge: false },
-            }),
-        ];
-
-        const barn = berikRoller(roller, new Map()).at(0) as BarnRolle | undefined;
-
-        expect(barn?.reellMottakerType).toBe("samhandler");
+        expect(barn?.reellMottakerType).toBe(forventet);
     });
 
     it("beriker forelder-roller (BP/BM) med navn og fødselsdato, men uten barn-spesifikke felter", () => {

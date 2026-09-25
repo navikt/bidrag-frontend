@@ -1,14 +1,18 @@
 import { Box } from "@navikt/ds-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Controller, type FieldPath, type FieldValues, type PathValue, type UseFormReturn } from "react-hook-form";
-import ReellMottakerValgGruppe, { type ReellMottakerValgregel } from "../../components/ReellMottakerValgGruppe";
+import ReellMottakerValgGruppe, {
+    type ReellMottakerValg,
+    type ReellMottakerValgregel,
+    useLagretSamhandler,
+} from "../../components/ReellMottakerValgGruppe";
 import {
     fraReellMottakerValg,
     initialiserReellMottaker,
     type ReellMottakerRegel,
     reellMottakerValgregel,
     tilReellMottakerValg,
-} from "../reell-mottaker-regel";
+} from "../../reell-mottaker-regel";
 
 type Props<TFieldValues extends FieldValues> = {
     form: UseFormReturn<TFieldValues>;
@@ -46,13 +50,8 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
         reellMottaker: typeof reellMottaker === "string" ? reellMottaker : undefined,
         reellMottakerNavn: typeof reellMottakerNavn === "string" ? reellMottakerNavn : undefined,
     };
-    const [lagretSamhandler, setLagretSamhandler] = useState<{ ident: string; navn: string } | null>(() =>
-        reellMottakerType === "annen_person" && reellMottaker && reellMottakerNavn
-            ? { ident: String(reellMottaker), navn: String(reellMottakerNavn) }
-            : null,
-    );
-
     const valg = tilReellMottakerValg(skjemaverdi, { ident: barnIdent, navn: barnNavn });
+    const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(valg);
 
     const settSkjemaverdi = (
         nyVerdi: ReturnType<typeof fraReellMottakerValg>,
@@ -63,20 +62,8 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
         setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn ?? "", options);
     };
 
-    const oppdaterValg = (nyttValg: Parameters<typeof fraReellMottakerValg>[0]) => {
-        if (
-            reellMottakerType === "annen_person" &&
-            reellMottaker &&
-            reellMottakerNavn &&
-            nyttValg.type !== "samhandler"
-        ) {
-            setLagretSamhandler({ ident: String(reellMottaker), navn: String(reellMottakerNavn) });
-        }
-
-        if (nyttValg.type === "samhandler" && nyttValg.ident && nyttValg.navn) {
-            setLagretSamhandler({ ident: nyttValg.ident, navn: nyttValg.navn });
-        }
-
+    const oppdaterValg = (nyttValg: ReellMottakerValg) => {
+        huskSamhandler(valg, nyttValg);
         settSkjemaverdi(fraReellMottakerValg(nyttValg), {
             shouldValidate: true,
             shouldDirty: true,

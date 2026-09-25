@@ -1,11 +1,11 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Alert, Tag } from "@navikt/ds-react";
 import type { UseFormReturn } from "react-hook-form";
+import type { ReellMottakerRegel } from "../../reell-mottaker-regel";
 import BarnManueltRegistrering from "../BarnManueltRegistrering";
 import SkjemaSeksjon from "../felles/SkjemaSeksjon";
 import BarnkurvListe from "../motpart-felles/BarnkurvListe";
 import { type Barnkurv, type BarnMedAlder, BarnMedAlderSchema, MYNDYG_BARN_ALDER } from "../opprett-sak-schema";
-import type { ReellMottakerRegel } from "../reell-mottaker-regel";
 
 interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     form: UseFormReturn<T>;

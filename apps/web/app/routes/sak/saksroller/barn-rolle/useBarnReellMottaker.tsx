@@ -6,6 +6,7 @@ import { useHentSamhandler } from "~/api/useApi.ts";
 import { FunnetPersonInnhold } from "../components/FunnetPersonInfo.tsx";
 import type { ReellMottakerValg } from "../components/ReellMottakerValgGruppe.tsx";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
+import { fjernRolle } from "../rolle-endringer.ts";
 import type { BarnRolle, SakRedigeringData } from "../sakvisning-schema.ts";
 
 export function useBarnReellMottaker({
@@ -101,16 +102,11 @@ export function useBarnReellMottaker({
         return "Ikke registrert";
     };
 
-    const handleFjernBarn = () => {
-        const oppdaterteRoller = roller.filter((r) => r.fodselsnummer !== rolle.fodselsnummer);
-        form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
-    };
-
     return {
         visReellMottaker,
         harReellMottaker: Boolean(rolle.reellMottaker),
         reellMottakerInfo: getReellMottakerInfo(),
-        handleFjernBarn,
+        handleFjernBarn: () => fjernRolle(form, rolle.fodselsnummer),
         handleÅpneReellMottaker: () => setVisReellMottaker(true),
         handleLukkReellMottaker: () => setVisReellMottaker(false),
         handleBekreftReellMottaker: (valg: ReellMottakerValg) => {

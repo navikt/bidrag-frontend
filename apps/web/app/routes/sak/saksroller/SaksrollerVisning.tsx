@@ -115,7 +115,7 @@ function LagrerOverlay() {
 type BarnISakenProps = {
     barn: BarnRolle[];
     roller: SakRedigeringData["roller"];
-    harBm: boolean;
+    bidragsmottakerIdent: string | undefined;
     dataUpdatedAt: number;
     hentOgNullstillSamhandler: ComponentProps<typeof BarnVisning>["hentOgNullstillSamhandler"];
     erOppfostringsbidrag: boolean;
@@ -126,7 +126,7 @@ type BarnISakenProps = {
 function BarnISaken({
     barn,
     roller,
-    harBm,
+    bidragsmottakerIdent,
     dataUpdatedAt,
     hentOgNullstillSamhandler,
     erOppfostringsbidrag,
@@ -148,7 +148,7 @@ function BarnISaken({
                             key={barnnøkkel(barnRolle, idx)}
                             rolle={barnRolle}
                             index={roller.indexOf(barnRolle)}
-                            kanFjerneRM={!barnRolle.erMyndig && harBm}
+                            bidragsmottakerIdent={bidragsmottakerIdent}
                             closeEditorSignal={dataUpdatedAt}
                             hentOgNullstillSamhandler={hentOgNullstillSamhandler}
                             erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
@@ -254,7 +254,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                         <BarnISaken
                                             barn={visning.barn}
                                             roller={visning.roller}
-                                            harBm={!!bm}
+                                            bidragsmottakerIdent={bm?.fodselsnummer || undefined}
                                             dataUpdatedAt={visning.dataUpdatedAt}
                                             hentOgNullstillSamhandler={visning.hentOgNullstillSamhandler}
                                             erOppfostringsbidrag={visning.sakstype === "Oppfostringsbidrag"}

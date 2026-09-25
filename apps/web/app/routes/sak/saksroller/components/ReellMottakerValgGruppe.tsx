@@ -12,6 +12,24 @@ export type ReellMottakerValg = {
 
 export type ReellMottakerValgregel = "valgfri" | "påkrevd" | "kun-samhandler";
 
+type Samhandler = { ident: string; navn: string };
+
+function somSamhandler(valg: ReellMottakerValg): Samhandler | null {
+    return valg.type === "samhandler" && valg.ident && valg.navn ? { ident: valg.ident, navn: valg.navn } : null;
+}
+
+/** Husker sist valgte samhandler, slik at den kan velges igjen etter bytte til et annet alternativ. */
+export function useLagretSamhandler(startvalg: ReellMottakerValg) {
+    const [lagretSamhandler, setLagretSamhandler] = useState(() => somSamhandler(startvalg));
+
+    const huskSamhandler = (forrige: ReellMottakerValg, nytt: ReellMottakerValg) => {
+        const samhandler = somSamhandler(nytt) ?? (nytt.type !== "samhandler" ? somSamhandler(forrige) : null);
+        if (samhandler) setLagretSamhandler(samhandler);
+    };
+
+    return { lagretSamhandler, huskSamhandler };
+}
+
 const KUN_SAMHANDLER_MELDING =
     "Barnet selv kan ikke velges som reell mottaker i oppfostringsbidrag. Velg samhandler (kommune).";
 
@@ -19,7 +37,7 @@ type Props = {
     barnNavn: string;
     barnIdent: string;
     valg: ReellMottakerValg;
-    lagretSamhandler: { ident: string; navn: string } | null;
+    lagretSamhandler: Samhandler | null;
     onValg: (valg: ReellMottakerValg) => void;
     regel: ReellMottakerValgregel;
     disabled?: boolean;

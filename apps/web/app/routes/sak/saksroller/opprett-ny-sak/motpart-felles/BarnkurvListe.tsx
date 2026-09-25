@@ -5,9 +5,9 @@ import type { UseFormReturn } from "react-hook-form";
 
 import { BarnKortInnhold } from "../../felles/BarnKort";
 import { KortRamme } from "../../felles/PersonRolleKort";
+import type { ReellMottakerRegel } from "../../reell-mottaker-regel";
 import { BarnReellMottaker } from "../components/ReellMottakerInline";
 import type { Barnkurv, BarnMedAlder } from "../opprett-sak-schema";
-import type { ReellMottakerRegel } from "../reell-mottaker-regel";
 import { beregnBarnkurvValg } from "./barnkurv-valg";
 
 type Props = {
