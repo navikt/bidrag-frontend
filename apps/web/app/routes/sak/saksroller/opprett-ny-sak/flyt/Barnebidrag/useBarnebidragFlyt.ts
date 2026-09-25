@@ -6,7 +6,6 @@ import { type UseFormReturn, useFormContext } from "react-hook-form";
 import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 import type { ForelderKortProps } from "../../felles/ParterSeksjon";
 import { lagEksisterendeSakPart, useFlowSubmission } from "../../hooks/useFlowSubmission";
-import useSyncKategori from "../../hooks/useSyncKategori";
 import type { BarnebidragSkjemaData, Barnkurv, ForelderPart, ForelderPartRolle } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import { grupperBarnIKurver, hentMotsattRolle } from "../../utils";
@@ -132,7 +131,6 @@ function relasjonsmeldinger(foreldreTilBarn: ForeldreTilBarn[], parter: Parter, 
 export function useBarnebidragFlyt() {
     const { partISaken, saksrolleFlyt } = useSaksrolleroversikt();
     const form = useFormContext<BarnebidragSkjemaData>();
-    useSyncKategori(form);
 
     const låstRolle = form.watch("låstRolle");
     const søktIdent = form.watch("søktIdent");

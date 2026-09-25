@@ -4,7 +4,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import ParterSeksjon from "../../felles/ParterSeksjon";
 import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
-import useSyncKategori from "../../hooks/useSyncKategori";
 import {
     type Diskresjonskode,
     type EktefellebidragSkjemaData,
@@ -42,8 +41,6 @@ export default function EktefellebidragFlyt() {
         },
         mode: "onChange",
     });
-
-    useSyncKategori(form);
 
     const motpart = form.watch("motpart");
     const settMotpart = (ident: string, navn: string, diskresjonskode: string | undefined) =>

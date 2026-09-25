@@ -5,7 +5,6 @@ import type { FarskapsSkjemaSchemaData, ForelderPartRolle } from "../opprett-sak
 import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
 import { grupperBarnIKurver } from "../utils";
 import { useFlowSubmission } from "./useFlowSubmission";
-import useSyncKategori from "./useSyncKategori";
 
 type EnPartMedBarnFlytType = "FARSKAP" | "OPPFOSTRINGSBIDRAG";
 
@@ -24,7 +23,6 @@ export function useEnPartMedBarnFlyt({
 }) {
     const { saksrolleFlyt, partISaken: partISakenContext } = useSaksrolleroversikt();
     const form = useFormContext<FarskapsSkjemaSchemaData>();
-    useSyncKategori(form);
     const barnkurver = grupperBarnIKurver(saksrolleFlyt?.type === flytType ? saksrolleFlyt.barnkurver : []);
 
     const valgteBarn = form.watch("valgteBarn");

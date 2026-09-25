@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 
 import { lagEndringsoppsummering } from "../endringsoppsummering-utils.ts";
-import { skalRapportereEndring } from "../endringssporing-utils.ts";
 import type { SakRedigeringData } from "../sakvisning-schema.ts";
 
 type Props = {
@@ -55,7 +54,7 @@ export function useEndringssporing({
 
         if (hoppOverPåfølgendeTilbakestillingRef.current) {
             hoppOverPåfølgendeTilbakestillingRef.current = false;
-            if (skalRapportereEndring(harEndringer, true)) {
+            if (harEndringer) {
                 onNyEndring();
             }
             return;
