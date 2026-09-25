@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { BodyLong, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useId } from "react";
 import SøkPerson from "./SøkPerson.tsx";
 
 export interface PersonSøkInnholdProps {
@@ -49,12 +49,21 @@ export interface PersonSøkRammeProps {
 
 /** Inline ramme for søk. Brukes der innholdet selv kan ligge i en modal. */
 export default function PersonSøkWrapper({ tittel, onAvbryt, ikon, actions, children }: PersonSøkRammeProps) {
+    const tittelId = useId();
     return (
-        <Box background="accent-soft" borderColor="accent" borderWidth="1" borderRadius="12" padding="space-16">
+        <Box
+            role="region"
+            aria-labelledby={tittelId}
+            background="accent-soft"
+            borderColor="accent"
+            borderWidth="1"
+            borderRadius="12"
+            padding="space-16"
+        >
             <VStack gap="space-16">
                 <HStack gap="space-8" align="center" wrap={false}>
                     {ikon}
-                    <Heading level="3" size="small">
+                    <Heading id={tittelId} level="3" size="small">
                         {tittel}
                     </Heading>
                 </HStack>

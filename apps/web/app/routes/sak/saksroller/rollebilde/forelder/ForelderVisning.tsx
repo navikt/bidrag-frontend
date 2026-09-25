@@ -3,8 +3,8 @@ import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { Button, HStack, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import PersonSøkModal from "../../felles/person-søk/PersonSøkModal.tsx";
 import { PersonSøkInnhold } from "../../felles/person-søk/PersonSøkWrapper.tsx";
+import RedigeringsRamme from "../../felles/RedigeringsRamme.tsx";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { fjernRolle } from "../endringer/rolle-endringer.ts";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
@@ -71,13 +71,13 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
             )}
 
             {visSøk && (
-                <PersonSøkModal tittel={`Endre ${forelderRolleNavn}`} onAvbryt={() => setVisSøk(false)}>
+                <RedigeringsRamme tittel={`Endre ${forelderRolleNavn}`} onAvbryt={() => setVisSøk(false)}>
                     <PersonSøkInnhold
                         beskrivelse={`Søk opp personen som skal være ${forelderRolleNavn} i saken`}
                         søkeLabel={`Søk etter ${forelderRolleNavn}`}
                         onPersonValgt={handlePersonValgt}
                     />
-                </PersonSøkModal>
+                </RedigeringsRamme>
             )}
         </VStack>
     );

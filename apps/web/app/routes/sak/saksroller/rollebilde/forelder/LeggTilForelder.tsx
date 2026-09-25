@@ -4,8 +4,8 @@ import { BodyLong, Box, Button, Heading, HStack, VStack } from "@navikt/ds-react
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import PersonInfo from "../../felles/person/PersonInfo.tsx";
-import PersonSøkModal from "../../felles/person-søk/PersonSøkModal.tsx";
 import { PersonSøkInnhold } from "../../felles/person-søk/PersonSøkWrapper.tsx";
+import RedigeringsRamme from "../../felles/RedigeringsRamme.tsx";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import { finnDuplikatForelderFeil } from "./forelder-regler.ts";
@@ -82,7 +82,7 @@ export default function LeggTilForelder({
     }
 
     return (
-        <PersonSøkModal tittel={`Legg til ${rolleNavn.toLowerCase()}`} onAvbryt={() => setVisSøk(false)}>
+        <RedigeringsRamme tittel={`Legg til ${rolleNavn.toLowerCase()}`} onAvbryt={() => setVisSøk(false)}>
             <PersonSøkInnhold
                 beskrivelse={`Søk opp personen som skal være ${rolleNavn.toLowerCase()} i saken`}
                 søkeLabel={`Søk etter ${rolleNavn.toLowerCase()}`}
@@ -123,6 +123,6 @@ export default function LeggTilForelder({
                     </Box>
                 )}
             </PersonSøkInnhold>
-        </PersonSøkModal>
+        </RedigeringsRamme>
     );
 }

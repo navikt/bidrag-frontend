@@ -73,4 +73,13 @@ test.describe("LeggTilBarn", () => {
         await expect(component.getByText(`Bruker nyeste fødselsnummer ${nyIdent}`)).toBeVisible();
         await expect(component.getByText("Lite Barn")).toBeVisible();
     });
+
+    test("inline-visning åpner barnesøket i skjemaet uten modal", async ({ mount }) => {
+        const component = await mount(`${STORY}Inline`);
+
+        await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+
+        await expect(component.getByRole("region", { name: "Legg til nytt barn i saken" })).toBeVisible();
+        await expect(component.page().getByRole("dialog")).toHaveCount(0);
+    });
 });

@@ -12,7 +12,7 @@ import {
     LeggTilBarnKnapp,
     useBarnSøk,
 } from "../../felles/person-søk/BarnSøk.tsx";
-import PersonSøkModal from "../../felles/person-søk/PersonSøkModal.tsx";
+import RedigeringsRamme from "../../felles/RedigeringsRamme.tsx";
 import { reellMottakerRegelForSak, reellMottakerValgregel } from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
 import { MYNDYG_BARN_ALDER, type SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
@@ -111,7 +111,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
     const harBeggeForeldre = roller.some((i) => i.type === "BP") && roller.some((i) => i.type === "BM");
 
     return (
-        <PersonSøkModal
+        <RedigeringsRamme
             tittel={barnSøkTittel}
             ikon={<BarnSøkIkon />}
             onAvbryt={søk.lukk}
@@ -122,7 +122,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
                     <SøskenListe søsken={tilgjengeligeSøsken} harBeggeForeldre={harBeggeForeldre} onVelg={leggTil} />
                 )}
             </BarnSøkInnhold>
-        </PersonSøkModal>
+        </RedigeringsRamme>
     );
 }
 

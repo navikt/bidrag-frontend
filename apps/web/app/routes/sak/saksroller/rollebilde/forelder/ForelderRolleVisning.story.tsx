@@ -1,6 +1,7 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { useForm } from "react-hook-form";
+import { RedigeringsvisningProvider } from "../../felles/RedigeringsRamme";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema";
 import ForelderRolleVisning from "./ForelderRolleVisning";
 
@@ -69,6 +70,12 @@ export const BeggeRollerISak = () => (
 );
 
 export const BidragsmottakerMangler = () => <ForelderRolleVisningScenario initialRoller={[bpKjentFraStart]} />;
+
+export const BidragsmottakerManglerInline = () => (
+    <RedigeringsvisningProvider visning="inline">
+        <ForelderRolleVisningScenario initialRoller={[bpKjentFraStart]} />
+    </RedigeringsvisningProvider>
+);
 
 export const BidragspliktigMangler = () => <ForelderRolleVisningScenario initialRoller={[bmKjentFraStart]} />;
 

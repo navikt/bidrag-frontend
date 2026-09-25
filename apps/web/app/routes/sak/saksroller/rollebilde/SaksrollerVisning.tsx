@@ -1,12 +1,11 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
-import { type ComponentProps, Suspense, useState } from "react";
+import { Suspense } from "react";
 import { FormProvider } from "react-hook-form";
-import type { BarnRolle, SakRedigeringData } from "../felles/sakvisning-schema.ts";
+import type { SakRedigeringData } from "../felles/sakvisning-schema.ts";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "../felles/utils.ts";
-import BarnVisning from "./barn/BarnVisning.tsx";
-import LeggTilBarn from "./barn/LeggTilBarn.tsx";
+import BarnISaken from "./barn/BarnISaken.tsx";
 import Endringsoppsummering from "./endringer/Endringsoppsummering.tsx";
 import type { Endringsrad } from "./endringer/endringsoppsummering-utils.ts";
 import ForelderRolleVisning from "./forelder/ForelderRolleVisning.tsx";
@@ -84,20 +83,6 @@ export default function SaksrollerVisning({ saksnummer }: SaksrollerVisningProps
     );
 }
 
-function barnnøkkel(barnRolle: BarnRolle, idx: number) {
-    return barnRolle.fodselsnummer || barnRolle.objektnummer || `${barnRolle.type}-${idx}`;
-}
-
-function IngenBarnMelding() {
-    return (
-        <InfoCard data-color="info" size="small">
-            <InfoCard.Message icon={<InformationSquareIcon aria-hidden />}>
-                Ingen barn registrert i saken ennå
-            </InfoCard.Message>
-        </InfoCard>
-    );
-}
-
 function LagrerOverlay() {
     return (
         <Box position="fixed" inset="space-0" className="bg-[white]/70 backdrop-blur-sm z-50">
@@ -107,61 +92,6 @@ function LagrerOverlay() {
                     <BodyLong textColor="subtle">Lagrer endringer...</BodyLong>
                 </VStack>
             </HStack>
-        </Box>
-    );
-}
-
-type BarnISakenProps = {
-    barn: BarnRolle[];
-    roller: SakRedigeringData["roller"];
-    bidragsmottakerIdent: string | undefined;
-    dataUpdatedAt: number;
-    hentOgNullstillSamhandler: ComponentProps<typeof BarnVisning>["hentOgNullstillSamhandler"];
-    erOppfostringsbidrag: boolean;
-    muligeBarn: ComponentProps<typeof LeggTilBarn>["søsken"];
-    funnetPersonISak: (fnr: string) => boolean;
-};
-
-function BarnISaken({
-    barn,
-    roller,
-    bidragsmottakerIdent,
-    dataUpdatedAt,
-    hentOgNullstillSamhandler,
-    erOppfostringsbidrag,
-    muligeBarn,
-    funnetPersonISak,
-}: BarnISakenProps) {
-    const [visSøk, setVisSøk] = useState(false);
-
-    return (
-        <Box background="sunken" padding="space-12">
-            <VStack gap="space-4">
-                <Heading level="2" size="small">
-                    Barn i saken ({barn.length})
-                </Heading>
-                {barn.length === 0 && <IngenBarnMelding />}
-                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
-                    {barn.map((barnRolle, idx) => (
-                        <BarnVisning
-                            key={barnnøkkel(barnRolle, idx)}
-                            rolle={barnRolle}
-                            index={roller.indexOf(barnRolle)}
-                            bidragsmottakerIdent={bidragsmottakerIdent}
-                            closeEditorSignal={dataUpdatedAt}
-                            hentOgNullstillSamhandler={hentOgNullstillSamhandler}
-                            erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
-                            erOppfostringsbidrag={erOppfostringsbidrag}
-                        />
-                    ))}
-                </HGrid>
-                <LeggTilBarn
-                    søsken={muligeBarn}
-                    erOppfostringsbidrag={erOppfostringsbidrag}
-                    setVisSøk={setVisSøk}
-                    visSøk={visSøk}
-                />
-            </VStack>
         </Box>
     );
 }

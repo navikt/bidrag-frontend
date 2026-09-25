@@ -81,6 +81,15 @@ test.describe("ForelderRolleVisning", () => {
         await expect(component.getByRole("dialog", { name: "Legg til bidragsmottaker" })).toBeVisible();
     });
 
+    test("inline-visning åpner søket i skjemaet uten modal", async ({ mount }) => {
+        const component = await mount(`${STORY_BM_MANGLER}Inline`);
+
+        await component.getByRole("button", { name: "Legg til person" }).click();
+
+        await expect(component.getByRole("region", { name: "Legg til bidragsmottaker" })).toBeVisible();
+        await expect(component.page().getByRole("dialog")).toHaveCount(0);
+    });
+
     test("søker opp og legger til bidragsmottaker - mocker et ekte nettverkskall (ikke context)", async ({
         mount,
         page,

@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { createRoutesStub } from "react-router";
+import { RedigeringsvisningProvider } from "../../felles/RedigeringsRamme.tsx";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import LeggTilBarn from "./LeggTilBarn.tsx";
 
@@ -50,3 +51,9 @@ const Stub = createRoutesStub([
 ]);
 
 export const MedBidragsmottaker = () => <Stub initialEntries={["/sak/2024%2F1/saksroller"]} />;
+
+export const MedBidragsmottakerInline = () => (
+    <RedigeringsvisningProvider visning="inline">
+        <Stub initialEntries={["/sak/2024%2F1/saksroller"]} />
+    </RedigeringsvisningProvider>
+);
