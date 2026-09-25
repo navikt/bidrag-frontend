@@ -155,7 +155,7 @@ const tekster = {
         avbryt: "Avbryt",
         avtaleDato: "Avtalemåned",
         barn: "Barn",
-        barnHarTilsysnsordning: "Barn har tilsynsordning",
+        barnHarTilsysnsordning: "Barn har tilsynsordning/forpleining",
         barnetillegg: "Barnetillegg",
         barnetrygd: "Barnetrygd",
         begrunnelse: "Begrunnelse",
