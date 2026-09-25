@@ -21,12 +21,14 @@ export const MenuButton = ({
     size,
     active,
     valideringsfeil,
+    icon,
     unconfirmedUpdates,
     loading,
     interactive = true,
 }: {
     step?: string;
     title: string | ReactElement;
+    icon?: ReactElement;
     onStepChange: () => void;
     interactive?: boolean;
     subMenu?: ReactNode;
@@ -66,6 +68,7 @@ export const MenuButton = ({
             >
                 <span className="grid items-center gap-1 grid-cols-[20px_20px_auto_20px]">
                     <span>
+                        {icon}
                         {displayBellIcon && <BellDotIcon title="Info" style={{ color: "var(--ax-text-neutral)" }} />}
                     </span>
                     {!step && (
@@ -113,6 +116,7 @@ interface SideMenuProps {
     children: ReactNode;
     otherChildren?: ReactNode;
 }
+
 export const SideMenu = ({ children, otherChildren }: SideMenuProps) => {
     const [menuOpen, setMenuOpen] = useState<boolean>(true);
     const { erFatterVedtak } = useBehandlingProvider();

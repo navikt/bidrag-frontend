@@ -1,11 +1,10 @@
-import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { Stonadstype, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { type PropsWithChildren, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import text from "../../common/constants/texts";
 import { BehandlingProvider } from "../../common/context/BehandlingContext";
 import { useBehandlingV2 } from "../../common/hooks/useApiData";
 import useFeatureToogle from "../../common/hooks/useFeatureToggle";
-
 import { STEPS as BarnebidragSteps, STEPS } from "../constants/steps";
 import { BarnebidragStepper } from "../enum/BarnebidragStepper";
 
@@ -158,7 +157,8 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
                 !(behandling.erVedtakUtenBeregning && behandling.lesemodus) &&
                 !erAvvist,
             interactive:
-                !behandling.virkningstidspunktV3?.erAvslagForAlle && behandling.vedtakstype !== Vedtakstype.OPPHOR,
+                [Stonadstype.BIDRAG, Stonadstype.BIDRAG18AAR].includes(behandling.stønadstype) ||
+                (!behandling.virkningstidspunktV3?.erAvslagForAlle && behandling.vedtakstype !== Vedtakstype.OPPHOR),
         },
         {
             step: BarnebidragStepper.GEBYR,
