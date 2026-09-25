@@ -1,8 +1,9 @@
+import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { NyOpprettSakFlytContext, OpprettSakFlytModal } from "@bidrag/common";
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { Button } from "@navikt/ds-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { type ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import BarnebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/EktefellebidragFlyt";
@@ -10,76 +11,48 @@ import EnPartMedBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/fl
 import type { InngangRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/inngang";
 import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt";
 import OpprettSakFlytInnbygget from "../../app/routes/sak/saksroller/opprett-ny-sak/OpprettSakFlytInnbygget";
-import type { PartISaken } from "../../app/routes/sak/saksroller/opprett-ny-sak/opprett-sak-schema";
+import type { PartRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/opprett-sak-schema";
 import {
     type OpprettSakFlytValg,
     SaksrolleroversiktProvider,
+    type Sakstype,
     useSaksrolleroversikt,
 } from "../../app/routes/sak/saksroller/opprett-ny-sak/saksrolleroversiktContext";
 import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
-type Scenario =
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "BARNEBIDRAG";
-          barnkurver: import("@bidrag/api/PersonApi").MotpartBarnRelasjon[];
-      }
-    | {
-          sakstype: "EKTEFELLEBIDRAG";
-          partISaken: PartISaken;
-          flow: "EKTEFELLEBIDRAG";
-          motpart: import("@bidrag/api/PersonApi").PersonDto[] | null;
-      }
-    | {
-          sakstype: "FARSKAP";
-          partISaken: PartISaken;
-          flow: "FARSKAP";
-          barnkurver: import("@bidrag/api/PersonApi").MotpartBarnRelasjon[];
-      }
-    | {
-          sakstype: "OPPFOSTRINGSBIDRAG";
-          partISaken: PartISaken;
-          flow: "OPPFOSTRINGSBIDRAG";
-          barnkurver: import("@bidrag/api/PersonApi").MotpartBarnRelasjon[];
-      };
+type Scenario = {
+    sakstype: Sakstype;
+    person: Pick<PersonDto, "ident" | "visningsnavn" | "fødselsdato">;
+    rolle: PartRolle;
+    relasjoner: MotpartBarnRelasjon[];
+};
+
+const flytkomponenter: Record<Sakstype, () => ReactNode> = {
+    BARNEBIDRAG: BarnebidragFlyt,
+    EKTEFELLEBIDRAG: EktefellebidragFlyt,
+    FARSKAP: EnPartMedBarnFlyt,
+    OPPFOSTRINGSBIDRAG: EnPartMedBarnFlyt,
+};
 
 function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
-    const { setPartISaken, setPartISakenAlder, setSakstype, setSakskategori, setSaksrolleFlyt } =
-        useSaksrolleroversikt();
+    const queryClient = useQueryClient();
+    const { velgSakstype, velgPerson } = useSaksrolleroversikt();
+    const Flyt = flytkomponenter[scenario.sakstype];
 
     useEffect(() => {
-        setSakstype(scenario.sakstype);
-        setSakskategori("Nasjonal");
-        setPartISaken(scenario.partISaken);
-        setPartISakenAlder(
-            scenario.partISaken.rolle === "barn_under_18" ? 10 : scenario.partISaken.rolle === "barn_over_18" ? 23 : 40,
-        );
+        queryClient.setQueryData(["hent_person_motpart_barn_relasjon", scenario.person.ident], {
+            personensMotpartBarnRelasjon: scenario.relasjoner,
+        });
+        velgSakstype(scenario.sakstype);
+        velgPerson(scenario.person as PersonDto, scenario.rolle);
+    }, [queryClient, scenario, velgSakstype, velgPerson]);
 
-        switch (scenario.flow) {
-            case "BARNEBIDRAG":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, barnkurver: scenario.barnkurver });
-                break;
-            case "EKTEFELLEBIDRAG":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, motpart: scenario.motpart });
-                break;
-            case "FARSKAP":
-            case "OPPFOSTRINGSBIDRAG":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, barnkurver: scenario.barnkurver });
-                break;
-        }
-    }, [scenario, setPartISaken, setPartISakenAlder, setSakskategori, setSakstype, setSaksrolleFlyt]);
-
-    switch (scenario.flow) {
-        case "BARNEBIDRAG":
-            return <BarnebidragFlyt />;
-        case "EKTEFELLEBIDRAG":
-            return <EktefellebidragFlyt />;
-        case "FARSKAP":
-        case "OPPFOSTRINGSBIDRAG":
-            return <EnPartMedBarnFlyt />;
-    }
+    return (
+        <Suspense>
+            <Flyt />
+        </Suspense>
+    );
 }
 
 export function WizardFlowStory({ scenario }: { scenario: Scenario }) {
@@ -182,6 +155,7 @@ function StoryRouter({ content, valg }: { content: ReactNode; valg?: OpprettSakF
                         element: (
                             <QueryClientProvider client={queryClient}>
                                 <BidragCommonsProviderMock
+                                    client={queryClient}
                                     personer={Object.fromEntries(
                                         Object.values(testpersoner).map((person) => [person.ident, person]),
                                     )}

@@ -1,11 +1,6 @@
-import { TilgangsFeilError } from "@bidrag/api";
-import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { Alert, Radio, RadioGroup, Stack, VStack } from "@navikt/ds-react";
-import { Suspense, useEffect, useState } from "react";
-import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
-import LasterSkeleton from "./components/LasterSkeleton";
-import { MAKS_ALDER_BARN, type PartRolle, PartRolleSchema } from "./opprett-sak-schema";
+import type { PersonDto } from "@bidrag/api/PersonApi";
+import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
+import { type PartRolle, PartRolleSchema } from "./opprett-sak-schema";
 import { filtrerSaksroller, type SaksrolleAlternativ } from "./saksrolle-regler";
 import { useSaksrolleroversikt } from "./saksrolleroversiktContext";
 
@@ -41,16 +36,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
         velgRolle(result.data);
     };
 
-    useEffect(() => {
-        if (!enforcedRolle) {
-            return;
-        }
-
-        if (partISakenSkjemaData?.rolle !== enforcedRolle) {
-            velgRolle(enforcedRolle);
-        }
-    }, [enforcedRolle, partISakenSkjemaData?.rolle, velgRolle]);
-
     return (
         <RadioGroup
             legend={`Hvilken rolle har ${partISaken.visningsnavn}?`}
@@ -67,153 +52,6 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
                 ))}
             </Stack>
         </RadioGroup>
-    );
-}
-
-export function SaksrolleFlytResolver({ partISaken, enforcedRolle }: Props) {
-    const [feil, settFeil] = useState("");
-    const { valgVersjon, partISaken: partISakenSkjemaData, sakstype, settFlytHvisGjeldende } = useSaksrolleroversikt();
-    const valgtRolle = partISakenSkjemaData?.rolle ?? null;
-    const erBarnRolle = valgtRolle === "barn_over_18" || valgtRolle === "barn_under_18";
-    const trengerRelasjon = !!valgtRolle && !erBarnRolle && !enforcedRolle;
-
-    useEffect(() => {
-        if (erBarnRolle) {
-            settFlytHvisGjeldende(valgVersjon, { key: Math.random(), type: "BARNEBIDRAG", barnkurver: [] });
-        }
-    }, [erBarnRolle, valgVersjon, settFlytHvisGjeldende]);
-
-    if (!trengerRelasjon) {
-        return null;
-    }
-
-    return (
-        <VStack gap="space-8">
-            {feil && <Alert variant="error">{feil}</Alert>}
-            {trengerRelasjon && (
-                <Suspense fallback={<LasterSkeleton tekst="Henter relasjoner..." />}>
-                    <RelasjonTilBarnBranch
-                        key={`${partISaken.ident}-${valgtRolle}-${valgVersjon}`}
-                        partISaken={partISaken}
-                        sakstype={sakstype}
-                        valgVersjon={valgVersjon}
-                        onFeil={settFeil}
-                    />
-                </Suspense>
-            )}
-        </VStack>
-    );
-}
-
-/**
- * Henter relasjon til barn/motpart for den valgte rollen og utleder riktig saksrolleflyt.
- *
- * Egen komponent slik at `useHentPersonMotpartBarnRelasjonSuspense` (en Suspense-spørring)
- * kun monteres når relasjonen faktisk trengs. Suspense-spørringer kan ikke deaktiveres med
- * et `enabled`-flagg, så betinget montering er riktig måte å styre om spørringen kjører.
- */
-function RelasjonTilBarnBranch({
-    partISaken,
-    sakstype,
-    valgVersjon,
-    onFeil,
-}: {
-    partISaken: PersonDto;
-    sakstype: string | null;
-    valgVersjon: number;
-    onFeil: (feil: string) => void;
-}) {
-    const { settFlytHvisGjeldende } = useSaksrolleroversikt();
-    const { data: relasjonTilBarn, error } = useHentPersonMotpartBarnRelasjonSuspense({ ident: partISaken.ident });
-
-    useEffect(() => {
-        if (sakstype === "EKTEFELLEBIDRAG") {
-            settFlytHvisGjeldende(valgVersjon, {
-                key: Math.random(),
-                type: "EKTEFELLEBIDRAG",
-                motpart: relasjonTilBarn?.personensMotpartBarnRelasjon
-                    ? Array.from(
-                          relasjonTilBarn.personensMotpartBarnRelasjon
-                              .reduce<Map<string, PersonDto>>((unikeMotparter, rel) => {
-                                  if (rel.motpart && !unikeMotparter.has(rel.motpart.ident)) {
-                                      unikeMotparter.set(rel.motpart.ident, rel.motpart);
-                                  }
-                                  return unikeMotparter;
-                              }, new Map())
-                              .values(),
-                      )
-                    : null,
-            });
-            return;
-        }
-
-        const relasjoner = relasjonTilBarn?.personensMotpartBarnRelasjon;
-
-        if (!relasjoner) {
-            return;
-        }
-
-        const harDuplisertMotpartMedUlikeRoller = relasjoner.some((relasjon, _, array) =>
-            array.some(
-                (r) =>
-                    r.motpart?.ident === relasjon.motpart?.ident &&
-                    r.forelderrolleMotpart !== relasjon.forelderrolleMotpart,
-            ),
-        );
-
-        if (harDuplisertMotpartMedUlikeRoller) {
-            onFeil(
-                `Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for ${partISaken.visningsnavn}. Kontakt support for å få hjelp.`,
-            );
-            return;
-        }
-
-        if (relasjoner.length === 0) {
-            settFlytHvisGjeldende(valgVersjon, { key: Math.random(), type: "BARNEBIDRAG", barnkurver: [] });
-            return;
-        }
-
-        const relasjonMedBarnUnder24 = relasjoner
-            .map((relasjon) => ({
-                ...relasjon,
-                fellesBarn: relasjon.fellesBarn.filter((barn) => {
-                    const alder = beregnAlderForPerson(barn);
-
-                    return alder !== null && alder <= MAKS_ALDER_BARN;
-                }),
-            }))
-            .filter((relasjon) => relasjon.fellesBarn.length > 0)
-            .reduce<MotpartBarnRelasjon[]>((acc, relasjon) => {
-                const eksisterende = acc.find(
-                    (r) =>
-                        r.motpart?.ident === relasjon.motpart?.ident &&
-                        r.forelderrolleMotpart === relasjon.forelderrolleMotpart,
-                );
-
-                if (eksisterende) {
-                    eksisterende.fellesBarn = [...eksisterende.fellesBarn, ...relasjon.fellesBarn];
-                } else {
-                    acc.push({ ...relasjon });
-                }
-
-                return acc;
-            }, []);
-
-        settFlytHvisGjeldende(valgVersjon, {
-            key: Math.random(),
-            type: "BARNEBIDRAG",
-            barnkurver: relasjonMedBarnUnder24,
-        });
-    }, [relasjonTilBarn, sakstype, partISaken.ident, valgVersjon, settFlytHvisGjeldende, onFeil]);
-
-    if (error === null) {
-        return null;
-    }
-
-    return error instanceof TilgangsFeilError ? (
-        <Alert variant="error">{error.message}</Alert>
-    ) : (
-        <Alert variant="error">Kunne ikke hente barn til {partISaken.visningsnavn}. Vennligst prøv igjen.</Alert>
     );
 }
 

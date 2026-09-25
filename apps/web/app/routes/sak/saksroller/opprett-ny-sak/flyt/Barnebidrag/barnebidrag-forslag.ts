@@ -105,3 +105,34 @@ export function parterEtterValg(
         [motsatt]: fyllUt ? tilPart(gjenstående[0] as PersonDto) : andre,
     } as Parter;
 }
+
+/** Samme motpart registrert med ulike forelderroller (f.eks. både mor og far) er en datafeil. */
+export function harMotpartMedUlikeForelderroller(relasjoner: MotpartBarnRelasjon[]): boolean {
+    return relasjoner.some((relasjon) =>
+        relasjoner.some(
+            (r) =>
+                r.motpart?.ident === relasjon.motpart?.ident &&
+                r.forelderrolleMotpart !== relasjon.forelderrolleMotpart,
+        ),
+    );
+}
+
+/** Barnkurver for en forelder: bare barn opp til og med 24 år, slått sammen per motpart og forelderrolle. */
+export function utledBarnkurverForForelder(relasjoner: MotpartBarnRelasjon[]): MotpartBarnRelasjon[] {
+    const barnkurver: MotpartBarnRelasjon[] = [];
+    for (const relasjon of relasjoner) {
+        const fellesBarn = relasjon.fellesBarn.filter((barn) => {
+            const alder = beregnAlderForPerson(barn);
+            return alder !== null && alder <= MAKS_ALDER_BARN;
+        });
+        if (fellesBarn.length === 0) continue;
+        const eksisterende = barnkurver.find(
+            (r) =>
+                r.motpart?.ident === relasjon.motpart?.ident &&
+                r.forelderrolleMotpart === relasjon.forelderrolleMotpart,
+        );
+        if (eksisterende) eksisterende.fellesBarn = [...eksisterende.fellesBarn, ...fellesBarn];
+        else barnkurver.push({ ...relasjon, fellesBarn });
+    }
+    return barnkurver;
+}

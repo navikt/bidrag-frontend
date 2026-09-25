@@ -1,29 +1,23 @@
-import { useEffect } from "react";
+import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { useFormContext } from "react-hook-form";
 
-import type { FarskapsSkjemaSchemaData, ForelderPartRolle } from "../opprett-sak-schema";
-import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
+import type { FarskapsSkjemaSchemaData } from "../opprett-sak-schema";
 import { grupperBarnIKurver } from "../utils";
 import { useFlowSubmission } from "./useFlowSubmission";
-
-type EnPartMedBarnFlytType = "FARSKAP" | "OPPFOSTRINGSBIDRAG";
 
 /**
  * Felles oppsett for flyter der saken opprettes med én kjent part og valgte barn,
  * uten kjent motpart (farskap og oppfostringsbidrag).
  */
 export function useEnPartMedBarnFlyt({
-    flytType,
+    registrerteKurver,
     arbeidsfordeling,
-    rolle,
 }: {
-    flytType: EnPartMedBarnFlytType;
+    registrerteKurver: MotpartBarnRelasjon[];
     arbeidsfordeling: "FRS" | "OPS";
-    rolle: ForelderPartRolle;
 }) {
-    const { saksrolleFlyt, partISaken: partISakenContext } = useSaksrolleroversikt();
     const form = useFormContext<FarskapsSkjemaSchemaData>();
-    const barnkurver = grupperBarnIKurver(saksrolleFlyt?.type === flytType ? saksrolleFlyt.barnkurver : []);
+    const barnkurver = grupperBarnIKurver(registrerteKurver);
 
     const valgteBarn = form.watch("valgteBarn");
     const partISaken = form.watch("partISaken");
@@ -36,16 +30,6 @@ export function useEnPartMedBarnFlyt({
         arbeidsfordeling,
         valgteBarn,
     });
-
-    useEffect(() => {
-        if (!partISaken.ident && partISakenContext?.ident) {
-            form.setValue(
-                "partISaken",
-                { ...partISakenContext, rolle, erKjent: true },
-                { shouldDirty: true, shouldValidate: true },
-            );
-        }
-    }, [form, partISaken.ident, partISakenContext, rolle]);
 
     return {
         form,

@@ -1,7 +1,10 @@
+import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert } from "@navikt/ds-react";
+import { Alert, InlineMessage, VStack } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 import type { ReellMottakerRegel } from "../../../reell-mottaker-regel";
+import LasterSkeleton from "../../components/LasterSkeleton";
 import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useEnPartMedBarnFlyt } from "../../hooks/useEnPartMedBarnFlyt";
 import {
@@ -9,6 +12,7 @@ import {
     type FarskapsSkjemaSchemaData,
     type ForelderPartRolle,
     OppfostringsbidragSkjemaSchema,
+    type PartISaken,
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
@@ -44,24 +48,52 @@ const konfig: Record<
  * Farskap og oppfostringsbidrag: én kjent part og valgte barn, uten motpart.
  */
 export default function EnPartMedBarnFlyt() {
-    const { saksrolleFlyt } = useSaksrolleroversikt();
-    const type = saksrolleFlyt?.type;
+    const { sakstype, partISaken } = useSaksrolleroversikt();
 
-    if (type !== "FARSKAP" && type !== "OPPFOSTRINGSBIDRAG") {
+    if (!partISaken || (sakstype !== "FARSKAP" && sakstype !== "OPPFOSTRINGSBIDRAG")) {
         return null;
     }
 
-    return <EnPartMedBarnSkjema key={type} type={type} />;
+    return <EnPartMedBarnMedForslag type={sakstype} partISaken={partISaken} />;
 }
 
-function EnPartMedBarnSkjema({ type }: { type: Flyttype }) {
+function EnPartMedBarnMedForslag({ type, partISaken }: { type: Flyttype; partISaken: PartISaken }) {
+    const { data, isLoading, isError } = useHentPersonMotpartBarnRelasjon({ ident: partISaken.ident });
+
+    if (isLoading) return <LasterSkeleton tekst="Laster data..." />;
+
+    return (
+        <VStack gap="space-24">
+            {isError && (
+                <InlineMessage status="warning">
+                    Kunne ikke hente forslag til barn. Du kan søke opp barn manuelt.
+                </InlineMessage>
+            )}
+            <EnPartMedBarnSkjema
+                type={type}
+                partISaken={partISaken}
+                registrerteKurver={data?.personensMotpartBarnRelasjon ?? []}
+            />
+        </VStack>
+    );
+}
+
+function EnPartMedBarnSkjema({
+    type,
+    partISaken,
+    registrerteKurver,
+}: {
+    type: Flyttype;
+    partISaken: PartISaken;
+    registrerteKurver: MotpartBarnRelasjon[];
+}) {
     const { sakskategori } = useSaksrolleroversikt();
     const { arbeidsfordeling, rolle, schema } = konfig[type];
     const form = useForm<FarskapsSkjemaSchemaData>({
         resolver: zodResolver(schema),
         defaultValues: {
             arbeidsfordeling,
-            partISaken: { ident: "", navn: "", rolle, diskresjonskode: undefined, erKjent: false },
+            partISaken: { ...partISaken, rolle, erKjent: true },
             valgteBarn: [],
             motpart: { ident: "", navn: "", erKjent: false },
             kategori: sakskategori,
@@ -71,17 +103,22 @@ function EnPartMedBarnSkjema({ type }: { type: Flyttype }) {
 
     return (
         <FormProvider {...form}>
-            <EnPartMedBarnInnhold type={type} />
+            <EnPartMedBarnInnhold type={type} registrerteKurver={registrerteKurver} />
         </FormProvider>
     );
 }
 
-function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
-    const { arbeidsfordeling, rolle, reellMottakerRegel, beskrivelse } = konfig[type];
+function EnPartMedBarnInnhold({
+    type,
+    registrerteKurver,
+}: {
+    type: Flyttype;
+    registrerteKurver: MotpartBarnRelasjon[];
+}) {
+    const { arbeidsfordeling, reellMottakerRegel, beskrivelse } = konfig[type];
     const { form, barnkurver, valgteBarn, onSubmit, innsending, status } = useEnPartMedBarnFlyt({
-        flytType: type,
+        registrerteKurver,
         arbeidsfordeling,
-        rolle,
     });
     const erOppfostring = type === "OPPFOSTRINGSBIDRAG";
 

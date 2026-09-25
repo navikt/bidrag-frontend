@@ -1,5 +1,7 @@
+import type { PersonDto } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
+import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
 
 import ParterSeksjon from "../../felles/ParterSeksjon";
 import RolleFlytSide from "../../felles/RolleFlytSide";
@@ -9,6 +11,7 @@ import {
     type EktefellebidragSkjemaData,
     EktefellebidragSkjemaSchema,
     type ForelderPartRolle,
+    type PartISaken,
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import { hentMotsattRolle } from "../../utils";
@@ -16,14 +19,28 @@ import { hentMotsattRolle } from "../../utils";
 const ingenHandling = { onVelg: () => undefined, onUkjent: () => undefined, onEndre: () => undefined };
 
 export default function EktefellebidragFlyt() {
-    const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();
+    const { partISaken } = useSaksrolleroversikt();
+    if (!partISaken) return null;
+    return <EktefellebidragMedForslag partISaken={partISaken} />;
+}
 
-    if (!partISaken || !saksrolleFlyt || saksrolleFlyt.type !== "EKTEFELLEBIDRAG") {
-        return null;
+function EktefellebidragMedForslag({ partISaken }: { partISaken: PartISaken }) {
+    const { data } = useHentPersonMotpartBarnRelasjonSuspense({ ident: partISaken.ident });
+    const unikeMotparter = new Map<string, PersonDto>();
+    for (const { motpart } of data?.personensMotpartBarnRelasjon ?? []) {
+        if (motpart && !unikeMotparter.has(motpart.ident)) unikeMotparter.set(motpart.ident, motpart);
     }
+    return <EktefellebidragSkjema partISaken={partISaken} forslagMotpart={[...unikeMotparter.values()]} />;
+}
 
-    const { motpart: forslagMotpart } = saksrolleFlyt;
-
+function EktefellebidragSkjema({
+    partISaken,
+    forslagMotpart,
+}: {
+    partISaken: PartISaken;
+    forslagMotpart: PersonDto[];
+}) {
+    const { sakskategori } = useSaksrolleroversikt();
     const motsattRolle = hentMotsattRolle(partISaken.rolle as ForelderPartRolle);
 
     const form = useForm<EktefellebidragSkjemaData>({
@@ -94,7 +111,7 @@ export default function EktefellebidragFlyt() {
                         {
                             rolle: motsattRolle,
                             part: motpart.ident ? motpart : { ...motpart, erKjent: undefined },
-                            forslag: (forslagMotpart ?? []).filter((person) => person.ident !== motpart.ident),
+                            forslag: forslagMotpart.filter((person) => person.ident !== motpart.ident),
                             kanSettesUkjent: false,
                             feil: form.formState.errors.motpart?.ident?.message,
                             onVelg: (person) => settMotpart(person.ident, person.visningsnavn, person.diskresjonskode),

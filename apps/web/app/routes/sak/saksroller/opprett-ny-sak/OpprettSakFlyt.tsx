@@ -3,7 +3,7 @@ import { MaskerSensitivInfo, PersonIdent } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { BodyLong, BodyShort, Box, Heading, HGrid, HStack, InlineMessage, Loader, VStack } from "@navikt/ds-react";
-import { type ReactNode, Suspense, useEffect, useRef, useState } from "react";
+import { type ReactNode, Suspense, useEffect, useRef } from "react";
 import { useHentPersoninformasjon } from "~/api/useApi.ts";
 import DiskresjonAlert from "../components/DiskresjonAlert";
 import PersonInfo from "../components/PersonInfo";
@@ -14,21 +14,15 @@ import BarnebidragFlyt from "./flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "./flyt/Ektefellebidrag/EktefellebidragFlyt";
 import EnPartMedBarnFlyt from "./flyt/EnPartMedBarn/EnPartMedBarnFlyt";
 import { type InngangRolle, tilPartRolle } from "./inngang";
-import type { PartRolle } from "./opprett-sak-schema";
 import SakskategoriVelger from "./SakskategoriVelger";
-import SaksrolleVelger, { SaksrolleFlytResolver } from "./SaksrolleVelger";
+import SaksrolleVelger from "./SaksrolleVelger";
 import SakstypeVelger from "./SakstypeVelger";
-import { type Sakstype, sakstypeTilBeskrivelse, useSaksrolleroversikt } from "./saksrolleroversiktContext";
-
-const AUTO_ASSIGNED_ROLES: Partial<Record<Sakstype, PartRolle>> = {
-    OPPFOSTRINGSBIDRAG: "bidragspliktig",
-    FARSKAP: "bidragsmottaker",
-};
-
-function getAutoAssignedRole(sakstype: Sakstype | null): PartRolle | null {
-    if (!sakstype) return null;
-    return AUTO_ASSIGNED_ROLES[sakstype] || null;
-}
+import {
+    type Sakstype,
+    sakstypeTilBeskrivelse,
+    tvungenRolle,
+    useSaksrolleroversikt,
+} from "./saksrolleroversiktContext";
 
 function ValgtPart({ person }: { person: PersonDto }) {
     return (
@@ -95,78 +89,38 @@ const flytkomponenter = {
 
 export default function OpprettSakFlyt({ visning = "side" }: { visning?: "side" | "modal" }) {
     const {
-        valgtPerson: partISaken,
+        valgtPerson,
+        partISaken,
         valgVersjon,
         sakstype,
         sakskategori,
         velgKategori,
-        saksrolleFlyt,
         isLoadingOpprettSak,
         velgPerson,
         velgSakstype: settSakstypeOgNullstill,
-        velgRolle,
-        settFlytHvisGjeldende,
-        hentBarnkurver,
     } = useSaksrolleroversikt();
-    const [barnkurvFeil, settBarnkurvFeil] = useState<{ versjon: number; tekst: string } | null>(null);
-
-    const FlytKomponent = saksrolleFlyt ? flytkomponenter[saksrolleFlyt.type] : null;
-
-    const oppdaterFlytForSakstypeOgPart = (person: PersonDto, valgtSakstype: Sakstype | null) => {
-        const autoRole = getAutoAssignedRole(valgtSakstype);
-
-        if (!autoRole) {
-            return;
-        }
-
-        const versjon = velgRolle(autoRole);
-
-        if (valgtSakstype === "OPPFOSTRINGSBIDRAG" || valgtSakstype === "FARSKAP") {
-            hentBarnkurver(person.ident)
-                .then((barnkurver) => {
-                    settFlytHvisGjeldende(versjon, {
-                        key: Date.now(),
-                        type: valgtSakstype,
-                        barnkurver,
-                    });
-                })
-                .catch(() => {
-                    settBarnkurvFeil({
-                        versjon,
-                        tekst: "Kunne ikke hente forslag til barn. Du kan søke opp barn manuelt.",
-                    });
-                    settFlytHvisGjeldende(versjon, {
-                        key: Date.now(),
-                        type: valgtSakstype,
-                        barnkurver: [],
-                    });
-                });
-        }
-    };
 
     const velgSakstype = (type: Sakstype) => {
-        if (type === sakstype || isLoadingOpprettSak) {
-            return;
-        }
-
+        if (type === sakstype || isLoadingOpprettSak) return;
         settSakstypeOgNullstill(type);
     };
 
     const leggTilPartISaken = (person: PersonDto) => {
         if (!sakstype || isLoadingOpprettSak) return;
         velgPerson(person);
-        oppdaterFlytForSakstypeOgPart(person, sakstype);
     };
 
     const velgFraInngang = (person: PersonDto, rolle: InngangRolle | undefined) => {
-        leggTilPartISaken(person);
-        velgInngangsrolle(person, rolle, sakstype, velgRolle);
+        if (!sakstype || isLoadingOpprettSak) return;
+        velgPerson(person, tilPartRolle(rolle, beregnAlderForPerson(person)));
     };
 
     const velgSakskategori = (kategori: typeof sakskategori) => {
         if (kategori === sakskategori || isLoadingOpprettSak) return;
         velgKategori(kategori);
     };
+
+    const FlytKomponent = sakstype ? flytkomponenter[sakstype] : null;
 
     return (
         <FlytRamme visning={visning}>
@@ -189,26 +143,16 @@ export default function OpprettSakFlyt({ visning = "side" }: { visning?: "side" 
                     <PartSeksjon
                         sakstype={sakstype}
                         sakskategori={sakskategori}
-                        partISaken={partISaken}
+                        partISaken={valgtPerson}
                         onPersonValgt={leggTilPartISaken}
                     />
                 )}
             </VStack>
 
-            {partISaken && (
-                <>
-                    <SaksrolleFlytResolver
-                        key={`${partISaken.ident}-${valgVersjon}`}
-                        partISaken={partISaken}
-                        enforcedRolle={getAutoAssignedRole(sakstype)}
-                    />
-                    {barnkurvFeil?.versjon === valgVersjon && (
-                        <InlineMessage status="warning">{barnkurvFeil.tekst}</InlineMessage>
-                    )}
-                    <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>
-                        {FlytKomponent && <FlytKomponent key={saksrolleFlyt?.key} />}
-                    </Suspense>
-                </>
+            {partISaken && FlytKomponent && (
+                <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>
+                    <FlytKomponent key={valgVersjon} />
+                </Suspense>
             )}
         </FlytRamme>
     );
@@ -227,17 +171,6 @@ function FlytRamme({ visning, children }: { visning: "side" | "modal"; children:
             </VStack>
         </Box>
     );
-}
-
-function velgInngangsrolle(
-    person: PersonDto,
-    inngangRolle: InngangRolle | undefined,
-    sakstype: Sakstype | null,
-    velgRolle: (rolle: PartRolle) => number,
-) {
-    if (getAutoAssignedRole(sakstype)) return;
-    const rolle = tilPartRolle(inngangRolle, beregnAlderForPerson(person));
-    if (rolle) velgRolle(rolle);
 }
 
 function Forhåndsutfylling({ onPerson }: { onPerson: (person: PersonDto, rolle: InngangRolle | undefined) => void }) {
@@ -313,7 +246,7 @@ function PartSeksjon({
                     <SaksrolleVelger
                         key={`${partISaken.ident}-${sakstype}`}
                         partISaken={partISaken}
-                        enforcedRolle={getAutoAssignedRole(sakstype)}
+                        enforcedRolle={tvungenRolle(sakstype)}
                     />
                 </SkjemaSeksjonKort>
             )}

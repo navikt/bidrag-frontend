@@ -1,6 +1,8 @@
+import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
 import BMUtenBarnAlert from "../../components/BMUtenBarnAlert";
 import ParterSeksjon from "../../felles/ParterSeksjon";
 import RolleFlytSide from "../../felles/RolleFlytSide";
@@ -14,6 +16,7 @@ import {
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
 import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
+import { harMotpartMedUlikeForelderroller, utledBarnkurverForForelder } from "./barnebidrag-forslag";
 import { useBarnebidragFlyt } from "./useBarnebidragFlyt";
 
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined };
@@ -30,7 +33,7 @@ function lagStartverdier(
         erKjent: true,
         diskresjonskode: partISaken.diskresjonskode,
     };
-    const erBarn = partISaken.rolle === "barn_over_18" || partISaken.rolle === "barn_under_18";
+    const erBarn = erBarnRolle(partISaken);
 
     return {
         låstRolle: partISaken.rolle,
@@ -61,16 +64,34 @@ function lagStartverdier(
  * Én flyt for barnebidrag, uansett om saken startes fra en forelder eller fra barnet.
  */
 export default function BarnebidragFlyt() {
-    const { partISaken, saksrolleFlyt } = useSaksrolleroversikt();
+    const { partISaken } = useSaksrolleroversikt();
 
-    if (!partISaken || saksrolleFlyt?.type !== "BARNEBIDRAG") {
-        return null;
-    }
-
-    return <BarnebidragSkjema partISaken={partISaken} />;
+    if (!partISaken) return null;
+    if (erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} barnkurver={[]} />;
+    return <BarnebidragForForelder partISaken={partISaken} />;
 }
 
-function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
+function erBarnRolle({ rolle }: PartISaken) {
+    return rolle === "barn_over_18" || rolle === "barn_under_18";
+}
+
+function BarnebidragForForelder({ partISaken }: { partISaken: PartISaken }) {
+    const { data } = useHentPersonMotpartBarnRelasjonSuspense({ ident: partISaken.ident });
+    const relasjoner = data?.personensMotpartBarnRelasjon ?? [];
+
+    if (harMotpartMedUlikeForelderroller(relasjoner)) {
+        return (
+            <Alert variant="error">
+                Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for {partISaken.navn}.
+                Kontakt support for å få hjelp.
+            </Alert>
+        );
+    }
+
+    return <BarnebidragSkjema partISaken={partISaken} barnkurver={utledBarnkurverForForelder(relasjoner)} />;
+}
+
+function BarnebidragSkjema({ partISaken, barnkurver }: { partISaken: PartISaken; barnkurver: MotpartBarnRelasjon[] }) {
     const { partISakenAlder, valgtPerson, sakskategori } = useSaksrolleroversikt();
     const form = useForm<BarnebidragSkjemaData>({
         resolver: zodResolver(BarnebidragSkjemaSchema),
@@ -85,12 +106,12 @@ function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
 
     return (
         <FormProvider {...form}>
-            <BarnebidragFlytInnhold />
+            <BarnebidragFlytInnhold registrerteKurver={barnkurver} />
         </FormProvider>
     );
 }
 
-function BarnebidragFlytInnhold() {
+function BarnebidragFlytInnhold({ registrerteKurver }: { registrerteKurver: MotpartBarnRelasjon[] }) {
     const {
         form,
         barnkurver,
@@ -102,7 +123,7 @@ function BarnebidragFlytInnhold() {
         innsending,
         meldinger,
         status,
-    } = useBarnebidragFlyt();
+    } = useBarnebidragFlyt(registrerteKurver);
 
     return (
         <RolleFlytSide

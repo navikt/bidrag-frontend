@@ -128,8 +128,8 @@ function relasjonsmeldinger(foreldreTilBarn: ForeldreTilBarn[], parter: Parter, 
     };
 }
 
-export function useBarnebidragFlyt() {
-    const { partISaken, saksrolleFlyt } = useSaksrolleroversikt();
+export function useBarnebidragFlyt(registrerteKurver: MotpartBarnRelasjon[]) {
+    const { partISaken } = useSaksrolleroversikt();
     const form = useFormContext<BarnebidragSkjemaData>();
 
     const låstRolle = form.watch("låstRolle");
@@ -141,7 +141,7 @@ export function useBarnebidragFlyt() {
     const låstForelder = erForelderRolle(låstRolle) ? låstRolle : null;
     const redigerbare = FORELDERROLLER.filter((rolle) => rolle !== låstForelder);
 
-    const barnkurver = useBarnkurver(form, saksrolleFlyt?.type === "BARNEBIDRAG" ? saksrolleFlyt.barnkurver : []);
+    const barnkurver = useBarnkurver(form, registrerteKurver);
     const { foreldreTilBarn, forslag, forslagsfeil, tilgangsfeil } = useForelderforslag(
         form,
         låstForelder ? { ident: søktIdent, navn: partISaken?.navn ?? "" } : undefined,

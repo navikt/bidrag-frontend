@@ -5,14 +5,9 @@ export const Standard = () => (
     <WizardFlowStory
         scenario={{
             sakstype: "OPPFOSTRINGSBIDRAG",
-            flow: "OPPFOSTRINGSBIDRAG",
-            partISaken: {
-                ident: testpersoner.bidragspliktig.ident,
-                navn: testpersoner.bidragspliktig.visningsnavn,
-                rolle: "bidragspliktig",
-                erKjent: true,
-            },
-            barnkurver,
+            person: testpersoner.bidragspliktig,
+            rolle: "bidragspliktig",
+            relasjoner: barnkurver,
         }}
     />
 );

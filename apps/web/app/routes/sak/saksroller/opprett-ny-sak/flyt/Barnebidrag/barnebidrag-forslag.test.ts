@@ -1,6 +1,13 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { describe, expect, it } from "vitest";
-import { harFullstendigRelasjon, parterEtterValg, utledFellesBarn, utledForelderforslag } from "./barnebidrag-forslag";
+import {
+    harFullstendigRelasjon,
+    harMotpartMedUlikeForelderroller,
+    parterEtterValg,
+    utledBarnkurverForForelder,
+    utledFellesBarn,
+    utledForelderforslag,
+} from "./barnebidrag-forslag";
 
 const person = (ident: string, visningsnavn = ident): PersonDto => ({ ident, visningsnavn }) as PersonDto;
 const far = person("11111111111", "Far");
@@ -131,5 +138,32 @@ describe("parterEtterValg", () => {
             null,
         );
         expect(nye.bidragsmottaker).toEqual(ukjent);
+    });
+});
+
+describe("utledBarnkurverForForelder", () => {
+    const barnMedAlder = (ident: string, fødselsdato: string) => ({ ...person(ident), fødselsdato }) as PersonDto;
+    const ungtBarn = barnMedAlder("55555555555", "2015-01-01");
+    const voksen = barnMedAlder("66666666666", "1990-01-01");
+
+    it("slår sammen kurver med samme motpart og rolle og fjerner barn over 24 år", () => {
+        expect(
+            utledBarnkurverForForelder([
+                { motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn, voksen] },
+                { motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn] },
+                { motpart: annen, forelderrolleMotpart: "MOR", fellesBarn: [voksen] },
+            ]),
+        ).toEqual([{ motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn, ungtBarn] }]);
+    });
+});
+
+describe("harMotpartMedUlikeForelderroller", () => {
+    it("oppdager samme motpart med ulike forelderroller", () => {
+        expect(
+            harMotpartMedUlikeForelderroller([
+                { motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [] },
+                { motpart: mor, forelderrolleMotpart: "FAR", fellesBarn: [] },
+            ]),
+        ).toBe(true);
     });
 });
