@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 
 import { useHarÅpneRedigeringer } from "../RedigeringRegisterContext.tsx";
 import { type SakRedigeringData, SakRedigeringSchema } from "../sakvisning-schema.ts";
+import { useBarnMedUfullstendigRelasjon } from "./useBarnMedUfullstendigRelasjon.ts";
 import { useEndringssporing } from "./useEndringssporing.ts";
 import { useHentSakMedPersoninfo } from "./useHentSakMedPersoninfo.ts";
 import { useInitialiserSaksrollerForm } from "./useInitialiserSaksrollerForm.ts";
@@ -10,9 +11,7 @@ import { useSakForslag } from "./useSakForslag.tsx";
 import { useSaksrollerRollerData } from "./useSaksrollerRollerData.ts";
 import { useSaksrollerStatus } from "./useSaksrollerStatus.ts";
 import { useSaksrollerSubmit } from "./useSaksrollerSubmit.ts";
-import { useSaksrollerUfullstendigRelasjon } from "./useSaksrollerUfullstendigRelasjon.ts";
 import { useSakvisningSamhandlerHandling } from "./useSakvisningSamhandlerHandling.ts";
-import { useUfullstendigRelasjonSjekk } from "./useUfullstendigRelasjonSjekk.ts";
 
 /**
  * Samler datahenting, skjema, endringssporing og lagring for visning og redigering av saksroller.
@@ -33,7 +32,6 @@ export function useSaksrollerVisning(saksnummer: string) {
         nullstillStatusmeldinger,
     } = useSaksrollerStatus(harÅpneRedigeringer);
     const { feil, muligeAndreForeldre, muligeBarnPerMotpart } = useSakForslag({ sak });
-    const { finnBarnMedUfullstendigRelasjon } = useUfullstendigRelasjonSjekk();
     const { hentOgNullstillSamhandler } = useSakvisningSamhandlerHandling();
 
     const formMethods = useForm<SakRedigeringData>({
@@ -44,7 +42,7 @@ export function useSaksrollerVisning(saksnummer: string) {
     const { reset, watch } = formMethods;
     const roller = watch("roller") || [];
 
-    const { bp, bm, barn, barnIdenter, barnIdenterKey, aktiveRoller, sakstype, muligeBarn } = useSaksrollerRollerData({
+    const { bp, bm, barn, barnIdenter, aktiveRoller, sakstype, muligeBarn } = useSaksrollerRollerData({
         roller,
         berikedeRoller,
         muligeBarnPerMotpart,
@@ -61,12 +59,10 @@ export function useSaksrollerVisning(saksnummer: string) {
         },
     });
 
-    const barnMedUfullstendigRelasjon = useSaksrollerUfullstendigRelasjon({
+    const barnMedUfullstendigRelasjon = useBarnMedUfullstendigRelasjon({
         barnIdenter,
-        barnIdenterKey,
         bidragspliktigIdent: bp?.fodselsnummer,
         bidragsmottakerIdent: bm?.fodselsnummer,
-        finnBarnMedUfullstendigRelasjon,
         harSak: !!sak,
     });
 

@@ -1,24 +1,13 @@
 import type { ForelderBarnRelasjonDto } from "@bidrag/api/PersonApi";
 
-export async function beregnBarnMedUfullstendigRelasjon(
-    barn: string[],
-    bidragsmottaker: string | undefined,
-    bidragspliktig: string | undefined,
-    hentRelasjon: (ident: string) => Promise<ForelderBarnRelasjonDto>,
-): Promise<string[]> {
-    if (!bidragsmottaker || !bidragspliktig) return barn;
-    const resultat = await Promise.all(
-        barn.map(async (barnIdent) => {
-            const relasjon = await hentRelasjon(barnIdent);
-            const foreldreIdent = relasjon.forelderBarnRelasjon
-                .filter((i) => i.minRolleForPerson === "BARN")
-                .map((i) => i.relatertPersonsIdent);
-            return foreldreIdent.length < 2 ||
-                !foreldreIdent.includes(bidragsmottaker) ||
-                !foreldreIdent.includes(bidragspliktig)
-                ? barnIdent
-                : null;
-        }),
-    );
-    return resultat.filter((ident): ident is string => ident !== null);
+/** Sann når barnet ikke har registrert både bidragsmottaker og bidragspliktig som foreldre. */
+export function harUfullstendigRelasjon(
+    relasjon: ForelderBarnRelasjonDto,
+    bidragsmottaker: string,
+    bidragspliktig: string,
+): boolean {
+    const foreldre = relasjon.forelderBarnRelasjon
+        .filter((i) => i.minRolleForPerson === "BARN")
+        .map((i) => i.relatertPersonsIdent);
+    return foreldre.length < 2 || !foreldre.includes(bidragsmottaker) || !foreldre.includes(bidragspliktig);
 }

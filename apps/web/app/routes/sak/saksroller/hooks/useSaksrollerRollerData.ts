@@ -17,7 +17,6 @@ export function useSaksrollerRollerData({
     const bm = useMemo(() => roller.find((r) => r.type === "BM"), [roller]);
     const barn = roller.filter(erBarn) as BarnRolle[];
     const barnIdenter = useMemo(() => barn.map((b) => b.fodselsnummer), [barn]);
-    const barnIdenterKey = barnIdenter.join(",");
     const aktiveRoller = useMemo(() => (roller.length > 0 ? roller : berikedeRoller), [roller, berikedeRoller]);
     const sakstype = useMemo(() => utledSakstype(aktiveRoller), [aktiveRoller]);
     const muligeBarn =
@@ -27,5 +26,5 @@ export function useSaksrollerRollerData({
               [])
             : [];
 
-    return { bp, bm, barn, barnIdenter, barnIdenterKey, aktiveRoller, sakstype, muligeBarn };
+    return { bp, bm, barn, barnIdenter, aktiveRoller, sakstype, muligeBarn };
 }

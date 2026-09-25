@@ -120,9 +120,11 @@ export function useSjekkTilgangOpprettSakUtenBm(enabled: boolean = true) {
     });
 }
 
+export const OPPRETT_SAK_MUTATION_KEY = ["opprett_sak"];
+
 export function useOpprettSak() {
     return useMutation<string, AxiosError<string> | TilgangsFeilError, OpprettSakRequest>({
-        mutationKey: ["opprett_sak"],
+        mutationKey: OPPRETT_SAK_MUTATION_KEY,
         mutationFn: async (request: OpprettSakRequest) => {
             try {
                 const response = await BIDRAG_SAK_API.sak.opprettSak(request);
