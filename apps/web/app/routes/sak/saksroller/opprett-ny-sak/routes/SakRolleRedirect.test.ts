@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { loader as nySakLegacyLoader } from "./NySakLegacyRedirect";
 import { loader } from "./SakRolleRedirect";
 
 describe("SakRolleRedirect", () => {
@@ -14,13 +15,25 @@ describe("SakRolleRedirect", () => {
         );
     });
 
-    test("bevarer parametere og sender ny sak til veiviseren", async () => {
+    test("bevarer parametere og sender ny sak til /sak/ny", async () => {
         const response = await loader({
             request: new Request("https://bidrag.nav.no/sak/rolle?enhet=4806&sessionState=test&from=bisys"),
         });
 
         expect(response.headers.get("Location")).toBe(
-            "https://bidrag.nav.no/sak/ny/saksroller?enhet=4806&sessionState=test&from=bisys",
+            "https://bidrag.nav.no/sak/ny?enhet=4806&sessionState=test&from=bisys",
+        );
+    });
+});
+
+describe("NySakLegacyRedirect", () => {
+    test("sender /sak/ny/saksroller til /sak/ny med parametere", async () => {
+        const response = await nySakLegacyLoader({
+            request: new Request("https://bidrag.nav.no/sak/ny/saksroller?enhet=4806&sessionState=test&from=bisys"),
+        });
+
+        expect(response.headers.get("Location")).toBe(
+            "https://bidrag.nav.no/sak/ny?enhet=4806&sessionState=test&from=bisys",
         );
     });
 });

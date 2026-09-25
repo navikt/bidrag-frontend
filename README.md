@@ -151,6 +151,35 @@ fra Unleash-web.
 
 ## Scripts
 
+### fallow
+
+[fallow](https://docs.fallow.tools) finner ubrukt kode, duplisering og komplekse funksjoner. Vi kjører det lokalt på mappa vi jobber i, gjerne sammen med en AI-agent. Det er ikke med i CI.
+
+Gi mappa som argument. Uten argument analyserer fallow hele repoet.
+
+```bash
+# Alt i én rapport: dead code, duplisering og kompleksitet
+pnpm fallow apps/web/app/routes/sak/saksroller
+
+# Én analyse om gangen
+pnpm fallow:health apps/web/app/routes/sak/saksroller
+pnpm fallow:dupes apps/web/app/routes/sak/saksroller
+pnpm fallow:dead-code apps/web/app/routes/sak/saksroller
+
+# JSON-utdata for AI-agenter
+pnpm fallow:json apps/web/app/routes/sak/saksroller
+```
+
+Du kan legge til flere flagg etter mappa. Se `pnpm fallow --help` for alle flagg. Ikke bruk `--production` med `fallow:health`: da hopper fallow over stories og tester, og alle komponenter ser utestet ut.
+
+Arbeidsflyt med AI-agent: be agenten kjøre `pnpm fallow:json <mappe>`, forenkle koden og kjøre analysen på nytt til funnene er borte. Kjør `pnpm typecheck`, `pnpm check` og testene etter hver runde. Agenten bruker fallow best med fallow-skillene installert lokalt. Se [fallow-rs/fallow-skills](https://github.com/fallow-rs/fallow-skills) for hvordan du installerer dem.
+
+#### Konfigurasjon
+
+Oppsettet ligger i `.fallowrc.json`. `*.story.tsx`-filene er registrert som testinnganger, fordi CT-testene monterer stories med en tekststreng (se [Component-testing](#component-testing-playwright-ct)). Uten dette tror fallow at komponentene er utestet. Det gir høye CRAP-verdier, og stories blir rapportert som ubrukte eksporter.
+
+CRAP-verdien er et estimat. Fallow regner ut dekningen fra hvilke filer testene importerer, og kjører ikke testene.
+
 ### migrate-imports
 
 Migrerer import-paths i `apps/web/app` (eller en valgfri delmappe) til monorepo-pakker:

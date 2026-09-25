@@ -5,7 +5,7 @@ export async function loader({ request }: { request: Request }) {
     const saksnummer = url.searchParams.get("saksnummer");
     const destination = saksnummer
         ? new URL(`/sak/${saksnummer}/saksroller`, url.origin)
-        : new URL("/sak/ny/saksroller", url.origin);
+        : new URL("/sak/ny", url.origin);
 
     const gjenværendeParams = new URLSearchParams(url.searchParams);
     gjenværendeParams.delete("saksnummer");

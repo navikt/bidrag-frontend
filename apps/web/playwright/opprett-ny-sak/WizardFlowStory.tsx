@@ -1,115 +1,36 @@
+import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
+import { NyOpprettSakFlytContext, OpprettSakFlytModal } from "@bidrag/common";
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { type ReactNode, useEffect, useMemo } from "react";
+import { Button } from "@navikt/ds-react";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { type ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import BarnBeggeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnBeggeForeldre/BarnBeggeForeldreFlyt";
-import BarnMedManglendeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/BarnMedManglendeForeldreFlyt";
-import EktefellebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/EktefellebidragFlyt";
-import FarskapsFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Farskap/FarskapsFlyt";
-import ForelderMedBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/ForelderMedBarnFlyt";
-import ForelderUtenBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderUtenBarn/ForelderUtenBarnFlyt";
-import OppfostringsbidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Oppfostringsbidrag/OppfostringsbidragFlyt";
-import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt";
-import type { PartISaken } from "../../app/routes/sak/saksroller/opprett-ny-sak/opprett-sak-schema";
-import {
-    SaksrolleroversiktProvider,
-    useSaksrolleroversikt,
-} from "../../app/routes/sak/saksroller/opprett-ny-sak/saksrolleroversiktContext";
+import OpprettSakSkjema from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/OpprettSakSkjema";
+import type { PartRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/opprett-sak-schema";
+import type { Sakstype } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/saksrolleroversiktContext";
+import type { InngangRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/start/inngang";
+import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlyt";
+import OpprettSakFlytInnbygget from "../../app/routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlytInnbygget";
 import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
-type Scenario =
-    | { sakstype: "BARNEBIDRAG"; partISaken: PartISaken; flow: "FORELDER_UTEN_BARN" }
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "FORELDER_MED_BARN";
-          barnkurver: Parameters<ReturnType<typeof useSaksrolleroversikt>["setSaksrolleFlyt"]>[0] extends infer _T
-              ? import("@bidrag/api/PersonApi").MotpartBarnRelasjon[]
-              : never;
-      }
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "BARN_BEGGE_FORELDRE";
-          foreldre: import("@bidrag/api/PersonApi").PersonDto[];
-      }
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "BARN_MANGLENDE_FORELDRE";
-          forelder: import("@bidrag/api/PersonApi").PersonDto | null;
-      }
-    | {
-          sakstype: "EKTEFELLEBIDRAG";
-          partISaken: PartISaken;
-          flow: "EKTEFELLEBIDRAG";
-          motpart: import("@bidrag/api/PersonApi").PersonDto[] | null;
-      }
-    | {
-          sakstype: "FARSKAP";
-          partISaken: PartISaken;
-          flow: "FARSKAP";
-          barnkurver: import("@bidrag/api/PersonApi").MotpartBarnRelasjon[];
-      }
-    | {
-          sakstype: "OPPFOSTRINGSBIDRAG";
-          partISaken: PartISaken;
-          flow: "OPPFOSTRINGSBIDRAG";
-          barnkurver: import("@bidrag/api/PersonApi").MotpartBarnRelasjon[];
-      };
+type Scenario = {
+    sakstype: Sakstype;
+    person: Pick<PersonDto, "ident" | "visningsnavn" | "fødselsdato">;
+    rolle: PartRolle;
+    relasjoner: MotpartBarnRelasjon[];
+};
 
 function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
-    const { setPartISaken, setPartISakenAlder, setSakstype, setSakskategori, setSaksrolleFlyt } =
-        useSaksrolleroversikt();
+    const queryClient = useQueryClient();
+    const [start] = useState(() => {
+        queryClient.setQueryData(["hent_person_motpart_barn_relasjon", scenario.person.ident], {
+            personensMotpartBarnRelasjon: scenario.relasjoner,
+        });
+        return { person: scenario.person as PersonDto, rolle: scenario.rolle, sakstype: scenario.sakstype };
+    });
 
-    useEffect(() => {
-        setSakstype(scenario.sakstype);
-        setSakskategori("Nasjonal");
-        setPartISaken(scenario.partISaken);
-        setPartISakenAlder(
-            scenario.partISaken.rolle === "barn_under_18" ? 10 : scenario.partISaken.rolle === "barn_over_18" ? 23 : 40,
-        );
-
-        switch (scenario.flow) {
-            case "FORELDER_MED_BARN":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, barnkurver: scenario.barnkurver });
-                break;
-            case "FORELDER_UTEN_BARN":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow });
-                break;
-            case "BARN_BEGGE_FORELDRE":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, foreldre: scenario.foreldre });
-                break;
-            case "BARN_MANGLENDE_FORELDRE":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, forelder: scenario.forelder });
-                break;
-            case "EKTEFELLEBIDRAG":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, motpart: scenario.motpart });
-                break;
-            case "FARSKAP":
-            case "OPPFOSTRINGSBIDRAG":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, barnkurver: scenario.barnkurver });
-                break;
-        }
-    }, [scenario, setPartISaken, setPartISakenAlder, setSakskategori, setSakstype, setSaksrolleFlyt]);
-
-    switch (scenario.flow) {
-        case "FORELDER_MED_BARN":
-            return <ForelderMedBarnFlyt />;
-        case "FORELDER_UTEN_BARN":
-            return <ForelderUtenBarnFlyt />;
-        case "BARN_BEGGE_FORELDRE":
-            return <BarnBeggeForeldreFlyt />;
-        case "BARN_MANGLENDE_FORELDRE":
-            return <BarnMedManglendeForeldreFlyt />;
-        case "EKTEFELLEBIDRAG":
-            return <EktefellebidragFlyt />;
-        case "FARSKAP":
-            return <FarskapsFlyt />;
-        case "OPPFOSTRINGSBIDRAG":
-            return <OppfostringsbidragFlyt />;
-    }
+    return <OpprettSakSkjema start={start} />;
 }
 
 export function WizardFlowStory({ scenario }: { scenario: Scenario }) {
@@ -118,6 +39,76 @@ export function WizardFlowStory({ scenario }: { scenario: Scenario }) {
 
 export function WizardPageStory() {
     return <StoryRouter content={<OpprettSakFlyt />} />;
+}
+
+/** Flyten bygd inn av en kaller. Callbacks lagres i skjulte felt, siden CT-props må kunne serialiseres. */
+export function WizardInnbyggetStory({ ident, rolle }: { ident: string; rolle?: InngangRolle }) {
+    const [saksnummer, settSaksnummer] = useState("");
+    const [avbrutt, settAvbrutt] = useState(false);
+    return (
+        <>
+            <form hidden>
+                <input data-testid="opprettet-saksnummer" readOnly value={saksnummer} />
+                <input data-testid="avbrutt" readOnly value={String(avbrutt)} />
+            </form>
+            <StoryRouter
+                content={
+                    <OpprettSakFlytInnbygget
+                        ident={ident}
+                        rolle={rolle}
+                        onOpprettet={settSaksnummer}
+                        onAvbryt={() => settAvbrutt(true)}
+                    />
+                }
+            />
+        </>
+    );
+}
+
+type ModalStoryProps = {
+    ident: string;
+    rolle?: InngangRolle;
+    initialForelderIdent?: string;
+    eierfogd?: string;
+    medNyFlyt?: boolean;
+};
+
+/** Modalen slik behandling og dokument åpner den. Resultatet lagres i skjulte felt. */
+export function WizardModalStory(props: ModalStoryProps) {
+    return <StoryRouter content={<ModalHarness {...props} />} />;
+}
+
+function ModalHarness({ ident, rolle, initialForelderIdent, eierfogd, medNyFlyt = true }: ModalStoryProps) {
+    const [open, settOpen] = useState(false);
+    const [saksnummer, settSaksnummer] = useState("");
+    const [lukket, settLukket] = useState(false);
+
+    return (
+        <NyOpprettSakFlytContext value={medNyFlyt ? OpprettSakFlytInnbygget : null}>
+            <form hidden>
+                <input data-testid="opprettet-saksnummer" readOnly value={saksnummer} />
+                <input data-testid="lukket" readOnly value={String(lukket)} />
+            </form>
+            <Button type="button" onClick={() => settOpen(true)}>
+                Åpne opprett sak
+            </Button>
+            <OpprettSakFlytModal
+                open={open}
+                onClose={() => {
+                    settOpen(false);
+                    settLukket(true);
+                }}
+                ident={ident}
+                rolle={rolle}
+                initialForelder={initialForelderIdent ? { ident: initialForelderIdent, rolle: "BP" } : undefined}
+                eierfogd={eierfogd}
+                onOpprettet={(nytt) => {
+                    settSaksnummer(nytt);
+                    settOpen(false);
+                }}
+            />
+        </NyOpprettSakFlytContext>
+    );
 }
 
 function StoryRouter({ content }: { content: ReactNode }) {
@@ -142,17 +133,18 @@ function StoryRouter({ content }: { content: ReactNode }) {
                         element: (
                             <QueryClientProvider client={queryClient}>
                                 <BidragCommonsProviderMock
+                                    client={queryClient}
                                     personer={Object.fromEntries(
                                         Object.values(testpersoner).map((person) => [person.ident, person]),
                                     )}
                                 >
-                                    <SaksrolleroversiktProvider>{content}</SaksrolleroversiktProvider>
+                                    {content}
                                 </BidragCommonsProviderMock>
                             </QueryClientProvider>
                         ),
                     },
                 ],
-                { initialEntries: ["/sak/ny/saksroller"] },
+                { initialEntries: ["/sak/ny"] },
             ),
         [content, queryClient],
     );

@@ -13,6 +13,7 @@ const feature = {
 const url = {
     /** Redirect-ruter i apps/web som slår opp BISYS_URL på serveren */
     bisysSak: "/bisys/sak",
+    bisysSakshistorikk: "/bisys/sakshistorikk",
     bisysOppgaveliste: "/bisys/oppgaveliste",
 };
 

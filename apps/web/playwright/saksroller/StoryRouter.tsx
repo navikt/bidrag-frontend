@@ -1,19 +1,11 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useMemo } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
+import { useTestQueryClient } from "./useTestQueryClient.ts";
 
 export function SaksrollerStoryRouter({ content }: { content: React.ReactNode }) {
-    const queryClient = useMemo(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: { retry: false, staleTime: Infinity },
-                    mutations: { retry: false },
-                },
-            }),
-        [],
-    );
+    const queryClient = useTestQueryClient();
     const router = useMemo(
         () =>
             createMemoryRouter(

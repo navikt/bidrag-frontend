@@ -1,16 +1,22 @@
 import { BodyLong, Loader, VStack } from "@navikt/ds-react";
+import { useFlag } from "@unleash/proxy-client-react";
 import { Suspense } from "react";
 
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SaksrollerPage.ts";
+import SaksrollerVisning from "./rollebilde/SaksrollerVisning.tsx";
 import SakErrorBoundary from "./SakErrorBoundary.tsx";
-import SaksrollerVisning from "./SaksrollerVisning.tsx";
 
 export const handle: SakSideTittelHandle = { sakSideTittel: "Saksroller" };
 
 export default function SaksrollerPage({ params }: Route.ComponentProps) {
+    const visNyRollebilde = useFlag("bisys.ny_rollebilde");
     const saksnummer = params.saksnummer;
     const tabTitle = `Saksroller - ${saksnummer}`;
+
+    if (!visNyRollebilde) {
+        throw new Error("Saksroller er ikke tilgjengelig");
+    }
 
     return (
         <>
