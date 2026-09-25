@@ -1,6 +1,7 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
 import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
+import type { Innbygget } from "./OpprettSakFlyt.story";
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt/Standard";
 
@@ -138,8 +139,80 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
     await component.getByRole("button", { name: /Opprett$/ }).click();
 
     await expect.poll(() => requests.create).toBeTruthy();
-    expect(requests.create?.roller).toHaveLength(2);
+    expect(requests.create).toMatchObject({
+        eierfogd: "4806",
+        kategori: "N",
+        arbeidsfordeling: "EFS",
+        ansatt: false,
+        inhabilitet: false,
+        levdeAdskilt: false,
+    });
+    expect(requests.create?.roller).toEqual([
+        expect.objectContaining({ fodselsnummer: testpersoner.bidragspliktig.ident, type: "BP" }),
+        expect.objectContaining({ fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM" }),
+    ]);
     await expect
         .poll(() => page.evaluate(() => (window as unknown as { __sammeDokument?: boolean }).__sammeDokument))
         .toBe(true);
+});
+
+test.describe("Innbygget med forhåndsutfylling", () => {
+    const INNBYGGET = "routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt/Innbygget";
+    const { bidragspliktig: bp, bidragsmottaker: bm, barnUnder18 } = testpersoner;
+    const rollevelger = (component: import("@playwright/test").Locator) =>
+        component.getByRole("radiogroup", { name: /Hvilken rolle har/ });
+
+    test("velger personen og rollen fra inngangen", async ({ mount, page }) => {
+        await mockWizardApi(page);
+        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident, rolle: "BP" });
+
+        await expect(rollevelger(component).getByRole("radio", { name: "Bidragspliktig" })).toBeChecked();
+        await expect(component.getByText(bp.visningsnavn).first()).toBeVisible();
+    });
+
+    test("barn under 18 får riktig rolle ut fra alder", async ({ mount, page }) => {
+        await mockWizardApi(page);
+        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: barnUnder18.ident, rolle: "BA" });
+
+        await expect(rollevelger(component).getByRole("radio", { name: "Barn under 18 år" })).toBeChecked();
+    });
+
+    test("uten rolle velger saksbehandler rollen selv", async ({ mount, page }) => {
+        await mockWizardApi(page);
+        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident });
+
+        await expect(rollevelger(component)).toBeVisible();
+        await expect(rollevelger(component).getByRole("radio", { checked: true })).toHaveCount(0);
+    });
+
+    test("kalleren får saksnummeret, og Avbryt er tilgjengelig", async ({ mount, page }) => {
+        const requests = await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
+        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: barnUnder18.ident, rolle: "BA" });
+
+        await component
+            .getByRole("group", { name: "Bidragspliktig" })
+            .getByRole("button", { name: `Bruk ${bp.visningsnavn}` })
+            .click();
+        await expect(component.getByRole("button", { name: "Avbryt" })).toBeVisible();
+
+        await component.getByRole("button", { name: /Opprett$/ }).click();
+        await expect.poll(() => requests.create).toBeTruthy();
+        expect(requests.create).toMatchObject({ eierfogd: "4806", kategori: "N", arbeidsfordeling: "EEN" });
+        expect(requests.create?.roller).toEqual([
+            expect.objectContaining({ fodselsnummer: bp.ident, type: "BP" }),
+            expect.objectContaining({ fodselsnummer: bm.ident, type: "BM" }),
+            expect.objectContaining({ fodselsnummer: barnUnder18.ident, type: "BA" }),
+        ]);
+        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("1234567");
+        await expect(component.getByTestId("avbrutt")).toHaveValue("false");
+    });
+
+    test("Avbryt kaller onAvbryt", async ({ mount, page }) => {
+        await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
+        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: barnUnder18.ident, rolle: "BA" });
+
+        await component.getByRole("button", { name: "Avbryt" }).click();
+        await expect(component.getByTestId("avbrutt")).toHaveValue("true");
+        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("");
+    });
 });

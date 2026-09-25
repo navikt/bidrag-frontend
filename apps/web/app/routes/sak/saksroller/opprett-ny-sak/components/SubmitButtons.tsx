@@ -7,6 +7,7 @@ import { type MouseEvent, type RefObject, useEffect, useRef, useState } from "re
 import { useFormContext } from "react-hook-form";
 import { useRouteLoaderData, useSearchParams } from "react-router";
 import type { loader as rootLoader } from "~/root.tsx";
+import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
 
 type Props = {
     blocked?: boolean;
@@ -25,6 +26,9 @@ function feilmeldingTekst(error: Props["error"]) {
 function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redirectmål: RefObject<Redirectmål>) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const [, setSearchParams] = useSearchParams();
+    const { onOpprettet } = useSaksrolleroversikt();
+    const onOpprettetRef = useRef(onOpprettet);
+    onOpprettetRef.current = onOpprettet;
 
     useEffect(() => {
         if (!saksnummer) return;
@@ -33,6 +37,8 @@ function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redi
             RedirectTo.behandleSak(saksnummer, bisysUrl);
         } else if (redirectmål.current === "soknad") {
             RedirectTo.nySoknad(saksnummer, bisysUrl);
+        } else if (onOpprettetRef.current) {
+            onOpprettetRef.current(saksnummer);
         } else {
             setSearchParams(
                 (forrige) => {
@@ -50,6 +56,7 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
     const afterSubmitRedirect = useRef<Redirectmål>(null);
     const [blockedError, setBlockedError] = useState<string | null>(null);
     const form = useFormContext();
+    const { onAvbryt } = useSaksrolleroversikt();
     const visFeil = Boolean(error || blockedError);
 
     useRedirectEtterOpprettelse(saksnummer, afterSubmitRedirect);
@@ -100,7 +107,7 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
                         : `Sak opprettet med saksnummer ${saksnummer}.`}
                 </Alert>
             ) : (
-                <Opprettknapper isLoading={isLoading} onVelg={velgHandling} />
+                <Opprettknapper isLoading={isLoading} onVelg={velgHandling} onAvbryt={onAvbryt} />
             )}
         </VStack>
     );
@@ -109,12 +116,19 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
 function Opprettknapper({
     isLoading,
     onVelg,
+    onAvbryt,
 }: {
     isLoading: boolean;
     onVelg: (event: MouseEvent<HTMLButtonElement>, handling: Redirectmål) => void;
+    onAvbryt?: () => void;
 }) {
     return (
         <HStack gap="space-2" justify="end">
+            {onAvbryt && (
+                <Button variant="tertiary-neutral" type="button" size="xsmall" disabled={isLoading} onClick={onAvbryt}>
+                    Avbryt
+                </Button>
+            )}
             <Button
                 variant="tertiary"
                 type="submit"

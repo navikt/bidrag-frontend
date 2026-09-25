@@ -23,7 +23,6 @@ export default function RolleFlytSide({ onSubmit, status, innledning, children, 
                 {innledning && <VStack gap="space-12">{innledning}</VStack>}
                 {children}
                 {innsending.oppsummering && <Oppsummering {...innsending.oppsummering} />}
-                {/* Info, advarsler og feil samles rett over knappene. */}
                 <VStack gap="space-12">
                     {visStatus && <EksisterendeSakStatus {...status} />}
                     {meldinger}

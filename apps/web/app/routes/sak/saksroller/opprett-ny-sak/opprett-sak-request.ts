@@ -24,6 +24,16 @@ const arbeidsfordelingTilEnum: Record<SaksrollerArbeidsfordeling, Arbeidsfordeli
 /**
  * Bygger requesten for alle sakstyper. BP og BM sendes bare når de har ident, slik at
  * ukjent part alltid sendes likt. Backend oppretter uansett ukjent BP/BM (`ukjentPart = UK`).
+ *
+ * Siste kontroll før innsending fjerner roller uten fødselsnummer og krever RM på alle barn
+ * når BM mangler.
+ *
+ * TODO(bidrag-sak): Backend regner BM som oppgitt så lenge det finnes en BM-rolle,
+ * også når den mangler fødselsnummer. Da hopper `OpprettSakValidator` over kravet om
+ * reell mottaker (RM) på barna, selv om BM lagres som ukjent (`ukjentPart = UK`).
+ * Uten RM og uten kjent BM har bidraget ingen mottaker. Denne kontrollen dekker
+ * hullet fra frontend. Fjern den når backend bare regner BM som oppgitt når
+ * fødselsnummer finnes.
  */
 export function lagOpprettSakRequest(
     enhet: string,
@@ -45,19 +55,6 @@ export function lagOpprettSakRequest(
     } as OpprettSakRequest);
 }
 
-/**
- * Siste kontroll av requesten før den sendes til bidrag-sak.
- *
- * TODO(bidrag-sak): Backend regner BM som oppgitt så lenge det finnes en BM-rolle,
- * også når den mangler fødselsnummer. Da hopper `OpprettSakValidator` over kravet om
- * reell mottaker (RM) på barna, selv om BM lagres som ukjent (`ukjentPart = UK`).
- * Uten RM og uten kjent BM har bidraget ingen mottaker. Denne kontrollen dekker
- * hullet fra frontend. Fjern den når backend bare regner BM som oppgitt når
- * fødselsnummer finnes.
- *
- * 1. Fjerner roller uten fødselsnummer.
- * 2. Krever RM på alle barn når BM mangler.
- */
 function kontrollerOpprettSakRequest(request: OpprettSakRequest): OpprettSakRequest {
     const roller = request.roller.filter((rolle) => !!rolle.fodselsnummer?.trim());
     const harBidragsmottaker = roller.some((rolle) => rolle.type === Rolletype.BM);

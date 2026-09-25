@@ -59,10 +59,6 @@ function partMedRolle(rolle: PartISaken["rolle"], partISaken: PartISaken, motpar
     return (partISaken.rolle === rolle ? partISaken : motpart) ?? null;
 }
 
-/**
- * 🔴 Tilgang til å opprette barnebidragssak uten BM håndheves bare her (ikke i bidrag-sak).
- * Oppfostring (OPS) har aldri BM, og Farskap/Ektefelle har alltid BM, så sjekken gjelder bare EEN.
- */
 function useTilgangUtenBm(
     bidragsmottaker: { erKjent?: boolean } | null,
     arbeidsfordeling: UseFlowSubmissionProps<FormMedKategori>["arbeidsfordeling"],
@@ -76,7 +72,6 @@ function useTilgangUtenBm(
     };
 }
 
-/** Sender inn én gang om gangen, og nullstiller feil og resultat når skjemaet endres. */
 function useSendInn<T extends FormMedKategori>(
     form: UseFormReturn<T>,
     innsending: ReturnType<typeof useOpprettSakHandling>,
@@ -108,6 +103,9 @@ function useSendInn<T extends FormMedKategori>(
  * Reusable hook for flow submission logic.
  * Handles enhet determination, existing case check, and form submission.
  * Type-safe and works with any form schema.
+ *
+ * 🔴 Tilgang til å opprette barnebidragssak uten BM håndheves bare her, ikke i bidrag-sak.
+ * Sjekken gjelder bare EEN: oppfostring (OPS) har aldri BM, og farskap og ektefelle har alltid BM.
  */
 export function useFlowSubmission<T extends FormMedKategori>({
     form,

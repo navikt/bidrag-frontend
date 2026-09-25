@@ -14,15 +14,16 @@ type Props = {
     barnkurver: Barnkurv[];
     form: UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
     reellMottakerRegel: ReellMottakerRegel;
-    /** Kalles når valget går over til en annen barnkurv, eller `null` når ingen barn er valgt. */
     onKurvByttet?: (kurv: Barnkurv | null) => void;
-    /** Barn som ikke kan velges bort, f.eks. barnet saken ble startet fra. */
     låsteIdenter?: string[];
 };
 
 /**
  * Alle barn som kan være med i saken, som valg i én liste: registrerte barn per motpart
  * og barn som er lagt til manuelt.
+ *
+ * `onKurvByttet` kalles når valget går over til en annen barnkurv, eller med `null` når ingen
+ * barn er valgt. `låsteIdenter` er barn som ikke kan velges bort, som barnet saken ble startet fra.
  */
 export default function BarnkurvListe({
     barnkurver,

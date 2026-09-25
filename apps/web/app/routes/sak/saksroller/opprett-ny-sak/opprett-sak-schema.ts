@@ -46,13 +46,13 @@ const MotpartSchema = z.object({
     diskresjonskode: DiskresjonskodeSchema.optional(),
 });
 
-// ==================== BARNEBIDRAG ====================
-// Samme skjema uansett om saken startes fra en forelder eller fra barnet.
-// Den oppsøkte personen er låst i sin rolle (`låstRolle` + `søktIdent`).
-
-// erKjent: undefined = ikke avklart, false = registrert som ukjent
 const ForelderPartSchema = MotpartSchema.omit({ rolle: true });
 
+/**
+ * Samme skjema uansett om saken startes fra en forelder eller fra barnet.
+ * 🔴 Den oppsøkte personen er låst i sin rolle (`låstRolle` + `søktIdent`) og kan ikke flyttes.
+ * `erKjent` på BP og BM: `undefined` er ikke avklart, `false` er registrert som ukjent.
+ */
 export const BarnebidragSkjemaSchema = z
     .object({
         låstRolle: PartRolleSchema,
@@ -76,7 +76,6 @@ type BarnebidragSkjemaInput = {
     valgteBarn: BarnMedAlder[];
 };
 
-// 🔴 Den oppsøkte personen kan ikke flyttes til en annen rolle.
 function validerLåstPart(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
     const { låstRolle, søktIdent } = data;
     const plassert =
@@ -145,8 +144,7 @@ const createSakMedBarnSkjemaSchema = (
 export const OppfostringsbidragSkjemaSchema = createSakMedBarnSkjemaSchema((barn, index, ctx) =>
     leggTilReellMottakerFeil(barn, "alltid", ["valgteBarn", index], ctx),
 );
-// ==================== FARSKAP SCHEMA ====================
-// Similar to OPPFOSTRINGSBIDRAG but does NOT require reellMottaker selection
+/** Som oppfostringsbidrag, men uten krav om reell mottaker. */
 export const FarskapsSkjemaSchema = createSakMedBarnSkjemaSchema();
 
 export type FarskapsSkjemaSchemaData = z.infer<typeof FarskapsSkjemaSchema>;

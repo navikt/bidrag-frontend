@@ -10,7 +10,9 @@ test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
 
     await brukPartner.click();
     const endrePartner = component.getByRole("button", { name: "Endre bidragsmottaker" });
-    await expect(component.getByRole("heading", { name: "Kontroller bidragspliktig og bidragsmottaker" })).toBeVisible();
+    await expect(
+        component.getByRole("heading", { name: "Kontroller bidragspliktig og bidragsmottaker" }),
+    ).toBeVisible();
     const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
     await expect(bmKort.getByText("Test Ukjent Person", { exact: true })).toBeVisible();
     await expect(component.getByRole("heading", { name: "Oppsummering" })).toBeVisible();

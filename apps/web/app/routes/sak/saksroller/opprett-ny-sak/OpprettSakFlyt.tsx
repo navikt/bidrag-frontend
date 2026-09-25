@@ -1,8 +1,10 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { MaskerSensitivInfo, PersonIdent } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
+import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { BodyLong, BodyShort, Box, Heading, HGrid, HStack, InlineMessage, Loader, VStack } from "@navikt/ds-react";
-import { Suspense, useState } from "react";
+import { type ReactNode, Suspense, useEffect, useRef, useState } from "react";
+import { useHentPersoninformasjon } from "~/api/useApi.ts";
 import DiskresjonAlert from "../components/DiskresjonAlert";
 import PersonInfo from "../components/PersonInfo";
 import SøkPerson from "../components/SøkPerson";
@@ -11,6 +13,7 @@ import SkjemaSeksjon, { SkjemaSeksjonKort } from "./felles/SkjemaSeksjon";
 import BarnebidragFlyt from "./flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "./flyt/Ektefellebidrag/EktefellebidragFlyt";
 import EnPartMedBarnFlyt from "./flyt/EnPartMedBarn/EnPartMedBarnFlyt";
+import { type InngangRolle, tilPartRolle } from "./inngang";
 import type { PartRolle } from "./opprett-sak-schema";
 import SakskategoriVelger from "./SakskategoriVelger";
 import SaksrolleVelger, { SaksrolleFlytResolver } from "./SaksrolleVelger";
@@ -90,7 +93,7 @@ const flytkomponenter = {
     OPPFOSTRINGSBIDRAG: EnPartMedBarnFlyt,
 } as const;
 
-export default function OpprettSakFlyt() {
+export default function OpprettSakFlyt({ visning = "side" }: { visning?: "side" | "modal" }) {
     const {
         valgtPerson: partISaken,
         valgVersjon,
@@ -155,19 +158,19 @@ export default function OpprettSakFlyt() {
         oppdaterFlytForSakstypeOgPart(person, sakstype);
     };
 
+    const velgFraInngang = (person: PersonDto, rolle: InngangRolle | undefined) => {
+        leggTilPartISaken(person);
+        velgInngangsrolle(person, rolle, sakstype, velgRolle);
+    };
+
     const velgSakskategori = (kategori: typeof sakskategori) => {
         if (kategori === sakskategori || isLoadingOpprettSak) return;
         velgKategori(kategori);
     };
 
     return (
-        <Box maxWidth="80rem" marginInline="auto" paddingBlock="space-32" paddingInline="space-16">
-            <VStack gap="space-24">
+        <FlytRamme visning={visning}>
                 {isLoadingOpprettSak && <OppretterSak />}
-
-                <Heading level="1" size="large">
-                    Opprett ny sak
-                </Heading>
 
                 <VStack gap="space-24" aria-busy={isLoadingOpprettSak}>
                     <SkjemaSeksjon tittel="Type sak">
@@ -181,6 +184,7 @@ export default function OpprettSakFlyt() {
                         </HGrid>
                     </SkjemaSeksjon>
 
+                    <Forhåndsutfylling onPerson={velgFraInngang} />
                     {sakstype && (
                         <PartSeksjon
                             sakstype={sakstype}
@@ -206,8 +210,54 @@ export default function OpprettSakFlyt() {
                         </Suspense>
                     </>
                 )}
+        </FlytRamme>
+    );
+}
+
+function FlytRamme({ visning, children }: { visning: "side" | "modal"; children: ReactNode }) {
+    if (visning === "modal") return <VStack gap="space-24">{children}</VStack>;
+
+    return (
+        <Box maxWidth="80rem" marginInline="auto" paddingBlock="space-32" paddingInline="space-16">
+            <VStack gap="space-24">
+                <Heading level="1" size="large">
+                    Opprett ny sak
+                </Heading>
+                {children}
             </VStack>
         </Box>
+    );
+}
+
+function velgInngangsrolle(
+    person: PersonDto,
+    inngangRolle: InngangRolle | undefined,
+    sakstype: Sakstype | null,
+    velgRolle: (rolle: PartRolle) => number,
+) {
+    if (getAutoAssignedRole(sakstype)) return;
+    const rolle = tilPartRolle(inngangRolle, beregnAlderForPerson(person));
+    if (rolle) velgRolle(rolle);
+}
+
+function Forhåndsutfylling({ onPerson }: { onPerson: (person: PersonDto, rolle: InngangRolle | undefined) => void }) {
+    const { inngang } = useSaksrolleroversikt();
+    const { data: person, error } = useHentPersoninformasjon(inngang ? { ident: inngang.ident } : null);
+    const utført = useRef(false);
+    const onPersonRef = useRef(onPerson);
+    onPersonRef.current = onPerson;
+
+    useEffect(() => {
+        if (!person || utført.current) return;
+        utført.current = true;
+        onPersonRef.current(person, inngang?.rolle);
+    }, [person, inngang?.rolle]);
+
+    if (!error) return null;
+    return (
+        <InlineMessage status="warning">
+            Kunne ikke hente personen saken ble åpnet for. Søk opp personen manuelt.
+        </InlineMessage>
     );
 }
 

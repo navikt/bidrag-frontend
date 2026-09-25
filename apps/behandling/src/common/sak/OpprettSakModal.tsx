@@ -1,5 +1,11 @@
-import type { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
-import { OpprettSakProvider, type OpprettSakRolleType, OpprettSakSkjema } from "@bidrag/common";
+import { Rolletype } from "@bidrag/api/BidragBehandlingApiV1";
+import {
+    OpprettSakFlytModal,
+    OpprettSakProvider,
+    type OpprettSakRolleType,
+    OpprettSakSkjema,
+    useHarNyOpprettSakFlyt,
+} from "@bidrag/common";
 import { Button, Loader, Modal } from "@navikt/ds-react";
 import { Suspense, useState } from "react";
 
@@ -25,6 +31,7 @@ export interface IOpprettSakModalProps {
  */
 export default function OpprettSakModal({ ident, bpIdent, navn, rolle, eierfogd, onSubmit }: IOpprettSakModalProps) {
     const [modalOpen, setModalOpen] = useState(false);
+    const harNyFlyt = useHarNyOpprettSakFlyt();
 
     function onClose() {
         setModalOpen(false);
@@ -40,7 +47,18 @@ export default function OpprettSakModal({ ident, bpIdent, navn, rolle, eierfogd,
             <Button variant="secondary" size="xsmall" onClick={() => setModalOpen(true)}>
                 Opprett sak
             </Button>
-            {modalOpen && (
+            {harNyFlyt && (
+                <OpprettSakFlytModal
+                    open={modalOpen}
+                    onClose={onClose}
+                    ident={ident}
+                    rolle={rolle === Rolletype.BP ? "BP" : rolle === Rolletype.BM ? "BM" : "BA"}
+                    initialForelder={bpIdent ? { ident: bpIdent, rolle: "BP" } : undefined}
+                    eierfogd={eierfogd}
+                    onOpprettet={håndterSubmit}
+                />
+            )}
+            {!harNyFlyt && modalOpen && (
                 <OpprettSakProvider
                     ident={ident}
                     navn={navn}

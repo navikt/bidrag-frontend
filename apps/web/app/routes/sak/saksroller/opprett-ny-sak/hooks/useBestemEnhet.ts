@@ -118,7 +118,8 @@ function useGeografiskeEnheter(
  * Henter enhet basert på parter og arbeidsfordeling.
  *
  * Prioritering:
- * 1. Hvis noen av partene har fortrolig adresse, returneres enhet 2103
+ * 1. Hvis noen av partene har fortrolig adresse, returneres enhet 2103.
+ *    🔴 Svarer NORG 2103 for en part, regnes den som fortrolig selv om diskresjonskode mangler i skjemaet.
  * 2. Hvis noen av partene har enhet 4883 (egen ansatt), returneres enhet 4883
  * 3. Ellers brukes enhet til bidragsmottaker, eller yngste barn hvis BM er ukjent
  *

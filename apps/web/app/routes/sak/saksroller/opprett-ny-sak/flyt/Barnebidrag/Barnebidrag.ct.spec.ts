@@ -28,7 +28,9 @@ test.describe("Start fra forelder med barn", () => {
         const førsteBarnIdent = await førsteBarn.getAttribute("value");
         const andreBarnIdent = await andreBarn.getAttribute("value");
 
-        await expect(component.getByRole("heading", { name: "Kontroller bidragspliktig og bidragsmottaker" })).toBeVisible();
+        await expect(
+            component.getByRole("heading", { name: "Kontroller bidragspliktig og bidragsmottaker" }),
+        ).toBeVisible();
         const bidragspliktigKort = component.getByRole("group", { name: "Bidragspliktig" });
         await expect(bidragspliktigKort.getByRole("button")).toHaveCount(0);
 

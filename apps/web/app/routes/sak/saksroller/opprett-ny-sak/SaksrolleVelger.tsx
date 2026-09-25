@@ -77,7 +77,6 @@ export function SaksrolleFlytResolver({ partISaken, enforcedRolle }: Props) {
     const erBarnRolle = valgtRolle === "barn_over_18" || valgtRolle === "barn_under_18";
     const trengerRelasjon = !!valgtRolle && !erBarnRolle && !enforcedRolle;
 
-    // Barnet er part: foreldrene hentes av selve flyten, som forslag i partskortene.
     useEffect(() => {
         if (erBarnRolle) {
             settFlytHvisGjeldende(valgVersjon, { key: Math.random(), type: "BARNEBIDRAG", barnkurver: [] });

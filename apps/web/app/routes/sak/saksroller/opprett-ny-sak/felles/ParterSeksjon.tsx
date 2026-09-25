@@ -22,13 +22,7 @@ export type ForelderKortProps = {
  * Felles partsseksjon: alltid ett kort for bidragspliktig og ett for bidragsmottaker,
  * uansett hvem saken ble startet fra. Kortet til den oppsøkte personen er låst.
  */
-export default function ParterSeksjon({
-    kort,
-    beskrivelse,
-}: {
-    kort: ForelderKortProps[];
-    beskrivelse?: string;
-}) {
+export default function ParterSeksjon({ kort, beskrivelse }: { kort: ForelderKortProps[]; beskrivelse?: string }) {
     return (
         <SkjemaSeksjon tittel="Kontroller bidragspliktig og bidragsmottaker" beskrivelse={beskrivelse}>
             <HGrid columns={{ xs: 1, md: 2 }} gap="space-16" align="start">

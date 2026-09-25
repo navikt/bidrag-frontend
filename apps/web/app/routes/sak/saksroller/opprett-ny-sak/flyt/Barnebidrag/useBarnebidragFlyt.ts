@@ -28,10 +28,6 @@ function erForelderRolle(rolle: string): rolle is ForelderPartRolle {
     return rolle === "bidragspliktig" || rolle === "bidragsmottaker";
 }
 
-/**
- * Registrerte barnkurver, eller barna BP har med valgt BM når saken ikke startet fra en forelder
- * med registrerte barn. Valgte kurvbarn som ikke lenger vises, fjernes.
- */
 function useBarnkurver(form: UseFormReturn<BarnebidragSkjemaData>, registrerteKurver: MotpartBarnRelasjon[]) {
     const bidragspliktig = form.watch("bidragspliktig.ident");
     const bidragsmottaker = form.watch("bidragsmottaker.ident");
@@ -58,7 +54,6 @@ function useBarnkurver(form: UseFormReturn<BarnebidragSkjemaData>, registrerteKu
     return barnkurver;
 }
 
-/** Registrerte foreldre til valgte barn, som forslag i BP/BM-kortene. */
 function useForelderforslag(
     form: UseFormReturn<BarnebidragSkjemaData>,
     låstForelder: { ident: string; navn: string } | undefined,
@@ -76,17 +71,16 @@ function useForelderforslag(
     return { foreldreTilBarn, forslag, forslagsfeil: feil, tilgangsfeil: tilgangsfeil?.message };
 }
 
-/**
- * Når bare ett kort kan redigeres og det finnes ett entydig forslag, fylles det ut. Skjer én gang
- * per nytt barn, slik at «Endre» ikke fylles ut på nytt.
- */
-function useFyllUtEntydigForelder(
+function useFyllUtForelder(
     foreldreTilBarn: ForeldreTilBarn[],
     forslag: PersonDto[],
-    redigerbare: ForelderPartRolle[],
+    låstForelder: ForelderPartRolle | null,
     fyllUt: (rolle: ForelderPartRolle, person: PersonDto) => void,
+    velg: (rolle: ForelderPartRolle, person: PersonDto) => void,
     erTom: (rolle: ForelderPartRolle) => boolean,
 ) {
+    const redigerbare = FORELDERROLLER.filter((rolle) => rolle !== låstForelder);
+    useFyllUtInitialForelder(forslag, låstForelder, velg, erTom);
     const behandledeBarn = useRef(new Set<string>());
     useEffect(() => {
         const nyeBarn = foreldreTilBarn.filter((b) => b.foreldre && !behandledeBarn.current.has(b.barn.ident));
@@ -96,6 +90,24 @@ function useFyllUtEntydigForelder(
         if (nyeBarn.length > 0 && redigerbare.length === 1 && rolle && erTom(rolle) && forslag.length === 1 && eneste) {
             fyllUt(rolle, eneste);
         }
+    });
+}
+
+function useFyllUtInitialForelder(
+    forslag: PersonDto[],
+    låstForelder: ForelderPartRolle | null,
+    velg: (rolle: ForelderPartRolle, person: PersonDto) => void,
+    erTom: (rolle: ForelderPartRolle) => boolean,
+) {
+    const initialForelder = useSaksrolleroversikt().inngang?.initialForelder;
+    const utført = useRef(false);
+    useEffect(() => {
+        if (!initialForelder || utført.current) return;
+        const rolle: ForelderPartRolle = initialForelder.rolle === "BP" ? "bidragspliktig" : "bidragsmottaker";
+        const person = forslag.find((f) => f.ident === initialForelder.ident);
+        if (!person || rolle === låstForelder || !erTom(rolle)) return;
+        utført.current = true;
+        velg(rolle, person);
     });
 }
 
@@ -143,11 +155,12 @@ export function useBarnebidragFlyt() {
         const nye = parterEtterValg(form.getValues(), rolle, person, forslag, låstForelder);
         for (const r of FORELDERROLLER) settPart(r, nye[r]);
     };
-    useFyllUtEntydigForelder(
+    useFyllUtForelder(
         foreldreTilBarn,
         forslag,
-        redigerbare,
+        låstForelder,
         (rolle, person) => settPart(rolle, tilPart(person)),
+        velg,
         (rolle) => form.getValues(rolle).erKjent === undefined,
     );
 

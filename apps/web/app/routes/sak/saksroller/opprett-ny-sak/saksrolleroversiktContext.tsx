@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createContext, type PropsWithChildren, useCallback, useContext, useRef, useState } from "react";
 
 import { hentPersonMotpartBarnRelasjonQueryOptions } from "~/api/useApi.ts";
+import type { OpprettSakInngang } from "./inngang";
 import type { PartISaken } from "./opprett-sak-schema";
 import { tilPartISaken } from "./utils";
 
@@ -34,7 +35,14 @@ export function sakstypeTilBeskrivelse(sakstype: Sakstype) {
             return "Søk opp bidragsmottakeren.";
     }
 }
-type SaksrolleroversiktContext = {
+/** Styrer hva som skjer etter innsending og om flyten kan avbrytes. Settes av den som bygger inn flyten. */
+export type OpprettSakFlytValg = {
+    inngang?: OpprettSakInngang;
+    onOpprettet?: (saksnummer: string) => void;
+    onAvbryt?: () => void;
+};
+
+type SaksrolleroversiktContext = OpprettSakFlytValg & {
     valgtPerson: PersonDto | null;
     valgVersjon: number;
     partISaken: PartISaken | null;
@@ -178,7 +186,12 @@ function useRelasjonsoppslag() {
     return { hentBarnkurver, harUfullstendigRelasjon };
 }
 
-function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
+function SaksrolleroversiktProvider({
+    children,
+    inngang,
+    onOpprettet,
+    onAvbryt,
+}: PropsWithChildren<OpprettSakFlytValg>) {
     const { velgPersonOgNullstillRolle, ...valg } = useSaksrollevalg();
     const { hentBarnkurver, harUfullstendigRelasjon } = useRelasjonsoppslag();
     const [isLoadingOpprettSak, setIsLoadingOpprettSak] = useState<boolean>(false);
@@ -217,6 +230,9 @@ function SaksrolleroversiktProvider({ children }: PropsWithChildren) {
                 velgKategori,
                 harUfullstendigRelasjon,
                 hentBarnkurver,
+                inngang,
+                onOpprettet,
+                onAvbryt,
             }}
         >
             {children}
