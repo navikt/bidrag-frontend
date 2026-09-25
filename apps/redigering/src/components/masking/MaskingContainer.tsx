@@ -4,7 +4,7 @@ import { DndContext, type DragEndEvent, MouseSensor, useSensor, useSensors } fro
 import type { Active } from "@dnd-kit/core/dist/store";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import type { Transform } from "@dnd-kit/utilities";
-import React, { type PropsWithChildren, useContext, useRef, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useRef, useState } from "react";
 import { v4 as uuidV4 } from "uuid";
 
 import type { IMaskingItemProps } from "./MaskingItem";
@@ -27,9 +27,7 @@ export interface MaskingContainerContextProps {
     enableDrag: () => void;
 }
 
-export const MaskingContainerContext = React.createContext<MaskingContainerContextProps>(
-    {} as MaskingContainerContextProps,
-);
+export const MaskingContainerContext = createContext<MaskingContainerContextProps>({} as MaskingContainerContextProps);
 function useMaskingContainer() {
     const context = useContext(MaskingContainerContext);
     if (context === undefined) {

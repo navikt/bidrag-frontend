@@ -1,5 +1,5 @@
 import { Button } from "@navikt/ds-react";
-import React, { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { useGetAvvik, useHentJournalpost } from "../../../hooks/useDokumentApi";
 import { useAppContext } from "../../../store/AppContext";
@@ -30,13 +30,13 @@ function Avvikshandtering() {
                 Avvikshåndtering
             </Button>
             {isModalOpen && (
-                <React.Suspense fallback={null}>
+                <Suspense fallback={null}>
                     <AvvikshandteringModal
                         closeModal={closeModal}
                         paloggetEnhet={påloggetEnhet}
                         saksnummer={saksnummer}
                     />
-                </React.Suspense>
+                </Suspense>
             )}
         </>
     );

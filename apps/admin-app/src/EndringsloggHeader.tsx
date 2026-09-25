@@ -16,7 +16,7 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import DOMPurify from "dompurify";
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     useGetEndringsloggForBruker,
     useLestAvBrukerEndring,
@@ -135,10 +135,10 @@ const MenuItem = ({
     skjermbilde?: EndringsloggTilhorerSkjermbilde;
 }) => {
     const mutation = useLestAvBrukerEndringslogg(skjermbilde);
-    const ref = React.useRef<HTMLDivElement>(null);
-    const hasMutated = React.useRef(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const hasMutated = useRef(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (item.endringer.length > 0) return;
         const observer = new IntersectionObserver(
             ([entry]) => {

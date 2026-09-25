@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 
 test.describe("ExpandedRoles", () => {
     test("viser rollekort for alle roller i saken", async ({ mount }) => {

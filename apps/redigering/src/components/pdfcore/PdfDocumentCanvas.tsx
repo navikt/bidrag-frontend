@@ -1,6 +1,12 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: canvas pan container is not interactive for keyboard users, only used for mouse-driven panning */
-import type * as React from "react";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+    type PropsWithChildren,
+    type MouseEvent as ReactMouseEvent,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
 
 type CanvasProps = {
     canvasWidth: number;
@@ -32,7 +38,7 @@ function scalePoint(p1: Point, scale: number) {
 
 const ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
 
-export default function PdfDocumentCanvas(props: React.PropsWithChildren<CanvasProps>) {
+export function PdfDocumentCanvas(props: PropsWithChildren<CanvasProps>) {
     const canvasRef = useRef<HTMLDivElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const [scale, setScale] = useState<number>(1);
@@ -92,7 +98,7 @@ export default function PdfDocumentCanvas(props: React.PropsWithChildren<CanvasP
     }, [mouseMove]);
 
     const startPan = useCallback(
-        (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        (event: ReactMouseEvent) => {
             document.addEventListener("mousemove", mouseMove);
             document.addEventListener("mouseup", mouseUp);
             lastMousePosRef.current = { x: event.pageX, y: event.pageY };
@@ -206,7 +212,7 @@ export default function PdfDocumentCanvas(props: React.PropsWithChildren<CanvasP
     }, [context, mousePos.x, mousePos.y, viewportTopLeft, scale]);
 
     return (
-        <div onMouseDown={startPan} ref={canvasRef} className={props.className}>
+        <div onMouseDown={startPan} role="document" ref={canvasRef} className={props.className}>
             {props.children}
         </div>
     );

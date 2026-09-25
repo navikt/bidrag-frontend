@@ -1,6 +1,6 @@
 import type { RolleDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Box, Skeleton } from "@navikt/ds-react";
-import { Suspense } from "react";
+import { type CSSProperties, Suspense } from "react";
 import RolleCard from "../roller/RolleCard";
 
 export type HeaderRolle = RolleDto & { visningsnavn?: string };
@@ -10,7 +10,7 @@ export type SaksnummerRoller = {
     roller: HeaderRolle[];
 };
 
-const ROLE_CARD_CONTAINER_STYLE: React.CSSProperties = {
+const ROLE_CARD_CONTAINER_STYLE: CSSProperties = {
     border: "1px solid var(--ax-border-neutral-subtle)",
     borderRadius: "0.375rem",
     background: "var(--ax-bg-default)",

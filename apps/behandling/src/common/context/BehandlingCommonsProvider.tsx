@@ -1,6 +1,6 @@
 import { BidragCommonsProvider } from "@bidrag/common";
 import { useQueryClient } from "@tanstack/react-query";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useHentPersonData, useHentRevurderingsbarn, useUthevPerson } from "../hooks/useApiData";
 
 /**
@@ -14,7 +14,7 @@ import { useHentPersonData, useHentRevurderingsbarn, useUthevPerson } from "../h
  * ident/stønad18År (ikke valgfrie), mens `BidragCommonsProvider` sin type tillater
  * at de er `undefined` - derfor `?? ""`/`?? false` som fallback i adapterne under.
  */
-export const BehandlingCommonsProvider = ({ children }: { children: React.ReactNode }) => {
+export const BehandlingCommonsProvider = ({ children }: { children: ReactNode }) => {
     const queryClient = useQueryClient();
 
     return (

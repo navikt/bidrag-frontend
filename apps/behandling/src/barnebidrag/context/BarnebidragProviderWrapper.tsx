@@ -1,5 +1,5 @@
 import { Stonadstype, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import React, { type PropsWithChildren, useRef, useState } from "react";
+import { type PropsWithChildren, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import text from "../../common/constants/texts";
 import { BehandlingProvider } from "../../common/context/BehandlingContext";
@@ -216,7 +216,7 @@ function BarnebidragProviderWrapper({ children }: PropsWithChildren) {
         };
     }
 
-    const value = React.useMemo(
+    const value = useMemo(
         () => ({
             formSteps,
             getPageErrorTexts,

@@ -1,7 +1,7 @@
-import { Box, Label, LocalAlert, Radio, RadioGroup, VStack } from "@navikt/ds-react";
+import { Box, LocalAlert, Radio, RadioGroup, VStack } from "@navikt/ds-react";
 
+import { useState } from "react";
 import FunnetPersonInfo from "./FunnetPersonInfo.tsx";
-import PersonInfo from "./PersonInfo.tsx";
 import ReellMottakerSøk from "./ReellMottakerSøk.tsx";
 
 export type ReellMottakerValg = {
@@ -10,20 +10,18 @@ export type ReellMottakerValg = {
     navn?: string;
 };
 
+export type ReellMottakerValgregel = "valgfri" | "påkrevd" | "kun-samhandler";
+
 const KUN_SAMHANDLER_MELDING =
     "Barnet selv kan ikke velges som reell mottaker i oppfostringsbidrag. Velg samhandler (kommune).";
 
 type Props = {
     barnNavn: string;
     barnIdent: string;
-    barnFødselsdato?: string;
     valg: ReellMottakerValg;
     lagretSamhandler: { ident: string; navn: string } | null;
     onValg: (valg: ReellMottakerValg) => void;
-    visBarnekort?: boolean;
-    kanFjerne?: boolean;
-    isRequired?: boolean;
-    kunSamhandlerSomReellMottaker?: boolean;
+    regel: ReellMottakerValgregel;
     disabled?: boolean;
     feil?: string;
 };
@@ -31,18 +29,20 @@ type Props = {
 export default function ReellMottakerValgGruppe({
     barnNavn,
     barnIdent,
-    barnFødselsdato,
     valg,
     lagretSamhandler,
     onValg,
-    visBarnekort = false,
-    kanFjerne = false,
-    isRequired = false,
-    kunSamhandlerSomReellMottaker = false,
+    regel,
     disabled,
     feil,
 }: Props) {
+    const påkrevd = regel !== "valgfri";
+    const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
+    const [error, setError] = useState<string>();
+
     const handleRadioChange = (value: string) => {
+        setError(undefined);
+
         if (value === "ingen") {
             onValg({});
             return;
@@ -58,22 +58,6 @@ export default function ReellMottakerValgGruppe({
 
     return (
         <VStack gap="space-24">
-            {visBarnekort && barnIdent && (
-                <VStack gap="space-8">
-                    <Label size="small">Barnet</Label>
-                    <Box
-                        background="raised"
-                        borderColor="neutral-subtleA"
-                        borderWidth="1"
-                        borderRadius="12"
-                        padding="space-8"
-                        width="fit-content"
-                    >
-                        <PersonInfo navn={barnNavn} ident={barnIdent} rolle="BA" fødselsdato={barnFødselsdato} />
-                    </Box>
-                </VStack>
-            )}
-
             <RadioGroup
                 size="small"
                 legend="Hvem er reell mottaker?"
@@ -83,7 +67,7 @@ export default function ReellMottakerValgGruppe({
                 error={feil}
             >
                 <VStack gap="space-0">
-                    <Radio value="ingen" disabled={isRequired || !kanFjerne}>
+                    <Radio value="ingen" disabled={påkrevd}>
                         Bidragsmottaker
                     </Radio>
                     <Radio disabled={kunSamhandlerSomReellMottaker} value="barnet_selv">
@@ -102,12 +86,24 @@ export default function ReellMottakerValgGruppe({
             {valg.type === "samhandler" && (
                 <ReellMottakerSøk
                     valgtSamhandlerId={valg.ident ?? lagretSamhandler?.ident}
-                    onVelg={(ident, navn) => onValg({ type: "samhandler", ident, navn })}
+                    onVelg={(ident, navn) => {
+                        setError(undefined);
+                        onValg({ type: "samhandler", ident, navn });
+                    }}
+                    onError={setError}
                 />
             )}
 
-            {valg.type === "samhandler" && valg.navn && valg.ident && (
-                <FunnetPersonInfo label="Reell mottaker:" navn={valg.navn} ident={valg.ident} disabled={disabled} />
+            {!feil && !error && valg.type === "samhandler" && valg.navn && valg.ident && (
+                <Box borderWidth="2" borderRadius="12">
+                    <FunnetPersonInfo
+                        label="Reell mottaker:"
+                        navn={valg.navn}
+                        ident={valg.ident}
+                        disabled={disabled}
+                        variant="info"
+                    />
+                </Box>
             )}
         </VStack>
     );

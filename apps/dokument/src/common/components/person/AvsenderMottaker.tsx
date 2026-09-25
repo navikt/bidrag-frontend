@@ -2,8 +2,7 @@ import "./AvsenderMottaker.css";
 
 import type { Rolletype } from "@bidrag/api/SakApi";
 import { Label, Radio, RadioGroup, type RadioProps, TextField } from "@navikt/ds-react";
-import type React from "react";
-import { type MutableRefObject, type PropsWithChildren, useState } from "react";
+import { type ChangeEvent, type MutableRefObject, type PropsWithChildren, useState } from "react";
 import type { Person } from "../../../types/person";
 import AvansertSok from "./AvansertSok";
 import PersonInfo from "./PersonInfo";
@@ -50,7 +49,7 @@ export default function AvsenderMottaker(props: AvsenderMottakerProps) {
 
     const label = isMottaker ? "Mottaker" : "Avsender";
 
-    function handleAvsenderChange(event: React.ChangeEvent<HTMLInputElement>) {
+    function handleAvsenderChange(event: ChangeEvent<HTMLInputElement>) {
         event.stopPropagation();
         event.preventDefault();
         const inputValue = event.target.value;

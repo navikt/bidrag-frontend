@@ -25,8 +25,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import JsonView from "@uiw/react-json-view";
 import { lightTheme } from "@uiw/react-json-view/light";
-import type React from "react";
-import { useState } from "react";
+import { type ComponentType, type FC, useState } from "react";
 import { OverstyrFatteVedtakRevurderingSwitch } from "../../common/components/vedtak/OverstyrRevurderingSwitch";
 import { useBehandlingProviderExists } from "../../common/context/BehandlingContext";
 import { useGetBehandlingV2, useRefetchFFInfoFn } from "../../common/hooks/useApiData";
@@ -37,7 +36,7 @@ interface JsonViewerProps {
     maxDepth?: number;
 }
 
-const JsonViewer: React.FC<JsonViewerProps> = ({ data, maxDepth = 10 }) => {
+const JsonViewer: FC<JsonViewerProps> = ({ data, maxDepth = 10 }) => {
     return (
         <Box
             background="neutral-soft"
@@ -63,12 +62,12 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, maxDepth = 10 }) => {
 type AdminAction = {
     key: string;
     label: string;
-    icon: React.ComponentType<unknown>;
+    icon: ComponentType<unknown>;
     mutation: ReturnType<typeof useMutation>;
     category: "admin" | "beregning-vedtak";
 };
 
-export const AdminPanelFloatingButton: React.FC = () => {
+export const AdminPanelFloatingButton: FC = () => {
     const { isAdminEnabled, nyToolbar } = useFeatureToogle();
     if (!isAdminEnabled) return null;
     if (nyToolbar) return null;
@@ -79,7 +78,7 @@ export const AdminPanelFloatingButton: React.FC = () => {
         </div>
     );
 };
-export const AdminPanel: React.FC = () => {
+export const AdminPanel: FC = () => {
     const providerExists = useBehandlingProviderExists();
     if (!providerExists) return null;
     const { isAdminEnabled } = useFeatureToogle();

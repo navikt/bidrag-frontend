@@ -190,11 +190,11 @@ function renderReellMottaker(identBarn: string, mottakerIdent: string, mottakerN
     }
 
     if (mottakerNavn && mottakerNavn.trim() !== "") {
-        return <PersonInfo navn={mottakerNavn} ident={trimmetMottakerIdent} />;
+        return <PersonInfo navn={mottakerNavn} ident={trimmetMottakerIdent} compact visKopieringsknapp={false} />;
     }
 
     if (erPersonIdent(trimmetMottakerIdent)) {
-        return <PersonInfo ident={trimmetMottakerIdent} />;
+        return <PersonInfo ident={trimmetMottakerIdent} compact visKopieringsknapp={false} />;
     }
 
     return trimmetMottakerIdent;
@@ -266,17 +266,19 @@ function PersonEndringerSvar({ gruppe }: { gruppe: Persongruppe }) {
     return (
         <FormSummary.Answer key={gruppe.personKey}>
             <FormSummary.Label>
-                <PersonInfo ident={gruppe.ident} />
-                {harLagtTilRolle && (
-                    <Tag size="xsmall" variant="alt1">
-                        Ny rolle
-                    </Tag>
-                )}
-                {gruppe.harUfullstendigRelasjon && (
-                    <Tag size="xsmall" variant="warning">
-                        Ufullstendig relasjon
-                    </Tag>
-                )}
+                <HStack gap="space-4" align="center" wrap>
+                    <PersonInfo ident={gruppe.ident} compact visKopieringsknapp={false} />
+                    {harLagtTilRolle && (
+                        <Tag size="xsmall" variant="alt1">
+                            Ny rolle
+                        </Tag>
+                    )}
+                    {gruppe.harUfullstendigRelasjon && (
+                        <Tag size="xsmall" variant="warning">
+                            Ufullstendig relasjon
+                        </Tag>
+                    )}
+                </HStack>
             </FormSummary.Label>
             {øvrigeEndringer.length > 0 && (
                 <FormSummary.Value>

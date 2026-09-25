@@ -1,5 +1,5 @@
 import { Button } from "@navikt/ds-react";
-import React, { useContext, useState } from "react";
+import { createContext, Suspense, useContext, useState } from "react";
 
 import { useHentAvvikListe } from "../../../hooks/useDokumentApi";
 import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
@@ -17,7 +17,7 @@ interface AvvikProviderProps {
     forsendelse: IForsendelse;
 }
 export const useAvvikModalContext = () => useContext(AvvikModalContext);
-const AvvikModalContext = React.createContext<AvvikProviderProps>({} as AvvikProviderProps);
+const AvvikModalContext = createContext<AvvikProviderProps>({} as AvvikProviderProps);
 
 function AvvikshandteringButton() {
     const { forsendelseId, saksnummer, enhet } = useSession();
@@ -44,7 +44,7 @@ function AvvikshandteringButton() {
                 Avvikshåndtering
             </Button>
             {isModalOpen && (
-                <React.Suspense fallback={<div></div>}>
+                <Suspense fallback={<div></div>}>
                     <AvvikModalContext.Provider
                         value={{
                             onCancel: closeModal,
@@ -57,7 +57,7 @@ function AvvikshandteringButton() {
                     >
                         <AvvikshandteringModal />
                     </AvvikModalContext.Provider>
-                </React.Suspense>
+                </Suspense>
             )}
         </>
     );

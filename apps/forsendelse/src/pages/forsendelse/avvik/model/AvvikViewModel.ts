@@ -1,11 +1,11 @@
 import { ArrowRightLeftIcon, FileXMarkIcon } from "@navikt/aksel-icons";
-import type { ForwardRefExoticComponent } from "react";
+import type { ForwardRefExoticComponent, SVGProps } from "react";
 
 import { AvvikType } from "../../../../types/AvvikTypes";
 
 type TitleSelectorFn = (metadata?: { tema: string }) => string;
 export interface AvvikViewModel {
-    IconComponent: ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
+    IconComponent: ForwardRefExoticComponent<SVGProps<SVGSVGElement>>;
     title: string | TitleSelectorFn;
     description?: string;
     metadata?: { tema: string };

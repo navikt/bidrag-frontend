@@ -329,6 +329,7 @@ export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = 
                         visningsnavn: response.data.navn,
                         offentligId: response.data.offentligId,
                         isValid: true,
+                        søktIdent: ident,
                     };
                 } else if (IdentUtils.isFnr(ident)) {
                     const response = await BIDRAG_PERSON_API.informasjon.hentPersonPost({
@@ -343,9 +344,10 @@ export const useHentSamhandlerEllerPersonForIdent = (sjekkSamhandler: boolean = 
                         ident: response.data.ident,
                         offentligId: response.data.aktørId ?? undefined,
                         isValid: true,
+                        søktIdent: ident,
                     };
                 } else {
-                    result = { ident, visningsnavn: "", isValid: false };
+                    result = { ident, visningsnavn: "", isValid: false, søktIdent: ident };
                 }
             } catch (e) {
                 await SecureLoggerService.warn(

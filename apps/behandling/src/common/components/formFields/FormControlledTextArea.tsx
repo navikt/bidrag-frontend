@@ -1,7 +1,6 @@
 import { Textarea } from "@navikt/ds-react";
 import type { MutationStatus } from "@tanstack/react-query";
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { useController, useFormContext } from "react-hook-form";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 import { SaveStatusIndicator } from "../SaveStatusIndicator";
@@ -29,7 +28,7 @@ export const FormControlledTextarea = ({
     hideLabel?: boolean;
     minRows?: number;
     className?: string;
-    description?: React.ReactNode;
+    description?: ReactNode;
     resize?: boolean;
     mutationState?: MutationStatus;
 }) => {
@@ -38,7 +37,7 @@ export const FormControlledTextarea = ({
 
     const { field, fieldState } = useController({ name, control });
 
-    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         clearErrors(name);
         field.onChange(e.target.value);
     };
