@@ -8,6 +8,7 @@ import { KortRamme } from "../../felles/PersonRolleKort";
 import type { ReellMottakerRegel } from "../../reell-mottaker-regel";
 import { BarnReellMottaker } from "../components/ReellMottakerInline";
 import type { Barnkurv, BarnMedAlder } from "../opprett-sak-schema";
+import { useSaksrolleroversikt } from "../saksrolleroversiktContext";
 import { beregnBarnkurvValg } from "./barnkurv-valg";
 
 type Props = {
@@ -112,6 +113,7 @@ function BarnGruppe({
     reellMottakerRegel: ReellMottakerRegel;
 }) {
     const valgteIdenter = barn.filter((b) => valgteBarn.some((v) => v.ident === b.ident)).map((b) => b.ident);
+    const { låstIdent } = useSaksrolleroversikt();
 
     return (
         <Box padding="space-16" borderRadius="8">
@@ -125,6 +127,7 @@ function BarnGruppe({
             <CheckboxGroup legend={legend} hideLegend value={valgteIdenter} onChange={onChange} size="small">
                 <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-16" align="start">
                     {barn.map((b) => {
+                        const låst = b.ident === låstIdent;
                         return (
                             <KortRamme key={b.ident}>
                                 <VStack gap="space-16">
@@ -133,8 +136,9 @@ function BarnGruppe({
                                         justify="space-between"
                                         gap="space-8"
                                         wrap={false}
-                                        className="cursor-pointer"
+                                        className={låst ? undefined : "cursor-pointer"}
                                         onClick={(event) =>
+                                            !låst &&
                                             event.currentTarget
                                                 .querySelector<HTMLInputElement>('input[type="checkbox"]')
                                                 ?.click()
@@ -150,6 +154,7 @@ function BarnGruppe({
                                             value={b.ident}
                                             hideLabel
                                             aria-label={`Velg ${b.navn ?? b.ident}`}
+                                            readOnly={låst}
                                             onClick={(event) => event.stopPropagation()}
                                         >
                                             {" "}

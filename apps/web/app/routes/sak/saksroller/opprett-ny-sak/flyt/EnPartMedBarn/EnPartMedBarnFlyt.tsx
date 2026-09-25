@@ -16,6 +16,7 @@ import {
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
+import { hentForelderRolleLabel } from "../../utils";
 
 type Flyttype = "FARSKAP" | "OPPFOSTRINGSBIDRAG";
 
@@ -58,7 +59,6 @@ export default function EnPartMedBarnFlyt() {
 }
 
 function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken: PartISaken }) {
-    const { sakskategori } = useSaksrolleroversikt();
     const { arbeidsfordeling, rolle, schema } = konfig[type];
     const form = useForm<FarskapsSkjemaSchemaData>({
         resolver: zodResolver(schema),
@@ -67,7 +67,7 @@ function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken:
             partISaken: { ...partISaken, rolle, erKjent: true },
             valgteBarn: [],
             motpart: { ident: "", navn: "", erKjent: false },
-            kategori: sakskategori,
+            kategori: "Nasjonal",
         },
         mode: "onChange",
     });
@@ -85,6 +85,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
         { arbeidsfordeling, rolle },
     );
     const partISaken = form.watch("partISaken");
+    const { låstIdent } = useSaksrolleroversikt();
     const settPart = (part: { ident: string; navn: string; diskresjonskode?: Diskresjonskode }) =>
         form.setValue(
             "partISaken",
@@ -97,34 +98,17 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
         <RolleFlytSide
             onSubmit={onSubmit}
             status={{ ...status, lastetekst: "Henter barn..." }}
-            meldinger={
-                <>
-                    {kurvfeil && (
-                        <InlineMessage status="warning">
-                            Kunne ikke hente forslag til barn. Du kan søke opp barn manuelt.
-                        </InlineMessage>
-                    )}
-                    {erOppfostring && valgteBarn.length > 0 && (
-                        <Alert variant="info" size="small">
-                            Reell mottaker må velges for hvert barn før saken kan opprettes.
-                        </Alert>
-                    )}
-                    {erOppfostring && valgteBarn.some((b) => b.reellMottakerType === "barnet_selv") && (
-                        <Alert variant="warning" size="small">
-                            Barnet selv kan ikke være reell mottaker i oppfostringsbidrag. Velg samhandler som kommune.
-                        </Alert>
-                    )}
-                </>
-            }
+            meldinger={<Meldinger kurvfeil={kurvfeil} erOppfostring={erOppfostring} valgteBarn={valgteBarn} />}
             innsending={innsending}
         >
             <ParterSeksjon
-                tittel={`Kontroller ${rolle}`}
+                tittel={hentForelderRolleLabel(rolle)}
                 kort={[
                     {
                         rolle,
                         part: { ...partISaken, erKjent: partISaken.ident ? true : undefined },
                         kanSettesUkjent: false,
+                        låst: !!låstIdent && partISaken.ident === låstIdent,
                         feil: form.formState.errors.partISaken?.ident?.message,
                         onVelg: (person) =>
                             settPart({
@@ -148,5 +132,35 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                 />
             )}
         </RolleFlytSide>
+    );
+}
+
+function Meldinger({
+    kurvfeil,
+    erOppfostring,
+    valgteBarn,
+}: {
+    kurvfeil: boolean;
+    erOppfostring: boolean;
+    valgteBarn: { reellMottakerType?: string | null }[];
+}) {
+    return (
+        <>
+            {kurvfeil && (
+                <InlineMessage status="warning">
+                    Kunne ikke hente forslag til barn. Du kan søke opp barn manuelt.
+                </InlineMessage>
+            )}
+            {erOppfostring && valgteBarn.length > 0 && (
+                <Alert variant="info" size="small">
+                    Reell mottaker må velges for hvert barn før saken kan opprettes.
+                </Alert>
+            )}
+            {erOppfostring && valgteBarn.some((b) => b.reellMottakerType === "barnet_selv") && (
+                <Alert variant="warning" size="small">
+                    Barnet selv kan ikke være reell mottaker i oppfostringsbidrag. Velg samhandler som kommune.
+                </Alert>
+            )}
+        </>
     );
 }

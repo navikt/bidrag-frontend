@@ -11,12 +11,7 @@ import NullstillDialog from "./felles/NullstillDialog";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "./felles/SkjemaSeksjon";
 import type { PartRolle } from "./opprett-sak-schema";
 import SaksrolleVelger from "./SaksrolleVelger";
-import {
-    type Sakstype,
-    sakstypeTilBeskrivelse,
-    tvungenRolle,
-    useSaksrolleroversikt,
-} from "./saksrolleroversiktContext";
+import { type Sakstype, sakstypeTilBeskrivelse, tvungenRolle, useErOppretterSak } from "./saksrolleroversiktContext";
 
 type Utkast = { person: PersonDto; rolle: PartRolle | null };
 
@@ -36,12 +31,19 @@ const SØKELABEL: Partial<Record<Sakstype, string>> = {
  */
 export default function StartpartVelger({
     sakstype,
-    forhåndsvalgt,
+    forhåndsvalgt = null,
+    visSøk = true,
+    harSkjema,
+    onBekreft,
 }: {
     sakstype: Sakstype;
-    forhåndsvalgt: PersonDto | null;
+    forhåndsvalgt?: PersonDto | null;
+    visSøk?: boolean;
+    /** Et utfylt skjema nullstilles ved ny bekreftelse, så da spørres det først. */
+    harSkjema: boolean;
+    onBekreft: (person: PersonDto, rolle: PartRolle) => void;
 }) {
-    const { partISaken, bekreftStart, isLoadingOpprettSak } = useSaksrolleroversikt();
+    const isLoadingOpprettSak = useErOppretterSak();
     const låstRolle = tvungenRolle(sakstype);
     const [utkast, setUtkast] = useState<Utkast | null>(() =>
         forhåndsvalgt ? { person: forhåndsvalgt, rolle: låstRolle } : null,
@@ -56,27 +58,29 @@ export default function StartpartVelger({
 
     const bekreft = () => {
         if (!utkast?.rolle) return;
-        bekreftStart(utkast.person, utkast.rolle);
+        onBekreft(utkast.person, utkast.rolle);
         setUtkast(null);
         setSøkNøkkel((forrige) => forrige + 1);
         setViserNullstillDialog(false);
     };
 
-    const onBekreftKlikk = () => (partISaken ? setViserNullstillDialog(true) : bekreft());
+    const onBekreftKlikk = () => (harSkjema ? setViserNullstillDialog(true) : bekreft());
 
     return (
         <SkjemaSeksjon
-            tittel={SEKSJONSTITTEL[sakstype] ?? "Søk opp person"}
+            tittel={visSøk ? (SEKSJONSTITTEL[sakstype] ?? "Søk opp person") : "Velg rolle"}
             beskrivelse={sakstypeTilBeskrivelse(sakstype)}
         >
-            <SkjemaSeksjonKort>
-                <SøkPerson
-                    key={søkNøkkel}
-                    label={SØKELABEL[sakstype] ?? "Søk etter person"}
-                    personInformasjon={velgPerson}
-                    compact
-                />
-            </SkjemaSeksjonKort>
+            {visSøk && (
+                <SkjemaSeksjonKort>
+                    <SøkPerson
+                        key={søkNøkkel}
+                        label={SØKELABEL[sakstype] ?? "Søk etter person"}
+                        personInformasjon={velgPerson}
+                        compact
+                    />
+                </SkjemaSeksjonKort>
+            )}
             {utkast && (
                 <SkjemaSeksjonKort>
                     <VStack gap="space-16" align="start">

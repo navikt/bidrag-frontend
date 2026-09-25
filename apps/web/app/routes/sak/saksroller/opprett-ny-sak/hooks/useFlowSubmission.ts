@@ -99,7 +99,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
         bidragsmottaker: bidragsmottaker,
         barn: valgteBarn,
         arbeidsfordeling,
-        sakskategori: sakskategoriTilEnum((form as UseFormReturn<FormMedKategori>).getValues("kategori")) || undefined,
+        sakskategori: sakskategoriTilEnum((form as UseFormReturn<FormMedKategori>).watch("kategori")) || undefined,
     });
 
     const tilgangUtenBm = useTilgangUtenBm(bidragsmottaker, arbeidsfordeling);

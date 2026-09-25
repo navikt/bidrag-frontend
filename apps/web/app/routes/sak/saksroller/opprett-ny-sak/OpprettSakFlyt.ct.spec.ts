@@ -51,7 +51,7 @@ test("ny Bekreft med utfylt skjema spør før skjemaet nullstilles", async ({ mo
     await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toHaveValue("");
 });
 
-test("bytte av kategori eller sakstype spør før skjemaet nullstilles", async ({ mount, page }) => {
+test("bytte av sakstype spør før skjemaet nullstilles", async ({ mount, page }) => {
     await mockWizardApi(page);
     const component = await mount(STORY);
     const barnOverskrift = component.getByRole("heading", { name: "Velg barn saken gjelder for" });
@@ -67,18 +67,28 @@ test("bytte av kategori eller sakstype spør før skjemaet nullstilles", async (
     await expect(component.getByRole("radio", { name: /Barnebidrag/ })).toBeChecked();
     await expect(barnOverskrift).toBeVisible();
 
-    await component.getByRole("radio", { name: "Utland" }).click();
-    await dialog.getByRole("button", { name: "Ja, start på nytt" }).click();
-    await expect(component.getByRole("radio", { name: "Utland" })).toBeChecked();
-    await expect(component.getByRole("radio", { name: /Barnebidrag/ })).toBeChecked();
-    await expect(barnOverskrift).toHaveCount(0);
-
-    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
     await component.getByRole("radio", { name: /Ektefellebidrag/ }).click();
     await dialog.getByRole("button", { name: "Ja, start på nytt" }).click();
+    await expect(component.getByRole("radio", { name: /Ektefellebidrag/ })).toBeChecked();
     await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toBeVisible();
     await expect(barnOverskrift).toHaveCount(0);
+});
+
+test("kategori velges i skjemaet uten å nullstille det", async ({ mount, page }) => {
+    await mockWizardApi(page);
+    const component = await mount(STORY);
+    const oppsummering = component
+        .locator("section")
+        .filter({ has: page.getByRole("heading", { name: "Oppsummering" }) });
+
+    await expect(component.getByRole("radio", { name: "Utland" })).toHaveCount(0);
+    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
     await expect(component.getByRole("radio", { name: "Nasjonal" })).toBeChecked();
+
+    await component.getByRole("radio", { name: "Utland" }).check();
+    await expect(page.getByRole("alertdialog")).toHaveCount(0);
+    await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toBeVisible();
+    await expect(oppsummering.getByText("Utland", { exact: true })).toBeVisible();
 });
 
 test("bytte av sakstype uten utfylt skjema skjer uten dialog", async ({ mount, page }) => {
@@ -169,6 +179,29 @@ test.describe("Innbygget med forhåndsutfylling", () => {
         await expect(rollevelger(component)).toHaveCount(0);
     });
 
+    test("viser ikke sakstype eller søk, og personen modalen åpnes for kan ikke endres", async ({ mount, page }) => {
+        await mockWizardApi(page);
+        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident, rolle: "BP" });
+        const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
+
+        await expect(bpKort.getByText(bp.visningsnavn).first()).toBeVisible();
+        await expect(component.getByRole("radio", { name: /Ektefellebidrag/ })).toHaveCount(0);
+        await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toHaveCount(0);
+        await expect(bpKort.getByRole("button", { name: "Endre bidragspliktig" })).toHaveCount(0);
+        await expect(component.getByRole("radio", { name: "Nasjonal" })).toBeChecked();
+        await expectNoAxeViolations(page, component);
+    });
+
+    test("barnet modalen åpnes for kan ikke velges bort", async ({ mount, page }) => {
+        await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
+        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: barnUnder18.ident, rolle: "BA" });
+        const barn = component.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` });
+
+        await expect(barn).toBeChecked();
+        await barn.click({ force: true });
+        await expect(barn).toBeChecked();
+    });
+
     test("inngang uten rolle lar saksbehandler velge rollen", async ({ mount, page }) => {
         await mockWizardApi(page);
         const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident });
@@ -176,6 +209,14 @@ test.describe("Innbygget med forhåndsutfylling", () => {
         await expect(rollevelger(component)).toBeVisible();
         await expect(rollevelger(component).getByRole("radio", { checked: true })).toHaveCount(0);
         await expect(component.getByRole("button", { name: "Bekreft" })).toBeDisabled();
+        await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toHaveCount(0);
+
+        await rollevelger(component).getByRole("radio", { name: "Bidragsmottaker" }).check();
+        await component.getByRole("button", { name: "Bekreft" }).click();
+        await expect(
+            component.getByRole("group", { name: "Bidragsmottaker" }).getByText(bp.visningsnavn).first(),
+        ).toBeVisible();
+        await expect(rollevelger(component)).toHaveCount(0);
     });
 
     test("fullflyt fra barn: rolle ut fra alder, velger BP, oppretter og gir saksnummeret til kalleren", async ({

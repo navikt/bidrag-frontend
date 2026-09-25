@@ -8,7 +8,6 @@ const barn = { ident: barnIdent, navn: "Barn", alder: 8, erMyndig: false };
 const kjent = (ident: string) => ({ ident, navn: ident, erKjent: true });
 
 const gyldig: BarnebidragSkjemaData = {
-    tillatUtenBarn: false,
     bidragspliktig: kjent(bp),
     bidragsmottaker: kjent(bm),
     valgteBarn: [barn],
@@ -56,11 +55,11 @@ describe("BarnebidragSkjemaSchema", () => {
         );
     });
 
-    it("krever barn, unntatt når saken startes fra BM", () => {
-        expect(feilFor({ valgteBarn: [] })).toEqual(
+    it("krever barn, unntatt når BM er kjent", () => {
+        expect(feilFor({ valgteBarn: [] })).toEqual([]);
+        expect(feilFor({ bidragsmottaker: { ident: "", erKjent: false }, valgteBarn: [] })).toEqual(
             expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn"] })]),
         );
-        expect(feilFor({ tillatUtenBarn: true, valgteBarn: [] })).toEqual([]);
     });
 });
 

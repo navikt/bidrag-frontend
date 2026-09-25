@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { useIsMutating } from "@tanstack/react-query";
-import { createContext, type PropsWithChildren, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useMemo } from "react";
 import { OPPRETT_SAK_MUTATION_KEY } from "~/api/useApi.ts";
 
 import type { OpprettSakInngang } from "./inngang";
@@ -50,98 +50,60 @@ export type OpprettSakFlytValg = {
     onAvbryt?: () => void;
 };
 
+/** Personen og rollen skjemaet fylles ut fra, og hvilken flyt som brukes. */
+export type OpprettSakStart = {
+    person: PersonDto;
+    rolle: PartRolle;
+    sakstype: Sakstype;
+};
+
 type SaksrolleroversiktContext = OpprettSakFlytValg & {
-    /** Personen saken ble startet fra. Brukes bare som utgangspunkt for skjemaet. */
-    startperson: PersonDto | null;
-    /** Øker ved hver bekreftelse, slik at underflyten monteres på nytt med tomt skjema. */
-    valgVersjon: number;
-    partISaken: PartISaken | null;
+    startperson: PersonDto;
+    partISaken: PartISaken;
     partISakenAlder: number | null;
-    isLoadingOpprettSak: boolean;
-    sakstype: Sakstype | null;
-    sakskategori: Sakskategori;
-    bekreftStart: (person: PersonDto, rolle: PartRolle) => void;
-    velgSakstype: (type: Sakstype) => void;
-    velgKategori: (kategori: Sakskategori) => void;
+    sakstype: Sakstype;
+    /** Personen flyten ble åpnet for. Kan ikke endres i skjemaet. */
+    låstIdent: string | null;
 };
 
 const SaksrolleroversiktContext = createContext<SaksrolleroversiktContext>({} as SaksrolleroversiktContext);
 
 function SaksrolleroversiktProvider({
     children,
+    start,
+    låstIdent = null,
     inngang,
     onOpprettet,
     onAvbryt,
-}: PropsWithChildren<OpprettSakFlytValg>) {
-    const [valgVersjon, setValgVersjon] = useState(0);
-    const [startperson, setStartperson] = useState<PersonDto | null>(null);
-    const [rolle, setRolle] = useState<PartRolle | null>(null);
-    const isLoadingOpprettSak = useIsMutating({ mutationKey: OPPRETT_SAK_MUTATION_KEY }) > 0;
-    const [sakstype, setSakstype] = useState<Sakstype | null>("BARNEBIDRAG");
-    const [sakskategori, setSakskategori] = useState<Sakskategori>("Nasjonal");
-
-    const nyttValg = useCallback((person: PersonDto | null, nyRolle: PartRolle | null) => {
-        setValgVersjon((forrige) => forrige + 1);
-        setStartperson(person);
-        setRolle(nyRolle);
-    }, []);
-
-    const bekreftStart = useCallback(
-        (person: PersonDto, valgtRolle: PartRolle) => nyttValg(person, tvungenRolle(sakstype) ?? valgtRolle),
-        [nyttValg, sakstype],
+}: PropsWithChildren<OpprettSakFlytValg & { start: OpprettSakStart; låstIdent?: string | null }>) {
+    const value = useMemo(
+        () => ({
+            startperson: start.person,
+            partISaken: tilPartISaken(start.person, start.rolle),
+            partISakenAlder: beregnAlderForPerson(start.person),
+            sakstype: start.sakstype,
+            låstIdent,
+            inngang,
+            onOpprettet,
+            onAvbryt,
+        }),
+        [start, låstIdent, inngang, onOpprettet, onAvbryt],
     );
 
-    const velgSakstype = useCallback(
-        (type: Sakstype) => {
-            nyttValg(null, null);
-            setSakstype(type);
-            setSakskategori("Nasjonal");
-        },
-        [nyttValg],
-    );
-
-    const velgKategori = useCallback(
-        (kategori: Sakskategori) => {
-            nyttValg(null, null);
-            setSakskategori(kategori);
-        },
-        [nyttValg],
-    );
-
-    const partISaken = useMemo(
-        () => (startperson && rolle ? tilPartISaken(startperson, rolle) : null),
-        [startperson, rolle],
-    );
-
-    return (
-        <SaksrolleroversiktContext
-            value={{
-                startperson,
-                valgVersjon,
-                partISaken,
-                partISakenAlder: startperson ? beregnAlderForPerson(startperson) : null,
-                isLoadingOpprettSak,
-                sakstype,
-                sakskategori,
-                bekreftStart,
-                velgSakstype,
-                velgKategori,
-                inngang,
-                onOpprettet,
-                onAvbryt,
-            }}
-        >
-            {children}
-        </SaksrolleroversiktContext>
-    );
+    return <SaksrolleroversiktContext value={value}>{children}</SaksrolleroversiktContext>;
 }
 
 function useSaksrolleroversikt() {
     const context = useContext(SaksrolleroversiktContext);
-    if (context === undefined) {
+    if (!context) {
         throw new Error("useSaksroller must be used within a SaksrolleroversiktProvider");
     }
     return context;
+}
+
+/** Om en sak sendes inn nå. Valg som nullstiller skjemaet sperres imens. */
+export function useErOppretterSak() {
+    return useIsMutating({ mutationKey: OPPRETT_SAK_MUTATION_KEY }) > 0;
 }
 
 export { SaksrolleroversiktProvider, useSaksrolleroversikt };

@@ -1,9 +1,10 @@
 import { BodyShort, Heading, HGrid, HStack, Label, Tag, VStack } from "@navikt/ds-react";
+import { useWatch } from "react-hook-form";
 import PersonInfo from "../../components/PersonInfo";
 import type { Diskresjonskode } from "../../sakvisning-schema";
 import { hentDiskresjonskodeForklaring } from "../../utils";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "../felles/SkjemaSeksjon";
-import { sakstypeTilTekst, useSaksrolleroversikt } from "../saksrolleroversiktContext";
+import { type Sakskategori, sakstypeTilTekst, useSaksrolleroversikt } from "../saksrolleroversiktContext";
 
 type Person = { ident?: string; navn?: string; diskresjonskode?: string };
 type Barn = Person & {
@@ -24,8 +25,9 @@ export type OppsummeringParter = {
  * Lik for alle sakstyper. Ukjent BP/BM lagres som ukjent part i bidrag-sak.
  */
 export default function Oppsummering({ bidragspliktig, bidragsmottaker, barn }: OppsummeringParter) {
-    const { sakstype, sakskategori } = useSaksrolleroversikt();
-    const sakTekst = sakstype ? sakstypeTilTekst(sakstype) : "Ikke valgt";
+    const { sakstype } = useSaksrolleroversikt();
+    const sakskategori = useWatch<{ kategori: Sakskategori }, "kategori">({ name: "kategori" });
+    const sakTekst = sakstypeTilTekst(sakstype);
 
     return (
         <SkjemaSeksjon tittel="Oppsummering">

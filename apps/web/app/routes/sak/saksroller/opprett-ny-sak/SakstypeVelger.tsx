@@ -1,4 +1,4 @@
-import { Radio, RadioGroup } from "@navikt/ds-react";
+import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
 
 import type { Sakstype } from "./saksrolleroversiktContext";
 
@@ -39,11 +39,13 @@ export default function SakstypeVelger({ value, onVelg }: Props) {
             value={value ?? undefined}
             onChange={(type) => onVelg(type as Sakstype)}
         >
-            {SAKSTYPE_OPTIONS.map((option) => (
-                <Radio key={option.type} value={option.type}>
-                    {option.label}
-                </Radio>
-            ))}
+            <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }}>
+                {SAKSTYPE_OPTIONS.map((option) => (
+                    <Radio key={option.type} value={option.type}>
+                        {option.label}
+                    </Radio>
+                ))}
+            </Stack>
         </RadioGroup>
     );
 }

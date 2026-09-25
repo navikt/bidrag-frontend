@@ -12,6 +12,8 @@ export type ForelderKortProps = {
     forslag?: PersonDto[];
     kanSettesUkjent?: boolean;
     feil?: string;
+    /** Parten kan ikke endres, fordi flyten ble åpnet for denne personen. */
+    låst?: boolean;
     onVelg: (person: PersonDto) => void;
     onUkjent: () => void;
     onEndre: () => void;
@@ -22,7 +24,7 @@ export type ForelderKortProps = {
  */
 export default function ParterSeksjon({
     kort,
-    tittel = "Kontroller bidragspliktig og bidragsmottaker",
+    tittel = "Bidragspliktig og bidragsmottaker",
     beskrivelse,
 }: {
     kort: ForelderKortProps[];
@@ -45,9 +47,7 @@ function ForelderKort(props: ForelderKortProps) {
 
     return (
         <VStack role="group" aria-label={hentForelderRolleLabel(rolle)}>
-            <RollePersonKort person={{ ...part, rolle }}>
-                <Handlinger {...props} />
-            </RollePersonKort>
+            <RollePersonKort person={{ ...part, rolle }}>{!props.låst && <Handlinger {...props} />}</RollePersonKort>
         </VStack>
     );
 }

@@ -34,7 +34,7 @@ function useMotparterTil(ident: string) {
 }
 
 function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }) {
-    const { sakskategori } = useSaksrolleroversikt();
+    const { låstIdent } = useSaksrolleroversikt();
     const startrolle = start.rolle as ForelderPartRolle;
     const motsattRolle = hentMotsattRolle(startrolle);
 
@@ -44,7 +44,7 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
             arbeidsfordeling: "EFS",
             partISaken: { ...start, erKjent: true },
             motpart: { ident: "", navn: "", rolle: motsattRolle, erKjent: true },
-            kategori: sakskategori,
+            kategori: "Nasjonal",
         },
         mode: "onChange",
     });
@@ -88,8 +88,9 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
     ): ForelderKortProps => ({
         rolle,
         part: { ...part, erKjent: part.ident ? true : undefined },
-        forslag: forslag.filter((person) => person.ident !== part.ident),
+        forslag: forslag.filter((person) => person.ident !== part.ident && person.ident !== låstIdent),
         kanSettesUkjent: false,
+        låst: !!låstIdent && part.ident === låstIdent,
         feil,
         onVelg: (person) =>
             sett({

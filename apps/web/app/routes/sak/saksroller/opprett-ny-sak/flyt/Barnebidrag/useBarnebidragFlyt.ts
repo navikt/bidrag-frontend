@@ -7,7 +7,13 @@ import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRel
 import type { ForelderKortProps } from "../../felles/ParterSeksjon";
 import { useFjernBarnUtenforKurver } from "../../hooks/useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
-import type { BarnebidragSkjemaData, Barnkurv, ForelderPart, ForelderPartRolle } from "../../opprett-sak-schema";
+import {
+    type BarnebidragSkjemaData,
+    type Barnkurv,
+    erKjentPart,
+    type ForelderPart,
+    type ForelderPartRolle,
+} from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import { grupperBarnIKurver } from "../../utils";
 import {
@@ -107,7 +113,7 @@ function partFraKurv(kurv: Barnkurv): ForelderPart {
     return kurv.motpart ? tilPart(kurv.motpart as PersonDto) : UKJENT;
 }
 
-function relasjonsmeldinger(foreldreTilBarn: ForeldreTilBarn[], parter: Parter, tillatUtenBarn: boolean) {
+function relasjonsmeldinger(foreldreTilBarn: ForeldreTilBarn[], parter: Parter) {
     const harBarn = foreldreTilBarn.length > 0;
     const fullstendig = harFullstendigRelasjon(
         foreldreTilBarn,
@@ -116,14 +122,14 @@ function relasjonsmeldinger(foreldreTilBarn: ForeldreTilBarn[], parter: Parter, 
     );
     return {
         ufullstendigRelasjon: harBarn && fullstendig === false,
-        bidragsmottakerUtenBarn: tillatUtenBarn && !harBarn,
+        bidragsmottakerUtenBarn: erKjentPart(parter.bidragsmottaker) && !harBarn,
     };
 }
 
 export function useBarnebidragFlyt() {
     const form = useFormContext<BarnebidragSkjemaData>();
+    const { låstIdent } = useSaksrolleroversikt();
 
-    const tillatUtenBarn = form.watch("tillatUtenBarn");
     const bidragspliktig = form.watch("bidragspliktig");
     const bidragsmottaker = form.watch("bidragsmottaker");
     const valgteBarn = form.watch("valgteBarn");
@@ -135,6 +141,7 @@ export function useBarnebidragFlyt() {
     const settPart = (rolle: ForelderPartRolle, part: ForelderPart) =>
         form.setValue(rolle, part, { shouldDirty: true, shouldValidate: form.formState.isSubmitted });
     const velg = (rolle: ForelderPartRolle, person: PersonDto) => {
+        if (person.ident === låstIdent) return;
         const nye = parterEtterValg(form.getValues(), rolle, person, forslag);
         for (const r of FORELDERROLLER) settPart(r, nye[r]);
     };
@@ -161,7 +168,8 @@ export function useBarnebidragFlyt() {
         (rolle): ForelderKortProps => ({
             rolle,
             part: parter[rolle],
-            forslag: forslag.filter((f) => f.ident !== parter[rolle].ident),
+            forslag: forslag.filter((f) => f.ident !== parter[rolle].ident && f.ident !== låstIdent),
+            låst: !!låstIdent && parter[rolle].ident === låstIdent,
             feil: form.formState.errors[rolle]?.ident?.message,
             onVelg: (person) => velg(rolle, person),
             onUkjent: () => settPart(rolle, UKJENT),
@@ -184,7 +192,7 @@ export function useBarnebidragFlyt() {
         meldinger: {
             tilgangsfeil,
             forslagsfeil,
-            ...relasjonsmeldinger(foreldreTilBarn, parter, tillatUtenBarn),
+            ...relasjonsmeldinger(foreldreTilBarn, parter),
         },
         status: { ...sakStatus, partISakenNavn: parter[primær].navn ?? "", motpartNavn: parter[sekundær].navn },
     };

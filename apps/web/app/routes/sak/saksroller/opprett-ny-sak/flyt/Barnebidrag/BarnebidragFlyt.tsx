@@ -24,7 +24,6 @@ function lagStartverdier(
     partISaken: PartISaken,
     alder: number | null,
     fødselsdato: string | undefined,
-    kategori: BarnebidragSkjemaData["kategori"],
 ): BarnebidragSkjemaData {
     const søkt: ForelderPart = {
         ident: partISaken.ident,
@@ -35,7 +34,6 @@ function lagStartverdier(
     const erBarn = erBarnRolle(partISaken);
 
     return {
-        tillatUtenBarn: partISaken.rolle === "bidragsmottaker",
         bidragspliktig: partISaken.rolle === "bidragspliktig" ? søkt : IKKE_VALGT,
         bidragsmottaker: partISaken.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT,
         valgteBarn: erBarn
@@ -54,7 +52,7 @@ function lagStartverdier(
                   },
               ]
             : [],
-        kategori,
+        kategori: "Nasjonal",
     };
 }
 
@@ -90,15 +88,10 @@ function BarnebidragForForelder({ partISaken }: { partISaken: PartISaken }) {
 }
 
 function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
-    const { partISakenAlder, startperson, sakskategori } = useSaksrolleroversikt();
+    const { partISakenAlder, startperson } = useSaksrolleroversikt();
     const form = useForm<BarnebidragSkjemaData>({
         resolver: zodResolver(BarnebidragSkjemaSchema),
-        defaultValues: lagStartverdier(
-            partISaken,
-            partISakenAlder,
-            startperson?.fødselsdato ?? undefined,
-            sakskategori,
-        ),
+        defaultValues: lagStartverdier(partISaken, partISakenAlder, startperson.fødselsdato ?? undefined),
         mode: "onChange",
     });
 
@@ -135,13 +128,20 @@ function BarnebidragFlytInnhold() {
             }
             innsending={innsending}
         >
+            <ParterSeksjon
+                kort={kort}
+                beskrivelse={
+                    kort.some((k) => k.part.erKjent === undefined)
+                        ? "Velg barn nedenfor for å få forslag til foreldre."
+                        : undefined
+                }
+            />
             <BarnSection
                 form={form}
                 barnkurver={barnkurver}
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
             />
-            <ParterSeksjon kort={kort} />
         </RolleFlytSide>
     );
 }

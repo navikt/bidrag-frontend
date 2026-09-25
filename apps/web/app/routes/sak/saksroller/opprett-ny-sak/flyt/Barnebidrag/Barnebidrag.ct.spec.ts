@@ -28,9 +28,7 @@ test.describe("Start fra forelder med barn", () => {
         const førsteBarnIdent = await førsteBarn.getAttribute("value");
         const andreBarnIdent = await andreBarn.getAttribute("value");
 
-        await expect(
-            component.getByRole("heading", { name: "Kontroller bidragspliktig og bidragsmottaker" }),
-        ).toBeVisible();
+        await expect(component.getByRole("heading", { name: "Bidragspliktig og bidragsmottaker" })).toBeVisible();
         const bidragspliktigKort = component.getByRole("group", { name: "Bidragspliktig" });
         await expect(bidragspliktigKort.getByRole("button", { name: "Endre bidragspliktig" })).toBeVisible();
 
@@ -119,7 +117,10 @@ test.describe("Start fra forelder uten registrerte barn", () => {
     test("legger til barn, får entydig forelder automatisk og oppretter sak", async ({ mount, page }) => {
         const requests = await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
+        const hint = component.getByText("Velg barn nedenfor for å få forslag til foreldre.");
+        await expect(hint).toBeVisible();
         await leggTilBarn(component, page);
+        await expect(hint).toHaveCount(0);
 
         const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
         await expect(bmKort.getByText(bm.visningsnavn)).toBeVisible();

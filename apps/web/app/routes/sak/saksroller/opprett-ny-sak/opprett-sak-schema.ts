@@ -50,11 +50,10 @@ const ForelderPartSchema = MotpartSchema.omit({ rolle: true });
 /**
  * Samme skjema uansett om saken startes fra en forelder eller fra barnet. Alle parter kan endres.
  * `erKjent` på BP og BM: `undefined` er ikke avklart, `false` er registrert som ukjent.
- * 🔴 `tillatUtenBarn`: saken kan opprettes uten barn når den ble startet fra bidragsmottaker.
+ * 🔴 Saken kan opprettes uten barn når bidragsmottaker er kjent.
  */
 export const BarnebidragSkjemaSchema = z
     .object({
-        tillatUtenBarn: z.boolean(),
         bidragspliktig: ForelderPartSchema,
         bidragsmottaker: ForelderPartSchema,
         valgteBarn: z.array(BarnMedAlderSchema),
@@ -66,7 +65,6 @@ export const BarnebidragSkjemaSchema = z
     });
 
 type BarnebidragSkjemaInput = {
-    tillatUtenBarn: boolean;
     bidragspliktig: ForelderPart;
     bidragsmottaker: ForelderPart;
     valgteBarn: BarnMedAlder[];
@@ -89,8 +87,11 @@ function validerForeldre(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
     validateUlikeParter({ ident: data.bidragspliktig.ident ?? "" }, data.bidragsmottaker, ctx, "bidragsmottaker");
 }
 
+/** Parten er valgt i skjemaet og ikke satt som ukjent. */
+export const erKjentPart = (part: ForelderPart) => part.erKjent === true && !!part.ident?.trim();
+
 function validerBarnebidragBarn(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    if (!data.tillatUtenBarn && data.valgteBarn.length === 0) {
+    if (!erKjentPart(data.bidragsmottaker) && data.valgteBarn.length === 0) {
         ctx.addIssue({ code: "custom", path: ["valgteBarn"], message: "Du må velge minst ett barn." });
     }
     const bidragsmottakerErUkjent = data.bidragsmottaker.erKjent === false;
