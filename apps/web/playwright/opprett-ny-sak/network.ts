@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page } from "@playwright/test";
+import { mockPersonOgRelasjoner } from "../felles/personMock";
 import { samhandler, testpersoner } from "./fixtures";
 
 type MockOptions = {
@@ -14,28 +15,11 @@ type MockOptions = {
 
 export async function mockWizardApi(page: Page, options: MockOptions = {}) {
     const requests: { create?: Record<string, unknown>; unit: Record<string, unknown>[] } = { unit: [] };
-    const personer = {
-        ...Object.fromEntries(Object.values(testpersoner).map((person) => [person.ident, person])),
-        ...options.personOverrides,
-    };
-
-    await page.route(/\/proxy\/bidrag-person\/informasjon\/?$/, async (route) => {
-        const { ident } = route.request().postDataJSON() as { ident: string };
-        await route.fulfill({ json: personer[ident] ?? { ident, visningsnavn: "Test Ukjent Person" } });
-    });
-    await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, async (route) => {
-        const { ident } = route.request().postDataJSON() as { ident: string };
-        await route.fulfill({
-            json: {
-                forelderBarnRelasjon: (options.parentRelations?.[ident] ?? []).map((relatertPersonsIdent) => ({
-                    minRolleForPerson: "BARN",
-                    relatertPersonsIdent,
-                })),
-            },
-        });
-    });
-    await page.route(/\/proxy\/bidrag-person\/motpartbarnrelasjon$/, async (route) => {
-        await route.fulfill({ json: { person: testpersoner.bidragspliktig, personensMotpartBarnRelasjon: [] } });
+    await mockPersonOgRelasjoner(page, {
+        testpersoner,
+        personOverrides: options.personOverrides,
+        foreldreTilBarn: (ident) => options.parentRelations?.[ident] ?? [],
+        motpartPerson: testpersoner.bidragspliktig,
     });
     await page.route(/\/proxy\/bidrag-sak\/person\/sak$/, async (route) => {
         await route.fulfill({ json: options.existingCases ?? [] });
@@ -57,7 +41,6 @@ export async function mockWizardApi(page: Page, options: MockOptions = {}) {
             json: options.createBody ?? { saksnummer: "1234567" },
         });
     });
-    await page.route(/\/log\/.*/, async (route) => route.fulfill({ status: 204 }));
 
     return requests;
 }

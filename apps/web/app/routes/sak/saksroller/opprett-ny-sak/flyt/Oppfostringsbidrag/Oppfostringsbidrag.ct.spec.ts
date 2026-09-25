@@ -4,7 +4,10 @@ import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Oppfostringsbidrag/Oppfostringsbidrag/Standard";
 
-test("krever samhandler som reell mottaker og bruker arbeidsfordeling OPS", async ({ mount, page }) => {
+test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppretter sak", async ({
+    mount,
+    page,
+}) => {
     const requests = await mockWizardApi(page);
     const component = await mount(STORY);
 
@@ -21,8 +24,12 @@ test("krever samhandler som reell mottaker og bruker arbeidsfordeling OPS", asyn
     await search.fill(samhandler.samhandlerId);
     await search.press("Enter");
     await expect(component.getByText(samhandler.navn).first()).toBeVisible();
-    await expect(component.getByText(samhandler.navn).first()).toBeVisible();
 
     await expect.poll(() => requests.unit.some((request) => request.arbeidsfordeling === "OPS")).toBe(true);
     await expectNoAxeViolations(page, component);
+
+    await opprettKnapp.click();
+    await expect.poll(() => requests.create).toBeTruthy();
+    expect(requests.create).toMatchObject({ arbeidsfordeling: "OPS" });
+    expect(JSON.stringify(requests.create)).toContain(samhandler.samhandlerId);
 });

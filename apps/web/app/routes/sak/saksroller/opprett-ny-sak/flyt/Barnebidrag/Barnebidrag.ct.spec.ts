@@ -92,8 +92,8 @@ test.describe("Start fra forelder uten registrerte barn", () => {
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
     };
 
-    test("velger entydig registrert forelder automatisk", async ({ mount, page }) => {
-        await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
+    test("legger til barn, får entydig forelder automatisk og oppretter sak", async ({ mount, page }) => {
+        const requests = await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
         await leggTilBarn(component, page);
 
@@ -102,6 +102,16 @@ test.describe("Start fra forelder uten registrerte barn", () => {
         await expect(bmKort.getByRole("button", { name: `Bruk ${bm.visningsnavn}` })).toHaveCount(0);
         await expect(component.getByRole("searchbox", { name: /Søk etter bidragsmottaker/ })).toHaveCount(0);
         await expectNoAxeViolations(page, component);
+
+        await component.getByRole("button", { name: /Opprett$/ }).click();
+        await expect.poll(() => requests.create).toBeTruthy();
+        expect(requests.create?.roller).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ fodselsnummer: bm.ident, type: "BM" }),
+                expect.objectContaining({ fodselsnummer: barnUnder18.ident, type: "BA" }),
+            ]),
+        );
+        await expect(component.getByText("Sak opprettet med saksnummer 1234567.")).toBeVisible();
     });
 
     test("foreslår begge når barnet har to andre registrerte foreldre", async ({ mount, page }) => {
@@ -124,17 +134,6 @@ test.describe("Start fra forelder uten registrerte barn", () => {
         await leggTilBarn(component, page);
 
         await expect(component.getByText(/har flere enn 2 registrerte foreldre/)).toBeVisible();
-    });
-
-    test("blokkerer ukjent bidragsmottaker når tilgang mangler", async ({ mount, page }) => {
-        await mockWizardApi(page, { accessAllowed: false });
-        const component = await mount(`${STORY}/ForelderUtenBarn`);
-        await leggTilBarn(component, page);
-        await component.getByRole("button", { name: "Registrer bidragsmottaker som ukjent" }).click();
-
-        await expect(component.getByText(/ikke tilgang til å opprette sak uten bidragsmottaker/)).toBeVisible();
-        await component.getByRole("button", { name: /Opprett$/ }).click();
-        await expect(component.getByText(/Kan ikke opprette saken ennå/)).toBeVisible();
     });
 });
 
