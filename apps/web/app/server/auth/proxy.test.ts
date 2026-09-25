@@ -92,10 +92,7 @@ describe("proxy", () => {
         const timeoutError = new DOMException("The operation timed out", "TimeoutError");
         vi.stubGlobal("fetch", vi.fn().mockRejectedValue(timeoutError));
 
-        const response = await proxyRequest(
-            new Request("http://frontend/proxy/bidrag-sak/vedtak"),
-            "KLIEN-T0001",
-        );
+        const response = await proxyRequest(new Request("http://frontend/proxy/bidrag-sak/vedtak"), "KLIEN-T0001");
 
         expect(response.status).toBe(504);
         expect(response.headers.get("X-Correlation-ID")).toBe("KLIEN-T0001");
