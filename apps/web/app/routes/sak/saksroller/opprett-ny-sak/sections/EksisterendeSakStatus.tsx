@@ -1,4 +1,5 @@
 import type { BidragssakDto } from "@bidrag/api/SakApi";
+import { MaskerSensitivInfo } from "@bidrag/common";
 import { Alert } from "@navikt/ds-react";
 import LasterSkeleton from "../components/LasterSkeleton";
 import EksisterendeSakSection from "./EksisterendeSakSection";
@@ -29,7 +30,7 @@ export default function EksisterendeSakStatus({
         <>
             {infoMelding && (
                 <Alert size="small" variant={infoMelding.type}>
-                    {infoMelding.melding}
+                    <MaskerSensitivInfo>{infoMelding.melding}</MaskerSensitivInfo>
                 </Alert>
             )}
             <EksisterendeSakSection

@@ -13,7 +13,10 @@ export function finnValideringsfeilForBarn(person: PersonDto, roller: SakRediger
             : `Dette barnet (${person.ident}) er allerede lagt til`;
     }
 
-    const alder = alderForBarn(person);
+    const alder = beregnAlderForPerson(person);
+    if (alder == null) {
+        return "Kunne ikke beregne alder for barnet.";
+    }
     if (alder > MAKS_ALDER_BARN) {
         return `${person.visningsnavn ?? "Barnet"} er ${alder} år og kan ikke legges til. Maks alder er ${MAKS_ALDER_BARN} år.`;
     }

@@ -163,7 +163,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
         enhetNavn,
         isLoadingEnhet,
         enhetError,
-        blocked: harEksisterendeSak || isLoadingHentSak || isLoadingEnhet || tilgangUtenBm.blokkert,
+        blocked: harEksisterendeSak || isLoadingHentSak || isLoadingEnhet || !enhet || tilgangUtenBm.blokkert,
         manglerTilgangUtenBm: tilgangUtenBm.mangler,
         oppsummering: parter,
         submitError: opprettSak.error,
