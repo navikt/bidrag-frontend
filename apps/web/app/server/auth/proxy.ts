@@ -44,6 +44,8 @@ const logErrorResponse = async (request: Request, backendResponse: Response, sub
     }
 };
 
+const TIMEOUT_MS = 60_000;
+
 async function proxyRequest(request: Request, app: string, context: Route.LoaderArgs["context"]): Promise<Response> {
     // Middleware har allerede satt ID-en. Fallback er kun en sikring for kall utenom kjeden.
     const correlationId = hentRequestKontekst().correlationId ?? generateCorrelationId();
@@ -57,13 +59,13 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
         });
     }
 
+    // Bygg backend-URL: behold path etter /proxy/:app, legg til base-URL sin path
+    const incomingUrl = new URL(request.url);
+    const subPath = incomingUrl.pathname.replace(`/proxy/${app}`, "");
+
     try {
         const apiConfig = getApiConfig(app);
         const oboToken = await getOnBehalfOfToken(authToken, apiConfig.audience);
-
-        // Bygg backend-URL: behold path etter /proxy/:app, legg til base-URL sin path
-        const incomingUrl = new URL(request.url);
-        const subPath = incomingUrl.pathname.replace(`/proxy/${app}`, "");
 
         const baseUrl = new URL(apiConfig.url);
         const backendUrl = new URL(baseUrl.pathname.replace(/\/$/, "") + subPath + incomingUrl.search, baseUrl.origin);
@@ -74,6 +76,7 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
         headers.delete("host");
 
         const backendResponse = await fetch(backendUrl.toString(), {
+            signal: AbortSignal.timeout(TIMEOUT_MS),
             method: request.method,
             headers,
             body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
@@ -83,15 +86,23 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
 
         return responseWithCorrelationId(backendResponse, correlationId);
     } catch (error) {
-        // Feil før eller under backend-kallet må fortsatt kunne spores av både bruker og utvikler.
-        if (error instanceof Response) {
-            navCombinedLogger.warn({ app, status: error.status }, "Proxy-kall feilet");
+        const loggerContext: LogContext = { app, method: request.method, path: subPath };
 
-            throw responseWithCorrelationId(error, correlationId);
+        if (error instanceof Response) {
+            navCombinedLogger.warn({ ...loggerContext, status: error.status }, "Proxy-kall feilet");
+            return responseWithCorrelationId(error, correlationId);
         }
 
-        navCombinedLogger.error({ app, method: request.method, err: error }, "Proxy-kall feilet");
+        if (error instanceof DOMException && error.name === "TimeoutError") {
+            const message = `Proxy-kall timeout mot ${app}`;
+            navCombinedLogger.error({ ...loggerContext, timeoutMs: TIMEOUT_MS, status: 504 }, message);
+            return new Response(message, {
+                status: 504,
+                headers: { [correlationIdHeader]: correlationId },
+            });
+        }
 
+        navCombinedLogger.error({ ...loggerContext, err: error }, "Proxy-kall feilet");
         throw new Response("Bad Gateway", {
             status: 502,
             headers: { [correlationIdHeader]: correlationId },
