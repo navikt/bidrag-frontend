@@ -473,7 +473,7 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                                     )
                                 }
                             >
-                                Underholdskostnad: Ugyldig perioder i forpleining for barn {value.gjelderBarn.navn}
+                                Underholdskostnad: Ugyldige perioder i forpleining for barn {value.gjelderBarn.navn}
                             </ErrorSummary.Item>,
                         ),
                     );
