@@ -1,6 +1,6 @@
 import { Box } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
-import OpprettSakFlyt from "../OpprettSakFlyt";
+import OpprettSakFlyt from "../start/OpprettSakFlyt";
 
 export default function NySaksrollerPage() {
     const visNyRollebilde = useFlag("bisys.ny_rollebilde");

@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, InlineMessage } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
-import type { ReellMottakerRegel } from "../../../reell-mottaker-regel";
-import LasterSkeleton from "../../components/LasterSkeleton";
-import ParterSeksjon from "../../felles/ParterSeksjon";
-import RolleFlytSide from "../../felles/RolleFlytSide";
-import { useEnPartMedBarnFlyt } from "../../hooks/useEnPartMedBarnFlyt";
+import type { ReellMottakerRegel } from "../../../felles/reell-mottaker/reell-mottaker-regel";
+import BarnSection from "../../barn/BarnSection";
+import ParterSeksjon from "../../parter/ParterSeksjon";
+import { hentForelderRolleLabel } from "../../parter/part-utils";
+import LasterSkeleton from "../../skjema/LasterSkeleton";
 import {
     type Diskresjonskode,
     FarskapsSkjemaSchema,
@@ -13,10 +13,10 @@ import {
     type ForelderPartRolle,
     OppfostringsbidragSkjemaSchema,
     type PartISaken,
-} from "../../opprett-sak-schema";
-import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
-import BarnSection from "../../sections/BarnSection";
-import { hentForelderRolleLabel } from "../../utils";
+} from "../../skjema/opprett-sak-schema";
+import RolleFlytSide from "../../skjema/RolleFlytSide";
+import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
+import { useEnPartMedBarnFlyt } from "./useEnPartMedBarnFlyt";
 
 type Flyttype = "FARSKAP" | "OPPFOSTRINGSBIDRAG";
 

@@ -1,7 +1,7 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { type ForelderPart, type ForelderPartRolle, MAKS_ALDER_BARN } from "../../opprett-sak-schema";
-import { hentMotsattRolle } from "../../utils";
+import { hentMotsattRolle } from "../../parter/part-utils";
+import { type ForelderPart, type ForelderPartRolle, MAKS_ALDER_BARN } from "../../skjema/opprett-sak-schema";
 
 export type ForeldreTilBarn = { barn: { ident: string; navn: string }; foreldre: PersonDto[] | undefined };
 

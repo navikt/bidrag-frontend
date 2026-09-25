@@ -19,7 +19,7 @@ import { ClientOnly } from "~/common/ClientOnly.tsx";
 import RootErrorBoundary from "~/common/components/errorpage/RootErrorBoundary.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import { UnleashContextUpdater } from "~/common/unleash/UnleashContextUpdater.tsx";
-import { NyOpprettSakFlytProvider } from "~/routes/sak/saksroller/opprett-ny-sak/NyOpprettSakFlytProvider.tsx";
+import { NyOpprettSakFlytProvider } from "~/routes/sak/saksroller/opprett-ny-sak/start/NyOpprettSakFlytProvider.tsx";
 import type { Route } from "./+types/root.ts";
 import faviconUrl from "./assets/bisys_favicon.ico";
 

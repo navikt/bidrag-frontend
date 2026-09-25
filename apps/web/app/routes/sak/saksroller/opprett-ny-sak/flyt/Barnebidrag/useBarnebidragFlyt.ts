@@ -4,18 +4,18 @@ import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { type UseFormReturn, useFormContext } from "react-hook-form";
 import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
-import type { ForelderKortProps } from "../../felles/ParterSeksjon";
-import { useFjernBarnUtenforKurver } from "../../hooks/useFjernBarnUtenforKurver";
-import { useFlowSubmission } from "../../hooks/useFlowSubmission";
+import { grupperBarnIKurver } from "../../barn/barnkurver";
+import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";
+import { useFlowSubmission } from "../../innsending/useFlowSubmission";
+import type { ForelderKortProps } from "../../parter/ParterSeksjon";
 import {
     type BarnebidragSkjemaData,
     type Barnkurv,
     erKjentPart,
     type ForelderPart,
     type ForelderPartRolle,
-} from "../../opprett-sak-schema";
-import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
-import { grupperBarnIKurver } from "../../utils";
+} from "../../skjema/opprett-sak-schema";
+import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
 import {
     type ForeldreTilBarn,
     harFullstendigRelasjon,

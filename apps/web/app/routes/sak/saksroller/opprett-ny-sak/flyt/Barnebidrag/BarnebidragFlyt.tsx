@@ -2,19 +2,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
-import BMUtenBarnAlert from "../../components/BMUtenBarnAlert";
-import ParterSeksjon from "../../felles/ParterSeksjon";
-import RolleFlytSide from "../../felles/RolleFlytSide";
+import BarnSection from "../../barn/BarnSection";
+import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";
+import ParterSeksjon from "../../parter/ParterSeksjon";
+import UfullstendigRelasjonAlert from "../../parter/UfullstendigRelasjonAlert";
 import {
     type BarnebidragSkjemaData,
     BarnebidragSkjemaSchema,
     type ForelderPart,
     MYNDYG_BARN_ALDER,
     type PartISaken,
-} from "../../opprett-sak-schema";
-import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
-import BarnSection from "../../sections/BarnSection";
-import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
+} from "../../skjema/opprett-sak-schema";
+import RolleFlytSide from "../../skjema/RolleFlytSide";
+import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
 import { harMotpartMedUlikeForelderroller } from "./barnebidrag-forslag";
 import { useBarnebidragFlyt } from "./useBarnebidragFlyt";
 

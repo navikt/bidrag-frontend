@@ -2,19 +2,18 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
-
-import ParterSeksjon, { type ForelderKortProps } from "../../felles/ParterSeksjon";
-import RolleFlytSide from "../../felles/RolleFlytSide";
-import { useFlowSubmission } from "../../hooks/useFlowSubmission";
+import { useFlowSubmission } from "../../innsending/useFlowSubmission";
+import ParterSeksjon, { type ForelderKortProps } from "../../parter/ParterSeksjon";
+import { hentMotsattRolle } from "../../parter/part-utils";
 import {
     type Diskresjonskode,
     type EktefellebidragSkjemaData,
     EktefellebidragSkjemaSchema,
     type ForelderPartRolle,
     type PartISaken,
-} from "../../opprett-sak-schema";
-import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
-import { hentMotsattRolle } from "../../utils";
+} from "../../skjema/opprett-sak-schema";
+import RolleFlytSide from "../../skjema/RolleFlytSide";
+import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
 
 type Part = { ident: string; navn: string; diskresjonskode?: Diskresjonskode };
 
