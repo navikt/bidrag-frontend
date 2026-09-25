@@ -9,16 +9,14 @@ type Forelderforslag = { forslag: PersonDto[]; feil?: string };
 
 /**
  * Registrerte foreldre til valgte barn, som forslag til BP/BM-kortene.
- * Samme regel uansett om saken startet fra en forelder eller fra barnet.
+ * Gir en advarsel når et barn har begge foreldre registrert og en valgt forelder ikke er en av dem.
  */
 export function utledForelderforslag({
     foreldreTilBarn,
-    låstForelder,
-    valgteIdenter,
+    valgteForeldre,
 }: {
     foreldreTilBarn: ForeldreTilBarn[];
-    låstForelder?: { ident: string; navn: string };
-    valgteIdenter: string[];
+    valgteForeldre: { ident: string; navn: string }[];
 }): Forelderforslag {
     const forslag = new Map<string, PersonDto>();
     let feil: string | undefined;
@@ -28,14 +26,11 @@ export function utledForelderforslag({
             feil = `Dette barnet (${barn.ident}) har flere enn 2 registrerte foreldre i systemet. Dette kan skyldes feil i data. Kontakt support.`;
             continue;
         }
-        if (låstForelder && foreldre.length === 2 && !foreldre.some((f) => f.ident === låstForelder.ident)) {
-            feil ??= `Er du sikker på at dette er riktig barn? Dette barnet (${barn.ident}) har begge foreldre registrert, men ${låstForelder.navn} (${låstForelder.ident}) er ikke en av dem.`;
+        const ikkeForelder = valgteForeldre.find((valgt) => !foreldre.some((f) => f.ident === valgt.ident));
+        if (ikkeForelder && foreldre.length === 2) {
+            feil ??= `Er du sikker på at dette er riktig barn? Dette barnet (${barn.ident}) har begge foreldre registrert, men ${ikkeForelder.navn} (${ikkeForelder.ident}) er ikke en av dem.`;
         }
-        for (const forelder of foreldre) {
-            if (forelder.ident !== låstForelder?.ident && !valgteIdenter.includes(forelder.ident)) {
-                forslag.set(forelder.ident, forelder);
-            }
-        }
+        for (const forelder of foreldre) forslag.set(forelder.ident, forelder);
     }
 
     return { forslag: [...forslag.values()], feil };
@@ -94,12 +89,11 @@ export function parterEtterValg(
     rolle: ForelderPartRolle,
     person: PersonDto,
     forslag: PersonDto[],
-    låstForelder: ForelderPartRolle | null,
 ): Parter {
     const motsatt = hentMotsattRolle(rolle);
     const andre = parter[motsatt].ident === person.ident ? parter[rolle] : parter[motsatt];
     const gjenstående = forslag.filter((f) => f.ident !== person.ident);
-    const fyllUt = motsatt !== låstForelder && andre.erKjent === undefined && gjenstående.length === 1;
+    const fyllUt = andre.erKjent === undefined && gjenstående.length === 1;
     return {
         [rolle]: tilPart(person),
         [motsatt]: fyllUt ? tilPart(gjenstående[0] as PersonDto) : andre,

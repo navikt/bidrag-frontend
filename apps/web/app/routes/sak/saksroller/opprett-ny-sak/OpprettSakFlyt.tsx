@@ -1,84 +1,19 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { MaskerSensitivInfo, PersonIdent } from "@bidrag/common";
-import { beregnAlder } from "@bidrag/utils";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { BodyLong, BodyShort, Box, Heading, HGrid, HStack, InlineMessage, Loader, VStack } from "@navikt/ds-react";
-import { type ReactNode, Suspense, useEffect, useRef } from "react";
+import { BodyLong, Box, Heading, HGrid, InlineMessage, Loader, VStack } from "@navikt/ds-react";
+import { type ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import { useHentPersoninformasjon } from "~/api/useApi.ts";
-import DiskresjonAlert from "../components/DiskresjonAlert";
-import PersonInfo from "../components/PersonInfo";
-import SøkPerson from "../components/SøkPerson";
 import LasterSkeleton from "./components/LasterSkeleton";
+import NullstillDialog from "./felles/NullstillDialog";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "./felles/SkjemaSeksjon";
 import BarnebidragFlyt from "./flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "./flyt/Ektefellebidrag/EktefellebidragFlyt";
 import EnPartMedBarnFlyt from "./flyt/EnPartMedBarn/EnPartMedBarnFlyt";
-import { type InngangRolle, tilPartRolle } from "./inngang";
+import { tilPartRolle } from "./inngang";
 import SakskategoriVelger from "./SakskategoriVelger";
-import SaksrolleVelger from "./SaksrolleVelger";
 import SakstypeVelger from "./SakstypeVelger";
-import {
-    type Sakstype,
-    sakstypeTilBeskrivelse,
-    tvungenRolle,
-    useSaksrolleroversikt,
-} from "./saksrolleroversiktContext";
-
-function ValgtPart({ person }: { person: PersonDto }) {
-    return (
-        <VStack gap="space-8">
-            <PersonInfo
-                ident={person.ident}
-                navn={person.visningsnavn}
-                fødselsdato={person.fødselsdato ?? undefined}
-                fallback={<ValgtPartPersonInfo person={person} />}
-            />
-            {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
-        </VStack>
-    );
-}
-
-function ValgtPartPersonInfo({ person }: { person: PersonDto }) {
-    const alder = person.fødselsdato ? beregnAlder(person.fødselsdato) : undefined;
-
-    return (
-        <MaskerSensitivInfo>
-            <VStack>
-                <BodyShort size="small" weight="semibold">
-                    {person.visningsnavn}
-                </BodyShort>
-                <HStack align="center" gap="space-4">
-                    <PersonIdent ident={person.ident} />
-                    {alder !== undefined && (
-                        <BodyShort size="small" textColor="subtle">
-                            ({alder} år)
-                        </BodyShort>
-                    )}
-                </HStack>
-            </VStack>
-        </MaskerSensitivInfo>
-    );
-}
-
-function partSeksjonTittel(sakstype: Sakstype) {
-    if (sakstype === "OPPFOSTRINGSBIDRAG") {
-        return "Bidragspliktig";
-    }
-    if (sakstype === "FARSKAP") {
-        return "Bidragsmottaker";
-    }
-    return "Søk opp person";
-}
-
-function partSøkLabel(sakstype: Sakstype) {
-    if (sakstype === "OPPFOSTRINGSBIDRAG") {
-        return "Søk etter bidragspliktig";
-    }
-    if (sakstype === "FARSKAP") {
-        return "Søk etter bidragsmottaker";
-    }
-    return "Søk etter person";
-}
+import StartpartVelger from "./StartpartVelger";
+import { type Sakstype, useSaksrolleroversikt } from "./saksrolleroversiktContext";
 
 const flytkomponenter = {
     BARNEBIDRAG: BarnebidragFlyt,
@@ -89,35 +24,35 @@ const flytkomponenter = {
 
 export default function OpprettSakFlyt({ visning = "side" }: { visning?: "side" | "modal" }) {
     const {
-        valgtPerson,
         partISaken,
         valgVersjon,
         sakstype,
         sakskategori,
         velgKategori,
         isLoadingOpprettSak,
-        velgPerson,
         velgSakstype: settSakstypeOgNullstill,
     } = useSaksrolleroversikt();
+    const [forhåndsvalgt, setForhåndsvalgt] = useState<PersonDto | null>(null);
+    const [ventendeBytte, setVentendeBytte] = useState<{ beskrivelse: string; utfør: () => void } | null>(null);
+
+    const byttMedBekreftelse = (beskrivelse: string, bytt: () => void) => {
+        const utfør = () => {
+            setForhåndsvalgt(null);
+            setVentendeBytte(null);
+            bytt();
+        };
+        if (partISaken) setVentendeBytte({ beskrivelse, utfør });
+        else utfør();
+    };
 
     const velgSakstype = (type: Sakstype) => {
         if (type === sakstype || isLoadingOpprettSak) return;
-        settSakstypeOgNullstill(type);
-    };
-
-    const leggTilPartISaken = (person: PersonDto) => {
-        if (!sakstype || isLoadingOpprettSak) return;
-        velgPerson(person);
-    };
-
-    const velgFraInngang = (person: PersonDto, rolle: InngangRolle | undefined) => {
-        if (!sakstype || isLoadingOpprettSak) return;
-        velgPerson(person, tilPartRolle(rolle, beregnAlderForPerson(person)));
+        byttMedBekreftelse("Skjemaet nullstilles når du bytter sakstype.", () => settSakstypeOgNullstill(type));
     };
 
     const velgSakskategori = (kategori: typeof sakskategori) => {
         if (kategori === sakskategori || isLoadingOpprettSak) return;
-        velgKategori(kategori);
+        byttMedBekreftelse("Skjemaet nullstilles når du bytter kategori.", () => velgKategori(kategori));
     };
 
     const FlytKomponent = sakstype ? flytkomponenter[sakstype] : null;
@@ -137,14 +72,19 @@ export default function OpprettSakFlyt({ visning = "side" }: { visning?: "side" 
                         </SkjemaSeksjonKort>
                     </HGrid>
                 </SkjemaSeksjon>
+                <NullstillDialog
+                    open={!!ventendeBytte}
+                    onOpenChange={(open) => !open && setVentendeBytte(null)}
+                    beskrivelse={ventendeBytte?.beskrivelse ?? ""}
+                    onBekreft={() => ventendeBytte?.utfør()}
+                />
 
-                <Forhåndsutfylling onPerson={velgFraInngang} />
+                <Forhåndsutfylling onUtenRolle={setForhåndsvalgt} />
                 {sakstype && (
-                    <PartSeksjon
+                    <StartpartVelger
+                        key={`${sakstype}-${sakskategori}-${forhåndsvalgt?.ident}`}
                         sakstype={sakstype}
-                        sakskategori={sakskategori}
-                        partISaken={valgtPerson}
-                        onPersonValgt={leggTilPartISaken}
+                        forhåndsvalgt={forhåndsvalgt}
                     />
                 )}
             </VStack>
@@ -173,17 +113,20 @@ function FlytRamme({ visning, children }: { visning: "side" | "modal"; children:
     );
 }
 
-function Forhåndsutfylling({ onPerson }: { onPerson: (person: PersonDto, rolle: InngangRolle | undefined) => void }) {
-    const { inngang } = useSaksrolleroversikt();
+/** Personen kalleren åpnet flyten for. Med kjent rolle bekreftes den direkte, ellers må saksbehandleren velge rolle. */
+function Forhåndsutfylling({ onUtenRolle }: { onUtenRolle: (person: PersonDto) => void }) {
+    const { inngang, bekreftStart } = useSaksrolleroversikt();
     const { data: person, error } = useHentPersoninformasjon(inngang ? { ident: inngang.ident } : null);
     const utført = useRef(false);
-    const onPersonRef = useRef(onPerson);
-    onPersonRef.current = onPerson;
+    const handlinger = useRef({ onUtenRolle, bekreftStart });
+    handlinger.current = { onUtenRolle, bekreftStart };
 
     useEffect(() => {
         if (!person || utført.current) return;
         utført.current = true;
-        onPersonRef.current(person, inngang?.rolle);
+        const rolle = tilPartRolle(inngang?.rolle, beregnAlderForPerson(person));
+        if (rolle) handlinger.current.bekreftStart(person, rolle);
+        else handlinger.current.onUtenRolle(person);
     }, [person, inngang?.rolle]);
 
     if (!error) return null;
@@ -210,46 +153,5 @@ function OppretterSak() {
                 <BodyLong>Oppretter sak...</BodyLong>
             </VStack>
         </Box>
-    );
-}
-
-function PartSeksjon({
-    sakstype,
-    sakskategori,
-    partISaken,
-    onPersonValgt,
-}: {
-    sakstype: Sakstype;
-    sakskategori: unknown;
-    partISaken?: PersonDto | null;
-    onPersonValgt: (person: PersonDto) => void;
-}) {
-    return (
-        <SkjemaSeksjon tittel={partSeksjonTittel(sakstype)} beskrivelse={sakstypeTilBeskrivelse(sakstype)}>
-            <HGrid gap="space-24" columns={{ xs: 1, sm: 2 }}>
-                <SkjemaSeksjonKort>
-                    <SøkPerson
-                        key={`${sakstype}-${sakskategori}`}
-                        label={partSøkLabel(sakstype)}
-                        personInformasjon={onPersonValgt}
-                        compact
-                    />
-                </SkjemaSeksjonKort>
-                {partISaken && (
-                    <SkjemaSeksjonKort>
-                        <ValgtPart person={partISaken} />
-                    </SkjemaSeksjonKort>
-                )}
-            </HGrid>
-            {partISaken && (
-                <SkjemaSeksjonKort>
-                    <SaksrolleVelger
-                        key={`${partISaken.ident}-${sakstype}`}
-                        partISaken={partISaken}
-                        enforcedRolle={tvungenRolle(sakstype)}
-                    />
-                </SkjemaSeksjonKort>
-            )}
-        </SkjemaSeksjon>
     );
 }

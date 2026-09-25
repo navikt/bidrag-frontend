@@ -1,6 +1,6 @@
 import { PersonIdent } from "@bidrag/common";
 import { BodyShort, Box, Checkbox, CheckboxGroup, HGrid, HStack, VStack } from "@navikt/ds-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import { BarnKortInnhold } from "../../felles/BarnKort";
@@ -15,25 +15,18 @@ type Props = {
     form: UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
     reellMottakerRegel: ReellMottakerRegel;
     onKurvByttet?: (kurv: Barnkurv | null) => void;
-    låsteIdenter?: string[];
 };
 
 /**
  * Alle barn som kan være med i saken, som valg i én liste: registrerte barn per motpart
- * og barn som er lagt til manuelt.
+ * og barn som er lagt til manuelt. Manuelt lagte barn er valgt fra start og blir stående når de velges bort.
  *
  * `onKurvByttet` kalles når valget går over til en annen barnkurv, eller med `null` når ingen
- * barn er valgt. `låsteIdenter` er barn som ikke kan velges bort, som barnet saken ble startet fra.
+ * barn er valgt.
  */
-export default function BarnkurvListe({
-    barnkurver,
-    form,
-    reellMottakerRegel,
-    onKurvByttet,
-    låsteIdenter = [],
-}: Props) {
+export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, onKurvByttet }: Props) {
     const valgteBarn = form.watch("valgteBarn") || [];
-    const manuelleBarn = valgteBarn.filter((b) => b.manuellLagtTil);
+    const manuelleBarn = useManuelleBarn(valgteBarn);
 
     const velgIKurv = (valgteIdenter: string[], kurvId: string) => {
         const valg = beregnBarnkurvValg(barnkurver, form.getValues("valgteBarn") || [], valgteIdenter, kurvId);
@@ -47,19 +40,20 @@ export default function BarnkurvListe({
         }
     };
 
-    const velgBortManuelle = (valgteIdenter: string[]) => {
-        const beholdt = valgteBarn.filter(
-            (b) => !b.manuellLagtTil || valgteIdenter.includes(b.ident) || låsteIdenter.includes(b.ident),
-        );
-        form.setValue("valgteBarn", beholdt);
-        if (beholdt.length === 0) onKurvByttet?.(null);
+    const velgManuelle = (valgteIdenter: string[]) => {
+        const beholdt = valgteBarn.filter((b) => !b.manuellLagtTil || valgteIdenter.includes(b.ident));
+        const gjenvalgt = manuelleBarn
+            .filter((b) => valgteIdenter.includes(b.ident) && !beholdt.some((v) => v.ident === b.ident))
+            .map((b) => ({ ...b, reellMottakerType: "ingen" as const, reellMottaker: "", reellMottakerNavn: "" }));
+        const nyeValg = [...beholdt, ...gjenvalgt];
+        form.setValue("valgteBarn", nyeValg);
+        if (nyeValg.length === 0) onKurvByttet?.(null);
     };
 
     const gruppe = {
         form,
         valgteBarn,
         reellMottakerRegel,
-        låsteIdenter,
     };
 
     return (
@@ -87,16 +81,17 @@ export default function BarnkurvListe({
                 );
             })}
             {manuelleBarn.length > 0 && (
-                <BarnGruppe
-                    {...gruppe}
-                    tittel="Lagt til manuelt"
-                    legend="Barn lagt til manuelt"
-                    barn={manuelleBarn}
-                    onChange={velgBortManuelle}
-                />
+                <BarnGruppe {...gruppe} legend="Barn lagt til manuelt" barn={manuelleBarn} onChange={velgManuelle} />
             )}
         </VStack>
     );
+}
+
+function useManuelleBarn(valgteBarn: BarnMedAlder[]) {
+    const [lagtTil, setLagtTil] = useState<BarnMedAlder[]>([]);
+    const nye = valgteBarn.filter((b) => b.manuellLagtTil && !lagtTil.some((l) => l.ident === b.ident));
+    if (nye.length > 0) setLagtTil([...lagtTil, ...nye]);
+    return [...lagtTil, ...nye];
 }
 
 function BarnGruppe({
@@ -107,30 +102,29 @@ function BarnGruppe({
     form,
     valgteBarn,
     reellMottakerRegel,
-    låsteIdenter,
 }: {
-    tittel: ReactNode;
+    tittel?: ReactNode;
     legend: string;
     barn: BarnMedAlder[];
     onChange: (valgteIdenter: string[]) => void;
     form: Props["form"];
     valgteBarn: BarnMedAlder[];
     reellMottakerRegel: ReellMottakerRegel;
-    låsteIdenter: string[];
 }) {
     const valgteIdenter = barn.filter((b) => valgteBarn.some((v) => v.ident === b.ident)).map((b) => b.ident);
 
     return (
         <Box padding="space-16" borderRadius="8">
-            <HStack asChild gap="space-4" paddingInline="space-8" marginBlock="space-0 space-8">
-                <BodyShort size="small" weight="semibold" textColor="subtle">
-                    {tittel}
-                </BodyShort>
-            </HStack>
+            {tittel && (
+                <HStack asChild gap="space-4" paddingInline="space-8" marginBlock="space-0 space-8">
+                    <BodyShort size="small" weight="semibold" textColor="subtle">
+                        {tittel}
+                    </BodyShort>
+                </HStack>
+            )}
             <CheckboxGroup legend={legend} hideLegend value={valgteIdenter} onChange={onChange} size="small">
                 <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-16" align="start">
                     {barn.map((b) => {
-                        const låst = låsteIdenter.includes(b.ident);
                         return (
                             <KortRamme key={b.ident}>
                                 <VStack gap="space-16">
@@ -139,7 +133,7 @@ function BarnGruppe({
                                         justify="space-between"
                                         gap="space-8"
                                         wrap={false}
-                                        className={låst ? undefined : "cursor-pointer"}
+                                        className="cursor-pointer"
                                         onClick={(event) =>
                                             event.currentTarget
                                                 .querySelector<HTMLInputElement>('input[type="checkbox"]')
@@ -155,7 +149,6 @@ function BarnGruppe({
                                         <Checkbox
                                             value={b.ident}
                                             hideLabel
-                                            readOnly={låst}
                                             aria-label={`Velg ${b.navn ?? b.ident}`}
                                             onClick={(event) => event.stopPropagation()}
                                         >

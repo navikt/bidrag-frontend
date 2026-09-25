@@ -1,9 +1,9 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
-import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
+import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 
-import ParterSeksjon from "../../felles/ParterSeksjon";
+import ParterSeksjon, { type ForelderKortProps } from "../../felles/ParterSeksjon";
 import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import {
@@ -16,108 +16,115 @@ import {
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import { hentMotsattRolle } from "../../utils";
 
-const ingenHandling = { onVelg: () => undefined, onUkjent: () => undefined, onEndre: () => undefined };
+type Part = { ident: string; navn: string; diskresjonskode?: Diskresjonskode };
 
 export default function EktefellebidragFlyt() {
     const { partISaken } = useSaksrolleroversikt();
     if (!partISaken) return null;
-    return <EktefellebidragMedForslag partISaken={partISaken} />;
+    return <EktefellebidragSkjema partISaken={partISaken} />;
 }
 
-function EktefellebidragMedForslag({ partISaken }: { partISaken: PartISaken }) {
-    const { data } = useHentPersonMotpartBarnRelasjonSuspense({ ident: partISaken.ident });
-    const unikeMotparter = new Map<string, PersonDto>();
+function useMotparterTil(ident: string) {
+    const { data } = useHentPersonMotpartBarnRelasjon(ident ? { ident } : null);
+    const unike = new Map<string, PersonDto>();
     for (const { motpart } of data?.personensMotpartBarnRelasjon ?? []) {
-        if (motpart && !unikeMotparter.has(motpart.ident)) unikeMotparter.set(motpart.ident, motpart);
+        if (motpart && !unike.has(motpart.ident)) unike.set(motpart.ident, motpart);
     }
-    return <EktefellebidragSkjema partISaken={partISaken} forslagMotpart={[...unikeMotparter.values()]} />;
+    return [...unike.values()];
 }
 
-function EktefellebidragSkjema({
-    partISaken,
-    forslagMotpart,
-}: {
-    partISaken: PartISaken;
-    forslagMotpart: PersonDto[];
-}) {
+function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }) {
     const { sakskategori } = useSaksrolleroversikt();
-    const motsattRolle = hentMotsattRolle(partISaken.rolle as ForelderPartRolle);
+    const startrolle = start.rolle as ForelderPartRolle;
+    const motsattRolle = hentMotsattRolle(startrolle);
 
     const form = useForm<EktefellebidragSkjemaData>({
         resolver: zodResolver(EktefellebidragSkjemaSchema),
         defaultValues: {
             arbeidsfordeling: "EFS",
-            partISaken: partISaken,
-            motpart: {
-                ident: "",
-                navn: "",
-                rolle: motsattRolle,
-                erKjent: true,
-            },
+            partISaken: { ...start, erKjent: true },
+            motpart: { ident: "", navn: "", rolle: motsattRolle, erKjent: true },
             kategori: sakskategori,
         },
         mode: "onChange",
     });
 
+    const partISaken = form.watch("partISaken");
     const motpart = form.watch("motpart");
-    const settMotpart = (ident: string, navn: string, diskresjonskode: string | undefined) =>
+    const forslagTilMotpart = useMotparterTil(partISaken.ident);
+    const forslagTilPartISaken = useMotparterTil(motpart.ident);
+
+    const settPartISaken = ({ ident, navn, diskresjonskode }: Part) =>
+        form.setValue(
+            "partISaken",
+            { ident, navn, rolle: startrolle, erKjent: true, diskresjonskode },
+            { shouldDirty: true, shouldValidate: true },
+        );
+    const settMotpart = ({ ident, navn, diskresjonskode }: Part) =>
         form.setValue(
             "motpart",
-            { ident, navn, rolle: motsattRolle, erKjent: true, diskresjonskode: diskresjonskode as Diskresjonskode },
+            { ident, navn, rolle: motsattRolle, erKjent: true, diskresjonskode },
             { shouldDirty: true, shouldValidate: true },
         );
 
+    const parter: Record<ForelderPartRolle, Part> =
+        startrolle === "bidragspliktig"
+            ? { bidragspliktig: partISaken, bidragsmottaker: motpart }
+            : { bidragspliktig: motpart, bidragsmottaker: partISaken };
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
-        partISaken: { ...partISaken, erKjent: true },
-        motpart,
-        valgteBarn: [],
+        bidragspliktig: { ...parter.bidragspliktig, erKjent: true },
+        bidragsmottaker: { ...parter.bidragsmottaker, erKjent: true },
         arbeidsfordeling: "EFS",
         erEktefellebidrag: true,
-        eksisterendeSakPartISaken: {
-            ident: partISaken.ident,
-            rolle: partISaken.rolle,
-            navn: partISaken.navn,
-            erKjent: true,
-        },
-        eksisterendeSakMotpart: {
-            ident: motpart.ident,
-            rolle: motpart.rolle,
-            erKjent: motpart.erKjent,
-            navn: motpart.navn,
-        },
+    });
+
+    const kort = (
+        rolle: ForelderPartRolle,
+        part: Part,
+        forslag: PersonDto[],
+        sett: (part: Part) => void,
+        feil?: string,
+    ): ForelderKortProps => ({
+        rolle,
+        part: { ...part, erKjent: part.ident ? true : undefined },
+        forslag: forslag.filter((person) => person.ident !== part.ident),
+        kanSettesUkjent: false,
+        feil,
+        onVelg: (person) =>
+            sett({
+                ident: person.ident,
+                navn: person.visningsnavn,
+                diskresjonskode: person.diskresjonskode as Diskresjonskode,
+            }),
+        onUkjent: () => undefined,
+        onEndre: () => sett({ ident: "", navn: "" }),
     });
 
     return (
         <FormProvider {...form}>
             <RolleFlytSide
                 onSubmit={onSubmit}
-                status={{
-                    ...sakStatus,
-                    partISakenNavn: partISaken.navn,
-                    motpartNavn: motpart.navn,
-                }}
+                status={{ ...sakStatus, partISakenNavn: partISaken.navn, motpartNavn: motpart.navn }}
                 innsending={innsending}
             >
                 <ParterSeksjon
                     beskrivelse="Velg ektefelle eller partner og kontroller rollene i saken."
                     kort={[
-                        {
-                            rolle: partISaken.rolle as ForelderPartRolle,
-                            part: { ...partISaken, erKjent: true },
-                            låst: true,
-                            ...ingenHandling,
-                        },
-                        {
-                            rolle: motsattRolle,
-                            part: motpart.ident ? motpart : { ...motpart, erKjent: undefined },
-                            forslag: forslagMotpart.filter((person) => person.ident !== motpart.ident),
-                            kanSettesUkjent: false,
-                            feil: form.formState.errors.motpart?.ident?.message,
-                            onVelg: (person) => settMotpart(person.ident, person.visningsnavn, person.diskresjonskode),
-                            onUkjent: () => undefined,
-                            onEndre: () => settMotpart("", "", undefined),
-                        },
+                        kort(
+                            startrolle,
+                            partISaken,
+                            forslagTilPartISaken,
+                            settPartISaken,
+                            form.formState.errors.partISaken?.ident?.message,
+                        ),
+                        kort(
+                            motsattRolle,
+                            motpart,
+                            forslagTilMotpart,
+                            settMotpart,
+                            form.formState.errors.motpart?.ident?.message,
+                        ),
                     ]}
                 />
             </RolleFlytSide>

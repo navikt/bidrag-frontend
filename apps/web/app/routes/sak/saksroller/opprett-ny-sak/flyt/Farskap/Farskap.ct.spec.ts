@@ -21,3 +21,17 @@ test("krever barn, bruker arbeidsfordeling FRS og oppretter farskapssak", async 
     expect(requests.create).toMatchObject({ arbeidsfordeling: "FRS" });
     expect((requests.create?.roller as { type: string }[]).map((r) => r.type)).toContain("BA");
 });
+
+test("parten det ble startet fra kan endres", async ({ mount, page }) => {
+    await mockWizardApi(page);
+    const component = await mount(STORY);
+    const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
+
+    await bmKort.getByRole("button", { name: "Endre bidragsmottaker" }).click();
+    await expect(bmKort.getByText("Ikke valgt")).toBeVisible();
+    await expect(bmKort.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
+
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+    await expect(component.getByText("Du må registrere bidragsmottaker")).toBeVisible();
+    await expectNoAxeViolations(page, component);
+});

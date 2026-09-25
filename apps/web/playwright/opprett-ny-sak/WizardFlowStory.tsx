@@ -37,7 +37,7 @@ const flytkomponenter: Record<Sakstype, () => ReactNode> = {
 
 function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
     const queryClient = useQueryClient();
-    const { velgSakstype, velgPerson } = useSaksrolleroversikt();
+    const { velgSakstype, bekreftStart } = useSaksrolleroversikt();
     const Flyt = flytkomponenter[scenario.sakstype];
 
     useEffect(() => {
@@ -45,8 +45,8 @@ function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
             personensMotpartBarnRelasjon: scenario.relasjoner,
         });
         velgSakstype(scenario.sakstype);
-        velgPerson(scenario.person as PersonDto, scenario.rolle);
-    }, [queryClient, scenario, velgSakstype, velgPerson]);
+        bekreftStart(scenario.person as PersonDto, scenario.rolle);
+    }, [queryClient, scenario, velgSakstype, bekreftStart]);
 
     return (
         <Suspense>

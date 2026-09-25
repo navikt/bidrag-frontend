@@ -35,3 +35,14 @@ test("fjerner opprettelsesfeil når partene endres", async ({ mount, page }) => 
     await component.getByRole("button", { name: "Endre bidragsmottaker" }).click();
     await expect(component.getByText("Kunne ikke opprette sak")).toHaveCount(0);
 });
+
+test("bidragspliktig det ble startet fra kan endres", async ({ mount, page }) => {
+    await mockWizardApi(page);
+    const component = await mount(STORY);
+    const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
+
+    await bpKort.getByRole("button", { name: "Endre bidragspliktig" }).click();
+    await expect(bpKort.getByText("Ikke valgt")).toBeVisible();
+    await expect(bpKort.getByRole("searchbox", { name: "Søk etter bidragspliktig" })).toBeVisible();
+    await expectNoAxeViolations(page, component);
+});

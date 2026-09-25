@@ -9,7 +9,6 @@ import SkjemaSeksjon from "./SkjemaSeksjon";
 export type ForelderKortProps = {
     rolle: ForelderPartRolle;
     part: ForelderPart;
-    låst?: boolean;
     forslag?: PersonDto[];
     kanSettesUkjent?: boolean;
     feil?: string;
@@ -19,12 +18,19 @@ export type ForelderKortProps = {
 };
 
 /**
- * Felles partsseksjon: alltid ett kort for bidragspliktig og ett for bidragsmottaker,
- * uansett hvem saken ble startet fra. Kortet til den oppsøkte personen er låst.
+ * Felles partsseksjon med ett redigerbart kort per part, uansett hvem saken ble startet fra.
  */
-export default function ParterSeksjon({ kort, beskrivelse }: { kort: ForelderKortProps[]; beskrivelse?: string }) {
+export default function ParterSeksjon({
+    kort,
+    tittel = "Kontroller bidragspliktig og bidragsmottaker",
+    beskrivelse,
+}: {
+    kort: ForelderKortProps[];
+    tittel?: string;
+    beskrivelse?: string;
+}) {
     return (
-        <SkjemaSeksjon tittel="Kontroller bidragspliktig og bidragsmottaker" beskrivelse={beskrivelse}>
+        <SkjemaSeksjon tittel={tittel} beskrivelse={beskrivelse}>
             <HGrid columns={{ xs: 1, md: 2 }} gap="space-16" align="start">
                 {kort.map((props) => (
                     <ForelderKort key={props.rolle} {...props} />
@@ -35,11 +41,13 @@ export default function ParterSeksjon({ kort, beskrivelse }: { kort: ForelderKor
 }
 
 function ForelderKort(props: ForelderKortProps) {
-    const { rolle, part, låst = false } = props;
+    const { rolle, part } = props;
 
     return (
         <VStack role="group" aria-label={hentForelderRolleLabel(rolle)}>
-            <RollePersonKort person={{ ...part, rolle }}>{!låst && <Handlinger {...props} />}</RollePersonKort>
+            <RollePersonKort person={{ ...part, rolle }}>
+                <Handlinger {...props} />
+            </RollePersonKort>
         </VStack>
     );
 }

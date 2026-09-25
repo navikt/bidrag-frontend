@@ -1,48 +1,34 @@
-import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
 import { type PartRolle, PartRolleSchema } from "./opprett-sak-schema";
 import { filtrerSaksroller, type SaksrolleAlternativ } from "./saksrolle-regler";
-import { useSaksrolleroversikt } from "./saksrolleroversiktContext";
+import type { Sakstype } from "./saksrolleroversiktContext";
 
 type Props = {
-    partISaken: PersonDto;
-    enforcedRolle: PartRolle | null;
+    navn: string;
+    alder: number | null;
+    sakstype: Sakstype;
+    rolle: PartRolle | null;
+    readOnly: boolean;
+    onVelg: (rolle: PartRolle) => void;
 };
 
-export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
-    const {
-        velgRolle,
-        partISakenAlder,
-        partISaken: partISakenSkjemaData,
-        sakstype,
-        isLoadingOpprettSak,
-    } = useSaksrolleroversikt();
+export default function SaksrolleVelger({ navn, alder, sakstype, rolle, readOnly, onVelg }: Props) {
+    const alternativer = filtrerSaksroller(sakstype, alder, skjemaPartRoller);
 
-    const valgtRolle = partISakenSkjemaData?.rolle ?? null;
-    const alternativer = filtrerSaksroller(sakstype, partISakenAlder, skjemaPartRoller);
-
-    const velgSaksrolle = (valgteRolle: string) => {
-        if (isLoadingOpprettSak) return;
-        const result = PartRolleSchema.safeParse(valgteRolle);
-
-        if (!result.success || !alternativer.some((valg) => valg.value === result.data)) {
-            return;
+    const velgSaksrolle = (verdi: string) => {
+        const result = PartRolleSchema.safeParse(verdi);
+        if (result.success && alternativer.some((valg) => valg.value === result.data)) {
+            onVelg(result.data);
         }
-
-        if (partISakenSkjemaData?.rolle === result.data) {
-            return;
-        }
-
-        velgRolle(result.data);
     };
 
     return (
         <RadioGroup
-            legend={`Hvilken rolle har ${partISaken.visningsnavn}?`}
-            value={valgtRolle ?? undefined}
+            legend={`Hvilken rolle har ${navn}?`}
+            value={rolle ?? null}
             onChange={velgSaksrolle}
             size="small"
-            readOnly={!!enforcedRolle || isLoadingOpprettSak}
+            readOnly={readOnly}
         >
             <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }} wrap={false}>
                 {alternativer.map((alternativ) => (

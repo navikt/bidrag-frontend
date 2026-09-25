@@ -17,37 +17,25 @@ const barn = { ident: "44444444444", navn: "Barn" };
 
 describe("utledForelderforslag", () => {
     it("start fra barn: begge registrerte foreldre er forslag", () => {
-        expect(utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor] }], valgteIdenter: [] })).toEqual({
-            forslag: [far, mor],
-            feil: undefined,
-        });
-    });
-
-    it("utelater låst forelder og foreldre som allerede er valgt", () => {
-        const { forslag } = utledForelderforslag({
-            foreldreTilBarn: [{ barn, foreldre: [far, mor] }],
-            låstForelder: { ident: far.ident, navn: "Far" },
-            valgteIdenter: [],
-        });
-        expect(forslag).toEqual([mor]);
-        expect(
-            utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor] }], valgteIdenter: [far.ident] })
-                .forslag,
-        ).toEqual([mor]);
+        expect(utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor] }], valgteForeldre: [] })).toEqual(
+            {
+                forslag: [far, mor],
+                feil: undefined,
+            },
+        );
     });
 
     it("feil ved mer enn to foreldre", () => {
         expect(
-            utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor, annen] }], valgteIdenter: [] }).feil,
+            utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor, annen] }], valgteForeldre: [] }).feil,
         ).toMatch(/flere enn 2 registrerte foreldre/);
     });
 
-    it("advarer når barnet har to andre foreldre enn låst forelder", () => {
+    it("advarer når barnet har to andre foreldre enn en valgt forelder", () => {
         expect(
             utledForelderforslag({
                 foreldreTilBarn: [{ barn, foreldre: [mor, annen] }],
-                låstForelder: { ident: far.ident, navn: "Far" },
-                valgteIdenter: [],
+                valgteForeldre: [{ ident: far.ident, navn: "Far" }],
             }).feil,
         ).toMatch(/Er du sikker på at dette er riktig barn/);
     });
@@ -96,47 +84,35 @@ describe("parterEtterValg", () => {
     });
 
     it("fyller ut det andre kortet når ett forslag gjenstår", () => {
-        const nye = parterEtterValg(
-            { bidragspliktig: ikkeValgt, bidragsmottaker: ikkeValgt },
-            "bidragspliktig",
+        const nye = parterEtterValg({ bidragspliktig: ikkeValgt, bidragsmottaker: ikkeValgt }, "bidragspliktig", far, [
             far,
-            [far, mor],
-            null,
-        );
+            mor,
+        ]);
         expect(nye).toEqual({ bidragspliktig: part(far), bidragsmottaker: part(mor) });
     });
 
     it("bytter roller når personen står i det andre kortet", () => {
-        const nye = parterEtterValg(
-            { bidragspliktig: part(far), bidragsmottaker: part(mor) },
-            "bidragspliktig",
+        const nye = parterEtterValg({ bidragspliktig: part(far), bidragsmottaker: part(mor) }, "bidragspliktig", mor, [
+            far,
             mor,
-            [far, mor],
-            null,
-        );
+        ]);
         expect(nye).toEqual({ bidragspliktig: part(mor), bidragsmottaker: part(far) });
     });
 
-    it("🔴 endrer aldri et låst kort", () => {
-        const nye = parterEtterValg(
-            { bidragspliktig: part(far), bidragsmottaker: ikkeValgt },
-            "bidragsmottaker",
+    it("endrer ikke et utfylt kort", () => {
+        const nye = parterEtterValg({ bidragspliktig: part(far), bidragsmottaker: ikkeValgt }, "bidragsmottaker", mor, [
             mor,
-            [mor, annen],
-            "bidragspliktig",
-        );
+            annen,
+        ]);
         expect(nye.bidragspliktig).toEqual(part(far));
     });
 
     it("beholder et ukjent kort", () => {
         const ukjent = { ...ikkeValgt, erKjent: false };
-        const nye = parterEtterValg(
-            { bidragspliktig: ikkeValgt, bidragsmottaker: ukjent },
-            "bidragspliktig",
+        const nye = parterEtterValg({ bidragspliktig: ikkeValgt, bidragsmottaker: ukjent }, "bidragspliktig", far, [
             far,
-            [far, mor],
-            null,
-        );
+            mor,
+        ]);
         expect(nye.bidragsmottaker).toEqual(ukjent);
     });
 });

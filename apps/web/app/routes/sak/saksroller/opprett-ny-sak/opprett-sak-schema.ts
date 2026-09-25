@@ -48,43 +48,29 @@ const MotpartSchema = z.object({
 const ForelderPartSchema = MotpartSchema.omit({ rolle: true });
 
 /**
- * Samme skjema uansett om saken startes fra en forelder eller fra barnet.
- * 🔴 Den oppsøkte personen er låst i sin rolle (`låstRolle` + `søktIdent`) og kan ikke flyttes.
+ * Samme skjema uansett om saken startes fra en forelder eller fra barnet. Alle parter kan endres.
  * `erKjent` på BP og BM: `undefined` er ikke avklart, `false` er registrert som ukjent.
+ * 🔴 `tillatUtenBarn`: saken kan opprettes uten barn når den ble startet fra bidragsmottaker.
  */
 export const BarnebidragSkjemaSchema = z
     .object({
-        låstRolle: PartRolleSchema,
-        søktIdent: z.string(),
+        tillatUtenBarn: z.boolean(),
         bidragspliktig: ForelderPartSchema,
         bidragsmottaker: ForelderPartSchema,
         valgteBarn: z.array(BarnMedAlderSchema),
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
     .superRefine((data, ctx) => {
-        validerLåstPart(data, ctx);
         validerForeldre(data, ctx);
         validerBarnebidragBarn(data, ctx);
     });
 
 type BarnebidragSkjemaInput = {
-    låstRolle: PartRolle;
-    søktIdent: string;
+    tillatUtenBarn: boolean;
     bidragspliktig: ForelderPart;
     bidragsmottaker: ForelderPart;
     valgteBarn: BarnMedAlder[];
 };
-
-function validerLåstPart(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    const { låstRolle, søktIdent } = data;
-    const plassert =
-        låstRolle === "bidragspliktig" || låstRolle === "bidragsmottaker"
-            ? data[låstRolle].ident === søktIdent
-            : data.valgteBarn.some((barn) => barn.ident === søktIdent);
-    if (!plassert) {
-        ctx.addIssue({ code: "custom", path: ["søktIdent"], message: "Personen du søkte opp må beholde sin rolle" });
-    }
-}
 
 function validerForeldre(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
     for (const felt of ["bidragspliktig", "bidragsmottaker"] as const) {
@@ -104,7 +90,7 @@ function validerForeldre(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
 }
 
 function validerBarnebidragBarn(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    if (data.låstRolle !== "bidragsmottaker" && data.valgteBarn.length === 0) {
+    if (!data.tillatUtenBarn && data.valgteBarn.length === 0) {
         ctx.addIssue({ code: "custom", path: ["valgteBarn"], message: "Du må velge minst ett barn." });
     }
     const bidragsmottakerErUkjent = data.bidragsmottaker.erKjent === false;
@@ -164,15 +150,17 @@ export const EktefellebidragSkjemaSchema = z
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
     .superRefine((data, ctx) => {
+        validerPartISaken(data.partISaken, ctx);
         validateUlikeParter(data.partISaken, data.motpart, ctx);
     });
 
 export type EktefellebidragSkjemaData = z.infer<typeof EktefellebidragSkjemaSchema>;
 const validateParterOgBarn = (
-    data: { partISaken: { ident: string }; motpart: { ident?: string }; valgteBarn: unknown[] },
+    data: { partISaken: { ident: string; rolle: string }; motpart: { ident?: string }; valgteBarn: unknown[] },
     kreverBarn: boolean,
     ctx: z.RefinementCtx,
 ) => {
+    validerPartISaken(data.partISaken, ctx);
     validateUlikeParter(data.partISaken, data.motpart, ctx);
     if (kreverBarn && data.valgteBarn.length === 0) {
         ctx.addIssue({
@@ -182,6 +170,16 @@ const validateParterOgBarn = (
         });
     }
 };
+
+function validerPartISaken(partISaken: { ident: string; rolle: string }, ctx: z.RefinementCtx) {
+    if (!partISaken.ident.trim()) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["partISaken", "ident"],
+            message: `Du må registrere ${partISaken.rolle}`,
+        });
+    }
+}
 
 const validateUlikeParter = (
     partISaken: { ident: string },

@@ -8,8 +8,7 @@ const barn = { ident: barnIdent, navn: "Barn", alder: 8, erMyndig: false };
 const kjent = (ident: string) => ({ ident, navn: ident, erKjent: true });
 
 const gyldig: BarnebidragSkjemaData = {
-    låstRolle: "bidragspliktig",
-    søktIdent: bp,
+    tillatUtenBarn: false,
     bidragspliktig: kjent(bp),
     bidragsmottaker: kjent(bm),
     valgteBarn: [barn],
@@ -47,17 +46,8 @@ describe("BarnebidragSkjemaSchema", () => {
         ).toEqual([]);
     });
 
-    it("🔴 avviser at den oppsøkte personen flyttes til en annen rolle", () => {
-        expect(feilFor({ bidragspliktig: kjent(bm), bidragsmottaker: kjent(bp) })).toEqual(
-            expect.arrayContaining([expect.objectContaining({ path: ["søktIdent"] })]),
-        );
-        expect(
-            feilFor({
-                låstRolle: "barn_under_18",
-                søktIdent: barnIdent,
-                valgteBarn: [{ ...barn, ident: "44444444444" }],
-            }),
-        ).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["søktIdent"] })]));
+    it("lar partene bytte roller", () => {
+        expect(feilFor({ bidragspliktig: kjent(bm), bidragsmottaker: kjent(bp) })).toEqual([]);
     });
 
     it("krever RM når BM er ukjent", () => {
@@ -70,11 +60,23 @@ describe("BarnebidragSkjemaSchema", () => {
         expect(feilFor({ valgteBarn: [] })).toEqual(
             expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn"] })]),
         );
-        expect(feilFor({ låstRolle: "bidragsmottaker", søktIdent: bm, valgteBarn: [] })).toEqual([]);
+        expect(feilFor({ tillatUtenBarn: true, valgteBarn: [] })).toEqual([]);
     });
 });
 
 describe("EktefellebidragSkjemaSchema", () => {
+    it("krever parten i saken", () => {
+        const resultat = EktefellebidragSkjemaSchema.safeParse({
+            arbeidsfordeling: "EFS",
+            partISaken: { ident: "", navn: "", rolle: "bidragspliktig", erKjent: true },
+            motpart: { ident: bm, navn: "Andre", rolle: "bidragsmottaker", erKjent: true },
+            kategori: "Nasjonal",
+        });
+        expect(resultat.error?.issues[0]).toEqual(
+            expect.objectContaining({ path: ["partISaken", "ident"], message: "Du må registrere bidragspliktig" }),
+        );
+    });
+
     it("avviser samme person som begge parter", () => {
         const resultat = EktefellebidragSkjemaSchema.safeParse({
             arbeidsfordeling: "EFS",

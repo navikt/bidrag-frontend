@@ -51,18 +51,18 @@ export type OpprettSakFlytValg = {
 };
 
 type SaksrolleroversiktContext = OpprettSakFlytValg & {
-    valgtPerson: PersonDto | null;
-    /** Øker ved hvert nytt valg, slik at underflyten monteres på nytt med tomt skjema. */
+    /** Personen saken ble startet fra. Brukes bare som utgangspunkt for skjemaet. */
+    startperson: PersonDto | null;
+    /** Øker ved hver bekreftelse, slik at underflyten monteres på nytt med tomt skjema. */
     valgVersjon: number;
     partISaken: PartISaken | null;
     partISakenAlder: number | null;
     isLoadingOpprettSak: boolean;
     sakstype: Sakstype | null;
     sakskategori: Sakskategori;
-    velgPerson: (person: PersonDto, rolle?: PartRolle | null) => void;
+    bekreftStart: (person: PersonDto, rolle: PartRolle) => void;
     velgSakstype: (type: Sakstype) => void;
     velgKategori: (kategori: Sakskategori) => void;
-    velgRolle: (rolle: PartRolle) => void;
 };
 
 const SaksrolleroversiktContext = createContext<SaksrolleroversiktContext>({} as SaksrolleroversiktContext);
@@ -74,7 +74,7 @@ function SaksrolleroversiktProvider({
     onAvbryt,
 }: PropsWithChildren<OpprettSakFlytValg>) {
     const [valgVersjon, setValgVersjon] = useState(0);
-    const [valgtPerson, setValgtPerson] = useState<PersonDto | null>(null);
+    const [startperson, setStartperson] = useState<PersonDto | null>(null);
     const [rolle, setRolle] = useState<PartRolle | null>(null);
     const isLoadingOpprettSak = useIsMutating({ mutationKey: OPPRETT_SAK_MUTATION_KEY }) > 0;
     const [sakstype, setSakstype] = useState<Sakstype | null>("BARNEBIDRAG");
@@ -82,17 +82,14 @@ function SaksrolleroversiktProvider({
 
     const nyttValg = useCallback((person: PersonDto | null, nyRolle: PartRolle | null) => {
         setValgVersjon((forrige) => forrige + 1);
-        setValgtPerson(person);
+        setStartperson(person);
         setRolle(nyRolle);
     }, []);
 
-    const velgPerson = useCallback(
-        (person: PersonDto, ønsketRolle: PartRolle | null = null) =>
-            nyttValg(person, tvungenRolle(sakstype) ?? ønsketRolle),
+    const bekreftStart = useCallback(
+        (person: PersonDto, valgtRolle: PartRolle) => nyttValg(person, tvungenRolle(sakstype) ?? valgtRolle),
         [nyttValg, sakstype],
     );
-
-    const velgRolle = useCallback((nyRolle: PartRolle) => nyttValg(valgtPerson, nyRolle), [nyttValg, valgtPerson]);
 
     const velgSakstype = useCallback(
         (type: Sakstype) => {
@@ -112,24 +109,23 @@ function SaksrolleroversiktProvider({
     );
 
     const partISaken = useMemo(
-        () => (valgtPerson && rolle ? tilPartISaken(valgtPerson, rolle) : null),
-        [valgtPerson, rolle],
+        () => (startperson && rolle ? tilPartISaken(startperson, rolle) : null),
+        [startperson, rolle],
     );
 
     return (
         <SaksrolleroversiktContext
             value={{
-                valgtPerson,
+                startperson,
                 valgVersjon,
                 partISaken,
-                partISakenAlder: valgtPerson ? beregnAlderForPerson(valgtPerson) : null,
+                partISakenAlder: startperson ? beregnAlderForPerson(startperson) : null,
                 isLoadingOpprettSak,
                 sakstype,
                 sakskategori,
-                velgPerson,
+                bekreftStart,
                 velgSakstype,
                 velgKategori,
-                velgRolle,
                 inngang,
                 onOpprettet,
                 onAvbryt,

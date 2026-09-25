@@ -1,4 +1,3 @@
-import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -16,7 +15,7 @@ import {
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
 import BarnSection from "../../sections/BarnSection";
 import UfullstendigRelasjonAlert from "../../UfullstendigRelasjonAlert";
-import { harMotpartMedUlikeForelderroller, utledBarnkurverForForelder } from "./barnebidrag-forslag";
+import { harMotpartMedUlikeForelderroller } from "./barnebidrag-forslag";
 import { useBarnebidragFlyt } from "./useBarnebidragFlyt";
 
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined };
@@ -36,8 +35,7 @@ function lagStartverdier(
     const erBarn = erBarnRolle(partISaken);
 
     return {
-        låstRolle: partISaken.rolle,
-        søktIdent: partISaken.ident,
+        tillatUtenBarn: partISaken.rolle === "bidragsmottaker",
         bidragspliktig: partISaken.rolle === "bidragspliktig" ? søkt : IKKE_VALGT,
         bidragsmottaker: partISaken.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT,
         valgteBarn: erBarn
@@ -67,7 +65,7 @@ export default function BarnebidragFlyt() {
     const { partISaken } = useSaksrolleroversikt();
 
     if (!partISaken) return null;
-    if (erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} barnkurver={[]} />;
+    if (erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} />;
     return <BarnebidragForForelder partISaken={partISaken} />;
 }
 
@@ -88,17 +86,17 @@ function BarnebidragForForelder({ partISaken }: { partISaken: PartISaken }) {
         );
     }
 
-    return <BarnebidragSkjema partISaken={partISaken} barnkurver={utledBarnkurverForForelder(relasjoner)} />;
+    return <BarnebidragSkjema partISaken={partISaken} />;
 }
 
-function BarnebidragSkjema({ partISaken, barnkurver }: { partISaken: PartISaken; barnkurver: MotpartBarnRelasjon[] }) {
-    const { partISakenAlder, valgtPerson, sakskategori } = useSaksrolleroversikt();
+function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
+    const { partISakenAlder, startperson, sakskategori } = useSaksrolleroversikt();
     const form = useForm<BarnebidragSkjemaData>({
         resolver: zodResolver(BarnebidragSkjemaSchema),
         defaultValues: lagStartverdier(
             partISaken,
             partISakenAlder,
-            valgtPerson?.fødselsdato ?? undefined,
+            startperson?.fødselsdato ?? undefined,
             sakskategori,
         ),
         mode: "onChange",
@@ -106,24 +104,14 @@ function BarnebidragSkjema({ partISaken, barnkurver }: { partISaken: PartISaken;
 
     return (
         <FormProvider {...form}>
-            <BarnebidragFlytInnhold registrerteKurver={barnkurver} />
+            <BarnebidragFlytInnhold />
         </FormProvider>
     );
 }
 
-function BarnebidragFlytInnhold({ registrerteKurver }: { registrerteKurver: MotpartBarnRelasjon[] }) {
-    const {
-        form,
-        barnkurver,
-        onKurvByttet,
-        låsteIdenter,
-        reellMottakerRegel,
-        kort,
-        onSubmit,
-        innsending,
-        meldinger,
-        status,
-    } = useBarnebidragFlyt(registrerteKurver);
+function BarnebidragFlytInnhold() {
+    const { form, barnkurver, onKurvByttet, reellMottakerRegel, kort, onSubmit, innsending, meldinger, status } =
+        useBarnebidragFlyt();
 
     return (
         <RolleFlytSide
@@ -152,7 +140,6 @@ function BarnebidragFlytInnhold({ registrerteKurver }: { registrerteKurver: Motp
                 barnkurver={barnkurver}
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
-                låsteIdenter={låsteIdenter}
             />
             <ParterSeksjon kort={kort} />
         </RolleFlytSide>

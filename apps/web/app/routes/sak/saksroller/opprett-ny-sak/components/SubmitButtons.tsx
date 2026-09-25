@@ -86,6 +86,7 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
         }
         if (blocked) {
             event.preventDefault();
+            void form.trigger();
             setBlockedError("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over.");
             return;
         }

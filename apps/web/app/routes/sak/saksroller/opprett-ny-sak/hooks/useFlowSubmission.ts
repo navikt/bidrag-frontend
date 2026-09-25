@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
 import type { OpprettSakParter } from "../opprett-sak-request";
-import type { BarnMedAlder, Motpart, PartISaken } from "../opprett-sak-schema";
+import type { BarnMedAlder, ForelderPartRolle, Motpart } from "../opprett-sak-schema";
 import type { EnhetOgSubmitSectionProps } from "../sections/EnhetOgSubmitSection";
 import { useBestemEnhet } from "./useBestemEnhet";
 import { useEksisterendeSakSjekk } from "./useEksisterendeSakSjekk";
@@ -11,52 +11,28 @@ import { useOpprettSakHandling } from "./useOpprettSakHandling";
 
 type FormMedKategori = FieldValues & { kategori: "Nasjonal" | "Utland" };
 
-export type EksisterendeSakPart = {
-    ident: string;
-    navn: string;
-    rolle: string;
-    erKjent: boolean | undefined;
-};
-
 interface UseFlowSubmissionProps<T extends FormMedKategori> {
     form: UseFormReturn<T>;
-    partISaken: PartISaken;
     /**
-     * Motparten flyten jobber med. `erKjent` styrer duplikatsjekken:
-     * `true`/`false` er avklart (kjent motpart / bevisst ukjent motpart) og lar
-     * sjekken kjøre, mens `undefined` betyr «ikke avklart ennå» og holder den av.
-     *
-     * Flyter uten motpartsbegrep utelater feltet og oppgir i stedet partene
-     * direkte via `eksisterendeSakPartISaken`/`eksisterendeSakMotpart`.
-     *
-     * `null` er bevisst ikke tillatt: det uttrykker «ingen informasjon» og slo
-     * stilltiende av duplikatsjekken selv i flyter som visste at motparten var
-     * ukjent (jf. Farskap og Oppfostringsbidrag).
+     * `erKjent` styrer duplikatsjekken: `true`/`false` er avklart (kjent part / bevisst ukjent part)
+     * og lar sjekken kjøre, mens `undefined` betyr «ikke avklart ennå» og holder den av.
      */
-    motpart?: Motpart;
+    bidragspliktig: Motpart;
+    bidragsmottaker: Motpart;
     valgteBarn?: BarnMedAlder[];
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     erEktefellebidrag?: boolean;
-    bidragspliktig?: Motpart | null;
-    bidragsmottaker?: Motpart | null;
-    eksisterendeSakPartISaken?: EksisterendeSakPart | null;
-    eksisterendeSakMotpart?: EksisterendeSakPart | null;
 }
 
-export function lagEksisterendeSakPart(
-    person: { ident?: string; navn?: string; erKjent?: boolean },
-    rolle: string,
-): EksisterendeSakPart {
-    return {
-        ident: person.ident ?? "",
-        navn: person.navn ?? "",
-        rolle,
-        erKjent: person.erKjent,
-    };
+function tilEksisterendeSakPart(part: Motpart, rolle: ForelderPartRolle) {
+    return { ident: part.ident ?? "", navn: part.navn ?? "", rolle, erKjent: part.erKjent };
 }
 
-function partMedRolle(rolle: PartISaken["rolle"], partISaken: PartISaken, motpart?: Motpart) {
-    return (partISaken.rolle === rolle ? partISaken : motpart) ?? null;
+/** Saker slås opp på BP, eller på BM når BP ikke er kjent. */
+function eksisterendeSakParter(bidragspliktig: Motpart, bidragsmottaker: Motpart) {
+    const bp = tilEksisterendeSakPart(bidragspliktig, "bidragspliktig");
+    const bm = tilEksisterendeSakPart(bidragsmottaker, "bidragsmottaker");
+    return bp.ident ? { partISaken: bp, motpart: bm } : { partISaken: bm, motpart: bp };
 }
 
 function useTilgangUtenBm(
@@ -100,60 +76,45 @@ function useSendInn<T extends FormMedKategori>(
 }
 
 /**
- * Reusable hook for flow submission logic.
- * Handles enhet determination, existing case check, and form submission.
- * Type-safe and works with any form schema.
+ * Felles innsending for alle flyter: enhet, sjekk av eksisterende sak og tilgang, ut fra partene i skjemaet.
  *
  * 🔴 Tilgang til å opprette barnebidragssak uten BM håndheves bare her, ikke i bidrag-sak.
  * Sjekken gjelder bare EEN: oppfostring (OPS) har aldri BM, og farskap og ektefelle har alltid BM.
  */
 export function useFlowSubmission<T extends FormMedKategori>({
     form,
-    partISaken,
-    motpart,
+    bidragspliktig,
+    bidragsmottaker,
     valgteBarn = [],
     arbeidsfordeling,
     erEktefellebidrag,
-    bidragspliktig,
-    bidragsmottaker,
-    eksisterendeSakPartISaken,
-    eksisterendeSakMotpart,
 }: UseFlowSubmissionProps<T>) {
-    const resolvedBidragspliktig = bidragspliktig ?? partMedRolle("bidragspliktig", partISaken, motpart);
-    const resolvedBidragsmottaker = bidragsmottaker ?? partMedRolle("bidragsmottaker", partISaken, motpart);
-
     const {
         enhet,
         enhetNavn,
         isLoading: isLoadingEnhet,
         error: enhetError,
     } = useBestemEnhet({
-        bidragspliktig: resolvedBidragspliktig,
-        bidragsmottaker: resolvedBidragsmottaker,
+        bidragspliktig: bidragspliktig,
+        bidragsmottaker: bidragsmottaker,
         barn: valgteBarn,
         arbeidsfordeling,
         sakskategori: sakskategoriTilEnum((form as UseFormReturn<FormMedKategori>).getValues("kategori")) || undefined,
     });
 
-    const tilgangUtenBm = useTilgangUtenBm(resolvedBidragsmottaker, arbeidsfordeling);
+    const tilgangUtenBm = useTilgangUtenBm(bidragsmottaker, arbeidsfordeling);
 
-    const safePartISaken = eksisterendeSakPartISaken ?? lagEksisterendeSakPart(partISaken, partISaken.rolle);
-    const safeMotpart = eksisterendeSakMotpart ?? lagEksisterendeSakPart(motpart ?? {}, motpart?.rolle ?? "");
     const {
         harEksisterendeSak,
         eksisterendeSak,
         isLoading: isLoadingHentSak,
         infoMelding,
-    } = useEksisterendeSakSjekk({
-        partISaken: safePartISaken,
-        motpart: safeMotpart,
-        erEktefellebidrag,
-    });
+    } = useEksisterendeSakSjekk({ ...eksisterendeSakParter(bidragspliktig, bidragsmottaker), erEktefellebidrag });
 
     const opprettSak = useOpprettSakHandling({ enhet: enhet ?? "", arbeidsfordeling: arbeidsfordeling ?? "EEN" });
     const parter = {
-        bidragspliktig: resolvedBidragspliktig,
-        bidragsmottaker: resolvedBidragsmottaker,
+        bidragspliktig: bidragspliktig,
+        bidragsmottaker: bidragsmottaker,
         barn: valgteBarn,
     };
     const onSubmit = useSendInn(form, opprettSak, parter);

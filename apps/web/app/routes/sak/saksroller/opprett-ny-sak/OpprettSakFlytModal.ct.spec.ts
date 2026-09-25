@@ -27,7 +27,6 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         const dialog = await åpneModal(page, component);
 
         await expect(dialog.getByRole("heading", { name: "Opprett ny sak" })).toHaveCount(0);
-        await expect(dialog.getByRole("radio", { name: "Barn under 18 år" })).toBeChecked();
         await expect(dialog.getByRole("group", { name: "Bidragspliktig" }).getByText(bp.visningsnavn)).toBeVisible();
         await expect(dialog.getByRole("group", { name: "Bidragsmottaker" }).getByText(bm.visningsnavn)).toBeVisible();
         await expect(dialog.getByText(/Arbeidsfordelingen gir en annen enhet/)).toHaveCount(0);

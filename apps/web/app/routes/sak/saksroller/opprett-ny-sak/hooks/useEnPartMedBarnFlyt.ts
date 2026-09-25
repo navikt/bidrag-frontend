@@ -1,32 +1,41 @@
-import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
+import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 
-import type { FarskapsSkjemaSchemaData } from "../opprett-sak-schema";
+import type { FarskapsSkjemaSchemaData, ForelderPartRolle } from "../opprett-sak-schema";
 import { grupperBarnIKurver } from "../utils";
+import { useFjernBarnUtenforKurver } from "./useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "./useFlowSubmission";
+
+const UKJENT = { ident: "", navn: "", erKjent: false };
 
 /**
  * Felles oppsett for flyter der saken opprettes med én kjent part og valgte barn,
- * uten kjent motpart (farskap og oppfostringsbidrag).
+ * uten kjent motpart (farskap og oppfostringsbidrag). Barna hentes for parten som er valgt i skjemaet.
  */
 export function useEnPartMedBarnFlyt({
-    registrerteKurver,
     arbeidsfordeling,
+    rolle,
 }: {
-    registrerteKurver: MotpartBarnRelasjon[];
     arbeidsfordeling: "FRS" | "OPS";
+    rolle: ForelderPartRolle;
 }) {
     const form = useFormContext<FarskapsSkjemaSchemaData>();
-    const barnkurver = grupperBarnIKurver(registrerteKurver);
-
     const valgteBarn = form.watch("valgteBarn");
     const partISaken = form.watch("partISaken");
-    const motpart = form.watch("motpart");
 
+    const { data, isLoading, isError } = useHentPersonMotpartBarnRelasjon(
+        partISaken.ident ? { ident: partISaken.ident } : null,
+    );
+    const barnkurver = grupperBarnIKurver(partISaken.ident ? (data?.personensMotpartBarnRelasjon ?? []) : []);
+
+    useFjernBarnUtenforKurver(form, barnkurver, isLoading);
+
+    const part = { ...partISaken, erKjent: !!partISaken.ident };
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
-        partISaken: { ...partISaken, erKjent: !!partISaken.ident },
-        motpart,
+        bidragspliktig: rolle === "bidragspliktig" ? part : UKJENT,
+        bidragsmottaker: rolle === "bidragsmottaker" ? part : UKJENT,
         arbeidsfordeling,
         valgteBarn,
     });
@@ -37,6 +46,8 @@ export function useEnPartMedBarnFlyt({
         valgteBarn,
         onSubmit,
         innsending,
+        lasterKurver: isLoading,
+        kurvfeil: isError,
         status: {
             ...sakStatus,
             partISakenNavn: partISaken.navn || partISaken.ident,
