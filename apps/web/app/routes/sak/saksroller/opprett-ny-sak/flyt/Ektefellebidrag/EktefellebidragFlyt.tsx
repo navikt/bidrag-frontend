@@ -1,18 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 
+import ParterSeksjon from "../../felles/ParterSeksjon";
 import RolleFlytSide from "../../felles/RolleFlytSide";
 import { useFlowSubmission } from "../../hooks/useFlowSubmission";
 import useSyncKategori from "../../hooks/useSyncKategori";
 import {
+    type Diskresjonskode,
     type EktefellebidragSkjemaData,
     EktefellebidragSkjemaSchema,
     type ForelderPartRolle,
 } from "../../opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../saksrolleroversiktContext";
-import EnhetOgSubmitSection from "../../sections/EnhetOgSubmitSection";
 import { hentMotsattRolle } from "../../utils";
-import EktefelleParterSeksjon from "./EktefelleParterSeksjon";
+
+const ingenHandling = { onVelg: () => undefined, onUkjent: () => undefined, onEndre: () => undefined };
 
 export default function EktefellebidragFlyt() {
     const { partISaken, saksrolleFlyt, sakskategori } = useSaksrolleroversikt();
@@ -44,6 +46,12 @@ export default function EktefellebidragFlyt() {
     useSyncKategori(form);
 
     const motpart = form.watch("motpart");
+    const settMotpart = (ident: string, navn: string, diskresjonskode: string | undefined) =>
+        form.setValue(
+            "motpart",
+            { ident, navn, rolle: motsattRolle, erKjent: true, diskresjonskode: diskresjonskode as Diskresjonskode },
+            { shouldDirty: true, shouldValidate: true },
+        );
 
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
@@ -75,9 +83,29 @@ export default function EktefellebidragFlyt() {
                     partISakenNavn: partISaken.navn,
                     motpartNavn: motpart.navn,
                 }}
-                submit={<EnhetOgSubmitSection {...innsending} />}
+                innsending={innsending}
             >
-                <EktefelleParterSeksjon form={form} forslagMotpart={forslagMotpart ?? []} motsattRolle={motsattRolle} />
+                <ParterSeksjon
+                    beskrivelse="Velg ektefelle eller partner og kontroller rollene i saken."
+                    kort={[
+                        {
+                            rolle: partISaken.rolle as ForelderPartRolle,
+                            part: { ...partISaken, erKjent: true },
+                            låst: true,
+                            ...ingenHandling,
+                        },
+                        {
+                            rolle: motsattRolle,
+                            part: motpart.ident ? motpart : { ...motpart, erKjent: undefined },
+                            forslag: (forslagMotpart ?? []).filter((person) => person.ident !== motpart.ident),
+                            kanSettesUkjent: false,
+                            feil: form.formState.errors.motpart?.ident?.message,
+                            onVelg: (person) => settMotpart(person.ident, person.visningsnavn, person.diskresjonskode),
+                            onUkjent: () => undefined,
+                            onEndre: () => settMotpart("", "", undefined),
+                        },
+                    ]}
+                />
             </RolleFlytSide>
         </FormProvider>
     );

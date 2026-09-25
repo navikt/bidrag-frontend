@@ -1,127 +1,89 @@
 import { describe, expect, it } from "vitest";
-import {
-    BarnBeggForeldreSkjemaSchema,
-    BarnMedManglendeForeldreSkjemaSchema,
-    EktefellebidragSkjemaSchema,
-    ForelderMedBarnSkjemaSchema,
-} from "./opprett-sak-schema";
+import { type BarnebidragSkjemaData, BarnebidragSkjemaSchema, EktefellebidragSkjemaSchema } from "./opprett-sak-schema";
 
-const ident = "11111111111";
-const annenIdent = "22222222222";
+const bp = "11111111111";
+const bm = "22222222222";
+const barnIdent = "33333333333";
+const barn = { ident: barnIdent, navn: "Barn", alder: 8, erMyndig: false };
+const kjent = (ident: string) => ({ ident, navn: ident, erKjent: true });
 
-describe("partsvalidering", () => {
-    it("avviser samme person som part i saken og motpart", () => {
-        const resultat = ForelderMedBarnSkjemaSchema.safeParse({
-            partISaken: {
-                ident,
-                navn: "Første part",
-                rolle: "bidragsmottaker",
-                erKjent: true,
-            },
-            motpart: {
-                ident,
-                navn: "Andre part",
-                rolle: "bidragspliktig",
-                erKjent: true,
-            },
-            valgteBarn: [],
-            kategori: "Nasjonal",
-        });
+const gyldig: BarnebidragSkjemaData = {
+    låstRolle: "bidragspliktig",
+    søktIdent: bp,
+    bidragspliktig: kjent(bp),
+    bidragsmottaker: kjent(bm),
+    valgteBarn: [barn],
+    kategori: "Nasjonal",
+};
 
-        expect(resultat.success).toBe(false);
-        expect(resultat.error?.issues).toEqual(
+const feilFor = (data: Partial<BarnebidragSkjemaData>) =>
+    BarnebidragSkjemaSchema.safeParse({ ...gyldig, ...data }).error?.issues ?? [];
+
+describe("BarnebidragSkjemaSchema", () => {
+    it("godtar kjente parter og ett barn", () => {
+        expect(BarnebidragSkjemaSchema.safeParse(gyldig).success).toBe(true);
+    });
+
+    it("avviser samme person som BP og BM", () => {
+        expect(feilFor({ bidragsmottaker: kjent(bp) })).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    path: ["motpart", "ident"],
+                    path: ["bidragsmottaker", "ident"],
                     message: "Samme person kan ikke være begge parter",
                 }),
             ]),
         );
     });
 
-    it.each([
-        BarnBeggForeldreSkjemaSchema,
-        BarnMedManglendeForeldreSkjemaSchema,
-    ])("avviser samme person i begge foreldreroller", (schema) => {
-        const resultat = schema.safeParse({
-            barn: {
-                ident: annenIdent,
-                navn: "Barn",
-                rolle: "barn_under_18",
-            },
-            foreldre: [
-                {
-                    ident,
-                    navn: "Første forelder",
-                    rolle: "bidragspliktig",
-                    erKjent: true,
-                },
-                {
-                    ident,
-                    navn: "Andre forelder",
-                    rolle: "bidragsmottaker",
-                    erKjent: true,
-                },
-            ],
-            kategori: "Nasjonal",
-        });
+    it("krever at forelder er registrert eller satt som ukjent", () => {
+        expect(feilFor({ bidragsmottaker: { ident: "", navn: "" } })).toEqual(
+            expect.arrayContaining([expect.objectContaining({ path: ["bidragsmottaker", "ident"] })]),
+        );
+        expect(
+            feilFor({
+                bidragsmottaker: { ident: "", erKjent: false },
+                valgteBarn: [{ ...barn, reellMottakerType: "barnet_selv" }],
+            }),
+        ).toEqual([]);
+    });
 
-        expect(resultat.success).toBe(false);
-        expect(resultat.error?.issues).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining({
-                    path: ["foreldre", 1, "ident"],
-                    message: "Samme person kan ikke være begge parter",
-                }),
-            ]),
+    it("🔴 avviser at den oppsøkte personen flyttes til en annen rolle", () => {
+        expect(feilFor({ bidragspliktig: kjent(bm), bidragsmottaker: kjent(bp) })).toEqual(
+            expect.arrayContaining([expect.objectContaining({ path: ["søktIdent"] })]),
+        );
+        expect(
+            feilFor({
+                låstRolle: "barn_under_18",
+                søktIdent: barnIdent,
+                valgteBarn: [{ ...barn, ident: "44444444444" }],
+            }),
+        ).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["søktIdent"] })]));
+    });
+
+    it("krever RM når BM er ukjent", () => {
+        expect(feilFor({ bidragsmottaker: { ident: "", erKjent: false } })).toEqual(
+            expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn", 0, "reellMottakerType"] })]),
         );
     });
 
-    it("tillater tom ident for ukjent motpart", () => {
-        const resultat = ForelderMedBarnSkjemaSchema.safeParse({
-            partISaken: {
-                ident,
-                navn: "Kjent part",
-                rolle: "bidragsmottaker",
-                erKjent: true,
-            },
-            motpart: {
-                ident: "",
-                navn: "",
-                rolle: "bidragspliktig",
-                erKjent: false,
-            },
-            valgteBarn: [],
-            kategori: "Nasjonal",
-        });
-
-        expect(resultat.success).toBe(true);
+    it("krever barn, unntatt når saken startes fra BM", () => {
+        expect(feilFor({ valgteBarn: [] })).toEqual(
+            expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn"] })]),
+        );
+        expect(feilFor({ låstRolle: "bidragsmottaker", søktIdent: bm, valgteBarn: [] })).toEqual([]);
     });
+});
 
-    it("bruker samme regel for ektefellebidrag", () => {
+describe("EktefellebidragSkjemaSchema", () => {
+    it("avviser samme person som begge parter", () => {
         const resultat = EktefellebidragSkjemaSchema.safeParse({
             arbeidsfordeling: "EFS",
-            partISaken: {
-                ident,
-                navn: "Første part",
-                rolle: "bidragspliktig",
-                erKjent: true,
-            },
-            motpart: {
-                ident,
-                navn: "Andre part",
-                rolle: "bidragsmottaker",
-                erKjent: true,
-            },
+            partISaken: { ident: bp, navn: "Første", rolle: "bidragspliktig", erKjent: true },
+            motpart: { ident: bp, navn: "Andre", rolle: "bidragsmottaker", erKjent: true },
             kategori: "Nasjonal",
         });
-
-        expect(resultat.success).toBe(false);
         expect(resultat.error?.issues[0]).toEqual(
-            expect.objectContaining({
-                path: ["motpart", "ident"],
-                message: "Samme person kan ikke være begge parter",
-            }),
+            expect.objectContaining({ path: ["motpart", "ident"], message: "Samme person kan ikke være begge parter" }),
         );
     });
 });

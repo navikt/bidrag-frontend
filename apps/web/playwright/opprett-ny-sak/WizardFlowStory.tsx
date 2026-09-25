@@ -2,13 +2,9 @@ import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/Bid
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useEffect, useMemo } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import BarnBeggeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnBeggeForeldre/BarnBeggeForeldreFlyt";
-import BarnMedManglendeForeldreFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/BarnManglendeForeldre/BarnMedManglendeForeldreFlyt";
+import BarnebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/EktefellebidragFlyt";
-import FarskapsFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Farskap/FarskapsFlyt";
-import ForelderMedBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderMedBarn/ForelderMedBarnFlyt";
-import ForelderUtenBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/ForelderUtenBarn/ForelderUtenBarnFlyt";
-import OppfostringsbidragFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/Oppfostringsbidrag/OppfostringsbidragFlyt";
+import EnPartMedBarnFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/flyt/EnPartMedBarn/EnPartMedBarnFlyt";
 import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/OpprettSakFlyt";
 import type { PartISaken } from "../../app/routes/sak/saksroller/opprett-ny-sak/opprett-sak-schema";
 import {
@@ -19,26 +15,11 @@ import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
 type Scenario =
-    | { sakstype: "BARNEBIDRAG"; partISaken: PartISaken; flow: "FORELDER_UTEN_BARN" }
     | {
           sakstype: "BARNEBIDRAG";
           partISaken: PartISaken;
-          flow: "FORELDER_MED_BARN";
-          barnkurver: Parameters<ReturnType<typeof useSaksrolleroversikt>["setSaksrolleFlyt"]>[0] extends infer _T
-              ? import("@bidrag/api/PersonApi").MotpartBarnRelasjon[]
-              : never;
-      }
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "BARN_BEGGE_FORELDRE";
-          foreldre: import("@bidrag/api/PersonApi").PersonDto[];
-      }
-    | {
-          sakstype: "BARNEBIDRAG";
-          partISaken: PartISaken;
-          flow: "BARN_MANGLENDE_FORELDRE";
-          forelder: import("@bidrag/api/PersonApi").PersonDto | null;
+          flow: "BARNEBIDRAG";
+          barnkurver: import("@bidrag/api/PersonApi").MotpartBarnRelasjon[];
       }
     | {
           sakstype: "EKTEFELLEBIDRAG";
@@ -72,17 +53,8 @@ function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
         );
 
         switch (scenario.flow) {
-            case "FORELDER_MED_BARN":
+            case "BARNEBIDRAG":
                 setSaksrolleFlyt({ key: 1, type: scenario.flow, barnkurver: scenario.barnkurver });
-                break;
-            case "FORELDER_UTEN_BARN":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow });
-                break;
-            case "BARN_BEGGE_FORELDRE":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, foreldre: scenario.foreldre });
-                break;
-            case "BARN_MANGLENDE_FORELDRE":
-                setSaksrolleFlyt({ key: 1, type: scenario.flow, forelder: scenario.forelder });
                 break;
             case "EKTEFELLEBIDRAG":
                 setSaksrolleFlyt({ key: 1, type: scenario.flow, motpart: scenario.motpart });
@@ -95,20 +67,13 @@ function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
     }, [scenario, setPartISaken, setPartISakenAlder, setSakskategori, setSakstype, setSaksrolleFlyt]);
 
     switch (scenario.flow) {
-        case "FORELDER_MED_BARN":
-            return <ForelderMedBarnFlyt />;
-        case "FORELDER_UTEN_BARN":
-            return <ForelderUtenBarnFlyt />;
-        case "BARN_BEGGE_FORELDRE":
-            return <BarnBeggeForeldreFlyt />;
-        case "BARN_MANGLENDE_FORELDRE":
-            return <BarnMedManglendeForeldreFlyt />;
+        case "BARNEBIDRAG":
+            return <BarnebidragFlyt />;
         case "EKTEFELLEBIDRAG":
             return <EktefellebidragFlyt />;
         case "FARSKAP":
-            return <FarskapsFlyt />;
         case "OPPFOSTRINGSBIDRAG":
-            return <OppfostringsbidragFlyt />;
+            return <EnPartMedBarnFlyt />;
     }
 }
 

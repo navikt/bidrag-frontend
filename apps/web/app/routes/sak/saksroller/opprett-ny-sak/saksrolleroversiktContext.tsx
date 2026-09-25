@@ -59,10 +59,7 @@ type SaksrolleroversiktContext = {
 };
 
 type SaksrolleFlyt =
-    | { key: number; type: "FORELDER_MED_BARN"; barnkurver: MotpartBarnRelasjon[] }
-    | { key: number; type: "FORELDER_UTEN_BARN" }
-    | { key: number; type: "BARN_BEGGE_FORELDRE"; foreldre: PersonDto[] }
-    | { key: number; type: "BARN_MANGLENDE_FORELDRE"; forelder: PersonDto | null }
+    | { key: number; type: "BARNEBIDRAG"; barnkurver: MotpartBarnRelasjon[] }
     | { key: number; type: "OPPFOSTRINGSBIDRAG"; barnkurver: MotpartBarnRelasjon[] }
     | { key: number; type: "FARSKAP"; barnkurver: MotpartBarnRelasjon[] }
     | { key: number; type: "EKTEFELLEBIDRAG"; motpart: PersonDto[] | null };

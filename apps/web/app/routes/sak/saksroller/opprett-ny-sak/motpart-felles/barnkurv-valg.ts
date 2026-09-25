@@ -1,6 +1,6 @@
-import type { Barnkurv, ForelderMedBarnSkjemaData } from "../opprett-sak-schema";
+import type { Barnkurv, BarnMedAlder } from "../opprett-sak-schema";
 
-type Barn = ForelderMedBarnSkjemaData["valgteBarn"][number];
+type Barn = BarnMedAlder;
 
 export function beregnBarnkurvValg(
     barnkurver: Barnkurv[],
@@ -25,7 +25,9 @@ export function beregnBarnkurvValg(
         (barn) => !identerIPar.includes(barn.ident) || valgteIdenter.includes(barn.ident),
     );
     const nyeBarn = kurv.barn
-        .filter((barn) => valgteIdenter.includes(barn.ident) && !eksisterendeValg.some((valg) => valg.ident === barn.ident))
+        .filter(
+            (barn) => valgteIdenter.includes(barn.ident) && !eksisterendeValg.some((valg) => valg.ident === barn.ident),
+        )
         .map((barn) => ({
             ...barn,
             reellMottakerType: "ingen" as const,
@@ -38,29 +40,5 @@ export function beregnBarnkurvValg(
         kurv,
         aktivKurv,
         valgteBarn: [...forblirValgt, ...nyeBarn],
-    };
-}
-
-export function lagMotpartFraBarnkurv(
-    kurv: Barnkurv,
-    motpartRolle: ForelderMedBarnSkjemaData["motpart"]["rolle"],
-) {
-    const erMotpartUkjent = kurv.id.toLowerCase().includes("ukjent");
-    if (!erMotpartUkjent && kurv.motpart) {
-        return {
-            ident: kurv.motpart.ident,
-            navn: kurv.motpart.visningsnavn ?? kurv.id,
-            erKjent: true,
-            rolle: motpartRolle,
-            diskresjonskode: kurv.motpart.diskresjonskode,
-        };
-    }
-
-    return {
-        ident: "",
-        navn: "",
-        erKjent: false,
-        rolle: motpartRolle,
-        diskresjonskode: undefined,
     };
 }

@@ -49,21 +49,10 @@ export function useEnPartMedBarnFlyt({
         }
     }, [form, partISaken.ident, partISakenContext, rolle]);
 
-    const kjentPart = partISaken.ident
-        ? {
-              rolle,
-              ident: partISaken.ident,
-              navn: partISaken.navn,
-              erKjent: true,
-              diskresjonskode: partISaken.diskresjonskode,
-          }
-        : null;
-
     return {
         form,
         barnkurver,
         valgteBarn,
-        kjentPart,
         onSubmit,
         innsending,
         status: {

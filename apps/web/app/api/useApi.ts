@@ -582,7 +582,7 @@ export function useHentForelderBarnRelasjon(request: PersonRequest | null, enabl
     });
 }
 
-function hentForeldreinformasjonForBarnQueryOptions(request: PersonRequest | null) {
+export function hentForeldreinformasjonForBarnQueryOptions(request: PersonRequest | null) {
     return {
         queryKey: ["hent_foreldreinformasjon_for_barn", request?.ident],
         queryFn: async () => {
@@ -630,19 +630,6 @@ function hentForeldreinformasjonForBarnQueryOptions(request: PersonRequest | nul
         },
         throwOnError: false,
     };
-}
-
-export function useHentForeldreinformasjonForBarn(request: PersonRequest | null, enabled: boolean = true) {
-    return useQuery<PersonDto[], AxiosError | TilgangsFeilError>({
-        ...hentForeldreinformasjonForBarnQueryOptions(request),
-        enabled: enabled && !!request?.ident,
-    });
-}
-
-export function useHentForeldreinformasjonForBarnSuspense(request: PersonRequest) {
-    return useSuspenseQuery<PersonDto[], AxiosError | TilgangsFeilError>({
-        ...hentForeldreinformasjonForBarnQueryOptions(request),
-    });
 }
 
 // ==================== ORGANISASJON ====================

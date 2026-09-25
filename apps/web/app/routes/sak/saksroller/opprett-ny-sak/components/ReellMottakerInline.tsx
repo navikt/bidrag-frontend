@@ -1,7 +1,14 @@
+import { Box } from "@navikt/ds-react";
 import { useEffect, useState } from "react";
 import { Controller, type FieldPath, type FieldValues, type PathValue, type UseFormReturn } from "react-hook-form";
 import ReellMottakerValgGruppe, { type ReellMottakerValgregel } from "../../components/ReellMottakerValgGruppe";
-import { fraReellMottakerValg, initialiserReellMottaker, tilReellMottakerValg } from "../reell-mottaker-regel";
+import {
+    fraReellMottakerValg,
+    initialiserReellMottaker,
+    type ReellMottakerRegel,
+    reellMottakerValgregel,
+    tilReellMottakerValg,
+} from "../reell-mottaker-regel";
 
 type Props<TFieldValues extends FieldValues> = {
     form: UseFormReturn<TFieldValues>;
@@ -125,5 +132,33 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
                 />
             )}
         />
+    );
+}
+
+/** Reell mottaker for et valgt barn i `valgteBarn`, eller ingenting når regelen skjuler valget. */
+export function BarnReellMottaker<TFieldValues extends FieldValues>({
+    form,
+    barn,
+    barnIndex,
+    regel,
+}: {
+    form: UseFormReturn<TFieldValues>;
+    barn: { ident: string; navn: string; erMyndig: boolean };
+    barnIndex: number;
+    regel: ReellMottakerRegel;
+}) {
+    if (regel.type === "skjult" || barnIndex === -1) {
+        return null;
+    }
+    return (
+        <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">
+            <ReellMottakerInline
+                form={form}
+                fieldPath={`valgteBarn.${barnIndex}`}
+                barnIdent={barn.ident}
+                barnNavn={barn.navn}
+                regel={reellMottakerValgregel(regel, barn.erMyndig)}
+            />
+        </Box>
     );
 }

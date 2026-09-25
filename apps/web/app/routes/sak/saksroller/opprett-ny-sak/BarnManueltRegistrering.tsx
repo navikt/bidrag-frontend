@@ -6,11 +6,11 @@ import type { UseFormReturn } from "react-hook-form";
 import PersonInfo from "../components/PersonInfo";
 import PersonSøkWrapper from "../components/PersonSøkWrapper";
 import { validerBarn } from "./barn-validering";
-import type { Barnkurv, ForelderMedBarnSkjemaData } from "./opprett-sak-schema";
+import type { Barnkurv, BarnMedAlder } from "./opprett-sak-schema";
 
 type Props = {
     barnkurver: Barnkurv[];
-    form: UseFormReturn<ForelderMedBarnSkjemaData>;
+    form: UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
     leggTilBarnManuell: (barn: PersonDto, alder: number) => void | Promise<void>;
 };
 

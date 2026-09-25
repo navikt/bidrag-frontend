@@ -9,18 +9,16 @@ test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
     const brukPartner = component.getByRole("button", { name: "Bruk Test Ektefelle" });
 
     await brukPartner.click();
-    const fjernPartner = component.getByRole("button", { name: "Fjern Test Ektefelle" });
-    await expect(fjernPartner).toHaveAttribute("aria-pressed", "true");
+    const endrePartner = component.getByRole("button", { name: "Endre bidragsmottaker" });
     await expect(component.getByRole("heading", { name: "Parter" })).toBeVisible();
-    await expect(component.getByText("Test Ukjent Person", { exact: true })).toHaveCount(2);
+    const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
+    await expect(bmKort.getByText("Test Ukjent Person", { exact: true })).toBeVisible();
+    await expect(component.getByRole("heading", { name: "Oppsummering" })).toBeVisible();
     await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();
 
-    await fjernPartner.click();
-    await expect(component.getByRole("button", { name: "Bruk Test Ektefelle" })).toHaveAttribute(
-        "aria-pressed",
-        "false",
-    );
-    await expect(component.getByText("Test Ukjent Person", { exact: true })).toHaveCount(1);
+    await endrePartner.click();
+    await expect(component.getByRole("button", { name: "Bruk Test Ektefelle" })).toBeVisible();
+    await expect(bmKort.getByText("Ikke valgt")).toBeVisible();
     await expectNoAxeViolations(page, component);
 });
 
@@ -32,6 +30,6 @@ test("fjerner opprettelsesfeil når partene endres", async ({ mount, page }) => 
     await component.getByRole("button", { name: /Opprett$/ }).click();
     await expect(component.getByText("Kunne ikke opprette sak")).toBeVisible();
 
-    await component.getByRole("button", { name: "Fjern Test Ektefelle" }).click();
+    await component.getByRole("button", { name: "Endre bidragsmottaker" }).click();
     await expect(component.getByText("Kunne ikke opprette sak")).toHaveCount(0);
 });

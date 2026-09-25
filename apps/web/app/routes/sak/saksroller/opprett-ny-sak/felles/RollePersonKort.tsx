@@ -1,6 +1,6 @@
 import { MaskerSensitivInfo } from "@bidrag/common";
 import { PersonIcon } from "@navikt/aksel-icons";
-import { BodyLong, HGrid, HStack, VStack } from "@navikt/ds-react";
+import { BodyLong, HStack, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
 import DiskresjonAlert from "../../components/DiskresjonAlert";
@@ -18,30 +18,6 @@ export type RollePerson = {
     diskresjonskode?: Diskresjonskode;
 };
 
-export function RollePersonGrid({
-    personer,
-    skjulManglende = false,
-    handlinger,
-}: {
-    personer: Array<RollePerson | null>;
-    skjulManglende?: boolean;
-    handlinger?: Partial<Record<ForelderPartRolle, ReactNode>>;
-}) {
-    const synligePersoner = skjulManglende ? personer.filter((person) => person !== null) : personer;
-
-    return (
-        <HGrid columns={{ xs: 1, md: 2 }} gap="space-16" align="start">
-            {synligePersoner.map((person, index) => (
-                <RollePersonKort
-                    key={person?.rolle ?? index}
-                    person={person}
-                    førInnhold={person?.rolle ? handlinger?.[person.rolle] : undefined}
-                />
-            ))}
-        </HGrid>
-    );
-}
-
 export function RollePersonKort({
     person,
     tittel,
@@ -57,10 +33,11 @@ export function RollePersonKort({
         return <SkjemaSeksjonKort />;
     }
 
+    const erIkkeValgt = person.erKjent === undefined && !person.ident;
     const erUkjent = person.erKjent === false || !person.ident || !person.navn;
 
     return (
-        <SkjemaSeksjonKort variant={erUkjent ? "warning" : "default"}>
+        <SkjemaSeksjonKort variant={erUkjent && !erIkkeValgt ? "warning" : "default"}>
             <VStack gap="space-12">
                 <HStack align="center" gap="space-8">
                     <PersonIcon aria-hidden fontSize="1.5rem" />
@@ -69,7 +46,15 @@ export function RollePersonKort({
                     </BodyLong>
                 </HStack>
                 {førInnhold}
-                <MaskerSensitivInfo>{erUkjent ? <UkjentPerson /> : <KjentPerson person={person} />}</MaskerSensitivInfo>
+                <MaskerSensitivInfo>
+                    {erIkkeValgt ? (
+                        <UkjentPerson tekst="Ikke valgt" />
+                    ) : erUkjent ? (
+                        <UkjentPerson tekst="Ukjent" />
+                    ) : (
+                        <KjentPerson person={person} />
+                    )}
+                </MaskerSensitivInfo>
                 {children}
             </VStack>
         </SkjemaSeksjonKort>
@@ -80,10 +65,10 @@ function rolletittel(rolle?: ForelderPartRolle) {
     return rolle ? hentForelderRolleLabel(rolle) : "Person";
 }
 
-function UkjentPerson() {
+function UkjentPerson({ tekst }: { tekst: string }) {
     return (
         <BodyLong size="small" textColor="subtle" className="italic">
-            Ukjent
+            {tekst}
         </BodyLong>
     );
 }

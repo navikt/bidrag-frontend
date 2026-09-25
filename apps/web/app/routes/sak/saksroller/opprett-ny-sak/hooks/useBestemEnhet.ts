@@ -5,15 +5,7 @@ import { useQueries } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useMemo } from "react";
 import { hentPersonGeografiskEnhetQueryOptions, useHentEnhetInfomasjon } from "~/api/useApi.ts";
-import {
-    type BarnMedAlder,
-    type BarnMedReellMottaker,
-    BarnMedReellMottakerSchema,
-    DiskresjonskodeSchema,
-    type ForelderMedRolle,
-    type Motpart,
-    type PartISaken,
-} from "../opprett-sak-schema";
+import { type BarnMedAlder, DiskresjonskodeSchema } from "../opprett-sak-schema";
 
 const ADRESSEBESKYTTELSE_ENHET = "2103";
 const EGEN_ANSATT_ENHET = "4883";
@@ -28,10 +20,12 @@ function tilGyldigSakskategori(sakskategori?: string): "U" | "N" | undefined {
     return sakskategori === "U" || sakskategori === "N" ? sakskategori : undefined;
 }
 
+type Part = { ident?: string; diskresjonskode?: string } | null;
+
 type BestemEnhetParams = {
-    bidragspliktig: PartISaken | Motpart | ForelderMedRolle | null;
-    bidragsmottaker: PartISaken | Motpart | ForelderMedRolle | null;
-    barn: BarnMedAlder[] | BarnMedReellMottaker;
+    bidragspliktig: Part;
+    bidragsmottaker: Part;
+    barn: BarnMedAlder[];
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     sakskategori?: string;
 };
@@ -51,44 +45,19 @@ function harFortroligAdresse(diskresjonskode?: string): boolean {
     return DiskresjonskodeSchema.safeParse(diskresjonskode).success;
 }
 
-function sjekkFortroligAdresseForParter(
-    bidragspliktig: PartISaken | Motpart | ForelderMedRolle | null,
-    bidragsmottaker: PartISaken | Motpart | ForelderMedRolle | null,
-    barn: BarnMedAlder[] | BarnMedReellMottaker,
-): boolean {
-    const barnArray = Array.isArray(barn) ? barn : [barn];
-    const harBPFortroligAdresse = harFortroligAdresse(bidragspliktig?.diskresjonskode);
-    const harBMFortroligAdresse = harFortroligAdresse(bidragsmottaker?.diskresjonskode);
-    const harBarnFortroligAdresse = barnArray.some((b) => harFortroligAdresse(b.diskresjonskode));
-
-    return harBPFortroligAdresse || harBMFortroligAdresse || harBarnFortroligAdresse;
+function sjekkFortroligAdresseForParter(bidragspliktig: Part, bidragsmottaker: Part, barn: BarnMedAlder[]): boolean {
+    return [bidragspliktig, bidragsmottaker, ...barn].some((person) => harFortroligAdresse(person?.diskresjonskode));
 }
 
 // Bruker bidragsmottaker hvis kjent, ellers yngste barn
-function finnIdentForArbeidsfordeling(
-    bidragsmottaker: PartISaken | Motpart | ForelderMedRolle | null,
-    barn: BarnMedAlder[] | BarnMedReellMottaker,
-): string | null {
-    if (bidragsmottaker?.ident && bidragsmottaker.ident.trim() !== "") {
+function finnIdentForArbeidsfordeling(bidragsmottaker: Part, barn: BarnMedAlder[]): string | null {
+    if (bidragsmottaker?.ident?.trim()) {
         return bidragsmottaker.ident;
     }
-
-    const valideringBarnMedReellMottaker = BarnMedReellMottakerSchema.safeParse(barn);
-    if (valideringBarnMedReellMottaker.success) {
-        return (barn as BarnMedReellMottaker).ident;
-    }
-
-    if (Array.isArray(barn) && barn.length > 0) {
-        const [yngsteBarn] = [...barn].sort((a, b) => a.alder - b.alder);
-        if (yngsteBarn) {
-            return yngsteBarn.ident;
-        }
-    }
-
-    return null;
+    const [yngsteBarn] = [...barn].sort((a, b) => a.alder - b.alder);
+    return yngsteBarn?.ident ?? null;
 }
 
-type Part = PartISaken | Motpart | ForelderMedRolle | null;
 type PersonIdent = { ident: string; rolle: "bp" | "bm" | "barn" };
 
 function harIdent(ident?: string): ident is string {
@@ -96,11 +65,10 @@ function harIdent(ident?: string): ident is string {
 }
 
 function samleIdenter(bidragspliktig: Part, bidragsmottaker: Part, barn: BestemEnhetParams["barn"]): PersonIdent[] {
-    const barnArray = Array.isArray(barn) ? barn : [barn];
     const kandidater: { ident?: string; rolle: PersonIdent["rolle"] }[] = [
         { ident: bidragspliktig?.ident, rolle: "bp" },
         { ident: bidragsmottaker?.ident, rolle: "bm" },
-        ...barnArray.map((b) => ({ ident: b.ident, rolle: "barn" as const })),
+        ...barn.map((b) => ({ ident: b.ident, rolle: "barn" as const })),
     ];
     return kandidater.filter((p): p is PersonIdent => harIdent(p.ident));
 }
@@ -132,10 +100,13 @@ function useGeografiskeEnheter(
     });
 
     const egenAnsattEnhet = enhetQueries.find((query) => query.data?.nummer === EGEN_ANSATT_ENHET)?.data;
+    // 🔴 Sikring hvis diskresjonskode mangler i skjemaet: NORG svarer 2103 for graderte personer.
+    const harFortroligEnhet = enhetQueries.some((query) => query.data?.nummer === ADRESSEBESKYTTELSE_ENHET);
     const index = identer.findIndex((p) => p.ident === identForArbeidsfordeling);
 
     return {
         harEgenAnsatt: !!egenAnsattEnhet,
+        harFortroligEnhet,
         standardEnhet: identForArbeidsfordeling && index !== -1 ? (enhetQueries[index]?.data ?? null) : null,
         isLoading: enhetQueries.some((q) => q.isLoading || q.isFetching),
         error: enhetQueries.find((q) => q.error)?.error ?? null,
@@ -193,12 +164,13 @@ export function useBestemEnhet({
     );
 
     const utland = useSpesialenhet(UTLAND_ENHET, erSakskategoriUtenlandssak);
-    const fortrolig = useSpesialenhet(ADRESSEBESKYTTELSE_ENHET, harFortroligAdresseVerdi);
-    const egenAnsatt = useSpesialenhet(EGEN_ANSATT_ENHET, geografisk.harEgenAnsatt && !harFortroligAdresseVerdi);
+    const erFortrolig = harFortroligAdresseVerdi || geografisk.harFortroligEnhet;
+    const fortrolig = useSpesialenhet(ADRESSEBESKYTTELSE_ENHET, erFortrolig);
+    const egenAnsatt = useSpesialenhet(EGEN_ANSATT_ENHET, geografisk.harEgenAnsatt && !erFortrolig);
 
     return velgEnhet({
         erSakskategoriUtenlandssak,
-        harFortroligAdresse: harFortroligAdresseVerdi,
+        harFortroligAdresse: erFortrolig,
         harEgenAnsatt: geografisk.harEgenAnsatt,
         identForArbeidsfordeling,
         standardEnhet: geografisk.standardEnhet,

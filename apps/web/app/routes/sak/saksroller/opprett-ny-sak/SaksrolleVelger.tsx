@@ -3,7 +3,7 @@ import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { Alert, Radio, RadioGroup, Stack, VStack } from "@navikt/ds-react";
 import { Suspense, useEffect, useState } from "react";
-import { useHentForeldreinformasjonForBarnSuspense, useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
+import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
 import LasterSkeleton from "./components/LasterSkeleton";
 import { MAKS_ALDER_BARN, type PartRolle, PartRolleSchema } from "./opprett-sak-schema";
 import { filtrerSaksroller, type SaksrolleAlternativ } from "./saksrolle-regler";
@@ -72,13 +72,19 @@ export default function SaksrolleVelger({ partISaken, enforcedRolle }: Props) {
 
 export function SaksrolleFlytResolver({ partISaken, enforcedRolle }: Props) {
     const [feil, settFeil] = useState("");
-    const { valgVersjon, partISaken: partISakenSkjemaData, sakstype } = useSaksrolleroversikt();
+    const { valgVersjon, partISaken: partISakenSkjemaData, sakstype, settFlytHvisGjeldende } = useSaksrolleroversikt();
     const valgtRolle = partISakenSkjemaData?.rolle ?? null;
     const erBarnRolle = valgtRolle === "barn_over_18" || valgtRolle === "barn_under_18";
     const trengerRelasjon = !!valgtRolle && !erBarnRolle && !enforcedRolle;
-    const trengerForeldreinfo = !!valgtRolle && erBarnRolle;
 
-    if (!trengerRelasjon && !trengerForeldreinfo) {
+    // Barnet er part: foreldrene hentes av selve flyten, som forslag i partskortene.
+    useEffect(() => {
+        if (erBarnRolle) {
+            settFlytHvisGjeldende(valgVersjon, { key: Math.random(), type: "BARNEBIDRAG", barnkurver: [] });
+        }
+    }, [erBarnRolle, valgVersjon, settFlytHvisGjeldende]);
+
+    if (!trengerRelasjon) {
         return null;
     }
 
@@ -91,16 +97,6 @@ export function SaksrolleFlytResolver({ partISaken, enforcedRolle }: Props) {
                         key={`${partISaken.ident}-${valgtRolle}-${valgVersjon}`}
                         partISaken={partISaken}
                         sakstype={sakstype}
-                        valgVersjon={valgVersjon}
-                        onFeil={settFeil}
-                    />
-                </Suspense>
-            )}
-            {trengerForeldreinfo && (
-                <Suspense fallback={<LasterSkeleton tekst="Henter foreldreinformasjon..." />}>
-                    <ForeldreinfoBranch
-                        key={`${partISaken.ident}-${valgtRolle}-${valgVersjon}`}
-                        partISaken={partISaken}
                         valgVersjon={valgVersjon}
                         onFeil={settFeil}
                     />
@@ -174,7 +170,7 @@ function RelasjonTilBarnBranch({
         }
 
         if (relasjoner.length === 0) {
-            settFlytHvisGjeldende(valgVersjon, { key: Math.random(), type: "FORELDER_UTEN_BARN" });
+            settFlytHvisGjeldende(valgVersjon, { key: Math.random(), type: "BARNEBIDRAG", barnkurver: [] });
             return;
         }
 
@@ -206,7 +202,7 @@ function RelasjonTilBarnBranch({
 
         settFlytHvisGjeldende(valgVersjon, {
             key: Math.random(),
-            type: "FORELDER_MED_BARN",
+            type: "BARNEBIDRAG",
             barnkurver: relasjonMedBarnUnder24,
         });
     }, [relasjonTilBarn, sakstype, partISaken.ident, valgVersjon, settFlytHvisGjeldende, onFeil]);
@@ -219,63 +215,6 @@ function RelasjonTilBarnBranch({
         <Alert variant="error">{error.message}</Alert>
     ) : (
         <Alert variant="error">Kunne ikke hente barn til {partISaken.visningsnavn}. Vennligst prøv igjen.</Alert>
-    );
-}
-
-/**
- * Henter foreldreinformasjon for en valgt barnerolle og utleder riktig saksrolleflyt.
- *
- * Egen komponent av samme grunn som `RelasjonTilBarnBranch`: monteres kun når foreldreinfo
- * faktisk trengs, slik at Suspense-spørringen aldri kalles i en "deaktivert" tilstand.
- */
-function ForeldreinfoBranch({
-    partISaken,
-    valgVersjon,
-    onFeil,
-}: {
-    partISaken: PersonDto;
-    valgVersjon: number;
-    onFeil: (feil: string) => void;
-}) {
-    const { settFlytHvisGjeldende } = useSaksrolleroversikt();
-    const { data: foreldreinformasjonTilBarn, error } = useHentForeldreinformasjonForBarnSuspense({
-        ident: partISaken.ident,
-    });
-
-    useEffect(() => {
-        if (foreldreinformasjonTilBarn.length === 2) {
-            settFlytHvisGjeldende(valgVersjon, {
-                key: Math.random(),
-                type: "BARN_BEGGE_FORELDRE",
-                foreldre: foreldreinformasjonTilBarn,
-            });
-        }
-
-        if (foreldreinformasjonTilBarn.length < 2) {
-            settFlytHvisGjeldende(valgVersjon, {
-                key: Math.random(),
-                type: "BARN_MANGLENDE_FORELDRE",
-                forelder: foreldreinformasjonTilBarn[0] ?? null,
-            });
-        }
-
-        if (foreldreinformasjonTilBarn.length > 2) {
-            onFeil(
-                `Dette barnet (${partISaken.ident}) har flere enn 2 registrerte foreldre i systemet. Dette kan skyldes feil i data. Kontakt support.`,
-            );
-        }
-    }, [foreldreinformasjonTilBarn, partISaken.ident, valgVersjon, settFlytHvisGjeldende, onFeil]);
-
-    if (error === null) {
-        return null;
-    }
-
-    return error instanceof TilgangsFeilError ? (
-        <Alert variant="error">{error.message}</Alert>
-    ) : (
-        <Alert variant="error">
-            Kunne ikke hente foreldreinformasjon til {partISaken.visningsnavn}. Vennligst prøv igjen.
-        </Alert>
     );
 }
 

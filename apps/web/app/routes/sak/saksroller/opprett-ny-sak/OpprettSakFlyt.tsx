@@ -8,13 +8,9 @@ import PersonInfo from "../components/PersonInfo";
 import SøkPerson from "../components/SøkPerson";
 import LasterSkeleton from "./components/LasterSkeleton";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "./felles/SkjemaSeksjon";
-import BarnBeggeForeldreFlyt from "./flyt/BarnBeggeForeldre/BarnBeggeForeldreFlyt";
-import BarnMedManglendeForeldreFlyt from "./flyt/BarnManglendeForeldre/BarnMedManglendeForeldreFlyt";
+import BarnebidragFlyt from "./flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "./flyt/Ektefellebidrag/EktefellebidragFlyt";
-import FarskapsFlyt from "./flyt/Farskap/FarskapsFlyt";
-import ForelderMedBarnFlyt from "./flyt/ForelderMedBarn/ForelderMedBarnFlyt";
-import ForelderUtenBarnFlyt from "./flyt/ForelderUtenBarn/ForelderUtenBarnFlyt";
-import OppfostringsbidragFlyt from "./flyt/Oppfostringsbidrag/OppfostringsbidragFlyt";
+import EnPartMedBarnFlyt from "./flyt/EnPartMedBarn/EnPartMedBarnFlyt";
 import type { PartRolle } from "./opprett-sak-schema";
 import SakskategoriVelger from "./SakskategoriVelger";
 import SaksrolleVelger, { SaksrolleFlytResolver } from "./SaksrolleVelger";
@@ -88,13 +84,10 @@ function partSøkLabel(sakstype: Sakstype) {
 }
 
 const flytkomponenter = {
-    FORELDER_MED_BARN: ForelderMedBarnFlyt,
-    FORELDER_UTEN_BARN: ForelderUtenBarnFlyt,
-    BARN_BEGGE_FORELDRE: BarnBeggeForeldreFlyt,
-    BARN_MANGLENDE_FORELDRE: BarnMedManglendeForeldreFlyt,
+    BARNEBIDRAG: BarnebidragFlyt,
     EKTEFELLEBIDRAG: EktefellebidragFlyt,
-    FARSKAP: FarskapsFlyt,
-    OPPFOSTRINGSBIDRAG: OppfostringsbidragFlyt,
+    FARSKAP: EnPartMedBarnFlyt,
+    OPPFOSTRINGSBIDRAG: EnPartMedBarnFlyt,
 } as const;
 
 export default function OpprettSakFlyt() {
