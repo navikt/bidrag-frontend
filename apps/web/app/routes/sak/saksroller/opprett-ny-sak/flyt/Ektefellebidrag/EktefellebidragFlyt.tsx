@@ -4,7 +4,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import ParterSeksjon, { type ForelderKortProps } from "../../parter/ParterSeksjon";
-import { hentMotsattRolle } from "../../parter/part-utils";
+import { filtrerBortValgteForeldre, hentMotsattRolle } from "../../parter/part-utils";
 import {
     type Diskresjonskode,
     type EktefellebidragSkjemaData,
@@ -87,7 +87,9 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
     ): ForelderKortProps => ({
         rolle,
         part: { ...part, erKjent: part.ident ? true : undefined },
-        forslag: forslag.filter((person) => person.ident !== part.ident && person.ident !== låstIdent),
+        forslag: filtrerBortValgteForeldre(forslag, [partISaken, motpart]).filter(
+            (person) => person.ident !== låstIdent,
+        ),
         kanSettesUkjent: false,
         låst: !!låstIdent && part.ident === låstIdent,
         feil,

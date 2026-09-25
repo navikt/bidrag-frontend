@@ -1,6 +1,6 @@
 import { PersonIdent } from "@bidrag/common";
 import { BodyShort, Box, Checkbox, CheckboxGroup, HGrid, HStack, VStack } from "@navikt/ds-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import { BarnKortInnhold } from "../../felles/person/BarnKort";
@@ -89,10 +89,15 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, on
 }
 
 function useManuelleBarn(valgteBarn: BarnMedAlder[]) {
-    const [lagtTil, setLagtTil] = useState<BarnMedAlder[]>([]);
-    const nye = valgteBarn.filter((b) => b.manuellLagtTil && !lagtTil.some((l) => l.ident === b.ident));
-    if (nye.length > 0) setLagtTil([...lagtTil, ...nye]);
-    return [...lagtTil, ...nye];
+    const lagtTil = useRef(new Map<string, BarnMedAlder>());
+
+    for (const barn of valgteBarn) {
+        if (barn.manuellLagtTil) {
+            lagtTil.current.set(barn.ident, barn);
+        }
+    }
+
+    return [...lagtTil.current.values()];
 }
 
 function BarnGruppe({

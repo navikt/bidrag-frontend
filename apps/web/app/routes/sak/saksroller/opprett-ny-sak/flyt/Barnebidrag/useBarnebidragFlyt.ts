@@ -8,7 +8,9 @@ import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { ForelderKortProps } from "../../parter/ParterSeksjon";
+import { filtrerBortValgteForeldre } from "../../parter/part-utils";
 import {
+    type BarnebidragForelderRolle,
     type BarnebidragSkjemaData,
     type Barnkurv,
     erKjentPart,
@@ -32,8 +34,9 @@ const UKJENT: ForelderPart = { ...IKKE_VALGT, erKjent: false };
 const FORELDERROLLER: ForelderPartRolle[] = ["bidragspliktig", "bidragsmottaker"];
 
 function useBarnkurver(form: UseFormReturn<BarnebidragSkjemaData>) {
-    const bidragspliktig = form.watch("bidragspliktig.ident");
-    const bidragsmottaker = form.watch("bidragsmottaker.ident");
+    const roller = form.watch("roller");
+    const bidragspliktig = roller.find((rolle) => rolle.type === "BP")?.ident;
+    const bidragsmottaker = roller.find((rolle) => rolle.type === "BM")?.ident;
     const valgteBarn = form.watch("valgteBarn");
 
     const kilde = bidragspliktig || bidragsmottaker;
@@ -65,7 +68,7 @@ function useForelderforslag(form: UseFormReturn<BarnebidragSkjemaData>, parter: 
         .filter((part) => part.erKjent && part.ident)
         .map((part) => ({ ident: part.ident ?? "", navn: part.navn ?? "" }));
     const { forslag, feil } = utledForelderforslag({ foreldreTilBarn, valgteForeldre });
-    const ledige = forslag.filter((f) => !valgteForeldre.some((valgt) => valgt.ident === f.ident));
+    const ledige = filtrerBortValgteForeldre(forslag, valgteForeldre);
     const tilgangsfeil = foreldreinfo.find((query) => query.error instanceof TilgangsFeilError)?.error;
     return { foreldreTilBarn, forslag, ledige, forslagsfeil: feil, tilgangsfeil: tilgangsfeil?.message };
 }
@@ -130,19 +133,28 @@ export function useBarnebidragFlyt() {
     const form = useFormContext<BarnebidragSkjemaData>();
     const { låstIdent } = useSaksrolleroversikt();
 
-    const bidragspliktig = form.watch("bidragspliktig");
-    const bidragsmottaker = form.watch("bidragsmottaker");
+    const roller = form.watch("roller");
+    const bidragspliktig = rolleSomPart(roller, "BP");
+    const bidragsmottaker = rolleSomPart(roller, "BM");
     const valgteBarn = form.watch("valgteBarn");
     const parter: Parter = { bidragspliktig, bidragsmottaker };
 
     const barnkurver = useBarnkurver(form);
     const { foreldreTilBarn, forslag, ledige, forslagsfeil, tilgangsfeil } = useForelderforslag(form, parter);
 
-    const settPart = (rolle: ForelderPartRolle, part: ForelderPart) =>
-        form.setValue(rolle, part, { shouldDirty: true, shouldValidate: form.formState.isSubmitted });
+    const settPart = (rolle: ForelderPartRolle, part: ForelderPart) => {
+        const type = rolle === "bidragspliktig" ? "BP" : "BM";
+        form.setValue(
+            "roller",
+            form
+                .getValues("roller")
+                .map((eksisterende) => (eksisterende.type === type ? { ...part, type } : eksisterende)),
+            { shouldDirty: true, shouldValidate: form.formState.isSubmitted },
+        );
+    };
     const velg = (rolle: ForelderPartRolle, person: PersonDto) => {
         if (person.ident === låstIdent) return;
-        const nye = parterEtterValg(form.getValues(), rolle, person, forslag);
+        const nye = parterEtterValg(parter, rolle, person, forslag);
         for (const r of FORELDERROLLER) settPart(r, nye[r]);
     };
     useFyllUtForelder(
@@ -150,7 +162,8 @@ export function useBarnebidragFlyt() {
         ledige,
         (rolle, person) => settPart(rolle, tilPart(person)),
         velg,
-        (rolle) => form.getValues(rolle).erKjent === undefined,
+        (rolle) =>
+            rolleSomPart(form.getValues("roller"), rolle === "bidragspliktig" ? "BP" : "BM").erKjent === undefined,
     );
 
     const onKurvByttet = (kurv: Barnkurv | null) => {
@@ -168,9 +181,9 @@ export function useBarnebidragFlyt() {
         (rolle): ForelderKortProps => ({
             rolle,
             part: parter[rolle],
-            forslag: forslag.filter((f) => f.ident !== parter[rolle].ident && f.ident !== låstIdent),
+            forslag: ledige.filter((f) => f.ident !== låstIdent),
             låst: !!låstIdent && parter[rolle].ident === låstIdent,
-            feil: form.formState.errors[rolle]?.ident?.message,
+            feil: form.formState.errors.roller?.[rolle === "bidragspliktig" ? 0 : 1]?.ident?.message,
             onVelg: (person) => velg(rolle, person),
             onUkjent: () => settPart(rolle, UKJENT),
             onEndre: () => settPart(rolle, IKKE_VALGT),
@@ -195,5 +208,15 @@ export function useBarnebidragFlyt() {
             ...relasjonsmeldinger(foreldreTilBarn, parter),
         },
         status: { ...sakStatus, partISakenNavn: parter[primær].navn ?? "", motpartNavn: parter[sekundær].navn },
+    };
+}
+
+function rolleSomPart(roller: BarnebidragForelderRolle[], type: "BP" | "BM"): ForelderPart {
+    const rolle = roller.find((r) => r.type === type);
+    return {
+        ident: rolle?.ident ?? "",
+        navn: rolle?.navn ?? "",
+        erKjent: rolle?.erKjent,
+        diskresjonskode: rolle?.diskresjonskode,
     };
 }

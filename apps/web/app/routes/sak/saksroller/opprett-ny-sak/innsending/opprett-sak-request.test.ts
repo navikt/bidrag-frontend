@@ -6,14 +6,14 @@ const BP = { ident: "11111111111" };
 const BM = { ident: "22222222222" };
 const BARN = { ident: "33333333333" };
 
-const lag = (parter: Partial<OpprettSakParter>, arbeidsfordeling: "EEN" | "OPS" | "FRS" | "EFS" = "EEN") =>
-    lagOpprettSakRequest("4806", arbeidsfordeling, { kategori: "Nasjonal", barn: [], ...parter });
+const lag = (roller: OpprettSakParter["roller"], arbeidsfordeling: "EEN" | "OPS" | "FRS" | "EFS" = "EEN") =>
+    lagOpprettSakRequest("4806", arbeidsfordeling, { kategori: "Nasjonal", roller });
 
 const roller = (request: ReturnType<typeof lag>) => request.roller.map((r) => [r.type, r.fodselsnummer]);
 
 describe("lagOpprettSakRequest", () => {
     it("bygger felles felter", () => {
-        const request = lagOpprettSakRequest("4806", "EEN", { kategori: "Utland", barn: [] });
+        const request = lagOpprettSakRequest("4806", "EEN", { kategori: "Utland", roller: [] });
         expect(request).toMatchObject({
             eierfogd: "4806",
             kategori: "U",
@@ -25,7 +25,31 @@ describe("lagOpprettSakRequest", () => {
     });
 
     it("barnebidrag med kjente parter", () => {
-        expect(roller(lag({ bidragspliktig: BP, bidragsmottaker: BM, barn: [BARN] }))).toEqual([
+        expect(
+            roller(
+                lag([
+                    { type: Rolletype.BP, fodselsnummer: BP.ident },
+                    { type: Rolletype.BM, fodselsnummer: BM.ident },
+                    { type: Rolletype.BA, fodselsnummer: BARN.ident },
+                ]),
+            ),
+        ).toEqual([
+            [Rolletype.BP, BP.ident],
+            [Rolletype.BM, BM.ident],
+            [Rolletype.BA, BARN.ident],
+        ]);
+    });
+
+    it("bygger samme request fra roller", () => {
+        expect(
+            roller(
+                lag([
+                    { type: Rolletype.BP, fodselsnummer: BP.ident },
+                    { type: Rolletype.BM, fodselsnummer: BM.ident },
+                    { type: Rolletype.BA, fodselsnummer: BARN.ident },
+                ]),
+            ),
+        ).toEqual([
             [Rolletype.BP, BP.ident],
             [Rolletype.BM, BM.ident],
             [Rolletype.BA, BARN.ident],
@@ -33,15 +57,25 @@ describe("lagOpprettSakRequest", () => {
     });
 
     it.each([undefined, null, {}, { ident: "" }])("utelater ukjent BM (%j) og krever RM", (bidragsmottaker) => {
-        expect(() => lag({ bidragspliktig: BP, bidragsmottaker, barn: [BARN] })).toThrow("reell mottaker");
+        expect(() =>
+            lag([
+                { type: Rolletype.BP, fodselsnummer: BP.ident },
+                { type: Rolletype.BM, fodselsnummer: bidragsmottaker?.ident },
+                { type: Rolletype.BA, fodselsnummer: BARN.ident },
+            ]),
+        ).toThrow("reell mottaker");
     });
 
     it("ukjent BM med RM på barnet", () => {
-        const request = lag({
-            bidragspliktig: BP,
-            bidragsmottaker: { ident: "" },
-            barn: [{ ...BARN, reellMottaker: "44444444444" }],
-        });
+        const request = lag([
+            { type: Rolletype.BP, fodselsnummer: BP.ident },
+            { type: Rolletype.BM, fodselsnummer: "" },
+            {
+                type: Rolletype.BA,
+                fodselsnummer: BARN.ident,
+                reellMottaker: { ident: "44444444444", verge: false },
+            },
+        ]);
         expect(roller(request)).toEqual([
             [Rolletype.BP, BP.ident],
             [Rolletype.BA, BARN.ident],
@@ -50,14 +84,32 @@ describe("lagOpprettSakRequest", () => {
     });
 
     it("ukjent BP sendes ikke", () => {
-        expect(roller(lag({ bidragspliktig: { ident: "" }, bidragsmottaker: BM, barn: [BARN] }))).toEqual([
+        expect(
+            roller(
+                lag([
+                    { type: Rolletype.BP, fodselsnummer: "" },
+                    { type: Rolletype.BM, fodselsnummer: BM.ident },
+                    { type: Rolletype.BA, fodselsnummer: BARN.ident },
+                ]),
+            ),
+        ).toEqual([
             [Rolletype.BM, BM.ident],
             [Rolletype.BA, BARN.ident],
         ]);
     });
 
     it("oppfostring: BP og barn med RM", () => {
-        const request = lag({ bidragspliktig: BP, barn: [{ ...BARN, reellMottaker: "SAM123" }] }, "OPS");
+        const request = lag(
+            [
+                { type: Rolletype.BP, fodselsnummer: BP.ident },
+                {
+                    type: Rolletype.BA,
+                    fodselsnummer: BARN.ident,
+                    reellMottaker: { ident: "SAM123", verge: false },
+                },
+            ],
+            "OPS",
+        );
         expect(request.arbeidsfordeling).toBe(Arbeidsfordeling.OPS);
         expect(roller(request)).toEqual([
             [Rolletype.BP, BP.ident],
@@ -66,7 +118,17 @@ describe("lagOpprettSakRequest", () => {
     });
 
     it("ektefellebidrag: bare BP og BM", () => {
-        expect(roller(lag({ bidragspliktig: BP, bidragsmottaker: BM }, "EFS"))).toEqual([
+        expect(
+            roller(
+                lag(
+                    [
+                        { type: Rolletype.BP, fodselsnummer: BP.ident },
+                        { type: Rolletype.BM, fodselsnummer: BM.ident },
+                    ],
+                    "EFS",
+                ),
+            ),
+        ).toEqual([
             [Rolletype.BP, BP.ident],
             [Rolletype.BM, BM.ident],
         ]);

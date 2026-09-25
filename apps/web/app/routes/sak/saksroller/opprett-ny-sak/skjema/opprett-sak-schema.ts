@@ -46,6 +46,9 @@ const MotpartSchema = z.object({
 });
 
 const ForelderPartSchema = MotpartSchema.omit({ rolle: true });
+const BarnebidragForelderRolleSchema = ForelderPartSchema.extend({
+    type: z.enum(["BP", "BM"]),
+});
 
 /**
  * Samme skjema uansett om saken startes fra en forelder eller fra barnet. Alle parter kan endres.
@@ -54,8 +57,7 @@ const ForelderPartSchema = MotpartSchema.omit({ rolle: true });
  */
 export const BarnebidragSkjemaSchema = z
     .object({
-        bidragspliktig: ForelderPartSchema,
-        bidragsmottaker: ForelderPartSchema,
+        roller: z.array(BarnebidragForelderRolleSchema),
         valgteBarn: z.array(BarnMedAlderSchema),
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
@@ -65,36 +67,45 @@ export const BarnebidragSkjemaSchema = z
     });
 
 type BarnebidragSkjemaInput = {
-    bidragspliktig: ForelderPart;
-    bidragsmottaker: ForelderPart;
+    roller: BarnebidragForelderRolle[];
     valgteBarn: BarnMedAlder[];
 };
 
 function validerForeldre(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    for (const felt of ["bidragspliktig", "bidragsmottaker"] as const) {
-        const { ident, erKjent } = data[felt];
+    const foreldre = ["BP", "BM"] as const;
+    for (const type of foreldre) {
+        const rolle = data.roller.find((r) => r.type === type);
+        const ident = rolle?.ident;
+        const erKjent = rolle?.erKjent;
         if (erKjent === undefined) {
             ctx.addIssue({
                 code: "custom",
-                path: [felt, "ident"],
-                message: `Du må registrere ${felt} eller velge ukjent`,
+                path: ["roller", type === "BP" ? 0 : 1, "ident"],
+                message: `Du må registrere ${type === "BP" ? "bidragspliktig" : "bidragsmottaker"} eller velge ukjent`,
             });
         }
         if (ident?.trim() && data.valgteBarn.some((barn) => barn.ident === ident)) {
-            ctx.addIssue({ code: "custom", path: [felt, "ident"], message: "Et barn kan ikke være forelder i saken" });
+            ctx.addIssue({
+                code: "custom",
+                path: ["roller", type === "BP" ? 0 : 1, "ident"],
+                message: "Et barn kan ikke være forelder i saken",
+            });
         }
     }
-    validateUlikeParter({ ident: data.bidragspliktig.ident ?? "" }, data.bidragsmottaker, ctx, "bidragsmottaker");
+    const bp = data.roller.find((r) => r.type === "BP");
+    const bm = data.roller.find((r) => r.type === "BM");
+    validateUlikeParter({ ident: bp?.ident ?? "" }, bm ?? {}, ctx, ["roller", 1]);
 }
 
 /** Parten er valgt i skjemaet og ikke satt som ukjent. */
 export const erKjentPart = (part: ForelderPart) => part.erKjent === true && !!part.ident?.trim();
 
 function validerBarnebidragBarn(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    if (!erKjentPart(data.bidragsmottaker) && data.valgteBarn.length === 0) {
+    const bidragsmottaker = data.roller.find((r) => r.type === "BM");
+    if (!erKjentPart(bidragsmottaker ?? {}) && data.valgteBarn.length === 0) {
         ctx.addIssue({ code: "custom", path: ["valgteBarn"], message: "Du må velge minst ett barn." });
     }
-    const bidragsmottakerErUkjent = data.bidragsmottaker.erKjent === false;
+    const bidragsmottakerErUkjent = bidragsmottaker?.erKjent === false;
     data.valgteBarn.forEach((barn, index) => {
         const grunn: ReellMottakerValideringsgrunn | null = barn.erMyndig
             ? "myndig-barn"
@@ -107,6 +118,7 @@ function validerBarnebidragBarn(data: BarnebidragSkjemaInput, ctx: z.RefinementC
 
 export type BarnebidragSkjemaData = z.infer<typeof BarnebidragSkjemaSchema>;
 export type ForelderPart = z.infer<typeof ForelderPartSchema>;
+export type BarnebidragForelderRolle = z.infer<typeof BarnebidragForelderRolleSchema>;
 
 const createSakMedBarnSkjemaSchema = (
     validateBarn?: (barn: z.infer<typeof BarnMedAlderSchema>, index: number, ctx: z.RefinementCtx) => void,
@@ -186,12 +198,12 @@ const validateUlikeParter = (
     partISaken: { ident: string },
     motpart: { ident?: string },
     ctx: z.RefinementCtx,
-    felt = "motpart",
+    felt: string | (string | number)[] = "motpart",
 ) => {
     if (motpart.ident?.trim() && partISaken.ident === motpart.ident) {
         ctx.addIssue({
             code: "custom",
-            path: [felt, "ident"],
+            path: [...(Array.isArray(felt) ? felt : [felt]), "ident"],
             message: "Samme person kan ikke være begge parter",
         });
     }

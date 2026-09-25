@@ -1,3 +1,4 @@
+import { Rolletype } from "@bidrag/api/SakApi";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
 import { useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
@@ -5,7 +6,7 @@ import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
 import { useEksisterendeSakSjekk } from "../eksisterende-sak/useEksisterendeSakSjekk";
 import type { BarnMedAlder, ForelderPartRolle, Motpart } from "../skjema/opprett-sak-schema";
 import type { EnhetOgSubmitSectionProps } from "./EnhetOgSubmitSection";
-import type { OpprettSakParter } from "./opprett-sak-request";
+import type { OpprettSakParter, OpprettSakRolle } from "./opprett-sak-request";
 import { useBestemEnhet } from "./useBestemEnhet";
 import { useOpprettSakHandling } from "./useOpprettSakHandling";
 
@@ -116,6 +117,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
         bidragspliktig: bidragspliktig,
         bidragsmottaker: bidragsmottaker,
         barn: valgteBarn,
+        roller: lagRoller(bidragspliktig, bidragsmottaker, valgteBarn),
     };
     const onSubmit = useSendInn(form, opprettSak, parter);
 
@@ -137,4 +139,16 @@ export function useFlowSubmission<T extends FormMedKategori>({
         sakStatus: { infoMelding, harEksisterendeSak, eksisterendeSak, isLoading: isLoadingHentSak },
         innsending,
     };
+}
+
+function lagRoller(bidragspliktig: Motpart, bidragsmottaker: Motpart, barn: BarnMedAlder[]): OpprettSakRolle[] {
+    return [
+        { type: Rolletype.BP, fodselsnummer: bidragspliktig.ident },
+        { type: Rolletype.BM, fodselsnummer: bidragsmottaker.ident },
+        ...barn.map((barnRolle) => ({
+            type: Rolletype.BA,
+            fodselsnummer: barnRolle.ident,
+            reellMottaker: barnRolle.reellMottaker ? { ident: barnRolle.reellMottaker, verge: false } : null,
+        })),
+    ];
 }

@@ -8,8 +8,10 @@ const barn = { ident: barnIdent, navn: "Barn", alder: 8, erMyndig: false };
 const kjent = (ident: string) => ({ ident, navn: ident, erKjent: true });
 
 const gyldig: BarnebidragSkjemaData = {
-    bidragspliktig: kjent(bp),
-    bidragsmottaker: kjent(bm),
+    roller: [
+        { ...kjent(bp), type: "BP" },
+        { ...kjent(bm), type: "BM" },
+    ],
     valgteBarn: [barn],
     kategori: "Nasjonal",
 };
@@ -23,10 +25,17 @@ describe("BarnebidragSkjemaSchema", () => {
     });
 
     it("avviser samme person som BP og BM", () => {
-        expect(feilFor({ bidragsmottaker: kjent(bp) })).toEqual(
+        expect(
+            feilFor({
+                roller: [
+                    { ...kjent(bp), type: "BP" },
+                    { ...kjent(bp), type: "BM" },
+                ],
+            }),
+        ).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    path: ["bidragsmottaker", "ident"],
+                    path: ["roller", 1, "ident"],
                     message: "Samme person kan ikke være begge parter",
                 }),
             ]),
@@ -34,32 +43,58 @@ describe("BarnebidragSkjemaSchema", () => {
     });
 
     it("krever at forelder er registrert eller satt som ukjent", () => {
-        expect(feilFor({ bidragsmottaker: { ident: "", navn: "" } })).toEqual(
-            expect.arrayContaining([expect.objectContaining({ path: ["bidragsmottaker", "ident"] })]),
-        );
         expect(
             feilFor({
-                bidragsmottaker: { ident: "", erKjent: false },
+                roller: [
+                    { ...kjent(bp), type: "BP" },
+                    { ident: "", navn: "", type: "BM" },
+                ],
+            }),
+        ).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["roller", 1, "ident"] })]));
+        expect(
+            feilFor({
+                roller: [
+                    { ...kjent(bp), type: "BP" },
+                    { ident: "", erKjent: false, type: "BM" },
+                ],
                 valgteBarn: [{ ...barn, reellMottakerType: "barnet_selv" }],
             }),
         ).toEqual([]);
     });
 
     it("lar partene bytte roller", () => {
-        expect(feilFor({ bidragspliktig: kjent(bm), bidragsmottaker: kjent(bp) })).toEqual([]);
+        expect(
+            feilFor({
+                roller: [
+                    { ...kjent(bm), type: "BP" },
+                    { ...kjent(bp), type: "BM" },
+                ],
+            }),
+        ).toEqual([]);
     });
 
     it("krever RM når BM er ukjent", () => {
-        expect(feilFor({ bidragsmottaker: { ident: "", erKjent: false } })).toEqual(
-            expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn", 0, "reellMottakerType"] })]),
-        );
+        expect(
+            feilFor({
+                roller: [
+                    { ...kjent(bp), type: "BP" },
+                    { ident: "", erKjent: false, type: "BM" },
+                ],
+            }),
+        ).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn", 0, "reellMottakerType"] })]));
     });
 
     it("krever barn, unntatt når BM er kjent", () => {
         expect(feilFor({ valgteBarn: [] })).toEqual([]);
-        expect(feilFor({ bidragsmottaker: { ident: "", erKjent: false }, valgteBarn: [] })).toEqual(
-            expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn"] })]),
-        );
+        expect(
+            feilFor({
+                roller: [
+                    { ...kjent(bp), type: "BP" },
+                    { ident: "", erKjent: false, type: "BM" },
+                ],
+                valgteBarn: [],
+            }),
+        ).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["valgteBarn"] })]));
     });
 });
 

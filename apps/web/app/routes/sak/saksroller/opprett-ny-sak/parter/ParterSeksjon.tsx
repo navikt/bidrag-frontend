@@ -1,10 +1,10 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Alert, Button, HGrid, VStack } from "@navikt/ds-react";
 import SøkPerson from "../../felles/person-søk/SøkPerson";
+import RolleForelderKort from "../../rollebilde/forelder/ForelderKort";
 import type { ForelderPart, ForelderPartRolle } from "../skjema/opprett-sak-schema";
 import SkjemaSeksjon from "../skjema/SkjemaSeksjon";
 import { hentForelderRolleLabel } from "./part-utils";
-import { RollePersonKort } from "./RollePersonKort";
 
 export type ForelderKortProps = {
     rolle: ForelderPartRolle;
@@ -44,10 +44,25 @@ export default function ParterSeksjon({
 
 function ForelderKort(props: ForelderKortProps) {
     const { rolle, part } = props;
+    const ident = part.ident;
+    const erKjent = part.erKjent === true && !!ident;
 
     return (
         <VStack role="group" aria-label={hentForelderRolleLabel(rolle)}>
-            <RollePersonKort person={{ ...part, rolle }}>{!props.låst && <Handlinger {...props} />}</RollePersonKort>
+            <RolleForelderKort
+                forelder={
+                    erKjent
+                        ? {
+                              ident,
+                              navn: part.navn,
+                              diskresjonskode: part.diskresjonskode,
+                          }
+                        : null
+                }
+                rolle={rolle === "bidragspliktig" ? "BP" : "BM"}
+                visIkon={false}
+                actions={!props.låst && <Handlinger {...props} />}
+            />
         </VStack>
     );
 }

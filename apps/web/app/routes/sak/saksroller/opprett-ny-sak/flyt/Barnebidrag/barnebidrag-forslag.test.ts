@@ -1,5 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { describe, expect, it } from "vitest";
+import { filtrerBortValgteForeldre } from "../../parter/part-utils";
 import {
     harFullstendigRelasjon,
     harMotpartMedUlikeForelderroller,
@@ -23,6 +24,15 @@ describe("utledForelderforslag", () => {
                 feil: undefined,
             },
         );
+    });
+
+    describe("filtrerBortValgteForeldre", () => {
+        it("fjerner foreldre som allerede er valgt i et annet kort", () => {
+            expect(filtrerBortValgteForeldre([far, mor, annen], [{ ident: far.ident }, { ident: undefined }])).toEqual([
+                mor,
+                annen,
+            ]);
+        });
     });
 
     it("feil ved mer enn to foreldre", () => {

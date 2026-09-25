@@ -2,14 +2,18 @@ import { Arbeidsfordeling, type OpprettSakRequest, Rolletype } from "@bidrag/api
 
 export type SaksrollerArbeidsfordeling = "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
 type Rolle = OpprettSakRequest["roller"][number];
-type Part = { ident?: string } | null | undefined;
-type Barn = { ident: string; reellMottaker?: string };
+
+export type OpprettSakRolle = {
+    fodselsnummer?: string;
+    type: Rolletype;
+    rolleType?: Rolletype;
+    mottagerErVerge?: boolean;
+    reellMottaker?: { ident: string; verge: boolean } | null;
+};
 
 export type OpprettSakParter = {
     kategori: "Nasjonal" | "Utland";
-    bidragspliktig?: Part;
-    bidragsmottaker?: Part;
-    barn: Barn[];
+    roller: OpprettSakRolle[];
 };
 
 const arbeidsfordelingTilEnum: Record<SaksrollerArbeidsfordeling, Arbeidsfordeling> = {
@@ -38,7 +42,7 @@ const arbeidsfordelingTilEnum: Record<SaksrollerArbeidsfordeling, Arbeidsfordeli
 export function lagOpprettSakRequest(
     enhet: string,
     arbeidsfordeling: SaksrollerArbeidsfordeling,
-    { kategori, bidragspliktig, bidragsmottaker, barn }: OpprettSakParter,
+    { kategori, roller }: OpprettSakParter,
 ): OpprettSakRequest {
     return kontrollerOpprettSakRequest({
         eierfogd: enhet,
@@ -47,12 +51,18 @@ export function lagOpprettSakRequest(
         ansatt: false,
         inhabilitet: false,
         levdeAdskilt: false,
-        roller: [
-            personRolle(bidragspliktig?.ident, Rolletype.BP),
-            personRolle(bidragsmottaker?.ident, Rolletype.BM),
-            ...barn.map(barnRolle),
-        ],
+        roller: roller.map(normaliserRolle),
     } as OpprettSakRequest);
+}
+
+function normaliserRolle(rolle: OpprettSakRolle): Rolle {
+    return {
+        fodselsnummer: rolle.fodselsnummer,
+        type: rolle.type,
+        rolleType: rolle.rolleType ?? rolle.type,
+        mottagerErVerge: rolle.mottagerErVerge ?? false,
+        reellMottaker: rolle.reellMottaker ?? null,
+    } as Rolle;
 }
 
 function kontrollerOpprettSakRequest(request: OpprettSakRequest): OpprettSakRequest {
@@ -68,15 +78,4 @@ function kontrollerOpprettSakRequest(request: OpprettSakRequest): OpprettSakRequ
 
 function harReellMottaker(rolle: Rolle) {
     return !!rolle.reellMottaker?.ident?.trim();
-}
-
-function personRolle(fodselsnummer: string | undefined, type: Rolletype): Rolle {
-    return { fodselsnummer, type, rolleType: type, mottagerErVerge: false } as Rolle;
-}
-
-function barnRolle(barn: Barn): Rolle {
-    return {
-        ...personRolle(barn.ident, Rolletype.BA),
-        reellMottaker: barn.reellMottaker ? { ident: barn.reellMottaker, verge: false } : null,
-    } as Rolle;
 }

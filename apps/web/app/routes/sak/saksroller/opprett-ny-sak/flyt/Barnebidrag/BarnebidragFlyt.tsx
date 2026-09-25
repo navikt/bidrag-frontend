@@ -7,6 +7,7 @@ import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";
 import ParterSeksjon from "../../parter/ParterSeksjon";
 import UfullstendigRelasjonAlert from "../../parter/UfullstendigRelasjonAlert";
 import {
+    type BarnebidragForelderRolle,
     type BarnebidragSkjemaData,
     BarnebidragSkjemaSchema,
     type ForelderPart,
@@ -34,8 +35,10 @@ function lagStartverdier(
     const erBarn = erBarnRolle(partISaken);
 
     return {
-        bidragspliktig: partISaken.rolle === "bidragspliktig" ? søkt : IKKE_VALGT,
-        bidragsmottaker: partISaken.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT,
+        roller: [
+            { ...(partISaken.rolle === "bidragspliktig" ? søkt : IKKE_VALGT), type: "BP" },
+            { ...(partISaken.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT), type: "BM" },
+        ] satisfies BarnebidragForelderRolle[],
         valgteBarn: erBarn
             ? [
                   {

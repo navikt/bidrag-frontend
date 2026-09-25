@@ -22,3 +22,8 @@ const forelderRolleLabels: Record<ForelderPartRolle, string> = {
 export function hentForelderRolleLabel(rolle: ForelderPartRolle): string {
     return forelderRolleLabels[rolle];
 }
+
+export function filtrerBortValgteForeldre(forslag: PersonDto[], valgteForeldre: { ident?: string }[]): PersonDto[] {
+    const valgteIdenter = new Set(valgteForeldre.map((forelder) => forelder.ident).filter(Boolean));
+    return forslag.filter((forelder) => !valgteIdenter.has(forelder.ident));
+}
