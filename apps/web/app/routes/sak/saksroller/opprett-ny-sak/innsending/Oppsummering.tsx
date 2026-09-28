@@ -57,7 +57,7 @@ export default function Oppsummering({ bidragspliktig, bidragsmottaker, barn }: 
                             <Felt key={b.ident}>
                                 <PersonVerdi person={b} />
                                 <BodyShort size="small" textColor="subtle">
-                                    Reell mottaker: {reellMottakerTekst(b)}
+                                    Reell mottaker: <span className="personnavn">{reellMottakerTekst(b)}</span>
                                 </BodyShort>
                             </Felt>
                         ))}

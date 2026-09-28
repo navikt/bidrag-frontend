@@ -78,7 +78,7 @@ export default function ReellMottakerValgGruppe({
                         Bidragsmottaker
                     </Radio>
                     <Radio disabled={kunSamhandlerSomReellMottaker} value="barnet_selv">
-                        {barnNavn} (barnet selv)
+                        <span className="personnavn">{barnNavn}</span> (barnet selv)
                     </Radio>
                     <Radio value="samhandler">Annen person eller samhandler</Radio>
                 </VStack>

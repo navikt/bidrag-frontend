@@ -32,6 +32,57 @@ test("Bekreft fyller ut skjemaet og tømmer søket", async ({ mount, page }) => 
     await expect(component.getByRole("button", { name: "Bekreft" })).toHaveCount(0);
 });
 
+test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ mount, page }) => {
+    await mockWizardApi(page, {
+        parentRelations: {
+            [testpersoner.barnUnder18.ident]: [testpersoner.bidragspliktig.ident, testpersoner.bidragsmottaker.ident],
+        },
+    });
+    const component = await mount(STORY);
+    const søk = component.getByRole("searchbox", { name: "Søk etter person" });
+    await søk.fill(testpersoner.bidragspliktig.ident);
+    await søk.press("Enter");
+
+    const rollenavn = component.getByRole("radiogroup", { name: /Hvilken rolle har/ }).locator(".personnavn");
+    await expect(rollenavn).toHaveText(testpersoner.bidragspliktig.visningsnavn);
+
+    await page.evaluate(() =>
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "ø", ctrlKey: true, bubbles: true })),
+    );
+    await expect(page.locator("body")).toHaveClass(/blur-sensitive-info/);
+    await expect(rollenavn).toHaveCSS("filter", "blur(5px)");
+
+    await component.getByRole("radio", { name: "Bidragspliktig" }).check();
+    await component.getByRole("button", { name: "Bekreft" }).click();
+    await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+    const barnSøk = page.getByRole("searchbox", { name: "Søk etter barn" });
+    await barnSøk.fill(testpersoner.barnUnder18.ident);
+    await barnSøk.press("Enter");
+    await component.getByRole("button", { name: "Legg til", exact: true }).click();
+    const oppsummering = component
+        .locator("section")
+        .filter({ has: page.getByRole("heading", { name: "Oppsummering" }) });
+    const partnavn = oppsummering.locator(".personnavn").filter({
+        hasText: testpersoner.bidragspliktig.visningsnavn,
+    });
+    const motpartnavn = component.locator(".personnavn").filter({
+        hasText: testpersoner.bidragsmottaker.visningsnavn,
+    });
+    const barnnavn = component.locator(".personnavn").filter({ hasText: testpersoner.barnUnder18.visningsnavn });
+
+    await expect(partnavn).toHaveCSS("filter", "blur(5px)");
+    await expect(partnavn).not.toHaveAttribute("title");
+    await expect(motpartnavn.first()).toHaveCSS("filter", "blur(5px)");
+    await expect(barnnavn.first()).toHaveCSS("filter", "blur(5px)");
+
+    await page.evaluate(() =>
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "ø", ctrlKey: true, bubbles: true })),
+    );
+    await expect(page.locator("body")).not.toHaveClass(/blur-sensitive-info/);
+    await expect(partnavn).toHaveCSS("filter", "none");
+    await expect(partnavn).toHaveAttribute("title", testpersoner.bidragspliktig.visningsnavn);
+});
+
 test("ny Bekreft med utfylt skjema spør før skjemaet nullstilles", async ({ mount, page }) => {
     await mockWizardApi(page);
     const component = await mount(STORY);

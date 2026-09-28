@@ -1,4 +1,12 @@
-import { IdentUtils, ModiaLink, PersonIdent, PersonNavnIdent, RolleTag, type RolleType } from "@bidrag/common";
+import {
+    IdentUtils,
+    ModiaLink,
+    PersonIdent,
+    PersonNavnIdent,
+    RolleTag,
+    type RolleType,
+    useBidragCommons,
+} from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
 import { BodyShort, Box, CopyButton, HStack, Link, Skeleton, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
@@ -37,6 +45,7 @@ function PersonInfoContent({
     compact = false,
     children,
 }: Props) {
+    const { erMaskert } = useBidragCommons();
     const { data } = useHentPersonData(ident);
     const erSamhandlerIdent = IdentUtils.isSamhandlerId(ident);
     const { data: samhandlerData } = useHentSamhandler(ident, erSamhandlerIdent);
@@ -56,6 +65,7 @@ function PersonInfoContent({
         erSamhandlerIdent,
         samhandlerNavn: samhandlerData?.navn,
         visningsnavn: data?.visningsnavn,
+        erMaskert,
         children,
     };
 
@@ -67,6 +77,7 @@ type PersonInfoContentProps = Omit<Props, "fødselsdato" | "alder" | "compact" |
     erSamhandlerIdent: boolean;
     samhandlerNavn?: string;
     visningsnavn?: string;
+    erMaskert: boolean;
 };
 
 function RolleTagForPerson({
@@ -81,11 +92,10 @@ function SamhandlerIdent({
     ident,
     navn,
     samhandlerNavn,
-    compact,
-}: Pick<PersonInfoContentProps, "ident" | "navn" | "samhandlerNavn"> & { compact?: boolean }) {
+}: Pick<PersonInfoContentProps, "ident" | "navn" | "samhandlerNavn">) {
     return (
         <HStack gap="space-1">
-            <BodyShort size="small" className={compact ? undefined : "personnavn"}>
+            <BodyShort size="small" className="personnavn">
                 {navn ?? samhandlerNavn}
             </BodyShort>
             <Link href={`/samhandler/${ident}`} target="_blank" rel="noopener noreferrer">
@@ -111,7 +121,7 @@ function PersonIdentLine({
         <HStack asChild align="center">
             <BodyShort textColor="subtle" size="small">
                 {erSamhandlerIdent ? (
-                    <SamhandlerIdent ident={ident} navn={navn} samhandlerNavn={samhandlerNavn} compact={compact} />
+                    <SamhandlerIdent ident={ident} navn={navn} samhandlerNavn={samhandlerNavn} />
                 ) : (
                     <PersonNavnIdent
                         variant="ident"
@@ -126,7 +136,8 @@ function PersonIdentLine({
 }
 
 function StandardPersonInfo(props: PersonInfoContentProps) {
-    const { ident, navn, visningsnavn, erSamhandlerIdent, visModiaLenke, tags, headingActions, children } = props;
+    const { ident, navn, visningsnavn, erMaskert, erSamhandlerIdent, visModiaLenke, tags, headingActions, children } =
+        props;
     return (
         <HStack gap="space-8" align="start" wrap={false}>
             <RolleTagForPerson {...props} />
@@ -139,7 +150,7 @@ function StandardPersonInfo(props: PersonInfoContentProps) {
                                 weight="semibold"
                                 truncate
                                 className="personnavn"
-                                title={visningsnavn ?? navn}
+                                title={erMaskert ? undefined : (visningsnavn ?? navn)}
                             >
                                 {visningsnavn ?? navn}
                             </BodyShort>
@@ -161,6 +172,7 @@ function CompactPersonInfo(props: PersonInfoContentProps) {
         ident,
         navn,
         visningsnavn,
+        erMaskert,
         erSamhandlerIdent,
         visModiaLenke,
         tags,
@@ -177,7 +189,12 @@ function CompactPersonInfo(props: PersonInfoContentProps) {
                         <HStack gap="space-4" align="center">
                             {!erSamhandlerIdent && (
                                 <Box asChild minWidth="0">
-                                    <BodyShort size="small" weight="semibold" title={visningsnavn ?? navn}>
+                                    <BodyShort
+                                        size="small"
+                                        weight="semibold"
+                                        className="personnavn"
+                                        title={erMaskert ? undefined : (visningsnavn ?? navn)}
+                                    >
                                         {visningsnavn ?? navn}
                                     </BodyShort>
                                 </Box>

@@ -111,7 +111,12 @@ export default function StartpartVelger({
             <NullstillDialog
                 open={viserNullstillDialog}
                 onOpenChange={setViserNullstillDialog}
-                beskrivelse={`Skjemaet nullstilles og fylles ut på nytt med ${utkast?.person.visningsnavn}.`}
+                beskrivelse={
+                    <>
+                        Skjemaet nullstilles og fylles ut på nytt med{" "}
+                        <span className="personnavn">{utkast?.person.visningsnavn}</span>.
+                    </>
+                }
                 onBekreft={bekreft}
             />
         </SkjemaSeksjon>

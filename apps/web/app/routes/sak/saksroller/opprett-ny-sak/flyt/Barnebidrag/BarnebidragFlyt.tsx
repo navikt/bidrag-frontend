@@ -78,8 +78,8 @@ function BarnebidragForForelder({ partISaken }: { partISaken: PartISaken }) {
     if (harMotpartMedUlikeForelderroller(relasjoner)) {
         return (
             <Alert variant="error">
-                Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for {partISaken.navn}.
-                Kontakt support for å få hjelp.
+                Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for{" "}
+                <span className="personnavn">{partISaken.navn}</span>. Kontakt support for å få hjelp.
             </Alert>
         );
     }

@@ -24,7 +24,11 @@ export default function SaksrolleVelger({ navn, alder, sakstype, rolle, readOnly
 
     return (
         <RadioGroup
-            legend={`Hvilken rolle har ${navn}?`}
+            legend={
+                <>
+                    Hvilken rolle har <span className="personnavn">{navn}</span>?
+                </>
+            }
             value={rolle ?? null}
             onChange={velgSaksrolle}
             size="small"

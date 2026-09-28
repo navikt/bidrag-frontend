@@ -72,7 +72,7 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, on
                         {...gruppe}
                         tittel={
                             <>
-                                Med {motpartNavn} <PersonIdent ident={ident} />
+                                Med <span className="personnavn">{motpartNavn}</span> <PersonIdent ident={ident} />
                             </>
                         }
                         legend={`Velg barn med ${motpartNavn}`}

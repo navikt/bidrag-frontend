@@ -1,4 +1,5 @@
 import { Button, Dialog } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 
 /** Bekreftelse før et utfylt skjema nullstilles. */
 export default function NullstillDialog({
@@ -9,7 +10,7 @@ export default function NullstillDialog({
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    beskrivelse: string;
+    beskrivelse: ReactNode;
     onBekreft: () => void;
 }) {
     return (

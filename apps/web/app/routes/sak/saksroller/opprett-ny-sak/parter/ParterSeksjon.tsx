@@ -121,7 +121,7 @@ function VelgForelder({
                     variant="secondary"
                     onClick={() => onVelg(person)}
                 >
-                    Bruk {person.visningsnavn}
+                    Bruk <span className="personnavn">{person.visningsnavn}</span>
                 </Button>
             ))}
             <SøkPerson label={`Søk etter ${rolle}`} personInformasjon={onVelg} />
