@@ -9,6 +9,7 @@ type SaksrollerStatus = {
     setFeilmelding: (melding: string | null) => void;
     setValideringsFeil: (melding: string | null) => void;
     setSuksessmelding: (melding: string | null) => void;
+    lagringBlokkert?: boolean;
 };
 
 export function useSaksrollerSubmit(
@@ -18,10 +19,14 @@ export function useSaksrollerSubmit(
 ) {
     const oppdaterSaksrollerMutation = useOppdaterSaksroller();
     const { handleSubmit } = formMethods;
-    const { setFeilmelding, setValideringsFeil, setSuksessmelding } = status;
+    const { setFeilmelding, setValideringsFeil, setSuksessmelding, lagringBlokkert = false } = status;
 
     const onSubmit = useCallback(
         async (data: SakRedigeringData): Promise<string> => {
+            if (lagringBlokkert) {
+                throw new Error("Relasjonen mellom barna og foreldrene er ikke kontrollert.");
+            }
+
             try {
                 setSuksessmelding(null);
                 setFeilmelding(null);
@@ -37,7 +42,14 @@ export function useSaksrollerSubmit(
                 throw err;
             }
         },
-        [oppdaterSaksrollerMutation, saksnummer, setFeilmelding, setSuksessmelding, setValideringsFeil],
+        [
+            lagringBlokkert,
+            oppdaterSaksrollerMutation,
+            saksnummer,
+            setFeilmelding,
+            setSuksessmelding,
+            setValideringsFeil,
+        ],
     );
 
     const handleSubmitAsync = useCallback(

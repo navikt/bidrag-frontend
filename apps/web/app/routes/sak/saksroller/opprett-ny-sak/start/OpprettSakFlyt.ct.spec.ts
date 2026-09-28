@@ -232,6 +232,8 @@ test.describe("Innbygget med forhåndsutfylling", () => {
             .getByRole("button", { name: `Bruk ${bp.visningsnavn}` })
             .click();
 
+        await expect(component.getByRole("button", { name: "Opprett og ny søknad" })).toHaveCount(0);
+        await expect(component.getByRole("button", { name: "Opprett og gå til sak" })).toHaveCount(0);
         await component.getByRole("button", { name: /Opprett$/ }).click();
         await expect.poll(() => requests.create).toBeTruthy();
         expect(requests.create).toMatchObject({ eierfogd: "4806", kategori: "N", arbeidsfordeling: "EEN" });

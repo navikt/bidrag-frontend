@@ -22,7 +22,7 @@ export default function RolleFlytSide({ onSubmit, status, innledning, children, 
     const visStatus = status.infoMelding || status.isLoading || (status.harEksisterendeSak && status.eksisterendeSak);
 
     return (
-        <FlytSkjema onSubmit={onSubmit}>
+        <FlytSkjema onSubmit={onSubmit} disabled={innsending.isLoading}>
             <VStack gap="space-24" aria-busy={status.isLoading}>
                 <KategoriSeksjon />
                 {innledning && <VStack gap="space-12">{innledning}</VStack>}

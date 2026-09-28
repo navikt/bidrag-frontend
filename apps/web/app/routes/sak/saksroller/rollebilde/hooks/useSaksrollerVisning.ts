@@ -58,12 +58,13 @@ export function useSaksrollerVisning(saksnummer: string) {
         },
     });
 
-    const barnMedUfullstendigRelasjon = useBarnMedUfullstendigRelasjon({
+    const relasjonskontroll = useBarnMedUfullstendigRelasjon({
         barnIdenter,
         bidragspliktigIdent: bp?.fodselsnummer,
         bidragsmottakerIdent: bm?.fodselsnummer,
         harSak: !!sak,
     });
+    const { barnMedUfullstendigRelasjon } = relasjonskontroll;
 
     const { endringsliste, harEndringer } = useEndringssporing({
         opprinneligeRoller: berikedeRoller,
@@ -77,11 +78,17 @@ export function useSaksrollerVisning(saksnummer: string) {
         setFeilmelding,
         setValideringsFeil,
         setSuksessmelding,
+        lagringBlokkert: relasjonskontroll.isLoading || relasjonskontroll.isError,
     });
 
     const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
     const erNyPerson = (fnr?: string) => (fnr ? !funnetPersonISak(fnr) : undefined);
     const samletFeilmelding = feilmelding || feil;
+    const relasjonskontrollStatus: "feilet" | "venter" | undefined = relasjonskontroll.isError
+        ? "feilet"
+        : relasjonskontroll.isLoading
+          ? "venter"
+          : undefined;
 
     return {
         sak,
@@ -111,6 +118,7 @@ export function useSaksrollerVisning(saksnummer: string) {
             feilmelding: samletFeilmelding || undefined,
             valideringsFeil,
             harAdvarsel: barnMedUfullstendigRelasjon.length > 0,
+            relasjonskontroll: relasjonskontrollStatus,
             harEndringer,
             suksessmelding,
             statusRef,

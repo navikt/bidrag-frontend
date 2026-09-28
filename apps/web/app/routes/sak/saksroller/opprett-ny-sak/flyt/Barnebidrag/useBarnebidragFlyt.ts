@@ -18,16 +18,9 @@ import {
     type ForelderPartRolle,
 } from "../../skjema/opprett-sak-schema";
 import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
-import {
-    type ForeldreTilBarn,
-    harFullstendigRelasjon,
-    rollerEtterValg,
-    rolleSomPart,
-    tilPart,
-    utledBarnkurverForForelder,
-    utledFellesBarn,
-    utledForelderforslag,
-} from "./barnebidrag-forslag";
+import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
+import { type ForeldreTilBarn, harFullstendigRelasjon, utledForelderforslag } from "./barnebidrag-forelderforslag";
+import { rollerEtterValg, rolleSomPart, tilPart } from "./barnebidrag-roller";
 
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined, diskresjonskode: undefined };
 const UKJENT: ForelderPart = { ...IKKE_VALGT, erKjent: false };

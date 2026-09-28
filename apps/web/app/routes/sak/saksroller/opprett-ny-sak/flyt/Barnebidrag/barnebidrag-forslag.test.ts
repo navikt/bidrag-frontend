@@ -1,14 +1,10 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { describe, expect, it } from "vitest";
 import { filtrerBortValgteForeldre } from "../../parter/part-utils";
-import {
-    harFullstendigRelasjon,
-    harMotpartMedUlikeForelderroller,
-    rollerEtterValg,
-    utledBarnkurverForForelder,
-    utledFellesBarn,
-    utledForelderforslag,
-} from "./barnebidrag-forslag";
+import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
+import { harFullstendigRelasjon, utledForelderforslag } from "./barnebidrag-forelderforslag";
+import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
+import { rollerEtterValg } from "./barnebidrag-roller";
 
 const person = (ident: string, visningsnavn = ident): PersonDto => ({ ident, visningsnavn }) as PersonDto;
 const far = person("11111111111", "Far");

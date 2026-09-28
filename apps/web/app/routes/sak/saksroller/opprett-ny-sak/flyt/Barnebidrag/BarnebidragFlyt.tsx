@@ -16,7 +16,7 @@ import {
 } from "../../skjema/opprett-sak-schema";
 import RolleFlytSide from "../../skjema/RolleFlytSide";
 import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
-import { harMotpartMedUlikeForelderroller } from "./barnebidrag-forslag";
+import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
 import { useBarnebidragFlyt } from "./useBarnebidragFlyt";
 
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined };

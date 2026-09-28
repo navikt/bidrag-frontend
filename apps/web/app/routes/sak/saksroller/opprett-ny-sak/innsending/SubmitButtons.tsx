@@ -33,12 +33,12 @@ function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redi
     useEffect(() => {
         if (!saksnummer) return;
 
-        if (redirectmål.current === "sak") {
+        if (onOpprettetRef.current) {
+            onOpprettetRef.current(saksnummer);
+        } else if (redirectmål.current === "sak") {
             RedirectTo.behandleSak(saksnummer, bisysUrl);
         } else if (redirectmål.current === "soknad") {
             RedirectTo.nySoknad(saksnummer, bisysUrl);
-        } else if (onOpprettetRef.current) {
-            onOpprettetRef.current(saksnummer);
         } else {
             setSearchParams(
                 (forrige) => {
@@ -56,7 +56,7 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
     const afterSubmitRedirect = useRef<Redirectmål>(null);
     const [blockedError, setBlockedError] = useState<string | null>(null);
     const form = useFormContext();
-    const { onAvbryt } = useSaksrolleroversikt();
+    const { onAvbryt, onOpprettet } = useSaksrolleroversikt();
     const visFeil = Boolean(error || blockedError);
 
     useRedirectEtterOpprettelse(saksnummer, afterSubmitRedirect);
@@ -108,7 +108,12 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
                         : `Sak opprettet med saksnummer ${saksnummer}.`}
                 </Alert>
             ) : (
-                <Opprettknapper isLoading={isLoading} onVelg={velgHandling} onAvbryt={onAvbryt} />
+                <Opprettknapper
+                    isLoading={isLoading}
+                    onVelg={velgHandling}
+                    onAvbryt={onAvbryt}
+                    harOnOpprettet={Boolean(onOpprettet)}
+                />
             )}
         </VStack>
     );
@@ -118,10 +123,12 @@ function Opprettknapper({
     isLoading,
     onVelg,
     onAvbryt,
+    harOnOpprettet,
 }: {
     isLoading: boolean;
     onVelg: (event: MouseEvent<HTMLButtonElement>, handling: Redirectmål) => void;
     onAvbryt?: () => void;
+    harOnOpprettet: boolean;
 }) {
     return (
         <HStack gap="space-2" justify="end">
@@ -130,28 +137,32 @@ function Opprettknapper({
                     Avbryt
                 </Button>
             )}
-            <Button
-                variant="tertiary"
-                type="submit"
-                size="xsmall"
-                title="Opprett sak og gå til ny søknad skjermbildet"
-                icon={<TasklistStartIcon title="lagre" fontSize="1.5rem" />}
-                loading={isLoading}
-                onClick={(event) => onVelg(event, "soknad")}
-            >
-                Opprett og ny søknad
-            </Button>
-            <Button
-                variant="tertiary"
-                type="submit"
-                size="xsmall"
-                icon={<TasklistSendIcon title="lagre" fontSize="1.5rem" />}
-                loading={isLoading}
-                title="Opprett og gå til sak"
-                onClick={(event) => onVelg(event, "sak")}
-            >
-                Opprett og gå til sak
-            </Button>
+            {!harOnOpprettet && (
+                <>
+                    <Button
+                        variant="tertiary"
+                        type="submit"
+                        size="xsmall"
+                        title="Opprett sak og gå til ny søknad skjermbildet"
+                        icon={<TasklistStartIcon title="lagre" fontSize="1.5rem" />}
+                        loading={isLoading}
+                        onClick={(event) => onVelg(event, "soknad")}
+                    >
+                        Opprett og ny søknad
+                    </Button>
+                    <Button
+                        variant="tertiary"
+                        type="submit"
+                        size="xsmall"
+                        icon={<TasklistSendIcon title="lagre" fontSize="1.5rem" />}
+                        loading={isLoading}
+                        title="Opprett og gå til sak"
+                        onClick={(event) => onVelg(event, "sak")}
+                    >
+                        Opprett og gå til sak
+                    </Button>
+                </>
+            )}
             <Button
                 variant="primary"
                 type="submit"

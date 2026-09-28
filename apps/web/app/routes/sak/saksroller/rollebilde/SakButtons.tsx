@@ -15,6 +15,7 @@ export type SakButtonsProps = {
     valideringsFeil?: string | null;
     harAdvarsel: boolean;
     harEndringer: boolean;
+    relasjonskontroll?: "venter" | "feilet";
     suksessmelding?: string | null;
     statusRef?: RefObject<HTMLDivElement | null>;
     statusResetKey: number;
@@ -27,6 +28,7 @@ export default function SakButtons({
     valideringsFeil,
     harAdvarsel,
     harEndringer,
+    relasjonskontroll,
     suksessmelding,
     statusRef,
     statusResetKey,
@@ -56,6 +58,7 @@ export default function SakButtons({
     };
 
     const lagre = async (handling: Lagrehandling) => {
+        if (lagrer || relasjonskontroll) return;
         setLagrer(true);
         try {
             await lagrehandlinger[handling]();
@@ -68,7 +71,7 @@ export default function SakButtons({
     };
 
     const velgLagrehandling = (handling: Lagrehandling) => {
-        if (lagrer) return;
+        if (lagrer || relasjonskontroll) return;
         if (!harEndringer) {
             setIngenEndringer(true);
         } else if (harAdvarsel) {
@@ -85,6 +88,7 @@ export default function SakButtons({
                 visIngenEndringer={ingenEndringer && !harEndringer}
                 feilmelding={feilmelding}
                 valideringsFeil={valideringsFeil}
+                relasjonskontroll={relasjonskontroll}
                 statusRef={statusRef}
             />
 
@@ -95,6 +99,7 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå til ny søknad skjermbildet"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
+                    disabled={Boolean(relasjonskontroll) || lagrer}
                     onClick={() => velgLagrehandling("nySoknad")}
                 >
                     Lagre og ny søknad
@@ -105,6 +110,7 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå tilbake til sak"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
+                    disabled={Boolean(relasjonskontroll) || lagrer}
                     onClick={() => velgLagrehandling("gaaTilSak")}
                 >
                     Lagre og gå til sak
@@ -113,6 +119,7 @@ export default function SakButtons({
                     type="button"
                     size="xsmall"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
+                    disabled={Boolean(relasjonskontroll) || lagrer}
                     onClick={() => velgLagrehandling("bliVaerende")}
                 >
                     Lagre
@@ -138,12 +145,14 @@ function Statusmeldinger({
     visIngenEndringer,
     feilmelding,
     valideringsFeil,
+    relasjonskontroll,
     statusRef,
 }: {
     suksessmelding?: string | null;
     visIngenEndringer: boolean;
     feilmelding?: string | null;
     valideringsFeil?: string | null;
+    relasjonskontroll?: "venter" | "feilet";
     statusRef?: RefObject<HTMLDivElement | null>;
 }) {
     return (
@@ -158,6 +167,18 @@ function Statusmeldinger({
                 </div>
             )}
             {visIngenEndringer && <InlineMessage status="info">Ingen endringer å lagre.</InlineMessage>}
+            {relasjonskontroll === "venter" && (
+                <InlineMessage status="info">Kontrollerer relasjonen mellom barna og foreldrene.</InlineMessage>
+            )}
+            {relasjonskontroll === "feilet" && (
+                <LocalAlert status="error">
+                    <LocalAlert.Header>
+                        <LocalAlert.Title>
+                            Kunne ikke kontrollere relasjonen mellom barna og foreldrene. Oppdater siden og prøv igjen.
+                        </LocalAlert.Title>
+                    </LocalAlert.Header>
+                </LocalAlert>
+            )}
             {feilmelding && (
                 <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
                     <LocalAlert.Header>

@@ -1,12 +1,12 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { tilBarn } from "../../felles/barn/barn-regler";
+import { erUnderMaksAlder, tilBarn } from "../../felles/barn/barn-regler";
 import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
 
 const tilBarnMedAlder = (person: PersonDto): BarnMedAlder => ({ ...tilBarn(person), navn: person.visningsnavn });
 
 export function grupperBarnIKurver(relasjoner: MotpartBarnRelasjon[]): Barnkurv[] {
     return relasjoner.map((rel, index) => {
-        const barnMedAlder: BarnMedAlder[] = rel.fellesBarn.map(tilBarnMedAlder);
+        const barnMedAlder: BarnMedAlder[] = rel.fellesBarn.filter(erUnderMaksAlder).map(tilBarnMedAlder);
         const sorterteBarn = barnMedAlder.sort((a, b) => b.alder - a.alder);
 
         return {

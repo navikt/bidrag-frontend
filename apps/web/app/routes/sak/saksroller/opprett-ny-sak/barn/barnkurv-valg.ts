@@ -25,7 +25,7 @@ export function beregnBarnkurvValg(
         ),
     );
     const bytterKurv = valgteIdenter.length > 0 && aktivKurv !== undefined && aktivKurv.id !== kurvId;
-    const eksisterendeValg = bytterKurv ? [] : nåværendeBarn;
+    const eksisterendeValg = bytterKurv ? nåværendeBarn.filter((barn) => barn.manuellLagtTil) : nåværendeBarn;
     const forblirValgt = eksisterendeValg.filter(
         (barn) => !identerIPar.includes(barn.ident) || valgteIdenter.includes(barn.ident),
     );

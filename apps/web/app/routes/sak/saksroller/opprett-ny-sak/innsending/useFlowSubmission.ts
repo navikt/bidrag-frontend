@@ -52,20 +52,23 @@ function useSendInn<T extends FormMedKategori>(
     form: UseFormReturn<T>,
     innsending: ReturnType<typeof useOpprettSakHandling>,
     parter: Omit<OpprettSakParter, "kategori">,
+    kanSendeInn: boolean,
 ) {
     const { opprettSak, isLoading, saksnummer, nullstillResultat } = innsending;
     const senderInn = useRef(false);
 
     useEffect(() => {
         const abonnement = form.watch(() => {
-            form.clearErrors();
-            nullstillResultat();
+            if (!senderInn.current && !isLoading) {
+                form.clearErrors();
+                nullstillResultat();
+            }
         });
         return () => abonnement.unsubscribe();
-    }, [form, nullstillResultat]);
+    }, [form, isLoading, nullstillResultat]);
 
     return form.handleSubmit(async (data) => {
-        if (senderInn.current || isLoading || saksnummer) return;
+        if (!kanSendeInn || senderInn.current || isLoading || saksnummer) return;
         senderInn.current = true;
         try {
             await opprettSak({ kategori: data.kategori, ...parter });
@@ -121,14 +124,21 @@ export function useFlowSubmission<T extends FormMedKategori>({
         barn: valgteBarn,
         roller: lagRoller(roller, valgteBarn),
     };
-    const onSubmit = useSendInn(form, opprettSak, parter);
+    const blocked =
+        harEksisterendeSak ||
+        isLoadingHentSak ||
+        isLoadingEnhet ||
+        !enhet ||
+        Boolean(enhetError) ||
+        tilgangUtenBm.blokkert;
+    const onSubmit = useSendInn(form, opprettSak, parter, !blocked);
 
     const innsending: EnhetOgSubmitSectionProps = {
         enhet,
         enhetNavn,
         isLoadingEnhet,
         enhetError,
-        blocked: harEksisterendeSak || isLoadingHentSak || isLoadingEnhet || !enhet || tilgangUtenBm.blokkert,
+        blocked,
         manglerTilgangUtenBm: tilgangUtenBm.mangler,
         oppsummering: parter,
         submitError: opprettSak.error,
