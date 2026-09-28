@@ -1,5 +1,13 @@
-import { Loader, Modal } from "@navikt/ds-react";
-import { type ComponentType, createContext, Suspense, useContext } from "react";
+import { Button, Loader, Modal } from "@navikt/ds-react";
+import {
+    type ComponentType,
+    createContext,
+    type MouseEventHandler,
+    Suspense,
+    useContext,
+    useId,
+    useState,
+} from "react";
 
 export type NyOpprettSakFlytProps = {
     ident: string;
@@ -16,6 +24,18 @@ export type NyOpprettSakFlytProps = {
  * `null` betyr at den gamle modalen skal brukes.
  */
 export const NyOpprettSakFlytContext = createContext<ComponentType<NyOpprettSakFlytProps> | null>(null);
+type ModalSubmit = {
+    isLoading: boolean;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+};
+const NyOpprettSakModalContext = createContext<{
+    formId: string;
+    setSubmit: (submit: ModalSubmit | null) => void;
+} | null>(null);
+
+export function useNyOpprettSakModal() {
+    return useContext(NyOpprettSakModalContext);
+}
 
 export function useHarNyOpprettSakFlyt() {
     return useContext(NyOpprettSakFlytContext) !== null;
@@ -28,15 +48,42 @@ type OpprettSakFlytModalProps = Omit<NyOpprettSakFlytProps, "onAvbryt"> & {
 
 export function OpprettSakFlytModal({ open, onClose, ...props }: OpprettSakFlytModalProps) {
     const Flyt = useContext(NyOpprettSakFlytContext);
+    const [submit, setSubmit] = useState<ModalSubmit | null>(null);
+    const formId = useId();
     if (!Flyt || !open) return null;
 
     return (
         <Modal open onClose={onClose} header={{ heading: "Opprett sak" }} width="70rem">
             <Modal.Body>
                 <Suspense fallback={<Loader size="3xlarge" title="Laster..." variant="interaction" />}>
-                    <Flyt {...props} onAvbryt={onClose} />
+                    <NyOpprettSakModalContext value={{ formId, setSubmit }}>
+                        <Flyt {...props} onAvbryt={onClose} />
+                    </NyOpprettSakModalContext>
                 </Suspense>
             </Modal.Body>
+            {submit && (
+                <Modal.Footer>
+                    <Button
+                        variant="primary"
+                        type="submit"
+                        form={formId}
+                        size="xsmall"
+                        loading={submit.isLoading}
+                        onClick={submit.onClick}
+                    >
+                        Opprett
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        type="button"
+                        size="xsmall"
+                        disabled={submit.isLoading}
+                        onClick={onClose}
+                    >
+                        Avbryt
+                    </Button>
+                </Modal.Footer>
+            )}
         </Modal>
     );
 }

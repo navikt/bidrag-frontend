@@ -3,8 +3,8 @@ import { NyOpprettSakFlytContext, OpprettSakFlytModal } from "@bidrag/common";
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { Button } from "@navikt/ds-react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { type ReactNode, Suspense, useEffect, useMemo, useState } from "react";
-import { createMemoryRouter, RouterProvider } from "react-router";
+import { type ReactNode, useMemo, useState } from "react";
+import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
 import OpprettSakSkjema from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/OpprettSakSkjema";
 import type { PartRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/opprett-sak-schema";
 import type { Sakstype } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/saksrolleroversiktContext";
@@ -138,6 +138,7 @@ function StoryRouter({ content }: { content: ReactNode }) {
                                         Object.values(testpersoner).map((person) => [person.ident, person]),
                                     )}
                                 >
+                                    <RoutePath />
                                     {content}
                                 </BidragCommonsProviderMock>
                             </QueryClientProvider>
@@ -150,6 +151,15 @@ function StoryRouter({ content }: { content: ReactNode }) {
     );
 
     return <RouterProvider router={router} />;
+}
+
+function RoutePath() {
+    const { pathname } = useLocation();
+    return (
+        <form hidden>
+            <input data-testid="route-path" readOnly value={pathname} />
+        </form>
+    );
 }
 
 export type { Scenario };

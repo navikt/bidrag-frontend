@@ -82,7 +82,6 @@ export default function StartpartVelger({
                         key={søkNøkkel}
                         label={SØKELABEL[sakstype] ?? "Søk etter person"}
                         personInformasjon={velgPerson}
-                        compact
                     />
                 </SkjemaSeksjonKort>
             )}

@@ -124,7 +124,7 @@ function VelgForelder({
                     Bruk {person.visningsnavn}
                 </Button>
             ))}
-            <SøkPerson label={`Søk etter ${rolle}`} personInformasjon={onVelg} compact />
+            <SøkPerson label={`Søk etter ${rolle}`} personInformasjon={onVelg} />
             {kanSettesUkjent && (
                 <Button type="button" size="small" variant="secondary-neutral" onClick={onUkjent}>
                     Registrer {rolle} som ukjent

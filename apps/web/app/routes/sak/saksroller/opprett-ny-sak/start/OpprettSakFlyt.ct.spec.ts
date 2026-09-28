@@ -128,6 +128,15 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
     await expect(component.getByRole("radio", { name: /Barnebidrag/ })).toBeChecked();
     await expectNoAxeViolations(page, component);
 
+    const søkefelt = component.getByRole("searchbox", { name: "Søk etter person" });
+    const personsøk = component.getByRole("link", { name: "Åpne personsøk i nytt vindu" });
+    const feltRamme = await søkefelt.boundingBox();
+    const lenkeRamme = await personsøk.boundingBox();
+    expect(feltRamme).not.toBeNull();
+    expect(lenkeRamme).not.toBeNull();
+    expect(feltRamme?.width).toBeLessThan(400);
+    expect(lenkeRamme?.y).toBeGreaterThan((feltRamme?.y ?? 0) + (feltRamme?.height ?? 0));
+
     await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
 
     await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
@@ -162,6 +171,8 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
     await expect
         .poll(() => page.evaluate(() => (window as unknown as { __sammeDokument?: boolean }).__sammeDokument))
         .toBe(true);
+    await expect(component.getByTestId("route-path")).toHaveValue("/sak/1234567/saksroller");
+    await expect(component.getByRole("button", { name: "Opprett", exact: true })).toHaveCount(0);
 });
 
 test.describe("Innbygget med forhåndsutfylling", () => {

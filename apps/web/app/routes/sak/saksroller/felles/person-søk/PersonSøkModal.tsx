@@ -2,16 +2,8 @@ import { Button, Detail, Heading, HStack, Modal, VStack } from "@navikt/ds-react
 import { useParams } from "react-router";
 import type { PersonSøkRammeProps } from "./PersonSøkWrapper.tsx";
 
-export default function PersonSøkModal({
-    tittel,
-    onAvbryt,
-    ikon,
-    saksnummer,
-    actions,
-    children,
-}: PersonSøkRammeProps & { saksnummer?: string }) {
-    const { saksnummer: saksnummerFraRute } = useParams();
-    const sak = saksnummer ?? saksnummerFraRute;
+export default function PersonSøkModal({ tittel, onAvbryt, ikon, actions, children }: PersonSøkRammeProps) {
+    const { saksnummer: sak } = useParams();
 
     return (
         <Modal open onClose={onAvbryt} width="medium" aria-label={tittel}>

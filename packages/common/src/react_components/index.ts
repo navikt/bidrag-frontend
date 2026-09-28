@@ -24,6 +24,7 @@ export {
     type NyOpprettSakFlytProps,
     OpprettSakFlytModal,
     useHarNyOpprettSakFlyt,
+    useNyOpprettSakModal,
 } from "./sak/opprett-sak/NyOpprettSakFlyt";
 export {
     type IOpprettSakPageProps,

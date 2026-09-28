@@ -1,13 +1,13 @@
 import { TilgangsFeilError } from "@bidrag/api";
-import { RedirectTo } from "@bidrag/common";
-import { TasklistSaveIcon, TasklistSendIcon, TasklistStartIcon } from "@navikt/aksel-icons";
-import { Alert, Button, HStack, VStack } from "@navikt/ds-react";
+import { RedirectTo, useNyOpprettSakModal } from "@bidrag/common";
+import { Alert, VStack } from "@navikt/ds-react";
 import type { AxiosError } from "axios";
 import { type MouseEvent, type RefObject, useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useRouteLoaderData, useSearchParams } from "react-router";
+import { useNavigate, useRouteLoaderData } from "react-router";
 import type { loader as rootLoader } from "~/root.tsx";
 import { useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
+import OpprettSakSideknapper, { type Redirectmål } from "./OpprettSakSideknapper";
 
 type Props = {
     blocked?: boolean;
@@ -16,8 +16,6 @@ type Props = {
     saksnummer?: string | null;
 };
 
-type Redirectmål = "sak" | "soknad" | null;
-
 function feilmeldingTekst(error: Props["error"]) {
     if (error instanceof TilgangsFeilError) return error.message;
     return error?.response?.data || "Kunne ikke opprette sak";
@@ -25,7 +23,7 @@ function feilmeldingTekst(error: Props["error"]) {
 
 function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redirectmål: RefObject<Redirectmål>) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
-    const [, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
     const { onOpprettet } = useSaksrolleroversikt();
     const onOpprettetRef = useRef(onOpprettet);
     onOpprettetRef.current = onOpprettet;
@@ -40,33 +38,19 @@ function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redi
         } else if (redirectmål.current === "soknad") {
             RedirectTo.nySoknad(saksnummer, bisysUrl);
         } else {
-            setSearchParams(
-                (forrige) => {
-                    forrige.set("saksnummer", saksnummer);
-                    return forrige;
-                },
-                { replace: true },
-            );
+            void navigate(`/sak/${encodeURIComponent(saksnummer)}/saksroller`, { replace: true });
         }
-    }, [saksnummer, bisysUrl, setSearchParams]);
+    }, [saksnummer, bisysUrl, navigate, redirectmål]);
 }
 
-export default function SubmitButtons({ blocked = false, isLoading = false, error, saksnummer }: Props) {
-    const errorRef = useRef<HTMLDivElement>(null);
+function useSubmitHandling({ blocked = false, isLoading = false, saksnummer }: Props) {
     const afterSubmitRedirect = useRef<Redirectmål>(null);
     const [blockedError, setBlockedError] = useState<string | null>(null);
     const form = useFormContext();
     const { onAvbryt, onOpprettet } = useSaksrolleroversikt();
-    const visFeil = Boolean(error || blockedError);
+    const modal = useNyOpprettSakModal();
 
     useRedirectEtterOpprettelse(saksnummer, afterSubmitRedirect);
-
-    useEffect(() => {
-        if (visFeil && errorRef.current) {
-            errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-            errorRef.current.focus();
-        }
-    }, [error, blockedError]);
 
     useEffect(() => {
         if (!blocked) {
@@ -94,6 +78,46 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
         afterSubmitRedirect.current = handling;
     };
 
+    useModalSubmit(modal?.setSubmit, isLoading, saksnummer, velgHandling);
+
+    return { blockedError, afterSubmitRedirect, velgHandling, onAvbryt, onOpprettet, modal };
+}
+
+function useModalSubmit(
+    setSubmit: NonNullable<ReturnType<typeof useNyOpprettSakModal>>["setSubmit"] | undefined,
+    isLoading: boolean,
+    saksnummer: Props["saksnummer"],
+    velgHandling: (event: MouseEvent<HTMLButtonElement>, handling: Redirectmål) => void,
+) {
+    const velgHandlingRef = useRef(velgHandling);
+    velgHandlingRef.current = velgHandling;
+    useEffect(() => {
+        if (!setSubmit) return;
+        if (saksnummer) {
+            setSubmit(null);
+            return;
+        }
+        setSubmit({ isLoading, onClick: (event) => velgHandlingRef.current(event, null) });
+        return () => setSubmit(null);
+    }, [setSubmit, isLoading, saksnummer]);
+}
+
+export default function SubmitButtons({ blocked = false, isLoading = false, error, saksnummer }: Props) {
+    const errorRef = useRef<HTMLDivElement>(null);
+    const { blockedError, afterSubmitRedirect, velgHandling, onAvbryt, onOpprettet, modal } = useSubmitHandling({
+        blocked,
+        isLoading,
+        saksnummer,
+    });
+    const visFeil = Boolean(error || blockedError);
+
+    useEffect(() => {
+        if (visFeil && errorRef.current) {
+            errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+            errorRef.current.focus();
+        }
+    }, [error, blockedError]);
+
     return (
         <VStack gap="space-8">
             {visFeil && (
@@ -103,12 +127,12 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
             )}
             {saksnummer ? (
                 <Alert variant="success" size="small" role="status">
-                    {afterSubmitRedirect.current
+                    {!onOpprettet && afterSubmitRedirect.current !== null
                         ? `Sak opprettet med saksnummer ${saksnummer}. Omdirigerer...`
                         : `Sak opprettet med saksnummer ${saksnummer}.`}
                 </Alert>
-            ) : (
-                <Opprettknapper
+            ) : modal ? null : (
+                <OpprettSakSideknapper
                     isLoading={isLoading}
                     onVelg={velgHandling}
                     onAvbryt={onAvbryt}
@@ -116,64 +140,5 @@ export default function SubmitButtons({ blocked = false, isLoading = false, erro
                 />
             )}
         </VStack>
-    );
-}
-
-function Opprettknapper({
-    isLoading,
-    onVelg,
-    onAvbryt,
-    harOnOpprettet,
-}: {
-    isLoading: boolean;
-    onVelg: (event: MouseEvent<HTMLButtonElement>, handling: Redirectmål) => void;
-    onAvbryt?: () => void;
-    harOnOpprettet: boolean;
-}) {
-    return (
-        <HStack gap="space-2" justify="end">
-            {onAvbryt && (
-                <Button variant="tertiary-neutral" type="button" size="xsmall" disabled={isLoading} onClick={onAvbryt}>
-                    Avbryt
-                </Button>
-            )}
-            {!harOnOpprettet && (
-                <>
-                    <Button
-                        variant="tertiary"
-                        type="submit"
-                        size="xsmall"
-                        title="Opprett sak og gå til ny søknad skjermbildet"
-                        icon={<TasklistStartIcon title="lagre" fontSize="1.5rem" />}
-                        loading={isLoading}
-                        onClick={(event) => onVelg(event, "soknad")}
-                    >
-                        Opprett og ny søknad
-                    </Button>
-                    <Button
-                        variant="tertiary"
-                        type="submit"
-                        size="xsmall"
-                        icon={<TasklistSendIcon title="lagre" fontSize="1.5rem" />}
-                        loading={isLoading}
-                        title="Opprett og gå til sak"
-                        onClick={(event) => onVelg(event, "sak")}
-                    >
-                        Opprett og gå til sak
-                    </Button>
-                </>
-            )}
-            <Button
-                variant="primary"
-                type="submit"
-                size="xsmall"
-                title="Opprett sak uten navigering"
-                icon={<TasklistSaveIcon title="lagre" fontSize="1.5rem" />}
-                loading={isLoading}
-                onClick={(event) => onVelg(event, null)}
-            >
-                Opprett
-            </Button>
-        </HStack>
     );
 }

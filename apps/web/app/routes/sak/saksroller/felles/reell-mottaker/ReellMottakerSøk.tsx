@@ -7,7 +7,7 @@ export default function ReellMottakerSøk({
 }: {
     valgtSamhandlerId?: string;
     onVelg: (ident: string, navn?: string) => void;
-    onError?: (feil: string) => void;
+    onError: (feil: string) => void;
 }) {
     return (
         <PersonSamhandlerSøk
@@ -16,9 +16,8 @@ export default function ReellMottakerSøk({
                 const treff = data as typeof data & { samhandlerId?: string; offentligId?: string };
                 onVelg(treff.samhandlerId ?? treff.ident ?? treff.offentligId ?? "", treff.navn ?? undefined);
             }}
-            onError={onError ?? (() => undefined)}
-            søketype="person-og-samhandler"
-            compact
+            onError={onError}
+            inkluderSamhandler
         />
     );
 }

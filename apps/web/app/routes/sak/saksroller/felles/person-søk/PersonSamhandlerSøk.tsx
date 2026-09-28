@@ -4,18 +4,6 @@ import { BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack } from "@
 import type { KeyboardEvent } from "react";
 import { usePersonSamhandlerSøk } from "./usePersonSamhandlerSøk.ts";
 
-const kompaktLayout = {
-    bredde: "100%",
-    padding: "space-0",
-    søkefelt: { flexGrow: "1", minWidth: "0" },
-} as const;
-
-const standardLayout = {
-    bredde: "50rem",
-    padding: "space-8",
-    søkefelt: { width: "30rem" },
-} as const;
-
 function søkebeskrivelse(inkluderSamhandler: boolean) {
     return inkluderSamhandler
         ? "Fødselsnummer, D-nummer (11 siffer) eller samhandler ident"
@@ -28,18 +16,15 @@ export default function PersonSamhandlerSøk({
     onResult,
     onError,
     onQueryChange,
-    søketype,
-    compact = false,
+    inkluderSamhandler = false,
 }: {
     valgIdent?: string;
     label?: string;
     onResult: (data: PersonDto) => void | Promise<void>;
     onError: (feil: string) => void;
     onQueryChange?: () => void;
-    søketype: "person" | "person-og-samhandler";
-    compact?: boolean;
+    inkluderSamhandler?: boolean;
 }) {
-    const inkluderSamhandler = søketype === "person-og-samhandler";
     const {
         samhandlerPersonFn,
         searchErrorMessage,
@@ -64,13 +49,11 @@ export default function PersonSamhandlerSøk({
         }
     }
 
-    const layout = compact ? kompaktLayout : standardLayout;
-
     return (
-        <HStack gap="space-8" align="center" width={layout.bredde} padding={layout.padding}>
+        <HStack gap="space-8" align="center" width="100%">
             <Box width="100%">
                 <VStack gap="space-8">
-                    <Box {...layout.søkefelt}>
+                    <Box width={{ xs: "100%", sm: "20rem" }} minWidth="0">
                         <Search
                             label={label || "Person- eller samhandlerident"}
                             description={søkebeskrivelse(inkluderSamhandler)}

@@ -12,6 +12,35 @@ import { useSaksrollerRollerData } from "./useSaksrollerRollerData.ts";
 import { useSaksrollerStatus } from "./useSaksrollerStatus.ts";
 import { useSakvisningSamhandlerHandling } from "./useSakvisningSamhandlerHandling.ts";
 
+function useSaksrollerForm({
+    berikedeRoller,
+    dataUpdatedAt,
+    saksnummer,
+    onDataReset,
+}: {
+    berikedeRoller: Parameters<typeof useInitialiserSaksrollerForm>[0]["berikedeRoller"];
+    dataUpdatedAt: number;
+    saksnummer: string;
+    onDataReset: () => void;
+}) {
+    const formMethods = useForm<SakRedigeringData>({
+        resolver: zodResolver(SakRedigeringSchema),
+        mode: "onChange",
+    });
+    const { reset, watch } = formMethods;
+    const roller = watch("roller") || [];
+
+    useInitialiserSaksrollerForm({ berikedeRoller, dataUpdatedAt, reset, saksnummer, onDataReset });
+
+    return { formMethods, roller };
+}
+
+function relasjonskontrollStatus({ isError, isLoading }: { isError: boolean; isLoading: boolean }) {
+    if (isError) return "feilet" as const;
+    if (isLoading) return "venter" as const;
+    return undefined;
+}
+
 /**
  * Samler datahenting, skjema, endringssporing og lagring for visning og redigering av saksroller.
  */
@@ -33,29 +62,20 @@ export function useSaksrollerVisning(saksnummer: string) {
     const { feil, muligeAndreForeldre, muligeBarnPerMotpart } = useSakForslag({ sak });
     const { hentOgNullstillSamhandler } = useSakvisningSamhandlerHandling();
 
-    const formMethods = useForm<SakRedigeringData>({
-        resolver: zodResolver(SakRedigeringSchema),
-        mode: "onChange",
-    });
-
-    const { reset, watch } = formMethods;
-    const roller = watch("roller") || [];
-
-    const { bp, bm, barn, barnIdenter, aktiveRoller, sakstype, muligeBarn } = useSaksrollerRollerData({
-        roller,
-        berikedeRoller,
-        muligeBarnPerMotpart,
-    });
-
-    useInitialiserSaksrollerForm({
+    const { formMethods, roller } = useSaksrollerForm({
         berikedeRoller,
         dataUpdatedAt,
-        reset,
         saksnummer,
         onDataReset: () => {
             setFeilmelding(null);
             setValideringsFeil(null);
         },
+    });
+
+    const { bp, bm, barn, barnIdenter, aktiveRoller, sakstype, muligeBarn } = useSaksrollerRollerData({
+        roller,
+        berikedeRoller,
+        muligeBarnPerMotpart,
     });
 
     const relasjonskontroll = useBarnMedUfullstendigRelasjon({
@@ -84,12 +104,6 @@ export function useSaksrollerVisning(saksnummer: string) {
     const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
     const erNyPerson = (fnr?: string) => (fnr ? !funnetPersonISak(fnr) : undefined);
     const samletFeilmelding = feilmelding || feil;
-    const relasjonskontrollStatus: "feilet" | "venter" | undefined = relasjonskontroll.isError
-        ? "feilet"
-        : relasjonskontroll.isLoading
-          ? "venter"
-          : undefined;
-
     return {
         sak,
         erEktefellebidrag,
@@ -118,7 +132,7 @@ export function useSaksrollerVisning(saksnummer: string) {
             feilmelding: samletFeilmelding || undefined,
             valideringsFeil,
             harAdvarsel: barnMedUfullstendigRelasjon.length > 0,
-            relasjonskontroll: relasjonskontrollStatus,
+            relasjonskontroll: relasjonskontrollStatus(relasjonskontroll),
             harEndringer,
             suksessmelding,
             statusRef,

@@ -1,5 +1,6 @@
+import { useNyOpprettSakModal } from "@bidrag/common";
 import { VStack } from "@navikt/ds-react";
-import type { ComponentProps, ReactNode } from "react";
+import { type ComponentProps, type ReactNode, useId } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import EksisterendeSakStatus, { type EksisterendeSakStatusProps } from "../eksisterende-sak/EksisterendeSakStatus";
 import EnhetOgSubmitSection, { type EnhetOgSubmitSectionProps } from "../innsending/EnhetOgSubmitSection";
@@ -20,9 +21,11 @@ type Props = {
 
 export default function RolleFlytSide({ onSubmit, status, innledning, children, meldinger, innsending }: Props) {
     const visStatus = status.infoMelding || status.isLoading || (status.harEksisterendeSak && status.eksisterendeSak);
+    const formId = useId();
+    const modal = useNyOpprettSakModal();
 
     return (
-        <FlytSkjema onSubmit={onSubmit} disabled={innsending.isLoading}>
+        <FlytSkjema id={modal?.formId ?? formId} onSubmit={onSubmit} disabled={innsending.isLoading}>
             <VStack gap="space-24" aria-busy={status.isLoading}>
                 <KategoriSeksjon />
                 {innledning && <VStack gap="space-12">{innledning}</VStack>}

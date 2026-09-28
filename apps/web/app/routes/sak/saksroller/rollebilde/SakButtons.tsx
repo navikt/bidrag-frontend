@@ -21,18 +21,17 @@ export type SakButtonsProps = {
     statusResetKey: number;
 };
 
-export default function SakButtons({
+function useSakLagring({
     onSubmit,
     onRefetch,
-    feilmelding,
-    valideringsFeil,
     harAdvarsel,
     harEndringer,
     relasjonskontroll,
-    suksessmelding,
-    statusRef,
     statusResetKey,
-}: SakButtonsProps) {
+}: Pick<
+    SakButtonsProps,
+    "onSubmit" | "onRefetch" | "harAdvarsel" | "harEndringer" | "relasjonskontroll" | "statusResetKey"
+>) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const [bekreftHandling, setBekreftHandling] = useState<Lagrehandling | null>(null);
     const [ingenEndringer, setIngenEndringer] = useState(false);
@@ -80,6 +79,30 @@ export default function SakButtons({
             void lagre(handling);
         }
     };
+
+    return { lagrer, ingenEndringer, bekreftHandling, setBekreftHandling, lagre, velgLagrehandling };
+}
+
+export default function SakButtons({
+    onSubmit,
+    onRefetch,
+    feilmelding,
+    valideringsFeil,
+    harAdvarsel,
+    harEndringer,
+    relasjonskontroll,
+    suksessmelding,
+    statusRef,
+    statusResetKey,
+}: SakButtonsProps) {
+    const { lagrer, ingenEndringer, bekreftHandling, setBekreftHandling, lagre, velgLagrehandling } = useSakLagring({
+        onSubmit,
+        onRefetch,
+        harAdvarsel,
+        harEndringer,
+        relasjonskontroll,
+        statusResetKey,
+    });
 
     return (
         <>

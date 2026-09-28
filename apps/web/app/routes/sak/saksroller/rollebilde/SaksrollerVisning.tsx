@@ -1,6 +1,6 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { InformationSquareIcon } from "@navikt/aksel-icons";
-import { BodyLong, Box, Heading, HGrid, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, Heading, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
 import { Suspense } from "react";
 import { FormProvider } from "react-hook-form";
 import type { SakRedigeringData } from "../felles/sakvisning-schema.ts";

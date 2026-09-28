@@ -32,7 +32,6 @@ export function PersonSøkInnhold({
                 personInformasjon={onPersonValgt}
                 onQueryChange={onQueryChange}
                 onError={onQueryChange}
-                compact
             />
             {resultat}
         </VStack>
