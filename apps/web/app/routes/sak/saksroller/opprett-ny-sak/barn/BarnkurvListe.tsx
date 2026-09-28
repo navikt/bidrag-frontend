@@ -8,7 +8,7 @@ import { KortRamme } from "../../felles/person/PersonRolleKort";
 import type { ReellMottakerRegel } from "../../felles/reell-mottaker/reell-mottaker-regel";
 import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
 import { useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
-import { beregnBarnkurvValg } from "./barnkurv-valg";
+import { beregnBarnkurvValg, utenReellMottaker } from "./barnkurv-valg";
 import { BarnReellMottaker } from "./ReellMottakerInline";
 
 type Props = {
@@ -45,12 +45,7 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, on
         const beholdt = valgteBarn.filter((b) => !b.manuellLagtTil || valgteIdenter.includes(b.ident));
         const gjenvalgt = manuelleBarn
             .filter((b) => valgteIdenter.includes(b.ident) && !beholdt.some((v) => v.ident === b.ident))
-            .map((b) => ({
-                ...b,
-                reellMottakerType: undefined,
-                reellMottaker: undefined,
-                reellMottakerNavn: undefined,
-            }));
+            .map(utenReellMottaker);
         const nyeValg = [...beholdt, ...gjenvalgt];
         form.setValue("valgteBarn", nyeValg);
         if (nyeValg.length === 0) onKurvByttet?.(null);

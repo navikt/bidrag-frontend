@@ -2,6 +2,11 @@ import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
 
 type Barn = BarnMedAlder;
 
+/** Barnet uten reell mottaker, for barn som velges på nytt. */
+export function utenReellMottaker(barn: Barn): Barn {
+    return { ...barn, reellMottakerType: undefined, reellMottaker: undefined, reellMottakerNavn: undefined };
+}
+
 export function beregnBarnkurvValg(
     barnkurver: Barnkurv[],
     nåværendeBarn: Barn[],
@@ -28,13 +33,7 @@ export function beregnBarnkurvValg(
         .filter(
             (barn) => valgteIdenter.includes(barn.ident) && !eksisterendeValg.some((valg) => valg.ident === barn.ident),
         )
-        .map((barn) => ({
-            ...barn,
-            reellMottakerType: undefined,
-            reellMottaker: undefined,
-            reellMottakerNavn: undefined,
-            manuellLagtTil: false,
-        }));
+        .map((barn) => ({ ...utenReellMottaker(barn), manuellLagtTil: false }));
 
     return {
         kurv,
