@@ -144,6 +144,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
         submitError: opprettSak.error,
         isLoading: opprettSak.isLoading,
         saksnummer: opprettSak.saksnummer,
+        harEksisterendeSak,
     };
 
     return {

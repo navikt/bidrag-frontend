@@ -14,6 +14,7 @@ type Props = {
     isLoading?: boolean;
     error?: AxiosError<string> | TilgangsFeilError | null;
     saksnummer?: string | null;
+    harEksisterendeSak?: boolean;
 };
 
 function feilmeldingTekst(error: Props["error"]) {
@@ -43,7 +44,7 @@ function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redi
     }, [saksnummer, bisysUrl, navigate, redirectmål]);
 }
 
-function useSubmitHandling({ blocked = false, isLoading = false, saksnummer }: Props) {
+function useSubmitHandling({ blocked = false, isLoading = false, saksnummer, harEksisterendeSak }: Props) {
     const afterSubmitRedirect = useRef<Redirectmål>(null);
     const [blockedError, setBlockedError] = useState<string | null>(null);
     const form = useFormContext();
@@ -71,7 +72,11 @@ function useSubmitHandling({ blocked = false, isLoading = false, saksnummer }: P
         if (blocked) {
             event.preventDefault();
             void form.trigger();
-            setBlockedError("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over.");
+            setBlockedError(
+                harEksisterendeSak
+                    ? "Kan ikke opprette saken. Det finnes allerede en sak mellom disse partene med samme roller. Åpne saken i varselet over, eller endre en av partene."
+                    : "Kan ikke opprette saken ennå. Kontroller feltene og meldingene over.",
+            );
             return;
         }
         setBlockedError(null);
@@ -102,12 +107,19 @@ function useModalSubmit(
     }, [setSubmit, isLoading, saksnummer]);
 }
 
-export default function SubmitButtons({ blocked = false, isLoading = false, error, saksnummer }: Props) {
+export default function SubmitButtons({
+    blocked = false,
+    isLoading = false,
+    error,
+    saksnummer,
+    harEksisterendeSak,
+}: Props) {
     const errorRef = useRef<HTMLDivElement>(null);
     const { blockedError, afterSubmitRedirect, velgHandling, onAvbryt, onOpprettet, modal } = useSubmitHandling({
         blocked,
         isLoading,
         saksnummer,
+        harEksisterendeSak,
     });
     const visFeil = Boolean(error || blockedError);
 

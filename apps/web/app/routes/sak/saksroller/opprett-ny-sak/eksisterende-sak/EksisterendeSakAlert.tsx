@@ -24,7 +24,7 @@ export default function EksisterendeSakAlert({ eksisterendeSak, partISakenNavn, 
     }, []);
 
     return (
-        <Alert variant="warning" size="small" ref={alertRef} tabIndex={-1}>
+        <Alert variant="error" size="small" ref={alertRef} tabIndex={-1}>
             <Heading level="3" size="xsmall" spacing>
                 Eksisterende sak funnet
             </Heading>

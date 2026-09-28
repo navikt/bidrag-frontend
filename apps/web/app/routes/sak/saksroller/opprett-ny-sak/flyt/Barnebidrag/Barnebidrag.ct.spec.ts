@@ -245,7 +245,7 @@ test.describe("Start fra barn", () => {
     });
 
     test("eksisterende sak mellom partene sperrer opprettelse", async ({ mount, page }) => {
-        await mockWizardApi(page);
+        const requests = await mockWizardApi(page);
         await barnetsForeldre(page, [bp.ident, bm.ident]);
         await page.route(/\/proxy\/bidrag-sak\/person\/sak$/, async (route) => {
             await route.fulfill({
@@ -270,8 +270,11 @@ test.describe("Start fra barn", () => {
         await expect(component.getByText(/7654321/)).toBeVisible();
         await component.getByRole("button", { name: /Opprett$/ }).click();
         await expect(
-            component.getByText("Kan ikke opprette saken ennå. Kontroller feltene og meldingene over."),
+            component.getByText(
+                "Kan ikke opprette saken. Det finnes allerede en sak mellom disse partene med samme roller. Åpne saken i varselet over, eller endre en av partene.",
+            ),
         ).toBeVisible();
+        expect(requests.create).toBeUndefined();
     });
 
     test("🔴 blokkerer ukjent bidragsmottaker når tilgang mangler", async ({ mount, page }) => {

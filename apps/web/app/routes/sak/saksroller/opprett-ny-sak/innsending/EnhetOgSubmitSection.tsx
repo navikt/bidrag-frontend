@@ -14,6 +14,7 @@ export interface EnhetOgSubmitSectionProps {
     isLoading?: boolean;
     submitError: Error | null;
     saksnummer: string | null;
+    harEksisterendeSak?: boolean;
     manglerTilgangUtenBm?: boolean;
     oppsummering?: OppsummeringParter;
 }
@@ -31,6 +32,7 @@ export default function EnhetOgSubmitSection({
     isLoading,
     submitError,
     saksnummer,
+    harEksisterendeSak,
     manglerTilgangUtenBm = false,
 }: EnhetOgSubmitSectionProps) {
     const eierfogd = useSaksrolleroversikt().inngang?.eierfogd;
@@ -46,7 +48,13 @@ export default function EnhetOgSubmitSection({
                 </InlineMessage>
             )}
 
-            <SubmitButtons blocked={blocked} isLoading={isLoading} error={submitError} saksnummer={saksnummer} />
+            <SubmitButtons
+                blocked={blocked}
+                isLoading={isLoading}
+                error={submitError}
+                saksnummer={saksnummer}
+                harEksisterendeSak={harEksisterendeSak}
+            />
         </VStack>
     );
 }
