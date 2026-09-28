@@ -45,7 +45,12 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, on
         const beholdt = valgteBarn.filter((b) => !b.manuellLagtTil || valgteIdenter.includes(b.ident));
         const gjenvalgt = manuelleBarn
             .filter((b) => valgteIdenter.includes(b.ident) && !beholdt.some((v) => v.ident === b.ident))
-            .map((b) => ({ ...b, reellMottakerType: "ingen" as const, reellMottaker: "", reellMottakerNavn: "" }));
+            .map((b) => ({
+                ...b,
+                reellMottakerType: undefined,
+                reellMottaker: undefined,
+                reellMottakerNavn: undefined,
+            }));
         const nyeValg = [...beholdt, ...gjenvalgt];
         form.setValue("valgteBarn", nyeValg);
         if (nyeValg.length === 0) onKurvByttet?.(null);

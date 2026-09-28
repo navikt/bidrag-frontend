@@ -30,9 +30,9 @@ export function beregnBarnkurvValg(
         )
         .map((barn) => ({
             ...barn,
-            reellMottakerType: "ingen" as const,
-            reellMottaker: "",
-            reellMottakerNavn: "",
+            reellMottakerType: undefined,
+            reellMottaker: undefined,
+            reellMottakerNavn: undefined,
             manuellLagtTil: false,
         }));
 

@@ -80,7 +80,7 @@ test.describe("Start fra forelder med barn", () => {
         await søk.fill(valgtIdent ?? "");
         await søk.press("Enter");
 
-        await expect(page.getByText(/allerede i listen over valgte barn/)).toBeVisible();
+        await expect(page.getByText(/er allerede lagt til/)).toBeVisible();
         await expect(component.getByRole("checkbox").first()).toBeChecked();
         expect(requests.create).toBeUndefined();
     });

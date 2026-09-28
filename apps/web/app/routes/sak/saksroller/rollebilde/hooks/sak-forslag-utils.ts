@@ -1,7 +1,6 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlderForPerson } from "@bidrag/utils";
+import { erUnderMaksAlder } from "../../felles/barn/barn-regler.ts";
 
-const MAKS_ALDER_BARN = 24;
 type MotpartBarnRelasjonDto = { personensMotpartBarnRelasjon?: MotpartBarnRelasjon[] };
 
 export function beregnSakForslag({
@@ -17,10 +16,6 @@ export function beregnSakForslag({
     ukjentForelder: boolean;
     andreForelderIdent: string | undefined;
 }): { muligeAndreForeldre: PersonDto[]; muligeBarnPerMotpart: Map<string, PersonDto[]> } {
-    const erBarnUnderMaksAlder = (barn: PersonDto) => {
-        const alder = beregnAlderForPerson(barn);
-        return alder != null && alder <= MAKS_ALDER_BARN;
-    };
     const relasjoner = motpartRelasjon.personensMotpartBarnRelasjon ?? [];
     const barnMap = new Map<string, PersonDto[]>();
     const muligeAndreForeldre: PersonDto[] = [];
@@ -55,7 +50,7 @@ export function beregnSakForslag({
 
     const muligeBarnPerMotpart = new Map(
         Array.from(barnMap.entries())
-            .map(([ident, barn]): [string, PersonDto[]] => [ident, barn.filter(erBarnUnderMaksAlder)])
+            .map(([ident, barn]): [string, PersonDto[]] => [ident, barn.filter(erUnderMaksAlder)])
             .filter(([, barn]) => barn.length > 0),
     );
     return { muligeAndreForeldre, muligeBarnPerMotpart };

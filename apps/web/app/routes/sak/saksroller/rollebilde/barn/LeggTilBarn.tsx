@@ -2,21 +2,12 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { BodyLong, Button, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-
-import {
-    BarnPersonInfo,
-    BarnSøkHandlinger,
-    BarnSøkIkon,
-    BarnSøkInnhold,
-    barnSøkTittel,
-    LeggTilBarnKnapp,
-    useBarnSøk,
-} from "../../felles/person-søk/BarnSøk.tsx";
-import RedigeringsRamme from "../../felles/RedigeringsRamme.tsx";
+import { alderForBarn, validerNyttBarn } from "../../felles/barn/barn-regler.ts";
+import { BarnPersonInfo, LeggTilBarnSøk, useBarnSøk } from "../../felles/person-søk/BarnSøk.tsx";
 import { reellMottakerRegelForSak, reellMottakerValgregel } from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
 import { MYNDYG_BARN_ALDER, type SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
-import { alderForBarn, finnValideringsfeilForBarn, lagBarnRolle } from "./legg-til-barn-utils.ts";
+import { lagBarnRolle } from "./legg-til-barn-utils.ts";
 import ReellMottakerVelger from "./ReellMottakerVelger.tsx";
 
 interface LeggTilBarnProps {
@@ -39,9 +30,12 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
         (søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident),
     );
 
+    const finnValideringsfeil = (person: PersonDto) =>
+        validerNyttBarn(person, { identerISaken: roller.map((rolle) => rolle.fodselsnummer) });
+
     const søk = useBarnSøk({
         valider: (person) => {
-            const valideringsfeil = finnValideringsfeilForBarn(person, roller);
+            const valideringsfeil = finnValideringsfeil(person);
             if (valideringsfeil) throw new Error(valideringsfeil);
             return alderForBarn(person);
         },
@@ -50,7 +44,7 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
     });
 
     const leggTil = (person: PersonDto) => {
-        const valideringsfeil = finnValideringsfeilForBarn(person, roller);
+        const valideringsfeil = finnValideringsfeil(person);
         if (valideringsfeil) {
             søk.setFeil(valideringsfeil);
             return;
@@ -104,25 +98,14 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
         );
     }
 
-    if (!visSøk) {
-        return <LeggTilBarnKnapp onClick={() => setVisSøk(true)} />;
-    }
-
     const harBeggeForeldre = roller.some((i) => i.type === "BP") && roller.some((i) => i.type === "BM");
 
     return (
-        <RedigeringsRamme
-            tittel={barnSøkTittel}
-            ikon={<BarnSøkIkon />}
-            onAvbryt={søk.lukk}
-            actions={<BarnSøkHandlinger søk={søk} />}
-        >
-            <BarnSøkInnhold søk={søk}>
-                {tilgjengeligeSøsken.length > 0 && (
-                    <SøskenListe søsken={tilgjengeligeSøsken} harBeggeForeldre={harBeggeForeldre} onVelg={leggTil} />
-                )}
-            </BarnSøkInnhold>
-        </RedigeringsRamme>
+        <LeggTilBarnSøk søk={søk} visSøk={visSøk} onÅpne={() => setVisSøk(true)}>
+            {tilgjengeligeSøsken.length > 0 && (
+                <SøskenListe søsken={tilgjengeligeSøsken} harBeggeForeldre={harBeggeForeldre} onVelg={leggTil} />
+            )}
+        </LeggTilBarnSøk>
     );
 }
 

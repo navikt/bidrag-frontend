@@ -9,7 +9,7 @@ import { type Sakskategori, sakstypeTilTekst, useSaksrolleroversikt } from "../s
 type Person = { ident?: string; navn?: string; diskresjonskode?: string };
 type Barn = Person & {
     ident: string;
-    reellMottakerType?: string | null;
+    reellMottakerType?: string;
     reellMottaker?: string;
     reellMottakerNavn?: string;
 };
@@ -97,7 +97,7 @@ function PersonVerdi({ person }: { person?: Person | null }) {
 
 function reellMottakerTekst(barn: Barn) {
     if (barn.reellMottakerType === "barnet_selv") return "Barnet selv";
-    if (barn.reellMottakerType === "annen_person" && barn.reellMottaker) {
+    if (barn.reellMottakerType === "samhandler" && barn.reellMottaker) {
         return barn.reellMottakerNavn ? `${barn.reellMottakerNavn} (${barn.reellMottaker})` : barn.reellMottaker;
     }
     return "Bidragsmottaker";

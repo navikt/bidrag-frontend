@@ -10,6 +10,7 @@ import {
     fraReellMottakerValg,
     initialiserReellMottaker,
     type ReellMottakerRegel,
+    type ReellMottakerSkjemaverdi,
     reellMottakerValgregel,
     tilReellMottakerValg,
 } from "../../felles/reell-mottaker/reell-mottaker-regel";
@@ -34,32 +35,22 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     const reellMottakerNavnPath = `${fieldPath}.reellMottakerNavn` as FieldPath<TFieldValues>;
     const setDynamiskFeltVerdi = (
         path: FieldPath<TFieldValues>,
-        value: string,
+        value: string | undefined,
         options?: Parameters<typeof form.setValue>[2],
     ) => form.setValue(path, value as PathValue<TFieldValues, FieldPath<TFieldValues>>, options);
 
     const reellMottakerType = form.watch(reellMottakerTypePath);
     const reellMottaker = form.watch(reellMottakerPath);
     const reellMottakerNavn = form.watch(reellMottakerNavnPath);
+    const skjemaverdi: ReellMottakerSkjemaverdi = { reellMottakerType, reellMottaker, reellMottakerNavn };
     const reellMottakerFeil = form.getFieldState(reellMottakerPath, form.formState).error?.message;
-    const skjemaverdi = {
-        reellMottakerType:
-            reellMottakerType === "ingen" || reellMottakerType === "barnet_selv" || reellMottakerType === "annen_person"
-                ? reellMottakerType
-                : undefined,
-        reellMottaker: typeof reellMottaker === "string" ? reellMottaker : undefined,
-        reellMottakerNavn: typeof reellMottakerNavn === "string" ? reellMottakerNavn : undefined,
-    };
-    const valg = tilReellMottakerValg(skjemaverdi, { ident: barnIdent, navn: barnNavn });
+    const valg = tilReellMottakerValg(skjemaverdi);
     const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(valg);
 
-    const settSkjemaverdi = (
-        nyVerdi: ReturnType<typeof fraReellMottakerValg>,
-        options: Parameters<typeof form.setValue>[2],
-    ) => {
-        setDynamiskFeltVerdi(reellMottakerTypePath, nyVerdi.reellMottakerType ?? "ingen", options);
-        setDynamiskFeltVerdi(reellMottakerPath, nyVerdi.reellMottaker ?? "", options);
-        setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn ?? "", options);
+    const settSkjemaverdi = (nyVerdi: ReellMottakerSkjemaverdi, options: Parameters<typeof form.setValue>[2]) => {
+        setDynamiskFeltVerdi(reellMottakerTypePath, nyVerdi.reellMottakerType, options);
+        setDynamiskFeltVerdi(reellMottakerPath, nyVerdi.reellMottaker, options);
+        setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn, options);
     };
 
     const oppdaterValg = (nyttValg: ReellMottakerValg) => {
@@ -79,8 +70,8 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
         });
         if (
             initialisert.reellMottakerType === skjemaverdi.reellMottakerType &&
-            (initialisert.reellMottaker ?? "") === (skjemaverdi.reellMottaker ?? "") &&
-            (initialisert.reellMottakerNavn ?? "") === (skjemaverdi.reellMottakerNavn ?? "")
+            initialisert.reellMottaker === skjemaverdi.reellMottaker &&
+            initialisert.reellMottakerNavn === skjemaverdi.reellMottakerNavn
         ) {
             return;
         }

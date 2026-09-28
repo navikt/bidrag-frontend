@@ -36,10 +36,14 @@ const RolleSchema = z.object({
     erMyndig: z.boolean().optional(),
 });
 
-const BarnRolleSchema = RolleSchema.extend({
+/** Reell mottaker slik den lagres i skjemaet, både i rollebildet og i opprett. `undefined` betyr ingen. */
+export const ReellMottakerFelterSchema = z.object({
     reellMottakerType: z.enum(["barnet_selv", "samhandler"]).optional(),
+    reellMottaker: z.string().optional(),
     reellMottakerNavn: z.string().optional(),
 });
+
+const BarnRolleSchema = RolleSchema.extend(ReellMottakerFelterSchema.shape);
 
 function harRegistrertBidragsmottaker(roller: Rolle[]): boolean {
     return roller.some((r) => r.type === "BM" && r.fodselsnummer && r.fodselsnummer.trim() !== "");

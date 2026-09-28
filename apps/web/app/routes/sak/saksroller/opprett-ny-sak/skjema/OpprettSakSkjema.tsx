@@ -1,5 +1,6 @@
 import { BodyLong, Box, Loader, VStack } from "@navikt/ds-react";
 import { type ComponentProps, Suspense } from "react";
+import { RedigeringsvisningProvider } from "../../felles/RedigeringsRamme";
 import BarnebidragFlyt from "../flyt/Barnebidrag/BarnebidragFlyt";
 import EktefellebidragFlyt from "../flyt/Ektefellebidrag/EktefellebidragFlyt";
 import EnPartMedBarnFlyt from "../flyt/EnPartMedBarn/EnPartMedBarnFlyt";
@@ -24,9 +25,11 @@ export default function OpprettSakSkjema(props: Omit<ComponentProps<typeof Saksr
     return (
         <SaksrolleroversiktProvider {...props}>
             {oppretter && <OppretterSak />}
-            <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>
-                <FlytKomponent />
-            </Suspense>
+            <RedigeringsvisningProvider visning="inline">
+                <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>
+                    <FlytKomponent />
+                </Suspense>
+            </RedigeringsvisningProvider>
         </SaksrolleroversiktProvider>
     );
 }

@@ -6,7 +6,12 @@ import {
 } from "../../felles/reell-mottaker/reell-mottaker-regel";
 // Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
 // sakvisning i stedet for å dupliseres.
-import { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER } from "../../felles/sakvisning-schema";
+import {
+    DiskresjonskodeSchema,
+    MAKS_ALDER_BARN,
+    MYNDYG_BARN_ALDER,
+    ReellMottakerFelterSchema,
+} from "../../felles/sakvisning-schema";
 
 export { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER };
 
@@ -29,10 +34,7 @@ export const BarnMedAlderSchema = z.object({
     fødselsdato: z.string().optional(),
     alder: z.number().min(0).max(130),
     erMyndig: z.boolean(),
-    // Reell mottaker (kun for 18+ eller ukjent motpart)
-    reellMottakerType: z.enum(["ingen", "barnet_selv", "annen_person"]).optional().nullable(),
-    reellMottaker: z.string().optional(),
-    reellMottakerNavn: z.string().optional(),
+    ...ReellMottakerFelterSchema.shape,
     manuellLagtTil: z.boolean().optional(),
     diskresjonskode: DiskresjonskodeSchema.optional(),
 });

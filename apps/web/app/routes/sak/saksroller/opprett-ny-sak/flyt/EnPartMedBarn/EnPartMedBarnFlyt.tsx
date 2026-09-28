@@ -166,7 +166,7 @@ function Meldinger({
 }: {
     kurvfeil: boolean;
     erOppfostring: boolean;
-    valgteBarn: { reellMottakerType?: string | null }[];
+    valgteBarn: { reellMottakerType?: string }[];
 }) {
     return (
         <>

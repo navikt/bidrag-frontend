@@ -3,7 +3,11 @@ import { Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react
 import { useFormContext } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort.tsx";
 import { KortRamme } from "../../felles/person/PersonRolleKort.tsx";
-import { reellMottakerRegelForSak, reellMottakerValgregel } from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
+import {
+    reellMottakerRegelForSak,
+    reellMottakerValgregel,
+    tilReellMottakerValg,
+} from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
 import ReellMottakerRad from "./ReellMottakerRad.tsx";
@@ -72,11 +76,7 @@ export default function BarnVisning({
                     <ReellMottakerVelger
                         barnNavn={rolle.navn || "Barnet"}
                         barnIdent={rolle.fodselsnummer}
-                        verdi={{
-                            type: rolle.reellMottakerType,
-                            ident: rolle.reellMottaker,
-                            navn: rolle.reellMottakerNavn,
-                        }}
+                        verdi={tilReellMottakerValg(rolle)}
                         onAvbryt={handleLukkReellMottaker}
                         onBekreft={handleBekreftReellMottaker}
                         regel={reellMottakerValgregel(

@@ -18,21 +18,21 @@ describe("reell mottaker-regler", () => {
         expect(reellMottakerValgregel({ type: "etter-barn", bidragsmottakerErUkjent: false }, false)).toBe("valgfri");
     });
 
-    it("oversetter annen_person til samhandlervalg uten å endre skjemaverdien", () => {
+    it("oversetter samhandler mellom skjemaverdi og valg uten å endre verdien", () => {
         const skjemaverdi = {
-            reellMottakerType: "annen_person" as const,
+            reellMottakerType: "samhandler" as const,
             reellMottaker: "SAM123",
             reellMottakerNavn: "Test kommune",
         };
 
-        const valg = tilReellMottakerValg(skjemaverdi, barn);
+        const valg = tilReellMottakerValg(skjemaverdi);
 
         expect(valg).toEqual({ type: "samhandler", ident: "SAM123", navn: "Test kommune" });
         expect(fraReellMottakerValg(valg)).toEqual(skjemaverdi);
     });
 
     it("initialiserer påkrevd valg med barnet selv", () => {
-        expect(initialiserReellMottaker({ reellMottakerType: "ingen" }, "påkrevd", barn)).toEqual({
+        expect(initialiserReellMottaker({}, "påkrevd", barn)).toEqual({
             reellMottakerType: "barnet_selv",
             reellMottaker: barn.ident,
             reellMottakerNavn: barn.navn,
@@ -51,20 +51,20 @@ describe("reell mottaker-regler", () => {
                 barn,
             ),
         ).toEqual({
-            reellMottakerType: "annen_person",
-            reellMottaker: "",
-            reellMottakerNavn: "",
+            reellMottakerType: "samhandler",
+            reellMottaker: undefined,
+            reellMottakerNavn: undefined,
         });
     });
 
     it("gir riktig valideringsfeil for myndig barn og manglende samhandler", () => {
-        expect(validerReellMottaker({ reellMottakerType: "ingen" }, "myndig-barn")).toEqual([
+        expect(validerReellMottaker({}, "myndig-barn")).toEqual([
             {
                 felt: "reellMottakerType",
                 melding: "Reell mottaker må registreres for barn over 18 år",
             },
         ]);
-        expect(validerReellMottaker({ reellMottakerType: "annen_person" }, "alltid")).toEqual([
+        expect(validerReellMottaker({ reellMottakerType: "samhandler" }, "alltid")).toEqual([
             { felt: "reellMottaker", melding: "Du må registrere reell mottaker" },
         ]);
     });

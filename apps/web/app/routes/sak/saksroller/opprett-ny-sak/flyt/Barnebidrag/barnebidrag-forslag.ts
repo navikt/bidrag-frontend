@@ -1,11 +1,6 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import {
-    type BarnebidragForelderRolle,
-    type ForelderPart,
-    type ForelderPartRolle,
-    MAKS_ALDER_BARN,
-} from "../../skjema/opprett-sak-schema";
+import { erUnderMaksAlder } from "../../../felles/barn/barn-regler";
+import type { BarnebidragForelderRolle, ForelderPart, ForelderPartRolle } from "../../skjema/opprett-sak-schema";
 
 export type ForeldreTilBarn = { barn: { ident: string; navn: string }; foreldre: PersonDto[] | undefined };
 
@@ -69,10 +64,7 @@ export function utledFellesBarn(
 ): MotpartBarnRelasjon | null {
     const relasjon = relasjonerTilBp?.find((r) => !!bidragsmottakerIdent && r.motpart?.ident === bidragsmottakerIdent);
     const fellesBarn =
-        relasjon?.fellesBarn.filter((barn) => {
-            const alder = beregnAlderForPerson(barn);
-            return alder !== null && alder <= MAKS_ALDER_BARN && !manueltLagtTil.includes(barn.ident);
-        }) ?? [];
+        relasjon?.fellesBarn.filter((barn) => erUnderMaksAlder(barn) && !manueltLagtTil.includes(barn.ident)) ?? [];
     return relasjon && fellesBarn.length > 0 ? { ...relasjon, fellesBarn } : null;
 }
 
@@ -137,10 +129,7 @@ export function harMotpartMedUlikeForelderroller(relasjoner: MotpartBarnRelasjon
 export function utledBarnkurverForForelder(relasjoner: MotpartBarnRelasjon[]): MotpartBarnRelasjon[] {
     const barnkurver: MotpartBarnRelasjon[] = [];
     for (const relasjon of relasjoner) {
-        const fellesBarn = relasjon.fellesBarn.filter((barn) => {
-            const alder = beregnAlderForPerson(barn);
-            return alder !== null && alder <= MAKS_ALDER_BARN;
-        });
+        const fellesBarn = relasjon.fellesBarn.filter(erUnderMaksAlder);
         if (fellesBarn.length === 0) continue;
         const eksisterende = barnkurver.find(
             (r) =>

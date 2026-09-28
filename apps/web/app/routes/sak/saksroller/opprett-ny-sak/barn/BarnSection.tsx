@@ -1,11 +1,13 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Alert, Tag } from "@navikt/ds-react";
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { alderForBarn, tilBarn, validerNyttBarn } from "../../felles/barn/barn-regler";
+import { LeggTilBarnSøk, useBarnSøk } from "../../felles/person-søk/BarnSøk";
 import type { ReellMottakerRegel } from "../../felles/reell-mottaker/reell-mottaker-regel";
-import { type Barnkurv, type BarnMedAlder, BarnMedAlderSchema, MYNDYG_BARN_ALDER } from "../skjema/opprett-sak-schema";
+import { type Barnkurv, type BarnMedAlder, BarnMedAlderSchema } from "../skjema/opprett-sak-schema";
 import SkjemaSeksjon from "../skjema/SkjemaSeksjon";
 import BarnkurvListe from "./BarnkurvListe";
-import BarnManueltRegistrering from "./BarnManueltRegistrering";
 
 interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     form: UseFormReturn<T>;
@@ -27,29 +29,31 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     const barnForm = form as unknown as BarnForm;
     const valgteBarn = barnForm.watch("valgteBarn");
 
-    const leggTilBarnManuell = async (person: PersonDto, alder: number) => {
-        const nyttBarn: BarnMedAlder = {
-            ident: person.ident,
-            navn: person.visningsnavn,
-            erMyndig: alder >= MYNDYG_BARN_ALDER,
-            alder: alder,
-            reellMottakerType: "ingen",
-            reellMottaker: "",
-            reellMottakerNavn: "",
-            manuellLagtTil: true,
-            fødselsdato: person?.fødselsdato || "",
-            diskresjonskode: person.diskresjonskode,
-        };
+    const [visSøk, setVisSøk] = useState(false);
+    const søk = useBarnSøk({
+        valider: (person) => {
+            const feil = validerNyttBarn(person, {
+                identerISaken: barnForm.getValues("valgteBarn").map((barn) => barn.ident),
+                identerIForslag: barnkurver.flatMap((kurv) => kurv.barn.map((barn) => barn.ident)),
+            });
+            if (feil) throw new Error(feil);
+            return alderForBarn(person);
+        },
+        onLeggTil: ({ person }) => {
+            leggTilBarnManuelt(person);
+            søk.lukk();
+        },
+        onLukk: () => setVisSøk(false),
+    });
 
-        const barnValidation = BarnMedAlderSchema.safeParse(nyttBarn);
+    const leggTilBarnManuelt = (person: PersonDto) => {
+        const barnValidation = BarnMedAlderSchema.safeParse({ ...tilBarn(person), manuellLagtTil: true });
 
         if (!barnValidation.success) {
             throw new Error("Kunne ikke validere barn som ble lagt til manuelt");
         }
 
-        const oppdaterteBarn = [...barnForm.getValues("valgteBarn"), barnValidation.data];
-
-        barnForm.setValue("valgteBarn", oppdaterteBarn, {
+        barnForm.setValue("valgteBarn", [...barnForm.getValues("valgteBarn"), barnValidation.data], {
             shouldValidate: barnValidation.data.erMyndig,
             shouldDirty: true,
             shouldTouch: true,
@@ -73,7 +77,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                 onKurvByttet={onKurvByttet}
             />
 
-            <BarnManueltRegistrering form={barnForm} leggTilBarnManuell={leggTilBarnManuell} barnkurver={barnkurver} />
+            <LeggTilBarnSøk søk={søk} visSøk={visSøk} onÅpne={() => setVisSøk(true)} />
 
             {valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
                 <Alert variant="error" size="small">

@@ -1,25 +1,12 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { type Barnkurv, type BarnMedAlder, MYNDYG_BARN_ALDER } from "../skjema/opprett-sak-schema";
+import { tilBarn } from "../../felles/barn/barn-regler";
+import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
 
-function leggTilAlderPåBarn(barn: PersonDto[]): BarnMedAlder[] {
-    return barn.map((person) => {
-        const alder = beregnAlderForPerson(person) ?? 0;
-
-        return {
-            ident: person.ident,
-            navn: person.visningsnavn,
-            fødselsdato: person.fødselsdato ?? undefined,
-            alder,
-            erMyndig: alder >= MYNDYG_BARN_ALDER,
-            diskresjonskode: person.diskresjonskode,
-        };
-    });
-}
+const tilBarnMedAlder = (person: PersonDto): BarnMedAlder => ({ ...tilBarn(person), navn: person.visningsnavn });
 
 export function grupperBarnIKurver(relasjoner: MotpartBarnRelasjon[]): Barnkurv[] {
     return relasjoner.map((rel, index) => {
-        const barnMedAlder = leggTilAlderPåBarn(rel.fellesBarn);
+        const barnMedAlder: BarnMedAlder[] = rel.fellesBarn.map(tilBarnMedAlder);
         const sorterteBarn = barnMedAlder.sort((a, b) => b.alder - a.alder);
 
         return {

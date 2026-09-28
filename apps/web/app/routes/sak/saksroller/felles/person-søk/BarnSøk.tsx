@@ -4,6 +4,7 @@ import { Box, Button, InlineMessage } from "@navikt/ds-react";
 import { type ReactNode, useState } from "react";
 
 import PersonInfo from "../person/PersonInfo.tsx";
+import RedigeringsRamme from "../RedigeringsRamme.tsx";
 import { PersonSøkInnhold } from "./PersonSøkWrapper.tsx";
 
 type FunnetBarn = { person: PersonDto; alder: number };
@@ -52,7 +53,7 @@ export function useBarnSøk({
     };
 }
 
-export function LeggTilBarnKnapp({ onClick }: { onClick: () => void }) {
+function LeggTilBarnKnapp({ onClick }: { onClick: () => void }) {
     return (
         <Box marginBlock="space-16 space-0">
             <Button type="button" variant="secondary" size="small" icon={<PlusIcon aria-hidden />} onClick={onClick}>
@@ -62,14 +63,44 @@ export function LeggTilBarnKnapp({ onClick }: { onClick: () => void }) {
     );
 }
 
-export const barnSøkTittel = "Legg til nytt barn i saken";
+const barnSøkTittel = "Legg til nytt barn i saken";
 
-export function BarnSøkIkon() {
+function BarnSøkIkon() {
     return <PersonTallShortIcon aria-hidden fontSize="1.5rem" />;
 }
 
-/** Innholdet i barnesøket. Legges i `PersonSøkModal` eller inline i `PersonSøkWrapper`. */
-export function BarnSøkInnhold({ søk, children }: { søk: ReturnType<typeof useBarnSøk>; children?: ReactNode }) {
+/**
+ * «Legg til nytt barn»-knapp som åpner barnesøket i en `RedigeringsRamme`.
+ * `children` vises over søkefeltet, for eksempel forslag til barn.
+ */
+export function LeggTilBarnSøk({
+    søk,
+    visSøk,
+    onÅpne,
+    children,
+}: {
+    søk: ReturnType<typeof useBarnSøk>;
+    visSøk: boolean;
+    onÅpne: () => void;
+    children?: ReactNode;
+}) {
+    if (!visSøk) {
+        return <LeggTilBarnKnapp onClick={onÅpne} />;
+    }
+
+    return (
+        <RedigeringsRamme
+            tittel={barnSøkTittel}
+            ikon={<BarnSøkIkon />}
+            onAvbryt={søk.lukk}
+            actions={<BarnSøkHandlinger søk={søk} />}
+        >
+            <BarnSøkInnhold søk={søk}>{children}</BarnSøkInnhold>
+        </RedigeringsRamme>
+    );
+}
+
+function BarnSøkInnhold({ søk, children }: { søk: ReturnType<typeof useBarnSøk>; children?: ReactNode }) {
     return (
         <PersonSøkInnhold
             beskrivelse="Søk opp barnet som skal legges til i saken"
@@ -96,7 +127,7 @@ export function BarnSøkInnhold({ søk, children }: { søk: ReturnType<typeof us
     );
 }
 
-export function BarnSøkHandlinger({ søk }: { søk: ReturnType<typeof useBarnSøk> }) {
+function BarnSøkHandlinger({ søk }: { søk: ReturnType<typeof useBarnSøk> }) {
     return (
         <>
             <Button type="button" size="small" onClick={søk.leggTil}>
