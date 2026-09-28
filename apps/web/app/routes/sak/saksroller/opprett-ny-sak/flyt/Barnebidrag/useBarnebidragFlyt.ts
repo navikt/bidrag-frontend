@@ -227,6 +227,6 @@ export function useBarnebidragFlyt() {
     };
 }
 
-export function finnRolleIndex(roller: BarnebidragForelderRolle[], type: "BP" | "BM") {
+function finnRolleIndex(roller: BarnebidragForelderRolle[], type: "BP" | "BM") {
     return roller.findIndex((rolle) => rolle.type === type);
 }

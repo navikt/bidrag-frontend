@@ -12,6 +12,7 @@ import {
     MYNDYG_BARN_ALDER,
     ReellMottakerFelterSchema,
 } from "../../felles/sakvisning-schema";
+import { tilForelderrolle } from "../parter/part-utils";
 
 export { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER };
 
@@ -76,32 +77,36 @@ type BarnebidragSkjemaInput = {
     valgteBarn: BarnMedAlder[];
 };
 
+type Rolletype = "BP" | "BM";
+
+/** Rollen av en type med feilstien til den. Rekkefølgen i `roller` kan variere. */
+function rolleFelt<T extends { type: Rolletype }>(roller: T[], type: Rolletype) {
+    const indeks = roller.findIndex((rolle) => rolle.type === type);
+    const path = ["roller", Math.max(indeks, 0)];
+    return { type, rolle: roller[indeks] as T | undefined, path, identPath: [...path, "ident"] };
+}
+
+function leggTilFeil(ctx: z.RefinementCtx, path: (string | number)[], message: string) {
+    ctx.addIssue({ code: "custom", path, message });
+}
+
 function validerForeldre(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    const foreldre = ["BP", "BM"] as const;
-    for (const type of foreldre) {
-        const rolle = data.roller.find((r) => r.type === type);
-        const rolleIndex = data.roller.findIndex((r) => r.type === type);
-        const ident = rolle?.ident;
-        const erKjent = rolle?.erKjent;
-        if (erKjent === undefined) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["roller", rolleIndex >= 0 ? rolleIndex : 0, "ident"],
-                message: `Du må registrere ${type === "BP" ? "bidragspliktig" : "bidragsmottaker"} eller velge ukjent`,
-            });
+    const barnIdenter = data.valgteBarn.map((barn) => barn.ident);
+    const bp = rolleFelt(data.roller, "BP");
+    const bm = rolleFelt(data.roller, "BM");
+    for (const { type, rolle, identPath } of [bp, bm]) {
+        if (rolle?.erKjent === undefined) {
+            leggTilFeil(ctx, identPath, `Du må registrere ${tilForelderrolle(type)} eller velge ukjent`);
         }
-        if (ident?.trim() && data.valgteBarn.some((barn) => barn.ident === ident)) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["roller", rolleIndex >= 0 ? rolleIndex : 0, "ident"],
-                message: "Et barn kan ikke være forelder i saken",
-            });
+        if (erBarnISaken(rolle?.ident, barnIdenter)) {
+            leggTilFeil(ctx, identPath, "Et barn kan ikke være forelder i saken");
         }
     }
-    const bp = data.roller.find((r) => r.type === "BP");
-    const bm = data.roller.find((r) => r.type === "BM");
-    const bmIndex = data.roller.findIndex((r) => r.type === "BM");
-    validateUlikeParter({ ident: bp?.ident ?? "" }, bm ?? {}, ctx, ["roller", bmIndex >= 0 ? bmIndex : 0]);
+    validateUlikeParter({ ident: bp.rolle?.ident ?? "" }, bm.rolle ?? {}, ctx, bm.path);
+}
+
+function erBarnISaken(ident: string | undefined, barnIdenter: string[]) {
+    return Boolean(ident?.trim()) && barnIdenter.includes(ident as string);
 }
 
 /** Parten er valgt i skjemaet og ikke satt som ukjent. */
@@ -178,31 +183,14 @@ export const EktefellebidragSkjemaSchema = z
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
     .superRefine((data, ctx) => {
-        const bp = data.roller.find((rolle) => rolle.type === "BP");
-        const bm = data.roller.find((rolle) => rolle.type === "BM");
-        const bpIndex = data.roller.findIndex((rolle) => rolle.type === "BP");
-        const bmIndex = data.roller.findIndex((rolle) => rolle.type === "BM");
-        if (!bp?.ident.trim()) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["roller", bpIndex >= 0 ? bpIndex : 0, "ident"],
-                message: "Du må registrere bidragspliktig",
-            });
+        const bp = rolleFelt(data.roller, "BP");
+        const bm = rolleFelt(data.roller, "BM");
+        for (const { type, rolle, identPath } of [bp, bm]) {
+            if (!rolle?.ident.trim()) {
+                leggTilFeil(ctx, identPath, `Du må registrere ${tilForelderrolle(type)}`);
+            }
         }
-        if (!bm?.ident.trim()) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["roller", bmIndex >= 0 ? bmIndex : 0, "ident"],
-                message: "Du må registrere bidragsmottaker",
-            });
-        }
-        if (bp?.ident && bp.ident === bm?.ident) {
-            ctx.addIssue({
-                code: "custom",
-                path: ["roller", bmIndex >= 0 ? bmIndex : 0, "ident"],
-                message: "Samme person kan ikke være begge parter",
-            });
-        }
+        validateUlikeParter({ ident: bp.rolle?.ident ?? "" }, bm.rolle ?? {}, ctx, bm.path);
     });
 
 export type EktefellebidragSkjemaData = z.infer<typeof EktefellebidragSkjemaSchema>;
@@ -215,7 +203,7 @@ function validerEnPartMedBarnRoller(roller: EnPartMedBarnRolle[], ctx: z.Refinem
         ctx.addIssue({
             code: "custom",
             path: ["roller", indeks, "ident"],
-            message: `Du må registrere ${manglendeRolle.type === "BP" ? "bidragspliktig" : "bidragsmottaker"}`,
+            message: `Du må registrere ${tilForelderrolle(manglendeRolle.type)}`,
         });
     }
     const bp = roller.find((rolle) => rolle.type === "BP");

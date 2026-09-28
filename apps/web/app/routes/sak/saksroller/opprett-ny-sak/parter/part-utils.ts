@@ -10,6 +10,14 @@ export function tilPartISaken(person: PersonDto, rolle: PartRolle): PartISaken {
     };
 }
 
+export function tilRolletype(rolle: ForelderPartRolle): "BP" | "BM" {
+    return rolle === "bidragspliktig" ? "BP" : "BM";
+}
+
+export function tilForelderrolle(type: "BP" | "BM"): ForelderPartRolle {
+    return type === "BP" ? "bidragspliktig" : "bidragsmottaker";
+}
+
 export function hentMotsattRolle(rolle: ForelderPartRolle): ForelderPartRolle {
     return rolle === "bidragspliktig" ? "bidragsmottaker" : "bidragspliktig";
 }

@@ -24,11 +24,6 @@ export default function OpprettSakPage() {
     const navigate = useNavigate();
     const visNyRollebilde = useFlag("bisys.ny_rollebilde");
 
-    const ident = searchParams.get("ident") ?? "";
-    const navn = searchParams.get("navn") ?? "";
-    const eierfogd = searchParams.get("eierfogd") ?? "";
-    const rolle = (searchParams.get("rolle") as OpprettSakRolleType | null) ?? undefined;
-
     if (visNyRollebilde) {
         return <NySaksrollerPage />;
     }
@@ -42,17 +37,20 @@ export default function OpprettSakPage() {
     }
 
     return (
-        <OpprettSakProvider
-            ident={ident}
-            navn={navn}
-            eierfogd={eierfogd}
-            rolle={rolle}
-            onSubmit={onSubmit}
-            onClose={onClose}
-        >
+        <OpprettSakProvider {...lesStartparametre(searchParams)} onSubmit={onSubmit} onClose={onClose}>
             <OpprettSakModalShell />
         </OpprettSakProvider>
     );
+}
+
+function lesStartparametre(searchParams: URLSearchParams) {
+    const hent = (navn: string) => searchParams.get(navn) ?? "";
+    return {
+        ident: hent("ident"),
+        navn: hent("navn"),
+        eierfogd: hent("eierfogd"),
+        rolle: (hent("rolle") || undefined) as OpprettSakRolleType | undefined,
+    };
 }
 
 function OpprettSakModalShell() {
