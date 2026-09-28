@@ -16,7 +16,7 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import DOMPurify from "dompurify";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     useGetEndringsloggForBruker,
     useLestAvBrukerEndring,
@@ -30,16 +30,18 @@ const EndringstypeToTagMapper = {
 };
 
 export function EndringsloggHeader({ skjermbilde }: { skjermbilde?: EndringsloggTilhorerSkjermbilde }) {
-    const endringslogg = useGetEndringsloggForBruker(skjermbilde);
+    const { data, isSuccess, isLoading, isError } = useGetEndringsloggForBruker(skjermbilde);
     const [selected, setSelected] = useState<EndringsLoggDto | null>(null);
     const [påkrevdUlestEndringer, setPåkrevdUlestEndringer] = useState<EndringsLoggDto[]>([]);
 
-    useEffect(() => {
-        const ulestPåkrevd = endringslogg.data?.filter((e) => e.erPåkrevd && !e.erLestAvBruker) ?? [];
-        setPåkrevdUlestEndringer(ulestPåkrevd);
-    }, [endringslogg.data]);
+    const endringslogg = useMemo(() => (Array.isArray(data) ? data : []), [data]);
 
-    const hasSomeUnread = endringslogg.data?.some((e) => !e.erLestAvBruker) ?? false;
+    useEffect(() => {
+        const ulestPåkrevd = endringslogg.filter((e) => e.erPåkrevd && !e.erLestAvBruker) ?? [];
+        setPåkrevdUlestEndringer(ulestPåkrevd);
+    }, [endringslogg]);
+
+    const hasSomeUnread = endringslogg.some((e) => !e.erLestAvBruker) ?? false;
     const visEndringSomErUlestOgPåkrevd = påkrevdUlestEndringer[0];
 
     return (
@@ -56,18 +58,16 @@ export function EndringsloggHeader({ skjermbilde }: { skjermbilde?: Endringslogg
                 </ActionMenu.Trigger>
                 <ActionMenu.Content onWheel={(e) => e.stopPropagation()} onTouchMove={(e) => e.stopPropagation()}>
                     <ActionMenu.Group label="Nyheter" className="endringslogg-header">
-                        {endringslogg.isLoading && <Loader size="medium" title="Venter..." />}
-                        {endringslogg.isError && (
+                        {isLoading && <Loader size="medium" title="Venter..." />}
+                        {isError && (
                             <ErrorMessage size="small" showIcon>
                                 Feil ved henting av meldinger
                             </ErrorMessage>
                         )}
-                        {endringslogg.isSuccess && endringslogg.data.length === 0 && (
-                            <ActionMenu.Item>Ingen nyheter</ActionMenu.Item>
-                        )}
-                        {endringslogg.isSuccess && endringslogg.data.length > 0 && (
+                        {isSuccess && endringslogg.length === 0 && <ActionMenu.Item>Ingen nyheter</ActionMenu.Item>}
+                        {isSuccess && endringslogg.length > 0 && (
                             <EndringsLista
-                                endringslogg={endringslogg.data}
+                                endringslogg={endringslogg}
                                 onSelect={setSelected}
                                 skjermbilde={skjermbilde}
                             />
