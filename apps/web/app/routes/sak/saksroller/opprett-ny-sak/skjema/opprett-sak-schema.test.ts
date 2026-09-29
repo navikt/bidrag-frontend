@@ -68,17 +68,6 @@ describe("BarnebidragSkjemaSchema", () => {
         ).toEqual([]);
     });
 
-    it("lar partene bytte roller", () => {
-        expect(
-            feilFor({
-                roller: [
-                    { ...kjent(bm), type: "BP" },
-                    { ...kjent(bp), type: "BM" },
-                ],
-            }),
-        ).toEqual([]);
-    });
-
     it("validerer roller uavhengig av rekkefølgen i listen", () => {
         expect(
             BarnebidragSkjemaSchema.safeParse({

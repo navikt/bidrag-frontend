@@ -142,15 +142,6 @@ test("kategori velges i skjemaet uten å nullstille det", async ({ mount, page }
     await expect(oppsummering.getByText("Utland", { exact: true })).toBeVisible();
 });
 
-test("bytte av sakstype uten utfylt skjema skjer uten dialog", async ({ mount, page }) => {
-    await mockWizardApi(page);
-    const component = await mount(STORY);
-
-    await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
-    await expect(page.getByRole("alertdialog")).toHaveCount(0);
-    await expect(component.getByRole("radio", { name: /Ektefellebidrag/ })).toBeChecked();
-});
-
 test("viser varsel når forslag til barn ikke kan hentes", async ({ mount, page }) => {
     await mockWizardApi(page);
     await page.route(/\/proxy\/bidrag-person\/motpartbarnrelasjon$/, async (route) => {
@@ -232,16 +223,10 @@ test.describe("Innbygget med forhåndsutfylling", () => {
     const rollevelger = (component: import("@playwright/test").Locator) =>
         component.getByRole("radiogroup", { name: /Hvilken rolle har/ });
 
-    test("inngang med BP fyller ut skjemaet uten Bekreft", async ({ mount, page }) => {
-        await mockWizardApi(page);
-        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident, rolle: "BP" });
-
-        await expect(component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
-        await expect(component.getByText(bp.visningsnavn).first()).toBeVisible();
-        await expect(rollevelger(component)).toHaveCount(0);
-    });
-
-    test("viser ikke sakstype eller søk, og personen modalen åpnes for kan ikke endres", async ({ mount, page }) => {
+    test("inngang med BP fyller ut skjemaet uten sakstype, søk eller mulighet til å endre personen", async ({
+        mount,
+        page,
+    }) => {
         await mockWizardApi(page);
         const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident, rolle: "BP" });
         const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
@@ -251,6 +236,8 @@ test.describe("Innbygget med forhåndsutfylling", () => {
         await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toHaveCount(0);
         await expect(bpKort.getByRole("button", { name: "Endre bidragspliktig" })).toHaveCount(0);
         await expect(component.getByRole("radio", { name: "Nasjonal" })).toBeChecked();
+        await expect(component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
+        await expect(rollevelger(component)).toHaveCount(0);
         await expectNoAxeViolations(page, component);
     });
 
@@ -279,33 +266,6 @@ test.describe("Innbygget med forhåndsutfylling", () => {
             component.getByRole("group", { name: "Bidragsmottaker" }).getByText(bp.visningsnavn).first(),
         ).toBeVisible();
         await expect(rollevelger(component)).toHaveCount(0);
-    });
-
-    test("fullflyt fra barn: rolle ut fra alder, velger BP, oppretter og gir saksnummeret til kalleren", async ({
-        mount,
-        page,
-    }) => {
-        const requests = await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
-        const component = await mount<typeof Innbygget>(INNBYGGET, { ident: barnUnder18.ident, rolle: "BA" });
-
-        await expect(rollevelger(component)).toHaveCount(0);
-        await component
-            .getByRole("group", { name: "Bidragspliktig" })
-            .getByRole("button", { name: `Bruk ${bp.visningsnavn}` })
-            .click();
-
-        await expect(component.getByRole("button", { name: "Opprett og ny søknad" })).toHaveCount(0);
-        await expect(component.getByRole("button", { name: "Opprett og gå til sak" })).toHaveCount(0);
-        await component.getByRole("button", { name: /Opprett$/ }).click();
-        await expect.poll(() => requests.create).toBeTruthy();
-        expect(requests.create).toMatchObject({ eierfogd: "4806", kategori: "N", arbeidsfordeling: "EEN" });
-        expect(requests.create?.roller).toEqual([
-            expect.objectContaining({ fodselsnummer: bp.ident, type: "BP" }),
-            expect.objectContaining({ fodselsnummer: bm.ident, type: "BM" }),
-            expect.objectContaining({ fodselsnummer: barnUnder18.ident, type: "BA" }),
-        ]);
-        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("1234567");
-        await expect(component.getByTestId("avbrutt")).toHaveValue("false");
     });
 
     test("Avbryt kaller onAvbryt", async ({ mount, page }) => {

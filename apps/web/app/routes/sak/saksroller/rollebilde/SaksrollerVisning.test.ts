@@ -4,57 +4,28 @@ import type { SakRedigeringData } from "../felles/sakvisning-schema.ts";
 import { finnFørsteValideringsfeil } from "./lagring/finn-forste-valideringsfeil.ts";
 import { utledSakstype } from "./utled-sakstype.ts";
 
+const zodTypefeil = { type: "invalid_type", message: "Invalid input: expected string, received null" };
+const egendefinert = (message: string) => ({ type: "custom", message });
+const førsteFeil = (feil: object) => finnFørsteValideringsfeil(feil as FieldErrors<SakRedigeringData>);
+
 describe("finnFørsteValideringsfeil", () => {
-    it("returnerer undefined når det ikke finnes noen feil", () => {
-        expect(finnFørsteValideringsfeil({})).toBeUndefined();
+    it("gir undefined uten feil", () => {
+        expect(førsteFeil({})).toBeUndefined();
     });
 
-    it("finner feilmeldingen på toppnivå når feilen er egendefinert (type custom)", () => {
-        const feil = {
-            saksnummer: { type: "custom", message: "Saksnummer må være en tekst" },
-        } as unknown as FieldErrors<SakRedigeringData>;
-
-        expect(finnFørsteValideringsfeil(feil)).toBe("Saksnummer må være en tekst");
+    it("finner egendefinert feil på toppnivå", () => {
+        expect(førsteFeil({ saksnummer: egendefinert("Ugyldig saksnummer") })).toBe("Ugyldig saksnummer");
     });
 
-    it("finner feilmeldingen nestet i et array-felt (roller)", () => {
-        const feil = {
-            roller: [
-                undefined,
-                {
-                    reellMottaker: {
-                        type: "custom",
-                        message: "Reell mottaker må registreres for barn over 18 år",
-                    },
-                },
-            ],
-        } as unknown as FieldErrors<SakRedigeringData>;
-
-        expect(finnFørsteValideringsfeil(feil)).toBe("Reell mottaker må registreres for barn over 18 år");
+    it("finner egendefinert feil nestet i roller", () => {
+        expect(førsteFeil({ roller: [undefined, { reellMottaker: egendefinert("RM mangler") }] })).toBe("RM mangler");
     });
 
-    it("ignorerer rå Zod-typefeil (ikke type custom) i stedet for å vise dem til bruker", () => {
-        const feil = {
-            saksnummer: { type: "invalid_type", message: "Invalid input: expected string, received null" },
-        } as unknown as FieldErrors<SakRedigeringData>;
-
-        expect(finnFørsteValideringsfeil(feil)).toBeUndefined();
-    });
-
-    it("hopper over en rå Zod-typefeil og finner en egendefinert feil lenger ute i treet", () => {
-        const feil = {
-            saksnummer: { type: "invalid_type", message: "Invalid input: expected string, received null" },
-            roller: [
-                {
-                    reellMottaker: {
-                        type: "custom",
-                        message: "Reell mottaker må registreres når bidragsmottaker er ukjent",
-                    },
-                },
-            ],
-        } as unknown as FieldErrors<SakRedigeringData>;
-
-        expect(finnFørsteValideringsfeil(feil)).toBe("Reell mottaker må registreres når bidragsmottaker er ukjent");
+    it("hopper over rå Zod-typefeil", () => {
+        expect(førsteFeil({ saksnummer: zodTypefeil })).toBeUndefined();
+        expect(førsteFeil({ saksnummer: zodTypefeil, roller: [{ reellMottaker: egendefinert("RM mangler") }] })).toBe(
+            "RM mangler",
+        );
     });
 });
 

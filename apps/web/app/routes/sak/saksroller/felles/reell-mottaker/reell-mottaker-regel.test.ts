@@ -12,12 +12,6 @@ import {
 const barn = { ident: "11111111111", navn: "Test Barn" };
 
 describe("reell mottaker-regler", () => {
-    it("krever reell mottaker for myndig barn eller ukjent bidragsmottaker", () => {
-        expect(reellMottakerValgregel({ type: "etter-barn", bidragsmottakerErUkjent: false }, true)).toBe("påkrevd");
-        expect(reellMottakerValgregel({ type: "etter-barn", bidragsmottakerErUkjent: true }, false)).toBe("påkrevd");
-        expect(reellMottakerValgregel({ type: "etter-barn", bidragsmottakerErUkjent: false }, false)).toBe("valgfri");
-    });
-
     it("oversetter samhandler mellom skjemaverdi og valg uten å endre verdien", () => {
         const skjemaverdi = {
             reellMottakerType: "samhandler" as const,

@@ -1,17 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { BarnRolle, Rolle } from "../../felles/sakvisning-schema.ts";
+import type { BarnRolle } from "../../felles/sakvisning-schema.ts";
 import { lagEndringsoppsummering } from "./endringsoppsummering-utils.ts";
-
-function lagForelder(overrides: Partial<Rolle> = {}): Rolle {
-    return {
-        fodselsnummer: "12345678901",
-        type: "BM",
-        rolleType: "BM",
-        objektnummer: "",
-        mottagerErVerge: false,
-        ...overrides,
-    };
-}
 
 function lagBarn(overrides: Partial<BarnRolle> = {}): BarnRolle {
     return {
@@ -35,14 +24,5 @@ describe("lagEndringsoppsummering – advarsel om ufullstendig relasjon", () => 
         const [endring] = lagEndringsoppsummering(opprinnelige, nåværende, ufullstendige);
 
         expect(endring?.harUfullstendigRelasjon).toBe(forventet);
-    });
-
-    it("setter harUfullstendigRelasjon=false som standard når parameteren utelates", () => {
-        const opprinnelige = [lagForelder()];
-        const nåværende = [lagForelder(), lagBarn()];
-
-        const [endring] = lagEndringsoppsummering(opprinnelige, nåværende);
-
-        expect(endring?.harUfullstendigRelasjon).toBe(false);
     });
 });

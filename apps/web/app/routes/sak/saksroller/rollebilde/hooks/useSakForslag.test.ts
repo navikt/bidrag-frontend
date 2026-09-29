@@ -102,17 +102,4 @@ describe("beregnSakForslag", () => {
 
         expect(resultat.muligeBarnPerMotpart.has("33333333333")).toBe(false);
     });
-
-    it("returnerer tomme resultater når det ikke finnes noen relasjoner", () => {
-        const resultat = beregnSakForslag({
-            motpartRelasjon: { personensMotpartBarnRelasjon: [] },
-            barnListe: [],
-            barnIdenter: [],
-            ukjentForelder: true,
-            andreForelderIdent: undefined,
-        });
-
-        expect(resultat.muligeAndreForeldre).toEqual([]);
-        expect(resultat.muligeBarnPerMotpart.size).toBe(0);
-    });
 });

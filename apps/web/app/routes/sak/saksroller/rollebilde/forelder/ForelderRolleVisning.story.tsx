@@ -77,21 +77,6 @@ export const BidragsmottakerManglerInline = () => (
     </RedigeringsvisningProvider>
 );
 
-export const BidragspliktigMangler = () => <ForelderRolleVisningScenario initialRoller={[bmKjentFraStart]} />;
-
-export const NyBidragspliktigKanFjernes = () => (
-    <ForelderRolleVisningScenario initialRoller={[bpNyLagtTil, bmKjentFraStart]} baselineRoller={[bmKjentFraStart]} />
-);
-
-const bpNyLagtTil: Rolle = {
-    fodselsnummer: genererFnr(),
-    type: "BP",
-    rolleType: "BP",
-    objektnummer: "3",
-    mottagerErVerge: false,
-    navn: "Ny Bidragspliktig",
-};
-
 const bpPlassholderMedTomtFodselsnummer: Rolle = {
     fodselsnummer: "",
     type: "BP",

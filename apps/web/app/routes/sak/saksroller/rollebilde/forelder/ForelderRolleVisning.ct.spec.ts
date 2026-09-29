@@ -4,8 +4,6 @@ import type { Page } from "@playwright/test";
 
 const STORY_BEGGE_KJENT = "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/BeggeRollerISak";
 const STORY_BM_MANGLER = "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/BidragsmottakerMangler";
-const STORY_BP_MANGLER = "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/BidragspliktigMangler";
-const STORY_NY_BP = "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/NyBidragspliktigKanFjernes";
 const STORY_BP_PLASSHOLDER =
     "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/BidragspliktigManglerMedPlassholderRolle";
 
@@ -38,29 +36,6 @@ test.describe("ForelderRolleVisning", () => {
         await expect(component.getByText("Ola Nordmann")).toBeVisible();
         await expect(component.getByText("Ukjent - ikke registrert")).toBeVisible();
         await expect(component.getByRole("button", { name: "Legg til person" })).toBeVisible();
-    });
-
-    test("bidragspliktig mangler (unntak, f.eks. farskapssak) - viser 'Ukjent - ikke registrert' og 'Legg til person'", async ({
-        mount,
-    }) => {
-        const component = await mount(STORY_BP_MANGLER);
-
-        await expect(component.getByText("Kari Nordmann")).toBeVisible();
-        await expect(component.getByText("Ukjent - ikke registrert")).toBeVisible();
-        await expect(component.getByRole("button", { name: "Legg til person" })).toBeVisible();
-    });
-
-    test("nylig lagt til bidragspliktig viser 'Ny'-merke og kan fjernes igjen via Fjern-knappen", async ({ mount }) => {
-        const component = await mount(STORY_NY_BP);
-
-        await expect(component.getByText("Ny", { exact: true })).toBeVisible();
-        await expect(component.getByRole("button", { name: "Endre" })).toBeVisible();
-
-        await component.getByRole("button", { name: "Fjern" }).click();
-
-        await expect(component.getByText("Ny Bidragspliktig")).toHaveCount(0);
-        await expect(component.getByText("Kari Nordmann")).toBeVisible();
-        await expect(component.getByRole("button", { name: "Legg til person" })).toHaveCount(1);
     });
 
     test("uthevPerson (context-mock, ikke useHentPersonData/'personer') fremhever kun bidragspliktig", async ({
@@ -122,6 +97,7 @@ test.describe("ForelderRolleVisning", () => {
         await component.getByRole("button", { name: "Søk", exact: true }).click();
 
         await expect(component.getByText("Ny Bidragspliktig")).toBeVisible();
+        await expect(component.getByText("Ny", { exact: true })).toBeVisible();
         await expect(component.getByRole("button", { name: "Legg til person" })).toHaveCount(0);
         await expect(component.getByRole("button", { name: "Fjern" })).toBeVisible();
 

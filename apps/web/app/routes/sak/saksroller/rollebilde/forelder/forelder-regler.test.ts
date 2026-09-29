@@ -17,17 +17,16 @@ const rolle = (type: "BP" | "BM", fodselsnummer: string): Rolle => ({
 });
 
 describe("finnDuplikatForelderFeil", () => {
-    it("avviser samme person i begge foreldreroller", () => {
-        expect(finnDuplikatForelderFeil([rolle("BP", person.ident)], "BM", person)).toBe(
-            "Test Person (11111111111) er allerede registrert som bidragspliktig og kan ikke legges til på nytt.",
-        );
-    });
-
-    it("tillater personen når den andre foreldrerollen har en annen ident", () => {
-        expect(finnDuplikatForelderFeil([rolle("BP", "22222222222")], "BM", person)).toBeNull();
-    });
-
-    it("sammenligner ikke mot rollen som erstattes", () => {
-        expect(finnDuplikatForelderFeil([rolle("BM", person.ident)], "BM", person)).toBeNull();
+    it.each([
+        {
+            tilfelle: "samme person i begge foreldreroller",
+            eksisterende: rolle("BP", person.ident),
+            forventet:
+                "Test Person (11111111111) er allerede registrert som bidragspliktig og kan ikke legges til på nytt.",
+        },
+        { tilfelle: "annen person i den andre rollen", eksisterende: rolle("BP", "22222222222"), forventet: null },
+        { tilfelle: "samme person i rollen som erstattes", eksisterende: rolle("BM", person.ident), forventet: null },
+    ])("$tilfelle", ({ eksisterende, forventet }) => {
+        expect(finnDuplikatForelderFeil([eksisterende], "BM", person)).toBe(forventet);
     });
 });

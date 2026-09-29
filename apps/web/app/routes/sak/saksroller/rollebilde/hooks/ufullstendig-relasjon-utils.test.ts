@@ -19,20 +19,12 @@ describe("harUfullstendigRelasjon", () => {
     const bidragsmottaker = "11111111111";
     const bidragspliktig = "22222222222";
 
-    it("er komplett når barnet har relasjon til begge foreldrene", () => {
-        expect(
-            harUfullstendigRelasjon(lagRelasjon([bidragsmottaker, bidragspliktig]), bidragsmottaker, bidragspliktig),
-        ).toBe(false);
-    });
-
-    it("er ufullstendig når barnet mangler relasjon til en av foreldrene", () => {
-        expect(
-            harUfullstendigRelasjon(lagRelasjon([bidragsmottaker, "33333333333"]), bidragsmottaker, bidragspliktig),
-        ).toBe(true);
-    });
-
-    it("er ufullstendig når barnet har færre enn to registrerte foreldre", () => {
-        expect(harUfullstendigRelasjon(lagRelasjon([bidragsmottaker]), bidragsmottaker, bidragspliktig)).toBe(true);
-        expect(harUfullstendigRelasjon(lagRelasjon([]), bidragsmottaker, bidragspliktig)).toBe(true);
+    it.each([
+        { foreldre: [bidragsmottaker, bidragspliktig], forventet: false },
+        { foreldre: [bidragsmottaker, "33333333333"], forventet: true },
+        { foreldre: [bidragsmottaker], forventet: true },
+        { foreldre: [], forventet: true },
+    ])("$foreldre gir $forventet", ({ foreldre, forventet }) => {
+        expect(harUfullstendigRelasjon(lagRelasjon(foreldre), bidragsmottaker, bidragspliktig)).toBe(forventet);
     });
 });

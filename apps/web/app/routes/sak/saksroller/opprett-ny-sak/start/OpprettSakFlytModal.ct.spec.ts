@@ -30,6 +30,8 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await expect(dialog.getByRole("group", { name: "Bidragspliktig" }).getByText(bp.visningsnavn)).toBeVisible();
         await expect(dialog.getByRole("group", { name: "Bidragsmottaker" }).getByText(bm.visningsnavn)).toBeVisible();
         await expect(dialog.getByText(/Arbeidsfordelingen gir en annen enhet/)).toHaveCount(0);
+        await expect(dialog.getByRole("button", { name: "Opprett og ny søknad" })).toHaveCount(0);
+        await expect(dialog.getByRole("button", { name: "Opprett og gå til sak" })).toHaveCount(0);
         const opprett = dialog.getByRole("button", { name: /Opprett$/ });
         await expect(opprett).toBeVisible();
         await expect(dialog.locator(".aksel-modal__footer").getByRole("button", { name: /Opprett$/ })).toBeVisible();

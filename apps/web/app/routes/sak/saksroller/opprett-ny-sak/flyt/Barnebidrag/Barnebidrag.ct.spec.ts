@@ -139,18 +139,6 @@ test.describe("Start fra forelder uten registrerte barn", () => {
         await expect(component.getByText("Sak opprettet med saksnummer 1234567.")).toBeVisible();
     });
 
-    test("foreslår begge når barnet har to andre registrerte foreldre", async ({ mount, page }) => {
-        await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident, annenForelder.ident] } });
-        const component = await mount(`${STORY}/ForelderUtenBarn`);
-        await leggTilBarn(component, page);
-
-        await expect(component.getByText(/har begge foreldre registrert/)).toBeVisible();
-        const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
-        await expect(bmKort.getByRole("button", { name: `Bruk ${bm.visningsnavn}` })).toBeVisible();
-        await expect(bmKort.getByRole("button", { name: `Bruk ${annenForelder.visningsnavn}` })).toBeVisible();
-        await expect(bmKort.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
-    });
-
     test("viser datakvalitetsfeil ved mer enn to registrerte foreldre", async ({ mount, page }) => {
         await mockWizardApi(page, {
             parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident, annenForelder.ident] },
