@@ -60,6 +60,7 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
                                     padding="space-12"
                                 >
                                     <PersonInfo
+                                        truncate
                                         navn={rolle.navn}
                                         ident={rolle.fodselsnummer}
                                         fødselsdato={rolle.fødselsdato}

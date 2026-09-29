@@ -13,13 +13,12 @@ import type { Sakskategori } from "./saksrolleroversiktContext";
 type Props = {
     onSubmit: ComponentProps<typeof FlytSkjema>["onSubmit"];
     status: EksisterendeSakStatusProps;
-    innledning?: ReactNode;
     children: ReactNode;
     meldinger?: ReactNode;
     innsending: EnhetOgSubmitSectionProps;
 };
 
-export default function RolleFlytSide({ onSubmit, status, innledning, children, meldinger, innsending }: Props) {
+export default function RolleFlytSide({ onSubmit, status, children, meldinger, innsending }: Props) {
     const visStatus = status.infoMelding || status.isLoading || (status.harEksisterendeSak && status.eksisterendeSak);
     const formId = useId();
     const modal = useNyOpprettSakModal();
@@ -28,7 +27,6 @@ export default function RolleFlytSide({ onSubmit, status, innledning, children, 
         <FlytSkjema id={modal?.formId ?? formId} onSubmit={onSubmit} disabled={innsending.isLoading}>
             <VStack gap="space-24" aria-busy={status.isLoading}>
                 <KategoriSeksjon />
-                {innledning && <VStack gap="space-12">{innledning}</VStack>}
                 {children}
                 {innsending.oppsummering && <Oppsummering {...innsending.oppsummering} />}
                 <VStack gap="space-12">

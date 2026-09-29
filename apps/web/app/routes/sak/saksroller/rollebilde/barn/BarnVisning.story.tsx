@@ -26,17 +26,10 @@ function lagBarn(overrides: Partial<BarnRolle> = {}): BarnRolle {
 
 interface BarnVisningScenarioProps {
     initialRoller: BarnRolle[];
-    bidragsmottakerIdent?: string;
     erNyttBarnIndex?: number;
-    erOppfostringsbidrag?: boolean;
 }
 
-function BarnVisningScenario({
-    initialRoller,
-    bidragsmottakerIdent = BM_IDENT,
-    erNyttBarnIndex,
-    erOppfostringsbidrag = false,
-}: BarnVisningScenarioProps) {
+function BarnVisningScenario({ initialRoller, erNyttBarnIndex }: BarnVisningScenarioProps) {
     const queryClient = useTestQueryClient();
     const form = useForm<SakRedigeringData>({
         defaultValues: { saksnummer: "2024/1", roller: initialRoller },
@@ -53,10 +46,10 @@ function BarnVisningScenario({
                                 key={rolle.fodselsnummer}
                                 rolle={rolle}
                                 index={index}
-                                bidragsmottakerIdent={bidragsmottakerIdent}
+                                bidragsmottakerIdent={BM_IDENT}
                                 erNyttBarn={index === erNyttBarnIndex}
                                 hentOgNullstillSamhandler={() => null}
-                                erOppfostringsbidrag={erOppfostringsbidrag}
+                                erOppfostringsbidrag={false}
                             />
                         ))}
                     </VStack>

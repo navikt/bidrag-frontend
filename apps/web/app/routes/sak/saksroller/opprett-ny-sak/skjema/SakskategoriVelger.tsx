@@ -5,17 +5,15 @@ import type { Sakskategori } from "./saksrolleroversiktContext";
 type Props = {
     value: Sakskategori;
     onChange: (value: Sakskategori) => void;
-    error?: string;
 };
 
-export default function SakskategoriVelger({ value, onChange, error }: Props) {
+export default function SakskategoriVelger({ value, onChange }: Props) {
     return (
         <RadioGroup
             legend="Velg om saken gjelder nasjonal eller internasjonal bidragssak"
             size="small"
             value={value}
             onChange={(nyVerdi) => onChange(nyVerdi as Sakskategori)}
-            error={error}
         >
             <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }} wrap={false}>
                 <Radio value="Nasjonal">Nasjonal</Radio>

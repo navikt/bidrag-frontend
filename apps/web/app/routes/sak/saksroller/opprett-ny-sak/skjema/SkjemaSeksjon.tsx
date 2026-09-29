@@ -32,18 +32,9 @@ export default function SkjemaSeksjon({ tittel, beskrivelse, handling, children 
     );
 }
 
-export function SkjemaSeksjonKort({
-    children,
-    variant = "default",
-}: PropsWithChildren<{ variant?: "default" | "warning" }>) {
+export function SkjemaSeksjonKort({ children }: PropsWithChildren) {
     return (
-        <Box
-            background={variant === "warning" ? "warning-soft" : "raised"}
-            borderColor={variant === "warning" ? "warning" : "neutral-subtleA"}
-            borderWidth="1"
-            borderRadius="12"
-            padding="space-16"
-        >
+        <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-16">
             {children}
         </Box>
     );

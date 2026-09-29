@@ -57,11 +57,11 @@ function renderReellMottaker(identBarn: string, mottakerIdent: string, mottakerN
     }
 
     if (mottakerNavn && mottakerNavn.trim() !== "") {
-        return <PersonInfo navn={mottakerNavn} ident={trimmetMottakerIdent} compact visKopieringsknapp={false} />;
+        return <PersonInfo navn={mottakerNavn} ident={trimmetMottakerIdent} visKopieringsknapp={false} />;
     }
 
     if (erPersonIdent(trimmetMottakerIdent)) {
-        return <PersonInfo ident={trimmetMottakerIdent} compact visKopieringsknapp={false} />;
+        return <PersonInfo ident={trimmetMottakerIdent} visKopieringsknapp={false} />;
     }
 
     return trimmetMottakerIdent;
@@ -134,7 +134,7 @@ function PersonEndringerSvar({ gruppe }: { gruppe: Persongruppe }) {
         <FormSummary.Answer key={gruppe.personKey}>
             <FormSummary.Label>
                 <HStack gap="space-4" align="center" wrap>
-                    <PersonInfo ident={gruppe.ident} compact visKopieringsknapp={false} />
+                    <PersonInfo ident={gruppe.ident} visKopieringsknapp={false} />
                     {lagtTil && (
                         <Tag size="xsmall" variant="alt1">
                             {lagtTil.rolleType === "BA" ? "Nytt barn" : "Ny rolle"}

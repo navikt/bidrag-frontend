@@ -25,10 +25,9 @@ const bmKjentFraStart: Rolle = {
 
 interface ForelderRolleVisningScenarioProps {
     initialRoller: Rolle[];
-    baselineRoller?: Rolle[];
 }
 
-function ForelderRolleVisningScenario({ initialRoller, baselineRoller }: ForelderRolleVisningScenarioProps) {
+function ForelderRolleVisningScenario({ initialRoller }: ForelderRolleVisningScenarioProps) {
     const form = useForm<SakRedigeringData>({
         defaultValues: { saksnummer: "2024/1", roller: initialRoller },
     });
@@ -36,7 +35,7 @@ function ForelderRolleVisningScenario({ initialRoller, baselineRoller }: Forelde
     const bp = roller.find((r) => r.type === "BP");
     const bm = roller.find((r) => r.type === "BM");
 
-    const funnetPersonISak = (fnr: string) => (baselineRoller ?? initialRoller).some((r) => r.fodselsnummer === fnr);
+    const funnetPersonISak = (fnr: string) => initialRoller.some((r) => r.fodselsnummer === fnr);
     const erNyForelderBp = bp?.fodselsnummer ? !funnetPersonISak(bp.fodselsnummer) : undefined;
     const erNyForelderBm = bm?.fodselsnummer ? !funnetPersonISak(bm.fodselsnummer) : undefined;
 
@@ -72,7 +71,7 @@ export const BeggeRollerISak = () => (
 export const BidragsmottakerMangler = () => <ForelderRolleVisningScenario initialRoller={[bpKjentFraStart]} />;
 
 export const BidragsmottakerManglerInline = () => (
-    <RedigeringsvisningProvider visning="inline">
+    <RedigeringsvisningProvider>
         <ForelderRolleVisningScenario initialRoller={[bpKjentFraStart]} />
     </RedigeringsvisningProvider>
 );

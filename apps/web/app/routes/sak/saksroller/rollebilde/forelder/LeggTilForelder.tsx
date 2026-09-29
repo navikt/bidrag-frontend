@@ -116,6 +116,7 @@ export default function LeggTilForelder({
                                     onClick={() => handlePersonValgt(forelder)}
                                 >
                                     <PersonInfo
+                                        truncate
                                         navn={forelder.visningsnavn}
                                         ident={forelder.ident}
                                         fødselsdato={forelder.fødselsdato || ""}

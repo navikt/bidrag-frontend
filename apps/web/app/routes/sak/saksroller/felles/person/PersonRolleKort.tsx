@@ -71,7 +71,6 @@ export function PersonRolleKortInnhold({
                     tags={tags}
                     headingActions={headingActions}
                     visModiaLenke
-                    compact
                 >
                     {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
                     <NyttFødselsnummerMelding ident={person.ident} søktIdent={søktIdent} />

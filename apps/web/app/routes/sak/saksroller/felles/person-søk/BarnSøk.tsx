@@ -143,6 +143,7 @@ function BarnSøkHandlinger({ søk }: { søk: ReturnType<typeof useBarnSøk> }) 
 export function BarnPersonInfo({ person, alder }: FunnetBarn) {
     return (
         <PersonInfo
+            truncate
             navn={person.visningsnavn}
             ident={person.ident}
             rolle="BA"

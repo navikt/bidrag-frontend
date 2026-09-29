@@ -17,7 +17,6 @@ interface ReellMottakerVelgerProps {
     onAvbryt: () => void;
     onBekreft: (verdi: ReellMottakerValg) => void;
     regel: ReellMottakerValgregel;
-    feil?: string;
 }
 
 export default function ReellMottakerVelger({
@@ -26,7 +25,6 @@ export default function ReellMottakerVelger({
     verdi,
     onAvbryt,
     onBekreft,
-    feil,
     regel,
 }: ReellMottakerVelgerProps) {
     const [valideringsfeil, setValideringsfeil] = useState<string | undefined>();
@@ -80,7 +78,7 @@ export default function ReellMottakerVelger({
                 lagretSamhandler={lagretSamhandler}
                 onValg={handleValg}
                 regel={regel}
-                feil={valideringsfeil ?? feil}
+                feil={valideringsfeil}
             />
         </RedigeringsRamme>
     );

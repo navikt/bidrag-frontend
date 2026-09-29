@@ -40,7 +40,6 @@ type Props = {
     lagretSamhandler: Samhandler | null;
     onValg: (valg: ReellMottakerValg) => void;
     regel: ReellMottakerValgregel;
-    disabled?: boolean;
     feil?: string;
 };
 
@@ -51,7 +50,6 @@ export default function ReellMottakerValgGruppe({
     lagretSamhandler,
     onValg,
     regel,
-    disabled,
     feil,
 }: Props) {
     const påkrevd = regel !== "valgfri";
@@ -70,7 +68,6 @@ export default function ReellMottakerValgGruppe({
                 legend="Hvem er reell mottaker?"
                 value={valg.type || "ingen"}
                 onChange={handleRadioChange}
-                disabled={disabled}
                 error={feil}
             >
                 <VStack gap="space-0">
@@ -95,7 +92,6 @@ export default function ReellMottakerValgGruppe({
                     valg={valg}
                     lagretSamhandlerIdent={lagretSamhandler?.ident}
                     skjulValgt={Boolean(feil || error)}
-                    disabled={disabled}
                     onVelg={(ident, navn) => {
                         setError(undefined);
                         onValg({ type: "samhandler", ident, navn });
@@ -121,14 +117,12 @@ function SamhandlerValg({
     valg,
     lagretSamhandlerIdent,
     skjulValgt,
-    disabled,
     onVelg,
     onError,
 }: {
     valg: ReellMottakerValg;
     lagretSamhandlerIdent?: string;
     skjulValgt: boolean;
-    disabled?: boolean;
     onVelg: (ident: string, navn?: string) => void;
     onError: (feil: string) => void;
 }) {
@@ -141,13 +135,7 @@ function SamhandlerValg({
             />
             {!skjulValgt && valg.navn && valg.ident && (
                 <Box borderWidth="2" borderRadius="12">
-                    <FunnetPersonInfo
-                        label="Reell mottaker:"
-                        navn={valg.navn}
-                        ident={valg.ident}
-                        disabled={disabled}
-                        variant="info"
-                    />
+                    <FunnetPersonInfo navn={valg.navn} ident={valg.ident} />
                 </Box>
             )}
         </>

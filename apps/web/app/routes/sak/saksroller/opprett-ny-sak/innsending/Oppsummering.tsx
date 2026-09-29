@@ -85,7 +85,7 @@ function PersonVerdi({ person }: { person?: Person | null }) {
     }
     return (
         <HStack gap="space-8" wrap align="center">
-            <PersonInfo ident={person.ident} navn={person.navn} compact visKopieringsknapp={false} />
+            <PersonInfo ident={person.ident} navn={person.navn} visKopieringsknapp={false} />
             {person.diskresjonskode && (
                 <Tag size="xsmall" variant="warning">
                     {hentDiskresjonskodeForklaring(person.diskresjonskode as Diskresjonskode)}

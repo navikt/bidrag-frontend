@@ -25,7 +25,7 @@ export default function OpprettSakSkjema(props: Omit<ComponentProps<typeof Saksr
     return (
         <SaksrolleroversiktProvider {...props}>
             {oppretter && <OppretterSak />}
-            <RedigeringsvisningProvider visning="inline">
+            <RedigeringsvisningProvider>
                 <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>
                     <FlytKomponent />
                 </Suspense>

@@ -8,7 +8,7 @@ import {
     useBidragCommons,
 } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
-import { BodyShort, Box, CopyButton, HStack, Link, Skeleton, VStack } from "@navikt/ds-react";
+import { BodyShort, Box, HStack, Link, Skeleton, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
@@ -26,7 +26,7 @@ type Props = {
     headingActions?: ReactNode;
     visModiaLenke?: boolean;
     visKopieringsknapp?: boolean;
-    compact?: boolean;
+    truncate?: boolean;
     children?: ReactNode;
     fallback?: ReactNode;
 };
@@ -42,7 +42,7 @@ function PersonInfoContent({
     headingActions,
     visModiaLenke,
     visKopieringsknapp = true,
-    compact = false,
+    truncate = false,
     children,
 }: Props) {
     const { erMaskert } = useBidragCommons();
@@ -66,13 +66,14 @@ function PersonInfoContent({
         samhandlerNavn: samhandlerData?.navn,
         visningsnavn: data?.visningsnavn,
         erMaskert,
+        truncate,
         children,
     };
 
-    return compact ? <CompactPersonInfo {...commonProps} /> : <StandardPersonInfo {...commonProps} />;
+    return <PersonInfoLayout {...commonProps} />;
 }
 
-type PersonInfoContentProps = Omit<Props, "fødselsdato" | "alder" | "compact" | "fallback"> & {
+type PersonInfoContentProps = Omit<Props, "fødselsdato" | "alder" | "fallback"> & {
     personAlder?: number;
     erSamhandlerIdent: boolean;
     samhandlerNavn?: string;
@@ -112,22 +113,17 @@ function PersonIdentLine({
     erSamhandlerIdent,
     personAlder,
     visKopieringsknapp,
-    compact = false,
 }: Pick<
     PersonInfoContentProps,
     "ident" | "navn" | "samhandlerNavn" | "erSamhandlerIdent" | "personAlder" | "visKopieringsknapp"
-> & { compact?: boolean }) {
+>) {
     return (
         <HStack asChild align="center">
             <BodyShort textColor="subtle" size="small">
                 {erSamhandlerIdent ? (
                     <SamhandlerIdent ident={ident} navn={navn} samhandlerNavn={samhandlerNavn} />
                 ) : (
-                    <PersonNavnIdent
-                        variant="ident"
-                        ident={ident}
-                        {...(!compact && { showCopyButton: visKopieringsknapp })}
-                    />
+                    <PersonNavnIdent variant="ident" ident={ident} showCopyButton={visKopieringsknapp} />
                 )}
                 {personAlder !== undefined && ` (${personAlder} år)`}
             </BodyShort>
@@ -135,39 +131,7 @@ function PersonIdentLine({
     );
 }
 
-function StandardPersonInfo(props: PersonInfoContentProps) {
-    const { ident, navn, visningsnavn, erMaskert, erSamhandlerIdent, visModiaLenke, tags, headingActions, children } =
-        props;
-    return (
-        <HStack gap="space-8" align="start" wrap={false}>
-            <RolleTagForPerson {...props} />
-            <VStack minWidth="0" flexGrow="1">
-                <HStack gap="space-8" align="center">
-                    {!erSamhandlerIdent && (
-                        <Box asChild minWidth="0">
-                            <BodyShort
-                                size="small"
-                                weight="semibold"
-                                truncate
-                                className="personnavn"
-                                title={erMaskert ? undefined : (visningsnavn ?? navn)}
-                            >
-                                {visningsnavn ?? navn}
-                            </BodyShort>
-                        </Box>
-                    )}
-                    {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} />}
-                    {tags}
-                    {headingActions}
-                </HStack>
-                <PersonIdentLine {...props} />
-                {children}
-            </VStack>
-        </HStack>
-    );
-}
-
-function CompactPersonInfo(props: PersonInfoContentProps) {
+function PersonInfoLayout(props: PersonInfoContentProps) {
     const {
         ident,
         navn,
@@ -177,21 +141,22 @@ function CompactPersonInfo(props: PersonInfoContentProps) {
         visModiaLenke,
         tags,
         headingActions,
+        truncate,
         children,
-        visKopieringsknapp,
     } = props;
     return (
         <HStack gap="space-4" align="start" wrap={false}>
             <RolleTagForPerson {...props} />
-            <VStack flexGrow="1">
-                <HStack justify="space-between">
-                    <VStack gap="space-1">
+            <VStack flexGrow="1" minWidth="0">
+                <HStack justify="space-between" wrap={false}>
+                    <VStack gap="space-1" minWidth="0">
                         <HStack gap="space-4" align="center">
                             {!erSamhandlerIdent && (
                                 <Box asChild minWidth="0">
                                     <BodyShort
                                         size="small"
                                         weight="semibold"
+                                        truncate={truncate}
                                         className="personnavn"
                                         title={erMaskert ? undefined : (visningsnavn ?? navn)}
                                     >
@@ -202,12 +167,9 @@ function CompactPersonInfo(props: PersonInfoContentProps) {
                             {tags}
                             {headingActions}
                         </HStack>
-                        <PersonIdentLine {...props} compact />
+                        <PersonIdentLine {...props} />
                     </VStack>
-                    <HStack>
-                        {visKopieringsknapp && <CopyButton copyText={ident} size="small" style={{ zIndex: 10000 }} />}
-                        {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} compact />}
-                    </HStack>
+                    {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} compact />}
                 </HStack>
                 {children}
             </VStack>
@@ -217,15 +179,15 @@ function CompactPersonInfo(props: PersonInfoContentProps) {
 
 export default function PersonInfo({ fallback, ...props }: Props) {
     return (
-        <Suspense fallback={fallback ?? <PersonInfoSkeleton compact={props.compact} />}>
+        <Suspense fallback={fallback ?? <PersonInfoSkeleton />}>
             <PersonInfoContent {...props} />
         </Suspense>
     );
 }
 
-function PersonInfoSkeleton({ compact = false }: Pick<Props, "compact">) {
+function PersonInfoSkeleton() {
     return (
-        <VStack gap="space-4" width={compact ? "12rem" : "16rem"} aria-label="Laster personinformasjon">
+        <VStack gap="space-4" width="12rem" aria-label="Laster personinformasjon">
             <Skeleton variant="text" width="70%" />
             <Skeleton variant="text" width="100%" />
         </VStack>

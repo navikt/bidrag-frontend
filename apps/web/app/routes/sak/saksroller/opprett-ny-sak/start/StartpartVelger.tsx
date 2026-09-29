@@ -129,6 +129,7 @@ function ValgtPart({ person }: { person: PersonDto }) {
     return (
         <VStack gap="space-8">
             <PersonInfo
+                truncate
                 ident={person.ident}
                 navn={person.visningsnavn}
                 fødselsdato={person.fødselsdato ?? undefined}

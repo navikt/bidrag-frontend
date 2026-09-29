@@ -53,7 +53,7 @@ const Stub = createRoutesStub([
 export const MedBidragsmottaker = () => <Stub initialEntries={["/sak/2024%2F1/saksroller"]} />;
 
 export const MedBidragsmottakerInline = () => (
-    <RedigeringsvisningProvider visning="inline">
+    <RedigeringsvisningProvider>
         <Stub initialEntries={["/sak/2024%2F1/saksroller"]} />
     </RedigeringsvisningProvider>
 );
