@@ -1,10 +1,9 @@
-import { BIDRAG_PERSON_API, TilgangsFeilError } from "@bidrag/api";
 import type { DistribuerTilAdresse } from "@bidrag/api/BidragDokumentApi";
 import type { EnhetDto } from "@bidrag/api/OrganisasjonApi";
-import { type PersonAdresseDto, type PersonDto, PersondetaljerDto, PersonRequest } from "@bidrag/api/PersonApi";
+import type { PersonAdresseDto, PersonDto } from "@bidrag/api/PersonApi";
 import type { SamhandlerDto } from "@bidrag/api/SamhandlerApi";
-import { IdentUtils, SecureLoggerService } from "@bidrag/common";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { IdentUtils } from "@bidrag/common";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import countries from "i18n-iso-countries/index.js";
 import norwegianLocale from "i18n-iso-countries/langs/nb.json";
