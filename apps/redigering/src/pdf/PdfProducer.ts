@@ -11,7 +11,7 @@ import {
 } from "@cantoo/pdf-lib";
 
 import type { IMaskingItemProps } from "../components/masking/MaskingItem";
-import type { PdfDocumentType } from "../components/utils/types";
+import type { PdfBytes } from "../components/utils/types";
 import type { EditDocumentMetadata } from "../types/EditorTypes";
 import { PdfAConverter } from "./PdfAConverter";
 import { getErrorMessage, isPageTreeCorruptionError } from "./PdfErrorUtils";
@@ -41,7 +41,7 @@ export interface IProducerProgress {
 export class PdfProducer {
     private pdfDocument: PDFDocument;
     private title: string;
-    private pdfBlob: PdfDocumentType;
+    private pdfBlob: PdfBytes;
     private processedDocument: Uint8Array;
     private config: EditDocumentMetadata;
     private onProgressUpdate: (process: IProducerProgress) => void;
@@ -53,7 +53,7 @@ export class PdfProducer {
     private requiresOriginalPdfRasterization = false;
 
     private font: PDFFont;
-    constructor(pdfBlob: PdfDocumentType) {
+    constructor(pdfBlob: PdfBytes) {
         this.pdfBlob = pdfBlob;
     }
 

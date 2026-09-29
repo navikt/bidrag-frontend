@@ -84,7 +84,7 @@ du har registrert ved journalføring (mottatt dato og søkt fra dato).
 Velg årsak til avslag
 - Årsak velger du fra en nedtrekksliste, og legger inn begrunnelsen for avslaget i begrunnelsesboksen
 
-Avslagsårsak sender deg direkte til steg 7 «Vedtak».
+Avslagsårsak sender deg direkte til steg 4 «Inntekt».
 
 #### Sette varighet av vedtaket
 - Default er at vedtaket står med løpende varighet.
@@ -260,8 +260,18 @@ skjermen om hva som er endret. Når du får en slik
 melding, må du trykke på «oppdater opplysninger».
 
 <h2 id={elementIds.brukerveildning.tittel_gebyr}>5. Gebyr</h2>
-- Systemet setter verdien fritatt eller ilagt automatisk basert på siste inntektsperiode på parten. I tilfeller hvor det er flere barn med ulike barnetillegg tar systemet med det høyeste barnetillegget i vurderingen.
-- Man kan manuelt overstyre verdien som systemet setter. Overstyrer man verdien må man fylle ut begrunnelse.
+På dette steget vil løsningen se på inntekt lagt inn av saksbehandler for den siste perioden, eller dersom saksbehandler ikke har lagt inn inntekt vil løsningen se på inntekt fra A-ordningen siste 12 mnd. Løsningen vil på bakgrunn av inntekt foreslå om partene skal bli ilagt eller fritatt for gebyr.
+
+Saksbehandler kan overstyre dette manuelt, men det må da legges inn en begrunnelse som blir tatt med videre i saksbehandlingsnotatet.
+
+For søknader som avslås, vil man få et eget saksbehandlingsnotat for inntekt og gebyr.
+
+#### Gebyr ved sammenslått behandlinger
+(f.eks. en søknad om fastsettelse for yngste barn i søskenflokk, og søknad om endring for eldre søsken i samme søskenflokk)
+
+Her må man som saksbehandler ta stilling til om det skal ilegges gebyr for hver av søknadslenkene, eller om man kun skal legge til gebyr på en av søknadslenkene. Dette er en vurdering saksbehandler må gjøre manuelt, da løsningen kun foreslår ilagt/fritatt ut ifra partenes inntekt på steg 4 «Inntekt».
+
+Antall gebyr ilagt/fritatt med begrunnelse vil fremgå av siste avsnitt før fatte vedtak.
 
 <h2 id={elementIds.brukerveildning.tittel_boforhold}>6. Boforhold</h2>
 ### Bidragspliktiges barn
@@ -285,24 +295,24 @@ melding, må du trykke på «oppdater opplysninger».
 Når det er flere barn i søknaden kan man sette ulike samværsklasser for barna. Da må
 man switche på «vurder separat per barn»-knappen. Barna vil da komme i egne faner på toppen.
 Hvis man skal sette samme samværsklasse for alle barna, må switchen være skrudd av.
-Det må skrives begrunnelse for samvær i notatet for hvert av barna hvis switchen er skrudd på
+Det må skrives begrunnelse for samvær i notatet for hvert av barna hvis switchen er skrudd på.
+
+Når det er flere søknader under én behandling  (FF eller søknad forskjellige barn med forskjellige virkningstidspunkt),
+må samværet vurderes separat per barn. Ingen switch for samtidig behandling. Det må velges samvær og skrives begrunnelse for alle barna i behandlingen.
 ##### Samvær
 - Man kan legge inn samværsklasse ved å velge samværsklasse direkte fra nedtrekkslisten, eller man kan legge inn i samværskalkulatoren.
 - Har man lagt inn i samværskalkulatoren kan man trykke på vis mer for å se hva som er lagt inn i kalkulatoren.
 - Har man lagt inn opplysninger i kalkulatoren og skal legge til flere perioder, vil kalkulatoren ta med de siste opplysningene som er lagt inn. Man kan da enten redigere på opplysningene eller nullstille.
 
-Når det er flere søknader under én behandling  (FF eller søknad forskjellige barn med forskjellige virkningstidspunkt),
-må samværet vurderes separat per barn. Ingen switch for samtidig behandling. Det må velges samvær og skrives begrunnelse for alle barna i behandlingen.
-
 <h2 id={elementIds.brukerveildning.tittel_vedtak}>8. Fatte vedtak</h2>
 Dette er siste steget i løsningen, hvor du skal fatte vedtak. Her ligger oppsummering av verdiene du har lagt til grunn i behandling og notat.
+
+Her ligger det også en oppsummering av totalt antall gebyr ilagt/fritatt og eventuell begrunnelse for overstyring av gebyr.
+
 Ved å trykke på vis mer får man en detaljert visning av beregningen for den perioden.
 
 Systemet setter automatisk 3 dagers utsettelse på fastsettelsesvedtak.
 Dette kan endres ved å velge antall dager/ikke utsett i “utsett overføring til regnskap”.
-
-Indeksår vil vises i dette steget. Systemet vil automatisk sette indeksår på bakgrunn av beløpshistorikk,
-virkningstidspunkt og eventuelt beløpet som er registrert i steg 2 «Privat avtale».
 
 Dersom du har valgt å «ikke fatte vedtak» for revurderingsbarnet, blir det kun fattet vedtak for søknadsbarnet.
 Bidraget for revurderingsbarnet løper da som før og det er kun søknadsbarnets bidrag som endres til ny beregning.

@@ -12,7 +12,7 @@ import {
     PDFStream,
 } from "@cantoo/pdf-lib";
 
-import type { PdfDocumentType } from "../components/utils/types";
+import type { PdfBytes } from "../components/utils/types";
 export const PDF_EDITOR_PRODUCER = "bidrag-dokument-redigering-ui";
 export const PDF_EDITOR_CREATOR = "NAV - Arbeids- og velferdsetaten";
 
@@ -292,7 +292,7 @@ export async function debugRepairPDF(pdfDoc: PDFDocument) {
     }
 }
 
-export async function lastGyldigPDF(pdfBytearray: PdfDocumentType) {
+export async function lastGyldigPDF(pdfBytearray: PdfBytes) {
     try {
         const pdfDoc = await PDFDocument.load(pdfBytearray);
         // Sjekk om sidene kan lastes. Hvis ikke så betyr det at PDF er korrupt
@@ -309,7 +309,7 @@ export interface IPrintableWarning {
     affectedPages?: number[];
 }
 
-export async function getPrintableWarning(pdfBytearray: PdfDocumentType): Promise<IPrintableWarning | undefined> {
+export async function getPrintableWarning(pdfBytearray: PdfBytes): Promise<IPrintableWarning | undefined> {
     const pdfBytes = toPdfBytes(pdfBytearray);
     const hasEncryptionMarker = hasEncryptionDictionaryMarker(pdfBytes);
 
@@ -370,7 +370,7 @@ export async function getPrintableWarning(pdfBytearray: PdfDocumentType): Promis
     }
 }
 
-function toPdfBytes(pdfBytearray: PdfDocumentType): Uint8Array {
+function toPdfBytes(pdfBytearray: PdfBytes): Uint8Array {
     if (typeof pdfBytearray === "string") {
         return new TextEncoder().encode(pdfBytearray);
     }

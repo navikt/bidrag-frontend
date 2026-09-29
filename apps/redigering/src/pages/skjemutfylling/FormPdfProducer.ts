@@ -2,7 +2,7 @@ import { FileUtils, LoggerService, SecureLoggerService } from "@bidrag/common";
 import { PDFCheckBox, PDFDocument, type PDFField, type PDFFont, PDFName, StandardFonts } from "@cantoo/pdf-lib";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 
-import type { PdfDocumentType } from "../../components/utils/types";
+import type { PdfBytes, PdfDocumentType } from "../../components/utils/types";
 import { PdfAConverter } from "../../pdf/PdfAConverter";
 import { deleteGroupobjectWithSKey, flattenForm, repairPDF } from "../../pdf/PdfHelpers";
 import { getFormValues } from "./FormHelper";
@@ -19,7 +19,7 @@ export class FormPdfProducer {
     private pdfDocument: PDFDocument;
     private formDocument: PDFDocumentProxy;
     private pdfBlob: PdfDocumentType;
-    private pdfBytes: PdfDocumentType;
+    private pdfBytes: PdfBytes;
     private processedDocument: Uint8Array;
 
     private font: PDFFont;
@@ -28,10 +28,7 @@ export class FormPdfProducer {
     }
 
     async init(formDocument: PDFDocumentProxy, title: string): Promise<FormPdfProducer> {
-        let pdfBytes = this.pdfBlob;
-        if (this.pdfBlob instanceof Blob) {
-            pdfBytes = await this.pdfBlob.arrayBuffer();
-        }
+        const pdfBytes = this.pdfBlob instanceof Blob ? await this.pdfBlob.arrayBuffer() : this.pdfBlob;
         this.pdfDocument = await PDFDocument.load(pdfBytes);
         this.font = await this.pdfDocument.embedFont(StandardFonts.TimesRoman);
         this.formDocument = formDocument;

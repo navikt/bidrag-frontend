@@ -81,8 +81,12 @@ const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse =
         case AvvikType.ENDRE_FAGOMRADE:
             return {
                 ...baseBody,
-                /// @ts-expect-error
-                detaljer: { fagomrade: avvik.fagomrade, bekreftetSendtScanning: avvik.bekreftetSendtScanning },
+                detaljer: {
+                    fagomrade: avvik.fagomrade,
+                    ...(avvik.bekreftetSendtScanning !== undefined && {
+                        bekreftetSendtScanning: String(avvik.bekreftetSendtScanning),
+                    }),
+                },
             };
         case AvvikType.SEND_TIL_FAGOMRADE:
             return {
@@ -104,8 +108,7 @@ const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse =
                 detaljer: { returDato: avvik.returDato },
             };
         case AvvikType.OVERFOR_TIL_ANNEN_ENHET:
-            /// @ts-expect-error
-            return { ...baseBody, detaljer: { ...otherValues } };
+            return { ...baseBody, detaljer: { ...(otherValues as Omit<typeof avvik, "type">) } };
         case AvvikType.FARSKAP_UTELUKKET:
             return baseBody;
         case AvvikType.MANGLER_ADRESSE:
@@ -115,8 +118,7 @@ const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse =
         case AvvikType.KOPIER_FRA_ANNEN_FAGOMRADE:
             return {
                 ...baseBody,
-                // @ts-expect-error
-                dokumenter: avvik.relevanteDokumenter,
+                dokumenter: avvik.relevanteDokumenter as Avvikshendelse["dokumenter"],
                 detaljer: { knyttTilSaker: avvik.knyttTilSaker.join(",") },
             };
         default:
