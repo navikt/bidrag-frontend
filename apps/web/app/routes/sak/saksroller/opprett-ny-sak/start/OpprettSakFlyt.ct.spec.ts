@@ -14,12 +14,11 @@ async function velgStartpart(component: Locator, ident: string, rolle?: string) 
         await component
             .getByRole("radiogroup", { name: /Hvilken rolle har/ })
             .getByRole("radio", { name: rolle })
-            .check();
+            .click();
     }
-    await component.getByRole("button", { name: "Bekreft" }).click();
 }
 
-test("Bekreft fyller ut skjemaet og tømmer søket", async ({ mount, page }) => {
+test("valgt rolle fyller ut skjemaet og tømmer søket", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
 
@@ -29,7 +28,6 @@ test("Bekreft fyller ut skjemaet og tømmer søket", async ({ mount, page }) => 
     await expect(component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
     await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toHaveValue("");
     await expect(component.getByRole("radiogroup", { name: /Hvilken rolle har/ })).toHaveCount(0);
-    await expect(component.getByRole("button", { name: "Bekreft" })).toHaveCount(0);
 });
 
 test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ mount, page }) => {
@@ -52,8 +50,7 @@ test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ m
     await expect(page.locator("body")).toHaveClass(/blur-sensitive-info/);
     await expect(rollenavn).toHaveCSS("filter", "blur(5px)");
 
-    await component.getByRole("radio", { name: "Bidragspliktig" }).check();
-    await component.getByRole("button", { name: "Bekreft" }).click();
+    await component.getByRole("radio", { name: "Bidragspliktig" }).click();
     await component.getByRole("button", { name: "Legg til nytt barn" }).click();
     const barnSøk = page.getByRole("searchbox", { name: "Søk etter barn" });
     await barnSøk.fill(testpersoner.barnUnder18.ident);
@@ -83,7 +80,7 @@ test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ m
     await expect(partnavn).toHaveAttribute("title", testpersoner.bidragspliktig.visningsnavn);
 });
 
-test("ny Bekreft med utfylt skjema spør før skjemaet nullstilles", async ({ mount, page }) => {
+test("nytt rollevalg med utfylt skjema spør før skjemaet nullstilles", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
     await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
@@ -94,8 +91,10 @@ test("ny Bekreft med utfylt skjema spør før skjemaet nullstilles", async ({ mo
     await dialog.getByRole("button", { name: "Avbryt" }).click();
     await expect(dialog).toBeHidden();
     await expect(component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" })).toBeVisible();
+    const rolle = component.getByRole("radiogroup", { name: /Hvilken rolle har/ });
+    await expect(rolle.getByRole("radio", { checked: true })).toHaveCount(0);
 
-    await component.getByRole("button", { name: "Bekreft" }).click();
+    await rolle.getByRole("radio", { name: "Bidragsmottaker" }).click();
     await dialog.getByRole("button", { name: "Ja, start på nytt" }).click();
     await expect(dialog).toBeHidden();
     await expect(component.getByRole("searchbox", { name: "Søk etter bidragspliktig" })).toBeVisible();
@@ -286,11 +285,9 @@ test.describe("Innbygget med forhåndsutfylling", () => {
 
         await expect(rollevelger(component)).toBeVisible();
         await expect(rollevelger(component).getByRole("radio", { checked: true })).toHaveCount(0);
-        await expect(component.getByRole("button", { name: "Bekreft" })).toBeDisabled();
         await expect(component.getByRole("searchbox", { name: "Søk etter person" })).toHaveCount(0);
 
-        await rollevelger(component).getByRole("radio", { name: "Bidragsmottaker" }).check();
-        await component.getByRole("button", { name: "Bekreft" }).click();
+        await rollevelger(component).getByRole("radio", { name: "Bidragsmottaker" }).click();
         await expect(
             component.getByRole("group", { name: "Bidragsmottaker" }).getByText(bp.visningsnavn).first(),
         ).toBeVisible();

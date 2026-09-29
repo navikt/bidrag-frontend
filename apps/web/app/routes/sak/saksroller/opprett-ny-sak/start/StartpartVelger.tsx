@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { MaskerSensitivInfo, PersonIdent } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { BodyShort, Button, HStack, VStack } from "@navikt/ds-react";
+import { BodyShort, HStack, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import DiskresjonAlert from "../../felles/person/DiskresjonAlert";
 import PersonInfo from "../../felles/person/PersonInfo";
@@ -31,7 +31,7 @@ const SØKELABEL: Partial<Record<Sakstype, string>> = {
 };
 
 /**
- * Søk som bare brukes for å starte skjemaet. Når saksbehandleren bekrefter, fylles skjemaet ut
+ * Søk som bare brukes for å starte skjemaet. Når rollen er valgt, fylles skjemaet ut
  * med personen og søket tømmes. Partene kan deretter endres fritt i skjemaet.
  */
 export default function StartpartVelger({
@@ -39,14 +39,14 @@ export default function StartpartVelger({
     forhåndsvalgt = null,
     visSøk = true,
     harSkjema,
-    onBekreft,
+    onValgt,
 }: {
     sakstype: Sakstype;
     forhåndsvalgt?: PersonDto | null;
     visSøk?: boolean;
-    /** Et utfylt skjema nullstilles ved ny bekreftelse, så da spørres det først. */
+    /** Et utfylt skjema nullstilles ved nytt valg, så da spørres det først. */
     harSkjema: boolean;
-    onBekreft: (person: PersonDto, rolle: PartRolle) => void;
+    onValgt: (person: PersonDto, rolle: PartRolle) => void;
 }) {
     const isLoadingOpprettSak = useErOppretterSak();
     const låstRolle = tvungenRolle(sakstype);
@@ -56,20 +56,30 @@ export default function StartpartVelger({
     const [søkNøkkel, setSøkNøkkel] = useState(0);
     const [viserNullstillDialog, setViserNullstillDialog] = useState(false);
 
-    const velgPerson = (person: PersonDto) => {
-        if (isLoadingOpprettSak) return;
-        setUtkast({ person, rolle: låstRolle });
-    };
-
-    const bekreft = () => {
-        if (!utkast?.rolle) return;
-        onBekreft(utkast.person, utkast.rolle);
+    const fyllUt = (valgt: Utkast | null = utkast) => {
+        if (!valgt?.rolle) return;
+        onValgt(valgt.person, valgt.rolle);
         setUtkast(null);
         setSøkNøkkel((forrige) => forrige + 1);
         setViserNullstillDialog(false);
     };
 
-    const onBekreftKlikk = () => (harSkjema ? setViserNullstillDialog(true) : bekreft());
+    const velg = (valgt: Utkast) => {
+        setUtkast(valgt);
+        if (!valgt.rolle) return;
+        if (harSkjema) setViserNullstillDialog(true);
+        else fyllUt(valgt);
+    };
+
+    const velgPerson = (person: PersonDto) => {
+        if (isLoadingOpprettSak) return;
+        velg({ person, rolle: låstRolle });
+    };
+
+    const avbrytNullstilling = (open: boolean) => {
+        setViserNullstillDialog(open);
+        if (!open) setUtkast((forrige) => (forrige && !låstRolle ? { ...forrige, rolle: null } : null));
+    };
 
     return (
         <SkjemaSeksjon
@@ -95,29 +105,21 @@ export default function StartpartVelger({
                             sakstype={sakstype}
                             rolle={utkast.rolle}
                             readOnly={!!låstRolle || isLoadingOpprettSak}
-                            onVelg={(rolle) => setUtkast({ ...utkast, rolle })}
+                            onVelg={(rolle) => velg({ ...utkast, rolle })}
                         />
-                        <Button
-                            type="button"
-                            size="small"
-                            disabled={!utkast.rolle || isLoadingOpprettSak}
-                            onClick={onBekreftKlikk}
-                        >
-                            Bekreft
-                        </Button>
                     </VStack>
                 </SkjemaSeksjonKort>
             )}
             <NullstillDialog
                 open={viserNullstillDialog}
-                onOpenChange={setViserNullstillDialog}
+                onOpenChange={avbrytNullstilling}
                 beskrivelse={
                     <>
                         Skjemaet nullstilles og fylles ut på nytt med{" "}
                         <span className="personnavn">{utkast?.person.visningsnavn}</span>.
                     </>
                 }
-                onBekreft={bekreft}
+                onBekreft={() => fyllUt()}
             />
         </SkjemaSeksjon>
     );

@@ -28,7 +28,7 @@ export default function OpprettSakFlyt() {
         else byttSakstype(type);
     };
 
-    const bekreftStart = (person: PersonDto, rolle: PartRolle) =>
+    const startSkjema = (person: PersonDto, rolle: PartRolle) =>
         setStart((forrige) => ({ person, rolle, sakstype, versjon: (forrige?.versjon ?? 0) + 1 }));
 
     return (
@@ -42,7 +42,7 @@ export default function OpprettSakFlyt() {
                         <SakstypeVelger value={sakstype} onVelg={velgSakstype} />
                     </SkjemaSeksjonKort>
                 </SkjemaSeksjon>
-                <StartpartVelger key={sakstype} sakstype={sakstype} harSkjema={!!start} onBekreft={bekreftStart} />
+                <StartpartVelger key={sakstype} sakstype={sakstype} harSkjema={!!start} onValgt={startSkjema} />
                 <NullstillDialog
                     open={!!ventendeSakstype}
                     onOpenChange={(open) => !open && setVentendeSakstype(null)}

@@ -58,7 +58,7 @@ export default function OpprettSakFlytInnbygget({
                     forhåndsvalgt={person}
                     visSøk={false}
                     harSkjema={false}
-                    onBekreft={(_, valgt) => setValgtRolle(valgt)}
+                    onValgt={(_, valgt) => setValgtRolle(valgt)}
                 />
             )}
         </VStack>
