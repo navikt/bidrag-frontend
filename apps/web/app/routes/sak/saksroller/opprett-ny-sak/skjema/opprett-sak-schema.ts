@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-    type ReellMottakerSkjemaverdi,
-    type ReellMottakerValideringsgrunn,
-    validerReellMottaker,
-} from "../../felles/reell-mottaker/reell-mottaker-regel";
+import { type SakParter, type Sakstype, validerSak } from "../../felles/saksregler";
 // Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
 // sakvisning i stedet for å dupliseres.
 import {
@@ -69,7 +65,7 @@ export const BarnebidragSkjemaSchema = z
     })
     .superRefine((data, ctx) => {
         validerForeldre(data, ctx);
-        validerBarnebidragBarn(data, ctx);
+        leggTilSaksfeil(data, "Barnebidrag", ctx);
     });
 
 type BarnebidragSkjemaInput = {
@@ -91,52 +87,50 @@ function leggTilFeil(ctx: z.RefinementCtx, path: (string | number)[], message: s
 }
 
 function validerForeldre(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    const barnIdenter = data.valgteBarn.map((barn) => barn.ident);
-    const bp = rolleFelt(data.roller, "BP");
-    const bm = rolleFelt(data.roller, "BM");
-    for (const { type, rolle, identPath } of [bp, bm]) {
+    for (const type of ["BP", "BM"] as const) {
+        const { rolle, identPath } = rolleFelt(data.roller, type);
         if (rolle?.erKjent === undefined) {
             leggTilFeil(ctx, identPath, `Du må registrere ${tilForelderrolle(type)} eller velge ukjent`);
         }
-        if (erBarnISaken(rolle?.ident, barnIdenter)) {
-            leggTilFeil(ctx, identPath, "Et barn kan ikke være forelder i saken");
-        }
     }
-    validateUlikeParter({ ident: bp.rolle?.ident ?? "" }, bm.rolle ?? {}, ctx, bm.path);
 }
 
-function erBarnISaken(ident: string | undefined, barnIdenter: string[]) {
-    return Boolean(ident?.trim()) && barnIdenter.includes(ident as string);
+type SkjemaMedParter = {
+    roller: Array<{ type: Rolletype; ident?: string; erKjent?: boolean }>;
+    valgteBarn?: BarnMedAlder[];
+};
+
+function tilSakParter({ roller, valgteBarn = [] }: SkjemaMedParter): SakParter {
+    const kjentIdent = (type: Rolletype) => roller.find((rolle) => rolle.type === type && rolle.erKjent)?.ident;
+    return {
+        bp: kjentIdent("BP"),
+        bm: kjentIdent("BM"),
+        bidragsmottakerErUkjent: roller.find((rolle) => rolle.type === "BM")?.erKjent === false,
+        barn: valgteBarn,
+    };
+}
+
+function leggTilSaksfeil(data: SkjemaMedParter, sakstype: Sakstype, ctx: z.RefinementCtx) {
+    for (const feil of validerSak(tilSakParter(data), sakstype)) {
+        const path =
+            feil.gjelder === "barn"
+                ? ["valgteBarn", feil.indeks, feil.felt]
+                : feil.gjelder === "barnliste"
+                  ? ["valgteBarn"]
+                  : rolleFelt(data.roller, feil.gjelder).identPath;
+        leggTilFeil(ctx, path, feil.melding);
+    }
 }
 
 /** Parten er valgt i skjemaet og ikke satt som ukjent. */
 export const erKjentPart = (part: ForelderPart) => part.erKjent === true && !!part.ident?.trim();
-
-function validerBarnebidragBarn(data: BarnebidragSkjemaInput, ctx: z.RefinementCtx) {
-    const bidragsmottaker = data.roller.find((r) => r.type === "BM");
-    if (!erKjentPart(bidragsmottaker ?? {}) && data.valgteBarn.length === 0) {
-        ctx.addIssue({ code: "custom", path: ["valgteBarn"], message: "Du må velge minst ett barn." });
-    }
-    const bidragsmottakerErUkjent = bidragsmottaker?.erKjent === false;
-    data.valgteBarn.forEach((barn, index) => {
-        const grunn: ReellMottakerValideringsgrunn | null = barn.erMyndig
-            ? "myndig-barn"
-            : bidragsmottakerErUkjent
-              ? "ukjent-bidragsmottaker"
-              : null;
-        leggTilReellMottakerFeil(barn, grunn, ["valgteBarn", index], ctx);
-    });
-}
 
 export type BarnebidragSkjemaData = z.infer<typeof BarnebidragSkjemaSchema>;
 export type ForelderPart = z.infer<typeof ForelderPartSchema>;
 export type BarnebidragForelderRolle = z.infer<typeof BarnebidragForelderRolleSchema>;
 export type EnPartMedBarnRolle = z.infer<typeof EnPartMedBarnRolleSchema>;
 
-const createSakMedBarnSkjemaSchema = (
-    validateBarn?: (barn: z.infer<typeof BarnMedAlderSchema>, index: number, ctx: z.RefinementCtx) => void,
-    { maksEttBarn = false }: { maksEttBarn?: boolean } = {},
-) =>
+const createSakMedBarnSkjemaSchema = (sakstype: "Oppfostringsbidrag" | "Farskap") =>
     z
         .object({
             arbeidsfordeling: ArbeidsfordelingSchema,
@@ -144,33 +138,11 @@ const createSakMedBarnSkjemaSchema = (
             valgteBarn: z.array(BarnMedAlderSchema),
             kategori: z.enum(["Nasjonal", "Utland"]),
         })
-        .superRefine((data, ctx) => {
-            validerEnPartMedBarnRoller(data.roller, ctx);
-            if (data.valgteBarn.length === 0) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ["valgteBarn"],
-                    message: "Du må velge minst ett barn.",
-                });
-            }
-            if (maksEttBarn && data.valgteBarn.length > 1) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ["valgteBarn"],
-                    message: "En farskapssak kan bare gjelde ett barn.",
-                });
-            }
+        .superRefine((data, ctx) => leggTilSaksfeil(data, sakstype, ctx));
 
-            data.valgteBarn.forEach((barn, index) => {
-                validateBarn?.(barn, index, ctx);
-            });
-        });
-
-export const OppfostringsbidragSkjemaSchema = createSakMedBarnSkjemaSchema((barn, index, ctx) =>
-    leggTilReellMottakerFeil(barn, "alltid", ["valgteBarn", index], ctx),
-);
+export const OppfostringsbidragSkjemaSchema = createSakMedBarnSkjemaSchema("Oppfostringsbidrag");
 /** Som oppfostringsbidrag, men uten krav om reell mottaker og med bare ett barn. */
-export const FarskapsSkjemaSchema = createSakMedBarnSkjemaSchema(undefined, { maksEttBarn: true });
+export const FarskapsSkjemaSchema = createSakMedBarnSkjemaSchema("Farskap");
 
 export type FarskapsSkjemaSchemaData = z.infer<typeof FarskapsSkjemaSchema>;
 
@@ -190,72 +162,9 @@ export const EktefellebidragSkjemaSchema = z
         ),
         kategori: z.enum(["Nasjonal", "Utland"]),
     })
-    .superRefine((data, ctx) => {
-        const bp = rolleFelt(data.roller, "BP");
-        const bm = rolleFelt(data.roller, "BM");
-        for (const { type, rolle, identPath } of [bp, bm]) {
-            if (!rolle?.ident.trim()) {
-                leggTilFeil(ctx, identPath, `Du må registrere ${tilForelderrolle(type)}`);
-            }
-        }
-        validateUlikeParter({ ident: bp.rolle?.ident ?? "" }, bm.rolle ?? {}, ctx, bm.path);
-    });
+    .superRefine((data, ctx) => leggTilSaksfeil(data, "Ektefellebidrag", ctx));
 
 export type EktefellebidragSkjemaData = z.infer<typeof EktefellebidragSkjemaSchema>;
-function validerEnPartMedBarnRoller(roller: EnPartMedBarnRolle[], ctx: z.RefinementCtx) {
-    const kjentRolle = roller.find((rolle) => rolle.erKjent === true && rolle.ident?.trim());
-    const ikkeValgtRolle = roller.find((rolle) => rolle.erKjent === undefined);
-    const manglendeRolle = ikkeValgtRolle ?? (!kjentRolle ? roller[0] : undefined);
-    if (manglendeRolle) {
-        const indeks = roller.indexOf(manglendeRolle);
-        ctx.addIssue({
-            code: "custom",
-            path: ["roller", indeks, "ident"],
-            message: `Du må registrere ${tilForelderrolle(manglendeRolle.type)}`,
-        });
-    }
-    const bp = roller.find((rolle) => rolle.type === "BP");
-    const bm = roller.find((rolle) => rolle.type === "BM");
-    if (bp?.ident?.trim() && bp.ident === bm?.ident) {
-        const bmIndex = bm ? roller.indexOf(bm) : 0;
-        ctx.addIssue({
-            code: "custom",
-            path: ["roller", bmIndex, "ident"],
-            message: "Samme person kan ikke være begge parter",
-        });
-    }
-}
-
-const validateUlikeParter = (
-    partISaken: { ident: string },
-    motpart: { ident?: string },
-    ctx: z.RefinementCtx,
-    felt: string | (string | number)[] = "motpart",
-) => {
-    if (motpart.ident?.trim() && partISaken.ident === motpart.ident) {
-        ctx.addIssue({
-            code: "custom",
-            path: [...(Array.isArray(felt) ? felt : [felt]), "ident"],
-            message: "Samme person kan ikke være begge parter",
-        });
-    }
-};
-
-function leggTilReellMottakerFeil(
-    verdi: ReellMottakerSkjemaverdi,
-    grunn: ReellMottakerValideringsgrunn | null,
-    basePath: Array<string | number>,
-    ctx: z.RefinementCtx,
-) {
-    validerReellMottaker(verdi, grunn).forEach((feil) => {
-        ctx.addIssue({
-            code: "custom",
-            path: [...basePath, feil.felt],
-            message: feil.melding,
-        });
-    });
-}
-
 // ==================== EXPORTED TYPES ====================
 
 export type BarnMedAlder = z.infer<typeof BarnMedAlderSchema>;

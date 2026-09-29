@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { type SakRedigeringData, SakRedigeringSchema } from "../../felles/sakvisning-schema.ts";
+import { type Sakstype, sakstypeForArbeidsfordeling } from "../../felles/saksregler.ts";
+import { lagSakRedigeringSchema, type SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useEndringssporing } from "../endringer/useEndringssporing.ts";
 import { useSaksrollerSubmit } from "../lagring/useSaksrollerSubmit.ts";
 import { useHarÅpneRedigeringer } from "../RedigeringRegisterContext.tsx";
@@ -16,15 +17,17 @@ function useSaksrollerForm({
     berikedeRoller,
     dataUpdatedAt,
     saksnummer,
+    sakstype,
     onDataReset,
 }: {
     berikedeRoller: Parameters<typeof useInitialiserSaksrollerForm>[0]["berikedeRoller"];
     dataUpdatedAt: number;
     saksnummer: string;
+    sakstype: Sakstype;
     onDataReset: () => void;
 }) {
     const formMethods = useForm<SakRedigeringData>({
-        resolver: zodResolver(SakRedigeringSchema),
+        resolver: zodResolver(lagSakRedigeringSchema(sakstype)),
         mode: "onChange",
     });
     const { reset, watch } = formMethods;
@@ -45,7 +48,7 @@ function relasjonskontrollStatus({ isError, isLoading }: { isError: boolean; isL
  * Samler datahenting, skjema, endringssporing og lagring for visning og redigering av saksroller.
  */
 export function useSaksrollerVisning(saksnummer: string) {
-    const { sak, berikedeRoller, erEktefellebidrag, refetch, dataUpdatedAt } = useHentSakMedPersoninfo(saksnummer);
+    const { sak, berikedeRoller, refetch, dataUpdatedAt } = useHentSakMedPersoninfo(saksnummer);
 
     const harÅpneRedigeringer = useHarÅpneRedigeringer();
     const {
@@ -61,18 +64,21 @@ export function useSaksrollerVisning(saksnummer: string) {
     } = useSaksrollerStatus(harÅpneRedigeringer);
     const { feil, muligeAndreForeldre, muligeBarnPerMotpart } = useSakForslag({ sak });
     const { hentOgNullstillSamhandler } = useSakvisningSamhandlerHandling();
+    const sakstype = sakstypeForArbeidsfordeling(sak.arbeidsfordeling);
+    const erEktefellebidrag = sakstype === "Ektefellebidrag";
 
     const { formMethods, roller } = useSaksrollerForm({
         berikedeRoller,
         dataUpdatedAt,
         saksnummer,
+        sakstype,
         onDataReset: () => {
             setFeilmelding(null);
             setValideringsFeil(null);
         },
     });
 
-    const { bp, bm, barn, barnIdenter, aktiveRoller, sakstype, muligeBarn } = useSaksrollerRollerData({
+    const { bp, bm, barn, barnIdenter, aktiveRoller, muligeBarn } = useSaksrollerRollerData({
         roller,
         berikedeRoller,
         muligeBarnPerMotpart,

@@ -2,7 +2,6 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useMemo } from "react";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { erBarn } from "../../felles/sakvisning-schema.ts";
-import { utledSakstype } from "../utled-sakstype.ts";
 
 export function useSaksrollerRollerData({
     roller,
@@ -18,7 +17,6 @@ export function useSaksrollerRollerData({
     const barn = roller.filter(erBarn) as BarnRolle[];
     const barnIdenter = useMemo(() => barn.map((b) => b.fodselsnummer), [barn]);
     const aktiveRoller = useMemo(() => (roller.length > 0 ? roller : berikedeRoller), [roller, berikedeRoller]);
-    const sakstype = useMemo(() => utledSakstype(aktiveRoller), [aktiveRoller]);
     const muligeBarn =
         bp || bm
             ? (muligeBarnPerMotpart.get(bp?.fodselsnummer ?? "") ??
@@ -26,5 +24,5 @@ export function useSaksrollerRollerData({
               [])
             : [];
 
-    return { bp, bm, barn, barnIdenter, aktiveRoller, sakstype, muligeBarn };
+    return { bp, bm, barn, barnIdenter, aktiveRoller, muligeBarn };
 }

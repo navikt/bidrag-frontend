@@ -171,9 +171,34 @@ test.describe("SaksrollerVisning", () => {
         await expect(component.getByText("Ingen endringer å lagre.")).toHaveCount(0);
     });
 
+    test("farskap: viser samme regel som ved opprett når saken har flere barn", async ({ mount, page }) => {
+        const { requests } = await mockSaksrollerApi(page, {
+            sak: lagSak({
+                arbeidsfordeling: "FRS",
+                roller: [
+                    lagRolle({ fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM", rolleType: "BM" }),
+                    lagRolle({ fodselsnummer: testpersoner.bidragspliktig.ident, type: "BP", rolleType: "BP" }),
+                    lagRolle({ fodselsnummer: testpersoner.barn.ident, type: "BA", rolleType: "BA" }),
+                    lagRolle({ fodselsnummer: genererFnr(), type: "BA", rolleType: "BA", objektnummer: "2" }),
+                ],
+            }),
+        });
+        const component = await mount(STORY);
+
+        await expect(component.getByText("Farskap", { exact: true })).toBeVisible();
+        await component.getByRole("button", { name: "Legg til reell mottaker" }).first().click();
+        await component.getByRole("radio", { name: "Barnet selv" }).check();
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+
+        await expect(component.getByText("En farskapssak kan bare gjelde ett barn.")).toBeVisible();
+        expect(requests.update).toBeFalsy();
+    });
+
     test("skjuler barneseksjonen for ektefellebidragssaker", async ({ mount, page }) => {
         await mockSaksrollerApi(page, {
             sak: lagSak({
+                arbeidsfordeling: "EFS",
                 roller: [
                     { fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM", rolleType: "BM" },
                     { fodselsnummer: testpersoner.bidragspliktig.ident, type: "BP", rolleType: "BP" },

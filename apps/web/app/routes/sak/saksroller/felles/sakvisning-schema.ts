@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { type SakParter, type Saksfeil, type Sakstype, validerSak } from "./saksregler";
 
 export const MYNDYG_BARN_ALDER = 18;
 export const MAKS_ALDER_BARN = 24;
@@ -45,41 +46,44 @@ export const ReellMottakerFelterSchema = z.object({
 
 const BarnRolleSchema = RolleSchema.extend(ReellMottakerFelterSchema.shape);
 
-function harRegistrertBidragsmottaker(roller: Rolle[]): boolean {
-    return roller.some((r) => r.type === "BM" && r.fodselsnummer && r.fodselsnummer.trim() !== "");
+const SakRedigeringObjektSchema = z.object({
+    saksnummer: z.string(),
+    roller: z.array(RolleSchema),
+});
+
+function tilSakParter(roller: Rolle[]): SakParter {
+    const ident = (type: RolleType) => roller.find((r) => r.type === type && r.fodselsnummer?.trim())?.fodselsnummer;
+    const bm = ident("BM");
+    return {
+        bp: ident("BP"),
+        bm,
+        bidragsmottakerErUkjent: !bm,
+        barn: roller
+            .filter(erBarn)
+            .map((barn) => ({ ...(barn as BarnRolle), ident: barn.fodselsnummer, erMyndig: barn.erMyndig === true })),
+    };
 }
 
-function trengerReellMottaker(barnRolle: z.infer<typeof BarnRolleSchema>, harBM: boolean): boolean {
-    return barnRolle.erMyndig === true || !harBM;
+function feltsti(roller: Rolle[], feil: Saksfeil): (string | number)[] {
+    if (feil.gjelder === "barn") {
+        const indeks = roller.flatMap((rolle, i) => (erBarn(rolle) ? [i] : []))[feil.indeks];
+        return indeks === undefined ? ["roller", "root"] : ["roller", indeks, "reellMottaker"];
+    }
+    if (feil.gjelder === "barnliste") return ["roller", "root"];
+    const indeks = roller.findIndex((r) => r.type === feil.gjelder);
+    return indeks >= 0 ? ["roller", indeks, "fodselsnummer"] : ["roller", "root"];
 }
 
-export const SakRedigeringSchema = z
-    .object({
-        saksnummer: z.string(),
-        roller: z.array(RolleSchema),
-    })
-    .superRefine((data, ctx) => {
-        const harBM = harRegistrertBidragsmottaker(data.roller);
-
-        data.roller.forEach((rolle, index) => {
-            if (rolle.type !== "BA") {
-                return;
-            }
-
-            const barnRolle = rolle as z.infer<typeof BarnRolleSchema>;
-            if (trengerReellMottaker(barnRolle, harBM) && !barnRolle.reellMottaker) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ["roller", index, "reellMottaker"],
-                    message: barnRolle.erMyndig
-                        ? "Reell mottaker må registreres for barn over 18 år"
-                        : "Reell mottaker må registreres når bidragsmottaker er ukjent",
-                });
-            }
-        });
+/** Skjema for endring av roller. Reglene er de samme som når saken opprettes, gitt sakens faste sakstype. */
+export function lagSakRedigeringSchema(sakstype: Sakstype) {
+    return SakRedigeringObjektSchema.superRefine((data, ctx) => {
+        for (const feil of validerSak(tilSakParter(data.roller), sakstype)) {
+            ctx.addIssue({ code: "custom", path: feltsti(data.roller, feil), message: feil.melding });
+        }
     });
+}
 
-export type SakRedigeringData = z.infer<typeof SakRedigeringSchema>;
+export type SakRedigeringData = z.infer<typeof SakRedigeringObjektSchema>;
 export type RolleType = z.infer<typeof RolleTypeSchema>;
 export type Rolle = z.infer<typeof RolleSchema>;
 export type BarnRolle = z.infer<typeof BarnRolleSchema>;

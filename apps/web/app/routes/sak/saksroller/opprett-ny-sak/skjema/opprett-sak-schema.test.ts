@@ -143,12 +143,16 @@ describe("EnPartMedBarn-skjemaene", () => {
         { ident: bp, navn: "Part", type: "BP" as const, erKjent: true },
         { ident: "", navn: "", type: "BM" as const, erKjent: false },
     ];
+    const farskapRoller = [
+        { ident: bm, navn: "Part", type: "BM" as const, erKjent: true },
+        { ident: "", navn: "", type: "BP" as const, erKjent: false },
+    ];
 
     it("godtar farskap med én kjent part og barn", () => {
         expect(
             FarskapsSkjemaSchema.safeParse({
                 arbeidsfordeling: "FRS",
-                roller,
+                roller: farskapRoller,
                 valgteBarn: [barn],
                 kategori: "Nasjonal",
             }).success,
@@ -158,7 +162,7 @@ describe("EnPartMedBarn-skjemaene", () => {
     it("avviser farskap med flere barn", () => {
         const resultat = FarskapsSkjemaSchema.safeParse({
             arbeidsfordeling: "FRS",
-            roller,
+            roller: farskapRoller,
             valgteBarn: [barn, { ...barn, ident: "12345678902" }],
             kategori: "Nasjonal",
         });
