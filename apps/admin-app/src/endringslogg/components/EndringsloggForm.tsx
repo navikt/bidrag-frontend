@@ -33,8 +33,7 @@ import {
 } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { EndringsModal } from "../index.tsx";
-
-//import { CustomQuillEditor } from "./customEditor/CustomQuillEditorImpl.tsx";
+import { CustomQuillEditor } from "./customEditor/CustomQuillEditor.tsx";
 
 type Endring = {
     innhold: string;
@@ -105,8 +104,8 @@ export const EndringstypeToVisningsnavn = {
 };
 
 const EndringsBox = ({
-    endringerFieldArray,
-}: {
+                         endringerFieldArray,
+                     }: {
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
     //const quillRef = useRef<HTMLDivElement>(null);
@@ -229,9 +228,9 @@ const EndringsBox = ({
 };
 
 const EndringsFormBox = ({
-    index,
-    endringerFieldArray,
-}: {
+                             index,
+                             endringerFieldArray,
+                         }: {
     index: number;
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
@@ -314,36 +313,36 @@ const EndringsFormBox = ({
                         </Select>
                     )}
                 />
-                {/*<Controller*/}
-                {/*    name={`endringer.${index}.innhold`}*/}
-                {/*    control={control}*/}
-                {/*    rules={{*/}
-                {/*        required: {*/}
-                {/*            value: true,*/}
-                {/*            message: "Dette feltet er påkrevd",*/}
-                {/*        },*/}
-                {/*    }}*/}
-                {/*    render={({ field, fieldState }) => (*/}
-                {/*        <CustomQuillEditor*/}
-                {/*            ref={_quillRef}*/}
-                {/*            resize*/}
-                {/*            onTextChange={(innhold) => field.onChange(innhold)}*/}
-                {/*            readOnly={false}*/}
-                {/*            error={fieldState.error?.message}*/}
-                {/*            defaultValue={field.value}*/}
-                {/*        />*/}
-                {/*    )}*/}
-                {/*/>*/}
+                <Controller
+                    name={`endringer.${index}.innhold`}
+                    control={control}
+                    rules={{
+                        required: {
+                            value: true,
+                            message: "Dette feltet er påkrevd",
+                        },
+                    }}
+                    render={({ field, fieldState }) => (
+                        <CustomQuillEditor
+                            ref={_quillRef}
+                            resize
+                            onTextChange={(innhold) => field.onChange(innhold)}
+                            readOnly={false}
+                            error={fieldState.error?.message}
+                            defaultValue={field.value}
+                        />
+                    )}
+                />
             </VStack>
         </Box>
     );
 };
 
 export default function EndringsloggForm({
-    onSave,
-    endringslogg,
-    mutationError,
-}: {
+                                             onSave,
+                                             endringslogg,
+                                             mutationError,
+                                         }: {
     onSave: (formValues: EndringsloggFormValues, onSuccess: (id: number) => void) => void;
     endringslogg?: EndringsLoggDto;
     mutationError: Error | null;
@@ -553,7 +552,7 @@ export default function EndringsloggForm({
                                                         {
                                                             EndringsloggTilhorerSkjermbildeToVisningsnavn[
                                                                 gjelder as EndringsloggTilhorerSkjermbilde
-                                                            ]
+                                                                ]
                                                         }
                                                     </option>
                                                 ),
