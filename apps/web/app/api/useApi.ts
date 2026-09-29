@@ -426,7 +426,7 @@ export function useHentPersonidenter(request: HentePersonidenterRequest | null, 
 
 export function useHentSivilstand(request: PersonRequest | null, enabled: boolean = true) {
     return useQuery<SivilstandPdlHistorikkDto, AxiosError | TilgangsFeilError>({
-        queryKey: ["hent_personidenter", request?.ident],
+        queryKey: ["hent_sivilstand", request?.ident],
         queryFn: async () => {
             if (!request) throw new Error("Request is required");
             try {
