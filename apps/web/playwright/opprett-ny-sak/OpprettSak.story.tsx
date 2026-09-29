@@ -92,22 +92,40 @@ function ModalHarness({ ident, rolle, initialForelderIdent, eierfogd, medNyFlyt 
             <Button type="button" onClick={() => settOpen(true)}>
                 Åpne opprett sak
             </Button>
-            <OpprettSakFlytModal
-                open={open}
-                onClose={() => {
-                    settOpen(false);
-                    settLukket(true);
-                }}
-                ident={ident}
-                rolle={rolle}
-                initialForelder={initialForelderIdent ? { ident: initialForelderIdent, rolle: "BP" } : undefined}
-                eierfogd={eierfogd}
-                onOpprettet={(nytt) => {
-                    settSaksnummer(nytt);
-                    settOpen(false);
-                }}
-            />
+            <YtreSkjema>
+                <OpprettSakFlytModal
+                    open={open}
+                    onClose={() => {
+                        settOpen(false);
+                        settLukket(true);
+                    }}
+                    ident={ident}
+                    rolle={rolle}
+                    initialForelder={initialForelderIdent ? { ident: initialForelderIdent, rolle: "BP" } : undefined}
+                    eierfogd={eierfogd}
+                    onOpprettet={(nytt) => {
+                        settSaksnummer(nytt);
+                        settOpen(false);
+                    }}
+                />
+            </YtreSkjema>
         </NyOpprettSakFlytContext>
+    );
+}
+
+/** Journalpostregistreringen i dokument legger modalen inne i sitt eget skjema. */
+function YtreSkjema({ children }: { children: ReactNode }) {
+    const [innsendt, settInnsendt] = useState(false);
+    return (
+        <form
+            onSubmit={(event) => {
+                event.preventDefault();
+                settInnsendt(true);
+            }}
+        >
+            <input data-testid="ytre-skjema-innsendt" readOnly hidden value={String(innsendt)} />
+            {children}
+        </form>
     );
 }
 

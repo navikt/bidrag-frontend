@@ -53,7 +53,7 @@ export function OpprettSakFlytModal({ open, onClose, ...props }: OpprettSakFlytM
     if (!Flyt || !open) return null;
 
     return (
-        <Modal open onClose={onClose} header={{ heading: "Opprett sak" }} width="70rem">
+        <Modal open portal onClose={onClose} header={{ heading: "Opprett sak" }} width="70rem">
             <Modal.Body>
                 <Suspense fallback={<Loader size="3xlarge" title="Laster..." variant="interaction" />}>
                     <NyOpprettSakModalContext value={{ formId, setSubmit }}>

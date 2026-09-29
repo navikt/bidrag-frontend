@@ -24,6 +24,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             initialForelderIdent: bp.ident,
             eierfogd: "4806",
         });
+        const url = page.url();
         const dialog = await åpneModal(page, component);
 
         await expect(dialog.getByRole("heading", { name: "Opprett ny sak" })).toHaveCount(0);
@@ -48,8 +49,36 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             expect.objectContaining({ fodselsnummer: barnUnder18.ident, type: "BA" }),
         ]);
         await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("1234567");
+        await expect(component.getByTestId("ytre-skjema-innsendt")).toHaveValue("false");
+        expect(page.url()).toBe(url);
         await expect(dialog).toBeHidden();
         await expect(component.getByTestId("lukket")).toHaveValue("false");
+    });
+
+    test("viser feil fra backend i modalen og lar den stå åpen", async ({ mount, page }) => {
+        await mockOpprettSakApi(page, { ...foreldreTilBarn, createStatus: 500, createBody: "Kunne ikke opprette sak" });
+        const component = await mount<typeof Modal>(STORY, {
+            ident: barnUnder18.ident,
+            rolle: "BA",
+            initialForelderIdent: bp.ident,
+        });
+        const dialog = await åpneModal(page, component);
+
+        await dialog.getByRole("button", { name: /Opprett$/ }).click();
+
+        await expect(dialog.getByText("Kunne ikke opprette sak")).toBeVisible();
+        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("");
+    });
+
+    test("viser valideringsfeil i modalen uten å sende inn", async ({ mount, page }) => {
+        const requests = await mockOpprettSakApi(page);
+        const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, rolle: "BA" });
+        const dialog = await åpneModal(page, component);
+
+        await dialog.getByRole("button", { name: /Opprett$/ }).click();
+
+        await expect(dialog.getByText("Du må registrere bidragspliktig eller velge ukjent")).toBeVisible();
+        expect(requests.create).toBeUndefined();
     });
 
     test("Avbryt lukker modalen uten å opprette sak", async ({ mount, page }) => {

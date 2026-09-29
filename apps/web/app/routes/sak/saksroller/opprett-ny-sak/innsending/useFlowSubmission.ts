@@ -1,6 +1,6 @@
 import { Rolletype } from "@bidrag/api/SakApi";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
-import { useEffect, useRef } from "react";
+import { type SubmitEvent, useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
 import { useEksisterendeSakSjekk } from "../eksisterende-sak/useEksisterendeSakSjekk";
@@ -67,7 +67,7 @@ function useSendInn<T extends FormMedKategori>(
         return () => abonnement.unsubscribe();
     }, [form, isLoading, nullstillResultat]);
 
-    return form.handleSubmit(async (data) => {
+    const sendInn = form.handleSubmit(async (data) => {
         if (!kanSendeInn || senderInn.current || isLoading || saksnummer) return;
         senderInn.current = true;
         try {
@@ -76,6 +76,10 @@ function useSendInn<T extends FormMedKategori>(
             senderInn.current = false;
         }
     });
+    return (event: SubmitEvent) => {
+        event.stopPropagation();
+        return sendInn(event);
+    };
 }
 
 /**
