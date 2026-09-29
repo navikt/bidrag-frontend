@@ -11,19 +11,32 @@ export interface PdfDokument {
     åpenForklaring?: string;
 }
 
+export interface PdfVisningKilde {
+    data?: { type: string; payload: unknown } | null;
+    isFetching?: boolean;
+    error?: Error | null;
+}
+
 export interface PdfVisningProps {
     dokument?: PdfDokument;
     lasterMetadata?: boolean;
+    /**
+     * Ekstern datakilde. Når denne er satt, hentes ikke dokumentet internt via
+     * `useHentSaksdokumentPdf` – i stedet vises PDF-en fra `kilde.data`. Brukes f.eks. for
+     * sammenslåtte PDF-er hentet med `useHentDokumenterPdf`.
+     */
+    kilde?: PdfVisningKilde;
 }
 
-export function PdfVisning({ dokument, lasterMetadata = false }: PdfVisningProps) {
-    const kanHente = Boolean(dokument?.kanÅpnes) && !lasterMetadata;
+export function PdfVisning({ dokument, lasterMetadata = false, kilde }: PdfVisningProps) {
+    const brukEksternKilde = kilde !== undefined;
+    const kanHente = !brukEksternKilde && Boolean(dokument?.kanÅpnes) && !lasterMetadata;
 
-    const {
-        data: cachedResponse,
-        isFetching,
-        error,
-    } = useHentSaksdokumentPdf(dokument?.journalpostId, dokument?.dokumentreferanse, kanHente);
+    const internHent = useHentSaksdokumentPdf(dokument?.journalpostId, dokument?.dokumentreferanse, kanHente);
+
+    const cachedResponse = brukEksternKilde ? kilde.data : internHent.data;
+    const isFetching = brukEksternKilde ? Boolean(kilde.isFetching) : internHent.isFetching;
+    const error = brukEksternKilde ? kilde.error : internHent.error;
 
     const pdfSource = useMemo(() => {
         if (!cachedResponse) return null;
