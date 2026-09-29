@@ -36,16 +36,16 @@ export default function PersonLayout({ params }: Route.ComponentProps) {
             </Page.Block>
         );
 
+    if (error) {
+        return error.message;
+    }
+
     if (isLoading || bruker === undefined) {
         return (
             <HStack width={"100%"} marginBlock={"space-128"} align={"center"} justify={"center"}>
                 <Loader size={"3xlarge"} />
             </HStack>
         );
-    }
-
-    if (error) {
-        return error.message;
     }
 
     return (
