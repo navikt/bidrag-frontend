@@ -1,6 +1,7 @@
 import { useBisysLink } from "@bidrag/common";
-import { Link } from "@navikt/ds-react";
-import { Link as RouterLink } from "react-router";
+import { XMarkIcon } from "@navikt/aksel-icons";
+import { InternalHeader, Link } from "@navikt/ds-react";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import { useReturLink } from "~/common/navigation/returLink.ts";
 
@@ -26,8 +27,18 @@ export default function BisysHeaderLink() {
     );
 }
 
+/** Dokumentvisningen åpnes alltid i en egen fane, så der gir det mer mening å lukke fanen enn å navigere tilbake. */
+export function erDokumentvisning(pathname: string) {
+    return pathname.startsWith("/dokument/") || pathname === "/dokumenter" || pathname.startsWith("/dokumenter/");
+}
+
 function BisysHeaderLinkInnhold() {
     const returLink = useReturLink();
+    const { pathname } = useLocation();
+
+    if (erDokumentvisning(pathname)) {
+        return <LukkVinduKnapp returHref={returLink?.href} />;
+    }
 
     // Når brukeren er rutet hit fra en annen side i appen, peker tilbakelenken dit i stedet for til Bisys.
     if (returLink) {
@@ -39,6 +50,31 @@ function BisysHeaderLinkInnhold() {
     }
 
     return <BisysFallbackLink />;
+}
+
+/**
+ * Nettleseren lar bare skript lukke faner som ble åpnet av skript eller via `target="_blank"`.
+ * Er fanen åpnet på annen måte (f.eks. lim inn URL), står den fortsatt åpen etter `window.close()`,
+ * og da navigeres det heller tilbake.
+ */
+function LukkVinduKnapp({ returHref }: { returHref?: string }) {
+    const navigate = useNavigate();
+
+    function lukkVindu() {
+        window.close();
+        window.setTimeout(() => {
+            if (window.closed) return;
+            if (returHref) navigate(returHref);
+            else window.history.back();
+        }, 200);
+    }
+
+    return (
+        <InternalHeader.Button onClick={lukkVindu} style={{ alignSelf: "center" }}>
+            <XMarkIcon aria-hidden fontSize="1.5rem" />
+            Lukk vindu
+        </InternalHeader.Button>
+    );
 }
 
 function BisysFallbackLink() {
