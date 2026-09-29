@@ -9,6 +9,7 @@ import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts
 import { fjernRolle } from "../endringer/rolle-endringer.ts";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
 import { ForelderKortInnhold } from "./ForelderKort.tsx";
+import { finnDuplikatForelderFeil } from "./forelder-regler.ts";
 
 interface ForelderVisningProps {
     form: UseFormReturn<SakRedigeringData>;
@@ -23,6 +24,12 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
     const forelderRolleNavn = rolle.type === "BP" ? "bidragspliktig" : "bidragsmottaker";
 
     const handlePersonValgt = (person: PersonDto) => {
+        const rolleType = forelderRolletype(rolle);
+        const duplikatFeil = rolleType && finnDuplikatForelderFeil(roller, rolleType, person);
+        if (duplikatFeil) {
+            throw new Error(duplikatFeil);
+        }
+
         const nyForelder: Rolle = {
             ...rolle,
             fodselsnummer: person.ident,

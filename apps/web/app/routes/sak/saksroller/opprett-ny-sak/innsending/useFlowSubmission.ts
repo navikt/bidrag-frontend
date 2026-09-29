@@ -111,6 +111,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
         harEksisterendeSak,
         eksisterendeSak,
         isLoading: isLoadingHentSak,
+        harFeil: eksisterendeSakFeilet,
         infoMelding,
     } = useEksisterendeSakSjekk({
         ...eksisterendeSakParter(valgtBidragspliktig, valgtBidragsmottaker),
@@ -127,6 +128,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
     const blocked =
         harEksisterendeSak ||
         isLoadingHentSak ||
+        eksisterendeSakFeilet ||
         isLoadingEnhet ||
         !enhet ||
         Boolean(enhetError) ||

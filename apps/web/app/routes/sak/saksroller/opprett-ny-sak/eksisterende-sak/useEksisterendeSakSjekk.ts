@@ -25,5 +25,5 @@ export function useEksisterendeSakSjekk({ partISaken, motpart, erEktefellebidrag
             }),
         [partISaken, motpart, erEktefellebidrag, skalHente, isLoading, error, sakForPartISaken],
     );
-    return { ...resultat, isLoading };
+    return { ...resultat, isLoading, harFeil: skalHente && Boolean(error) };
 }
