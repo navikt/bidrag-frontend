@@ -104,8 +104,8 @@ export const EndringstypeToVisningsnavn = {
 };
 
 const EndringsBox = ({
-                         endringerFieldArray,
-                     }: {
+    endringerFieldArray,
+}: {
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
     //const quillRef = useRef<HTMLDivElement>(null);
@@ -228,9 +228,9 @@ const EndringsBox = ({
 };
 
 const EndringsFormBox = ({
-                             index,
-                             endringerFieldArray,
-                         }: {
+    index,
+    endringerFieldArray,
+}: {
     index: number;
     endringerFieldArray: UseFieldArrayReturn<EndringsloggFormValues, "endringer">;
 }) => {
@@ -339,10 +339,10 @@ const EndringsFormBox = ({
 };
 
 export default function EndringsloggForm({
-                                             onSave,
-                                             endringslogg,
-                                             mutationError,
-                                         }: {
+    onSave,
+    endringslogg,
+    mutationError,
+}: {
     onSave: (formValues: EndringsloggFormValues, onSuccess: (id: number) => void) => void;
     endringslogg?: EndringsLoggDto;
     mutationError: Error | null;
@@ -552,7 +552,7 @@ export default function EndringsloggForm({
                                                         {
                                                             EndringsloggTilhorerSkjermbildeToVisningsnavn[
                                                                 gjelder as EndringsloggTilhorerSkjermbilde
-                                                                ]
+                                                            ]
                                                         }
                                                     </option>
                                                 ),
