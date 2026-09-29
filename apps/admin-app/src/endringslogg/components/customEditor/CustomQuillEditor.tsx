@@ -3,7 +3,6 @@ import { lazy, Suspense } from "react";
 
 import type { EditorProps } from "./CustomQuillEditorImpl";
 
-
 const CustomQuillEditorImpl = lazy(() =>
     import("./CustomQuillEditorImpl").then((modul) => ({ default: modul.CustomQuillEditor })),
 );
