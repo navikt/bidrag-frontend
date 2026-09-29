@@ -115,7 +115,7 @@ const getBodyForAvvikType = (avvik: Avvik, saksnummer: string): Avvikshendelse =
         case AvvikType.KOPIER_FRA_ANNEN_FAGOMRADE:
             return {
                 ...baseBody,
-                // @ts-ignore
+                // @ts-expect-error
                 dokumenter: avvik.relevanteDokumenter,
                 detaljer: { knyttTilSaker: avvik.knyttTilSaker.join(",") },
             };
