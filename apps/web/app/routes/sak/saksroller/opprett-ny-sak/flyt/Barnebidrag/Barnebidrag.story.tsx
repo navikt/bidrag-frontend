@@ -1,8 +1,8 @@
 import { barnkurver, testpersoner, ukjentBarnkurv } from "@ct/opprett-ny-sak/fixtures";
-import { WizardFlowStory } from "@ct/opprett-ny-sak/WizardFlowStory";
+import { OpprettSakSkjemaStory } from "@ct/opprett-ny-sak/OpprettSak.story";
 
 export const ForelderMedBarn = () => (
-    <WizardFlowStory
+    <OpprettSakSkjemaStory
         scenario={{
             sakstype: "BARNEBIDRAG",
             person: testpersoner.bidragspliktig,
@@ -13,7 +13,7 @@ export const ForelderMedBarn = () => (
 );
 
 export const ForelderUkjentBidragsmottaker = () => (
-    <WizardFlowStory
+    <OpprettSakSkjemaStory
         scenario={{
             sakstype: "BARNEBIDRAG",
             person: testpersoner.bidragspliktig,
@@ -24,7 +24,7 @@ export const ForelderUkjentBidragsmottaker = () => (
 );
 
 export const ForelderUtenBarn = () => (
-    <WizardFlowStory
+    <OpprettSakSkjemaStory
         scenario={{
             sakstype: "BARNEBIDRAG",
             person: testpersoner.bidragspliktig,
@@ -35,7 +35,7 @@ export const ForelderUtenBarn = () => (
 );
 
 export const BarnUnder18 = () => (
-    <WizardFlowStory
+    <OpprettSakSkjemaStory
         scenario={{
             sakstype: "BARNEBIDRAG",
             person: testpersoner.barnUnder18,
@@ -46,7 +46,7 @@ export const BarnUnder18 = () => (
 );
 
 export const BarnOver18 = () => (
-    <WizardFlowStory
+    <OpprettSakSkjemaStory
         scenario={{
             sakstype: "BARNEBIDRAG",
             person: testpersoner.barnOver18,

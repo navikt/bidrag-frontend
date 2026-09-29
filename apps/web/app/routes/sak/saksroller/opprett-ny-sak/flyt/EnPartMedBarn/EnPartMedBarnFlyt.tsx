@@ -171,7 +171,7 @@ function Meldinger({
     return (
         <>
             {kurvfeil && (
-                <InlineMessage status="warning">
+                <InlineMessage status="warning" size="small">
                     Kunne ikke hente forslag til barn. Du kan søke opp barn manuelt.
                 </InlineMessage>
             )}

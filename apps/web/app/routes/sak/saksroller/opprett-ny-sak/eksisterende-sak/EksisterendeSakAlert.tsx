@@ -28,7 +28,7 @@ export default function EksisterendeSakAlert({ eksisterendeSak, partISakenNavn, 
             <Heading level="3" size="xsmall" spacing>
                 Eksisterende sak funnet
             </Heading>
-            <BodyShort spacing>
+            <BodyShort size="small" spacing>
                 Det finnes allerede en sak (saksnr:{" "}
                 <Link
                     data-color="accent"

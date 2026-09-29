@@ -13,7 +13,7 @@ type MockOptions = {
     personOverrides?: Record<string, Record<string, unknown>>;
 };
 
-export async function mockWizardApi(page: Page, options: MockOptions = {}) {
+export async function mockOpprettSakApi(page: Page, options: MockOptions = {}) {
     const requests: { create?: Record<string, unknown>; unit: Record<string, unknown>[] } = { unit: [] };
     await mockPersonOgRelasjoner(page, {
         testpersoner,

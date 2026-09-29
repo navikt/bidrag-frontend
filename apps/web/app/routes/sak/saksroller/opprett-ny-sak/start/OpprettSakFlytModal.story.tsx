@@ -1,3 +1,3 @@
-import { WizardModalStory } from "@ct/opprett-ny-sak/WizardFlowStory";
+import { OpprettSakFlytModalStory } from "@ct/opprett-ny-sak/OpprettSak.story";
 
-export const Modal = WizardModalStory;
+export const Modal = OpprettSakFlytModalStory;

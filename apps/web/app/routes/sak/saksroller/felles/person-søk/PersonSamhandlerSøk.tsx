@@ -106,7 +106,7 @@ function Søkestatus({ søker, info, feilmelding }: { søker: boolean; info?: st
             {søker && (
                 <HStack gap="space-8">
                     <Loader size="small" title="Søker…" />
-                    <BodyShort>Søker…</BodyShort>
+                    <BodyShort size="small">Søker…</BodyShort>
                 </HStack>
             )}
             {info && !feilmelding && <Søkemelding status="info">{info}</Søkemelding>}

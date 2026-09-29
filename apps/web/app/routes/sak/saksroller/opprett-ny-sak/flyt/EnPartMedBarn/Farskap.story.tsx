@@ -1,8 +1,8 @@
 import { barnkurver, testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { WizardFlowStory } from "@ct/opprett-ny-sak/WizardFlowStory";
+import { OpprettSakSkjemaStory } from "@ct/opprett-ny-sak/OpprettSak.story";
 
 export const Standard = () => (
-    <WizardFlowStory
+    <OpprettSakSkjemaStory
         scenario={{
             sakstype: "FARSKAP",
             person: testpersoner.bidragsmottaker,

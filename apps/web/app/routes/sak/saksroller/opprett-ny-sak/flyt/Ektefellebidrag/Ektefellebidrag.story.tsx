@@ -1,8 +1,8 @@
 import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { WizardFlowStory } from "@ct/opprett-ny-sak/WizardFlowStory";
+import { OpprettSakSkjemaStory } from "@ct/opprett-ny-sak/OpprettSak.story";
 
 export const MedForslag = () => (
-    <WizardFlowStory
+    <OpprettSakSkjemaStory
         scenario={{
             sakstype: "EKTEFELLEBIDRAG",
             person: testpersoner.bidragspliktig,

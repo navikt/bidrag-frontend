@@ -1,6 +1,6 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
+import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
 import type { Locator } from "@playwright/test";
 import type { Innbygget } from "./OpprettSakFlyt.story";
 
@@ -20,7 +20,7 @@ async function velgStartpart(component: Locator, ident: string, rolle?: string) 
 }
 
 test("Bekreft fyller ut skjemaet og tømmer søket", async ({ mount, page }) => {
-    await mockWizardApi(page);
+    await mockOpprettSakApi(page);
     const component = await mount(STORY);
 
     await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
@@ -33,7 +33,7 @@ test("Bekreft fyller ut skjemaet og tømmer søket", async ({ mount, page }) => 
 });
 
 test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ mount, page }) => {
-    await mockWizardApi(page, {
+    await mockOpprettSakApi(page, {
         parentRelations: {
             [testpersoner.barnUnder18.ident]: [testpersoner.bidragspliktig.ident, testpersoner.bidragsmottaker.ident],
         },
@@ -84,7 +84,7 @@ test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ m
 });
 
 test("ny Bekreft med utfylt skjema spør før skjemaet nullstilles", async ({ mount, page }) => {
-    await mockWizardApi(page);
+    await mockOpprettSakApi(page);
     const component = await mount(STORY);
     await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
 
@@ -103,7 +103,7 @@ test("ny Bekreft med utfylt skjema spør før skjemaet nullstilles", async ({ mo
 });
 
 test("bytte av sakstype spør før skjemaet nullstilles", async ({ mount, page }) => {
-    await mockWizardApi(page);
+    await mockOpprettSakApi(page);
     const component = await mount(STORY);
     const barnOverskrift = component.getByRole("heading", { name: "Velg barn saken gjelder for" });
     const dialog = page.getByRole("alertdialog", { name: "Er du sikker?" });
@@ -126,7 +126,7 @@ test("bytte av sakstype spør før skjemaet nullstilles", async ({ mount, page }
 });
 
 test("kategori velges i skjemaet uten å nullstille det", async ({ mount, page }) => {
-    await mockWizardApi(page);
+    await mockOpprettSakApi(page);
     const component = await mount(STORY);
     const oppsummering = component
         .locator("section")
@@ -143,7 +143,7 @@ test("kategori velges i skjemaet uten å nullstille det", async ({ mount, page }
 });
 
 test("viser varsel når forslag til barn ikke kan hentes", async ({ mount, page }) => {
-    await mockWizardApi(page);
+    await mockOpprettSakApi(page);
     await page.route(/\/proxy\/bidrag-person\/motpartbarnrelasjon$/, async (route) => {
         await route.fulfill({ status: 500, json: { error: "Unavailable" } });
     });
@@ -164,7 +164,7 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
     mount,
     page,
 }) => {
-    const requests = await mockWizardApi(page);
+    const requests = await mockOpprettSakApi(page);
     const component = await mount(STORY);
 
     await expect(component.getByRole("radio", { name: /Barnebidrag/ })).toBeChecked();
@@ -227,7 +227,7 @@ test.describe("Innbygget med forhåndsutfylling", () => {
         mount,
         page,
     }) => {
-        await mockWizardApi(page);
+        await mockOpprettSakApi(page);
         const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident, rolle: "BP" });
         const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
 
@@ -242,7 +242,7 @@ test.describe("Innbygget med forhåndsutfylling", () => {
     });
 
     test("barnet modalen åpnes for kan ikke velges bort", async ({ mount, page }) => {
-        await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
+        await mockOpprettSakApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
         const component = await mount<typeof Innbygget>(INNBYGGET, { ident: barnUnder18.ident, rolle: "BA" });
         const barn = component.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` });
 
@@ -252,7 +252,7 @@ test.describe("Innbygget med forhåndsutfylling", () => {
     });
 
     test("inngang uten rolle lar saksbehandler velge rollen", async ({ mount, page }) => {
-        await mockWizardApi(page);
+        await mockOpprettSakApi(page);
         const component = await mount<typeof Innbygget>(INNBYGGET, { ident: bp.ident });
 
         await expect(rollevelger(component)).toBeVisible();
@@ -269,7 +269,7 @@ test.describe("Innbygget med forhåndsutfylling", () => {
     });
 
     test("Avbryt kaller onAvbryt", async ({ mount, page }) => {
-        await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
+        await mockOpprettSakApi(page, { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } });
         const component = await mount<typeof Innbygget>(INNBYGGET, { ident: barnUnder18.ident, rolle: "BA" });
 
         await component.getByRole("button", { name: "Avbryt" }).click();

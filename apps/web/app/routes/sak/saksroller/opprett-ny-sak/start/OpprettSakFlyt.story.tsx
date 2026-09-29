@@ -1,4 +1,4 @@
-import { WizardInnbyggetStory, WizardPageStory } from "@ct/opprett-ny-sak/WizardFlowStory";
+import { OpprettSakFlytInnbyggetStory, OpprettSakFlytStory } from "@ct/opprett-ny-sak/OpprettSak.story";
 
-export const Standard = () => <WizardPageStory />;
-export const Innbygget = WizardInnbyggetStory;
+export const Standard = () => <OpprettSakFlytStory />;
+export const Innbygget = OpprettSakFlytInnbyggetStory;

@@ -133,7 +133,7 @@ export default function SubmitButtons({
     return (
         <VStack gap="space-8">
             {visFeil && (
-                <Alert variant="error" ref={errorRef} tabIndex={-1}>
+                <Alert variant="error" size="small" ref={errorRef} tabIndex={-1}>
                     {blockedError ?? feilmeldingTekst(error)}
                 </Alert>
             )}

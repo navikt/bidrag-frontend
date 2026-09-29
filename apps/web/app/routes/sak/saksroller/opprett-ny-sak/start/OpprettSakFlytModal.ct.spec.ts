@@ -1,6 +1,6 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
+import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
 import type { Locator, Page } from "@playwright/test";
 import type { Modal } from "./OpprettSakFlytModal.story";
 
@@ -17,7 +17,7 @@ async function åpneModal(page: Page, component: Locator) {
 
 test.describe("Opprett sak som modal fra behandling og dokument", () => {
     test("forhåndsutfyller barn og BP, sender riktig request og gir saksnummeret tilbake", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page, foreldreTilBarn);
+        const requests = await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, {
             ident: barnUnder18.ident,
             rolle: "BA",
@@ -53,7 +53,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
     });
 
     test("Avbryt lukker modalen uten å opprette sak", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page, foreldreTilBarn);
+        const requests = await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, rolle: "BA" });
         const dialog = await åpneModal(page, component);
 
@@ -66,7 +66,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
     });
 
     test("Avbryt er sperret mens saken sendes inn", async ({ mount, page }) => {
-        await mockWizardApi(page, foreldreTilBarn);
+        await mockOpprettSakApi(page, foreldreTilBarn);
         let svar: () => void = () => undefined;
         await page.route(/\/proxy\/bidrag-sak\/sak$/, async (route) => {
             await new Promise<void>((resolve) => {
@@ -89,7 +89,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
     });
 
     test("viser avvik når arbeidsfordelingen gir en annen enhet enn eierfogd", async ({ mount, page }) => {
-        await mockWizardApi(page, foreldreTilBarn);
+        await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, {
             ident: barnUnder18.ident,
             rolle: "BA",
@@ -104,7 +104,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
     });
 
     test("uten ny flyt vises ingen ny modal", async ({ mount, page }) => {
-        await mockWizardApi(page);
+        await mockOpprettSakApi(page);
         const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, medNyFlyt: false });
 
         await component.getByRole("button", { name: "Åpne opprett sak" }).click();

@@ -33,16 +33,16 @@ function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
     return <OpprettSakSkjema start={start} />;
 }
 
-export function WizardFlowStory({ scenario }: { scenario: Scenario }) {
+export function OpprettSakSkjemaStory({ scenario }: { scenario: Scenario }) {
     return <StoryRouter content={<ScenarioBootstrap scenario={scenario} />} />;
 }
 
-export function WizardPageStory() {
+export function OpprettSakFlytStory() {
     return <StoryRouter content={<OpprettSakFlyt />} />;
 }
 
 /** Flyten bygd inn av en kaller. Callbacks lagres i skjulte felt, siden CT-props må kunne serialiseres. */
-export function WizardInnbyggetStory({ ident, rolle }: { ident: string; rolle?: InngangRolle }) {
+export function OpprettSakFlytInnbyggetStory({ ident, rolle }: { ident: string; rolle?: InngangRolle }) {
     const [saksnummer, settSaksnummer] = useState("");
     const [avbrutt, settAvbrutt] = useState(false);
     return (
@@ -74,7 +74,7 @@ type ModalStoryProps = {
 };
 
 /** Modalen slik behandling og dokument åpner den. Resultatet lagres i skjulte felt. */
-export function WizardModalStory(props: ModalStoryProps) {
+export function OpprettSakFlytModalStory(props: ModalStoryProps) {
     return <StoryRouter content={<ModalHarness {...props} />} />;
 }
 

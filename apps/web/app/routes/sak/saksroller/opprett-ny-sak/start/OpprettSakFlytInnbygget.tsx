@@ -35,7 +35,7 @@ export default function OpprettSakFlytInnbygget({
 
     if (error) {
         return (
-            <InlineMessage status="error">
+            <InlineMessage status="error" size="small">
                 Kunne ikke hente personen saken skal opprettes for. Lukk vinduet og prøv igjen.
             </InlineMessage>
         );

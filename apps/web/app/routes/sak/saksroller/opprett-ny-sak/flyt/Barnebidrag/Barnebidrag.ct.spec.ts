@@ -1,6 +1,6 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
+import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Barnebidrag/Barnebidrag";
 const { bidragspliktig: bp, bidragsmottaker: bm, annenForelder, barnUnder18 } = testpersoner;
@@ -21,7 +21,7 @@ async function barnetsForeldre(page: import("@playwright/test").Page, foreldre: 
 
 test.describe("Start fra forelder med barn", () => {
     test("valgt motpart viser bare felles barn, Endre gir alle kurvene tilbake", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page);
+        const requests = await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/ForelderMedBarn`);
         const førsteBarn = component.getByRole("checkbox").first();
         const andreBarn = component.getByRole("checkbox").nth(1);
@@ -59,7 +59,7 @@ test.describe("Start fra forelder med barn", () => {
     });
 
     test("viser relasjons- og tilgangsadvarsel når bidragsmottaker er ukjent", async ({ mount, page }) => {
-        await mockWizardApi(page, { accessAllowed: false });
+        await mockOpprettSakApi(page, { accessAllowed: false });
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
 
         await component.getByRole("checkbox").first().check();
@@ -70,7 +70,7 @@ test.describe("Start fra forelder med barn", () => {
     });
 
     test("nullstiller ikke skjemaet ved forsøk på å legge til allerede valgt barn", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page);
+        const requests = await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/ForelderMedBarn`);
         await component.getByRole("checkbox").first().check();
         const valgtIdent = await component.getByRole("checkbox").first().getAttribute("value");
@@ -100,7 +100,7 @@ test.describe("Start fra forelder uten registrerte barn", () => {
     };
 
     test("manuelt lagt til barn står i listen, er valgt og kan velges bort og inn igjen", async ({ mount, page }) => {
-        await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
+        await mockOpprettSakApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
         await leggTilBarn(component, page);
 
@@ -115,7 +115,7 @@ test.describe("Start fra forelder uten registrerte barn", () => {
     });
 
     test("legger til barn, får entydig forelder automatisk og oppretter sak", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
+        const requests = await mockOpprettSakApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
         const hint = component.getByText("Velg barn nedenfor for å få forslag til foreldre.");
         await expect(hint).toBeVisible();
@@ -140,7 +140,7 @@ test.describe("Start fra forelder uten registrerte barn", () => {
     });
 
     test("viser datakvalitetsfeil ved mer enn to registrerte foreldre", async ({ mount, page }) => {
-        await mockWizardApi(page, {
+        await mockOpprettSakApi(page, {
             parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident, annenForelder.ident] },
         });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
@@ -152,7 +152,7 @@ test.describe("Start fra forelder uten registrerte barn", () => {
 
 test.describe("Start fra barn", () => {
     test("barnet kan velges bort, og valgt BP gir den andre forelderen som BM", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page);
+        const requests = await mockOpprettSakApi(page);
         await barnetsForeldre(page, [bp.ident, bm.ident]);
         const component = await mount(`${STORY}/BarnUnder18`);
         const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
@@ -185,7 +185,7 @@ test.describe("Start fra barn", () => {
     });
 
     test("henter barn på nytt når en forelder velges", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page);
+        const requests = await mockOpprettSakApi(page);
         await barnetsForeldre(page, [bp.ident, bm.ident]);
         await page.route(/\/proxy\/bidrag-person\/motpartbarnrelasjon$/, async (route) => {
             await route.fulfill({
@@ -233,7 +233,7 @@ test.describe("Start fra barn", () => {
     });
 
     test("eksisterende sak mellom partene sperrer opprettelse", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page);
+        const requests = await mockOpprettSakApi(page);
         await barnetsForeldre(page, [bp.ident, bm.ident]);
         await page.route(/\/proxy\/bidrag-sak\/person\/sak$/, async (route) => {
             await route.fulfill({
@@ -266,7 +266,7 @@ test.describe("Start fra barn", () => {
     });
 
     test("🔴 blokkerer ukjent bidragsmottaker når tilgang mangler", async ({ mount, page }) => {
-        const requests = await mockWizardApi(page, { accessAllowed: false });
+        const requests = await mockOpprettSakApi(page, { accessAllowed: false });
         await barnetsForeldre(page, [bp.ident, bm.ident]);
         const component = await mount(`${STORY}/BarnUnder18`);
         const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
@@ -287,7 +287,7 @@ test.describe("Start fra barn", () => {
         mount,
         page,
     }) => {
-        await mockWizardApi(page);
+        await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/BarnOver18`);
 
         await expect(component.getByRole("searchbox", { name: "Søk etter bidragspliktig" })).toBeVisible();

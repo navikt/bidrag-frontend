@@ -1,10 +1,10 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
-import { expectNoAxeViolations, mockWizardApi } from "@ct/opprett-ny-sak/network";
+import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
 
 const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/Ektefellebidrag/MedForslag";
 
 test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
-    await mockWizardApi(page);
+    await mockOpprettSakApi(page);
     const component = await mount(STORY);
     const brukPartner = component.getByRole("button", { name: "Bruk Test Ektefelle" });
 
@@ -23,7 +23,7 @@ test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
 });
 
 test("fjerner opprettelsesfeil når partene endres", async ({ mount, page }) => {
-    await mockWizardApi(page, { createStatus: 500, createBody: "Kunne ikke opprette sak" });
+    await mockOpprettSakApi(page, { createStatus: 500, createBody: "Kunne ikke opprette sak" });
     const component = await mount(STORY);
 
     await component.getByRole("button", { name: "Bruk Test Ektefelle" }).click();
@@ -35,7 +35,7 @@ test("fjerner opprettelsesfeil når partene endres", async ({ mount, page }) => 
 });
 
 test("bidragspliktig det ble startet fra kan endres", async ({ mount, page }) => {
-    await mockWizardApi(page);
+    await mockOpprettSakApi(page);
     const component = await mount(STORY);
     const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
 
