@@ -13,11 +13,7 @@ type FellesProps = {
     forelder: ForelderKortPerson | null;
     ukjentTekst?: string;
     rolle?: "BP" | "BM";
-    visModiaLenke?: boolean;
-    visIkon?: boolean;
-    visKopieringsknapp?: boolean;
     tags?: ReactNode;
-    headingActions?: ReactNode;
     actions?: ReactNode;
     søktIdent?: string;
     children?: ReactNode;
@@ -36,12 +32,10 @@ function tilPerson(forelder: ForelderKortPerson | null): PersonDto | null {
     };
 }
 
-export function ForelderKortInnhold({ forelder, rolle, visModiaLenke, ...resten }: FellesProps) {
-    return (
-        <PersonRolleKortInnhold person={tilPerson(forelder)} rolle={rolle} visModiaLenke={visModiaLenke} {...resten} />
-    );
+export function ForelderKortInnhold({ forelder, ...resten }: FellesProps) {
+    return <PersonRolleKortInnhold person={tilPerson(forelder)} {...resten} />;
 }
 
-export default function ForelderKort({ forelder, rolle, visModiaLenke = true, ...resten }: FellesProps) {
-    return <PersonRolleKort person={tilPerson(forelder)} rolle={rolle} visModiaLenke={visModiaLenke} {...resten} />;
+export default function ForelderKort({ forelder, ...resten }: FellesProps) {
+    return <PersonRolleKort person={tilPerson(forelder)} {...resten} />;
 }

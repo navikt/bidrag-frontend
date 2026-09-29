@@ -49,3 +49,19 @@ test("nytt barn erstatter det forrige fordi farskap bare kan gjelde ett barn", a
     await expect(førsteBarn).not.toBeChecked();
     await expect(component.getByText("1 valgt")).toBeVisible();
 });
+
+test("barnekortet har kopier og Modia utenfor avkrysningen", async ({ mount, page }) => {
+    await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+    const barn = component.getByRole("checkbox").first();
+
+    await expect(component.getByRole("link", { name: "Åpne personen i Modia" }).first()).toBeVisible();
+    await component
+        .getByRole("button", { name: /kopier/i })
+        .first()
+        .click();
+    await expect(barn).not.toBeChecked();
+
+    await barn.check();
+    await expect(barn).toBeChecked();
+});

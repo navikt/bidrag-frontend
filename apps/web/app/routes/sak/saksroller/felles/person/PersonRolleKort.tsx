@@ -1,5 +1,4 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { PersonIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
@@ -30,9 +29,6 @@ type InnholdProps = {
     rolle?: RolleType;
     alder?: number;
     stønad18År?: boolean;
-    visModiaLenke?: boolean;
-    visKopieringsknapp?: boolean;
-    visIkon?: boolean;
     tags?: ReactNode;
     headingActions?: ReactNode;
     søktIdent?: string;
@@ -57,15 +53,12 @@ export function PersonRolleKortInnhold({
     rolle,
     alder,
     stønad18År,
-    visModiaLenke,
-    visKopieringsknapp = true,
-    visIkon = true,
     tags,
     headingActions,
     søktIdent,
     children,
 }: InnholdProps) {
-    const innhold = (
+    return (
         <VStack gap="space-0" flexGrow="1" minWidth="0">
             {person ? (
                 <PersonInfo
@@ -77,8 +70,7 @@ export function PersonRolleKortInnhold({
                     stønad18År={stønad18År}
                     tags={tags}
                     headingActions={headingActions}
-                    visModiaLenke={visModiaLenke}
-                    visKopieringsknapp={visKopieringsknapp}
+                    visModiaLenke
                     compact
                 >
                     {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
@@ -95,19 +87,6 @@ export function PersonRolleKortInnhold({
                 </HStack>
             )}
         </VStack>
-    );
-
-    return (
-        <HStack gap="space-4" align="center" justify="space-between" width="100%">
-            <HStack gap="space-4" align="center" flexGrow="1" minWidth="0">
-                {visIkon && (
-                    <Box padding="space-8" borderRadius="full" background="neutral-moderate">
-                        <PersonIcon aria-hidden fontSize="1.25rem" className="text-ax-neutral-700" />
-                    </Box>
-                )}
-                {innhold}
-            </HStack>
-        </HStack>
     );
 }
 

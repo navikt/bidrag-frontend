@@ -44,9 +44,9 @@ export function harFullstendigRelasjon(
 ): boolean | undefined {
     if (foreldreTilBarn.length === 0) return true;
     if (foreldreTilBarn.some((b) => b.foreldre === undefined)) return undefined;
-    if (!bidragspliktigIdent || !bidragsmottakerIdent) return false;
+    const kjenteForeldre = [bidragspliktigIdent, bidragsmottakerIdent].filter((ident): ident is string => !!ident);
     return foreldreTilBarn.every(({ foreldre = [] }) => {
         const identer = foreldre.map((f) => f.ident);
-        return identer.includes(bidragspliktigIdent) && identer.includes(bidragsmottakerIdent);
+        return kjenteForeldre.every((ident) => identer.includes(ident));
     });
 }

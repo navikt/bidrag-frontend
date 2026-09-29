@@ -70,7 +70,6 @@ function ForelderKort(props: ForelderKortProps) {
                         : null
                 }
                 rolle={rolle === "bidragspliktig" ? "BP" : "BM"}
-                visIkon={false}
                 ukjentTekst={part.erKjent === undefined ? "Ikke valgt" : "Ukjent - ikke registrert"}
                 søktIdent={valgtPerson?.ident === ident ? valgtPerson?.søktIdent : undefined}
                 actions={!props.låst && <Handlinger {...handlinger} />}

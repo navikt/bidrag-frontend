@@ -42,13 +42,13 @@ export default function OpprettSakFlyt() {
                         <SakstypeVelger value={sakstype} onVelg={velgSakstype} />
                     </SkjemaSeksjonKort>
                 </SkjemaSeksjon>
+                <StartpartVelger key={sakstype} sakstype={sakstype} harSkjema={!!start} onBekreft={bekreftStart} />
                 <NullstillDialog
                     open={!!ventendeSakstype}
                     onOpenChange={(open) => !open && setVentendeSakstype(null)}
                     beskrivelse="Skjemaet nullstilles når du bytter sakstype."
                     onBekreft={() => ventendeSakstype && byttSakstype(ventendeSakstype)}
                 />
-                <StartpartVelger key={sakstype} sakstype={sakstype} harSkjema={!!start} onBekreft={bekreftStart} />
                 {start && <OpprettSakSkjema key={start.versjon} start={start} />}
             </VStack>
         </Box>

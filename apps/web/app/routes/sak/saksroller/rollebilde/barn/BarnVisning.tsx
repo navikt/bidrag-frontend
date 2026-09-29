@@ -57,7 +57,6 @@ export default function BarnVisning({
                         erMyndig: rolle.erMyndig,
                         diskresjonskode: rolle.diskresjonskode,
                     }}
-                    visIkon={false}
                     headingActions={erNyttBarn && <NyttBarnHandlinger onFjern={handleFjernBarn} />}
                 >
                     {!visReellMottaker && (

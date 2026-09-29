@@ -55,7 +55,8 @@ describe("harFullstendigRelasjon", () => {
     it("krever at alle barn har både BP og BM registrert", () => {
         expect(harFullstendigRelasjon([{ barn, foreldre: [far, mor] }], far.ident, mor.ident)).toBe(true);
         expect(harFullstendigRelasjon([{ barn, foreldre: [far] }], far.ident, mor.ident)).toBe(false);
-        expect(harFullstendigRelasjon([{ barn, foreldre: [far, mor] }], far.ident, undefined)).toBe(false);
+        expect(harFullstendigRelasjon([{ barn, foreldre: [far, mor] }], far.ident, undefined)).toBe(true);
+        expect(harFullstendigRelasjon([{ barn, foreldre: [mor] }], far.ident, undefined)).toBe(false);
     });
 });
 

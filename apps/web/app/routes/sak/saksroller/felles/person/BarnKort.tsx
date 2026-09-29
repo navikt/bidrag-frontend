@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import type { ReactNode } from "react";
-import PersonRolleKort, { PersonRolleKortInnhold } from "./PersonRolleKort";
+import { PersonRolleKortInnhold } from "./PersonRolleKort";
 
 type BarnKortPerson = {
     ident: string;
@@ -12,22 +12,13 @@ type BarnKortPerson = {
     diskresjonskode?: PersonDto["diskresjonskode"];
 };
 
-type FellesProps = {
-    barn: BarnKortPerson | null;
-    visIkon?: boolean;
-    visKopieringsknapp?: boolean;
-    visRolleTag?: boolean;
-    tags?: ReactNode;
+type Props = {
+    barn: BarnKortPerson;
     headingActions?: ReactNode;
-    actions?: ReactNode;
     children?: ReactNode;
 };
 
-function tilPerson(barn: BarnKortPerson | null): PersonDto | null {
-    if (!barn) {
-        return null;
-    }
-
+function tilPerson(barn: BarnKortPerson): PersonDto {
     return {
         ident: barn.ident,
         visningsnavn: barn.navn ?? "",
@@ -36,38 +27,18 @@ function tilPerson(barn: BarnKortPerson | null): PersonDto | null {
     };
 }
 
-function alderForBarn(barn: BarnKortPerson | null): number | undefined {
-    if (!barn) {
-        return undefined;
-    }
-
+function alderForBarn(barn: BarnKortPerson): number | undefined {
     return barn.alder ?? beregnAlderForPerson({ ident: barn.ident, fødselsdato: barn.fødselsdato }) ?? undefined;
 }
 
-export function BarnKortInnhold({ barn, ...resten }: FellesProps) {
-    const { visRolleTag = true, ...kortProps } = resten;
-
+export function BarnKortInnhold({ barn, ...resten }: Props) {
     return (
         <PersonRolleKortInnhold
             person={tilPerson(barn)}
-            rolle={visRolleTag ? "BA" : undefined}
+            rolle="BA"
             alder={alderForBarn(barn)}
-            stønad18År={barn?.erMyndig}
-            {...kortProps}
-        />
-    );
-}
-
-export default function BarnKort({ barn, ...resten }: FellesProps) {
-    const { visRolleTag = true, ...kortProps } = resten;
-
-    return (
-        <PersonRolleKort
-            person={tilPerson(barn)}
-            rolle={visRolleTag ? "BA" : undefined}
-            alder={alderForBarn(barn)}
-            stønad18År={barn?.erMyndig}
-            {...kortProps}
+            stønad18År={barn.erMyndig}
+            {...resten}
         />
     );
 }

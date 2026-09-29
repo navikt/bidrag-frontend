@@ -146,34 +146,16 @@ function BarnGruppe({
                         return (
                             <KortRamme key={b.ident}>
                                 <VStack gap="space-16">
-                                    <HStack
-                                        align="start"
-                                        justify="space-between"
-                                        gap="space-8"
-                                        wrap={false}
-                                        className={låst ? undefined : "cursor-pointer"}
-                                        onClick={(event) =>
-                                            !låst &&
-                                            event.currentTarget
-                                                .querySelector<HTMLInputElement>('input[type="checkbox"]')
-                                                ?.click()
-                                        }
-                                    >
-                                        <BarnKortInnhold
-                                            barn={b}
-                                            visIkon={false}
-                                            visKopieringsknapp={false}
-                                            visRolleTag={false}
-                                        />
+                                    <HStack align="start" gap="space-8" wrap={false}>
                                         <Checkbox
                                             value={b.ident}
                                             hideLabel
                                             aria-label={`Velg ${b.navn ?? b.ident}`}
                                             readOnly={låst}
-                                            onClick={(event) => event.stopPropagation()}
                                         >
                                             {" "}
                                         </Checkbox>
+                                        <BarnKortInnhold barn={b} />
                                     </HStack>
                                     {valgteIdenter.includes(b.ident) && (
                                         <BarnReellMottaker

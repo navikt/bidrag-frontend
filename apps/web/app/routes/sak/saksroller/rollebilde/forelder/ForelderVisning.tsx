@@ -56,8 +56,6 @@ export default function ForelderVisning({ form, rolle, erNyForelder, søktIdent,
                     diskresjonskode: rolle.diskresjonskode,
                 }}
                 rolle={forelderRolletype(rolle)}
-                visModiaLenke
-                visIkon={false}
                 søktIdent={søktIdent}
                 tags={
                     erNyForelder && (

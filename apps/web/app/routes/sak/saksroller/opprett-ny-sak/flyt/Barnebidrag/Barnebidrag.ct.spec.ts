@@ -58,15 +58,34 @@ test.describe("Start fra forelder med barn", () => {
         await expect(component.getByRole("button", { name: /^Opprett/ })).toHaveCount(0);
     });
 
-    test("viser relasjons- og tilgangsadvarsel når bidragsmottaker er ukjent", async ({ mount, page }) => {
+    test("viser tilgangsadvarsel, men ikke relasjonsadvarsel, når bidragsmottaker er ukjent", async ({
+        mount,
+        page,
+    }) => {
         await mockOpprettSakApi(page, { accessAllowed: false });
+        const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
+        const bpIdent = await component
+            .getByRole("group", { name: "Bidragspliktig" })
+            .locator(".personident")
+            .first()
+            .textContent();
+        await barnetsForeldre(page, [bpIdent?.replace(/\D/g, "") ?? ""]);
+
+        await component.getByRole("checkbox").first().check();
+
+        await expect(component.getByText(/ikke tilgang til å opprette sak uten bidragsmottaker/)).toBeVisible();
+        await expect(component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" }).first()).toBeVisible();
+        await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
+    });
+
+    test("viser relasjonsadvarsel når bidragspliktig ikke er forelder til barnet", async ({ mount, page }) => {
+        await mockOpprettSakApi(page);
+        await barnetsForeldre(page, [annenForelder.ident]);
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
 
         await component.getByRole("checkbox").first().check();
 
         await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toBeVisible();
-        await expect(component.getByText(/ikke tilgang til å opprette sak uten bidragsmottaker/)).toBeVisible();
-        await expect(component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" }).first()).toBeVisible();
     });
 
     test("nullstiller ikke skjemaet ved forsøk på å legge til allerede valgt barn", async ({ mount, page }) => {
