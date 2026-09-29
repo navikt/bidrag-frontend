@@ -49,6 +49,13 @@ export default [
         route("innkreving", "./routes/bruker/innkreving/InnkrevingPage.tsx"),
     ]),
 
+    route("person/:personid", "./routes/person/PersonLayout.tsx", [
+        index("./routes/person/oversikt/OversiktPage.tsx"),
+        route("historikk", "./routes/person/historikk/HistorikkPage.tsx"),
+        route("personalia", "./routes/person/personalia/PersonaliaPage.tsx"),
+        route("kontoopplysninger", "./routes/person/kontoopplysninger/KontoopplysningerPage.tsx"),
+    ]),
+
     route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),
     route("samhandler/:samhandlerId", "./routes/samhandler/SamhandlerDetaljer.tsx"),
 
