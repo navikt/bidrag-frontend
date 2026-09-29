@@ -46,7 +46,10 @@ function erUnderProduksjon(dokument?: DokumentDto) {
  * brevklienten, og fanen som ble åpnet for fremviseren lukkes etterpå.
  */
 async function åpneIMbdokOgLukkVindu(journalpostId: string, dokumentreferanse: string) {
-    const metadataResponse = await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet1(journalpostId, dokumentreferanse);
+    const metadataResponse = await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet1(
+        journalpostId,
+        dokumentreferanse,
+    );
     if (metadataResponse.data[0]?.format !== DokumentFormatDto.MBDOK) return false;
 
     const dokumentUrl = await hentDokumentUrlApi({ journalpostId, dokumentreferanse });
@@ -56,11 +59,11 @@ async function åpneIMbdokOgLukkVindu(journalpostId: string, dokumentreferanse: 
 }
 
 export default function JournalpostFremviser({
-                                                 journalpostId,
-                                                 dokumentreferanse,
-                                                 hidden,
-                                                 fallbackDokumentreferanser = [],
-                                             }: JournalpostFremviserProps) {
+    journalpostId,
+    dokumentreferanse,
+    hidden,
+    fallbackDokumentreferanser = [],
+}: JournalpostFremviserProps) {
     const { data, isLoading: isLoadingJournalpost, error: journalpostError } = useHentJournalpost(journalpostId);
 
     const journalpost: JournalpostDto | undefined = data?.journalpost ?? undefined;
