@@ -56,11 +56,11 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
     const oppdaterValg = (nyttValg: ReellMottakerValg) => {
         huskSamhandler(valg, nyttValg);
         settSkjemaverdi(fraReellMottakerValg(nyttValg), {
-            shouldValidate: true,
+            shouldValidate: form.formState.isSubmitted,
             shouldDirty: true,
             shouldTouch: true,
         });
-        form.trigger(reellMottakerTypePath);
+        if (form.formState.isSubmitted) form.trigger(reellMottakerTypePath);
     };
 
     useEffect(() => {
@@ -77,7 +77,7 @@ export default function ReellMottakerInline<TFieldValues extends FieldValues>({
         }
 
         settSkjemaverdi(initialisert, {
-            shouldValidate: true,
+            shouldValidate: form.formState.isSubmitted,
             shouldDirty: true,
             shouldTouch: true,
         });

@@ -1,10 +1,28 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonIcon } from "@navikt/aksel-icons";
-import { BodyLong, Box, HStack, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
+import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
 import type { RolleType } from "../sakvisning-schema";
 import DiskresjonAlert from "./DiskresjonAlert";
 import PersonInfo from "./PersonInfo";
+
+/**
+ * Varsler om at personen har fått nytt fødselsnummer når søkt ident avviker fra funnet ident.
+ * Bare fødselsnummeret sladdes med Ctrl+ø. Rendrer ingenting når identene er like.
+ */
+export function NyttFødselsnummerMelding({ ident, søktIdent }: Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">) {
+    if (!ident || !søktIdent || ident === søktIdent) {
+        return null;
+    }
+
+    return (
+        <InlineMessage status="info" size="small" role="status">
+            Personen har fått nytt fødselsnummer. Søkte på <span className="personident">{søktIdent}</span>, bruker
+            nyeste fødselsnummer <span className="personident">{ident}</span>.
+        </InlineMessage>
+    );
+}
 
 type InnholdProps = {
     person: PersonDto | null;
@@ -17,6 +35,7 @@ type InnholdProps = {
     visIkon?: boolean;
     tags?: ReactNode;
     headingActions?: ReactNode;
+    søktIdent?: string;
     children?: ReactNode;
 };
 
@@ -43,6 +62,7 @@ export function PersonRolleKortInnhold({
     visIkon = true,
     tags,
     headingActions,
+    søktIdent,
     children,
 }: InnholdProps) {
     const innhold = (
@@ -62,6 +82,7 @@ export function PersonRolleKortInnhold({
                     compact
                 >
                     {person.diskresjonskode && <DiskresjonAlert diskresjonskode={person.diskresjonskode} />}
+                    <NyttFødselsnummerMelding ident={person.ident} søktIdent={søktIdent} />
                     {children}
                 </PersonInfo>
             ) : (

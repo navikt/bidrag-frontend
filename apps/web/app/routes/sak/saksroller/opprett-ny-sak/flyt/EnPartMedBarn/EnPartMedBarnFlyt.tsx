@@ -69,7 +69,7 @@ function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken:
             valgteBarn: [],
             kategori: "Nasjonal",
         },
-        mode: "onChange",
+        mode: "onSubmit",
     });
 
     return (
@@ -144,6 +144,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                     barnkurver={barnkurver}
                     reellMottakerRegel={reellMottakerRegel}
                     beskrivelse={beskrivelse}
+                    maksEttBarn={type === "FARSKAP"}
                 />
             )}
         </RolleFlytSide>

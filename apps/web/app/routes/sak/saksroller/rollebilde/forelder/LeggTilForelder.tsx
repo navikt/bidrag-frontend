@@ -15,6 +15,7 @@ interface LeggTilForelderProps {
     rolleType: "BP" | "BM";
     rolleNavn: string;
     muligeAndreForeldre?: PersonDto[];
+    onPersonValgt?: (person: PersonDto) => void;
 }
 
 export default function LeggTilForelder({
@@ -22,6 +23,7 @@ export default function LeggTilForelder({
     rolleType,
     rolleNavn,
     muligeAndreForeldre = [],
+    onPersonValgt,
 }: LeggTilForelderProps) {
     const [visSøk, setVisSøk] = useState(false);
     useRegistrerÅpenRedigering(`legg-til-forelder-${rolleType}`, visSøk);
@@ -53,6 +55,7 @@ export default function LeggTilForelder({
             ? roller.map((r) => (r.type === rolleType ? nyForelder : r))
             : [...roller, nyForelder];
         form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
+        onPersonValgt?.(person);
         setVisSøk(false);
     };
 

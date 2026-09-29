@@ -160,6 +160,35 @@ test("viser varsel når forslag til barn ikke kan hentes", async ({ mount, page 
     );
 });
 
+test("viser info om nyeste fødselsnummer i kortet til motparten etter søket", async ({ mount, page }) => {
+    const gammelIdent = "01010199999";
+    await mockOpprettSakApi(page, { personOverrides: { [gammelIdent]: testpersoner.bidragsmottaker } });
+    const component = await mount(STORY);
+
+    await component.getByRole("radio", { name: /Ektefellebidrag/ }).check();
+    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
+
+    const motpartSøk = component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" });
+    await motpartSøk.fill(gammelIdent);
+    await motpartSøk.press("Enter");
+
+    const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
+    await expect(bmKort.getByRole("searchbox")).toHaveCount(0);
+    const meldingstekst = `Bruker nyeste fødselsnummer ${testpersoner.bidragsmottaker.ident}`;
+    await expect(bmKort.getByText(meldingstekst)).toBeVisible();
+
+    await page.evaluate(() =>
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "ø", ctrlKey: true, bubbles: true })),
+    );
+    const melding = bmKort.getByRole("status").filter({ hasText: meldingstekst });
+    await expect(melding).toHaveCSS("filter", "none");
+    await expect(melding).toContainText(`Søkte på ${gammelIdent}`);
+    await expect(melding.locator(".personident")).toHaveCount(2);
+    for (const ident of await melding.locator(".personident").all()) {
+        await expect(ident).toHaveCSS("filter", "blur(5px)");
+    }
+});
+
 test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter ektefellebidragssak", async ({
     mount,
     page,

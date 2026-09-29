@@ -2,7 +2,21 @@ import { ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
 import { BodyShort } from "@navikt/ds-react";
 
 import type { Diskresjonskode } from "../sakvisning-schema.ts";
-import { hentDiskresjonskodeForklaring } from "../utils.ts";
+
+const diskresjonskodeForklaringer: Record<Diskresjonskode, string> = {
+    SPSF: "Strengt fortrolig (kode 6)",
+    SPFO: "Fortrolig (kode 7)",
+    URIK: "Utenriksadresse",
+    MILI: "Militær",
+    PEND: "Pendler",
+    SVAL: "Svalbard",
+    P19: "Paragraf 19 (adressesperre)",
+};
+
+/** Returnerer lesbar forklaring for en diskresjonskode. */
+export function hentDiskresjonskodeForklaring(kode: Diskresjonskode): string {
+    return diskresjonskodeForklaringer[kode];
+}
 
 type Props = {
     diskresjonskode: Diskresjonskode;

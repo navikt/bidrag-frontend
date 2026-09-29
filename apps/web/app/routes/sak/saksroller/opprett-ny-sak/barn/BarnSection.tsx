@@ -15,6 +15,7 @@ interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     reellMottakerRegel: ReellMottakerRegel;
     onKurvByttet?: (kurv: Barnkurv | null) => void;
     beskrivelse?: string;
+    maksEttBarn?: boolean;
 }
 
 type BarnForm = UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
@@ -25,6 +26,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     reellMottakerRegel,
     onKurvByttet,
     beskrivelse,
+    maksEttBarn = false,
 }: BarnSectionProps<T>) {
     const barnForm = form as unknown as BarnForm;
     const valgteBarn = barnForm.watch("valgteBarn");
@@ -53,8 +55,11 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
             throw new Error("Kunne ikke validere barn som ble lagt til manuelt");
         }
 
-        barnForm.setValue("valgteBarn", [...barnForm.getValues("valgteBarn"), barnValidation.data], {
-            shouldValidate: barnValidation.data.erMyndig,
+        const valgteBarn = maksEttBarn
+            ? [barnValidation.data]
+            : [...barnForm.getValues("valgteBarn"), barnValidation.data];
+        barnForm.setValue("valgteBarn", valgteBarn, {
+            shouldValidate: form.formState.isSubmitted,
             shouldDirty: true,
             shouldTouch: true,
         });
@@ -75,6 +80,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                 form={barnForm}
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
+                maksEttBarn={maksEttBarn}
             />
 
             <LeggTilBarnSøk søk={søk} visSøk={visSøk} onÅpne={() => setVisSøk(true)} />

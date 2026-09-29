@@ -19,6 +19,7 @@ type FellesProps = {
     tags?: ReactNode;
     headingActions?: ReactNode;
     actions?: ReactNode;
+    søktIdent?: string;
     children?: ReactNode;
 };
 

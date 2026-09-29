@@ -53,7 +53,7 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
     const form = useForm<EktefellebidragSkjemaData>({
         resolver: zodResolver(EktefellebidragSkjemaSchema),
         defaultValues: startverdier(start),
-        mode: "onChange",
+        mode: "onSubmit",
     });
 
     const roller = form.watch("roller");
@@ -72,7 +72,7 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
                 .map((eksisterende) =>
                     eksisterende.type === type ? { ...eksisterende, ...part, erKjent: true } : eksisterende,
                 ),
-            { shouldDirty: true, shouldValidate: true },
+            { shouldDirty: true, shouldValidate: form.formState.isSubmitted },
         );
     };
     const settPartISaken = (part: Part) => settRolle(startrolle, part);

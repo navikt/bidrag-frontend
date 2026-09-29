@@ -2,6 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
 import { BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack } from "@navikt/ds-react";
 import type { KeyboardEvent } from "react";
+import { NyttFødselsnummerMelding } from "../person/PersonRolleKort.tsx";
 import { usePersonSamhandlerSøk } from "./usePersonSamhandlerSøk.ts";
 
 function søkebeskrivelse(inkluderSamhandler: boolean) {
@@ -50,77 +51,54 @@ export default function PersonSamhandlerSøk({
     }
 
     return (
-        <HStack gap="space-8" align="center" width="100%">
-            <Box width="100%">
-                <VStack gap="space-8">
-                    <Box width={{ xs: "100%", sm: "20rem" }} minWidth="0">
-                        <Search
-                            label={label || "Person- eller samhandlerident"}
-                            description={søkebeskrivelse(inkluderSamhandler)}
-                            size="small"
-                            value={searchValue}
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(value) => {
-                                onSearchValueChange(value);
-                            }}
-                            onSearchClick={onInputChange}
-                            onKeyDown={handleSearchKeyDown}
-                        >
-                            <Search.Button type="button" loading={samhandlerPersonFn.isPending} />
-                        </Search>
-                    </Box>
-                    <BodyShort size="small" textColor="subtle">
-                        <PersonSokButton
+        <VStack gap="space-8" width="100%">
+            <Box width={{ xs: "100%", sm: "20rem" }} minWidth="0">
+                <Search
+                    label={label || "Person- eller samhandlerident"}
+                    description={søkebeskrivelse(inkluderSamhandler)}
+                    size="small"
+                    value={searchValue}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={onSearchValueChange}
+                    onSearchClick={onInputChange}
+                    onKeyDown={handleSearchKeyDown}
+                >
+                    <Search.Button type="button" loading={samhandlerPersonFn.isPending} />
+                </Search>
+            </Box>
+            <BodyShort size="small" textColor="subtle">
+                <PersonSokButton
+                    visSomLenke
+                    onError={onSearchError}
+                    onResult={(data) => {
+                        if (data?.ident) onInputChange(data.ident);
+                    }}
+                />
+                {inkluderSamhandler && (
+                    <>
+                        {" "}
+                        <SamhandlerSokButton
                             visSomLenke
-                            onError={onSearchError}
                             onResult={(data) => {
-                                if (data?.ident) onInputChange(data.ident);
+                                if (data?.samhandlerId) onInputChange(data.samhandlerId);
                             }}
                         />
-                        {inkluderSamhandler && (
-                            <>
-                                {" "}
-                                <SamhandlerSokButton
-                                    visSomLenke
-                                    onResult={(data) => {
-                                        if (data?.samhandlerId) onInputChange(data.samhandlerId);
-                                    }}
-                                />
-                            </>
-                        )}
-                    </BodyShort>
-                </VStack>
-                <Søkestatus
-                    søker={samhandlerPersonFn.isPending}
-                    info={nyttFødselsnummerInfo}
-                    feilmelding={searchErrorMessage}
-                />
-            </Box>
-        </HStack>
-    );
-}
-
-function Søkestatus({ søker, info, feilmelding }: { søker: boolean; info?: string; feilmelding?: string }) {
-    return (
-        <>
-            {søker && (
+                    </>
+                )}
+            </BodyShort>
+            {samhandlerPersonFn.isPending && (
                 <HStack gap="space-8">
                     <Loader size="small" title="Søker…" />
                     <BodyShort size="small">Søker…</BodyShort>
                 </HStack>
             )}
-            {info && !feilmelding && <Søkemelding status="info">{info}</Søkemelding>}
-            {feilmelding && <Søkemelding status="warning">{feilmelding}</Søkemelding>}
-        </>
-    );
-}
-
-function Søkemelding({ status, children }: { status: "info" | "warning"; children: string }) {
-    return (
-        <Box asChild marginBlock="space-4 space-0">
-            <InlineMessage status={status} size="small">
-                {children}
-            </InlineMessage>
-        </Box>
+            {searchErrorMessage ? (
+                <InlineMessage status="warning" size="small">
+                    {searchErrorMessage}
+                </InlineMessage>
+            ) : (
+                nyttFødselsnummerInfo && <NyttFødselsnummerMelding {...nyttFødselsnummerInfo} />
+            )}
+        </VStack>
     );
 }

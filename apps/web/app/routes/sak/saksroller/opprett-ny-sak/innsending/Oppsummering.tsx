@@ -1,8 +1,8 @@
 import { BodyShort, Heading, HGrid, HStack, Label, Tag, VStack } from "@navikt/ds-react";
 import { useWatch } from "react-hook-form";
+import { hentDiskresjonskodeForklaring } from "../../felles/person/DiskresjonAlert";
 import PersonInfo from "../../felles/person/PersonInfo";
 import type { Diskresjonskode } from "../../felles/sakvisning-schema";
-import { hentDiskresjonskodeForklaring } from "../../felles/utils";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "../skjema/SkjemaSeksjon";
 import { type Sakskategori, sakstypeTilTekst, useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
 

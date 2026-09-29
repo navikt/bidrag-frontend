@@ -82,6 +82,27 @@ test.describe("ForelderRolleVisning", () => {
         await expect(component.getByRole("button", { name: "Legg til person" })).toHaveCount(0);
     });
 
+    test("viser info om nyeste fødselsnummer i kortet etter at søket er lukket", async ({ mount, page }) => {
+        const gammelIdent = genererFnr();
+        const nyIdent = genererFnr();
+        await page.route("**/proxy/bidrag-person/informasjon/", (route) => {
+            const requestIdent = (route.request().postDataJSON() as { ident: string }).ident;
+            const person = [gammelIdent, nyIdent].includes(requestIdent)
+                ? { ident: nyIdent, visningsnavn: "Kari Nyfnr" }
+                : { ident: requestIdent, visningsnavn: "Ukjent" };
+            return route.fulfill({ json: person });
+        });
+        const component = await mount(STORY_BM_MANGLER);
+
+        await component.getByRole("button", { name: "Legg til person" }).click();
+        await component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" }).fill(gammelIdent);
+        await component.getByRole("button", { name: "Søk", exact: true }).click();
+
+        await expect(component.getByText("Kari Nyfnr")).toBeVisible();
+        await expect(component.getByRole("searchbox")).toHaveCount(0);
+        await expect(component.getByText(`Bruker nyeste fødselsnummer ${nyIdent}`)).toBeVisible();
+    });
+
     test("bidragspliktig som mangler er en rolle med tomt fødselsnummer (reell API-form) - kan legges til og angres", async ({
         mount,
         page,

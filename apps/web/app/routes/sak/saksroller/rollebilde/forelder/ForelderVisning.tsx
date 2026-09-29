@@ -15,9 +15,11 @@ interface ForelderVisningProps {
     form: UseFormReturn<SakRedigeringData>;
     rolle: Rolle;
     erNyForelder: boolean;
+    søktIdent?: string;
+    onPersonValgt?: (person: PersonDto) => void;
 }
 
-export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderVisningProps) {
+export default function ForelderVisning({ form, rolle, erNyForelder, søktIdent, onPersonValgt }: ForelderVisningProps) {
     const [visSøk, setVisSøk] = useState(false);
     const roller = form.watch("roller") || [];
 
@@ -40,6 +42,7 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
         };
 
         form.setValue("roller", erstattForelder(roller, nyForelder), { shouldValidate: true });
+        onPersonValgt?.(person);
         setVisSøk(false);
     };
 
@@ -55,6 +58,7 @@ export default function ForelderVisning({ form, rolle, erNyForelder }: ForelderV
                 rolle={forelderRolletype(rolle)}
                 visModiaLenke
                 visIkon={false}
+                søktIdent={søktIdent}
                 tags={
                     erNyForelder && (
                         <Tag variant="alt1" size="xsmall">

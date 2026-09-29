@@ -135,6 +135,7 @@ export type EnPartMedBarnRolle = z.infer<typeof EnPartMedBarnRolleSchema>;
 
 const createSakMedBarnSkjemaSchema = (
     validateBarn?: (barn: z.infer<typeof BarnMedAlderSchema>, index: number, ctx: z.RefinementCtx) => void,
+    { maksEttBarn = false }: { maksEttBarn?: boolean } = {},
 ) =>
     z
         .object({
@@ -152,6 +153,13 @@ const createSakMedBarnSkjemaSchema = (
                     message: "Du må velge minst ett barn.",
                 });
             }
+            if (maksEttBarn && data.valgteBarn.length > 1) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["valgteBarn"],
+                    message: "En farskapssak kan bare gjelde ett barn.",
+                });
+            }
 
             data.valgteBarn.forEach((barn, index) => {
                 validateBarn?.(barn, index, ctx);
@@ -161,8 +169,8 @@ const createSakMedBarnSkjemaSchema = (
 export const OppfostringsbidragSkjemaSchema = createSakMedBarnSkjemaSchema((barn, index, ctx) =>
     leggTilReellMottakerFeil(barn, "alltid", ["valgteBarn", index], ctx),
 );
-/** Som oppfostringsbidrag, men uten krav om reell mottaker. */
-export const FarskapsSkjemaSchema = createSakMedBarnSkjemaSchema();
+/** Som oppfostringsbidrag, men uten krav om reell mottaker og med bare ett barn. */
+export const FarskapsSkjemaSchema = createSakMedBarnSkjemaSchema(undefined, { maksEttBarn: true });
 
 export type FarskapsSkjemaSchemaData = z.infer<typeof FarskapsSkjemaSchema>;
 

@@ -92,7 +92,7 @@ function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
     const form = useForm<BarnebidragSkjemaData>({
         resolver: zodResolver(BarnebidragSkjemaSchema),
         defaultValues: lagStartverdier(partISaken, partISakenAlder, startperson.fødselsdato ?? undefined),
-        mode: "onChange",
+        mode: "onSubmit",
     });
 
     return (

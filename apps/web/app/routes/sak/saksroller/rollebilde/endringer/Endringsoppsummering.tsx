@@ -125,7 +125,7 @@ function EndringsRadSvar({ endring }: { endring: Exclude<Endringsrad, { type: "l
 }
 
 function PersonEndringerSvar({ gruppe }: { gruppe: Persongruppe }) {
-    const harLagtTilRolle = gruppe.endringer.some((endring) => endring.type === "lagtTil");
+    const lagtTil = gruppe.endringer.find((endring) => endring.type === "lagtTil");
     const øvrigeEndringer = gruppe.endringer.filter(
         (endring): endring is Exclude<Endringsrad, { type: "lagtTil" }> => endring.type !== "lagtTil",
     );
@@ -135,9 +135,9 @@ function PersonEndringerSvar({ gruppe }: { gruppe: Persongruppe }) {
             <FormSummary.Label>
                 <HStack gap="space-4" align="center" wrap>
                     <PersonInfo ident={gruppe.ident} compact visKopieringsknapp={false} />
-                    {harLagtTilRolle && (
+                    {lagtTil && (
                         <Tag size="xsmall" variant="alt1">
-                            Ny rolle
+                            {lagtTil.rolleType === "BA" ? "Nytt barn" : "Ny rolle"}
                         </Tag>
                     )}
                     {gruppe.harUfullstendigRelasjon && (

@@ -155,6 +155,18 @@ describe("EnPartMedBarn-skjemaene", () => {
         ).toBe(true);
     });
 
+    it("avviser farskap med flere barn", () => {
+        const resultat = FarskapsSkjemaSchema.safeParse({
+            arbeidsfordeling: "FRS",
+            roller,
+            valgteBarn: [barn, { ...barn, ident: "12345678902" }],
+            kategori: "Nasjonal",
+        });
+        expect(resultat.error?.issues).toEqual([
+            expect.objectContaining({ path: ["valgteBarn"], message: "En farskapssak kan bare gjelde ett barn." }),
+        ]);
+    });
+
     it("krever reell mottaker for oppfostringsbidrag", () => {
         const resultat = OppfostringsbidragSkjemaSchema.safeParse({
             arbeidsfordeling: "OPS",

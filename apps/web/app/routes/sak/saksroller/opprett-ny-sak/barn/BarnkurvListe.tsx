@@ -16,6 +16,7 @@ type Props = {
     form: UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
     reellMottakerRegel: ReellMottakerRegel;
     onKurvByttet?: (kurv: Barnkurv | null) => void;
+    maksEttBarn?: boolean;
 };
 
 /**
@@ -23,17 +24,21 @@ type Props = {
  * og barn som er lagt til manuelt. Manuelt lagte barn er valgt fra start og blir stående når de velges bort.
  *
  * `onKurvByttet` kalles når valget går over til en annen barnkurv, eller med `null` når ingen
- * barn er valgt.
+ * barn er valgt. Med `maksEttBarn` erstatter et nytt valg det forrige.
  */
-export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, onKurvByttet }: Props) {
+export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, onKurvByttet, maksEttBarn }: Props) {
     const valgteBarn = form.watch("valgteBarn") || [];
     const manuelleBarn = useManuelleBarn(valgteBarn);
+
+    const settValgteBarn = (nyeValg: BarnMedAlder[]) => {
+        form.setValue("valgteBarn", maksEttBarn ? begrensTilSisteValg(nyeValg, form.getValues("valgteBarn")) : nyeValg);
+    };
 
     const velgIKurv = (valgteIdenter: string[], kurvId: string) => {
         const valg = beregnBarnkurvValg(barnkurver, form.getValues("valgteBarn") || [], valgteIdenter, kurvId);
         if (!valg) return;
 
-        form.setValue("valgteBarn", valg.valgteBarn);
+        settValgteBarn(valg.valgteBarn);
         if (valg.valgteBarn.length === 0) {
             onKurvByttet?.(null);
         } else if (valgteIdenter.length > 0 && valg.aktivKurv?.id !== kurvId) {
@@ -47,7 +52,7 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, on
             .filter((b) => valgteIdenter.includes(b.ident) && !beholdt.some((v) => v.ident === b.ident))
             .map(utenReellMottaker);
         const nyeValg = [...beholdt, ...gjenvalgt];
-        form.setValue("valgteBarn", nyeValg);
+        settValgteBarn(nyeValg);
         if (nyeValg.length === 0) onKurvByttet?.(null);
     };
 
@@ -86,6 +91,11 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, on
             )}
         </VStack>
     );
+}
+
+function begrensTilSisteValg(nyeValg: BarnMedAlder[], forrigeValg: BarnMedAlder[]) {
+    if (nyeValg.length <= 1) return nyeValg;
+    return nyeValg.filter((barn) => !forrigeValg.some((forrige) => forrige.ident === barn.ident)).slice(-1);
 }
 
 function useManuelleBarn(valgteBarn: BarnMedAlder[]) {

@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useEffect, useRef, useState } from "react";
+import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
 import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
-import { hentNyttFødselsnummerMelding } from "../utils.ts";
 
 export function usePersonSamhandlerSøk({
     valgIdent,
@@ -18,7 +18,8 @@ export function usePersonSamhandlerSøk({
 }) {
     const samhandlerPersonFn = useHentSamhandlerEllerPersonForIdent(inkluderSamhandler);
     const [searchErrorMessage, setSearchErrorMessage] = useState<string>();
-    const [nyttFødselsnummerInfo, setNyttFødselsnummerInfo] = useState<string>();
+    const [nyttFødselsnummerInfo, setNyttFødselsnummerInfo] =
+        useState<Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">>();
     const [searchValue, setSearchValue] = useState(valgIdent || "");
     const søkeversjon = useRef(0);
 
@@ -48,7 +49,7 @@ export function usePersonSamhandlerSøk({
                 }
 
                 setSearchErrorMessage(undefined);
-                setNyttFødselsnummerInfo(hentNyttFødselsnummerMelding(data));
+                setNyttFødselsnummerInfo({ ident: data.ident, søktIdent: data.søktIdent });
                 try {
                     await onResult(data);
                 } catch (err) {

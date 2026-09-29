@@ -1,5 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Alert, Button, HGrid, VStack } from "@navikt/ds-react";
+import { useState } from "react";
+import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
 import SøkPerson from "../../felles/person-søk/SøkPerson";
 import RolleForelderKort from "../../rollebilde/forelder/ForelderKort";
 import type { ForelderPart, ForelderPartRolle } from "../skjema/opprett-sak-schema";
@@ -46,6 +48,14 @@ function ForelderKort(props: ForelderKortProps) {
     const { rolle, part } = props;
     const ident = part.ident;
     const erKjent = part.erKjent === true && !!ident;
+    const [valgtPerson, setValgtPerson] = useState<Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">>();
+    const handlinger: ForelderKortProps = {
+        ...props,
+        onVelg: (person) => {
+            setValgtPerson(person);
+            props.onVelg(person);
+        },
+    };
 
     return (
         <VStack role="group" aria-label={hentForelderRolleLabel(rolle)}>
@@ -62,7 +72,8 @@ function ForelderKort(props: ForelderKortProps) {
                 rolle={rolle === "bidragspliktig" ? "BP" : "BM"}
                 visIkon={false}
                 ukjentTekst={part.erKjent === undefined ? "Ikke valgt" : "Ukjent - ikke registrert"}
-                actions={!props.låst && <Handlinger {...props} />}
+                søktIdent={valgtPerson?.ident === ident ? valgtPerson?.søktIdent : undefined}
+                actions={!props.låst && <Handlinger {...handlinger} />}
             />
         </VStack>
     );

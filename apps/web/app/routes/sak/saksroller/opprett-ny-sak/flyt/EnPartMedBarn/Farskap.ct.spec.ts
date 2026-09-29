@@ -35,3 +35,17 @@ test("parten det ble startet fra kan endres", async ({ mount, page }) => {
     await expect(component.getByText("Du må registrere bidragsmottaker")).toBeVisible();
     await expectNoAxeViolations(page, component);
 });
+
+test("nytt barn erstatter det forrige fordi farskap bare kan gjelde ett barn", async ({ mount, page }) => {
+    await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+    const førsteBarn = component.getByRole("checkbox").first();
+    const andreBarn = component.getByRole("checkbox").nth(1);
+
+    await førsteBarn.check();
+    await andreBarn.check();
+
+    await expect(andreBarn).toBeChecked();
+    await expect(førsteBarn).not.toBeChecked();
+    await expect(component.getByText("1 valgt")).toBeVisible();
+});

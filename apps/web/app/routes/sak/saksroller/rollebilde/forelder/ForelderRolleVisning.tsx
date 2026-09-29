@@ -1,6 +1,8 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Box, Heading, HGrid, VStack } from "@navikt/ds-react";
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import ForelderVisning from "./ForelderVisning.tsx";
 import LeggTilForelder from "./LeggTilForelder.tsx";
@@ -27,6 +29,7 @@ function EnkelForelderRolle({
 }: EnkelForelderRolleProps) {
     const rolleNavn = ROLLE_NAVN[rolleType];
     const rolleErKjent = Boolean(rolle?.fodselsnummer);
+    const [valgtPerson, setValgtPerson] = useState<Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">>();
 
     return (
         <VStack gap="space-4">
@@ -35,13 +38,20 @@ function EnkelForelderRolle({
             </Heading>
             <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-12">
                 {rolleErKjent ? (
-                    <ForelderVisning form={form} rolle={rolle as Rolle} erNyForelder={erNyForelderForKjentRolle} />
+                    <ForelderVisning
+                        form={form}
+                        rolle={rolle as Rolle}
+                        erNyForelder={erNyForelderForKjentRolle}
+                        søktIdent={valgtPerson?.ident === rolle?.fodselsnummer ? valgtPerson?.søktIdent : undefined}
+                        onPersonValgt={setValgtPerson}
+                    />
                 ) : (
                     <LeggTilForelder
                         rolleType={rolleType}
                         rolleNavn={rolleNavn}
                         form={form}
                         muligeAndreForeldre={muligeAndreForeldre}
+                        onPersonValgt={setValgtPerson}
                     />
                 )}
             </Box>

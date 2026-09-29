@@ -12,6 +12,7 @@ test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppre
 
     await expect(component.getByText(/Barnet selv kan ikke velges som reell mottaker/)).toBeVisible();
     await expect(component.getByRole("button", { name: "Legg til reell mottaker" })).toHaveCount(0);
+    await expect(component.getByText("Du må registrere reell mottaker")).toHaveCount(0);
     const opprettKnapp = component.getByRole("button", { name: /Opprett$/ });
     await expect(opprettKnapp).toBeEnabled();
     await opprettKnapp.click();
