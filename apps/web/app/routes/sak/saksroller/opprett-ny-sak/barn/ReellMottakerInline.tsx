@@ -11,7 +11,7 @@ import {
     initialiserReellMottaker,
     type ReellMottakerSkjemaverdi,
     tilReellMottakerValg,
-} from "../../felles/reell-mottaker/reell-mottaker-regel";
+} from "../../felles/reell-mottaker/reell-mottaker-valg";
 import { type ReellMottakerRegel, reellMottakerValgregel } from "../../felles/saksregler";
 
 type Props<TFieldValues extends FieldValues> = {

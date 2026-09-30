@@ -5,7 +5,7 @@ import {
     initialiserValg,
     tilReellMottakerValg,
     validerReellMottaker,
-} from "./reell-mottaker-regel";
+} from "./reell-mottaker-valg";
 
 const barn = { ident: "11111111111", navn: "Test Barn" };
 

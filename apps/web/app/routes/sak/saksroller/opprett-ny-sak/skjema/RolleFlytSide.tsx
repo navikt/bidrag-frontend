@@ -6,9 +6,9 @@ import EksisterendeSakStatus, { type EksisterendeSakStatusProps } from "../eksis
 import EnhetOgSubmitSection, { type EnhetOgSubmitSectionProps } from "../innsending/EnhetOgSubmitSection";
 import Oppsummering from "../innsending/Oppsummering";
 import FlytSkjema from "./FlytSkjema";
+import type { Sakskategori } from "./OpprettSakStartContext";
 import SakskategoriVelger from "./SakskategoriVelger";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "./SkjemaSeksjon";
-import type { Sakskategori } from "./saksrolleroversiktContext";
 
 type Props = {
     onSubmit: ComponentProps<typeof FlytSkjema>["onSubmit"];

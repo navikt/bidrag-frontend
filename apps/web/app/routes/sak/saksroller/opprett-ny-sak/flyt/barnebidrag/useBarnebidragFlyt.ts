@@ -10,6 +10,7 @@ import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver"
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { ForelderKortProps } from "../../parter/ParterSeksjon";
 import { filtrerBortValgteForeldre } from "../../parter/part-utils";
+import { useOpprettSakStart } from "../../skjema/OpprettSakStartContext";
 import {
     type BarnebidragForelderRolle,
     type BarnebidragSkjemaData,
@@ -18,7 +19,6 @@ import {
     type ForelderPart,
     type ForelderPartRolle,
 } from "../../skjema/opprett-sak-schema";
-import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
 import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
 import { type ForeldreTilBarn, harFullstendigRelasjon, utledForelderforslag } from "./barnebidrag-forelderforslag";
 import { rollerEtterValg, rolleSomPart, tilPart } from "./barnebidrag-roller";
@@ -94,7 +94,7 @@ function useFyllUtInitialForelder(
     velg: (rolle: ForelderPartRolle, person: PersonDto) => void,
     erTom: (rolle: ForelderPartRolle) => boolean,
 ) {
-    const initialForelder = useSaksrolleroversikt().inngang?.initialForelder;
+    const initialForelder = useOpprettSakStart().inngang?.initialForelder;
     const utført = useRef(false);
     useEffect(() => {
         if (!initialForelder || utført.current) return;
@@ -125,7 +125,7 @@ function relasjonsmeldinger(
 
 export function useBarnebidragFlyt() {
     const form = useFormContext<BarnebidragSkjemaData>();
-    const { låstIdent } = useSaksrolleroversikt();
+    const { låstIdent } = useOpprettSakStart();
 
     const roller = form.watch("roller");
     const bidragspliktig = rolleSomPart(roller, "BP");

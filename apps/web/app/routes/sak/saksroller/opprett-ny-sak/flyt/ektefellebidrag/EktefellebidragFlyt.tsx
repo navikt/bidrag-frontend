@@ -6,6 +6,7 @@ import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import ParterSeksjon, { type ForelderKortProps } from "../../parter/ParterSeksjon";
 import { filtrerBortValgteForeldre, hentMotsattRolle, tilForelderrolle, tilRolletype } from "../../parter/part-utils";
+import { useOpprettSakStart } from "../../skjema/OpprettSakStartContext";
 import {
     type Diskresjonskode,
     type EktefellebidragSkjemaData,
@@ -14,12 +15,11 @@ import {
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
 import RolleFlytSide from "../../skjema/RolleFlytSide";
-import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
 
 type Part = { ident: string; navn: string; diskresjonskode?: Diskresjonskode };
 
 export default function EktefellebidragFlyt() {
-    const { partISaken } = useSaksrolleroversikt();
+    const { partISaken } = useOpprettSakStart();
     if (!partISaken) return null;
     return <EktefellebidragSkjema partISaken={partISaken} />;
 }
@@ -46,7 +46,7 @@ function finnPart(roller: EktefellebidragSkjemaData["roller"], rolle: ForelderPa
 }
 
 function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }) {
-    const { låstIdent } = useSaksrolleroversikt();
+    const { låstIdent } = useOpprettSakStart();
     const startrolle = start.rolle as ForelderPartRolle;
     const motsattRolle = hentMotsattRolle(startrolle);
 

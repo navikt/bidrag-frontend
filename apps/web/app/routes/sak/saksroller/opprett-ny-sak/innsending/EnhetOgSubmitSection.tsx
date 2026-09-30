@@ -1,5 +1,5 @@
 import { InlineMessage, VStack } from "@navikt/ds-react";
-import { useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
+import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import EnhetInfoAlert from "./EnhetInfoAlert";
 import KanIkkeOppretteSakAlert from "./KanIkkeOppretteSakAlert";
 import type { OppsummeringParter } from "./Oppsummering";
@@ -35,7 +35,7 @@ export default function EnhetOgSubmitSection({
     harEksisterendeSak,
     manglerTilgangUtenBm = false,
 }: EnhetOgSubmitSectionProps) {
-    const eierfogd = useSaksrolleroversikt().inngang?.eierfogd;
+    const eierfogd = useOpprettSakStart().inngang?.eierfogd;
     const avvikerFraEierfogd = !isLoadingEnhet && !!enhet && !!eierfogd && enhet !== eierfogd;
 
     return (

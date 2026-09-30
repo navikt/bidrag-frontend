@@ -1,6 +1,6 @@
 import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
 
-import type { Sakstype } from "../skjema/saksrolleroversiktContext";
+import type { Sakstype } from "../skjema/OpprettSakStartContext";
 
 type SakstypeOption = {
     type: Sakstype;

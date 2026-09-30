@@ -2,7 +2,7 @@ import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { samhandler } from "@ct/opprett-ny-sak/fixtures";
 import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/EnPartMedBarn/Oppfostringsbidrag/Standard";
+const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/en-part-med-barn/Oppfostringsbidrag/Standard";
 
 test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppretter sak", async ({ mount, page }) => {
     const requests = await mockOpprettSakApi(page);

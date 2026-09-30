@@ -4,7 +4,7 @@ import {
     type ReellMottakerSkjemaverdi,
     type ReellMottakerValideringsgrunn,
     validerReellMottaker,
-} from "./reell-mottaker/reell-mottaker-regel";
+} from "./reell-mottaker/reell-mottaker-valg";
 
 export const MYNDYG_BARN_ALDER = 18;
 export const MAKS_ALDER_BARN = 24;

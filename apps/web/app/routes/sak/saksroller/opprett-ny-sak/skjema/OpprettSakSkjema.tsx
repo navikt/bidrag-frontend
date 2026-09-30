@@ -1,11 +1,11 @@
 import { BodyLong, Box, Loader, VStack } from "@navikt/ds-react";
 import { type ComponentProps, Suspense } from "react";
 import { RedigeringsvisningProvider } from "../../felles/RedigeringsRamme";
-import BarnebidragFlyt from "../flyt/Barnebidrag/BarnebidragFlyt";
-import EktefellebidragFlyt from "../flyt/Ektefellebidrag/EktefellebidragFlyt";
-import EnPartMedBarnFlyt from "../flyt/EnPartMedBarn/EnPartMedBarnFlyt";
+import BarnebidragFlyt from "../flyt/barnebidrag/BarnebidragFlyt";
+import EktefellebidragFlyt from "../flyt/ektefellebidrag/EktefellebidragFlyt";
+import EnPartMedBarnFlyt from "../flyt/en-part-med-barn/EnPartMedBarnFlyt";
 import LasterSkeleton from "./LasterSkeleton";
-import { SaksrolleroversiktProvider, useErOppretterSak } from "./saksrolleroversiktContext";
+import { OpprettSakStartProvider, useErOppretterSak } from "./OpprettSakStartContext";
 
 const flytkomponenter = {
     BARNEBIDRAG: BarnebidragFlyt,
@@ -18,19 +18,19 @@ const flytkomponenter = {
  * Skjemaet for valgt sakstype, fylt ut fra startpersonen. Brukes både på siden og i modalen.
  * Gi ny `key` for å starte skjemaet på nytt.
  */
-export default function OpprettSakSkjema(props: Omit<ComponentProps<typeof SaksrolleroversiktProvider>, "children">) {
+export default function OpprettSakSkjema(props: Omit<ComponentProps<typeof OpprettSakStartProvider>, "children">) {
     const FlytKomponent = flytkomponenter[props.start.sakstype];
     const oppretter = useErOppretterSak();
 
     return (
-        <SaksrolleroversiktProvider {...props}>
+        <OpprettSakStartProvider {...props}>
             {oppretter && <OppretterSak />}
             <RedigeringsvisningProvider>
                 <Suspense fallback={<LasterSkeleton tekst="Laster data..." />}>
                     <FlytKomponent />
                 </Suspense>
             </RedigeringsvisningProvider>
-        </SaksrolleroversiktProvider>
+        </OpprettSakStartProvider>
     );
 }
 

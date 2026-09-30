@@ -56,7 +56,7 @@ export type OpprettSakStart = {
     sakstype: Sakstype;
 };
 
-type SaksrolleroversiktContext = OpprettSakFlytValg & {
+type OpprettSakStartContext = OpprettSakFlytValg & {
     startperson: PersonDto;
     partISaken: PartISaken;
     partISakenAlder: number | null;
@@ -65,9 +65,9 @@ type SaksrolleroversiktContext = OpprettSakFlytValg & {
     låstIdent: string | null;
 };
 
-const SaksrolleroversiktContext = createContext<SaksrolleroversiktContext>({} as SaksrolleroversiktContext);
+const OpprettSakStartContext = createContext<OpprettSakStartContext>({} as OpprettSakStartContext);
 
-function SaksrolleroversiktProvider({
+function OpprettSakStartProvider({
     children,
     start,
     låstIdent = null,
@@ -89,13 +89,13 @@ function SaksrolleroversiktProvider({
         [start, låstIdent, inngang, onOpprettet, onAvbryt],
     );
 
-    return <SaksrolleroversiktContext value={value}>{children}</SaksrolleroversiktContext>;
+    return <OpprettSakStartContext value={value}>{children}</OpprettSakStartContext>;
 }
 
-function useSaksrolleroversikt() {
-    const context = useContext(SaksrolleroversiktContext);
+function useOpprettSakStart() {
+    const context = useContext(OpprettSakStartContext);
     if (!context) {
-        throw new Error("useSaksroller must be used within a SaksrolleroversiktProvider");
+        throw new Error("useOpprettSakStart må brukes innenfor OpprettSakStartProvider");
     }
     return context;
 }
@@ -105,4 +105,4 @@ export function useErOppretterSak() {
     return useIsMutating({ mutationKey: OPPRETT_SAK_MUTATION_KEY }) > 0;
 }
 
-export { SaksrolleroversiktProvider, useSaksrolleroversikt };
+export { OpprettSakStartProvider, useOpprettSakStart };

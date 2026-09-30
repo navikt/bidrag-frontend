@@ -6,8 +6,8 @@ import type { UseFormReturn } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort";
 import { KortRamme } from "../../felles/person/PersonRolleKort";
 import type { ReellMottakerRegel } from "../../felles/saksregler";
+import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
-import { useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
 import { beregnBarnkurvValg, utenReellMottaker } from "./barnkurv-valg";
 import { BarnReellMottaker } from "./ReellMottakerInline";
 
@@ -128,7 +128,7 @@ function BarnGruppe({
     reellMottakerRegel: ReellMottakerRegel;
 }) {
     const valgteIdenter = barn.filter((b) => valgteBarn.some((v) => v.ident === b.ident)).map((b) => b.ident);
-    const { låstIdent } = useSaksrolleroversikt();
+    const { låstIdent } = useOpprettSakStart();
 
     return (
         <Box padding="space-16" borderRadius="8">

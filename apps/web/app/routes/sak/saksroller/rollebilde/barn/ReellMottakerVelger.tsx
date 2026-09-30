@@ -8,7 +8,7 @@ import ReellMottakerValgGruppe, {
     type ReellMottakerValgregel,
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
-import { initialiserValg } from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
+import { initialiserValg } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;

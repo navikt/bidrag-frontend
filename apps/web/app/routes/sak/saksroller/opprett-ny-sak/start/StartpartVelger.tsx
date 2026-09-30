@@ -8,14 +8,14 @@ import DiskresjonAlert from "../../felles/person/DiskresjonAlert";
 import PersonInfo from "../../felles/person/PersonInfo";
 import SøkPerson from "../../felles/person-søk/SøkPerson";
 import NullstillDialog from "../skjema/NullstillDialog";
-import type { PartRolle } from "../skjema/opprett-sak-schema";
-import SkjemaSeksjon, { SkjemaSeksjonKort } from "../skjema/SkjemaSeksjon";
 import {
     type Sakstype,
     sakstypeTilBeskrivelse,
     tvungenRolle,
     useErOppretterSak,
-} from "../skjema/saksrolleroversiktContext";
+} from "../skjema/OpprettSakStartContext";
+import type { PartRolle } from "../skjema/opprett-sak-schema";
+import SkjemaSeksjon, { SkjemaSeksjonKort } from "../skjema/SkjemaSeksjon";
 import SaksrolleVelger from "./SaksrolleVelger";
 
 type Utkast = { person: PersonDto; rolle: PartRolle | null };

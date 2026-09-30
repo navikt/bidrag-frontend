@@ -5,7 +5,7 @@ import { Rolletype } from "@bidrag/api/SakApi";
 import { SecureLoggerService } from "@bidrag/common";
 import { useEffect, useState } from "react";
 import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
-import { beregnSakForslag } from "./sak-forslag-utils.ts";
+import { beregnSakForslag } from "../beregninger/sak-forslag.ts";
 
 type SakForslag = {
     muligeBarnPerMotpart: Map<string, PersonDto[]>;

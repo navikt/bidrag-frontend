@@ -6,7 +6,7 @@ import { type MouseEvent, type RefObject, useEffect, useRef, useState } from "re
 import { useFormContext } from "react-hook-form";
 import { useNavigate, useRouteLoaderData } from "react-router";
 import type { loader as rootLoader } from "~/root.tsx";
-import { useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
+import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import OpprettSakSideknapper, { type Redirectmål } from "./OpprettSakSideknapper";
 
 type Props = {
@@ -25,7 +25,7 @@ function feilmeldingTekst(error: Props["error"]) {
 function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redirectmål: RefObject<Redirectmål>) {
     const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const navigate = useNavigate();
-    const { onOpprettet } = useSaksrolleroversikt();
+    const { onOpprettet } = useOpprettSakStart();
     const onOpprettetRef = useRef(onOpprettet);
     onOpprettetRef.current = onOpprettet;
 
@@ -48,7 +48,7 @@ function useSubmitHandling({ blocked = false, isLoading = false, saksnummer, har
     const afterSubmitRedirect = useRef<Redirectmål>(null);
     const [blockedError, setBlockedError] = useState<string | null>(null);
     const form = useFormContext();
-    const { onAvbryt, onOpprettet } = useSaksrolleroversikt();
+    const { onAvbryt, onOpprettet } = useOpprettSakStart();
     const modal = useNyOpprettSakModal();
 
     useRedirectEtterOpprettelse(saksnummer, afterSubmitRedirect);

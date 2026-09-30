@@ -1,6 +1,6 @@
 import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
 
-import type { Sakskategori } from "./saksrolleroversiktContext";
+import type { Sakskategori } from "./OpprettSakStartContext";
 
 type Props = {
     value: Sakskategori;

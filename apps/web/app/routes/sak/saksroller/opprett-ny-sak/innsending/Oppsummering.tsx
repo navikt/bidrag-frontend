@@ -3,8 +3,8 @@ import { useWatch } from "react-hook-form";
 import { hentDiskresjonskodeForklaring } from "../../felles/person/DiskresjonAlert";
 import PersonInfo from "../../felles/person/PersonInfo";
 import type { Diskresjonskode } from "../../felles/sakvisning-schema";
+import { type Sakskategori, sakstypeTilTekst, useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "../skjema/SkjemaSeksjon";
-import { type Sakskategori, sakstypeTilTekst, useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
 
 type Person = { ident?: string; navn?: string; diskresjonskode?: string };
 type Barn = Person & {
@@ -25,7 +25,7 @@ export type OppsummeringParter = {
  * Lik for alle sakstyper. Ukjent BP/BM lagres som ukjent part i bidrag-sak.
  */
 export default function Oppsummering({ bidragspliktig, bidragsmottaker, barn }: OppsummeringParter) {
-    const { sakstype } = useSaksrolleroversikt();
+    const { sakstype } = useOpprettSakStart();
     const sakskategori = useWatch<{ kategori: Sakskategori }, "kategori">({ name: "kategori" });
     const sakTekst = sakstypeTilTekst(sakstype);
 

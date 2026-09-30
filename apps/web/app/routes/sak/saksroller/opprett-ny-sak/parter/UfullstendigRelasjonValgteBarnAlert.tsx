@@ -1,6 +1,6 @@
 import { Alert } from "@navikt/ds-react";
 
-export default function UfullstendigRelasjonAlert() {
+export default function UfullstendigRelasjonValgteBarnAlert() {
     return (
         <Alert variant="warning" size="small">
             OBS: Valgte barn har manglende eller ufullstendig relasjon til partene. Vennligst dobbeltsjekk relasjoner

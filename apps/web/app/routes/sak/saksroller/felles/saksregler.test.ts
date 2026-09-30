@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { reellMottakerRegel, reellMottakerValgregel, type SakParter, type Sakstype, validerSak } from "./saksregler";
+import {
+    reellMottakerRegel,
+    reellMottakerValgregel,
+    type SakParter,
+    type Sakstype,
+    sakstypeForArbeidsfordeling,
+    validerSak,
+} from "./saksregler";
 
 const BP = "22222222222";
 const BM = "11111111111";
@@ -143,5 +150,17 @@ describe("reellMottakerValgregel", () => {
         forventet,
     }) => {
         expect(reellMottakerValgregel(reellMottakerRegel(sakstype, bmUkjent), erMyndig)).toBe(forventet);
+    });
+});
+
+describe("sakstypeForArbeidsfordeling", () => {
+    it.each([
+        { arbeidsfordeling: "EFS", forventet: "Ektefellebidrag" },
+        { arbeidsfordeling: "OPS", forventet: "Oppfostringsbidrag" },
+        { arbeidsfordeling: "FRS", forventet: "Farskap" },
+        { arbeidsfordeling: "EEN", forventet: "Barnebidrag" },
+        { arbeidsfordeling: undefined, forventet: "Barnebidrag" },
+    ] as const)("$arbeidsfordeling gir $forventet", ({ arbeidsfordeling, forventet }) => {
+        expect(sakstypeForArbeidsfordeling(arbeidsfordeling)).toBe(forventet);
     });
 });

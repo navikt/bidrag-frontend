@@ -6,8 +6,8 @@ import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/reac
 import { type ReactNode, useMemo, useState } from "react";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
 import OpprettSakSkjema from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/OpprettSakSkjema";
+import type { Sakstype } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/OpprettSakStartContext";
 import type { PartRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/opprett-sak-schema";
-import type { Sakstype } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/saksrolleroversiktContext";
 import type { InngangRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/start/inngang";
 import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlyt";
 import OpprettSakFlytInnbygget from "../../app/routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlytInnbygget";

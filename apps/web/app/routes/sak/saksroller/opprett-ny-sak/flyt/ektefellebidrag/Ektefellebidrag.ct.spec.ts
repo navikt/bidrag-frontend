@@ -1,7 +1,7 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/Ektefellebidrag/Ektefellebidrag/MedForslag";
+const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/ektefellebidrag/Ektefellebidrag/MedForslag";
 
 test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
     await mockOpprettSakApi(page);

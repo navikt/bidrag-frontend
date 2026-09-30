@@ -5,7 +5,7 @@ import { useQueries } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useMemo } from "react";
 import { hentPersonGeografiskEnhetQueryOptions, useHentEnhetInfomasjon } from "~/api/useApi.ts";
-import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "../../felles/utils.ts";
+import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "../../felles/enheter.ts";
 import { type BarnMedAlder, DiskresjonskodeSchema } from "../skjema/opprett-sak-schema";
 
 const UTLAND_ENHET = "4865";

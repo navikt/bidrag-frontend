@@ -3,9 +3,9 @@ import { Box, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import NullstillDialog from "../skjema/NullstillDialog";
 import OpprettSakSkjema from "../skjema/OpprettSakSkjema";
+import { type OpprettSakStart, type Sakstype, useErOppretterSak } from "../skjema/OpprettSakStartContext";
 import type { PartRolle } from "../skjema/opprett-sak-schema";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "../skjema/SkjemaSeksjon";
-import { type OpprettSakStart, type Sakstype, useErOppretterSak } from "../skjema/saksrolleroversiktContext";
 import SakstypeVelger from "./SakstypeVelger";
 import StartpartVelger from "./StartpartVelger";
 

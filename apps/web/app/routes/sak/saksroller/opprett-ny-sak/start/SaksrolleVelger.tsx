@@ -1,6 +1,6 @@
 import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
+import type { Sakstype } from "../skjema/OpprettSakStartContext";
 import { type PartRolle, PartRolleSchema } from "../skjema/opprett-sak-schema";
-import type { Sakstype } from "../skjema/saksrolleroversiktContext";
 import { filtrerSaksroller, type SaksrolleAlternativ } from "./saksrolle-regler";
 
 type Props = {

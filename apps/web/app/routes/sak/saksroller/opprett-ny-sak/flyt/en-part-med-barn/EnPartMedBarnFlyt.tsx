@@ -6,6 +6,7 @@ import BarnSection from "../../barn/BarnSection";
 import ParterSeksjon from "../../parter/ParterSeksjon";
 import { hentForelderRolleLabel } from "../../parter/part-utils";
 import LasterSkeleton from "../../skjema/LasterSkeleton";
+import { useOpprettSakStart } from "../../skjema/OpprettSakStartContext";
 import {
     type Diskresjonskode,
     type EnPartMedBarnRolle,
@@ -16,7 +17,6 @@ import {
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
 import RolleFlytSide from "../../skjema/RolleFlytSide";
-import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
 import { useEnPartMedBarnFlyt } from "./useEnPartMedBarnFlyt";
 
 type Flyttype = "FARSKAP" | "OPPFOSTRINGSBIDRAG";
@@ -50,7 +50,7 @@ const konfig: Record<
  * Farskap og oppfostringsbidrag: én kjent part og valgte barn, uten motpart.
  */
 export default function EnPartMedBarnFlyt() {
-    const { sakstype, partISaken } = useSaksrolleroversikt();
+    const { sakstype, partISaken } = useOpprettSakStart();
 
     if (!partISaken || (sakstype !== "FARSKAP" && sakstype !== "OPPFOSTRINGSBIDRAG")) {
         return null;
@@ -94,7 +94,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
     const rolleIndex = form
         .getValues("roller")
         .findIndex((part) => part.type === (rolle === "bidragspliktig" ? "BP" : "BM"));
-    const { låstIdent } = useSaksrolleroversikt();
+    const { låstIdent } = useOpprettSakStart();
     const settPart = (part: { ident: string; navn: string; diskresjonskode?: Diskresjonskode }) =>
         form.setValue(
             "roller",

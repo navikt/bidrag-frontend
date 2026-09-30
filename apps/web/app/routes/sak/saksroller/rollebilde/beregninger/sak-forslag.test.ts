@@ -1,7 +1,7 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
 import { describe, expect, it } from "vitest";
 
-import { beregnSakForslag } from "./sak-forslag-utils.ts";
+import { beregnSakForslag } from "./sak-forslag.ts";
 
 const MAKS_ALDER_BARN = 24;
 

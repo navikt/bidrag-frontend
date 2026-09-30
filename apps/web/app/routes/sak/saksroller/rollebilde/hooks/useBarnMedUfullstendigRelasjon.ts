@@ -1,7 +1,7 @@
 import { BIDRAG_PERSON_API } from "@bidrag/api";
 import { SecureLoggerService } from "@bidrag/common";
 import { useQueries } from "@tanstack/react-query";
-import { harUfullstendigRelasjon } from "./ufullstendig-relasjon-utils.ts";
+import { harUfullstendigRelasjon } from "../beregninger/ufullstendig-relasjon.ts";
 
 export function useBarnMedUfullstendigRelasjon({
     barnIdenter,

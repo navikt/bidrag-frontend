@@ -6,7 +6,8 @@ import { MYNDYG_BARN_ALDER } from "../../../felles/saksregler";
 import BarnSection from "../../barn/BarnSection";
 import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";
 import ParterSeksjon from "../../parter/ParterSeksjon";
-import UfullstendigRelasjonAlert from "../../parter/UfullstendigRelasjonAlert";
+import UfullstendigRelasjonValgteBarnAlert from "../../parter/UfullstendigRelasjonValgteBarnAlert";
+import { useOpprettSakStart } from "../../skjema/OpprettSakStartContext";
 import {
     type BarnebidragForelderRolle,
     type BarnebidragSkjemaData,
@@ -15,7 +16,6 @@ import {
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
 import RolleFlytSide from "../../skjema/RolleFlytSide";
-import { useSaksrolleroversikt } from "../../skjema/saksrolleroversiktContext";
 import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
 import { useBarnebidragFlyt } from "./useBarnebidragFlyt";
 
@@ -60,7 +60,7 @@ function lagStartverdier(
  * Én flyt for barnebidrag, uansett om saken startes fra en forelder eller fra barnet.
  */
 export default function BarnebidragFlyt() {
-    const { partISaken } = useSaksrolleroversikt();
+    const { partISaken } = useOpprettSakStart();
 
     if (!partISaken) return null;
     if (erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} />;
@@ -88,7 +88,7 @@ function BarnebidragForForelder({ partISaken }: { partISaken: PartISaken }) {
 }
 
 function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
-    const { partISakenAlder, startperson } = useSaksrolleroversikt();
+    const { partISakenAlder, startperson } = useOpprettSakStart();
     const form = useForm<BarnebidragSkjemaData>({
         resolver: zodResolver(BarnebidragSkjemaSchema),
         defaultValues: lagStartverdier(partISaken, partISakenAlder, startperson.fødselsdato ?? undefined),
@@ -122,7 +122,7 @@ function BarnebidragFlytInnhold() {
                             {meldinger.forslagsfeil}
                         </Alert>
                     )}
-                    {meldinger.ufullstendigRelasjon && <UfullstendigRelasjonAlert />}
+                    {meldinger.ufullstendigRelasjon && <UfullstendigRelasjonValgteBarnAlert />}
                     {meldinger.bidragsmottakerUtenBarn && <BMUtenBarnAlert />}
                 </>
             }
