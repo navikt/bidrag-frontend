@@ -70,7 +70,7 @@ export default function AapneDokumentKnapp({
     åpneHeleJournalposten = false,
 }: PropsWithChildren<AapneDokumentKnappProps>) {
     const [laster, setLaster] = useState(false);
-    const åpneSomSammenslåttToggleErPå =  useFlag(AAPNE_SOM_SAMMENSLATT_TOGGLE);
+    const åpneSomSammenslåttToggleErPå = useFlag(AAPNE_SOM_SAMMENSLATT_TOGGLE);
 
     const kanÅpnesDirekte = status === DokumentStatusDto.FERDIGSTILT && Boolean(dokumentreferanse);
     const kanÅpnesMedMbdok = status === DokumentStatusDto.UNDER_REDIGERING && Boolean(dokumentreferanse);
