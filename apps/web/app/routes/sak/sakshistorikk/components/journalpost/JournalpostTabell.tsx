@@ -229,8 +229,7 @@ export default function JournalpostTabell({
             // Håndtering av vedlegg i expandable row
             const dok = rad.dok;
             const tekst = dok.tittel ?? dok.dokumentreferanse ?? "";
-            const erFørsteDokument = jp.dokumenter?.[0]?.dokumentreferanse === dok.dokumentreferanse;
-            return renderDokumentLink(dok, tekst, journalpostId, erFørsteDokument);
+            return renderDokumentLink(dok, tekst, journalpostId);
         }
 
         const antall = rad.jp.dokumenter?.length ?? 0;
