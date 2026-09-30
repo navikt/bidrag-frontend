@@ -16,9 +16,7 @@ export function DokumenterFremviser({ dokumenter }: DokumenterFremviserProps) {
     if (dokumenter.length === 0) {
         return (
             <VStack align="center" justify="center" style={{ height: "100vh", padding: "var(--a-spacing-16)" }}>
-                <Alert variant="warning">
-                    Fant ingen dokumenter
-                </Alert>
+                <Alert variant="warning">Fant ingen dokumenter</Alert>
             </VStack>
         );
     }
