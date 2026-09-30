@@ -49,7 +49,7 @@ function BarnVisningScenario({ initialRoller, erNyttBarnIndex }: BarnVisningScen
                                 bidragsmottakerIdent={BM_IDENT}
                                 erNyttBarn={index === erNyttBarnIndex}
                                 hentOgNullstillSamhandler={() => null}
-                                erOppfostringsbidrag={false}
+                                sakstype="Barnebidrag"
                             />
                         ))}
                     </VStack>

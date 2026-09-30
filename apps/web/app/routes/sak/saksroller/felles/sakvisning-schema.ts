@@ -1,9 +1,6 @@
 import { z } from "zod";
 import { type SakParter, type Saksfeil, type Sakstype, validerSak } from "./saksregler";
 
-export const MYNDYG_BARN_ALDER = 18;
-export const MAKS_ALDER_BARN = 24;
-
 const RolleTypeSchema = z.enum(["BP", "BM", "BA", "RM"]);
 
 export const DiskresjonskodeSchema = z.enum(["SPSF", "SPFO", "URIK", "MILI", "PEND", "SVAL", "P19"]);

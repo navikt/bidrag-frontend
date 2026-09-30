@@ -2,8 +2,8 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import type { RolleDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { beregnAlderForPerson } from "@bidrag/utils";
+import { MYNDYG_BARN_ALDER } from "../../felles/saksregler.ts";
 import type { BarnRolle, Rolle } from "../../felles/sakvisning-schema.ts";
-import { MYNDYG_BARN_ALDER } from "../../felles/sakvisning-schema.ts";
 
 export function berikRoller(
     roller: RolleDto[],

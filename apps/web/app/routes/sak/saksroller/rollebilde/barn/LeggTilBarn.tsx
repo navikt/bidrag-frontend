@@ -4,20 +4,25 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { alderForBarn, validerNyttBarn } from "../../felles/barn/barn-regler.ts";
 import { BarnPersonInfo, LeggTilBarnSøk, useBarnSøk } from "../../felles/person-søk/BarnSøk.tsx";
-import { reellMottakerRegelForSak, reellMottakerValgregel } from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
-import { MYNDYG_BARN_ALDER, type SakRedigeringData } from "../../felles/sakvisning-schema.ts";
+import {
+    MYNDYG_BARN_ALDER,
+    reellMottakerRegel,
+    reellMottakerValgregel,
+    type Sakstype,
+} from "../../felles/saksregler.ts";
+import type { SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import { lagBarnRolle } from "./legg-til-barn-utils.ts";
 import ReellMottakerVelger from "./ReellMottakerVelger.tsx";
 
 interface LeggTilBarnProps {
     søsken?: PersonDto[];
-    erOppfostringsbidrag?: boolean;
+    sakstype: Sakstype;
     visSøk: boolean;
     setVisSøk: (visSøk: boolean) => void;
 }
 
-export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSøk, setVisSøk }: LeggTilBarnProps) {
+export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSøk }: LeggTilBarnProps) {
     const [valgtBarn, setValgtBarn] = useState<PersonDto | null>(null);
     const [visReellMottaker, setVisReellMottaker] = useState(false);
 
@@ -87,13 +92,12 @@ export default function LeggTilBarn({ søsken = [], erOppfostringsbidrag, visSø
                     form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, valg.navn, { shouldValidate: true });
                     resetEtterReellMottaker();
                 }}
-                regel={reellMottakerValgregel(
-                    reellMottakerRegelForSak(
-                        Boolean(erOppfostringsbidrag),
-                        roller.find((rolle) => rolle.type === "BM")?.fodselsnummer,
-                    ),
-                    alderForBarn(valgtBarn) >= MYNDYG_BARN_ALDER,
-                )}
+                regel={
+                    reellMottakerValgregel(
+                        reellMottakerRegel(sakstype, !roller.find((rolle) => rolle.type === "BM")?.fodselsnummer),
+                        alderForBarn(valgtBarn) >= MYNDYG_BARN_ALDER,
+                    ) ?? "valgfri"
+                }
             />
         );
     }

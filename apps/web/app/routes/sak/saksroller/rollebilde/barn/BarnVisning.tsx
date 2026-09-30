@@ -3,11 +3,8 @@ import { Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react
 import { useFormContext } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort.tsx";
 import { KortRamme } from "../../felles/person/PersonRolleKort.tsx";
-import {
-    reellMottakerRegelForSak,
-    reellMottakerValgregel,
-    tilReellMottakerValg,
-} from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
+import { tilReellMottakerValg } from "../../felles/reell-mottaker/reell-mottaker-regel.ts";
+import { reellMottakerRegel, reellMottakerValgregel, type Sakstype } from "../../felles/saksregler.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
 import ReellMottakerRad from "./ReellMottakerRad.tsx";
@@ -21,7 +18,7 @@ interface BarnVisningProps {
     erNyttBarn?: boolean;
     hentOgNullstillSamhandler: (barnIndex: number, isLeggTilBarn: boolean) => { ident: string; navn: string } | null;
     closeEditorSignal?: number;
-    erOppfostringsbidrag?: boolean;
+    sakstype: Sakstype;
 }
 
 export default function BarnVisning({
@@ -31,7 +28,7 @@ export default function BarnVisning({
     erNyttBarn,
     hentOgNullstillSamhandler,
     closeEditorSignal,
-    erOppfostringsbidrag = false,
+    sakstype,
 }: BarnVisningProps) {
     const form = useFormContext<SakRedigeringData>();
     const {
@@ -78,10 +75,12 @@ export default function BarnVisning({
                         verdi={tilReellMottakerValg(rolle)}
                         onAvbryt={handleLukkReellMottaker}
                         onBekreft={handleBekreftReellMottaker}
-                        regel={reellMottakerValgregel(
-                            reellMottakerRegelForSak(erOppfostringsbidrag, bidragsmottakerIdent),
-                            rolle.erMyndig ?? false,
-                        )}
+                        regel={
+                            reellMottakerValgregel(
+                                reellMottakerRegel(sakstype, !bidragsmottakerIdent),
+                                rolle.erMyndig ?? false,
+                            ) ?? "valgfri"
+                        }
                     />
                 )}
                 <RollehistorikkVisning

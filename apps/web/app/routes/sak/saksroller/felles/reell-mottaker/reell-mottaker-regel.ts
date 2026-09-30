@@ -2,11 +2,6 @@ import type { z } from "zod";
 import type { ReellMottakerFelterSchema } from "../sakvisning-schema";
 import type { ReellMottakerValg, ReellMottakerValgregel } from "./ReellMottakerValgGruppe";
 
-export type ReellMottakerRegel =
-    | { type: "skjult" }
-    | { type: "etter-barn"; bidragsmottakerErUkjent: boolean }
-    | { type: "alltid-samhandler" };
-
 export type ReellMottakerSkjemaverdi = z.infer<typeof ReellMottakerFelterSchema>;
 
 type Barn = {
@@ -20,27 +15,6 @@ export type ReellMottakerFeil = {
     felt: "reellMottakerType" | "reellMottaker";
     melding: string;
 };
-
-/** Rollebildet: oppfostringsbidrag krever samhandler. Ellers avgjør barnets alder og om BM har ident. */
-export function reellMottakerRegelForSak(
-    erOppfostringsbidrag: boolean,
-    bidragsmottakerIdent: string | undefined,
-): Exclude<ReellMottakerRegel, { type: "skjult" }> {
-    return erOppfostringsbidrag
-        ? { type: "alltid-samhandler" }
-        : { type: "etter-barn", bidragsmottakerErUkjent: !bidragsmottakerIdent };
-}
-
-export function reellMottakerValgregel(
-    regel: Exclude<ReellMottakerRegel, { type: "skjult" }>,
-    erMyndig: boolean,
-): ReellMottakerValgregel {
-    if (regel.type === "alltid-samhandler") {
-        return "kun-samhandler";
-    }
-
-    return erMyndig || regel.bidragsmottakerErUkjent ? "påkrevd" : "valgfri";
-}
 
 export function tilReellMottakerValg(verdi: ReellMottakerSkjemaverdi): ReellMottakerValg {
     return { type: verdi.reellMottakerType, ident: verdi.reellMottaker, navn: verdi.reellMottakerNavn };

@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
+import { MYNDYG_BARN_ALDER } from "../../../felles/saksregler";
 import BarnSection from "../../barn/BarnSection";
 import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";
 import ParterSeksjon from "../../parter/ParterSeksjon";
@@ -11,7 +12,6 @@ import {
     type BarnebidragSkjemaData,
     BarnebidragSkjemaSchema,
     type ForelderPart,
-    MYNDYG_BARN_ALDER,
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
 import RolleFlytSide from "../../skjema/RolleFlytSide";

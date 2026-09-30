@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, InlineMessage } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
-import type { ReellMottakerRegel } from "../../../felles/reell-mottaker/reell-mottaker-regel";
+import { reellMottakerRegel, type Sakstype } from "../../../felles/saksregler";
 import BarnSection from "../../barn/BarnSection";
 import ParterSeksjon from "../../parter/ParterSeksjon";
 import { hentForelderRolleLabel } from "../../parter/part-utils";
@@ -27,7 +27,7 @@ const konfig: Record<
         arbeidsfordeling: "FRS" | "OPS";
         rolle: ForelderPartRolle;
         schema: typeof FarskapsSkjemaSchema;
-        reellMottakerRegel: ReellMottakerRegel;
+        sakstype: Extract<Sakstype, "Farskap" | "Oppfostringsbidrag">;
         beskrivelse?: string;
     }
 > = {
@@ -35,14 +35,14 @@ const konfig: Record<
         arbeidsfordeling: "FRS",
         rolle: "bidragsmottaker",
         schema: FarskapsSkjemaSchema,
-        reellMottakerRegel: { type: "skjult" },
+        sakstype: "Farskap",
         beskrivelse: "Velg barnet saken gjelder. Den andre forelderen registreres når farskapet er avklart.",
     },
     OPPFOSTRINGSBIDRAG: {
         arbeidsfordeling: "OPS",
         rolle: "bidragspliktig",
         schema: OppfostringsbidragSkjemaSchema,
-        reellMottakerRegel: { type: "alltid-samhandler" },
+        sakstype: "Oppfostringsbidrag",
     },
 };
 
@@ -80,7 +80,7 @@ function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken:
 }
 
 function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
-    const { arbeidsfordeling, reellMottakerRegel, beskrivelse, rolle } = konfig[type];
+    const { arbeidsfordeling, sakstype, beskrivelse, rolle } = konfig[type];
     const { form, barnkurver, valgteBarn, onSubmit, innsending, status, lasterKurver, kurvfeil } = useEnPartMedBarnFlyt(
         { arbeidsfordeling, rolle },
     );
@@ -142,7 +142,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                 <BarnSection
                     form={form}
                     barnkurver={barnkurver}
-                    reellMottakerRegel={reellMottakerRegel}
+                    reellMottakerRegel={reellMottakerRegel(sakstype, false)}
                     beskrivelse={beskrivelse}
                     maksEttBarn={type === "FARSKAP"}
                 />

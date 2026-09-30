@@ -5,7 +5,7 @@ import type { UseFormReturn } from "react-hook-form";
 
 import { BarnKortInnhold } from "../../felles/person/BarnKort";
 import { KortRamme } from "../../felles/person/PersonRolleKort";
-import type { ReellMottakerRegel } from "../../felles/reell-mottaker/reell-mottaker-regel";
+import type { ReellMottakerRegel } from "../../felles/saksregler";
 import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
 import { useSaksrolleroversikt } from "../skjema/saksrolleroversiktContext";
 import { beregnBarnkurvValg, utenReellMottaker } from "./barnkurv-valg";

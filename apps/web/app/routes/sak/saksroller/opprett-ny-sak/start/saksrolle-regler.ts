@@ -1,4 +1,5 @@
-import { MAKS_ALDER_BARN, MYNDYG_BARN_ALDER, type PartRolle } from "../skjema/opprett-sak-schema";
+import { MAKS_ALDER_BARN, MYNDYG_BARN_ALDER } from "../../felles/saksregler";
+import type { PartRolle } from "../skjema/opprett-sak-schema";
 
 export type SaksrolleAlternativ = {
     label: string;

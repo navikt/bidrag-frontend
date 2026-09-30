@@ -4,6 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { type UseFormReturn, useFormContext } from "react-hook-form";
 import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
+import { reellMottakerRegel } from "../../../felles/saksregler";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
@@ -203,7 +204,7 @@ export function useBarnebidragFlyt() {
         form,
         barnkurver,
         onKurvByttet,
-        reellMottakerRegel: { type: "etter-barn", bidragsmottakerErUkjent: bidragsmottaker.erKjent === false } as const,
+        reellMottakerRegel: reellMottakerRegel("Barnebidrag", bidragsmottaker.erKjent === false),
         kort,
         onSubmit,
         innsending,

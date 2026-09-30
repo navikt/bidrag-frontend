@@ -186,7 +186,7 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                             bidragsmottakerIdent={bm?.fodselsnummer || undefined}
                                             dataUpdatedAt={visning.dataUpdatedAt}
                                             hentOgNullstillSamhandler={visning.hentOgNullstillSamhandler}
-                                            erOppfostringsbidrag={visning.sakstype === "Oppfostringsbidrag"}
+                                            sakstype={visning.sakstype}
                                             muligeBarn={visning.muligeBarn}
                                             funnetPersonISak={visning.funnetPersonISak}
                                         />

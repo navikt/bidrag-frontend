@@ -36,7 +36,7 @@ function LeggTilBarnScenario({ initialRoller }: { initialRoller: Rolle[] }) {
                 }}
             >
                 <FormProvider {...form}>
-                    <LeggTilBarn visSøk={visSøk} setVisSøk={setVisSøk} />
+                    <LeggTilBarn sakstype="Barnebidrag" visSøk={visSøk} setVisSøk={setVisSøk} />
                 </FormProvider>
             </BidragCommonsProviderMock>
         </QueryClientProvider>

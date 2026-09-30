@@ -1,9 +1,13 @@
+import type { ReellMottakerValgregel } from "./reell-mottaker/ReellMottakerValgGruppe";
 import {
     type ReellMottakerFeil,
     type ReellMottakerSkjemaverdi,
     type ReellMottakerValideringsgrunn,
     validerReellMottaker,
 } from "./reell-mottaker/reell-mottaker-regel";
+
+export const MYNDYG_BARN_ALDER = 18;
+export const MAKS_ALDER_BARN = 24;
 
 export type Sakstype = "Barnebidrag" | "Ektefellebidrag" | "Oppfostringsbidrag" | "Farskap";
 
@@ -69,7 +73,7 @@ function validerForeldre(parter: SakParter, sakstype: Sakstype): Saksfeil[] {
             ? [{ gjelder: type, melding: "Et barn kan ikke være forelder i saken" }]
             : [];
     });
-    if (parter.bp?.trim() && parter.bp === parter.bm) {
+    if (erSammeForelder(parter.bp, parter.bm)) {
         feil.push({ gjelder: "BM", melding: "Samme person kan ikke være begge parter" });
     }
     return feil;
@@ -86,9 +90,59 @@ function validerAntallBarn(parter: SakParter, sakstype: Sakstype): Saksfeil[] {
     return [];
 }
 
+/** BP og BM kan ikke være samme person. */
+export function erSammeForelder(bp: string | undefined, bm: string | undefined): boolean {
+    return !!bp?.trim() && bp === bm;
+}
+
+/**
+ * Hvordan reell mottaker behandles for barna i saken.
+ * - `skjult`: saken har ikke reell mottaker.
+ * - `kun-myndige`: påkrevd for myndige barn, ellers ikke aktuelt.
+ * - `etter-barn`: påkrevd for myndige barn og når bidragsmottaker er ukjent, ellers valgfri.
+ * - `alltid-samhandler`: påkrevd for alle barn, og må være en samhandler.
+ */
+export type ReellMottakerRegel =
+    | { type: "skjult" }
+    | { type: "kun-myndige" }
+    | { type: "etter-barn"; bidragsmottakerErUkjent: boolean }
+    | { type: "alltid-samhandler" };
+
+/** 🔴 Farskap følger bidrag-sak, som krever reell mottaker for myndige barn i alle saker. */
+export function reellMottakerRegel(sakstype: Sakstype, bidragsmottakerErUkjent: boolean): ReellMottakerRegel {
+    switch (sakstype) {
+        case "Ektefellebidrag":
+            return { type: "skjult" };
+        case "Farskap":
+            return { type: "kun-myndige" };
+        case "Oppfostringsbidrag":
+            return { type: "alltid-samhandler" };
+        case "Barnebidrag":
+            return { type: "etter-barn", bidragsmottakerErUkjent };
+    }
+}
+
+/** Valget saksbehandler får for ett barn, eller `undefined` når valget ikke er aktuelt. */
+export function reellMottakerValgregel(
+    regel: ReellMottakerRegel,
+    erMyndig: boolean,
+): ReellMottakerValgregel | undefined {
+    switch (regel.type) {
+        case "skjult":
+            return undefined;
+        case "kun-myndige":
+            return erMyndig ? "påkrevd" : undefined;
+        case "alltid-samhandler":
+            return "kun-samhandler";
+        case "etter-barn":
+            return erMyndig || regel.bidragsmottakerErUkjent ? "påkrevd" : "valgfri";
+    }
+}
+
 function validerReellMottakere(parter: SakParter, sakstype: Sakstype): Saksfeil[] {
+    const regel = reellMottakerRegel(sakstype, parter.bidragsmottakerErUkjent);
     return parter.barn.flatMap((barn, indeks) =>
-        validerReellMottaker(barn, reellMottakerGrunn(barn, parter, sakstype)).map(({ felt, melding }) => ({
+        validerReellMottaker(barn, reellMottakerGrunn(regel, barn.erMyndig)).map(({ felt, melding }) => ({
             gjelder: "barn" as const,
             indeks,
             felt,
@@ -97,13 +151,9 @@ function validerReellMottakere(parter: SakParter, sakstype: Sakstype): Saksfeil[
     );
 }
 
-function reellMottakerGrunn(
-    barn: SakParter["barn"][number],
-    parter: SakParter,
-    sakstype: Sakstype,
-): ReellMottakerValideringsgrunn | null {
-    if (sakstype === "Oppfostringsbidrag") return "alltid";
-    if (sakstype !== "Barnebidrag") return null;
-    if (barn.erMyndig) return "myndig-barn";
-    return parter.bidragsmottakerErUkjent ? "ukjent-bidragsmottaker" : null;
+function reellMottakerGrunn(regel: ReellMottakerRegel, erMyndig: boolean): ReellMottakerValideringsgrunn | null {
+    const valgregel = reellMottakerValgregel(regel, erMyndig);
+    if (valgregel === "kun-samhandler") return "alltid";
+    if (valgregel !== "påkrevd") return null;
+    return erMyndig ? "myndig-barn" : "ukjent-bidragsmottaker";
 }

@@ -28,7 +28,7 @@ function useSaksrollerForm({
 }) {
     const formMethods = useForm<SakRedigeringData>({
         resolver: zodResolver(lagSakRedigeringSchema(sakstype)),
-        mode: "onChange",
+        mode: "onSubmit",
     });
     const { reset, watch } = formMethods;
     const roller = watch("roller") || [];

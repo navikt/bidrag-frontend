@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { alderForBarn, tilBarn, validerNyttBarn } from "../../felles/barn/barn-regler";
 import { LeggTilBarnSøk, useBarnSøk } from "../../felles/person-søk/BarnSøk";
-import type { ReellMottakerRegel } from "../../felles/reell-mottaker/reell-mottaker-regel";
+import type { ReellMottakerRegel } from "../../felles/saksregler";
 import { type Barnkurv, type BarnMedAlder, BarnMedAlderSchema } from "../skjema/opprett-sak-schema";
 import SkjemaSeksjon from "../skjema/SkjemaSeksjon";
 import BarnkurvListe from "./BarnkurvListe";

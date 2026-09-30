@@ -9,11 +9,10 @@ import ReellMottakerValgGruppe, {
 import {
     fraReellMottakerValg,
     initialiserReellMottaker,
-    type ReellMottakerRegel,
     type ReellMottakerSkjemaverdi,
-    reellMottakerValgregel,
     tilReellMottakerValg,
 } from "../../felles/reell-mottaker/reell-mottaker-regel";
+import { type ReellMottakerRegel, reellMottakerValgregel } from "../../felles/saksregler";
 
 type Props<TFieldValues extends FieldValues> = {
     form: UseFormReturn<TFieldValues>;
@@ -125,7 +124,8 @@ export function BarnReellMottaker<TFieldValues extends FieldValues>({
     barnIndex: number;
     regel: ReellMottakerRegel;
 }) {
-    if (regel.type === "skjult" || barnIndex === -1) {
+    const valgregel = reellMottakerValgregel(regel, barn.erMyndig);
+    if (!valgregel || barnIndex === -1) {
         return null;
     }
     return (
@@ -135,7 +135,7 @@ export function BarnReellMottaker<TFieldValues extends FieldValues>({
                 fieldPath={`valgteBarn.${barnIndex}`}
                 barnIdent={barn.ident}
                 barnNavn={barn.navn}
-                regel={reellMottakerValgregel(regel, barn.erMyndig)}
+                regel={valgregel}
             />
         </Box>
     );

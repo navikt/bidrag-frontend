@@ -1,6 +1,7 @@
 import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { Box, Heading, HGrid, InfoCard, VStack } from "@navikt/ds-react";
 import { type ComponentProps, useState } from "react";
+import type { Sakstype } from "../../felles/saksregler.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import BarnVisning from "./BarnVisning.tsx";
 import LeggTilBarn from "./LeggTilBarn.tsx";
@@ -25,7 +26,7 @@ export type BarnISakenProps = {
     bidragsmottakerIdent: string | undefined;
     dataUpdatedAt: number;
     hentOgNullstillSamhandler: ComponentProps<typeof BarnVisning>["hentOgNullstillSamhandler"];
-    erOppfostringsbidrag: boolean;
+    sakstype: Sakstype;
     muligeBarn: ComponentProps<typeof LeggTilBarn>["søsken"];
     funnetPersonISak: (fnr: string) => boolean;
 };
@@ -37,7 +38,7 @@ export default function BarnISaken({
     bidragsmottakerIdent,
     dataUpdatedAt,
     hentOgNullstillSamhandler,
-    erOppfostringsbidrag,
+    sakstype,
     muligeBarn,
     funnetPersonISak,
 }: BarnISakenProps) {
@@ -60,16 +61,11 @@ export default function BarnISaken({
                             closeEditorSignal={dataUpdatedAt}
                             hentOgNullstillSamhandler={hentOgNullstillSamhandler}
                             erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}
-                            erOppfostringsbidrag={erOppfostringsbidrag}
+                            sakstype={sakstype}
                         />
                     ))}
                 </HGrid>
-                <LeggTilBarn
-                    søsken={muligeBarn}
-                    erOppfostringsbidrag={erOppfostringsbidrag}
-                    setVisSøk={setVisSøk}
-                    visSøk={visSøk}
-                />
+                <LeggTilBarn søsken={muligeBarn} sakstype={sakstype} setVisSøk={setVisSøk} visSøk={visSøk} />
             </VStack>
         </Box>
     );

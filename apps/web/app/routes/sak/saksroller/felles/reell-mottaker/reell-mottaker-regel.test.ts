@@ -3,8 +3,6 @@ import {
     fraReellMottakerValg,
     initialiserReellMottaker,
     initialiserValg,
-    reellMottakerRegelForSak,
-    reellMottakerValgregel,
     tilReellMottakerValg,
     validerReellMottaker,
 } from "./reell-mottaker-regel";
@@ -61,24 +59,6 @@ describe("reell mottaker-regler", () => {
         expect(validerReellMottaker({ reellMottakerType: "samhandler" }, "alltid")).toEqual([
             { felt: "reellMottaker", melding: "Du må registrere reell mottaker" },
         ]);
-    });
-});
-
-describe("reellMottakerRegelForSak", () => {
-    it.each([
-        { oppfostring: true, bmIdent: "22222222222", erMyndig: false, forventet: "kun-samhandler" },
-        { oppfostring: false, bmIdent: "22222222222", erMyndig: false, forventet: "valgfri" },
-        { oppfostring: false, bmIdent: "22222222222", erMyndig: true, forventet: "påkrevd" },
-        // 🔴 BM-rolle med tomt fødselsnummer er ukjent, samme som i sakvisning-schema.
-        { oppfostring: false, bmIdent: "", erMyndig: false, forventet: "påkrevd" },
-        { oppfostring: false, bmIdent: undefined, erMyndig: false, forventet: "påkrevd" },
-    ])("oppfostring=$oppfostring, BM=$bmIdent, myndig=$erMyndig gir $forventet", ({
-        oppfostring,
-        bmIdent,
-        erMyndig,
-        forventet,
-    }) => {
-        expect(reellMottakerValgregel(reellMottakerRegelForSak(oppfostring, bmIdent), erMyndig)).toBe(forventet);
     });
 });
 

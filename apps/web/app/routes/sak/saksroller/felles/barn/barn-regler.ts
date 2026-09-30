@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
-import { MAKS_ALDER_BARN, MYNDYG_BARN_ALDER } from "../sakvisning-schema";
+import { MAKS_ALDER_BARN, MYNDYG_BARN_ALDER } from "../saksregler";
 
 export function alderForBarn(person: PersonDto): number {
     return beregnAlderForPerson(person) ?? 0;

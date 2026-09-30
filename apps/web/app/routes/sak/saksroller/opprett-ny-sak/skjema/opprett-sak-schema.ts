@@ -2,15 +2,10 @@ import { z } from "zod";
 import { type SakParter, type Sakstype, validerSak } from "../../felles/saksregler";
 // Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
 // sakvisning i stedet for å dupliseres.
-import {
-    DiskresjonskodeSchema,
-    MAKS_ALDER_BARN,
-    MYNDYG_BARN_ALDER,
-    ReellMottakerFelterSchema,
-} from "../../felles/sakvisning-schema";
+import { DiskresjonskodeSchema, ReellMottakerFelterSchema } from "../../felles/sakvisning-schema";
 import { tilForelderrolle } from "../parter/part-utils";
 
-export { DiskresjonskodeSchema, MAKS_ALDER_BARN, MYNDYG_BARN_ALDER };
+export { DiskresjonskodeSchema };
 
 // ==================== BASE SCHEMAS ====================
 
