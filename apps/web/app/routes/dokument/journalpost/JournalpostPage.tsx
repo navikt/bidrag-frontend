@@ -1,3 +1,4 @@
+import { useHentJournalpost } from "~/api/useApi.ts";
 import { getDocumentOpenOptions } from "../utils/documentRouteParamsUtils";
 import type { Route } from "./+types/JournalpostPage";
 import JournalpostFremviser from "./JournalpostFremviser";
@@ -11,11 +12,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function JournalpostPage({ params, loaderData }: Route.ComponentProps) {
     const { journalpostId, dokumentreferanse } = params;
     const { openInNewTab } = loaderData;
-    const documentTitle = `Journalpost - ${journalpostId}`;
+    const { data } = useHentJournalpost(journalpostId);
 
     return (
         <>
-            <title>{documentTitle}</title>
+            <title>{data?.journalpost?.innhold ?? journalpostId}</title>
             <JournalpostFremviser
                 journalpostId={journalpostId}
                 dokumentreferanse={dokumentreferanse}

@@ -76,7 +76,7 @@ export const EndringsModal = ({
             onClose={() => onClose()}
             header={{ heading: selectedEndringslogg.tittel }}
             closeOnBackdropClick={closeOnBackdropClick}
-            className="max-w-[1500px]"
+            className="max-w-[1500px] min-w-[40rem] min-h-[30rem]"
         >
             {selectedEndringer === undefined ? (
                 <Loader>LOADING</Loader>
@@ -90,13 +90,16 @@ export const EndringsModal = ({
                             </Tag>
                         </Heading>
 
-                        <BodyLong as="div" size="small">
+                        <BodyLong as="div" size="small" className="min-w-0">
                             <div
                                 style={{
                                     overflowWrap: "break-word",
-                                    maxWidth: "70rem",
+                                    wordBreak: "break-word",
+                                    width: "100%",
                                     minWidth: "38rem",
                                     maxHeight: "40rem",
+                                    overflowY: "auto",
+                                    overflowX: "hidden",
                                 }}
                                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEndringer.innhold) }}
                             />

@@ -1,8 +1,10 @@
-import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
-import { DokumentStatusDto } from "@bidrag/api/BidragDokumentApi";
+import { BIDRAG_DOKUMENT_API } from "@bidrag/api";
+import type { DokumentDto, JournalpostDto } from "@bidrag/api/BidragDokumentApi";
+import { DokumentFormatDto, DokumentStatusDto } from "@bidrag/api/BidragDokumentApi";
+import { OpenDocumentUtils } from "@bidrag/common";
 import { Button, Loader, VStack } from "@navikt/ds-react";
-import { useMemo } from "react";
-import { hentDokumentApi, useHentJournalpost } from "~/api/useApi.ts";
+import { useEffect, useMemo, useRef } from "react";
+import { hentDokumentApi, hentDokumentUrlApi, useHentJournalpost } from "~/api/useApi.ts";
 import { JournalpostMetadata } from "~/common/dokument/JournalpostMetadata";
 import { DokumentVisning } from "../../sak/dokumenter/components/DokumentVisning";
 import { useDokumentState } from "../../sak/dokumenter/components/hooks/useDokumentState";
@@ -32,6 +34,30 @@ function genererFallbackDokumenter(dokumentreferanse?: string, fallbackReferanse
     }));
 }
 
+function erUnderProduksjon(dokument?: DokumentDto) {
+    return (
+        dokument?.status === DokumentStatusDto.UNDER_PRODUKSJON ||
+        dokument?.status === DokumentStatusDto.UNDER_REDIGERING
+    );
+}
+
+/**
+ * Dokumenter under produksjon i MBDOK kan ikke vises i PDF-fremviseren. De åpnes i stedet i
+ * brevklienten, og fanen som ble åpnet for fremviseren lukkes etterpå.
+ */
+async function åpneIMbdokOgLukkVindu(journalpostId: string, dokumentreferanse: string) {
+    const metadataResponse = await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet1(
+        journalpostId,
+        dokumentreferanse,
+    );
+    if (metadataResponse.data[0]?.format !== DokumentFormatDto.MBDOK) return false;
+
+    const dokumentUrl = await hentDokumentUrlApi({ journalpostId, dokumentreferanse });
+    OpenDocumentUtils.openDocumentExternal(dokumentUrl);
+    setTimeout(() => window.close(), 400);
+    return true;
+}
+
 export default function JournalpostFremviser({
     journalpostId,
     dokumentreferanse,
@@ -58,6 +84,25 @@ export default function JournalpostFremviser({
             },
         ];
     }, [journalpost, dokumentreferanse, fallbackDokumentreferanser]);
+
+    const mbdokÅpnetRef = useRef(false);
+
+    useEffect(() => {
+        if (mbdokÅpnetRef.current || !journalpost) return;
+
+        const dokumenter = journalpost.dokumenter ?? [];
+        const dokument = dokumentreferanse
+            ? dokumenter.find((dok) => dok.dokumentreferanse === dokumentreferanse)
+            : dokumenter[0];
+
+        const referanse = dokument?.dokumentreferanse ?? dokumentreferanse;
+        if (!erUnderProduksjon(dokument) || !referanse) return;
+
+        mbdokÅpnetRef.current = true;
+        åpneIMbdokOgLukkVindu(journalpostId, referanse).catch(() => {
+            mbdokÅpnetRef.current = false;
+        });
+    }, [journalpost, journalpostId, dokumentreferanse]);
 
     const {
         data: dokumentData,

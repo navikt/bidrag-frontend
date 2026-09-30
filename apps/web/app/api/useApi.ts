@@ -844,10 +844,10 @@ export function useHentDokumentMetadata(journalpostId: string, dokumentreferanse
         queryFn: async () => {
             try {
                 const response = dokumentreferanse
-                    ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata1(journalpostId, dokumentreferanse, {
+                    ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet1(journalpostId, dokumentreferanse, {
                           validateStatus: (status) => status === 200 || status === 204 || status === 404,
                       })
-                    : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata(journalpostId, {
+                    : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet(journalpostId, {
                           validateStatus: (status) => status === 200 || status === 204 || status === 404,
                       });
 
@@ -1005,8 +1005,8 @@ export function useHentSaksdokumentPdf(journalpostId?: string, dokumentreferanse
 
             // Formatet er ikke kjent på forhånd (f.eks. dokumenter under produksjon), så det må hentes her
             const metadataResponse = dokumentreferanse
-                ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata1(journalpostId, dokumentreferanse)
-                : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata(journalpostId);
+                ? await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet1(journalpostId, dokumentreferanse)
+                : await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet(journalpostId);
             const erMBDok = metadataResponse.data[0]?.format === DokumentFormatDto.MBDOK;
 
             if (erMBDok) {

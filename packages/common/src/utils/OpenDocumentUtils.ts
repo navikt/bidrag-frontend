@@ -116,7 +116,7 @@ export class OpenDocumentUtils {
         optimizeForPrint?: boolean,
         retryCount?: number,
     ) {
-        const dokumentMetadataResponse = await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadata1(
+        const dokumentMetadataResponse = await BIDRAG_DOKUMENT_API.dokument.hentDokumentMetadataGet1(
             journalpostId,
             dokumentreferanse,
         );

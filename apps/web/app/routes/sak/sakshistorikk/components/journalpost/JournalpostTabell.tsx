@@ -194,7 +194,12 @@ export default function JournalpostTabell({
         );
     };
 
-    const renderDokumentLink = (dok: DokumentDto, tittel: string, journalpostId?: string | null) => {
+    const renderDokumentLink = (
+        dok: DokumentDto,
+        tittel: string,
+        journalpostId?: string | null,
+        åpneHeleJournalposten = false,
+    ) => {
         const dokStatus = dok.status;
         if (!journalpostId || !dok.dokumentreferanse) {
             return <TruncatedText tittel={tittel} />;
@@ -210,6 +215,7 @@ export default function JournalpostTabell({
                     status={dokStatus ?? undefined}
                     tittel={tittel}
                     extraQueryParams={{ [RETUR_PARAM]: "sakshistorikk", [SAKSNR_PARAM]: saksnummer }}
+                    åpneHeleJournalposten={åpneHeleJournalposten}
                 >
                     {<TruncatedText tittel={tittel} />}
                 </AapneDokumentKnapp>
@@ -239,7 +245,7 @@ export default function JournalpostTabell({
 
         const hoveddokRef = rad.jp.dokumenter?.[0];
         if (journalpostId && hoveddokRef) {
-            return renderDokumentLink(hoveddokRef, tekst, journalpostId);
+            return renderDokumentLink(hoveddokRef, tekst, journalpostId, true);
         }
 
         return <TruncatedText tittel={tekst} />;
