@@ -155,14 +155,14 @@ describe("utledBarnkurverForForelder", () => {
     const ungtBarn = barnMedAlder("55555555555", "2015-01-01");
     const voksen = barnMedAlder("66666666666", "1990-01-01");
 
-    it("slår sammen kurver med samme motpart og rolle og fjerner barn over 24 år", () => {
+    it("slår sammen kurver med samme motpart og rolle, fjerner duplikater og barn over 24 år", () => {
         expect(
             utledBarnkurverForForelder([
-                { motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn, voksen] },
+                { motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn, voksen, ungtBarn] },
                 { motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn] },
                 { motpart: annen, forelderrolleMotpart: "MOR", fellesBarn: [voksen] },
             ]),
-        ).toEqual([{ motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn, ungtBarn] }]);
+        ).toEqual([{ motpart: mor, forelderrolleMotpart: "MOR", fellesBarn: [ungtBarn] }]);
     });
 });
 

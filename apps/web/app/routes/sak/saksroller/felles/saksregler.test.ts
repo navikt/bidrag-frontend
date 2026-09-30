@@ -78,6 +78,12 @@ describe("validerSak", () => {
             sak: parter({ bp: BARN.ident, bm: BM, barn: [BARN] }),
             forventet: ["BP: Et barn kan ikke være forelder i saken"],
         },
+        {
+            sakstype: "Barnebidrag",
+            beskrivelse: "barn som bidragsmottaker",
+            sak: parter({ bp: BP, bm: BARN.ident, barn: [BARN] }),
+            forventet: ["BM: Et barn kan ikke være forelder i saken"],
+        },
         { sakstype: "Farskap", beskrivelse: "BM og ett barn", sak: parter({ bm: BM, barn: [BARN] }), forventet: [] },
         {
             sakstype: "Farskap",

@@ -50,14 +50,28 @@ export function OpprettSakFlytModal({ open, onClose, ...props }: OpprettSakFlytM
     const Flyt = useContext(NyOpprettSakFlytContext);
     const [submit, setSubmit] = useState<ModalSubmit | null>(null);
     const formId = useId();
+    const sending = submit?.isLoading ?? false;
+    const lukkHvisIkkeSender = () => {
+        if (!sending) onClose();
+    };
     if (!Flyt || !open) return null;
 
     return (
-        <Modal open portal onClose={onClose} header={{ heading: "Opprett sak" }} width="70rem">
+        <Modal
+            open
+            portal
+            onClose={lukkHvisIkkeSender}
+            onBeforeClose={() => !sending}
+            onCancel={(event) => {
+                if (sending) event.preventDefault();
+            }}
+            header={{ heading: "Opprett sak", closeButton: !sending }}
+            width="70rem"
+        >
             <Modal.Body>
                 <Suspense fallback={<Loader size="3xlarge" title="Laster..." variant="interaction" />}>
                     <NyOpprettSakModalContext value={{ formId, setSubmit }}>
-                        <Flyt {...props} onAvbryt={onClose} />
+                        <Flyt {...props} onAvbryt={lukkHvisIkkeSender} />
                     </NyOpprettSakModalContext>
                 </Suspense>
             </Modal.Body>
@@ -68,7 +82,7 @@ export function OpprettSakFlytModal({ open, onClose, ...props }: OpprettSakFlytM
                         type="submit"
                         form={formId}
                         size="xsmall"
-                        loading={submit.isLoading}
+                        loading={sending}
                         onClick={submit.onClick}
                     >
                         Opprett
@@ -77,8 +91,8 @@ export function OpprettSakFlytModal({ open, onClose, ...props }: OpprettSakFlytM
                         variant="secondary"
                         type="button"
                         size="xsmall"
-                        disabled={submit.isLoading}
-                        onClick={onClose}
+                        disabled={sending}
+                        onClick={lukkHvisIkkeSender}
                     >
                         Avbryt
                     </Button>

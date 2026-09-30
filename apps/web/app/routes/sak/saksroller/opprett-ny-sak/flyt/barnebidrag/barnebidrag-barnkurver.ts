@@ -1,6 +1,18 @@
 import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { erUnderMaksAlder } from "../../../felles/barn/barn-regler";
 
+function slåSammenUnikeBarn(eksisterende: MotpartBarnRelasjon["fellesBarn"], nye: MotpartBarnRelasjon["fellesBarn"]) {
+    const identer = new Set(eksisterende.map((barn) => barn.ident));
+    return [
+        ...eksisterende,
+        ...nye.filter((barn) => {
+            if (identer.has(barn.ident)) return false;
+            identer.add(barn.ident);
+            return true;
+        }),
+    ];
+}
+
 /**
  * 🔴 Barn BP har sammen med valgt BM, som valgbare barn i saken. Bare relasjonen med BM brukes,
  * så barn fra andre forhold vises aldri. Barn som allerede er lagt til manuelt, utelates.
@@ -27,8 +39,8 @@ export function utledBarnkurverForForelder(relasjoner: MotpartBarnRelasjon[]): M
                 r.motpart?.ident === relasjon.motpart?.ident &&
                 r.forelderrolleMotpart === relasjon.forelderrolleMotpart,
         );
-        if (eksisterende) eksisterende.fellesBarn = [...eksisterende.fellesBarn, ...fellesBarn];
-        else barnkurver.push({ ...relasjon, fellesBarn });
+        if (eksisterende) eksisterende.fellesBarn = slåSammenUnikeBarn(eksisterende.fellesBarn, fellesBarn);
+        else barnkurver.push({ ...relasjon, fellesBarn: slåSammenUnikeBarn([], fellesBarn) });
     }
     return barnkurver;
 }

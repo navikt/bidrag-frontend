@@ -94,7 +94,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         expect(requests.create).toBeUndefined();
     });
 
-    test("Avbryt er sperret mens saken sendes inn", async ({ mount, page }) => {
+    test("modalen kan ikke lukkes mens saken sendes inn", async ({ mount, page }) => {
         await mockOpprettSakApi(page, foreldreTilBarn);
         let svar: () => void = () => undefined;
         await page.route(/\/proxy\/bidrag-sak\/sak$/, async (route) => {
@@ -112,6 +112,9 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
 
         await dialog.getByRole("button", { name: /Opprett$/ }).click();
         await expect(dialog.getByRole("button", { name: "Avbryt" })).toBeDisabled();
+        await page.keyboard.press("Escape");
+        await expect(dialog).toBeVisible();
+        await expect(component.getByTestId("lukket")).toHaveValue("false");
 
         svar();
         await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("1234567");
