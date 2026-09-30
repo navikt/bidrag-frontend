@@ -13,13 +13,14 @@ function lagDokumentHref(
     journalpostId: string,
     dokumentreferanse: string | undefined,
     extraParams: string,
-    somSammenslått: boolean,
+    åpneHeleJournalpostenSammenslått: boolean,
 ) {
-    if (somSammenslått) {
-        // `/dokumenter` forventer `<Kilde>-<journalpostId>:<dokumentreferanse>`; journalposter uten kildeprefiks er BID.
+    if (åpneHeleJournalpostenSammenslått) {
+        // `/dokumenter` henter alle dokumentene i journalposten når kun `<Kilde>-<journalpostId>` oppgis.
+        // Journalposter uten kildeprefiks er BID.
         const journalpostIdMedPrefiks = journalpostId.includes("-") ? journalpostId : `BID-${journalpostId}`;
         const params = new URLSearchParams(extraParams);
-        params.set("dokument", `${journalpostIdMedPrefiks}:${dokumentreferanse}`);
+        params.set("dokument", journalpostIdMedPrefiks);
         return `/dokumenter?${params.toString()}`;
     }
     return `/dokument/${journalpostId}/${dokumentreferanse}?dok=${dokumentreferanse}&${extraParams}`;
@@ -41,13 +42,18 @@ export interface AapneDokumentKnappProps {
     visRedigeringKnapp?: boolean;
     /** Ekstra query-parametre som skal legges til lenken for å åpne dokumentet. */
     extraQueryParams?: Record<string, string>;
+    /**
+     * Åpne alle dokumentene i journalposten som én sammenslått PDF (kun når toggle
+     * `frontend.aapne-dokument-sammenslatt` er på). Ellers åpnes dokumentet i vanlig dokumentvisning.
+     */
+    åpneHeleJournalposten?: boolean;
 }
 /**
  * Felleskomponent for å åpne et dokument, uavhengig av om det ligger i en journalpost
  * (ferdigstilt/arkivert) eller fortsatt er under produksjon i mbdok.
  *
- * - `FERDIGSTILT`: åpner dokumentvisningen i en ny fane. Med toggle `frontend.aapne-dokument-sammenslatt`
- *   åpnes dokumentet i stedet i den sammenslåtte visningen (`/dokumenter`).
+ * - `FERDIGSTILT`: åpner dokumentvisningen i en ny fane. Med `åpneHeleJournalposten` og toggle
+ *   `frontend.aapne-dokument-sammenslatt` åpnes i stedet hele journalposten sammenslått (`/dokumenter`).
  * - `UNDER_PRODUKSJON`: åpner via mbdok, med en spinner i inntil 5 sekunder og sperre mot dobbeltklikk.
  * - I tillegg kan en knapp for å åpne dokumentet i redigeringsverktøyet vises (`visRedigeringKnapp`).
  */
@@ -61,14 +67,20 @@ export default function AapneDokumentKnapp({
     visRedigeringKnapp = false,
     children,
     extraQueryParams,
+    åpneHeleJournalposten = false,
 }: PropsWithChildren<AapneDokumentKnappProps>) {
     const [laster, setLaster] = useState(false);
-    const åpneSomSammenslått = useFlag(AAPNE_SOM_SAMMENSLATT_TOGGLE);
+    const åpneSomSammenslåttToggleErPå =  useFlag(AAPNE_SOM_SAMMENSLATT_TOGGLE);
 
     const kanÅpnesDirekte = status === DokumentStatusDto.FERDIGSTILT && Boolean(dokumentreferanse);
     const kanÅpnesMedMbdok = status === DokumentStatusDto.UNDER_REDIGERING && Boolean(dokumentreferanse);
     const extraParams = new URLSearchParams(extraQueryParams).toString();
-    const dokumentHref = lagDokumentHref(journalpostId, dokumentreferanse, extraParams, åpneSomSammenslått);
+    const dokumentHref = lagDokumentHref(
+        journalpostId,
+        dokumentreferanse,
+        extraParams,
+        åpneSomSammenslåttToggleErPå && åpneHeleJournalposten,
+    );
 
     function åpneMedMbdok() {
         if (laster || !dokumentreferanse) return;
