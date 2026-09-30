@@ -1,11 +1,29 @@
 import { DokumentStatusDto } from "@bidrag/api/BidragDokumentApi";
 import { PencilIcon } from "@navikt/aksel-icons";
 import { Button, Link, Loader } from "@navikt/ds-react";
+import { useFlag } from "@unleash/proxy-client-react";
 import { type PropsWithChildren, useState } from "react";
 
 import { OpenDocumentUtils } from "../../utils";
 
 const MBDOK_SPINNER_VARIGHET_MS = 5000;
+const AAPNE_SOM_SAMMENSLATT_TOGGLE = "frontend.aapne-dokument-sammenslatt";
+
+function lagDokumentHref(
+    journalpostId: string,
+    dokumentreferanse: string | undefined,
+    extraParams: string,
+    somSammenslått: boolean,
+) {
+    if (somSammenslått) {
+        // `/dokumenter` forventer `<Kilde>-<journalpostId>:<dokumentreferanse>`; journalposter uten kildeprefiks er BID.
+        const journalpostIdMedPrefiks = journalpostId.includes("-") ? journalpostId : `BID-${journalpostId}`;
+        const params = new URLSearchParams(extraParams);
+        params.set("dokument", `${journalpostIdMedPrefiks}:${dokumentreferanse}`);
+        return `/dokumenter?${params.toString()}`;
+    }
+    return `/dokument/${journalpostId}/${dokumentreferanse}?dok=${dokumentreferanse}&${extraParams}`;
+}
 
 export interface AapneDokumentKnappProps {
     journalpostId: string;
@@ -28,7 +46,8 @@ export interface AapneDokumentKnappProps {
  * Felleskomponent for å åpne et dokument, uavhengig av om det ligger i en journalpost
  * (ferdigstilt/arkivert) eller fortsatt er under produksjon i mbdok.
  *
- * - `FERDIGSTILT`: åpner dokumentvisningen i en ny fane.
+ * - `FERDIGSTILT`: åpner dokumentvisningen i en ny fane. Med toggle `frontend.aapne-dokument-sammenslatt`
+ *   åpnes dokumentet i stedet i den sammenslåtte visningen (`/dokumenter`).
  * - `UNDER_PRODUKSJON`: åpner via mbdok, med en spinner i inntil 5 sekunder og sperre mot dobbeltklikk.
  * - I tillegg kan en knapp for å åpne dokumentet i redigeringsverktøyet vises (`visRedigeringKnapp`).
  */
@@ -44,11 +63,12 @@ export default function AapneDokumentKnapp({
     extraQueryParams,
 }: PropsWithChildren<AapneDokumentKnappProps>) {
     const [laster, setLaster] = useState(false);
+    const åpneSomSammenslått = useFlag(AAPNE_SOM_SAMMENSLATT_TOGGLE);
 
     const kanÅpnesDirekte = status === DokumentStatusDto.FERDIGSTILT && Boolean(dokumentreferanse);
     const kanÅpnesMedMbdok = status === DokumentStatusDto.UNDER_REDIGERING && Boolean(dokumentreferanse);
     const extraParams = new URLSearchParams(extraQueryParams).toString();
-    const dokumentHref = `/dokument/${journalpostId}/${dokumentreferanse}?dok=${dokumentreferanse}&${extraParams}`;
+    const dokumentHref = lagDokumentHref(journalpostId, dokumentreferanse, extraParams, åpneSomSammenslått);
 
     function åpneMedMbdok() {
         if (laster || !dokumentreferanse) return;
