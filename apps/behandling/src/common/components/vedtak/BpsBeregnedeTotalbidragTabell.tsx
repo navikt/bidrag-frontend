@@ -28,6 +28,7 @@ export const BpsBeregnedeTotalbidragTabellSærbidrag = () => {
 
     const delberegning = beregnetSærbidrag.resultat.delberegningBidragspliktigesBeregnedeTotalBidrag;
 
+    if (!delberegning) return;
     return (
         <BpsBeregnedeTotalbidragTabell
             beregning={
