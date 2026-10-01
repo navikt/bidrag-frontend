@@ -20,6 +20,7 @@ countries.registerLocale(norwegianLocale);
 export function alpha3ToAlpha2CountryCode(alpha3: string): string | undefined {
     return countries.alpha3ToAlpha2(alpha3);
 }
+
 type PersonInfo = { ident: string; navn?: string; valid?: boolean };
 
 export const PersonApiQueryKeys = {
