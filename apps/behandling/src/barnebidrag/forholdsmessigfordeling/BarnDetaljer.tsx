@@ -16,6 +16,7 @@ import {
     DateToDDMMYYYYString,
     DateToMMYYYYString,
     dateOrNull,
+    maxOfDate,
     toISODateString,
 } from "../../utils/date-utils";
 import LøpendeBidragListe from "./LøpendeBidragListe";
@@ -30,15 +31,15 @@ interface BarnDetaljerOpprettFFProps {
     onManueltOverstyrtRevurderingsdatoChange?: (ident: string, dato?: string) => void;
 }
 
-const defaultRevurderingsdatoNesteMaaned = addMonthsIgnoreDay(new Date(), 1);
+const getDefaultRevurderingsdatoNesteMaaned = (søktFomDato: Date | string) => addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1);
 
-const erDefaultRevurderingsdato = (dato?: Date) => {
+const erDefaultRevurderingsdato = (søktFomDato: Date | string, dato?: Date, ) => {
     if (!dato) {
         return true;
     }
     return (
-        dato.getFullYear() === defaultRevurderingsdatoNesteMaaned.getFullYear() &&
-        dato.getMonth() === defaultRevurderingsdatoNesteMaaned.getMonth()
+        dato.getFullYear() === getDefaultRevurderingsdatoNesteMaaned(søktFomDato).getFullYear() &&
+        dato.getMonth() === getDefaultRevurderingsdatoNesteMaaned(søktFomDato).getMonth()
     );
 };
 
@@ -52,13 +53,13 @@ function BarnRevurderingsMonthPicker({
     onChange?: (ident: string, dato?: string) => void;
 }) {
     const { søktFomDato } = useGetBehandlingV2();
-    const aktivDato = selectedDato ? new Date(selectedDato) : defaultRevurderingsdatoNesteMaaned;
+    const aktivDato = selectedDato ? new Date(selectedDato) : getDefaultRevurderingsdatoNesteMaaned(søktFomDato);
 
     const handleMonthChange = (dato: Date | undefined) => {
         if (!onChange) {
             return;
         }
-        if (erDefaultRevurderingsdato(dato ?? undefined)) {
+        if (erDefaultRevurderingsdato(søktFomDato, dato ?? undefined)) {
             onChange(ident, undefined);
             return;
         }
@@ -73,7 +74,7 @@ function BarnRevurderingsMonthPicker({
                 onChange={handleMonthChange}
                 defaultSelected={aktivDato}
                 fromDate={dateOrNull(søktFomDato) ?? undefined}
-                toDate={addMonthsIgnoreDay(new Date(), 1)}
+                toDate={addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1)}
                 inputFormat="dd.MM.yyyy"
                 size="small"
             />
