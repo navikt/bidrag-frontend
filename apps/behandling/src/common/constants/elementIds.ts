@@ -35,4 +35,5 @@ export default {
     seksjon_underholdskostnad_beregnet: "underholdskostnad_beregnet",
     seksjon_underholdskostnad_tilysnsutgifter: "tilysnsutgifter",
     seksjon_underholdskostnad_tilleggstønad: "tilleggstønad",
+    seksjon_underholdskostnad_forpleining: "forpleining",
 };
