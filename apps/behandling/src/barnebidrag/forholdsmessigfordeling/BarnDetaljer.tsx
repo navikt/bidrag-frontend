@@ -31,9 +31,10 @@ interface BarnDetaljerOpprettFFProps {
     onManueltOverstyrtRevurderingsdatoChange?: (ident: string, dato?: string) => void;
 }
 
-const getDefaultRevurderingsdatoNesteMaaned = (søktFomDato: Date | string) => addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1);
+const getDefaultRevurderingsdatoNesteMaaned = (søktFomDato: Date | string) =>
+    addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1);
 
-const erDefaultRevurderingsdato = (søktFomDato: Date | string, dato?: Date, ) => {
+const erDefaultRevurderingsdato = (søktFomDato: Date | string, dato?: Date) => {
     if (!dato) {
         return true;
     }
