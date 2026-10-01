@@ -1,26 +1,17 @@
-import { describe, expect, test } from "vitest";
-import { loader } from "./SakRolleRedirect";
+import { expect, test } from "vitest";
+import { loader as sakRolleLoader } from "./SakRolleRedirect";
 
-describe("SakRolleRedirect", () => {
-    test("bevarer parametere og sender eksisterende sak til rollebildet", async () => {
-        const response = await loader({
-            request: new Request(
-                "https://bidrag.nav.no/sak/rolle?saksnummer=1234567&enhet=4806&sessionState=test&from=bisys",
-            ),
-        });
+const parametere = "enhet=4806&sessionState=test&from=bisys";
 
-        expect(response.headers.get("Location")).toBe(
-            "https://bidrag.nav.no/sak/1234567/saksroller?enhet=4806&sessionState=test&from=bisys",
-        );
-    });
+test.each([
+    {
+        loader: sakRolleLoader,
+        fra: `/sak/rolle?saksnummer=1234567&${parametere}`,
+        til: `/sak/1234567/saksroller?${parametere}`,
+    },
+    { loader: sakRolleLoader, fra: `/sak/rolle?${parametere}`, til: `/sak/ny?${parametere}` },
+])("$fra sendes til $til", async ({ loader, fra, til }) => {
+    const response = await loader({ request: new Request(`https://bidrag.nav.no${fra}`) });
 
-    test("bevarer parametere og sender ny sak til veiviseren", async () => {
-        const response = await loader({
-            request: new Request("https://bidrag.nav.no/sak/rolle?enhet=4806&sessionState=test&from=bisys"),
-        });
-
-        expect(response.headers.get("Location")).toBe(
-            "https://bidrag.nav.no/sak/ny/saksroller?enhet=4806&sessionState=test&from=bisys",
-        );
-    });
+    expect(response.headers.get("Location")).toBe(`https://bidrag.nav.no${til}`);
 });

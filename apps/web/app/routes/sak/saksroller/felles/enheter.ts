@@ -1,0 +1,2 @@
+export const ADRESSEBESKYTTELSE_ENHET = "2103";
+export const EGEN_ANSATT_ENHET = "4883";

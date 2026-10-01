@@ -30,7 +30,8 @@ export default defineConfig({
             workers: 1,
             use: {
                 ...galleryProjectUse,
-                launchOptions: { slowMo: 500 },
+                viewport: { width: 1600, height: 1080 },
+                launchOptions: { slowMo: 1000 },
             },
         },
     ],

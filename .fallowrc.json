@@ -1,0 +1,28 @@
+{
+    "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+    "ignorePatterns": [
+        "**/*.generated.*",
+        "**/*.gen.*",
+        "**/generated/**",
+        "**/codegen/**",
+        "packages/api/src/api/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.react-router/**",
+        "**/.fallow/**"
+    ],
+    "framework": [
+        {
+            "name": "story-galleri",
+            "enablers": ["@playwright/test"],
+            "entryPoints": ["apps/web/app/**/*.story.tsx", "packages/common/src/**/*.story.tsx"],
+            "entryPointRole": "test",
+            "usedExports": [
+                {
+                    "pattern": "**/*.story.tsx",
+                    "exports": ["*"]
+                }
+            ]
+        }
+    ]
+}

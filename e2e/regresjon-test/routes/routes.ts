@@ -25,7 +25,7 @@ export const routes = {
         navn: testData.testpersonNavn,
         eierfogd: testData.enhet,
     }),
-    nySaksroller: "/sak/ny/saksroller",
+    nySaksroller: withQuery("/sak/ny", { enhet: testData.enhet, from: "bisys" }),
     bruker: `/bruker/${encode(testData.brukerident)}`,
     brukerReskontro: `/bruker/${encode(testData.brukerident)}/reskontro`,
     brukerSumPrSak: `/bruker/${encode(testData.brukerident)}/sumprsak`,
