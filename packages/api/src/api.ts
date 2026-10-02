@@ -7,6 +7,7 @@ import { Api as BidragDokumentProduksjonApi } from "./api/BidragDokumentProduksj
 import { Api as BidragForsendelseApi } from "./api/BidragForsendelseApi";
 import { Api as BidragForstesideApi } from "./api/BidragForstesideApi";
 import { Api as BidragKodeverkApi } from "./api/BidragKodeverkApi";
+import { Api as BidragOppgaveApi } from "./api/BidragOppgaveApi";
 import { Api as BidragReskontro } from "./api/BidragReskontroApi";
 import { Api as BidragVedtak } from "./api/BidragVedtakApi";
 import { Api as BidragOrganisasjon } from "./api/OrganisasjonApi";
@@ -78,4 +79,8 @@ export const BEHANDLING_API_V1 = proxy(new BidragBehandlingApi(), {
 
 export const BIDRAG_DOKUMENT_PRODUKSJON_API = proxy(new BidragDokumentProduksjonApi(), {
     app: "bidrag-dokument-produksjon",
+});
+
+export const BIDRAG_OPPGAVE_API = proxy(new BidragOppgaveApi(), {
+    app: "bidrag-oppgave",
 });

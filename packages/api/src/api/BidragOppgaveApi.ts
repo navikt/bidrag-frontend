@@ -18,12 +18,6 @@ export interface FinnOppgaverRequest {
    * @maxLength 13
    */
   aktoerId?: string | null;
-  saksbehandler?: string | null;
-  /**
-   * @minLength 4
-   * @maxLength 4
-   */
-  enhetsnummer?: string | null;
   /**
    * @format int32
    * @min 1
@@ -46,15 +40,29 @@ export interface Beskrivelseinnslag {
   endringer: string[];
 }
 
-export interface OppgaveDto {
+export interface BidragOppgaveDto {
   /** @format int64 */
   id: number;
-  tittel: string;
   beskrivelse?: string | null;
-  beskrivelseshistorikk?: Beskrivelseinnslag[] | null;
-  status: "OPPRETTET" | "UNDER_BEHANDLING" | "FERDIG";
+  beskrivelseListe?: Beskrivelseinnslag[] | null;
+  status:
+    | "OPPRETTET"
+    | "AAPNET"
+    | "UNDER_BEHANDLING"
+    | "FERDIGSTILT"
+    | "FEILREGISTRERT";
   /** @format date-time */
-  opprettet?: string | null;
+  opprettetTidspunkt?: string | null;
+  tema: string;
+  oppgavetype: string;
+  journalpostId?: string | null;
+  tildeltEnhetsnr: string;
+  tilordnetRessurs?: string | null;
+  brukerFnr?: string | null;
+  saksreferanse?: string | null;
+  prioritet: "HOY" | "NORM" | "LAV" | "KRITISK";
+  /** @format date */
+  fristFerdigstillelse?: string | null;
 }
 
 import type {
@@ -121,8 +129,7 @@ export class HttpClient<SecurityDataType = unknown> {
   }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL:
-        axiosConfig.baseURL || "https://bidrag-oppgave-q2.intern.dev.nav.no",
+      baseURL: axiosConfig.baseURL || "http://localhost:8080",
     });
     this.secure = secure;
     this.format = format;
@@ -236,7 +243,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title bidrag-oppgave
  * @version v1
- * @baseUrl https://bidrag-oppgave-q2.intern.dev.nav.no
+ * @baseUrl http://localhost:8080
  */
 export class Api<
   SecurityDataType extends unknown,
@@ -251,7 +258,7 @@ export class Api<
      * @secure
      */
     finnOppgaver: (data: FinnOppgaverRequest, params: RequestParams = {}) =>
-      this.request<OppgaveDto[], any>({
+      this.request<BidragOppgaveDto[], any>({
         path: `/api/oppgaver`,
         method: "POST",
         body: data,
