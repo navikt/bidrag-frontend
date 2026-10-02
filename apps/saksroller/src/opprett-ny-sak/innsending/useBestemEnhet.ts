@@ -72,10 +72,6 @@ function samleIdenter(bidragspliktig: Part, bidragsmottaker: Part, barn: BestemE
     return kandidater.filter((p): p is PersonIdent => harIdent(p.ident));
 }
 
-function useSpesialenhet(enhetsnummer: string, aktiv: boolean): EnhetInfo {
-    return useEnhetsnavn(enhetsnummer, aktiv);
-}
-
 function useGeografiskeEnheter(
     identer: PersonIdent[],
     identForArbeidsfordeling: string | null,
@@ -162,10 +158,10 @@ export function useBestemEnhet({
         !harFortroligAdresseVerdi,
     );
 
-    const utland = useSpesialenhet(UTLAND_ENHET, erSakskategoriUtenlandssak);
+    const utland = useEnhetsnavn(UTLAND_ENHET, erSakskategoriUtenlandssak);
     const erFortrolig = harFortroligAdresseVerdi || geografisk.harFortroligEnhet;
-    const fortrolig = useSpesialenhet(ADRESSEBESKYTTELSE_ENHET, erFortrolig);
-    const egenAnsatt = useSpesialenhet(EGEN_ANSATT_ENHET, geografisk.harEgenAnsatt && !erFortrolig);
+    const fortrolig = useEnhetsnavn(ADRESSEBESKYTTELSE_ENHET, erFortrolig);
+    const egenAnsatt = useEnhetsnavn(EGEN_ANSATT_ENHET, geografisk.harEgenAnsatt && !erFortrolig);
 
     return velgEnhet({
         erSakskategoriUtenlandssak,
