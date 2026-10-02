@@ -1,11 +1,11 @@
 import { TilgangsFeilError } from "@bidrag/api";
-import { RedirectTo, useNyOpprettSakModal } from "@bidrag/common";
+import { useNyOpprettSakModal } from "@bidrag/common";
 import { Alert, VStack } from "@navikt/ds-react";
 import type { AxiosError } from "axios";
 import { type MouseEvent, type RefObject, useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useNavigate, useRouteLoaderData } from "react-router";
-import type { loader as rootLoader } from "~/root.tsx";
+import { useNavigate } from "react-router";
+import { gåTilBisys } from "../../felles/bisys-lenker";
 import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import OpprettSakSideknapper, { type Redirectmål } from "./OpprettSakSideknapper";
 
@@ -23,7 +23,6 @@ function feilmeldingTekst(error: Props["error"]) {
 }
 
 function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redirectmål: RefObject<Redirectmål>) {
-    const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const navigate = useNavigate();
     const { onOpprettet } = useOpprettSakStart();
     const onOpprettetRef = useRef(onOpprettet);
@@ -35,13 +34,13 @@ function useRedirectEtterOpprettelse(saksnummer: string | null | undefined, redi
         if (onOpprettetRef.current) {
             onOpprettetRef.current(saksnummer);
         } else if (redirectmål.current === "sak") {
-            RedirectTo.behandleSak(saksnummer, bisysUrl);
+            gåTilBisys("sak", saksnummer);
         } else if (redirectmål.current === "soknad") {
-            RedirectTo.nySoknad(saksnummer, bisysUrl);
+            gåTilBisys("soknad", saksnummer);
         } else {
             void navigate(`/sak/${encodeURIComponent(saksnummer)}/saksroller`, { replace: true });
         }
-    }, [saksnummer, bisysUrl, navigate, redirectmål]);
+    }, [saksnummer, navigate, redirectmål]);
 }
 
 function useSubmitHandling({ blocked = false, isLoading = false, saksnummer, harEksisterendeSak }: Props) {

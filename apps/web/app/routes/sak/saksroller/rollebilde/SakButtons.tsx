@@ -1,10 +1,8 @@
-import { RedirectTo } from "@bidrag/common";
 import { ExclamationmarkTriangleIcon, FloppydiskIcon } from "@navikt/aksel-icons";
 import { BodyLong, Button, Dialog, HStack, InlineMessage, LocalAlert } from "@navikt/ds-react";
 import { type RefObject, useEffect, useState } from "react";
-import { useRouteLoaderData } from "react-router";
 
-import type { loader as rootLoader } from "~/root.tsx";
+import { gåTilBisys } from "../felles/bisys-lenker";
 
 type Lagrehandling = "nySoknad" | "gaaTilSak" | "bliVaerende";
 
@@ -32,7 +30,6 @@ function useSakLagring({
     SakButtonsProps,
     "onSubmit" | "onRefetch" | "harAdvarsel" | "harEndringer" | "relasjonskontroll" | "statusResetKey"
 >) {
-    const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const [bekreftHandling, setBekreftHandling] = useState<Lagrehandling | null>(null);
     const [ingenEndringer, setIngenEndringer] = useState(false);
     const [lagrer, setLagrer] = useState(false);
@@ -48,8 +45,8 @@ function useSakLagring({
     }, [statusResetKey]);
 
     const lagrehandlinger: Record<Lagrehandling, () => Promise<void>> = {
-        nySoknad: async () => RedirectTo.nySoknad(await onSubmit(), bisysUrl),
-        gaaTilSak: async () => RedirectTo.behandleSak(await onSubmit(), bisysUrl),
+        nySoknad: async () => gåTilBisys("soknad", await onSubmit()),
+        gaaTilSak: async () => gåTilBisys("sak", await onSubmit()),
         bliVaerende: async () => {
             await onSubmit();
             await onRefetch();

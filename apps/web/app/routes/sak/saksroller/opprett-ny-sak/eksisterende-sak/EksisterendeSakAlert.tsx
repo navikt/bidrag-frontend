@@ -1,10 +1,8 @@
 import type { BidragssakDto } from "@bidrag/api/SakApi";
-import { RedirectTo } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Alert, BodyShort, Heading, Link } from "@navikt/ds-react";
 import { useEffect, useRef } from "react";
-import { useRouteLoaderData } from "react-router";
-import type { loader as rootLoader } from "~/root.tsx";
+import { gåTilBisys } from "../../felles/bisys-lenker";
 
 type Props = {
     eksisterendeSak: BidragssakDto;
@@ -13,7 +11,6 @@ type Props = {
 };
 
 export default function EksisterendeSakAlert({ eksisterendeSak, partISakenNavn, motpartNavn }: Props) {
-    const { bisysUrl = "" } = useRouteLoaderData<typeof rootLoader>("root") ?? {};
     const alertRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -35,7 +32,7 @@ export default function EksisterendeSakAlert({ eksisterendeSak, partISakenNavn, 
                     href="#"
                     onClick={(e) => {
                         e.preventDefault();
-                        RedirectTo.behandleSak(eksisterendeSak.saksnummer, bisysUrl, true);
+                        gåTilBisys("sak", eksisterendeSak.saksnummer, true);
                     }}
                 >
                     <span className="saksnr">{eksisterendeSak.saksnummer}</span> <ExternalLinkIcon aria-hidden />
