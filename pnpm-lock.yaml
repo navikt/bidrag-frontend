@@ -168,6 +168,9 @@ importers:
       '@bidrag/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@bidrag/saksroller':
+        specifier: workspace:*
+        version: link:../saksroller
       '@bidrag/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -271,6 +274,9 @@ importers:
       '@bidrag/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@bidrag/saksroller':
+        specifier: workspace:*
+        version: link:../saksroller
       '@bidrag/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -563,6 +569,70 @@ importers:
         specifier: ^8.0.16
         version: 8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(tsx@4.22.4)(yaml@2.9.0)
 
+  apps/saksroller:
+    dependencies:
+      '@bidrag/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@bidrag/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@bidrag/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      '@hookform/resolvers':
+        specifier: ^5.2.2
+        version: 5.4.0(react-hook-form@7.86.0(react@19.2.7))
+      '@navikt/aksel-icons':
+        specifier: 'catalog:'
+        version: 8.13.1
+      '@navikt/ds-react':
+        specifier: 'catalog:'
+        version: 8.12.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.101.0(react@19.2.7)
+      '@unleash/proxy-client-react':
+        specifier: ^5.0.1
+        version: 5.1.0(unleash-proxy-client@3.8.2)
+      axios:
+        specifier: 'catalog:'
+        version: 1.18.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.7
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.7(react@19.2.7)
+      react-hook-form:
+        specifier: ^7.85.0
+        version: 7.86.0(react@19.2.7)
+      react-router:
+        specifier: 'catalog:'
+        version: 8.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      zod:
+        specifier: 'catalog:'
+        version: 4.4.3
+    devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.13.0
+        version: 4.13.0(playwright-core@1.62.1)
+      '@playwright/test':
+        specifier: ^1.62.1
+        version: 1.62.1
+      '@types/node':
+        specifier: ^25
+        version: 25.9.3
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.17)
+      vite:
+        specifier: ^8.0.16
+        version: 8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(tsx@4.22.4)(yaml@2.9.0)
+
   apps/samhandler:
     dependencies:
       '@bidrag/api':
@@ -622,6 +692,9 @@ importers:
       '@bidrag/redigering':
         specifier: workspace:*
         version: link:../redigering
+      '@bidrag/saksroller':
+        specifier: workspace:*
+        version: link:../saksroller
       '@bidrag/samhandler':
         specifier: workspace:*
         version: link:../samhandler
