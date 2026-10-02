@@ -1,11 +1,10 @@
+import { SakErrorBoundary, SaksrollerVisning } from "@bidrag/saksroller";
 import { BodyLong, Loader, VStack } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
 import { Suspense } from "react";
 
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SaksrollerPage.ts";
-import SaksrollerVisning from "./rollebilde/SaksrollerVisning.tsx";
-import SakErrorBoundary from "./SakErrorBoundary.tsx";
 
 export const handle: SakSideTittelHandle = { sakSideTittel: "Saksroller" };
 

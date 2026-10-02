@@ -1,5 +1,4 @@
 import { TilgangsFeilError } from "@bidrag/api";
-import { useNyOpprettSakModal } from "@bidrag/common";
 import { Alert, VStack } from "@navikt/ds-react";
 import type { AxiosError } from "axios";
 import { type MouseEvent, type RefObject, useEffect, useRef, useState } from "react";
@@ -7,6 +6,7 @@ import { useFormContext } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { gåTilBisys } from "../../felles/bisys-lenker";
 import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
+import { useNyOpprettSakModal } from "../start/opprettSakModalContext";
 import OpprettSakSideknapper, { type Redirectmål } from "./OpprettSakSideknapper";
 
 type Props = {

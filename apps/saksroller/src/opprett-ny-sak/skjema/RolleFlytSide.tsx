@@ -1,10 +1,10 @@
-import { useNyOpprettSakModal } from "@bidrag/common";
 import { VStack } from "@navikt/ds-react";
 import { type ComponentProps, type ReactNode, useId } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import EksisterendeSakStatus, { type EksisterendeSakStatusProps } from "../eksisterende-sak/EksisterendeSakStatus";
 import EnhetOgSubmitSection, { type EnhetOgSubmitSectionProps } from "../innsending/EnhetOgSubmitSection";
 import Oppsummering from "../innsending/Oppsummering";
+import { useNyOpprettSakModal } from "../start/opprettSakModalContext";
 import FlytSkjema from "./FlytSkjema";
 import type { Sakskategori } from "./OpprettSakStartContext";
 import SakskategoriVelger from "./SakskategoriVelger";
