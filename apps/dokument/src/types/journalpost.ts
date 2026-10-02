@@ -191,7 +191,9 @@ export class JournalpostMapper extends BaseDtoMapper<Journalpost> {
 
     isDigitalInnsendt() {
         // Basert på listen i valideringen i fil https://github.com/navikt/dokarkiv/blob/c0d2c5f9ec61ae7ae38f6ced6d4821392bbeeae4/journalpost/src/main/java/no/nav/dokarkiv/journalpost/v1/validators/OppdaterJournalpostValidator.java#L66
-        return [Kanal.NAV_NO_CHAT, Kanal.NAV_NO, Kanal.NAV_NO_BID, Kanal.ALTINN, Kanal.EESSI].includes(this.journalpostDto.kanal)
+        return [Kanal.NAV_NO_CHAT, Kanal.NAV_NO, Kanal.NAV_NO_BID, Kanal.ALTINN, Kanal.EESSI].includes(
+            this.journalpostDto.kanal,
+        );
     }
     kildeDisplayValue() {
         if (this.journalpostDto.kanal === Kanal.INGEN_DISTRIBUSJON) {
