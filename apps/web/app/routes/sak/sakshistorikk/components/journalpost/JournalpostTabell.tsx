@@ -125,6 +125,13 @@ export default function JournalpostTabell({
         slettModalRef.current?.showModal();
     };
 
+    const finnDokDato = (jp: JournalpostDto) => {
+        if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato !== null){
+           return  jp.mottattDato ? formaterDato(jp.mottattDato) : ""
+        }
+        return  jp.dokumentDato ? formaterDato(jp.dokumentDato) : ""
+    };
+
     const lukkSlettBekreftelse = () => {
         slettModalRef.current?.close();
         setJournalpostIdTilSletting(null);
@@ -310,7 +317,7 @@ export default function JournalpostTabell({
             header: "Dok.dato",
             isSortable: true,
             bodyCell: (rad: JournalpostRad) =>
-                rad.erVedlegg ? "" : rad.jp.dokumentDato ? formaterDato(rad.jp.dokumentDato) : "",
+                rad.erVedlegg ? "" : finnDokDato(rad.jp),
         },
         {
             id: "journalfortDato",
