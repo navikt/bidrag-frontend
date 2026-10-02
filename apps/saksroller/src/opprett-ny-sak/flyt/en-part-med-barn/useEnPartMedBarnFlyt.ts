@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
+import { useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";

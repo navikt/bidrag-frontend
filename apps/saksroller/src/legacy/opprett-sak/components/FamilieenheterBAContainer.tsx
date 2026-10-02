@@ -1,16 +1,12 @@
 import { Button, Heading, Loader } from "@navikt/ds-react";
 import { type MouseEvent, useEffect, useMemo, useState } from "react";
-import {
-    useHentFlerePersoninformasjon,
-    useHentForelderBarnRelasjon,
-    useOpprettSak,
-} from "../../../../api/useOpprettSakApiData.ts";
 import { OBLIGATORISK_FELT } from "../constants.ts";
 import { useSakContext } from "../OpprettSakContext.tsx";
 import { getMotpartRolleType } from "../personUtils.ts";
 import { RolleType } from "../RolleType.ts";
 import { createSakPayloadForBA } from "../sakUtils.ts";
 import type { IForeldreRoleData, IPersonensReellMottakerRolle } from "../types.ts";
+import { useHentFlerePersoninformasjon, useHentForelderBarnRelasjon, useOpprettSak } from "../useOpprettSakApiData";
 import DefaultButton from "./DefaultButton.tsx";
 import RoleRadio from "./RoleRadio.tsx";
 import type { ISelectData } from "./RoleSelect.tsx";

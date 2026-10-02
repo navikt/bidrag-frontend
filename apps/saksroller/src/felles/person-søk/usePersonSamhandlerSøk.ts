@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useEffect, useRef, useState } from "react";
-import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
-import { useHentSamhandlerEllerPersonForIdent } from "~/api/useApi.ts";
+import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
+import { useHentSamhandlerEllerPersonForIdent } from "../../api/samhandler.api";
 
 export function usePersonSamhandlerSøk({
     valgIdent,

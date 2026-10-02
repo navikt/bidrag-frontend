@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { useIsMutating } from "@tanstack/react-query";
 import { createContext, type PropsWithChildren, useContext, useMemo } from "react";
-import { OPPRETT_SAK_MUTATION_KEY } from "~/api/useApi.ts";
+import { OPPRETT_SAK_MUTATION_KEY } from "../../api/sak.api";
 import { tilPartISaken } from "../parter/part-utils";
 import type { OpprettSakInngang } from "../start/inngang";
 import type { PartISaken, PartRolle } from "./opprett-sak-schema";
@@ -39,7 +39,7 @@ const TVUNGEN_ROLLE: Partial<Record<Sakstype, PartRolle>> = {
 };
 
 export function tvungenRolle(sakstype: Sakstype | null): PartRolle | null {
-    return (sakstype && TVUNGEN_ROLLE[sakstype]) ?? null;
+    return sakstype ? (TVUNGEN_ROLLE[sakstype] ?? null) : null;
 }
 
 /** Styrer hva som skjer etter innsending og om flyten kan avbrytes. Settes av den som bygger inn flyten. */

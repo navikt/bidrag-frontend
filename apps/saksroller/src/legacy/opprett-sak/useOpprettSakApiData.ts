@@ -1,17 +1,10 @@
 import { BIDRAG_PERSON_API, BIDRAG_SAK_API, BIDRAG_TILGANGSKONTROLL_API, TilgangsFeilError } from "@bidrag/api";
 import type { ForelderBarnRelasjonDto, MotpartBarnRelasjonDto, PersonRequest } from "@bidrag/api/PersonApi";
 import type { OpprettSakRequest } from "@bidrag/api/SakApi";
+import { SecureLoggerService } from "@bidrag/common";
 import { useMutation, useQueries, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import { SecureLoggerService } from "../logging";
 
-/**
- * Datahentings-hooker for "Opprett ny sak"-funksjonaliteten (delt mellom
- * apps/web sin egen rute og apps/behandling sin innebygde modal). Speiler
- * mønsteret i apps/web/app/api/useApi.ts (samme retry-/TilgangsFeilError-
- * konvensjon), men bor her i @bidrag/common siden apps/behandling ikke kan
- * importere fra apps/web.
- */
 export function useKanOppretteSakUtenBm() {
     return useSuspenseQuery({
         queryKey: ["kan_opprette_sak_uten_bm"],

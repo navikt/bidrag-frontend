@@ -1,18 +1,16 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Button, Checkbox } from "@navikt/ds-react";
 import { type ChangeEvent, type MouseEvent, useEffect, useState } from "react";
-import { useOpprettSak } from "../../../../api/useOpprettSakApiData.ts";
 import { useSakContext } from "../OpprettSakContext.tsx";
 import { RolleType } from "../RolleType.ts";
 import { createSakPayload } from "../sakUtils.ts";
 import type { IPersonensReellMottakerRolle } from "../types.ts";
+import { useOpprettSak } from "../useOpprettSakApiData";
 import DefaultButton from "./DefaultButton.tsx";
 import PersonReellMottakerCard from "./PersonReellMottakerCard.tsx";
 
 // Migrert fra bidrag-ui
 // (apps/sak-ui/src/pages/opprett-sak/container/barn/barn-container/BarnContainer.tsx).
-// Den lokale hooken `useCreateSak` er erstattet med `useOpprettSak` fra
-// `~/api/useApi.ts`, som allerede finnes for resten av applikasjonen.
 export interface IBarnContainerProps {
     personensRolle: RolleType;
 }

@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
+import { useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import ParterSeksjon, { type ForelderKortProps } from "../../parter/ParterSeksjon";
 import { filtrerBortValgteForeldre, hentMotsattRolle, tilForelderrolle, tilRolletype } from "../../parter/part-utils";

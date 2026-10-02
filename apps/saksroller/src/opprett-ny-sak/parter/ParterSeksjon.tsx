@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Alert, Button, HGrid, VStack } from "@navikt/ds-react";
 import { useState } from "react";
-import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
+import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import SøkPerson from "../../felles/person-søk/SøkPerson";
 import RolleForelderKort from "../../rollebilde/forelder/ForelderKort";
 import type { ForelderPart, ForelderPartRolle } from "../skjema/opprett-sak-schema";

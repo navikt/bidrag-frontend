@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useHentSakForPerson } from "~/api/useApi.ts";
+import { useHentSakForPerson } from "../../api/sak.api";
 import type { ForelderPartRolle } from "../skjema/opprett-sak-schema";
 import { beregnEksisterendeSakSjekk } from "./eksisterende-sak-utils.ts";
 

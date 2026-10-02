@@ -1,7 +1,7 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { BodyLong, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
-import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
+import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import type { RolleType } from "../sakvisning-schema";
 import DiskresjonAlert from "./DiskresjonAlert";
 import PersonInfo from "./PersonInfo";

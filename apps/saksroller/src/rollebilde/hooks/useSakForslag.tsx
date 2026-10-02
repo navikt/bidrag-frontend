@@ -4,7 +4,7 @@ import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { Rolletype } from "@bidrag/api/SakApi";
 import { SecureLoggerService } from "@bidrag/common";
 import { useEffect, useState } from "react";
-import { useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
+import { useHentPersonMotpartBarnRelasjon } from "../../api/person.api";
 import { beregnSakForslag } from "../beregninger/sak-forslag.ts";
 
 type SakForslag = {

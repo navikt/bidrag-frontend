@@ -1,4 +1,4 @@
-import { useOpprettSak } from "~/api/useApi.ts";
+import { useOpprettSak } from "../../api/sak.api";
 import { lagOpprettSakRequest, type OpprettSakParter, type SaksrollerArbeidsfordeling } from "./opprett-sak-request";
 
 /**

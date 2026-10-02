@@ -4,7 +4,7 @@ import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
 import { useQueries } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useMemo } from "react";
-import { hentPersonGeografiskEnhetQueryOptions, useHentEnhetInfomasjon } from "~/api/useApi.ts";
+import { hentPersonGeografiskEnhetQueryOptions, useEnhetsnavn } from "../../api/enhet.api";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "../../felles/enheter.ts";
 import { type BarnMedAlder, DiskresjonskodeSchema } from "../skjema/opprett-sak-schema";
 
@@ -73,8 +73,7 @@ function samleIdenter(bidragspliktig: Part, bidragsmottaker: Part, barn: BestemE
 }
 
 function useSpesialenhet(enhetsnummer: string, aktiv: boolean): EnhetInfo {
-    const { data, isLoading, isFetching, error } = useHentEnhetInfomasjon(enhetsnummer, aktiv);
-    return { navn: data?.navn, isLoading: isLoading || isFetching, error };
+    return useEnhetsnavn(enhetsnummer, aktiv);
 }
 
 function useGeografiskeEnheter(

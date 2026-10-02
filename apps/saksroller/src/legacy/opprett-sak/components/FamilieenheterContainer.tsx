@@ -1,11 +1,11 @@
 import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
+import { PersonNavnIdent } from "@bidrag/common";
 import { Heading, Select } from "@navikt/ds-react";
 import { type ChangeEvent, useEffect, useState } from "react";
-import { useKanOppretteSakUtenBm } from "../../../../api/useOpprettSakApiData.ts";
-import PersonNavnIdent from "../../../person/PersonNavnIdent.tsx";
 import { useSakContext } from "../OpprettSakContext.tsx";
 import { getMotpartRolleType } from "../personUtils.ts";
 import { RolleType } from "../RolleType.ts";
+import { useKanOppretteSakUtenBm } from "../useOpprettSakApiData";
 import BarnContainer from "./BarnContainer.tsx";
 import BarnMotpartUkjentContainer from "./BarnMotpartUkjentContainer.tsx";
 

@@ -1,12 +1,12 @@
-import type { NyOpprettSakFlytProps } from "@bidrag/common";
 import { beregnAlderForPerson } from "@bidrag/utils/personUtils";
 import { InlineMessage, VStack } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
-import { useHentPersoninformasjon } from "~/api/useApi.ts";
+import { useInngangsperson } from "../../api/person.api";
 import LasterSkeleton from "../skjema/LasterSkeleton";
 import OpprettSakSkjema from "../skjema/OpprettSakSkjema";
 import type { PartRolle } from "../skjema/opprett-sak-schema";
 import { tilPartRolle } from "./inngang";
+import type { NyOpprettSakFlytProps } from "./opprettSakModalContext";
 import StartpartVelger from "./StartpartVelger";
 
 /**
@@ -21,7 +21,7 @@ export default function OpprettSakFlytInnbygget({
     onOpprettet,
     onAvbryt,
 }: NyOpprettSakFlytProps) {
-    const { data: person, error } = useHentPersoninformasjon({ ident });
+    const { person, error } = useInngangsperson(ident);
     const [valgtRolle, setValgtRolle] = useState<PartRolle | null>(null);
     const inngang = useMemo(
         () => ({ ident, rolle, initialForelder, eierfogd }),

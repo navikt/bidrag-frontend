@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { Box, Heading, HGrid, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import type { ISamhandlerPersonInfo } from "~/api/types/person.ts";
+import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import ForelderVisning from "./ForelderVisning.tsx";
 import LeggTilForelder from "./LeggTilForelder.tsx";

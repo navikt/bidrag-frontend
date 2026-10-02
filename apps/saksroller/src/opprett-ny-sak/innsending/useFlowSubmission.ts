@@ -2,7 +2,7 @@ import { Rolletype } from "@bidrag/api/SakApi";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
 import { type SubmitEvent, useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
-import { useSjekkTilgangOpprettSakUtenBm } from "~/api/useApi.ts";
+import { useSjekkTilgangOpprettSakUtenBm } from "../../api/sak.api";
 import { useEksisterendeSakSjekk } from "../eksisterende-sak/useEksisterendeSakSjekk";
 import type { BarnebidragForelderRolle, BarnMedAlder, ForelderPartRolle, Motpart } from "../skjema/opprett-sak-schema";
 import type { EnhetOgSubmitSectionProps } from "./EnhetOgSubmitSection";

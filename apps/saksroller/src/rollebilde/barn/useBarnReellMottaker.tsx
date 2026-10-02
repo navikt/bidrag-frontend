@@ -2,7 +2,7 @@ import { SecureLoggerService } from "@bidrag/common";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useHentSamhandler } from "~/api/useApi.ts";
+import { useHentSamhandler } from "../../api/samhandler.api";
 import { FunnetPersonInnhold } from "../../felles/person/FunnetPersonInfo.tsx";
 import type { ReellMottakerValg } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";

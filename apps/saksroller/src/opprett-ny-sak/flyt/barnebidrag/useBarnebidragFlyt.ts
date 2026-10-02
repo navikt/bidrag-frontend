@@ -3,7 +3,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { type UseFormReturn, useFormContext } from "react-hook-form";
-import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "~/api/useApi.ts";
+import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
 import { reellMottakerRegel } from "../../../felles/saksregler";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";

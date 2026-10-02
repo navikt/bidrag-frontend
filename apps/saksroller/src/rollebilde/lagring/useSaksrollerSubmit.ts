@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useOppdaterSaksroller } from "~/api/useApi.ts";
+import { useOppdaterSaksroller } from "../../api/sak.api";
 import type { SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { finnFørsteValideringsfeil } from "./finn-forste-valideringsfeil.ts";
 import { lagOppdaterRollerRequest } from "./lag-oppdater-roller-request.ts";

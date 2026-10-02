@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useHentPersonMotpartBarnRelasjonSuspense } from "~/api/useApi.ts";
+import { useHentPersonMotpartBarnRelasjonSuspense } from "../../../api/person.api";
 import { MYNDYG_BARN_ALDER } from "../../../felles/saksregler";
 import BarnSection from "../../barn/BarnSection";
 import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";

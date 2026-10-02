@@ -14,6 +14,7 @@
         "@bidrag/api": "workspace:*",
         "@bidrag/behandling": "workspace:*",
         "@bidrag/common": "workspace:*",
+        "@bidrag/saksroller": "workspace:*",
         "@bidrag/dokument": "workspace:*",
         "@bidrag/forsendelse": "workspace:*",
         "@bidrag/redigering": "workspace:*",

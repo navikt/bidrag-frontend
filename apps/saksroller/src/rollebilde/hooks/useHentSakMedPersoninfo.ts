@@ -1,6 +1,7 @@
 import type { BidragssakDto } from "@bidrag/api/SakApi";
 import { useMemo } from "react";
-import { useHentFlerePersoninformasjonSuspense, useHentSakSuspense } from "~/api/useApi.ts";
+import { useHentFlerePersoninformasjonSuspense } from "../../api/person.api";
+import { useHentSakSuspense } from "../../api/sak.api";
 import type { Rolle } from "../../felles/sakvisning-schema.ts";
 import { berikRoller } from "../beregninger/rolleberikelse.ts";
 

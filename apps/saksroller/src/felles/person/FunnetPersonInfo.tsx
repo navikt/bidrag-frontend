@@ -2,7 +2,7 @@ import { IdentUtils } from "@bidrag/common";
 import { PersonIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
 
-import { useHentSamhandler } from "~/api/useApi.ts";
+import { useHentSamhandler } from "../../api/samhandler.api";
 import PersonInfo from "./PersonInfo.tsx";
 
 type Props = {

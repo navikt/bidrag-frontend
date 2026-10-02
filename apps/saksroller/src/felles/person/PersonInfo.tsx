@@ -12,7 +12,8 @@ import { BodyShort, Box, HStack, Link, Skeleton, VStack } from "@navikt/ds-react
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
-import { useHentPersonData, useHentSamhandler } from "~/api/useApi.ts";
+import { useHentPersonData } from "../../api/person.api";
+import { useHentSamhandler } from "../../api/samhandler.api";
 import type { RolleType as SaksrolleType } from "../sakvisning-schema.ts";
 
 type Props = {
