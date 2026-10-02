@@ -7,7 +7,7 @@ const TOGGLE = "bisys.ny_sakshistorikk";
 /** True når gammel sakshistorikk i Bisys er skrudd av, og alle skal til sakshistorikken i denne appen. */
 export function useKunNySakshistorikk(): boolean {
     const variant = useVariant(TOGGLE);
-    return useFlag(TOGGLE) && variant.enabled && variant.name === "skru_av_gamle";
+    return useFlag(TOGGLE) && variant.enabled === true && variant.name === "skru_av_gamle";
 }
 
 export function KunNySakshistorikkSync() {
