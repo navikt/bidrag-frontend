@@ -126,10 +126,10 @@ export default function JournalpostTabell({
     };
 
     const finnDokDato = (jp: JournalpostDto) => {
-        if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato !== null){
-           return  jp.mottattDato ? formaterDato(jp.mottattDato) : ""
+        if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato !== null) {
+            return jp.mottattDato ? formaterDato(jp.mottattDato) : "";
         }
-        return  jp.dokumentDato ? formaterDato(jp.dokumentDato) : ""
+        return jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
     };
 
     const lukkSlettBekreftelse = () => {
@@ -316,8 +316,7 @@ export default function JournalpostTabell({
             id: "dokumentDato",
             header: "Dok.dato",
             isSortable: true,
-            bodyCell: (rad: JournalpostRad) =>
-                rad.erVedlegg ? "" : finnDokDato(rad.jp),
+            bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : finnDokDato(rad.jp)),
         },
         {
             id: "journalfortDato",
