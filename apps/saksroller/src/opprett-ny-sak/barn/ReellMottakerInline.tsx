@@ -22,7 +22,7 @@ type Props<TFieldValues extends FieldValues> = {
     regel: ReellMottakerValgregel;
 };
 
-export default function ReellMottakerInline<TFieldValues extends FieldValues>({
+function ReellMottakerInline<TFieldValues extends FieldValues>({
     form,
     fieldPath,
     barnIdent,

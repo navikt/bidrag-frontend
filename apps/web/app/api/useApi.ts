@@ -14,10 +14,10 @@ import {
     type JournalpostResponse,
 } from "@bidrag/api/BidragDokumentApi";
 import type { EnhetDto } from "@bidrag/api/OrganisasjonApi";
-import type { ForelderBarnRelasjonDto, PersonDto, PersonRequest } from "@bidrag/api/PersonApi";
+import type { PersonDto, PersonRequest } from "@bidrag/api/PersonApi";
 import type { BidragssakDto, FogdhistorikkDto, SakshendelseDto } from "@bidrag/api/SakApi";
 import { LoggerService, SecureLoggerService } from "@bidrag/common";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 // ==================== SAK ====================
@@ -79,99 +79,6 @@ export function useHentPersoninformasjon(request: PersonRequest | null, enabled:
                     await SecureLoggerService.warn(`Ingen tilgang til person ${request.ident}`);
                     throw new TilgangsFeilError(
                         `Du har ikke tilgang til informasjon om denne personen ${request.ident}`,
-                    );
-                }
-                throw e;
-            }
-        },
-        enabled: enabled && !!request?.ident,
-        retry: (failureCount, error) => {
-            if (error instanceof TilgangsFeilError) {
-                return false;
-            }
-            return failureCount < 1;
-        },
-        throwOnError: false,
-    });
-}
-
-export function useHentPersoninformasjonMutation() {
-    return useMutation<PersonDto, AxiosError | TilgangsFeilError, PersonRequest>({
-        mutationFn: async (request) => {
-            try {
-                const { data, status } = await BIDRAG_PERSON_API.informasjon.hentPersonPost(request);
-                await SecureLoggerService.info(`Hentet personinformasjon for ident ${request.ident}`);
-                if (status !== 200) {
-                    throw new Error(`Fant ikke person med ident ${request.ident}`);
-                }
-                return data;
-            } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til person ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til informasjon om denne personen ${request.ident}`,
-                    );
-                }
-                throw e;
-            }
-        },
-    });
-}
-
-export function useHentFlerePersoninformasjon(identer: string[], enabled: boolean = true) {
-    return useQueries({
-        queries: identer.map((ident) => ({
-            queryKey: ["hent_personinformasjon", ident],
-            queryFn: async () => {
-                try {
-                    const { data } = await BIDRAG_PERSON_API.informasjon.hentPersonPost({
-                        ident,
-                    });
-                    await SecureLoggerService.info(`Hentet personinformasjon for ident ${ident}`);
-                    return data;
-                } catch (e) {
-                    const axiosError = e as AxiosError;
-                    const status = axiosError?.response?.status;
-
-                    if (status === 403 || status === 401) {
-                        await SecureLoggerService.warn(`Ingen tilgang til person ${ident}`);
-                        throw new TilgangsFeilError(`Du har ikke tilgang til informasjon om denne personen ${ident}`);
-                    }
-                    throw e;
-                }
-            },
-            enabled: enabled && ident.length === 11,
-            retry: (failureCount: number, error: Error) => {
-                if (error instanceof TilgangsFeilError) {
-                    return false;
-                }
-                return failureCount < 1;
-            },
-            throwOnError: false,
-        })),
-    });
-}
-
-export function useHentForelderBarnRelasjon(request: PersonRequest | null, enabled: boolean = true) {
-    return useQuery<ForelderBarnRelasjonDto | undefined, AxiosError | TilgangsFeilError>({
-        queryKey: ["hent_forelder_barn_relasjon", request?.ident],
-        queryFn: async (): Promise<ForelderBarnRelasjonDto | undefined> => {
-            if (!request || !enabled) return undefined;
-            try {
-                const { data } = await BIDRAG_PERSON_API.forelderbarnrelasjon.hentForelderBarnRelasjon1(request);
-                await SecureLoggerService.info(`Hentet forelder-barn relasjon for ident ${request.ident}`);
-                return data;
-            } catch (e) {
-                const axiosError = e as AxiosError;
-                const status = axiosError?.response?.status;
-
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til relasjoner for barn ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til å hente relasjoner for denne personen ${request.ident}`,
                     );
                 }
                 throw e;

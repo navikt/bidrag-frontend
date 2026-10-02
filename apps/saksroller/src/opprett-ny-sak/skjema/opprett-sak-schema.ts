@@ -2,7 +2,7 @@ import { z } from "zod";
 import { type SakParter, type Sakstype, validerSak } from "../../felles/saksregler";
 // Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
 // sakvisning i stedet for å dupliseres.
-import { DiskresjonskodeSchema, ReellMottakerFelterSchema } from "../../felles/sakvisning-schema";
+import { type Diskresjonskode, DiskresjonskodeSchema, ReellMottakerFelterSchema } from "../../felles/sakvisning-schema";
 import { tilForelderrolle } from "../parter/part-utils";
 
 export { DiskresjonskodeSchema };
@@ -167,7 +167,6 @@ export type Motpart = z.infer<typeof MotpartSchema>;
 export type PartISaken = z.infer<typeof PartISakenSchema>;
 export type PartRolle = z.infer<typeof PartRolleSchema>;
 export type ForelderPartRolle = z.infer<typeof ForelderPartRolleSchema>;
-export type Diskresjonskode = z.infer<typeof DiskresjonskodeSchema>;
 
 // ==================== HELPER TYPES ====================
 

@@ -2,13 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, InlineMessage } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { reellMottakerRegel, type Sakstype } from "../../../felles/saksregler";
+import type { Diskresjonskode } from "../../../felles/sakvisning-schema";
 import BarnSection from "../../barn/BarnSection";
 import ParterSeksjon from "../../parter/ParterSeksjon";
 import { hentForelderRolleLabel } from "../../parter/part-utils";
 import LasterSkeleton from "../../skjema/LasterSkeleton";
 import { useOpprettSakStart } from "../../skjema/OpprettSakStartContext";
 import {
-    type Diskresjonskode,
     type EnPartMedBarnRolle,
     FarskapsSkjemaSchema,
     type FarskapsSkjemaSchemaData,

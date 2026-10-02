@@ -56,12 +56,6 @@ export type GodtattBrudd = {
     begrunnelse: string;
 };
 
-export const AKSEL_MODAL_SECONDARY_KNAPP_KONTRAST: GodtattBrudd = {
-    regel: "color-contrast",
-    selektor: '.aksel-modal__footer > .aksel-button--medium[data-variant="secondary"]',
-    begrunnelse: "Aksel secondary-knapp i modal-footer: #4285c9 på hvit gir 3.86:1, WCAG AA krever 4.5:1",
-};
-
 export async function expectNoAxeViolations(
     page: Page,
     component: Locator,

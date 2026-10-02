@@ -54,7 +54,7 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
     });
 }
 
-export function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
+function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
     return {
         queryKey: ["hent_person_motpart_barn_relasjon", request?.ident],
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
