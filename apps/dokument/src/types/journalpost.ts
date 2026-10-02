@@ -69,6 +69,18 @@ export const JournalpostKildeDisplayValueMap: Map<Kanal, string> = new Map<Kanal
     [Kanal.SENTRAL_UTSKRIFT, "Sentral print"],
     [Kanal.SDP, "Digital postkasse"],
     [Kanal.INGEN_DISTRIBUSJON, "Ingen distribusjon"],
+    [Kanal.INNSENDT_NAV_ANSATT, "Registrert av NAV-ansatt"],
+    [Kanal.NAV_NO_UINNLOGGET, "Ditt NAV (uinnlogget)"],
+    [Kanal.NAV_NO_CHAT, "Innlogget samtale"],
+    [Kanal.ALTINN, "Altinn"],
+    [Kanal.ALTINN_INNBOKS, "Altinn innboks"],
+    [Kanal.HR_SYSTEM_API, "HR-system"],
+    [Kanal.E_POST, "E-post"],
+    [Kanal.EESSI, "EESSI"],
+    [Kanal.EIA, "EIA"],
+    [Kanal.EKST_OPPS, "Eksternt"],
+    [Kanal.HELSENETTET, "Helsenettet"],
+    [Kanal.TRYGDERETTEN, "Trygderetten"],
 ]);
 
 export const DokumentTypeDisplayValueMap: Map<DokumentType, string> = new Map<DokumentType, string>([
@@ -178,7 +190,8 @@ export class JournalpostMapper extends BaseDtoMapper<Journalpost> {
     }
 
     isDigitalInnsendt() {
-        return this.journalpostDto.kanal === Kanal.NAV_NO_BID || this.journalpostDto.kanal === Kanal.NAV_NO;
+        // Basert på listen i valideringen i fil https://github.com/navikt/dokarkiv/blob/c0d2c5f9ec61ae7ae38f6ced6d4821392bbeeae4/journalpost/src/main/java/no/nav/dokarkiv/journalpost/v1/validators/OppdaterJournalpostValidator.java#L66
+        return [Kanal.NAV_NO_CHAT, Kanal.NAV_NO, Kanal.NAV_NO_BID, Kanal.ALTINN, Kanal.EESSI].includes(this.journalpostDto.kanal)
     }
     kildeDisplayValue() {
         if (this.journalpostDto.kanal === Kanal.INGEN_DISTRIBUSJON) {
