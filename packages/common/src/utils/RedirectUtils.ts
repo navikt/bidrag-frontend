@@ -5,6 +5,13 @@ export function getSessionStateFromParam() {
     return sessionState ? `sessionState=${getParamFromUrl("sessionState")}` : "";
 }
 
+let kunNySakshistorikk = false;
+
+/** Settes av `KunNySakshistorikkSync`, siden redirects skjer utenfor React og ikke kan lese toggelen selv. */
+export function setKunNySakshistorikk(verdi: boolean) {
+    kunNySakshistorikk = verdi;
+}
+
 export const RedirectTo = {
     oppgaveListe: (bisysurl: string) => {
         window.location.href = `${bisysurl}Oppgaveliste.do?${getSessionStateFromParam()}`;
@@ -30,7 +37,7 @@ export const RedirectTo = {
         const searchParams = new URLSearchParams(window.location.search);
         const { sessionState } = getBisysSessionParams(searchParams);
         const params = new URLSearchParams();
-        if (searchParams.get("from") === "bisys") {
+        if (!kunNySakshistorikk && searchParams.get("from") === "bisys") {
             params.set("saksnr", saksnr);
             if (sessionState) params.set("sessionState", sessionState);
             window.location.href = `/bisys/sakshistorikk?${params}`;

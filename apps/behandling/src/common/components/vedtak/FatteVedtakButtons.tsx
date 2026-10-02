@@ -4,6 +4,7 @@ import {
     TypeBehandling,
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
+import { RedirectTo } from "@bidrag/common";
 import { Alert, BodyShort, Button, Checkbox, CheckboxGroup, Heading, Select } from "@navikt/ds-react";
 import { useIsMutating, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -11,7 +12,6 @@ import debounce from "lodash/debounce";
 import { useState } from "react";
 import { useParams } from "react-router";
 import { useVedtakProvider } from "../../../barnebidrag/components/vedtak/VedtakCommon";
-import environment from "../../../environment";
 import { BEHANDLING_API_V1 } from "../../constants/api";
 import { MåBekrefteOpplysningerStemmerError } from "../../constants/MåBekrefteOpplysningerStemmerError";
 import { fatteVedtakMutationKey } from "../../constants/mutationKeys";
@@ -85,7 +85,7 @@ export const FatteVedtakButtons = ({
             }
         },
         onSuccess: () => {
-            window.location.href = `${environment.url.bisysSakshistorikk}?saksnr=${saksnummer}`;
+            RedirectTo.sakshistorikk(saksnummer);
         },
     });
     const throttledSubmit = debounce(fatteVedtakFn.mutate, 100);

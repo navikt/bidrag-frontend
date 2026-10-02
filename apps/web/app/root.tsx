@@ -13,7 +13,7 @@ import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts"
 import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
 import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
-import { BidragProgressbarFullScreen } from "@bidrag/common";
+import { BidragProgressbarFullScreen, KunNySakshistorikkSync } from "@bidrag/common";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import RootErrorBoundary from "~/common/components/errorpage/RootErrorBoundary.tsx";
@@ -98,6 +98,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
                     fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} bisysUrl={bisysUrl} />}
                 >
                     <UnleashContextUpdater />
+                    <KunNySakshistorikkSync />
                     <NyOpprettSakFlytProvider>
                         <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
                             <ClientOnly fallback={<BidragProgressbarFullScreen />}>
