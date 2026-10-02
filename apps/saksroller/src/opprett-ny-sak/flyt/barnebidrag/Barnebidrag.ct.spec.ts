@@ -1,8 +1,8 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
-import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
+import { testpersoner } from "@ct-saksroller/opprett-ny-sak/fixtures";
+import { expectNoAxeViolations, mockOpprettSakApi } from "@ct-saksroller/opprett-ny-sak/network";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/flyt/barnebidrag/Barnebidrag";
+const STORY = "opprett-ny-sak/flyt/barnebidrag/Barnebidrag";
 const { bidragspliktig: bp, bidragsmottaker: bm, annenForelder, barnUnder18 } = testpersoner;
 
 /** Storyen genererer egne identer, så barnet i storyen får foreldrene uansett ident. */

@@ -1,16 +1,16 @@
 import type { MotpartBarnRelasjon, PersonDto } from "@bidrag/api/PersonApi";
-import { NyOpprettSakFlytContext, OpprettSakFlytModal } from "@bidrag/common";
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { Button } from "@navikt/ds-react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useMemo, useState } from "react";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
-import OpprettSakSkjema from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/OpprettSakSkjema";
-import type { Sakstype } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/OpprettSakStartContext";
-import type { PartRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/skjema/opprett-sak-schema";
-import type { InngangRolle } from "../../app/routes/sak/saksroller/opprett-ny-sak/start/inngang";
-import OpprettSakFlyt from "../../app/routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlyt";
-import OpprettSakFlytInnbygget from "../../app/routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlytInnbygget";
+import OpprettSakSkjema from "../../src/opprett-ny-sak/skjema/OpprettSakSkjema";
+import type { Sakstype } from "../../src/opprett-ny-sak/skjema/OpprettSakStartContext";
+import type { PartRolle } from "../../src/opprett-ny-sak/skjema/opprett-sak-schema";
+import type { InngangRolle } from "../../src/opprett-ny-sak/start/inngang";
+import OpprettSakFlyt from "../../src/opprett-ny-sak/start/OpprettSakFlyt";
+import OpprettSakFlytInnbygget from "../../src/opprett-ny-sak/start/OpprettSakFlytInnbygget";
+import { OpprettSakFlytModal } from "../../src/opprett-ny-sak/start/OpprettSakFlytModal";
 import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
@@ -70,7 +70,6 @@ type ModalStoryProps = {
     rolle?: InngangRolle;
     initialForelderIdent?: string;
     eierfogd?: string;
-    medNyFlyt?: boolean;
 };
 
 /** Modalen slik behandling og dokument åpner den. Resultatet lagres i skjulte felt. */
@@ -78,13 +77,13 @@ export function OpprettSakFlytModalStory(props: ModalStoryProps) {
     return <StoryRouter content={<ModalHarness {...props} />} />;
 }
 
-function ModalHarness({ ident, rolle, initialForelderIdent, eierfogd, medNyFlyt = true }: ModalStoryProps) {
+function ModalHarness({ ident, rolle, initialForelderIdent, eierfogd }: ModalStoryProps) {
     const [open, settOpen] = useState(false);
     const [saksnummer, settSaksnummer] = useState("");
     const [lukket, settLukket] = useState(false);
 
     return (
-        <NyOpprettSakFlytContext value={medNyFlyt ? OpprettSakFlytInnbygget : null}>
+        <>
             <form hidden>
                 <input data-testid="opprettet-saksnummer" readOnly value={saksnummer} />
                 <input data-testid="lukket" readOnly value={String(lukket)} />
@@ -109,7 +108,7 @@ function ModalHarness({ ident, rolle, initialForelderIdent, eierfogd, medNyFlyt 
                     }}
                 />
             </YtreSkjema>
-        </NyOpprettSakFlytContext>
+        </>
     );
 }
 

@@ -1,9 +1,9 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
-import { lagRolle, lagSak, testpersoner } from "@ct/saksroller/fixtures.ts";
-import { mockSaksrollerApi } from "@ct/saksroller/network.ts";
+import { lagRolle, lagSak, testpersoner } from "@ct-saksroller/saksroller/fixtures.ts";
+import { mockSaksrollerApi } from "@ct-saksroller/saksroller/network.ts";
 
-const STORY = "routes/sak/saksroller/rollebilde/SaksrollerVisning/Standard";
+const STORY = "rollebilde/SaksrollerVisning/Standard";
 
 test.describe("SaksrollerVisning", () => {
     test("kan legge til første barn når saken ikke har barn", async ({ mount, page }) => {

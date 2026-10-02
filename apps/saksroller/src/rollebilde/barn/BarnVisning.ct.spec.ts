@@ -1,9 +1,9 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 
-const STORY_UTEN_RM = "routes/sak/saksroller/rollebilde/barn/BarnVisning/UtenReellMottaker";
-const STORY_NYTT_BARN = "routes/sak/saksroller/rollebilde/barn/BarnVisning/NyttBarnKanFjernes";
-const STORY_PÅKREVD_RM = "routes/sak/saksroller/rollebilde/barn/BarnVisning/PåkrevdReellMottaker";
+const STORY_UTEN_RM = "rollebilde/barn/BarnVisning/UtenReellMottaker";
+const STORY_NYTT_BARN = "rollebilde/barn/BarnVisning/NyttBarnKanFjernes";
+const STORY_PÅKREVD_RM = "rollebilde/barn/BarnVisning/PåkrevdReellMottaker";
 
 test.describe("BarnVisning", () => {
     test("fjerner kun det nye barnet via Fjern-knappen, uten å påvirke andre barn", async ({ mount }) => {

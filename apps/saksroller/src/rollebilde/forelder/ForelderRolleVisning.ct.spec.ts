@@ -2,10 +2,9 @@ import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import type { Page } from "@playwright/test";
 
-const STORY_BEGGE_KJENT = "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/BeggeRollerISak";
-const STORY_BM_MANGLER = "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/BidragsmottakerMangler";
-const STORY_BP_PLASSHOLDER =
-    "routes/sak/saksroller/rollebilde/forelder/ForelderRolleVisning/BidragspliktigManglerMedPlassholderRolle";
+const STORY_BEGGE_KJENT = "rollebilde/forelder/ForelderRolleVisning/BeggeRollerISak";
+const STORY_BM_MANGLER = "rollebilde/forelder/ForelderRolleVisning/BidragsmottakerMangler";
+const STORY_BP_PLASSHOLDER = "rollebilde/forelder/ForelderRolleVisning/BidragspliktigManglerMedPlassholderRolle";
 
 async function mockPersonInformasjonForIdentFørMount(page: Page, ident: string, visningsnavn: string) {
     await page.route("**/proxy/bidrag-person/informasjon/", async (route) => {

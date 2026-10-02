@@ -1,6 +1,6 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
-import { useTestQueryClient } from "@ct/saksroller/useTestQueryClient.ts";
+import { useTestQueryClient } from "@ct-saksroller/saksroller/useTestQueryClient.ts";
 import { VStack } from "@navikt/ds-react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";

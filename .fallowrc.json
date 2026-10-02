@@ -15,7 +15,11 @@
         {
             "name": "story-galleri",
             "enablers": ["@playwright/test"],
-            "entryPoints": ["apps/web/app/**/*.story.tsx", "packages/common/src/**/*.story.tsx"],
+            "entryPoints": [
+                "apps/web/app/**/*.story.tsx",
+                "packages/common/src/**/*.story.tsx",
+                "apps/saksroller/src/**/*.story.tsx"
+            ],
             "entryPointRole": "test",
             "usedExports": [
                 {

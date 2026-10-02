@@ -12,6 +12,7 @@ export default defineConfig({
         alias: {
             "~": fileURLToPath(new URL("../app", import.meta.url)),
             "@ct": fileURLToPath(new URL(".", import.meta.url)),
+            "@ct-saksroller": fileURLToPath(new URL("../../saksroller/playwright", import.meta.url)),
         },
     },
     server: {
@@ -32,6 +33,7 @@ export default defineConfig({
                 "./playwright/gallery/stories.ts",
                 "./app/**/*.story.tsx",
                 "../../packages/common/src/**/*.story.tsx",
+                "../saksroller/src/**/*.story.tsx",
             ],
         },
     },

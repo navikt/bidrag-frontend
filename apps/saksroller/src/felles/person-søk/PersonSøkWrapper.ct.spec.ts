@@ -1,6 +1,6 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 
-const STORY = "routes/sak/saksroller/felles/person-søk/PersonSøkWrapper/Standard";
+const STORY = "felles/person-søk/PersonSøkWrapper/Standard";
 
 test("vises inline, ikke som modal, og Avbryt lukker søket", async ({ mount }) => {
     const component = await mount(STORY);

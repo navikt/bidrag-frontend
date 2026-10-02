@@ -1,10 +1,10 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
-import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
+import { testpersoner } from "@ct-saksroller/opprett-ny-sak/fixtures";
+import { expectNoAxeViolations, mockOpprettSakApi } from "@ct-saksroller/opprett-ny-sak/network";
 import type { Locator } from "@playwright/test";
 import type { Innbygget } from "./OpprettSakFlyt.story";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlyt/Standard";
+const STORY = "opprett-ny-sak/start/OpprettSakFlyt/Standard";
 
 async function velgStartpart(component: Locator, ident: string, rolle?: string) {
     const søk = component.getByRole("searchbox", { name: /^Søk etter/ }).first();
@@ -246,7 +246,7 @@ test("hele siden: velger sakstype, søker part, fyller ut motpart og oppretter e
 });
 
 test.describe("Innbygget med forhåndsutfylling", () => {
-    const INNBYGGET = "routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlyt/Innbygget";
+    const INNBYGGET = "opprett-ny-sak/start/OpprettSakFlyt/Innbygget";
     const { bidragspliktig: bp, bidragsmottaker: bm, barnUnder18 } = testpersoner;
     const rollevelger = (component: import("@playwright/test").Locator) =>
         component.getByRole("radiogroup", { name: /Hvilken rolle har/ });

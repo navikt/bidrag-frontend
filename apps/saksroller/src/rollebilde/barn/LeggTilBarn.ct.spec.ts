@@ -2,7 +2,7 @@ import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import type { Page } from "@playwright/test";
 
-const STORY = "routes/sak/saksroller/rollebilde/barn/LeggTilBarn/MedBidragsmottaker";
+const STORY = "rollebilde/barn/LeggTilBarn/MedBidragsmottaker";
 
 async function mockPersonInformasjonFørMount(
     page: Page,

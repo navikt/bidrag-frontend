@@ -1,10 +1,10 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
-import { testpersoner } from "@ct/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "@ct/opprett-ny-sak/network";
+import { testpersoner } from "@ct-saksroller/opprett-ny-sak/fixtures";
+import { expectNoAxeViolations, mockOpprettSakApi } from "@ct-saksroller/opprett-ny-sak/network";
 import type { Locator, Page } from "@playwright/test";
 import type { Modal } from "./OpprettSakFlytModal.story";
 
-const STORY = "routes/sak/saksroller/opprett-ny-sak/start/OpprettSakFlytModal/Modal";
+const STORY = "opprett-ny-sak/start/OpprettSakFlytModal/Modal";
 const { bidragspliktig: bp, bidragsmottaker: bm, barnUnder18 } = testpersoner;
 const foreldreTilBarn = { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } };
 
@@ -133,14 +133,5 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await expect(
             dialog.getByText("Arbeidsfordelingen gir en annen enhet enn 9999.", { exact: false }),
         ).toBeVisible();
-    });
-
-    test("uten ny flyt vises ingen ny modal", async ({ mount, page }) => {
-        await mockOpprettSakApi(page);
-        const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, medNyFlyt: false });
-
-        await component.getByRole("button", { name: "Åpne opprett sak" }).click();
-
-        await expect(page.getByRole("dialog")).toHaveCount(0);
     });
 });
