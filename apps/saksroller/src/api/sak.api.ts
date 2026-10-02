@@ -23,7 +23,7 @@ export function useSjekkTilgangOpprettSakUtenBm(enabled: boolean = true) {
                 const response = await BIDRAG_TILGANGSKONTROLL_API.v2.sjekkTilgangOpprettSakUtenBm();
 
                 await SecureLoggerService.info(
-                    `Tilgangssjekk for opprettelse av sak uten BM: ${response.data ? "Har tilgang" : "Ingen tilgang"}`,
+                    `Tilgangssjekk for opprettelse av sak uten BM: ${response.data.harTilgang ? "Har tilgang" : "Ingen tilgang"}`,
                 );
 
                 return response.data.harTilgang;
