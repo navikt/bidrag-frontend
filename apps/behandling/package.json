@@ -15,6 +15,7 @@
     "dependencies": {
         "@bidrag/api": "workspace:*",
         "@bidrag/common": "workspace:*",
+        "@bidrag/saksroller": "workspace:*",
         "@bidrag/utils": "workspace:*",
         "@mdx-js/react": "^3.1.1",
         "@navikt/aksel-icons": "catalog:",

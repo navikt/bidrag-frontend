@@ -1,0 +1,11 @@
+{
+    "extends": "../../tsconfig.packages.json",
+    "include": ["src", "playwright"],
+    "compilerOptions": {
+        "types": ["node", "vite/client"],
+        "lib": ["ES2023", "DOM", "DOM.Iterable"],
+        "paths": {
+            "@ct-saksroller/*": ["./playwright/*"]
+        }
+    }
+}

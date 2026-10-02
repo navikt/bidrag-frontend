@@ -29,9 +29,14 @@ const commonStories = normaliser(
     /^(\.\.\/)+packages\/common\/src\//,
     "packages/common/src",
 );
-for (const [path, importer] of Object.entries(commonStories)) {
+const saksrollerStories = normaliser(
+    import.meta.glob("../../../saksroller/src/**/*.story.tsx"),
+    /^(\.\.\/)+saksroller\/src\//,
+    "apps/saksroller/src",
+);
+for (const [path, importer] of Object.entries({ ...commonStories, ...saksrollerStories })) {
     if (stories[path]) {
-        throw new Error(`Duplikat story-sti "${path}" mellom apps/web og packages/common.`);
+        throw new Error(`Duplikat story-sti "${path}" mellom apps/web, packages/common og apps/saksroller.`);
     }
     stories[path] = importer;
 }
