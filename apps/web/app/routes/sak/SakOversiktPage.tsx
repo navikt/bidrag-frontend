@@ -1,27 +1,19 @@
-import { PersonNavn } from "@bidrag/common";
 import { Box, Heading, Loader, LocalAlert, VStack } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { finnOppgaver } from "~/api/query/oppgave.query.ts";
-import { useHentPersoninformasjon } from "~/api/useApi.ts";
 import { OppgaveTabell } from "~/common/oppgave/OppgaveTabell.tsx";
-import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
-import type { Route } from "./+types/BrukerOversikt";
+import type { Route } from "./+types/SakOversiktPage";
 
-export default function BrukerOversikt({ params }: Route.ComponentProps) {
-    const { decodeFnr } = useObfuscateFnr();
-    const brukerId = params.brukerid;
-    const fnr = decodeFnr(brukerId);
-    const { data: bruker } = useHentPersoninformasjon({ ident: fnr });
+export default function SakOversiktPage({ params }: Route.ComponentProps) {
+    const saksnummer = params.saksnummer;
 
-    const { data: oppgaver } = useSuspenseQuery(finnOppgaver({ aktoerId: bruker?.aktørId }));
+    const { data: oppgaver } = useSuspenseQuery(finnOppgaver({ saksnummer: saksnummer }));
 
     return (
         <VStack gap={"space-48"}>
-            <title>Brukeroversikt</title>
-            <Heading size={"medium"}>
-                Brukeroversikt for <PersonNavn ident={fnr} />
-            </Heading>
+            <title>Sak {saksnummer}</title>
+            <Heading size={"medium"}>Oversikt sak {saksnummer}</Heading>
             <LocalAlert status={"announcement"}>
                 <LocalAlert.Header>
                     <LocalAlert.Title>Under konstruksjon</LocalAlert.Title>

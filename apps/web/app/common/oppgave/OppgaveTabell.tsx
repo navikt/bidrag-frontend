@@ -1,18 +1,14 @@
 import type { Beskrivelseinnslag, BidragOppgaveDto } from "@bidrag/api/BidragOppgaveApi";
-import { MaskerSensitivInfo, PersonIdent } from "@bidrag/common";
+import { MaskerSensitivInfo, PersonNavn } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils/datoUtils";
 import { BodyLong, Box, Detail, HStack, Label, Link, List, Table, VStack } from "@navikt/ds-react";
 import { ListItem } from "@navikt/ds-react/List";
 import { Link as RouterLink } from "react-router";
+import { ObfuscateFnrLink } from "~/common/person/ObfuscateFnrLink.tsx";
 
 interface OppgaveTabellProps {
     oppgaver: BidragOppgaveDto[];
 }
-
-const tidspunktFormat = new Intl.DateTimeFormat("nb-NO", {
-    dateStyle: "short",
-    timeStyle: "short",
-});
 
 function BeskrivelseListe({ innslag }: { innslag?: Beskrivelseinnslag[] | null }) {
     if (!innslag?.length) return <p>Ingen beskrivelser</p>;
@@ -22,11 +18,9 @@ function BeskrivelseListe({ innslag }: { innslag?: Beskrivelseinnslag[] | null }
             {innslag.map((beskrivelse, indeks) => (
                 <VStack gap="space-4" key={`${beskrivelse.tidspunkt ?? "uten-tidspunkt"}-${indeks}`}>
                     <HStack gap="space-8" align={"center"}>
-                        <Label className="font-semibold">
+                        <Label>
                             {beskrivelse.tidspunkt && (
-                                <time dateTime={beskrivelse.tidspunkt}>
-                                    {tidspunktFormat.format(new Date(beskrivelse.tidspunkt))}
-                                </time>
+                                <time dateTime={beskrivelse.tidspunkt}>{formaterDato(beskrivelse.tidspunkt)}</time>
                             )}
                         </Label>
                         <Detail as={"span"}>
@@ -57,7 +51,7 @@ export function OppgaveTabell({ oppgaver }: OppgaveTabellProps) {
     if (oppgaver.length === 0) return <p>Ingen oppgaver</p>;
 
     return (
-        <Box >
+        <Box>
             <Table size="small">
                 <caption className="sr-only">Oppgaver</caption>
                 <Table.Header>
@@ -78,24 +72,20 @@ export function OppgaveTabell({ oppgaver }: OppgaveTabellProps) {
                     {oppgaver.map((oppgave) => (
                         <Table.ExpandableRow
                             key={oppgave.id}
-                            colSpan={7}
                             content={
                                 <MaskerSensitivInfo>
                                     <BeskrivelseListe innslag={oppgave.beskrivelseListe} />
                                 </MaskerSensitivInfo>
                             }
                         >
-                            <Table.HeaderCell scope="row">{oppgave.id}</Table.HeaderCell>
-                            <Table.HeaderCell scope="row">{oppgave.oppgavetype}</Table.HeaderCell>
+                            <Table.DataCell scope="row">{oppgave.id}</Table.DataCell>
+                            <Table.DataCell scope="row">{oppgave.oppgavetype}</Table.DataCell>
                             <Table.DataCell>{oppgave.tildeltEnhetsnr}</Table.DataCell>
                             <Table.DataCell>{formaterDato(oppgave.fristFerdigstillelse)}</Table.DataCell>
                             <Table.DataCell>{oppgave.tilordnetRessurs || "-"}</Table.DataCell>
                             <Table.DataCell>
                                 {oppgave.saksreferanse ? (
-                                    <Link
-                                        as={RouterLink}
-                                        to={`/sak/${encodeURIComponent(oppgave.saksreferanse)}/saksroller`}
-                                    >
+                                    <Link as={RouterLink} to={`/sak/${encodeURIComponent(oppgave.saksreferanse)}`}>
                                         {oppgave.saksreferanse}
                                     </Link>
                                 ) : (
@@ -103,13 +93,9 @@ export function OppgaveTabell({ oppgaver }: OppgaveTabellProps) {
                                 )}
                             </Table.DataCell>
                             <Table.DataCell>
-                                {oppgave.brukerFnr ? (
-                                    <MaskerSensitivInfo>
-                                        <PersonIdent ident={oppgave.brukerFnr} />
-                                    </MaskerSensitivInfo>
-                                ) : (
-                                    "-"
-                                )}
+                                <Link as={ObfuscateFnrLink} to={`/bruker/${oppgave.brukerFnr}`}>
+                                    <PersonNavn ident={oppgave.brukerFnr || undefined} />
+                                </Link>
                             </Table.DataCell>
                         </Table.ExpandableRow>
                     ))}

@@ -58,6 +58,7 @@ export default [
         ...dokumentSakRoutes,
         layout("routes/sak/SakHeaderLayout.tsx", [
             layout("routes/sak/SakStandardLayout.tsx", [
+                index("routes/sak/SakOversiktPage.tsx"),
                 route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
                 route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
                 route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),
