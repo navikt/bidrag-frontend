@@ -404,10 +404,9 @@ const GebyrForm = () => {
     const unikeIdenterForGebyr = useMemo(
         () =>
             Array.from(
-
-                    saker.flatMap((sak) =>
-                        [...sak.gebyrRoller, ...sak.gebyr18År].map((gebyrRolle) => gebyrRolle.rolle.ident),
-                    ),
+                saker.flatMap((sak) =>
+                    [...sak.gebyrRoller, ...sak.gebyr18År].map((gebyrRolle) => gebyrRolle.rolle.ident),
+                ),
             ).filter((ident): ident is string => Boolean(ident)),
         [saker],
     );
