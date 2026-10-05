@@ -1,5 +1,6 @@
 import { Box, Heading, Loader, LocalAlert, VStack } from "@navikt/ds-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useFlag } from "@unleash/proxy-client-react";
 import { Suspense } from "react";
 import { finnOppgaver } from "~/api/query/oppgave.query.ts";
 import { OppgaveTabell } from "~/common/oppgave/OppgaveTabell.tsx";
@@ -7,8 +8,9 @@ import type { Route } from "./+types/SakOversiktPage";
 
 export default function SakOversiktPage({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;
+    const oppgaveEnabledFlag = useFlag("frontend.oppgaver");
 
-    const { data: oppgaver } = useSuspenseQuery(finnOppgaver({ saksnummer: saksnummer }));
+    const { data: oppgaver } = useSuspenseQuery(finnOppgaver({ saksnummer: saksnummer }, oppgaveEnabledFlag));
 
     return (
         <VStack gap={"space-48"}>

@@ -3,7 +3,7 @@ import type { BidragOppgaveDto, FinnOppgaverRequest } from "@bidrag/api/BidragOp
 import { withQueryErrorHandlingV2 } from "@bidrag/common";
 import { queryOptions } from "@tanstack/react-query";
 
-export function finnOppgaver(request: FinnOppgaverRequest) {
+export function finnOppgaver(request: FinnOppgaverRequest, enabled = true) {
     return queryOptions({
         queryKey: ["finnOppgaver", request],
         queryFn: () =>
@@ -11,6 +11,6 @@ export function finnOppgaver(request: FinnOppgaverRequest) {
                 const { data } = await BIDRAG_OPPGAVE_API.api.finnOppgaver(request);
                 return data;
             }),
-        enabled: !!request.aktoerId || !!request.saksnummer,
+        enabled: enabled && (!!request.aktoerId || !!request.saksnummer),
     });
 }

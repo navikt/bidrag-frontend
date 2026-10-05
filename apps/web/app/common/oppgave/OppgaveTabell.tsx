@@ -15,7 +15,7 @@ function BeskrivelseListe({ innslag }: { innslag?: Beskrivelseinnslag[] | null }
     if (!innslag?.length) return <p>Ingen beskrivelser</p>;
 
     return (
-        <VStack as="ol" gap="space-16" padding="space-16">
+        <VStack gap="space-16" padding="space-16">
             {innslag.map((beskrivelse, indeks) => (
                 <VStack gap="space-4" key={`${beskrivelse.tidspunkt ?? "uten-tidspunkt"}-${indeks}`}>
                     <HStack gap="space-8" align={"center"}>
@@ -100,9 +100,11 @@ export function OppgaveTabell({ oppgaver }: OppgaveTabellProps) {
                                 )}
                             </Table.DataCell>
                             <Table.DataCell>
-                                <Link as={ObfuscateFnrLink} to={`/bruker/${oppgave.brukerFnr}`}>
-                                    <PersonNavn ident={oppgave.brukerFnr || undefined} />
-                                </Link>
+                                {oppgave.brukerFnr && (
+                                    <Link as={ObfuscateFnrLink} to={`/bruker/${oppgave.brukerFnr}`}>
+                                        <PersonNavn ident={oppgave.brukerFnr || undefined} />
+                                    </Link>
+                                )}
                             </Table.DataCell>
                         </Table.ExpandableRow>
                     ))}
