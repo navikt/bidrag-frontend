@@ -27,7 +27,6 @@ export default function DebugPage({ forsendelseId, dokumentreferanse }: DebugPag
     async function openFile(ev: ChangeEvent<HTMLInputElement>) {
         const fileBuffer = await readFile(ev);
 
-        //@ts-expect-error
         setPdfdocument(new Blob([fileBuffer]));
     }
     function _base64ToArrayBuffer(base64) {

@@ -16,10 +16,7 @@ export function DokumenterFremviser({ dokumenter }: DokumenterFremviserProps) {
     if (dokumenter.length === 0) {
         return (
             <VStack align="center" justify="center" style={{ height: "100vh", padding: "var(--a-spacing-16)" }}>
-                <Alert variant="warning">
-                    Ingen dokumenter er angitt. Legg til minst én <code>dokument</code>-parameter i URL-en, f.eks.{" "}
-                    <code>?dokument=JOARK-123:456</code>.
-                </Alert>
+                <Alert variant="warning">Fant ingen dokumenter</Alert>
             </VStack>
         );
     }

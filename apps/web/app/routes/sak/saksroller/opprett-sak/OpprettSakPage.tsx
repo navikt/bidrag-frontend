@@ -1,7 +1,9 @@
 import { OpprettSakProvider, type OpprettSakRolleType, OpprettSakSkjema, useOpprettSakContext } from "@bidrag/common";
 import { Heading, Loader, Modal } from "@navikt/ds-react";
+import { useFlag } from "@unleash/proxy-client-react";
 import { Suspense } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import NySaksrollerPage from "../opprett-ny-sak/routes/NySaksrollerPage";
 
 /**
  * Rute for "Opprett ny sak" (migrert fra bidrag-ui, se
@@ -20,11 +22,11 @@ import { useNavigate, useSearchParams } from "react-router";
 export default function OpprettSakPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const visNyRollebilde = useFlag("bisys.ny_rollebilde");
 
-    const ident = searchParams.get("ident") ?? "";
-    const navn = searchParams.get("navn") ?? "";
-    const eierfogd = searchParams.get("eierfogd") ?? "";
-    const rolle = (searchParams.get("rolle") as OpprettSakRolleType | null) ?? undefined;
+    if (visNyRollebilde) {
+        return <NySaksrollerPage />;
+    }
 
     function onClose() {
         navigate(-1);
@@ -35,17 +37,20 @@ export default function OpprettSakPage() {
     }
 
     return (
-        <OpprettSakProvider
-            ident={ident}
-            navn={navn}
-            eierfogd={eierfogd}
-            rolle={rolle}
-            onSubmit={onSubmit}
-            onClose={onClose}
-        >
+        <OpprettSakProvider {...lesStartparametre(searchParams)} onSubmit={onSubmit} onClose={onClose}>
             <OpprettSakModalShell />
         </OpprettSakProvider>
     );
+}
+
+function lesStartparametre(searchParams: URLSearchParams) {
+    const hent = (navn: string) => searchParams.get(navn) ?? "";
+    return {
+        ident: hent("ident"),
+        navn: hent("navn"),
+        eierfogd: hent("eierfogd"),
+        rolle: (hent("rolle") || undefined) as OpprettSakRolleType | undefined,
+    };
 }
 
 function OpprettSakModalShell() {

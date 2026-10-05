@@ -28,7 +28,7 @@ export const addMonths = (date: Date, months: number) => {
     return newDate;
 };
 
-export const addMonthsIgnoreDay = (date: Date, months: number) => {
+export const addMonthsIgnoreDay = (date: Date | string, months: number) => {
     // If the day of the month is higher month of the next month the month will end up being two months ahead
     // Ex if date is 31.01.2021 and we add 1 month then the resulting date will be 03.03.2021 because february ends at 28.02.2021
     // Thats why we set the day to first day before adding the months

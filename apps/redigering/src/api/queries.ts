@@ -51,10 +51,7 @@ export const lastDokumenter = (
                 if (dokumenter && dokumenter.length > 0) {
                     return BIDRAG_DOKUMENT_API.dokument.hentDokumenter(
                         {
-                            // Genererte typer sier `string`, men endepunktet forventer
-                            // flere `dokument`-query-parametre (serialisert via paramsSerializer
-                            // under). Runtime-oppførsel er uendret fra den frittstående appen.
-                            dokument: dokumenter as unknown as string,
+                            dokument: dokumenter,
                             resizeToA4,
                             optimizeForPrint,
                         },
@@ -102,7 +99,7 @@ export const lastDokumenter = (
                 throw e;
             }
         },
-        select: (response) => {
+        select: (response): PdfDocumentType => {
             return response.data;
         },
     });

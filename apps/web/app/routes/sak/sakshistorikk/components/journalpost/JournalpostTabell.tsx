@@ -125,6 +125,13 @@ export default function JournalpostTabell({
         slettModalRef.current?.showModal();
     };
 
+    const finnDokDato = (jp: JournalpostDto) => {
+        if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato !== null) {
+            return jp.mottattDato ? formaterDato(jp.mottattDato) : "";
+        }
+        return jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
+    };
+
     const lukkSlettBekreftelse = () => {
         slettModalRef.current?.close();
         setJournalpostIdTilSletting(null);
@@ -194,7 +201,12 @@ export default function JournalpostTabell({
         );
     };
 
-    const renderDokumentLink = (dok: DokumentDto, tittel: string, journalpostId?: string | null) => {
+    const renderDokumentLink = (
+        dok: DokumentDto,
+        tittel: string,
+        journalpostId?: string | null,
+        åpneHeleJournalposten = false,
+    ) => {
         const dokStatus = dok.status;
         if (!journalpostId || !dok.dokumentreferanse) {
             return <TruncatedText tittel={tittel} />;
@@ -210,6 +222,7 @@ export default function JournalpostTabell({
                     status={dokStatus ?? undefined}
                     tittel={tittel}
                     extraQueryParams={{ [RETUR_PARAM]: "sakshistorikk", [SAKSNR_PARAM]: saksnummer }}
+                    åpneHeleJournalposten={åpneHeleJournalposten}
                 >
                     {<TruncatedText tittel={tittel} />}
                 </AapneDokumentKnapp>
@@ -239,7 +252,7 @@ export default function JournalpostTabell({
 
         const hoveddokRef = rad.jp.dokumenter?.[0];
         if (journalpostId && hoveddokRef) {
-            return renderDokumentLink(hoveddokRef, tekst, journalpostId);
+            return renderDokumentLink(hoveddokRef, tekst, journalpostId, true);
         }
 
         return <TruncatedText tittel={tekst} />;
@@ -303,8 +316,7 @@ export default function JournalpostTabell({
             id: "dokumentDato",
             header: "Dok.dato",
             isSortable: true,
-            bodyCell: (rad: JournalpostRad) =>
-                rad.erVedlegg ? "" : rad.jp.dokumentDato ? formaterDato(rad.jp.dokumentDato) : "",
+            bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : finnDokDato(rad.jp)),
         },
         {
             id: "journalfortDato",
