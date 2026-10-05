@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
 import { BodyLong, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import type { RolleType } from "../sakvisning-schema";
 import DiskresjonAlert from "./DiskresjonAlert";
@@ -39,9 +39,13 @@ type Props = InnholdProps & {
     actions?: ReactNode;
 };
 
-export function KortRamme({ children }: { children: ReactNode }) {
+type KortRammeProps = {
+    children: ReactNode;
+} & Pick<ComponentProps<typeof Box>, "background" | "borderColor">;
+
+export function KortRamme({ children, background = "raised", borderColor = "neutral-subtleA" }: KortRammeProps) {
     return (
-        <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-16">
+        <Box background={background} borderColor={borderColor} borderWidth="1" borderRadius="12" padding="space-12">
             {children}
         </Box>
     );

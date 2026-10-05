@@ -51,7 +51,7 @@ export default function BarnISaken({
                     Barn i saken ({barn.length})
                 </Heading>
                 {barn.length === 0 && <IngenBarnMelding />}
-                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
+                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24">
                     {barn.map((barnRolle, idx) => (
                         <BarnVisning
                             key={barnnøkkel(barnRolle, idx)}

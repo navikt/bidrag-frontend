@@ -1,4 +1,3 @@
-import { PersonIdent } from "@bidrag/common";
 import { BodyShort, Box, Checkbox, CheckboxGroup, HGrid, HStack, VStack } from "@navikt/ds-react";
 import { type ReactNode, useRef } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -77,17 +76,26 @@ export default function BarnkurvListe({ barnkurver, form, reellMottakerRegel, on
                         {...gruppe}
                         tittel={
                             <>
-                                Med <span className="personnavn">{motpartNavn}</span> <PersonIdent ident={ident} />
+                                Med <span className="personnavn">{motpartNavn}</span>{" "}
+                                <span className="personident">{ident}</span>
                             </>
                         }
                         legend={`Velg barn med ${motpartNavn}`}
                         barn={kurv.barn}
                         onChange={(identer) => velgIKurv(identer, kurv.id)}
+                        visVelgAlle={!maksEttBarn}
                     />
                 );
             })}
             {manuelleBarn.length > 0 && (
-                <BarnGruppe {...gruppe} legend="Barn lagt til manuelt" barn={manuelleBarn} onChange={velgManuelle} />
+                <BarnGruppe
+                    {...gruppe}
+                    tittel="Barn lagt til manuelt"
+                    legend="Barn lagt til manuelt"
+                    barn={manuelleBarn}
+                    onChange={velgManuelle}
+                    visVelgAlle={!maksEttBarn}
+                />
             )}
         </VStack>
     );
@@ -118,6 +126,7 @@ function BarnGruppe({
     form,
     valgteBarn,
     reellMottakerRegel,
+    visVelgAlle,
 }: {
     tittel?: ReactNode;
     legend: string;
@@ -126,19 +135,42 @@ function BarnGruppe({
     form: Props["form"];
     valgteBarn: BarnMedAlder[];
     reellMottakerRegel: ReellMottakerRegel;
+    visVelgAlle: boolean;
 }) {
     const valgteIdenter = barn.filter((b) => valgteBarn.some((v) => v.ident === b.ident)).map((b) => b.ident);
     const { låstIdent } = useOpprettSakStart();
+    const valgbareIdenter = barn.filter((b) => b.ident !== låstIdent).map((b) => b.ident);
+    const valgteValgbareIdenter = valgteIdenter.filter((ident) => valgbareIdenter.includes(ident));
+    const alleValgbareErValgt = valgbareIdenter.length > 0 && valgteValgbareIdenter.length === valgbareIdenter.length;
+    const noenValgbareErValgt = valgteValgbareIdenter.length > 0 && !alleValgbareErValgt;
 
     return (
         <Box padding="space-16" borderRadius="8">
             {tittel && (
-                <HStack asChild gap="space-4" paddingInline="space-8" marginBlock="space-0 space-8">
-                    <BodyShort size="small" weight="semibold" textColor="subtle">
+                <HStack align="center" justify="space-between" gap="space-8" wrap={false} paddingInline="space-8">
+                    <BodyShort size="small" weight="semibold" textColor="subtle" truncate>
                         {tittel}
                     </BodyShort>
+                    {visVelgAlle && valgbareIdenter.length > 0 && (
+                        <Checkbox
+                            size="small"
+                            checked={alleValgbareErValgt}
+                            indeterminate={noenValgbareErValgt}
+                            aria-label={`Velg alle: ${legend}`}
+                            onChange={() =>
+                                onChange(
+                                    alleValgbareErValgt
+                                        ? valgteIdenter.filter((ident) => ident === låstIdent)
+                                        : barn.map((b) => b.ident),
+                                )
+                            }
+                        >
+                            Velg alle
+                        </Checkbox>
+                    )}
                 </HStack>
             )}
+            {tittel && <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" marginBlock="space-8 space-8" />}
             <CheckboxGroup legend={legend} hideLegend value={valgteIdenter} onChange={onChange} size="small">
                 <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-16" align="start">
                     {barn.map((b) => {
@@ -147,24 +179,27 @@ function BarnGruppe({
                             <KortRamme key={b.ident}>
                                 <VStack gap="space-16">
                                     <HStack align="start" gap="space-8" wrap={false}>
-                                        <Checkbox
-                                            value={b.ident}
-                                            hideLabel
-                                            aria-label={`Velg ${b.navn ?? b.ident}`}
-                                            readOnly={låst}
-                                        >
-                                            {" "}
-                                        </Checkbox>
-                                        <BarnKortInnhold barn={b} />
-                                    </HStack>
-                                    {valgteIdenter.includes(b.ident) && (
-                                        <BarnReellMottaker
-                                            form={form}
+                                        <BarnKortInnhold
                                             barn={b}
-                                            barnIndex={valgteBarn.findIndex((v) => v.ident === b.ident)}
-                                            regel={reellMottakerRegel}
+                                            headingActions={
+                                                <Checkbox
+                                                    value={b.ident}
+                                                    hideLabel
+                                                    aria-label={`Velg ${b.navn ?? b.ident}`}
+                                                    readOnly={låst}
+                                                >
+                                                    {" "}
+                                                </Checkbox>
+                                            }
                                         />
-                                    )}
+                                    </HStack>
+                                    <BarnReellMottaker
+                                        form={form}
+                                        barn={b}
+                                        barnIndex={valgteBarn.findIndex((v) => v.ident === b.ident)}
+                                        regel={reellMottakerRegel}
+                                        valgt={valgteIdenter.includes(b.ident)}
+                                    />
                                 </VStack>
                             </KortRamme>
                         );

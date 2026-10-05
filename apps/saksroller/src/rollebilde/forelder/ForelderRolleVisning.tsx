@@ -1,8 +1,9 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Box, Heading, HGrid, VStack } from "@navikt/ds-react";
+import { Heading, HGrid, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
+import { KortRamme } from "../../felles/person/PersonRolleKort";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import ForelderVisning from "./ForelderVisning.tsx";
 import LeggTilForelder from "./LeggTilForelder.tsx";
@@ -36,7 +37,7 @@ function EnkelForelderRolle({
             <Heading level="2" size="small">
                 {rolleNavn}
             </Heading>
-            <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-12">
+            <KortRamme>
                 {rolleErKjent ? (
                     <ForelderVisning
                         form={form}
@@ -54,7 +55,7 @@ function EnkelForelderRolle({
                         onPersonValgt={setValgtPerson}
                     />
                 )}
-            </Box>
+            </KortRamme>
         </VStack>
     );
 }
@@ -77,7 +78,7 @@ export default function ForelderRolleVisning({
     muligeAndreForeldre,
 }: ForelderRolleVisningProps) {
     return (
-        <HGrid columns={{ xs: 1, md: 2, xl: 3 }} gap="space-24" align="start">
+        <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
             <EnkelForelderRolle
                 rolleType="BP"
                 rolle={bp}

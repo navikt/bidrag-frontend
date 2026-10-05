@@ -14,6 +14,7 @@ type FellesProps = {
     ukjentTekst?: string;
     rolle?: "BP" | "BM";
     tags?: ReactNode;
+    headingActions?: ReactNode;
     actions?: ReactNode;
     søktIdent?: string;
     children?: ReactNode;

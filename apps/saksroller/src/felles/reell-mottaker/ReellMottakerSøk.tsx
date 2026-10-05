@@ -18,6 +18,7 @@ export default function ReellMottakerSøk({
             }}
             onError={onError}
             inkluderSamhandler
+            tømVedTreff
         />
     );
 }

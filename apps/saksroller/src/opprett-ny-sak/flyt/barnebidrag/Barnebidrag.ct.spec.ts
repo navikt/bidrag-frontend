@@ -20,6 +20,30 @@ async function barnetsForeldre(page: import("@playwright/test").Page, foreldre: 
 }
 
 test.describe("Start fra forelder med barn", () => {
+    test("viser reell mottaker deaktivert og uten valgt alternativ når barnet ikke er valgt", async ({ mount }) => {
+        const component = await mount(`${STORY}/ForelderMedBarn`);
+        const barnValg = component.getByRole("checkbox").first();
+        const mottakerGruppe = component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" }).first();
+
+        await expect(mottakerGruppe).toBeVisible();
+        await expect(mottakerGruppe).toHaveAttribute("disabled", "");
+        for (const valg of await mottakerGruppe.getByRole("radio").all()) {
+            await expect(valg).toBeDisabled();
+            await expect(valg).not.toBeChecked();
+        }
+
+        await barnValg.check();
+        await expect(mottakerGruppe).not.toHaveAttribute("disabled");
+        await expect(mottakerGruppe.getByRole("radio").first()).toBeEnabled();
+
+        await barnValg.uncheck();
+        await expect(mottakerGruppe).toHaveAttribute("disabled", "");
+        for (const valg of await mottakerGruppe.getByRole("radio").all()) {
+            await expect(valg).toBeDisabled();
+            await expect(valg).not.toBeChecked();
+        }
+    });
+
     test("valgt motpart viser bare felles barn, Endre gir alle kurvene tilbake", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/ForelderMedBarn`);

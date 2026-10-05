@@ -1,5 +1,5 @@
-import { XMarkIcon } from "@navikt/aksel-icons";
-import { Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react";
+import { TrashIcon } from "@navikt/aksel-icons";
+import { Box, Button, ErrorMessage, Tag, VStack } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort.tsx";
 import { KortRamme } from "../../felles/person/PersonRolleKort.tsx";
@@ -54,7 +54,14 @@ export default function BarnVisning({
                         erMyndig: rolle.erMyndig,
                         diskresjonskode: rolle.diskresjonskode,
                     }}
-                    headingActions={erNyttBarn && <NyttBarnHandlinger onFjern={handleFjernBarn} />}
+                    tags={
+                        erNyttBarn && (
+                            <Tag variant="strong" data-color="meta-purple" size="xsmall">
+                                Ny
+                            </Tag>
+                        )
+                    }
+                    headingActions={erNyttBarn && <FjernBarnHandling onFjern={handleFjernBarn} />}
                 >
                     {!visReellMottaker && (
                         <ReellMottakerRad
@@ -93,16 +100,15 @@ export default function BarnVisning({
     );
 }
 
-function NyttBarnHandlinger({ onFjern }: { onFjern: () => void }) {
+function FjernBarnHandling({ onFjern }: { onFjern: () => void }) {
     return (
-        <HStack gap="space-12" align="center" flexShrink="0" marginInline="auto space-0">
-            <Tag variant="alt1" size="xsmall">
-                Nytt barn
-            </Tag>
-            <Button type="button" variant="tertiary" size="small" icon={<XMarkIcon aria-hidden />} onClick={onFjern}>
-                Fjern
-            </Button>
-        </HStack>
+        <Button
+            type="button"
+            variant="tertiary"
+            size="small"
+            icon={<TrashIcon aria-hidden />}
+            onClick={onFjern}
+        />
     );
 }
 

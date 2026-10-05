@@ -1,21 +1,18 @@
 import { IdentUtils } from "@bidrag/common";
-import { PersonIcon } from "@navikt/aksel-icons";
 import { BodyShort, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
+import type { ReactNode } from "react";
 
 import { useHentSamhandler } from "../../api/samhandler.api";
 import PersonInfo from "./PersonInfo.tsx";
+import { KortRamme } from "./PersonRolleKort.tsx";
 
 type Props = {
     navn: string;
     ident: string;
+    handlinger?: ReactNode;
 };
 
 export function FunnetPersonInnhold({ label, navn, ident }: { label?: string; navn: string; ident?: string }) {
-    const erSamhandlerIdent = ident ? IdentUtils.isSamhandlerId(ident) : false;
-    const { data } = useHentSamhandler(ident ?? "", erSamhandlerIdent);
-    const samhandlerManglerKontonummer =
-        erSamhandlerIdent && data && !data.kontonummer?.norskKontonummer && !data.kontonummer?.iban;
-
     return (
         <VStack gap="space-4">
             {label && (
@@ -24,22 +21,37 @@ export function FunnetPersonInnhold({ label, navn, ident }: { label?: string; na
                 </BodyShort>
             )}
             <PersonInfo ident={ident ?? ""} navn={navn} />
-            {samhandlerManglerKontonummer && (
-                <InlineMessage status="warning" size="small">
-                    Samhandler mangler norsk kontonummer eller IBAN
-                </InlineMessage>
-            )}
+            <SamhandlerKontonummerMelding ident={ident} />
         </VStack>
     );
 }
 
-export default function FunnetPersonInfo({ navn, ident }: Props) {
+function SamhandlerKontonummerMelding({ ident }: { ident?: string }) {
+    const erSamhandlerIdent = ident ? IdentUtils.isSamhandlerId(ident) : false;
+    const { data } = useHentSamhandler(ident ?? "", erSamhandlerIdent);
+    const manglerKontonummer =
+        erSamhandlerIdent && data && !data.kontonummer?.norskKontonummer && !data.kontonummer?.iban;
+
+    if (!manglerKontonummer) return null;
+
     return (
-        <Box background="info-soft" borderColor="info" borderWidth="1" borderRadius="8" padding="space-12">
-            <HStack gap="space-12" align="start" minWidth="0" wrap={false}>
-                <PersonIcon fontSize="1.5rem" aria-hidden className="text-ax-accent-700" />
-                <FunnetPersonInnhold label="Reell mottaker:" navn={navn} ident={ident} />
+        <InlineMessage status="warning" size="small">
+            Samhandler mangler norsk kontonummer eller IBAN
+        </InlineMessage>
+    );
+}
+
+export default function FunnetPersonInfo({ navn, ident, handlinger }: Props) {
+    return (
+        <KortRamme background="info-soft" borderColor="info">
+            <HStack gap="space-8" align="start" justify="space-between" wrap={false}>
+                <Box flexGrow="1" minWidth="0">
+                    <PersonInfo truncate navn={navn} ident={ident} rolle="RM" visModiaLenke>
+                        <SamhandlerKontonummerMelding ident={ident} />
+                    </PersonInfo>
+                </Box>
+                {handlinger && <Box flexShrink="0">{handlinger}</Box>}
             </HStack>
-        </Box>
+        </KortRamme>
     );
 }

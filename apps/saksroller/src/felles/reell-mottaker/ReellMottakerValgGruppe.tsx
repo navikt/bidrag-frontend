@@ -1,4 +1,5 @@
-import { Box, LocalAlert, Radio, RadioGroup, VStack } from "@navikt/ds-react";
+import { TrashIcon } from "@navikt/aksel-icons";
+import { Button, InlineMessage, Radio, RadioGroup, VStack } from "@navikt/ds-react";
 
 import { useState } from "react";
 import FunnetPersonInfo from "../person/FunnetPersonInfo.tsx";
@@ -23,6 +24,11 @@ export function useLagretSamhandler(startvalg: ReellMottakerValg) {
     const [lagretSamhandler, setLagretSamhandler] = useState(() => somSamhandler(startvalg));
 
     const huskSamhandler = (forrige: ReellMottakerValg, nytt: ReellMottakerValg) => {
+        if (nytt.type === "samhandler" && !nytt.ident) {
+            setLagretSamhandler(null);
+            return;
+        }
+
         const samhandler = somSamhandler(nytt) ?? (nytt.type !== "samhandler" ? somSamhandler(forrige) : null);
         if (samhandler) setLagretSamhandler(samhandler);
     };
@@ -41,6 +47,7 @@ type Props = {
     onValg: (valg: ReellMottakerValg) => void;
     regel: ReellMottakerValgregel;
     feil?: string;
+    disabled?: boolean;
 };
 
 export default function ReellMottakerValgGruppe({
@@ -51,6 +58,7 @@ export default function ReellMottakerValgGruppe({
     onValg,
     regel,
     feil,
+    disabled = false,
 }: Props) {
     const påkrevd = regel !== "valgfri";
     const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
@@ -66,9 +74,10 @@ export default function ReellMottakerValgGruppe({
             <RadioGroup
                 size="small"
                 legend="Hvem er reell mottaker?"
-                value={valg.type || "ingen"}
+                value={disabled ? "" : valg.type || "ingen"}
                 onChange={handleRadioChange}
                 error={feil}
+                disabled={disabled}
             >
                 <VStack gap="space-0">
                     <Radio value="ingen" disabled={påkrevd}>
@@ -82,9 +91,9 @@ export default function ReellMottakerValgGruppe({
             </RadioGroup>
 
             {kunSamhandlerSomReellMottaker && (
-                <LocalAlert status="warning" size="small">
-                    <LocalAlert.Content>{KUN_SAMHANDLER_MELDING}</LocalAlert.Content>
-                </LocalAlert>
+                <InlineMessage status="info" size="small">
+                    {KUN_SAMHANDLER_MELDING}
+                </InlineMessage>
             )}
 
             {valg.type === "samhandler" && (
@@ -95,6 +104,10 @@ export default function ReellMottakerValgGruppe({
                     onVelg={(ident, navn) => {
                         setError(undefined);
                         onValg({ type: "samhandler", ident, navn });
+                    }}
+                    onFjern={() => {
+                        setError(undefined);
+                        onValg({ type: "samhandler" });
                     }}
                     onError={setError}
                 />
@@ -118,12 +131,14 @@ function SamhandlerValg({
     lagretSamhandlerIdent,
     skjulValgt,
     onVelg,
+    onFjern,
     onError,
 }: {
     valg: ReellMottakerValg;
     lagretSamhandlerIdent?: string;
     skjulValgt: boolean;
     onVelg: (ident: string, navn?: string) => void;
+    onFjern: () => void;
     onError: (feil: string) => void;
 }) {
     return (
@@ -134,9 +149,20 @@ function SamhandlerValg({
                 onError={onError}
             />
             {!skjulValgt && valg.navn && valg.ident && (
-                <Box borderWidth="2" borderRadius="12">
-                    <FunnetPersonInfo navn={valg.navn} ident={valg.ident} />
-                </Box>
+                <FunnetPersonInfo
+                    navn={valg.navn}
+                    ident={valg.ident}
+                    handlinger={
+                        <Button
+                            type="button"
+                            size="small"
+                            variant="tertiary"
+                            icon={<TrashIcon aria-hidden />}
+                            aria-label="Fjern reell mottaker"
+                            onClick={onFjern}
+                        />
+                    }
+                />
             )}
         </>
     );

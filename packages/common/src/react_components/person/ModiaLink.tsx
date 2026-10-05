@@ -21,13 +21,8 @@ export default function ModiaLink({ ident, className, compact = false }: ModiaLi
             aria-label="Åpne personen i Modia"
             className={className}
         >
-            {compact ? (
-                "m"
-            ) : (
-                <>
-                    Modia <ExternalLinkIcon aria-hidden />
-                </>
-            )}
+            Modia
+            <ExternalLinkIcon aria-hidden />
         </Link>
     );
 }
