@@ -43,7 +43,7 @@ export default [
     ...redigeringroutes,
 
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
-        index("./routes/bruker/index.tsx"),
+        index("./routes/bruker/BrukerOversikt.tsx"),
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
         route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
         route("innkreving", "./routes/bruker/innkreving/InnkrevingPage.tsx"),
