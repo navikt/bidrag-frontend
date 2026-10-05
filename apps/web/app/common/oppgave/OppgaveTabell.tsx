@@ -1,8 +1,9 @@
 import type { Beskrivelseinnslag, BidragOppgaveDto } from "@bidrag/api/BidragOppgaveApi";
 import { MaskerSensitivInfo, PersonNavn } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils/datoUtils";
-import { BodyLong, Box, Detail, HStack, Label, Link, List, Table, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, Detail, HStack, InlineMessage, Label, Link, List, Table, VStack } from "@navikt/ds-react";
 import { ListItem } from "@navikt/ds-react/List";
+import { useFlag } from "@unleash/proxy-client-react";
 import { Link as RouterLink } from "react-router";
 import { ObfuscateFnrLink } from "~/common/person/ObfuscateFnrLink.tsx";
 
@@ -48,6 +49,12 @@ function BeskrivelseListe({ innslag }: { innslag?: Beskrivelseinnslag[] | null }
 }
 
 export function OppgaveTabell({ oppgaver }: OppgaveTabellProps) {
+    const enabledFlag = useFlag("frontend.oppgaver");
+
+    if (!enabledFlag) {
+        return <InlineMessage status={"warning"}>Oppgaver er foreløpig ikke tilgjengelig for deg</InlineMessage>;
+    }
+
     if (oppgaver.length === 0) return <p>Ingen oppgaver</p>;
 
     return (
