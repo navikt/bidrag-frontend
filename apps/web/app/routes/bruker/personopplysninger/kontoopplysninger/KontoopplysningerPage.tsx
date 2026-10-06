@@ -1,19 +1,10 @@
 import type { KontonummerDto } from "@bidrag/api/PersonApi";
 import { Box, Heading, HStack, InlineMessage, Table, VStack } from "@navikt/ds-react";
-import { useHentPersoninformasjonDetaljer } from "~/api/useApi.ts";
-import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
-import styles from "~/routes/person/PersonTable.module.css";
-import type { Route } from "./+types/KontoopplysningerPage";
+import { useBrukerContext } from "~/routes/bruker/personopplysninger/PersonLayout.tsx";
+import styles from "../Personopplysninger.module.css";
 
-export default function KontoopplysningerPage({ params }: Route.ComponentProps) {
-    const { decodeFnr } = useObfuscateFnr();
-    const personId = params.personid;
-    const ident = decodeFnr(personId);
-    const { data: bruker } = useHentPersoninformasjonDetaljer({ ident });
-
-    if (!bruker) {
-        return null;
-    }
+export default function KontoopplysningerPage() {
+    const { detaljer } = useBrukerContext();
 
     return (
         <VStack padding={"space-24"} gap={"space-16"}>
@@ -21,38 +12,16 @@ export default function KontoopplysningerPage({ params }: Route.ComponentProps) 
             <HStack gap={"space-24"}>
                 <VStack gap={"space-16"} marginBlock={"space-12"} className={styles.table}>
                     <Heading size={"xsmall"}>KONTONUMMER NORGE</Heading>
-                    <KontonummerTabell konto={bruker.kontonummer} />
+                    <KontonummerTabell konto={detaljer.kontonummer} />
                 </VStack>
 
                 <VStack gap={"space-16"} marginBlock={"space-12"} className={styles.table}>
                     <Heading size={"xsmall"}>UTENLANDSK KONTO</Heading>
-                    <KontonummerTabell konto={bruker.kontonummer} utenlandsk={true} />
+                    <KontonummerTabell konto={detaljer.kontonummer} utenlandsk={true} />
                 </VStack>
             </HStack>
         </VStack>
     );
-}
-
-function formatBankAddress(konto: KontonummerDto) {
-    let address = "";
-    if (konto.bankadresse1) {
-        address = konto.bankadresse1;
-    }
-    if (konto.bankadresse2) {
-        if (address !== "") {
-            address += ", " + konto.bankadresse2;
-        } else {
-            address = konto.bankadresse2;
-        }
-    }
-    if (konto.bankadresse3) {
-        if (address !== "") {
-            address += ", " + konto.bankadresse3;
-        } else {
-            address = konto.bankadresse3;
-        }
-    }
-    return address;
 }
 
 function KontonummerTabell({ konto, utenlandsk }: { konto?: KontonummerDto | null; utenlandsk?: boolean }) {
@@ -67,19 +36,17 @@ function KontonummerTabell({ konto, utenlandsk }: { konto?: KontonummerDto | nul
                 <Table.Body>
                     {konto === null || konto === undefined || isWrongTable ? (
                         <Table.Row>
-                            <InlineMessage status={"info"}>
-                                Ikke registrert {utenlandsk ? "utenlandsk" : "norsk"} kontonummer på bruker
-                            </InlineMessage>
+                            <Table.DataCell>
+                                <InlineMessage status={"info"}>
+                                    Ikke registrert {utenlandsk ? "utenlandsk" : "norsk"} kontonummer på bruker
+                                </InlineMessage>
+                            </Table.DataCell>
                         </Table.Row>
                     ) : (
                         <>
                             <Table.Row>
                                 <Table.HeaderCell scope={"row"}>Type konto</Table.HeaderCell>
                                 <Table.DataCell scope={"row"}>{utenlandsk ? "Utenlandsk" : "Norsk"}</Table.DataCell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.HeaderCell scope={"row"}>Utbetales til</Table.HeaderCell>
-                                <Table.DataCell scope={"row"}>TODO Jeg vet ikke hva som går her</Table.DataCell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.HeaderCell scope={"row"}>Kontonummer/IBAN</Table.HeaderCell>
@@ -104,8 +71,20 @@ function KontonummerTabell({ konto, utenlandsk }: { konto?: KontonummerDto | nul
                                 <Table.DataCell scope={"row"}>{konto.valutakode}</Table.DataCell>
                             </Table.Row>
                             <Table.Row>
-                                <Table.HeaderCell scope={"row"}>Bankens adresse</Table.HeaderCell>
-                                <Table.DataCell scope={"row"}>{formatBankAddress(konto)}</Table.DataCell>
+                                <Table.HeaderCell scope={"row"}>Adresse 1</Table.HeaderCell>
+                                <Table.DataCell scope={"row"}>{konto.bankadresse1}</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.HeaderCell scope={"row"}>Adresse 2</Table.HeaderCell>
+                                <Table.DataCell scope={"row"}>{konto.bankadresse2}</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.HeaderCell scope={"row"}>Adresse 3</Table.HeaderCell>
+                                <Table.DataCell scope={"row"}>{konto.bankadresse3}</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.HeaderCell scope={"row"}>Bankens landkode</Table.HeaderCell>
+                                <Table.DataCell scope={"row"}>{konto.banklandkode}</Table.DataCell>
                             </Table.Row>
                         </>
                     )}
