@@ -182,13 +182,8 @@ function BarnGruppe({
                                         <BarnKortInnhold
                                             barn={b}
                                             headingActions={
-                                                <Checkbox
-                                                    value={b.ident}
-                                                    hideLabel
-                                                    aria-label={`Velg ${b.navn ?? b.ident}`}
-                                                    readOnly={låst}
-                                                >
-                                                    {" "}
+                                                <Checkbox value={b.ident} hideLabel readOnly={låst}>
+                                                    Velg {b.navn ?? b.ident}
                                                 </Checkbox>
                                             }
                                         />

@@ -107,6 +107,7 @@ function FjernBarnHandling({ onFjern }: { onFjern: () => void }) {
             variant="tertiary"
             size="small"
             icon={<TrashIcon aria-hidden />}
+            aria-label="Fjern barn"
             onClick={onFjern}
         />
     );

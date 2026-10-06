@@ -6,14 +6,14 @@ const STORY_NYTT_BARN = "rollebilde/barn/BarnVisning/NyttBarnKanFjernes";
 const STORY_PÅKREVD_RM = "rollebilde/barn/BarnVisning/PåkrevdReellMottaker";
 
 test.describe("BarnVisning", () => {
-    test("fjerner kun det nye barnet via Fjern-knappen, uten å påvirke andre barn", async ({ mount }) => {
+    test("fjerner kun det nye barnet via Fjern barn-knappen, uten å påvirke andre barn", async ({ mount }) => {
         const component = await mount(STORY_NYTT_BARN);
 
         await expect(component.getByText("Nytt Barn", { exact: true })).toBeVisible();
         await expect(component.getByText("Eksisterende Barn")).toBeVisible();
-        await expect(component.getByText("Nytt barn", { exact: true })).toBeVisible();
+        await expect(component.getByText("Ny", { exact: true })).toBeVisible();
 
-        await component.getByRole("button", { name: "Fjern" }).click();
+        await component.getByRole("button", { name: "Fjern barn" }).click();
 
         await expect(component.getByText("Nytt Barn", { exact: true })).toHaveCount(0);
         await expect(component.getByText("Eksisterende Barn")).toBeVisible();
@@ -49,7 +49,6 @@ test.describe("BarnVisning", () => {
 
         await søkefelt.fill(samhandlerIdent);
         await søkefelt.press("Enter");
-        await expect(component.getByText("Reell mottaker:")).toBeVisible();
         await expect(
             component.getByRole("dialog", { name: "Endre reell mottaker" }).getByText("Funnet Mottaker"),
         ).toBeVisible();

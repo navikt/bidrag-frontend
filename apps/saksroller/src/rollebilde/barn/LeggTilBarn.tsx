@@ -9,7 +9,11 @@ import ReellMottakerValgGruppe, {
     type ReellMottakerValgregel,
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
-import { initialiserValg } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
+import {
+    initialiserValg,
+    kanBekrefteReellMottaker,
+    MANGLER_REELL_MOTTAKER_MELDING,
+} from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 import {
     MYNDYG_BARN_ALDER,
     reellMottakerRegel,
@@ -76,24 +80,17 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
             regel ?? "valgfri",
             barn,
         );
-        const påkrevd = regel !== undefined && regel !== "valgfri";
-        const kanLeggeTil =
-            valg.type === "samhandler"
-                ? Boolean(valg.ident)
-                : !påkrevd || (valg.type === "barnet_selv" && Boolean(valg.ident));
-
-        if (!kanLeggeTil) {
-            setReellMottakerFeil({
-                barnIdent: person.ident,
-                melding: "Velg eller søk opp en reell mottaker før du legger til.",
-            });
+        if (!kanBekrefteReellMottaker(valg, regel)) {
+            setReellMottakerFeil({ barnIdent: person.ident, melding: MANGLER_REELL_MOTTAKER_MELDING });
             return;
         }
 
-        const nyttBarn = lagBarnRolle(person);
-        nyttBarn.reellMottakerType = valg.type;
-        nyttBarn.reellMottaker = valg.ident;
-        nyttBarn.reellMottakerNavn = valg.navn;
+        const nyttBarn = {
+            ...lagBarnRolle(person),
+            reellMottakerType: valg.type,
+            reellMottaker: valg.ident,
+            reellMottakerNavn: valg.navn,
+        };
 
         form.setValue("roller", [...roller, nyttBarn], { shouldValidate: true });
 

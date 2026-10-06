@@ -41,11 +41,11 @@ test.describe("LeggTilBarn", () => {
 
         await søkefelt.fill(barnIdent);
         await component.getByRole("button", { name: "Søk", exact: true }).click();
-        await expect(component.getByText("Lite Barn")).toBeVisible();
+        await expect(component.getByTitle("Lite Barn")).toBeVisible();
         await expect(component.getByText("Bruker nyeste fødselsnummer")).toHaveCount(0);
 
         await søkefelt.fill(ukjentIdent);
-        await expect(component.getByText("Lite Barn")).toHaveCount(0);
+        await expect(component.getByTitle("Lite Barn")).toHaveCount(0);
         await søkefelt.press("Enter");
         await expect(component.getByText("Finnes ingen person eller samhandler med oppgitt ident")).toHaveCount(1);
         await leggTil.click();
@@ -53,7 +53,7 @@ test.describe("LeggTilBarn", () => {
 
         await søkefelt.fill(barnIdent);
         await søkefelt.press("Enter");
-        await expect(component.getByText("Lite Barn")).toBeVisible();
+        await expect(component.getByTitle("Lite Barn")).toBeVisible();
         await leggTil.click();
         await expect(dialog).toHaveCount(0);
     });
@@ -71,7 +71,29 @@ test.describe("LeggTilBarn", () => {
         await component.getByRole("searchbox", { name: "Søk etter barn" }).press("Enter");
 
         await expect(component.getByText(`Bruker nyeste fødselsnummer ${nyIdent}`)).toBeVisible();
-        await expect(component.getByText("Lite Barn")).toBeVisible();
+        await expect(component.getByTitle("Lite Barn")).toBeVisible();
+    });
+
+    test("krever ident på samhandler før myndig barn legges til", async ({ mount, page }) => {
+        const barnIdent = genererFnr();
+        await mockPersonInformasjonFørMount(page, {
+            [barnIdent]: {
+                ident: barnIdent,
+                visningsnavn: "Voksent Barn",
+                fødselsdato: `${new Date().getFullYear() - 19}-01-01`,
+            },
+        });
+        const component = await mount(STORY);
+        const dialog = component.getByRole("dialog", { name: "Legg til nytt barn i saken" });
+
+        await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+        await component.getByRole("searchbox", { name: "Søk etter barn" }).fill(barnIdent);
+        await component.getByRole("searchbox", { name: "Søk etter barn" }).press("Enter");
+        await component.getByRole("radio", { name: "Annen person eller samhandler" }).check();
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+
+        await expect(component.getByText("Velg eller søk opp en reell mottaker før du legger til.")).toBeVisible();
+        await expect(dialog).toBeVisible();
     });
 
     test("inline-visning åpner barnesøket i skjemaet uten modal", async ({ mount }) => {

@@ -129,7 +129,7 @@ function PersonIdentLine({
                 )}
                 {personAlder !== undefined && ` (${personAlder} år)`}
                 {visKopieringsknapp && <CopyButton copyText={ident} size="small" />}
-                {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} compact />}
+                {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} />}
             </BodyShort>
         </HStack>
     );
@@ -159,9 +159,7 @@ function PersonInfoLayout(props: PersonInfoContentProps) {
                             )}
                             {tags}
                         </HStack>
-                        <HStack gap="space-4">
-                            <PersonIdentLine {...props} />
-                        </HStack>
+                        <PersonIdentLine {...props} />
                     </VStack>
                     {headingActions}
                 </HStack>

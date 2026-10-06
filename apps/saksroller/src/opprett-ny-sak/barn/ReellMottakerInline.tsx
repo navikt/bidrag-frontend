@@ -140,7 +140,7 @@ export function BarnReellMottaker<TFieldValues extends FieldValues>({
                     lagretSamhandler={null}
                     onValg={() => {}}
                     regel={valgregel}
-                    disabled
+                    readOnly
                 />
             </Box>
         );

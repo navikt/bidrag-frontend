@@ -8,9 +8,12 @@ test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppre
     const requests = await mockOpprettSakApi(page);
     const component = await mount(STORY);
 
-    await component.getByRole("checkbox").first().check();
+    await component
+        .getByRole("checkbox", { name: /^Velg (?!alle)/ })
+        .first()
+        .check();
 
-    await expect(component.getByText(/Barnet selv kan ikke velges som reell mottaker/)).toBeVisible();
+    await expect(component.getByText(/Barnet selv kan ikke velges som reell mottaker/).first()).toBeVisible();
     await expect(component.getByRole("button", { name: "Legg til reell mottaker" })).toHaveCount(0);
     await expect(component.getByText("Du må registrere reell mottaker")).toHaveCount(0);
     const opprettKnapp = component.getByRole("button", { name: /Opprett$/ });
@@ -30,4 +33,22 @@ test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppre
     await expect.poll(() => requests.create).toBeTruthy();
     expect(requests.create).toMatchObject({ arbeidsfordeling: "OPS" });
     expect(JSON.stringify(requests.create)).toContain(samhandler.samhandlerId);
+});
+
+test("tømmer søkefeltet ved treff og fjerner valgt samhandler med Fjern reell mottaker", async ({ mount, page }) => {
+    await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+    await component
+        .getByRole("checkbox", { name: /^Velg (?!alle)/ })
+        .first()
+        .check();
+
+    const search = component.getByRole("searchbox", { name: "Person- eller samhandlerident" });
+    await search.fill(samhandler.samhandlerId);
+    await search.press("Enter");
+    await expect(component.getByText(samhandler.navn).first()).toBeVisible();
+    await expect(search).toHaveValue("");
+
+    await component.getByRole("button", { name: "Fjern reell mottaker" }).click();
+    await expect(component.getByText(samhandler.navn)).toHaveCount(0);
 });

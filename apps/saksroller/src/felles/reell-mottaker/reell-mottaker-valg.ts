@@ -37,6 +37,16 @@ export function initialiserValg(valg: ReellMottakerValg, regel: ReellMottakerVal
     return valg.type ? valg : { type: "barnet_selv", ident: barn.ident, navn: barn.navn };
 }
 
+export const MANGLER_REELL_MOTTAKER_MELDING = "Velg eller søk opp en reell mottaker før du legger til.";
+
+export function kanBekrefteReellMottaker(valg: ReellMottakerValg, regel: ReellMottakerValgregel | undefined): boolean {
+    if (valg.type === "samhandler") {
+        return Boolean(valg.ident);
+    }
+    const påkrevd = regel !== undefined && regel !== "valgfri";
+    return !påkrevd || (valg.type === "barnet_selv" && Boolean(valg.ident));
+}
+
 export function initialiserReellMottaker(
     verdi: ReellMottakerSkjemaverdi,
     regel: ReellMottakerValgregel,

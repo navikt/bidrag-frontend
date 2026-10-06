@@ -2,6 +2,6 @@
     "extends": "../../tsconfig.packages.json",
     "include": ["src"],
     "compilerOptions": {
-        "types": ["node", "react", "react-dom", "vite/client"]
+        "types": ["node", "react", "react-dom"]
     }
 }

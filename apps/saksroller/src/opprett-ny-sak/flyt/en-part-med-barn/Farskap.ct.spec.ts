@@ -12,7 +12,10 @@ test("krever barn, bruker arbeidsfordeling FRS og oppretter farskapssak", async 
     await opprettKnapp.click();
     await expect(component.getByText("Du må velge minst ett barn.")).toBeVisible();
 
-    await component.getByRole("checkbox").first().check();
+    await component
+        .getByRole("checkbox", { name: /^Velg (?!alle)/ })
+        .first()
+        .check();
     await expect.poll(() => requests.unit.some((request) => request.arbeidsfordeling === "FRS")).toBe(true);
     await expectNoAxeViolations(page, component);
 
@@ -39,8 +42,8 @@ test("parten det ble startet fra kan endres", async ({ mount, page }) => {
 test("nytt barn erstatter det forrige fordi farskap bare kan gjelde ett barn", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
-    const førsteBarn = component.getByRole("checkbox").first();
-    const andreBarn = component.getByRole("checkbox").nth(1);
+    const førsteBarn = component.getByRole("checkbox", { name: /^Velg (?!alle)/ }).first();
+    const andreBarn = component.getByRole("checkbox", { name: /^Velg (?!alle)/ }).nth(1);
 
     await førsteBarn.check();
     await andreBarn.check();
@@ -53,7 +56,7 @@ test("nytt barn erstatter det forrige fordi farskap bare kan gjelde ett barn", a
 test("barnekortet har kopier og Modia utenfor avkrysningen", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
-    const barn = component.getByRole("checkbox").first();
+    const barn = component.getByRole("checkbox", { name: /^Velg (?!alle)/ }).first();
 
     await expect(component.getByRole("link", { name: "Åpne personen i Modia" }).first()).toBeVisible();
     await component

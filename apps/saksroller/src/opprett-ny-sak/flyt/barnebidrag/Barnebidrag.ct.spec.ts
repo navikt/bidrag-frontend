@@ -19,36 +19,55 @@ async function barnetsForeldre(page: import("@playwright/test").Page, foreldre: 
     });
 }
 
+function barnCheckboxer(component: import("@playwright/test").Locator) {
+    return component.getByRole("checkbox", { name: /^Velg (?!alle)/ });
+}
+
 test.describe("Start fra forelder med barn", () => {
-    test("viser reell mottaker deaktivert og uten valgt alternativ når barnet ikke er valgt", async ({ mount }) => {
+    test("reell mottaker er skrivebeskyttet og uten valgt alternativ når barnet ikke er valgt", async ({ mount }) => {
         const component = await mount(`${STORY}/ForelderMedBarn`);
-        const barnValg = component.getByRole("checkbox").first();
+        const barnValg = barnCheckboxer(component).first();
         const mottakerGruppe = component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" }).first();
+        const samhandlerValg = mottakerGruppe.getByRole("radio", { name: "Annen person eller samhandler" });
 
         await expect(mottakerGruppe).toBeVisible();
-        await expect(mottakerGruppe).toHaveAttribute("disabled", "");
-        for (const valg of await mottakerGruppe.getByRole("radio").all()) {
-            await expect(valg).toBeDisabled();
-            await expect(valg).not.toBeChecked();
-        }
+        await expect(mottakerGruppe.getByText("Velg barnet for å angi reell mottaker")).toBeVisible();
+        await samhandlerValg.click();
+        await expect(samhandlerValg).not.toBeChecked();
 
         await barnValg.check();
-        await expect(mottakerGruppe).not.toHaveAttribute("disabled");
-        await expect(mottakerGruppe.getByRole("radio").first()).toBeEnabled();
+        await expect(mottakerGruppe.getByText("Velg barnet for å angi reell mottaker")).toHaveCount(0);
+        await samhandlerValg.click();
+        await expect(samhandlerValg).toBeChecked();
 
         await barnValg.uncheck();
-        await expect(mottakerGruppe).toHaveAttribute("disabled", "");
+        await expect(mottakerGruppe.getByText("Velg barnet for å angi reell mottaker")).toBeVisible();
         for (const valg of await mottakerGruppe.getByRole("radio").all()) {
-            await expect(valg).toBeDisabled();
             await expect(valg).not.toBeChecked();
+        }
+    });
+
+    test("Velg alle velger og fjerner alle barna i kurven", async ({ mount }) => {
+        const component = await mount(`${STORY}/ForelderMedBarn`);
+        const velgAlle = component.getByRole("checkbox", { name: /^Velg alle/ }).first();
+        const kurv = component.getByRole("group", { name: /^Velg barn med/ }).first();
+
+        await velgAlle.check();
+        for (const barn of await kurv.getByRole("checkbox").all()) {
+            await expect(barn).toBeChecked();
+        }
+
+        await velgAlle.uncheck();
+        for (const barn of await kurv.getByRole("checkbox").all()) {
+            await expect(barn).not.toBeChecked();
         }
     });
 
     test("valgt motpart viser bare felles barn, Endre gir alle kurvene tilbake", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/ForelderMedBarn`);
-        const førsteBarn = component.getByRole("checkbox").first();
-        const andreBarn = component.getByRole("checkbox").nth(1);
+        const førsteBarn = barnCheckboxer(component).first();
+        const andreBarn = barnCheckboxer(component).nth(1);
         const førsteBarnIdent = await førsteBarn.getAttribute("value");
         const andreBarnIdent = await andreBarn.getAttribute("value");
 
@@ -95,7 +114,7 @@ test.describe("Start fra forelder med barn", () => {
             .textContent();
         await barnetsForeldre(page, [bpIdent?.replace(/\D/g, "") ?? ""]);
 
-        await component.getByRole("checkbox").first().check();
+        await barnCheckboxer(component).first().check();
 
         await expect(component.getByText(/ikke tilgang til å opprette sak uten bidragsmottaker/)).toBeVisible();
         await expect(component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" }).first()).toBeVisible();
@@ -107,7 +126,7 @@ test.describe("Start fra forelder med barn", () => {
         await barnetsForeldre(page, [annenForelder.ident]);
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
 
-        await component.getByRole("checkbox").first().check();
+        await barnCheckboxer(component).first().check();
 
         await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toBeVisible();
     });
@@ -115,8 +134,8 @@ test.describe("Start fra forelder med barn", () => {
     test("nullstiller ikke skjemaet ved forsøk på å legge til allerede valgt barn", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/ForelderMedBarn`);
-        await component.getByRole("checkbox").first().check();
-        const valgtIdent = await component.getByRole("checkbox").first().getAttribute("value");
+        await barnCheckboxer(component).first().check();
+        const valgtIdent = await barnCheckboxer(component).first().getAttribute("value");
 
         await component.getByRole("button", { name: "Legg til nytt barn" }).click();
         const søk = page.getByRole("searchbox", { name: "Søk etter barn" });
@@ -124,7 +143,7 @@ test.describe("Start fra forelder med barn", () => {
         await søk.press("Enter");
 
         await expect(page.getByText(/er allerede lagt til/)).toBeVisible();
-        await expect(component.getByRole("checkbox").first()).toBeChecked();
+        await expect(barnCheckboxer(component).first()).toBeChecked();
         expect(requests.create).toBeUndefined();
     });
 });

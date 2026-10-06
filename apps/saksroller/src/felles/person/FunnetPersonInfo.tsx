@@ -1,5 +1,5 @@
 import { IdentUtils } from "@bidrag/common";
-import { BodyShort, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
+import { Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 
 import { useHentSamhandler } from "../../api/samhandler.api";
@@ -12,14 +12,9 @@ type Props = {
     handlinger?: ReactNode;
 };
 
-export function FunnetPersonInnhold({ label, navn, ident }: { label?: string; navn: string; ident?: string }) {
+export function FunnetPersonInnhold({ navn, ident }: { navn: string; ident?: string }) {
     return (
         <VStack gap="space-4">
-            {label && (
-                <BodyShort size="small" weight="semibold">
-                    {label}
-                </BodyShort>
-            )}
             <PersonInfo ident={ident ?? ""} navn={navn} />
             <SamhandlerKontonummerMelding ident={ident} />
         </VStack>
