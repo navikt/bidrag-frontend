@@ -34,7 +34,11 @@ import {
 import { useInntektTableProvider } from "./InntektTableContext";
 import { Opplysninger } from "./Opplysninger";
 
-const ignorerBarnetilleggTyper = [Inntektstype.BARNETILLEGG_SUMMERT, Inntektstype.BARNETILLEGG_TILTAKSPENGER];
+const ignorerBarnetilleggTyper = [
+    Inntektstype.BARNETILLEGG_SUMMERT,
+    Inntektstype.BARNETILLEGG_TILTAKSPENGER,
+    Inntektstype.BARNETILLEGG_FORSVARET,
+];
 const ignorerBarnetilleggBidragTyper = [Inntektstype.BARNETILLEGG_SUMMERT];
 const Beskrivelse = ({ item, field }: { item: InntektFormPeriode; field: string }) => {
     const { type } = useBehandlingProvider();
