@@ -47,13 +47,14 @@ export default [
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
         route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
         route("innkreving", "./routes/bruker/innkreving/InnkrevingPage.tsx"),
-    ]),
-
-    route("person/:personid", "./routes/person/PersonLayout.tsx", [
-        index("./routes/person/oversikt/OversiktPage.tsx"),
-        route("historikk", "./routes/person/historikk/HistorikkPage.tsx"),
-        route("personalia", "./routes/person/personalia/PersonaliaPage.tsx"),
-        route("kontoopplysninger", "./routes/person/kontoopplysninger/KontoopplysningerPage.tsx"),
+        layout("routes/bruker/personopplysninger/PersonLayout.tsx", [
+            route("personalia", "./routes/bruker/personopplysninger/personalia/PersonaliaPage.tsx"),
+            route("historikk", "./routes/bruker/personopplysninger/historikk/HistorikkPage.tsx"),
+            route(
+                "kontoopplysninger",
+                "./routes/bruker/personopplysninger/kontoopplysninger/KontoopplysningerPage.tsx",
+            ),
+        ]),
     ]),
 
     route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),

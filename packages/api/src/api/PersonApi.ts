@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -8,6 +9,26 @@
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
+
+export enum Adressetype {
+  BOSTEDSADRESSE = "BOSTEDSADRESSE",
+  KONTAKTADRESSE = "KONTAKTADRESSE",
+  OPPHOLDSADRESSE = "OPPHOLDSADRESSE",
+  DELT_BOSTED = "DELT_BOSTED",
+}
+
+export enum SivilstandskodePDL {
+  GIFT = "GIFT",
+  UGIFT = "UGIFT",
+  UOPPGITT = "UOPPGITT",
+  ENKE_ELLER_ENKEMANN = "ENKE_ELLER_ENKEMANN",
+  SKILT = "SKILT",
+  SEPARERT = "SEPARERT",
+  REGISTRERT_PARTNER = "REGISTRERT_PARTNER",
+  SEPARERT_PARTNER = "SEPARERT_PARTNER",
+  SKILT_PARTNER = "SKILT_PARTNER",
+  GJENLEVENDE_PARTNER = "GJENLEVENDE_PARTNER",
+}
 
 export interface PersonRequest {
   ident: string;
@@ -29,19 +50,6 @@ export interface SivilstandPdlDto {
 export interface SivilstandPdlHistorikkDto {
   /** Liste over alle hentede forekomster av sivilstand fra bidrag-person */
   sivilstandPdlDto: SivilstandPdlDto[];
-}
-
-export enum SivilstandskodePDL {
-  GIFT = "GIFT",
-  UGIFT = "UGIFT",
-  UOPPGITT = "UOPPGITT",
-  ENKE_ELLER_ENKEMANN = "ENKE_ELLER_ENKEMANN",
-  SKILT = "SKILT",
-  SEPARERT = "SEPARERT",
-  REGISTRERT_PARTNER = "REGISTRERT_PARTNER",
-  SEPARERT_PARTNER = "SEPARERT_PARTNER",
-  SKILT_PARTNER = "SKILT_PARTNER",
-  GJENLEVENDE_PARTNER = "GJENLEVENDE_PARTNER",
 }
 
 export interface HentePersonidenterRequest {
@@ -171,13 +179,6 @@ export interface PersonDto {
   visningsnavn: string;
 }
 
-export enum Adressetype {
-  BOSTEDSADRESSE = "BOSTEDSADRESSE",
-  KONTAKTADRESSE = "KONTAKTADRESSE",
-  OPPHOLDSADRESSE = "OPPHOLDSADRESSE",
-  DELT_BOSTED = "DELT_BOSTED",
-}
-
 export interface DodsboDto {
   /** Fra Tingretten angis skifteformen for booppgjøret. */
   skifteform: "OFFENTLIG" | "ANNET";
@@ -272,7 +273,7 @@ export interface PersondetaljerDto {
   dødsbo?: DodsboDto | null;
   språk?: string | null;
   /** Liste over tidligere identer personen har hatt. */
-  tidligereIdenter?: any[] | null;
+  tidligereIdenter?: string[] | null;
 }
 
 export interface HusstandsmedlemmerRequest {
@@ -330,7 +331,10 @@ export interface HusstandsmedlemmerDto {
 
 export interface Graderingsinfo {
   /** Map med ident til gradering. */
-  identerTilGradering: Record<string, "STRENGT_FORTROLIG" | "FORTROLIG" | "STRENGT_FORTROLIG_UTLAND" | "UGRADERT">;
+  identerTilGradering: Record<
+    string,
+    "STRENGT_FORTROLIG" | "FORTROLIG" | "STRENGT_FORTROLIG_UTLAND" | "UGRADERT"
+  >;
   /** Hvor vidt hovedident fra GraderingQuery er skjerment. */
   identerTilSkjerming: Record<string, boolean>;
 }
@@ -388,12 +392,19 @@ export interface Fodselsdatoer {
   identerTilDatoer: Record<string, string>;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -408,9 +419,13 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -420,6 +435,7 @@ export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequest
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -432,10 +448,17 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "https://bidrag-person-q2.intern.dev.nav.no/bidrag-person",
+      baseURL:
+        axiosConfig.baseURL ||
+        "https://bidrag-person-q2.intern.dev.nav.no/bidrag-person",
     });
     this.secure = secure;
     this.format = format;
@@ -446,7 +469,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -454,7 +480,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -475,11 +505,15 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
       }
 
       return formData;
@@ -503,11 +537,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -530,7 +574,9 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version v1
  * @baseUrl https://bidrag-person-q2.intern.dev.nav.no/bidrag-person
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
   spraak = {
     /**
      * @description Henter personens språk fra Kontakt- og reservasjonsregisteret
@@ -578,7 +624,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/personidenter
      * @secure
      */
-    hentePersonidenter: (data: HentePersonidenterRequest, params: RequestParams = {}) =>
+    hentePersonidenter: (
+      data: HentePersonidenterRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<PersonidentDto[], any>({
         path: `/personidenter`,
         method: "POST",
@@ -633,7 +682,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/motpartbarnrelasjon
      * @secure
      */
-    getPersonensMotpartBarnRelasjon: (data: PersonRequest, params: RequestParams = {}) =>
+    getPersonensMotpartBarnRelasjon: (
+      data: PersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<MotpartBarnRelasjonDto, MotpartBarnRelasjonDto>({
         path: `/motpartbarnrelasjon`,
         method: "POST",
@@ -652,7 +704,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/informasjon/detaljer
      * @secure
      */
-    hentPersoninformasjonDetaljer: (data: PersonRequest, params: RequestParams = {}) =>
+    hentPersoninformasjonDetaljer: (
+      data: PersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<PersondetaljerDto, PersondetaljerDto>({
         path: `/informasjon/detaljer`,
         method: "POST",
@@ -741,7 +796,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/husstandsmedlemskapbarn
      * @secure
      */
-    hentHusstandsmedlemskapBarn: (data: HusstandsmedlemmerRequest, params: RequestParams = {}) =>
+    hentHusstandsmedlemskapBarn: (
+      data: HusstandsmedlemmerRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<HusstandsmedlemmerDto, any>({
         path: `/husstandsmedlemskapbarn`,
         method: "POST",
@@ -760,7 +818,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/husstandsmedlemmer
      * @secure
      */
-    hentHusstandsmedlemmer: (data: HusstandsmedlemmerRequest, params: RequestParams = {}) =>
+    hentHusstandsmedlemmer: (
+      data: HusstandsmedlemmerRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<HusstandsmedlemmerDto, any>({
         path: `/husstandsmedlemmer`,
         method: "POST",
@@ -815,7 +876,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/geografisktilknytning
      * @secure
      */
-    hentGeografiskTilknytning: (data: PersonRequest, params: RequestParams = {}) =>
+    hentGeografiskTilknytning: (
+      data: PersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<GeografiskTilknytningDto, any>({
         path: `/geografisktilknytning`,
         method: "POST",
@@ -889,7 +953,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/forelderbarnrelasjon
      * @secure
      */
-    hentForelderBarnRelasjon1: (data: PersonRequest, params: RequestParams = {}) =>
+    hentForelderBarnRelasjon1: (
+      data: PersonRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<ForelderBarnRelasjonDto, any>({
         path: `/forelderbarnrelasjon`,
         method: "POST",
