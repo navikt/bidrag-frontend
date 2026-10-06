@@ -299,9 +299,9 @@ export const ForholdsmessigFordelingVarsel = () => {
             <Heading size="xsmall">Forholdsmessig fordeling</Heading>
             <BodyShort size="small" className="w-max">
                 {enPeriodeHarSlåttUtTilFFPga25Prosent
-                    ? "BPs totale andel av U overstiger 25% av inntekten. Bidraget er derfor forholdsmessig fordelt i minst en av periodene"
+                    ? "BPs totale andel av U overstiger 25% av inntekten. Bidraget er derfor forholdsmessig fordelt i minst en av periodene."
                     : enPeriodeHarSlåttUtTilFFPgaRedusertEvne &&
-                      "BP har ikke full bidragsevne. Bidraget er derfor forholdsmessig fordelt i minst en av periodene"}
+                      "BP har ikke full bidragsevne. Bidraget er derfor forholdsmessig fordelt i minst en av periodene."}
             </BodyShort>
         </Alert>
     );
