@@ -52,6 +52,7 @@ import {
     type StonadTilBarnetilsynAktiveGrunnlagDto,
     type StonadTilBarnetilsynDto,
     type TilleggsstonadDto,
+    type UnderholdDto,
     type VirkningstidspunktBarnDtoV2,
     type VirkningstidspunktFeilV2Dto,
 } from "@bidrag/api/BidragBehandlingApiV1";
@@ -1357,36 +1358,22 @@ export const useUpdateUnderholdBegrunnelse = () => {
 
     return useMutation({
         mutationKey: MutationKeys.oppdatereUnderhold(behandlingId),
-        mutationFn: async (input: UnderholdskostnadBegrunnelsePayload): Promise<void> => {
+        mutationFn: async (input: UnderholdskostnadBegrunnelsePayload): Promise<UnderholdDto[]> => {
             const { triggeredBy: _triggeredBy, ...payload } = input;
-            await BEHANDLING_API_V1.api.oppdatereBegrunnelse(Number(behandlingId), payload);
+            const { data } = await BEHANDLING_API_V1.api.oppdatereBegrunnelse(Number(behandlingId), payload);
+            return data;
         },
-        onSuccess: (_, payload) => {
+        // Svaret inneholder hele underholdskostnadslista med ferske valideringsfeil. Vi legger
+        // den rett inn i cachen. Tidligere ble bare begrunnelsesteksten oppdatert, mens
+        // valideringsfeil ble stående urørt, så `manglerBegrunnelse` forble sann og steget
+        // sperret til saksbehandler trykket F5. Samme mønster som de øvrige mutasjonene her.
+        onSuccess: (underholdskostnader) => {
             queryClient.setQueryData(
                 QueryKeys.behandlingV2(behandlingId),
-                (currentData: BehandlingDtoV2): BehandlingDtoV2 => {
-                    const updatedAndreBarn = payload.triggeredBy.startsWith("underholdskostnaderAndreBarn");
-                    const underholdIndex = currentData.underholdskostnader.findIndex(
-                        (underhold) => underhold.id === Number(payload.underholdsid),
-                    );
-
-                    const updatedUnderholdskostnader = updatedAndreBarn
-                        ? currentData.underholdskostnader.map((underhold) => ({
-                              ...underhold,
-                              begrunnelse: underhold.gjelderBarn.medIBehandlingen
-                                  ? underhold.begrunnelse
-                                  : payload.begrunnelse,
-                          }))
-                        : currentData.underholdskostnader.toSpliced(Number(underholdIndex), 1, {
-                              ...currentData.underholdskostnader[underholdIndex],
-                              begrunnelse: payload.begrunnelse,
-                          });
-
-                    return {
-                        ...currentData,
-                        underholdskostnader: updatedUnderholdskostnader,
-                    };
-                },
+                (currentData: BehandlingDtoV2): BehandlingDtoV2 => ({
+                    ...currentData,
+                    underholdskostnader,
+                }),
             );
         },
         networkMode: "always",
