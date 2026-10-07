@@ -127,7 +127,8 @@ const Main = () => {
 const Side = () => {
     const { lesemodus, onStepChange, getNextStep, setSaveErrorState } = useBehandlingProvider();
     const { erBisysVedtak, underholdskostnader, vedtakstype } = useGetBehandlingV2();
-    const { watch, control, getValues, setValue, setError, clearErrors } = useFormContext<UnderholdskostnadFormValues>();
+    const { watch, control, getValues, setValue, setError, clearErrors } =
+        useFormContext<UnderholdskostnadFormValues>();
     const { selectedRoller } = useBehandlingProvider();
     const visibleUnderholdskostnader = useMemo(() => {
         const currentUnderholdskostnader = getValues("underholdskostnaderMedIBehandling");
