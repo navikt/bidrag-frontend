@@ -1,4 +1,5 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
+import { Vedtakstype } from "@bidrag/api/SakApi";
 
 /** Vedtak fattet i ny løsning regnes alltid som fattet og beregnet, som i Bisys. */
 export function erFattetBeregnet(hendelse: SakshendelseDto): boolean {
@@ -23,7 +24,7 @@ export function lagForsendelseParams(
         ...(hendelse.søknadsgruppe && { behandlingType: hendelse.søknadsgruppe }),
         ...(erFattetBeregnet(hendelse) && { erFattetBeregnet: "true" }),
         ...(hendelse.søktAv && { soknadFra: hendelse.søktAv }),
-        ...(hendelse.vedtakType && { vedtakType: hendelse.vedtakType }),
+        ...{ vedtakType: hendelse.vedtakType ?? Vedtakstype.ENDRING },
     });
 
     hendelse.barnObjektNumre?.forEach((objNr) => {
