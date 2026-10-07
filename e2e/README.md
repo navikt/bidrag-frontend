@@ -1,7 +1,7 @@
 # E2E-workspace
 
 E2E-testene åpner brukerrettede sider uten å lagre eller endre data. Lokal kjøring går gjennom Wonderwall på
-`http://localhost:4000`. Testene kan også kjøres mot Q2. 
+`http://localhost:4000`. Testene kan også kjøres mot Q2.
 
 ## Konfigurasjon
 

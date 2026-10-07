@@ -37,7 +37,7 @@ import { useHentSak } from "~/api/useApi.ts";
 import { medReturMål, RETUR_PARAM, SAKSNR_PARAM } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
-import { journalstatusDisplayVerdi, standardSort } from "./journalpostUtils";
+import { journalstatusDisplayVerdi, standardSort, visesSomForsendelse } from "./journalpostUtils";
 import PersonIdentMedRolle from "./PersonIdentMedRolle";
 
 interface JournalpostRad {
@@ -123,6 +123,13 @@ export default function JournalpostTabell({
     const åpneSlettBekreftelse = (journalpostId: string) => {
         setJournalpostIdTilSletting(journalpostId);
         slettModalRef.current?.showModal();
+    };
+
+    const finnDokDato = (jp: JournalpostDto) => {
+        if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato !== null) {
+            return jp.mottattDato ? formaterDato(jp.mottattDato) : "";
+        }
+        return jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
     };
 
     const lukkSlettBekreftelse = () => {
@@ -279,7 +286,7 @@ export default function JournalpostTabell({
             header: "",
             bodyCell: (rad: JournalpostRad) => {
                 if (rad.erVedlegg) return null;
-                if (rad.jp.journalpostId?.startsWith("BIF")) {
+                if (visesSomForsendelse(rad.jp)) {
                     return (
                         <Link
                             href={`/sak/${saksnummer}/forsendelse/${rad.jp.journalpostId}?${jpParams()}`}
@@ -309,8 +316,7 @@ export default function JournalpostTabell({
             id: "dokumentDato",
             header: "Dok.dato",
             isSortable: true,
-            bodyCell: (rad: JournalpostRad) =>
-                rad.erVedlegg ? "" : rad.jp.dokumentDato ? formaterDato(rad.jp.dokumentDato) : "",
+            bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : finnDokDato(rad.jp)),
         },
         {
             id: "journalfortDato",

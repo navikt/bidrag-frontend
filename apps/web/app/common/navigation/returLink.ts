@@ -1,4 +1,4 @@
-import { getBisysSessionParams } from "@bidrag/common";
+import { getBisysSessionParams, useKunNySakshistorikk } from "@bidrag/common";
 import { useLocation, useSearchParams } from "react-router";
 
 /** Query-parameter som forteller hvilken side brukeren ble rutet fra. */
@@ -132,7 +132,7 @@ interface StandardReturMål {
     /** Bygger stien til en underside, brukt for å kjenne igjen hvor vi står. */
     undersideSti: (id: string, side: string) => string;
     /** Lenken tilbake til foreldresiden. */
-    destinasjon: (id: string, searchParams: URLSearchParams) => ReturDestinasjon;
+    destinasjon: (id: string, searchParams: URLSearchParams, kunNySakshistorikk: boolean) => ReturDestinasjon;
 }
 
 /** Query-verdien i `?from=` som ber oss rute tilbake til Bisys i stedet for i denne appen. */
@@ -155,8 +155,8 @@ const STANDARD_RETUR_MÅL: StandardReturMål[] = [
         id: ({ saksnummer }) => saksnummer,
         undersider: ["behandling", "vedtak", "forsendelse", "rediger", "journalpost", "journal"],
         undersideSti: sakSti,
-        destinasjon: (saksnummer, searchParams) =>
-            searchParams.get(RETUR_PARAM) === BISYS_RETUR_VERDI
+        destinasjon: (saksnummer, searchParams, kunNySakshistorikk) =>
+            !kunNySakshistorikk && searchParams.get(RETUR_PARAM) === BISYS_RETUR_VERDI
                 ? bisysSakshistorikkDestinasjon(saksnummer)
                 : sakshistorikkAppDestinasjon(saksnummer),
     },
@@ -186,13 +186,14 @@ export function finnStandardReturMål(
     pathname: string,
     kontekst: ReturKontekst,
     searchParams: URLSearchParams = new URLSearchParams(),
+    kunNySakshistorikk = false,
 ): (ReturDestinasjon & { label: string }) | null {
     for (const mål of STANDARD_RETUR_MÅL) {
         const id = mål.id(kontekst);
         if (!id) continue;
 
         const erTreff = mål.undersider.some((side) => erUnderside(pathname, mål.undersideSti(id, side), side));
-        if (erTreff) return { label: mål.label, ...mål.destinasjon(id, searchParams) };
+        if (erTreff) return { label: mål.label, ...mål.destinasjon(id, searchParams, kunNySakshistorikk) };
     }
     return null;
 }
@@ -247,9 +248,12 @@ export function useReturLink(): ReturLenke | null {
     const [searchParams] = useSearchParams();
     const { pathname } = useLocation();
 
+    const kunNySakshistorikk = useKunNySakshistorikk();
     const kontekst = hentSakBrukerFraUrl(pathname, searchParams);
 
-    const mål = lesEksplisittReturMål(searchParams, kontekst) ?? finnStandardReturMål(pathname, kontekst, searchParams);
+    const mål =
+        lesEksplisittReturMål(searchParams, kontekst) ??
+        finnStandardReturMål(pathname, kontekst, searchParams, kunNySakshistorikk);
 
     if (!mål) return null;
 

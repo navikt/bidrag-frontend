@@ -13,12 +13,13 @@ import { serverUnleashContext } from "~/server/unleash/featureToggles.server.ts"
 import { evaluerAlleToggles } from "~/server/unleash/unleash.server.ts";
 import { getFaro, initFaro } from "./faro.client";
 import "./index.css";
-import { BidragProgressbarFullScreen } from "@bidrag/common";
+import { BidragProgressbarFullScreen, KunNySakshistorikkSync } from "@bidrag/common";
 import { bisysParamsMiddleware } from "~/common/bisys/bisys-params.middleware.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import RootErrorBoundary from "~/common/components/errorpage/RootErrorBoundary.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import { UnleashContextUpdater } from "~/common/unleash/UnleashContextUpdater.tsx";
+import { NyOpprettSakFlytProvider } from "~/routes/sak/saksroller/opprett-ny-sak/start/NyOpprettSakFlytProvider.tsx";
 import type { Route } from "./+types/root.ts";
 import faviconUrl from "./assets/bisys_favicon.ico";
 
@@ -97,11 +98,14 @@ export default function App({ loaderData }: Route.ComponentProps) {
                     fallback={(error) => <RootErrorBoundary error={error} bruker={navUser} bisysUrl={bisysUrl} />}
                 >
                     <UnleashContextUpdater />
-                    <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
-                        <ClientOnly fallback={<BidragProgressbarFullScreen />}>
-                            <Outlet />
-                        </ClientOnly>
-                    </AppLayout>
+                    <KunNySakshistorikkSync />
+                    <NyOpprettSakFlytProvider>
+                        <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
+                            <ClientOnly fallback={<BidragProgressbarFullScreen />}>
+                                <Outlet />
+                            </ClientOnly>
+                        </AppLayout>
+                    </NyOpprettSakFlytProvider>
                 </FaroErrorBoundary>
             </FlagProvider>
         </QueryClientWrapper>

@@ -1,6 +1,6 @@
 import { HStack } from "@navikt/ds-react";
 
-const INNKREVING_MARKØR = ",innkreving";
+const INNKREVING_MARKØR = /,\s*innkreving/;
 
 function InnkrevingIkon() {
     return (
@@ -18,17 +18,18 @@ type Props = {
 };
 
 /**
- * Viser `søknadsgruppeBeskrivelse`, men erstatter en eventuell ",innkreving"-
+ * Viser `søknadsgruppeBeskrivelse`, men erstatter en eventuell ",innkreving"- eller ", innkreving"-
  * del av teksten med et ikon (med title "Med innkreving") i stedet for å vise
  * teksten rått.
  */
 export function SøknadsgruppeBeskrivelseCelle({ beskrivelse }: Props) {
-    if (!beskrivelse?.includes(INNKREVING_MARKØR)) {
+    const treff = beskrivelse?.match(INNKREVING_MARKØR);
+    if (!beskrivelse || treff?.index === undefined) {
         return beskrivelse;
     }
 
-    const [førInnkreving, ...restDeler] = beskrivelse.split(INNKREVING_MARKØR);
-    const etterInnkreving = restDeler.join(INNKREVING_MARKØR);
+    const førInnkreving = beskrivelse.slice(0, treff.index);
+    const etterInnkreving = beskrivelse.slice(treff.index + treff[0].length);
 
     return (
         <HStack gap="space-4" align="center" wrap={false}>

@@ -42,7 +42,7 @@ export function lagSak(overrides: Record<string, unknown> = {}) {
         ukjentPart: false,
         vedtakssperre: false,
         avsluttet: false,
-        arbeidsfordeling: { enhet: "4806" },
+        arbeidsfordeling: "EEN",
         roller: [
             lagRolle({ fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM", rolleType: "BM" }),
             lagRolle({ fodselsnummer: testpersoner.bidragspliktig.ident, type: "BP", rolleType: "BP" }),

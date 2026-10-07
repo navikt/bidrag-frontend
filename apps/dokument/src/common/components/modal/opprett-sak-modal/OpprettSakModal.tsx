@@ -1,4 +1,4 @@
-import { OpprettSakProvider, OpprettSakSkjema } from "@bidrag/common";
+import { OpprettSakFlytModal, OpprettSakProvider, OpprettSakSkjema, useHarNyOpprettSakFlyt } from "@bidrag/common";
 import { Loader, Modal } from "@navikt/ds-react";
 import { Suspense } from "react";
 
@@ -19,6 +19,23 @@ export interface IOpprettSakModalProps {
  * gamle modalen ble brukt.
  */
 export default function OpprettSakModal({ isOpen, ident, navn, eierfogd, onSubmit, onClose }: IOpprettSakModalProps) {
+    const harNyFlyt = useHarNyOpprettSakFlyt();
+
+    if (harNyFlyt) {
+        return (
+            <OpprettSakFlytModal
+                open={isOpen}
+                onClose={onClose}
+                ident={ident}
+                eierfogd={eierfogd}
+                onOpprettet={(saksnummer) => {
+                    onSubmit(saksnummer);
+                    onClose();
+                }}
+            />
+        );
+    }
+
     if (!isOpen) {
         return null;
     }

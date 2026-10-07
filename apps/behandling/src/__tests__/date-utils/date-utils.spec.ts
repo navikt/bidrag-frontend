@@ -1,7 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { isValidDate, periodCoversMinOneFullCalendarMonth } from "../../utils/date-utils";
+import { addMonthsIgnoreDay, isValidDate, periodCoversMinOneFullCalendarMonth } from "../../utils/date-utils";
 
 describe("DateUtils", () => {
+    describe("addMonthsIgnoreDay", () => {
+        it.each([
+            { input: "2026-01-31", months: 1, expected: new Date(2026, 1, 1) },
+            { input: "2024-01-31", months: 1, expected: new Date(2024, 1, 1) },
+            { input: "2026-12-31", months: 1, expected: new Date(2027, 0, 1) },
+            { input: "2026-01-31", months: 3, expected: new Date(2026, 3, 1) },
+            { input: "2026-03-31", months: -1, expected: new Date(2026, 1, 1) },
+            { input: "2026-01-31", months: 0, expected: new Date(2026, 0, 1) },
+        ])("adds $months months to $input without overflowing the target month", ({ input, months, expected }) => {
+            expect(addMonthsIgnoreDay(input, months)).toEqual(expected);
+            expect(addMonthsIgnoreDay(new Date(input), months)).toEqual(expected);
+        });
+
+        it("does not mutate the original Date", () => {
+            const input = new Date(2026, 0, 31, 12, 30);
+            const originalTime = input.getTime();
+
+            expect(addMonthsIgnoreDay(input, 1)).toEqual(new Date(2026, 1, 1));
+            expect(input.getTime()).toBe(originalTime);
+        });
+    });
+
     it("isValidDate should return false for null", () => {
         const isValid = isValidDate(null);
         expect(isValid).equals(false);

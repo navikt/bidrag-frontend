@@ -43,6 +43,12 @@ export function journalstatusDisplayVerdi(jp: JournalpostDto): string {
     return status ?? "-";
 }
 
+/** System-forsendelser (BIF) vises som forsendelse, med unntak av notater som vises som journalpost. */
+export function visesSomForsendelse(jp: JournalpostDto): boolean {
+    const erNotat = jp.dokumentType === "X";
+    return (jp.journalpostId?.startsWith("BIF") ?? false) && !erNotat;
+}
+
 export function standardSort(a: JournalpostDto, b: JournalpostDto): number {
     const klarTilPrint = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON;
     const underOpprettelse = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.UNDER_OPPRETTELSE;
