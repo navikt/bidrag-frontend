@@ -8,7 +8,7 @@ import {
     TypeBehandling,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils, PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
-import { Alert, BodyShort, Box, Heading, Table } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, Heading, Table, Tooltip } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
 import type { OppdatereInntektRequestLosnet } from "../../../types/apiSpecFix";
 import { formatterBeløp } from "../../../utils/number-utils";
@@ -94,6 +94,16 @@ const BeløpMånedDagsats = ({ item, field }: { item: InntektFormPeriode; field:
 };
 
 const Skattesats = ({ item, field }: { item: InntektFormPeriode; field: string }) => {
+    if (item.inntektstype === Inntektstype.BARNETILLEGG_FORSVARET) {
+        return (
+            <Tooltip content="Barnetillegg fra Forsvaret er skattefritt">
+                <BodyShort size="small" textColor="subtle" className="h-6 flex items-center justify-end">
+                    Ikke relevant
+                </BodyShort>
+            </Tooltip>
+        );
+    }
+
     return (
         <>
             {item.erRedigerbart || item.kanBarnetilleggSkattesatsRedigeres ? (
@@ -182,7 +192,8 @@ export const Barnetillegg = () => {
             }
         }
 
-        if (erBidrag && (periode.skattesats === undefined || periode.skattesats < 0)) {
+        const skattesatsErRelevant = periode.inntektstype !== Inntektstype.BARNETILLEGG_FORSVARET;
+        if (erBidrag && skattesatsErRelevant && (periode.skattesats === undefined || periode.skattesats < 0)) {
             setError(`${fieldName}.skattesats`, {
                 type: "notValid",
                 message: text.error.barnetilleggSkattesats,
