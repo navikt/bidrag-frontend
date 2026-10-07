@@ -37,7 +37,7 @@ import { useHentSak } from "~/api/useApi.ts";
 import { medReturMål, RETUR_PARAM, SAKSNR_PARAM } from "~/common/navigation/returLink.ts";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
-import { journalstatusDisplayVerdi, standardSort } from "./journalpostUtils";
+import { journalstatusDisplayVerdi, standardSort, visesSomForsendelse } from "./journalpostUtils";
 import PersonIdentMedRolle from "./PersonIdentMedRolle";
 
 interface JournalpostRad {
@@ -286,7 +286,7 @@ export default function JournalpostTabell({
             header: "",
             bodyCell: (rad: JournalpostRad) => {
                 if (rad.erVedlegg) return null;
-                if (rad.jp.journalpostId?.startsWith("BIF")) {
+                if (visesSomForsendelse(rad.jp)) {
                     return (
                         <Link
                             href={`/sak/${saksnummer}/forsendelse/${rad.jp.journalpostId}?${jpParams()}`}
