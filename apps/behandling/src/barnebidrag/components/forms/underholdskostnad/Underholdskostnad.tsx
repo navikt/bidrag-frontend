@@ -127,7 +127,7 @@ const Main = () => {
 const Side = () => {
     const { lesemodus, onStepChange, getNextStep, setSaveErrorState } = useBehandlingProvider();
     const { erBisysVedtak, underholdskostnader, vedtakstype } = useGetBehandlingV2();
-    const { watch, control, getValues, setValue, setError } = useFormContext<UnderholdskostnadFormValues>();
+    const { watch, control, getValues, setValue, setError, clearErrors } = useFormContext<UnderholdskostnadFormValues>();
     const { selectedRoller } = useBehandlingProvider();
     const visibleUnderholdskostnader = useMemo(() => {
         const currentUnderholdskostnader = getValues("underholdskostnaderMedIBehandling");
@@ -194,8 +194,13 @@ const Side = () => {
                 type: "notValid",
                 message: text.error.feltErPåkrevd,
             });
+        } else {
+            // Feilen ble tidligere bare satt, aldri fjernet, og effekten kjørte ikke på nytt når
+            // underholdskostnadene ble oppdatert. Da ble feltet stående i feil selv etter at
+            // begrunnelsen var lagret, og steget slapp deg ikke videre før du trykket F5.
+            clearErrors(fieldName);
         }
-    }, [fieldName, underholdId]);
+    }, [fieldName, underholdId, underholdskostnader, setError, clearErrors]);
 
     const onSave = useCallback(
         async (name: string, payload: OppdatereBegrunnelseRequest) => {
