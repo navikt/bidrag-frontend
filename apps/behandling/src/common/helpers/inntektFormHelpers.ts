@@ -3,6 +3,7 @@ import {
     type InntektDtoV2,
     type InntekterDtoRolle,
     Inntektsrapportering,
+    Inntektstype,
     type InntektValideringsfeil,
     type InntektValideringsfeilV2Dto,
     Kilde,
@@ -256,7 +257,7 @@ export const createPayload = (periode: InntektFormPeriode, virkningsdato: Date):
             gjelderId: periode.gjelderRolleId,
             gjelderBarnId: periode.gjelderBarnId,
             gjelderBarn: periode.gjelderBarn,
-            skatteprosent: periode.skattesats,
+            skatteprosent: periode.inntektstype === Inntektstype.BARNETILLEGG_FORSVARET ? null : periode.skattesats,
             inntektstype: periode.inntektstype ? periode.inntektstype : null,
         },
     };
