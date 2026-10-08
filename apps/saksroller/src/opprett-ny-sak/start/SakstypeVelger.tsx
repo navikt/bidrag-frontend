@@ -1,9 +1,9 @@
 import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
 
-import type { Sakstype } from "../skjema/OpprettSakStartContext";
+import type { OpprettSakstype } from "../skjema/OpprettSakStartContext";
 
 type SakstypeOption = {
-    type: Sakstype;
+    type: OpprettSakstype;
     label: string;
 };
 
@@ -27,8 +27,8 @@ const SAKSTYPE_OPTIONS: SakstypeOption[] = [
 ];
 
 type Props = {
-    value: Sakstype | null;
-    onVelg: (type: Sakstype) => void;
+    value: OpprettSakstype | null;
+    onVelg: (type: OpprettSakstype) => void;
 };
 
 export default function SakstypeVelger({ value, onVelg }: Props) {
@@ -37,7 +37,7 @@ export default function SakstypeVelger({ value, onVelg }: Props) {
             legend="Velg sakstype"
             size="small"
             value={value ?? undefined}
-            onChange={(type) => onVelg(type as Sakstype)}
+            onChange={(type) => onVelg(type as OpprettSakstype)}
         >
             <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }}>
                 {SAKSTYPE_OPTIONS.map((option) => (

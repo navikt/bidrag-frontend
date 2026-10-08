@@ -3,7 +3,7 @@ import { Box, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import NullstillDialog from "../skjema/NullstillDialog";
 import OpprettSakSkjema from "../skjema/OpprettSakSkjema";
-import { type OpprettSakStart, type Sakstype, useErOppretterSak } from "../skjema/OpprettSakStartContext";
+import { type OpprettSakStart, type OpprettSakstype, useErOppretterSak } from "../skjema/OpprettSakStartContext";
 import type { PartRolle } from "../skjema/opprett-sak-schema";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "../skjema/SkjemaSeksjon";
 import SakstypeVelger from "./SakstypeVelger";
@@ -11,18 +11,18 @@ import StartpartVelger from "./StartpartVelger";
 
 /** Siden for å opprette ny sak: velg sakstype, søk opp en person og fyll ut skjemaet. */
 export default function OpprettSakFlyt() {
-    const [sakstype, setSakstype] = useState<Sakstype>("BARNEBIDRAG");
+    const [sakstype, setSakstype] = useState<OpprettSakstype>("BARNEBIDRAG");
     const [start, setStart] = useState<(OpprettSakStart & { versjon: number }) | null>(null);
-    const [ventendeSakstype, setVentendeSakstype] = useState<Sakstype | null>(null);
+    const [ventendeSakstype, setVentendeSakstype] = useState<OpprettSakstype | null>(null);
     const oppretter = useErOppretterSak();
 
-    const byttSakstype = (type: Sakstype) => {
+    const byttSakstype = (type: OpprettSakstype) => {
         setVentendeSakstype(null);
         setStart(null);
         setSakstype(type);
     };
 
-    const velgSakstype = (type: Sakstype) => {
+    const velgSakstype = (type: OpprettSakstype) => {
         if (type === sakstype || oppretter) return;
         if (start) setVentendeSakstype(type);
         else byttSakstype(type);
