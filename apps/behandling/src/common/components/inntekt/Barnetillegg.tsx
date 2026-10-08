@@ -97,7 +97,7 @@ const Skattesats = ({ item, field }: { item: InntektFormPeriode; field: string }
     if (item.inntektstype === Inntektstype.BARNETILLEGG_FORSVARET) {
         return (
             <Tooltip content="Barnetillegg fra Forsvaret er skattefritt">
-                <BodyShort size="small" textColor="subtle" className="h-6 flex items-center justify-end">
+                <BodyShort size="small" textColor="subtle" className="h-6 flex items-center justify-end" tabIndex={0}>
                     Ikke relevant
                 </BodyShort>
             </Tooltip>
