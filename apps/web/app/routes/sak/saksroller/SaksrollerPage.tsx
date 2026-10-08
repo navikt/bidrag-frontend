@@ -1,4 +1,4 @@
-import { SakErrorBoundary, SaksrollerVisning } from "@bidrag/saksroller";
+import { SaksrollerVisning } from "@bidrag/saksroller";
 import { BodyLong, Loader, VStack } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
 import { Suspense } from "react";
@@ -20,18 +20,16 @@ export default function SaksrollerPage({ params }: Route.ComponentProps) {
     return (
         <>
             <title>{tabTitle}</title>
-            <SakErrorBoundary saksnummer={saksnummer}>
-                <Suspense
-                    fallback={
-                        <VStack align="center" justify="center" gap="space-12" minHeight="100vh">
-                            <Loader size="2xlarge" title="Laster sak..." />
-                            <BodyLong>Laster sak</BodyLong>
-                        </VStack>
-                    }
-                >
-                    <SaksrollerVisning saksnummer={saksnummer} />
-                </Suspense>
-            </SakErrorBoundary>
+            <Suspense
+                fallback={
+                    <VStack align="center" justify="center" gap="space-12" minHeight="100vh">
+                        <Loader size="2xlarge" title="Laster sak..." />
+                        <BodyLong>Laster sak</BodyLong>
+                    </VStack>
+                }
+            >
+                <SaksrollerVisning saksnummer={saksnummer} />
+            </Suspense>
         </>
     );
 }
