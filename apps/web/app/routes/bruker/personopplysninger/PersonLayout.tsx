@@ -48,29 +48,40 @@ export default function PersonLayout({ params }: Route.ComponentProps) {
         );
     }
 
+    const tabDefault = () => {
+        switch (window.location.pathname.split("/").pop()) {
+            case "historikk":
+                return "historikk";
+            case "kontoopplysninger":
+                return "kontoopplysninger";
+            default:
+                return "personalia";
+        }
+    };
+
     return (
         <>
-            <Tabs defaultValue={window.location.pathname.split("/").pop()}>
+            <Tabs defaultValue={tabDefault()}>
                 <Tabs.List>
                     <Tabs.Tab
                         value="personalia"
                         label="Personalia"
                         as={Link}
-                        to={`/bruker/${brukerid}/personalia`}
+                        to={`/bruker/${brukerid}/personopplysninger`}
                         icon={<PersonIcon aria-hidden />}
                     />
                     <Tabs.Tab
                         value="historikk"
                         label="Historikk"
                         as={Link}
-                        to={`/bruker/${brukerid}/historikk`}
+                        to={`/bruker/${brukerid}/personopplysninger/historikk`}
                         icon={<ClockDashedIcon aria-hidden />}
                     />
                     <Tabs.Tab
                         value="kontoopplysninger"
                         label="Kontoopplysninger"
                         as={Link}
-                        to={`/bruker/${brukerid}/kontoopplysninger`}
+                        to={`/bruker/${brukerid}/personopplysninger/kontoopplysninger`}
                         icon={<CardIcon aria-hidden />}
                     />
                 </Tabs.List>

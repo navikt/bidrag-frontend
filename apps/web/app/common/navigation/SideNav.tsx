@@ -4,6 +4,7 @@ import styles from "./SideNav.module.css";
 export interface SideNavItem {
     label: string;
     href: string;
+    isNotEnd?: boolean;
 }
 
 interface SideNavProps {
@@ -24,7 +25,7 @@ export function SideNav({ items, ariaLabel = "Sidemeny" }: SideNavProps) {
             <ul className={styles.list}>
                 {items.map((item) => (
                     <li key={item.href} className={styles.listItem}>
-                        <NavLink to={item.href} className={styles.link} end>
+                        <NavLink to={item.href} className={styles.link} end={!item.isNotEnd}>
                             <span>{item.label}</span>
                         </NavLink>
                     </li>
