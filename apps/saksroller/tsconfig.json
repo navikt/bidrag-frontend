@@ -3,9 +3,6 @@
     "include": ["src", "playwright"],
     "compilerOptions": {
         "types": ["node", "vite/client"],
-        "lib": ["ES2023", "DOM", "DOM.Iterable"],
-        "paths": {
-            "@ct-saksroller/*": ["./playwright/*"]
-        }
+        "lib": ["ES2023", "DOM", "DOM.Iterable"]
     }
 }

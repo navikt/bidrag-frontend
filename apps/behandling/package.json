@@ -41,9 +41,9 @@
         "@react-router/dev": "catalog:",
         "@types/lodash": "^4.17.14",
         "@types/mdx": "^2.0.13",
-        "@types/node": "^25",
+        "@types/node": "catalog:",
         "jsdom": "^30.0.1",
-        "vite": "^8.0.16"
+        "vite": "catalog:"
     },
     "peerDependencies": {
         "@tanstack/react-query": "catalog:",

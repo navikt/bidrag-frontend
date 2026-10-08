@@ -1,7 +1,7 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
-import { useTestQueryClient } from "@ct-saksroller/saksroller/useTestQueryClient.ts";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTestQueryClient } from "../../../playwright/saksroller/useTestQueryClient.ts";
 import PersonSøkWrapper, { PersonSøkInnhold } from "./PersonSøkWrapper.tsx";
 
 function StandardScenario() {

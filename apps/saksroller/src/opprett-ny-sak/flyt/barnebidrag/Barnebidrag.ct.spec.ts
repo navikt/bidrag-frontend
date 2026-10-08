@@ -1,6 +1,6 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
-import { testpersoner } from "@ct-saksroller/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "@ct-saksroller/opprett-ny-sak/network";
+import { testpersoner } from "../../../../playwright/opprett-ny-sak/fixtures";
+import { expectNoAxeViolations, mockOpprettSakApi } from "../../../../playwright/opprett-ny-sak/network";
 
 const STORY = "opprett-ny-sak/flyt/barnebidrag/Barnebidrag";
 const { bidragspliktig: bp, bidragsmottaker: bm, annenForelder, barnUnder18 } = testpersoner;

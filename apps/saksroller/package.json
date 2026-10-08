@@ -22,12 +22,12 @@
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@axe-core/playwright": "^4.13.0",
-        "@playwright/test": "^1.62.1",
-        "@types/node": "^25",
+        "@axe-core/playwright": "catalog:",
+        "@playwright/test": "catalog:",
+        "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
-        "vite": "^8.0.16"
+        "vite": "catalog:"
     },
     "peerDependencies": {
         "@tanstack/react-query": "catalog:",

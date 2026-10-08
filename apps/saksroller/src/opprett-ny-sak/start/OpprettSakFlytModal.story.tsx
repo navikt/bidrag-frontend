@@ -1,3 +1,3 @@
-import { OpprettSakFlytModalStory } from "@ct-saksroller/opprett-ny-sak/OpprettSak.story";
+import { OpprettSakFlytModalStory } from "../../../playwright/opprett-ny-sak/OpprettSak.story";
 
 export const Modal = OpprettSakFlytModalStory;

@@ -9,7 +9,7 @@ import PersonInfo from "../../felles/person/PersonInfo";
 import SøkPerson from "../../felles/person-søk/SøkPerson";
 import NullstillDialog from "../skjema/NullstillDialog";
 import {
-    type Sakstype,
+    type OpprettSakstype,
     sakstypeTilBeskrivelse,
     tvungenRolle,
     useErOppretterSak,
@@ -20,12 +20,12 @@ import SaksrolleVelger from "./SaksrolleVelger";
 
 type Utkast = { person: PersonDto; rolle: PartRolle | null };
 
-const SEKSJONSTITTEL: Partial<Record<Sakstype, string>> = {
+const SEKSJONSTITTEL: Partial<Record<OpprettSakstype, string>> = {
     OPPFOSTRINGSBIDRAG: "Bidragspliktig",
     FARSKAP: "Bidragsmottaker",
 };
 
-const SØKELABEL: Partial<Record<Sakstype, string>> = {
+const SØKELABEL: Partial<Record<OpprettSakstype, string>> = {
     OPPFOSTRINGSBIDRAG: "Søk etter bidragspliktig",
     FARSKAP: "Søk etter bidragsmottaker",
 };
@@ -41,7 +41,7 @@ export default function StartpartVelger({
     harSkjema,
     onValgt,
 }: {
-    sakstype: Sakstype;
+    sakstype: OpprettSakstype;
     forhåndsvalgt?: PersonDto | null;
     visSøk?: boolean;
     /** Et utfylt skjema nullstilles ved nytt valg, så da spørres det først. */

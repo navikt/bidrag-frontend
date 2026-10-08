@@ -1,12 +1,12 @@
 import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
-import type { Sakstype } from "../skjema/OpprettSakStartContext";
+import type { OpprettSakstype } from "../skjema/OpprettSakStartContext";
 import { type PartRolle, PartRolleSchema } from "../skjema/opprett-sak-schema";
 import { filtrerSaksroller, type SaksrolleAlternativ } from "./saksrolle-regler";
 
 type Props = {
     navn: string;
     alder: number | null;
-    sakstype: Sakstype;
+    sakstype: OpprettSakstype;
     rolle: PartRolle | null;
     readOnly: boolean;
     onVelg: (rolle: PartRolle) => void;

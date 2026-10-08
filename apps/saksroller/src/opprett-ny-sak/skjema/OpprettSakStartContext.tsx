@@ -7,9 +7,9 @@ import { tilPartISaken } from "../parter/part-utils";
 import type { OpprettSakInngang } from "../start/inngang";
 import type { PartISaken, PartRolle } from "./opprett-sak-schema";
 
-export type Sakstype = "BARNEBIDRAG" | "EKTEFELLEBIDRAG" | "OPPFOSTRINGSBIDRAG" | "FARSKAP";
+export type OpprettSakstype = "BARNEBIDRAG" | "EKTEFELLEBIDRAG" | "OPPFOSTRINGSBIDRAG" | "FARSKAP";
 export type Sakskategori = "Nasjonal" | "Utland";
-export function sakstypeTilTekst(sakstype: Sakstype) {
+export function sakstypeTilTekst(sakstype: OpprettSakstype) {
     switch (sakstype) {
         case "BARNEBIDRAG":
             return "Barnebidrag";
@@ -21,7 +21,7 @@ export function sakstypeTilTekst(sakstype: Sakstype) {
             return "Farskap";
     }
 }
-export function sakstypeTilBeskrivelse(sakstype: Sakstype) {
+export function sakstypeTilBeskrivelse(sakstype: OpprettSakstype) {
     switch (sakstype) {
         case "BARNEBIDRAG":
             return "Start med å identifisere en part i saken (forelder eller barn).";
@@ -33,12 +33,12 @@ export function sakstypeTilBeskrivelse(sakstype: Sakstype) {
             return "Søk opp bidragsmottakeren.";
     }
 }
-const TVUNGEN_ROLLE: Partial<Record<Sakstype, PartRolle>> = {
+const TVUNGEN_ROLLE: Partial<Record<OpprettSakstype, PartRolle>> = {
     OPPFOSTRINGSBIDRAG: "bidragspliktig",
     FARSKAP: "bidragsmottaker",
 };
 
-export function tvungenRolle(sakstype: Sakstype | null): PartRolle | null {
+export function tvungenRolle(sakstype: OpprettSakstype | null): PartRolle | null {
     return sakstype ? (TVUNGEN_ROLLE[sakstype] ?? null) : null;
 }
 
@@ -53,14 +53,14 @@ export type OpprettSakFlytValg = {
 export type OpprettSakStart = {
     person: PersonDto;
     rolle: PartRolle;
-    sakstype: Sakstype;
+    sakstype: OpprettSakstype;
 };
 
 type OpprettSakStartContext = OpprettSakFlytValg & {
     startperson: PersonDto;
     partISaken: PartISaken;
     partISakenAlder: number | null;
-    sakstype: Sakstype;
+    sakstype: OpprettSakstype;
     /** Personen flyten ble åpnet for. Kan ikke endres i skjemaet. */
     låstIdent: string | null;
 };

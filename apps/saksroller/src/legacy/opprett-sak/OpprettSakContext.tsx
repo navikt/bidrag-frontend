@@ -27,7 +27,7 @@ interface ISakContext extends IOpprettSakPageProps {
 // Migrert fra bidrag-ui (apps/sak-ui/src/context/sakContext.tsx). `useStartTracing`
 // og `PageWrapper`/`QueryClientWrapper` er droppet siden apps/web allerede har
 // global tracing og providers via app/root.tsx.
-export const SakContext = createContext<ISakContext | null>(null);
+const SakContext = createContext<ISakContext | null>(null);
 
 export function SakProvider({ children, ...props }: PropsWithChildren<IOpprettSakPageProps>) {
     const [selectedMotpart, setSelectedMotpart] = useState<MotpartBarnRelasjon | undefined>();
@@ -61,5 +61,3 @@ export function useSakContext(): ISakContext {
     }
     return context;
 }
-
-export default SakProvider;

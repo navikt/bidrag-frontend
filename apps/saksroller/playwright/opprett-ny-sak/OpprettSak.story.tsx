@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/reac
 import { type ReactNode, useMemo, useState } from "react";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
 import OpprettSakSkjema from "../../src/opprett-ny-sak/skjema/OpprettSakSkjema";
-import type { Sakstype } from "../../src/opprett-ny-sak/skjema/OpprettSakStartContext";
+import type { OpprettSakstype } from "../../src/opprett-ny-sak/skjema/OpprettSakStartContext";
 import type { PartRolle } from "../../src/opprett-ny-sak/skjema/opprett-sak-schema";
 import type { InngangRolle } from "../../src/opprett-ny-sak/start/inngang";
 import OpprettSakFlyt from "../../src/opprett-ny-sak/start/OpprettSakFlyt";
@@ -15,7 +15,7 @@ import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
 type Scenario = {
-    sakstype: Sakstype;
+    sakstype: OpprettSakstype;
     person: Pick<PersonDto, "ident" | "visningsnavn" | "fødselsdato">;
     rolle: PartRolle;
     relasjoner: MotpartBarnRelasjon[];

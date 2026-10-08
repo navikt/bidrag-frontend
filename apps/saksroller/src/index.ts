@@ -8,4 +8,3 @@ export { RolleType as OpprettSakRolleType } from "./legacy/opprett-sak/RolleType
 export { default as OpprettSakFlyt } from "./opprett-ny-sak/start/OpprettSakFlyt";
 export { OpprettSakFlytModal } from "./opprett-ny-sak/start/OpprettSakFlytModal";
 export { default as SaksrollerVisning } from "./rollebilde/SaksrollerVisning";
-export { default as SakErrorBoundary } from "./SakErrorBoundary";

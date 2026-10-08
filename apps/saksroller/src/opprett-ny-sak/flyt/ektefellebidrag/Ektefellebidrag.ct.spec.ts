@@ -1,5 +1,5 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
-import { expectNoAxeViolations, mockOpprettSakApi } from "@ct-saksroller/opprett-ny-sak/network";
+import { expectNoAxeViolations, mockOpprettSakApi } from "../../../../playwright/opprett-ny-sak/network";
 
 const STORY = "opprett-ny-sak/flyt/ektefellebidrag/Ektefellebidrag/MedForslag";
 
