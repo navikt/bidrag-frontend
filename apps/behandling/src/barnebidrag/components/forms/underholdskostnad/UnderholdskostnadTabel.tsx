@@ -1,6 +1,7 @@
 import {
     type BehandlingDtoV2,
     type FaktiskTilsynsutgiftDto,
+    type ForpleiningDto,
     type OppdatereUnderholdResponse,
     SletteUnderholdselementTypeEnum,
     type StonadTilBarnetilsynDto,
@@ -24,6 +25,7 @@ import type { UnderholdskostnadTables } from "../../../context/BarnebidragProvid
 import { useOnDeleteUnderholdsObjekt } from "../../../hooks/useOnDeleteUnderholdsObjekt";
 import type {
     FaktiskTilsynsutgiftPeriode,
+    ForpleiningPeriode,
     StønadTilBarnetilsynPeriode,
     TilleggsstonadPeriode,
     UnderholdkostnadsFormPeriode,
@@ -31,10 +33,11 @@ import type {
 } from "../../../types/underholdskostnadFormValues";
 import { transformUnderholdskostnadPeriode } from "../helpers/UnderholdskostnadFormHelpers";
 
-const fieldNameToSletteUnderholdselementTypeEnum = {
+export const fieldNameToSletteUnderholdselementTypeEnum = {
     stønadTilBarnetilsyn: SletteUnderholdselementTypeEnum.STONADTILBARNETILSYN,
     faktiskTilsynsutgift: SletteUnderholdselementTypeEnum.FAKTISK_TILSYNSUTGIFT,
     tilleggsstønad: SletteUnderholdselementTypeEnum.TILLEGGSSTONAD,
+    forpleining: SletteUnderholdselementTypeEnum.FORPLEINING,
 };
 
 type UnderholdskostnadTableChildrenProps = {
@@ -42,7 +45,9 @@ type UnderholdskostnadTableChildrenProps = {
     onRemovePeriode: (index: number) => void;
     onSaveRow: (index: number) => void;
     onEditRow: (index: number) => void;
-    addPeriod: (periode: StønadTilBarnetilsynPeriode | FaktiskTilsynsutgiftPeriode | TilleggsstonadPeriode) => void;
+    addPeriod: (
+        periode: StønadTilBarnetilsynPeriode | FaktiskTilsynsutgiftPeriode | TilleggsstonadPeriode | ForpleiningPeriode,
+    ) => void;
 };
 
 export const UnderholdskostnadTabel = ({
@@ -58,12 +63,14 @@ export const UnderholdskostnadTabel = ({
         mutation: UseMutationResult<
             OppdatereUnderholdResponse,
             Error,
-            StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto,
+            StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto | ForpleiningDto,
             unknown
         >;
         queryClientUpdater: (updateFn: (currentData: BehandlingDtoV2) => BehandlingDtoV2) => BehandlingDtoV2;
     };
-    createPayload: (index: number) => StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto;
+    createPayload: (
+        index: number,
+    ) => StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto | ForpleiningDto;
     children: (props: UnderholdskostnadTableChildrenProps) => ReactNode;
 }) => {
     const { underholdskostnader } = useGetBehandlingV2();
@@ -96,17 +103,19 @@ export const UnderholdskostnadTabel = ({
         const updatedPerioder = response[underholdskostnadType] as
             | StonadTilBarnetilsynDto[]
             | FaktiskTilsynsutgiftDto[]
-            | TilleggsstonadDto[];
+            | TilleggsstonadDto[]
+            | ForpleiningDto[];
 
         return updatedPerioder;
     };
     const updateTable = (
-        updatedPerioder: StonadTilBarnetilsynDto[] | FaktiskTilsynsutgiftDto[] | TilleggsstonadDto[],
+        updatedPerioder: StonadTilBarnetilsynDto[] | FaktiskTilsynsutgiftDto[] | TilleggsstonadDto[] | ForpleiningDto[],
     ) => {
         const transformedUpdatedPerioder = updatedPerioder.map(transformUnderholdskostnadPeriode) as
             | StønadTilBarnetilsynPeriode[]
             | FaktiskTilsynsutgiftPeriode[]
-            | TilleggsstonadPeriode[];
+            | TilleggsstonadPeriode[]
+            | ForpleiningPeriode[];
         setValue(fieldName, transformedUpdatedPerioder);
     };
 
@@ -186,8 +195,13 @@ export const UnderholdskostnadTabel = ({
                         } else {
                             const cachedUnderhold = underholdskostnader.find((cU) => cU.id === underhold.id);
                             const cachedPeriode = cachedUnderhold[underholdskostnadType]?.find(
-                                (p: StonadTilBarnetilsynDto | FaktiskTilsynsutgiftDto | TilleggsstonadDto) =>
-                                    p.id === cachedPeriode.id,
+                                (
+                                    p:
+                                        | StonadTilBarnetilsynDto
+                                        | FaktiskTilsynsutgiftDto
+                                        | TilleggsstonadDto
+                                        | ForpleiningDto,
+                                ) => p.id === cachedPeriode.id,
                             );
                             setValue(`${fieldName}.${index}`, cachedPeriode);
                         }
@@ -322,7 +336,13 @@ export const UnderholdskostnadTabel = ({
     const tableValideringsfeil = valideringsfeil?.[underholdskostnadType];
     const displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError =
         underholdskostnadType === "tilleggsstønad" && tilleggsstønadsperioderUtenFaktiskTilsynsutgift;
-    const tableHasErrors = tableValideringsfeil || displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError;
+    // Backend kontrollerer forpleiningen på nytt når andre kostnader endres, så feilen kan oppstå uten at raden lagres
+    const forpleiningOverstigerUnderholdskostnad =
+        underholdskostnadType === "forpleining" ? (valideringsfeil?.forpleiningOverstigerUnderholdskostnad ?? []) : [];
+    const tableHasErrors =
+        tableValideringsfeil ||
+        displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError ||
+        forpleiningOverstigerUnderholdskostnad.length > 0;
 
     return (
         <>
@@ -333,6 +353,26 @@ export const UnderholdskostnadTabel = ({
                     </Heading>
                     {displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError && (
                         <BodyShort size="small">{text.error.tilleggsstønadsperioderUtenFaktiskTilsynsutgift}</BodyShort>
+                    )}
+                    {forpleiningOverstigerUnderholdskostnad.length > 0 && (
+                        <>
+                            {forpleiningOverstigerUnderholdskostnad.map((periode, index) => (
+                                <BodyShort key={`${periode.fom}-${periode.tom}-${index}`} size="small">
+                                    {periode.tom &&
+                                        removePlaceholder(
+                                            text.alert.forpleiningOverstigerUnderholdskostnad,
+                                            DateToDDMMYYYYString(dateOrNull(periode.fom)),
+                                            DateToDDMMYYYYString(dateOrNull(periode.tom)),
+                                        )}
+                                    {!periode.tom &&
+                                        removePlaceholder(
+                                            text.alert.forpleiningOverstigerUnderholdskostnadLøpende,
+                                            DateToDDMMYYYYString(dateOrNull(periode.fom)),
+                                        )}
+                                </BodyShort>
+                            ))}
+                            <BodyShort size="small">{text.alert.forpleiningOverstigerUnderholdskostnadFiks}</BodyShort>
+                        </>
                     )}
                     {tableValideringsfeil?.overlappendePerioder?.length > 0 && (
                         <>
