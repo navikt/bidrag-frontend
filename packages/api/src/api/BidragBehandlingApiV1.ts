@@ -47,6 +47,7 @@ export enum Grunnlagstype {
   TILLEGGSSTONADPERIODE = "TILLEGGSSTØNAD_PERIODE",
   BARNETILSYNMEDSTONADPERIODE = "BARNETILSYN_MED_STØNAD_PERIODE",
   FORPLEINING_UTGIFT = "FORPLEINING_UTGIFT",
+  FORPLEINING_PERIODE = "FORPLEINING_PERIODE",
   NETTO_BARNETILSYN = "NETTO_BARNETILSYN",
   UNDERHOLDSKOSTNAD = "UNDERHOLDSKOSTNAD",
   BPS_ANDEL_UNDERHOLDSKOSTNAD = "BPS_ANDEL_UNDERHOLDSKOSTNAD",
@@ -2022,6 +2023,13 @@ export interface SoknadDetaljerDto {
   behandlingstema?: Behandlingstema | null;
 }
 
+export interface ForpleiningDto {
+  /** @format int64 */
+  id?: number | null;
+  periode: DatoperiodeDto;
+  beløp: number;
+}
+
 export interface TilleggsstonadDto {
   /** @format int64 */
   id?: number | null;
@@ -2077,6 +2085,8 @@ export interface UnderholdDto {
   /** @uniqueItems true */
   tilleggsstønad: TilleggsstonadDto[];
   /** @uniqueItems true */
+  forpleining: ForpleiningDto[];
+  /** @uniqueItems true */
   underholdskostnad: UnderholdskostnadDto[];
   begrunnelse?: string | null;
   begrunnelseFraOpprinneligVedtak?: string | null;
@@ -2127,6 +2137,7 @@ export interface UnderholdskostnadValideringsfeil {
   tilleggsstønad?: UnderholdskostnadValideringsfeilTabell | null;
   faktiskTilsynsutgift?: UnderholdskostnadValideringsfeilTabell | null;
   stønadTilBarnetilsyn?: UnderholdskostnadValideringsfeilTabell | null;
+  forpleining?: UnderholdskostnadValideringsfeilTabell | null;
   /**
    * Tilleggsstønadsperioder som ikke overlapper fullstendig med faktiske tilsynsutgifter.
    * @uniqueItems true
@@ -2136,6 +2147,11 @@ export interface UnderholdskostnadValideringsfeil {
   manglerPerioderForTilsynsordning: boolean;
   /** Må ha fylt ut begrunnelse hvis minst en periode er lagt til underholdskostnad */
   manglerBegrunnelse: boolean;
+  /**
+   * Perioder der forpleiningen overstiger underholdskostnaden før forpleining er trukket fra
+   * @uniqueItems true
+   */
+  forpleiningOverstigerUnderholdskostnad: DatoperiodeDto[];
   gjelderBarn: UnderholdBarnDto;
   /** @format int64 */
   id: number;
@@ -2437,11 +2453,20 @@ export interface OppdatereUnderholdResponse {
   /** @uniqueItems true */
   tilleggsstønad: TilleggsstonadDto[];
   /** @uniqueItems true */
+  forpleining: ForpleiningDto[];
+  /** @uniqueItems true */
   valideringsfeil?: UnderholdskostnadValideringsfeil[] | null;
   /** @uniqueItems true */
   beregnetUnderholdskostnader: BeregnetUnderholdskostnad[];
   /** @format int64 */
   underholdId: number;
+}
+
+export interface OppdatereForpleiningRequest {
+  /** @format int64 */
+  id?: number | null;
+  periode: DatoperiodeDto;
+  beløp: number;
 }
 
 export interface OppdatereTilleggsstonadRequest {
@@ -4493,6 +4518,11 @@ export interface NotatFaktiskTilsynsutgiftDto {
   total: number;
 }
 
+export interface NotatForpleiningDto {
+  periode: DatoperiodeDto;
+  beløp: number;
+}
+
 export interface NotatGebyrDetaljerDto {
   søknad?: NotatGebyrSoknadDetaljerDto | null;
   inntekt: NotatGebyrInntektDto;
@@ -4773,6 +4803,7 @@ export interface NotatUnderholdBarnDto {
   stønadTilBarnetilsyn: NotatStonadTilBarnetilsynDto[];
   faktiskTilsynsutgift: NotatFaktiskTilsynsutgiftDto[];
   tilleggsstønad: NotatTilleggsstonadDto[];
+  forpleining: NotatForpleiningDto[];
   underholdskostnad: NotatUnderholdskostnadBeregningDto[];
   begrunnelse?: NotatBegrunnelseDto | null;
 }
@@ -4790,6 +4821,7 @@ export interface NotatUnderholdskostnadBeregningDto {
   stønadTilBarnetilsyn: number;
   tilsynsutgifter: number;
   barnetrygd: number;
+  forpleining?: number | null;
   total: number;
   beregningsdetaljer?: NotatUnderholdskostnadPeriodeBeregningsdetaljer | null;
 }
@@ -5130,6 +5162,7 @@ export enum SletteUnderholdselementTypeEnum {
   FAKTISK_TILSYNSUTGIFT = "FAKTISK_TILSYNSUTGIFT",
   STONADTILBARNETILSYN = "STØNAD_TIL_BARNETILSYN",
   TILLEGGSSTONAD = "TILLEGGSSTØNAD",
+  FORPLEINING = "FORPLEINING",
 }
 
 import type {
@@ -5422,6 +5455,29 @@ export class Api<
     ) =>
       this.request<OppdatereUnderholdResponse, any>({
         path: `/api/v2/behandling/${behandlingsid}/underhold/${underholdsid}/tilleggsstonad`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Oppdatere forpleining for underholdskostnad i behandling. Returnerer oppdatert element.
+     *
+     * @tags underhold-controller
+     * @name OppdatereForpleining
+     * @request PUT:/api/v2/behandling/{behandlingsid}/underhold/{underholdsid}/forpleining
+     * @secure
+     */
+    oppdatereForpleining: (
+      behandlingsid: number,
+      underholdsid: number,
+      data: OppdatereForpleiningRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<OppdatereUnderholdResponse, any>({
+        path: `/api/v2/behandling/${behandlingsid}/underhold/${underholdsid}/forpleining`,
         method: "PUT",
         body: data,
         secure: true,
