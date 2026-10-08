@@ -1,10 +1,10 @@
 import { BidragCommonsProviderMock } from "@bidrag/common/playwright/testing/BidragCommonsProviderMock.tsx";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
-import { useTestQueryClient } from "@ct-saksroller/saksroller/useTestQueryClient.ts";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { createRoutesStub } from "react-router";
+import { useTestQueryClient } from "../../../playwright/saksroller/useTestQueryClient.ts";
 import { RedigeringsvisningProvider } from "../../felles/RedigeringsRamme.tsx";
 import type { Rolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import LeggTilBarn from "./LeggTilBarn.tsx";

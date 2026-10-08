@@ -1,5 +1,5 @@
-import { barnkurver, testpersoner } from "@ct-saksroller/opprett-ny-sak/fixtures";
-import { OpprettSakSkjemaStory } from "@ct-saksroller/opprett-ny-sak/OpprettSak.story";
+import { barnkurver, testpersoner } from "../../../../playwright/opprett-ny-sak/fixtures";
+import { OpprettSakSkjemaStory } from "../../../../playwright/opprett-ny-sak/OpprettSak.story";
 
 export const Standard = () => (
     <OpprettSakSkjemaStory

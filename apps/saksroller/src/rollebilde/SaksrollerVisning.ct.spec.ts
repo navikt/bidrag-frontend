@@ -1,7 +1,7 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
-import { lagRolle, lagSak, testpersoner } from "@ct-saksroller/saksroller/fixtures.ts";
-import { mockSaksrollerApi } from "@ct-saksroller/saksroller/network.ts";
+import { lagRolle, lagSak, testpersoner } from "../../playwright/saksroller/fixtures.ts";
+import { mockSaksrollerApi } from "../../playwright/saksroller/network.ts";
 
 const STORY = "rollebilde/SaksrollerVisning/Standard";
 

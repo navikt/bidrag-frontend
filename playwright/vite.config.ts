@@ -10,9 +10,7 @@ export default defineConfig({
     plugins: [react(), tailwindcss()],
     resolve: {
         alias: {
-            "~": fileURLToPath(new URL("../app", import.meta.url)),
-            "@ct": fileURLToPath(new URL(".", import.meta.url)),
-            "@ct-saksroller": fileURLToPath(new URL("../../saksroller/playwright", import.meta.url)),
+            "~": fileURLToPath(new URL("../apps/web/app", import.meta.url)),
         },
     },
     server: {
@@ -31,9 +29,9 @@ export default defineConfig({
             clientFiles: [
                 "./playwright/gallery/main.tsx",
                 "./playwright/gallery/stories.ts",
-                "./app/**/*.story.tsx",
-                "../../packages/common/src/**/*.story.tsx",
-                "../saksroller/src/**/*.story.tsx",
+                "./apps/web/app/**/*.story.tsx",
+                "./packages/*/src/**/*.story.tsx",
+                "./apps/*/src/**/*.story.tsx",
             ],
         },
     },

@@ -1,5 +1,5 @@
 import "@navikt/ds-css";
-import "../../app/index.css";
+import "../../apps/web/app/index.css";
 
 import { type ComponentType, StrictMode } from "react";
 import { flushSync } from "react-dom";

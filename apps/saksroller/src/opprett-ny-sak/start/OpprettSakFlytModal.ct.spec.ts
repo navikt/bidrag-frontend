@@ -1,7 +1,7 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
-import { testpersoner } from "@ct-saksroller/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "@ct-saksroller/opprett-ny-sak/network";
 import type { Locator, Page } from "@playwright/test";
+import { testpersoner } from "../../../playwright/opprett-ny-sak/fixtures";
+import { expectNoAxeViolations, mockOpprettSakApi } from "../../../playwright/opprett-ny-sak/network";
 import type { Modal } from "./OpprettSakFlytModal.story";
 
 const STORY = "opprett-ny-sak/start/OpprettSakFlytModal/Modal";
