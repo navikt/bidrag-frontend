@@ -26,7 +26,9 @@ const harUnderholdskostnadValideringsfeil = (valideringsfeil?: Underholdskostnad
         !!valideringsfeil?.faktiskTilsynsutgift ||
         !!valideringsfeil?.stønadTilBarnetilsyn ||
         !!valideringsfeil?.tilleggsstønad ||
-        !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length
+        !!valideringsfeil?.forpleining ||
+        !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length ||
+        !!valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length
     );
 
 const harSamværValideringsfeil = (valideringsfeil?: SamvaerValideringsfeilDto | null) =>
