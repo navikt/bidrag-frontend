@@ -1,5 +1,6 @@
 import type {
     FaktiskTilsynsutgiftDto,
+    ForpleiningDto,
     StonadTilBarnetilsynDto,
     StonadTilBarnetilsynDtoSkolealderEnum,
     StonadTilBarnetilsynDtoTilsynstypeEnum,
@@ -22,21 +23,24 @@ export interface StønadTilBarnetilsynPeriode
 }
 export interface FaktiskTilsynsutgiftPeriode extends UnderholdPeriode, Omit<FaktiskTilsynsutgiftDto, "periode"> {}
 export interface TilleggsstonadPeriode extends UnderholdPeriode, Omit<TilleggsstonadDto, "periode"> {}
+export interface ForpleiningPeriode extends UnderholdPeriode, Omit<ForpleiningDto, "periode"> {}
 
 export type UnderholdkostnadsFormPeriode =
     | StønadTilBarnetilsynPeriode
     | FaktiskTilsynsutgiftPeriode
-    | TilleggsstonadPeriode;
+    | TilleggsstonadPeriode
+    | ForpleiningPeriode;
 
 export interface Underhold
-    extends Omit<UnderholdDto, "stønadTilBarnetilsyn" | "faktiskTilsynsutgift" | "tilleggsstønad"> {
+    extends Omit<UnderholdDto, "stønadTilBarnetilsyn" | "faktiskTilsynsutgift" | "tilleggsstønad" | "forpleining"> {
     stønadTilBarnetilsyn?: StønadTilBarnetilsynPeriode[];
     faktiskTilsynsutgift?: FaktiskTilsynsutgiftPeriode[];
     tilleggsstønad?: TilleggsstonadPeriode[];
+    forpleining?: ForpleiningPeriode[];
 }
 
 export interface UnderholdAndreBarn
-    extends Omit<UnderholdDto, "stønadTilBarnetilsyn" | "faktiskTilsynsutgift" | "tilleggsstønad"> {
+    extends Omit<UnderholdDto, "stønadTilBarnetilsyn" | "faktiskTilsynsutgift" | "tilleggsstønad" | "forpleining"> {
     faktiskTilsynsutgift?: FaktiskTilsynsutgiftPeriode[];
 }
 

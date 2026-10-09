@@ -1,0 +1,39 @@
+{
+    "name": "@bidrag/saksroller",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run --passWithNoTests --exclude '**/*.ct.spec.ts'"
+    },
+    "dependencies": {
+        "@bidrag/api": "workspace:*",
+        "@bidrag/common": "workspace:*",
+        "@bidrag/utils": "workspace:*",
+        "@hookform/resolvers": "^5.2.2",
+        "@navikt/aksel-icons": "catalog:",
+        "@navikt/ds-react": "catalog:",
+        "axios": "catalog:",
+        "react-hook-form": "^7.85.0",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@axe-core/playwright": "catalog:",
+        "@playwright/test": "catalog:",
+        "@types/node": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "vite": "catalog:"
+    },
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "@unleash/proxy-client-react": "^5.0.1",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-router": "catalog:"
+    }
+}
