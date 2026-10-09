@@ -2,10 +2,10 @@ import { formaterDato } from "@bidrag/utils";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import {
     BodyShort,
-    Button,
     Heading,
     HStack,
     InlineMessage,
+    Link,
     Loader,
     LocalAlert,
     type SortState,
@@ -34,26 +34,23 @@ export function HenvendelseSeksjon({ ident }: { ident: string }) {
 
     return (
         <VStack gap="space-16">
-            <Heading size="small" level="2">
-                Henvendelser{antall !== undefined && ` (${antall})`}
-            </Heading>
-            <HStack justify="space-between" align="center" gap="space-16">
-                <InlineMessage status="info" size="small">
-                    Bruker kan ha flere henvendelser i Modia
-                </InlineMessage>
-                <Button
-                    as="a"
-                    href={modiaLenke(ident)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="secondary"
-                    size="small"
-                    icon={<ExternalLinkIcon aria-hidden />}
-                    iconPosition="left"
-                >
-                    Gå til Modia
-                </Button>
+            <HStack gap="space-8" align="center">
+                <Heading size="small" level="2">
+                    Henvendelser
+                </Heading>
+                {antall !== undefined && (
+                    <Tag variant="strong" data-color="neutral" size="xsmall" aria-label={`${antall} henvendelser`}>
+                        {antall}
+                    </Tag>
+                )}
             </HStack>
+            <InlineMessage status="info" size="small">
+                Bruker kan ha flere henvendelser i{" "}
+                <Link href={modiaLenke(ident)} target="_blank" rel="noopener noreferrer">
+                    Modia
+                    <ExternalLinkIcon title="Åpnes i ny fane" />
+                </Link>
+            </InlineMessage>
             {henvendelser.isPending ? (
                 <Loader title="Henter henvendelser" />
             ) : henvendelser.isError ? (
@@ -99,9 +96,7 @@ function HenvendelseTabell({ ident, rader }: { ident: string; rader: ReturnType<
             <caption className="sr-only">Henvendelser</caption>
             <Table.Header>
                 <Table.Row>
-                    <Table.ColumnHeader>
-                        <span className="sr-only">Åpne i Modia</span>
-                    </Table.ColumnHeader>
+                    <Table.ColumnHeader>Se henvendelse</Table.ColumnHeader>
                     <Table.ColumnHeader sortable sortKey="sisteMeldingSendt">
                         Siste dato
                     </Table.ColumnHeader>
