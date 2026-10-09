@@ -43,9 +43,9 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
     const form = useFormContext<SakRedigeringData>();
     const roller = form.watch("roller") || [];
 
-    const tilgjengeligeSøsken = søsken.filter(
-        (søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident),
-    );
+    const tilgjengeligeSøsken = søsken
+        .filter((søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident))
+        .sort((a, b) => alderForBarn(b) - alderForBarn(a));
 
     const finnValideringsfeil = (person: PersonDto) =>
         validerNyttBarn(person, { identerISaken: roller.map((rolle) => rolle.fodselsnummer) });

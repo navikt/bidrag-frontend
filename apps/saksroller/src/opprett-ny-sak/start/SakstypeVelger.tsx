@@ -1,4 +1,4 @@
-import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
+import { Select } from "@navikt/ds-react";
 
 import type { OpprettSakstype } from "../skjema/OpprettSakStartContext";
 
@@ -27,25 +27,27 @@ const SAKSTYPE_OPTIONS: SakstypeOption[] = [
 ];
 
 type Props = {
-    value: OpprettSakstype | null;
+    value: OpprettSakstype;
     onVelg: (type: OpprettSakstype) => void;
 };
 
 export default function SakstypeVelger({ value, onVelg }: Props) {
     return (
-        <RadioGroup
-            legend="Velg sakstype"
+        <Select
+            label="Velg sakstype"
             size="small"
-            value={value ?? undefined}
-            onChange={(type) => onVelg(type as OpprettSakstype)}
+            value={value}
+            onChange={(event) => {
+                const valgt = SAKSTYPE_OPTIONS.find((alternativ) => alternativ.type === event.target.value);
+                if (!valgt) throw new Error("Fant ikke den valgte sakstypen");
+                onVelg(valgt.type);
+            }}
         >
-            <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }}>
-                {SAKSTYPE_OPTIONS.map((option) => (
-                    <Radio key={option.type} value={option.type}>
-                        {option.label}
-                    </Radio>
-                ))}
-            </Stack>
-        </RadioGroup>
+            {SAKSTYPE_OPTIONS.map((option) => (
+                <option key={option.type} value={option.type}>
+                    {option.label}
+                </option>
+            ))}
+        </Select>
     );
 }

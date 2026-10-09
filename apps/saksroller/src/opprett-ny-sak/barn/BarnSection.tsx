@@ -22,6 +22,7 @@ interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     maksEttBarn?: boolean;
     /** Barnkurvene eller foreldrene som avgjør dem, hentes. Viser lasting så barn ikke hopper mellom grupper. */
     lasterKurver?: boolean;
+    utvidSøskenflokker?: boolean;
 }
 
 type BarnForm = UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
@@ -35,6 +36,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     beskrivelse,
     maksEttBarn = false,
     lasterKurver = false,
+    utvidSøskenflokker = false,
 }: BarnSectionProps<T>) {
     const barnForm = form as unknown as BarnForm;
     const valgteBarn = barnForm.watch("valgteBarn");
@@ -99,6 +101,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
                 maksEttBarn={maksEttBarn}
+                utvidSøskenflokker={utvidSøskenflokker}
             />
 
             <LeggTilBarnSøk søk={søk} visSøk={visSøk} onÅpne={() => setVisSøk(true)} />

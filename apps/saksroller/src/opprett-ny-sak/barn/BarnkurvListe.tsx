@@ -1,5 +1,5 @@
-import { BodyShort, Box, Checkbox, CheckboxGroup, HGrid, HStack, Skeleton, VStack } from "@navikt/ds-react";
-import { type ReactNode, useRef, useState } from "react";
+import { Accordion, BodyShort, Checkbox, CheckboxGroup, HGrid, HStack, Skeleton, VStack } from "@navikt/ds-react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort";
 import { KortRamme } from "../../felles/person/PersonRolleKort";
@@ -20,6 +20,7 @@ type Props = {
     reellMottakerRegel: ReellMottakerRegel;
     onKurvByttet?: (kurv: Barnkurv | null) => void;
     maksEttBarn?: boolean;
+    utvidSøskenflokker?: boolean;
 };
 
 /**
@@ -38,6 +39,7 @@ export default function BarnkurvListe({
     reellMottakerRegel,
     onKurvByttet,
     maksEttBarn,
+    utvidSøskenflokker = false,
 }: Props) {
     const valgteBarn = form.watch("valgteBarn") || [];
     const harManueltValgtBarn = valgteBarn.some((barn) => barn.manuellLagtTil);
@@ -75,7 +77,7 @@ export default function BarnkurvListe({
         settAktivKurvId(kurvHarValgteBarn ? kurvId : null);
         if (valg.valgteBarn.length === 0) {
             onKurvByttet?.(null);
-        } else if (valgteIdenter.length > 0 && valg.aktivKurv?.id !== kurvId) {
+        } else if (kurvHarValgteBarn && valg.aktivKurv?.id !== kurvId) {
             onKurvByttet?.(valg.kurv);
         }
     };
@@ -94,6 +96,7 @@ export default function BarnkurvListe({
         form,
         valgteBarn,
         reellMottakerRegel,
+        utvidSøskenflokker,
     };
 
     const visManuelle = !laster && manuelleBarn.length > 0;
@@ -105,37 +108,55 @@ export default function BarnkurvListe({
 
     return (
         <VStack gap="space-16">
-            {barnkurver.map((kurv) => {
-                // Uten motpart vet vi ikke hvor barnet hører hjemme før alt er hentet. Vis lasting i stedet.
-                if (!kurv.motpart && laster) return null;
-                const motpartNavn = kurv.motpart?.visningsnavn ?? "ukjent forelder";
-                const ident = !kurv.motpart
-                    ? ukjentNummer(ukjenteKurver.indexOf(kurv) + 1).trim()
-                    : kurv.motpart.ident
-                      ? `(${kurv.motpart.ident})`
-                      : "";
-                const tittelUtenMotpart =
-                    !kurv.motpart && manuellTittel && kurv.barn.some((b) => erManuelt(b.ident)) ? manuellTittel : null;
-                return (
+            <Accordion as="section" aria-label="Søskenflokker" size="small" indent={false}>
+                {barnkurver.map((kurv) => {
+                    // Uten motpart vet vi ikke hvor barnet hører hjemme før alt er hentet. Vis lasting i stedet.
+                    if (!kurv.motpart && laster) return null;
+                    const motpartNavn = kurv.motpart?.visningsnavn ?? "ukjent forelder";
+                    const ident = !kurv.motpart
+                        ? ukjentNummer(ukjenteKurver.indexOf(kurv) + 1).trim()
+                        : kurv.motpart.ident
+                          ? `(${kurv.motpart.ident})`
+                          : "";
+                    const tittelUtenMotpart =
+                        !kurv.motpart && manuellTittel && kurv.barn.some((b) => erManuelt(b.ident))
+                            ? manuellTittel
+                            : null;
+                    return (
+                        <BarnGruppe
+                            key={kurv.id}
+                            {...gruppe}
+                            tittel={
+                                tittelUtenMotpart ?? (
+                                    <>
+                                        <span className="personnavn">
+                                            {kurv.forelder?.visningsnavn || kurv.forelder?.ident || "Ukjent forelder"}
+                                        </span>
+                                        {" og "}
+                                        <span className="personnavn">{motpartNavn}</span>
+                                        {!kurv.motpart && ident && ` ${ident}`}
+                                    </>
+                                )
+                            }
+                            legend={tittelUtenMotpart ?? `Velg barn med ${motpartNavn}`}
+                            barn={kurv.barn}
+                            disabled={låstKurvId !== null && låstKurvId !== kurv.id}
+                            onChange={(identer) => velgIKurv(identer, kurv.id)}
+                            visVelgAlle={!maksEttBarn}
+                        />
+                    );
+                })}
+                {visManuelle && (
                     <BarnGruppe
-                        key={kurv.id}
                         {...gruppe}
-                        tittel={
-                            tittelUtenMotpart ?? (
-                                <>
-                                    Med <span className="personnavn">{motpartNavn}</span>{" "}
-                                    <span className="personident">{ident}</span>
-                                </>
-                            )
-                        }
-                        legend={tittelUtenMotpart ?? `Velg barn med ${motpartNavn}`}
-                        barn={kurv.barn}
-                        disabled={låstKurvId !== null && låstKurvId !== kurv.id}
-                        onChange={(identer) => velgIKurv(identer, kurv.id)}
+                        tittel={manuellTittel ?? `Med ukjent forelder${ukjentNummer(antallUkjente)}`}
+                        legend={manuellTittel ?? `Velg barn med ukjent forelder${ukjentNummer(antallUkjente)}`}
+                        barn={manuelleBarn}
+                        onChange={velgManuelle}
                         visVelgAlle={!maksEttBarn}
                     />
-                );
-            })}
+                )}
+            </Accordion>
             {laster && (
                 <VStack gap="space-8" role="status" aria-live="polite">
                     <BodyShort size="small" textColor="subtle">
@@ -143,16 +164,6 @@ export default function BarnkurvListe({
                     </BodyShort>
                     <Skeleton variant="rounded" height="8rem" />
                 </VStack>
-            )}
-            {visManuelle && (
-                <BarnGruppe
-                    {...gruppe}
-                    tittel={manuellTittel ?? `Med ukjent forelder${ukjentNummer(antallUkjente)}`}
-                    legend={manuellTittel ?? `Velg barn med ukjent forelder${ukjentNummer(antallUkjente)}`}
-                    barn={manuelleBarn}
-                    onChange={velgManuelle}
-                    visVelgAlle={!maksEttBarn}
-                />
             )}
         </VStack>
     );
@@ -185,6 +196,7 @@ function BarnGruppe({
     reellMottakerRegel,
     visVelgAlle,
     disabled = false,
+    utvidSøskenflokker,
 }: {
     tittel?: ReactNode;
     legend: string;
@@ -195,8 +207,14 @@ function BarnGruppe({
     reellMottakerRegel: ReellMottakerRegel;
     visVelgAlle: boolean;
     disabled?: boolean;
+    utvidSøskenflokker: boolean;
 }) {
     const valgteIdenter = barn.filter((b) => valgteBarn.some((v) => v.ident === b.ident)).map((b) => b.ident);
+    const harValgteBarn = valgteIdenter.length > 0;
+    const [open, setOpen] = useState(utvidSøskenflokker || harValgteBarn);
+    useEffect(() => {
+        if (utvidSøskenflokker || harValgteBarn) setOpen(true);
+    }, [utvidSøskenflokker, harValgteBarn]);
     const { låstIdent } = useOpprettSakStart();
     const valgbareIdenter = barn.filter((b) => b.ident !== låstIdent).map((b) => b.ident);
     const valgteValgbareIdenter = valgteIdenter.filter((ident) => valgbareIdenter.includes(ident));
@@ -204,12 +222,10 @@ function BarnGruppe({
     const noenValgbareErValgt = valgteValgbareIdenter.length > 0 && !alleValgbareErValgt;
 
     return (
-        <Box padding="space-16" borderRadius="8">
-            {tittel && (
-                <HStack align="center" justify="space-between" gap="space-8" wrap={false} paddingInline="space-8">
-                    <BodyShort size="small" weight="semibold" textColor="subtle" truncate>
-                        {tittel}
-                    </BodyShort>
+        <Accordion.Item open={open} onOpenChange={setOpen}>
+            <Accordion.Header>{tittel ?? legend}</Accordion.Header>
+            <Accordion.Content>
+                <VStack gap="space-16">
                     {visVelgAlle && valgbareIdenter.length > 0 && (
                         <Checkbox
                             size="small"
@@ -228,40 +244,46 @@ function BarnGruppe({
                             Velg alle
                         </Checkbox>
                     )}
-                </HStack>
-            )}
-            {tittel && <Box borderColor="neutral-subtleA" borderWidth="1 0 0 0" marginBlock="space-8 space-8" />}
-            <CheckboxGroup legend={legend} hideLegend value={valgteIdenter} onChange={onChange} size="small">
-                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-16" align="start">
-                    {barn.map((b) => {
-                        const låst = b.ident === låstIdent;
-                        return (
-                            <KortRamme key={b.ident}>
-                                <VStack gap="space-16">
-                                    <HStack align="start" gap="space-8" wrap={false}>
-                                        <BarnKortInnhold
-                                            barn={b}
-                                            tags={låst && <LåstPartTag />}
-                                            headingActions={
-                                                <Checkbox value={b.ident} hideLabel readOnly={låst} disabled={disabled}>
-                                                    Velg {b.navn ?? b.ident}
-                                                </Checkbox>
-                                            }
-                                        />
-                                    </HStack>
-                                    <BarnReellMottaker
-                                        form={form}
-                                        barn={b}
-                                        barnIndex={valgteBarn.findIndex((v) => v.ident === b.ident)}
-                                        regel={reellMottakerRegel}
-                                        valgt={valgteIdenter.includes(b.ident)}
-                                    />
-                                </VStack>
-                            </KortRamme>
-                        );
-                    })}
-                </HGrid>
-            </CheckboxGroup>
-        </Box>
+                    <CheckboxGroup legend={legend} hideLegend value={valgteIdenter} onChange={onChange} size="small">
+                        <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-16" align="start">
+                            {barn
+                                .toSorted((a, b) => b.alder - a.alder)
+                                .map((b) => {
+                                    const låst = b.ident === låstIdent;
+                                    return (
+                                        <KortRamme key={b.ident}>
+                                            <VStack gap="space-16">
+                                                <HStack align="start" gap="space-8" wrap={false}>
+                                                    <BarnKortInnhold
+                                                        barn={b}
+                                                        tags={låst && <LåstPartTag />}
+                                                        headingActions={
+                                                            <Checkbox
+                                                                value={b.ident}
+                                                                hideLabel
+                                                                readOnly={låst}
+                                                                disabled={disabled}
+                                                            >
+                                                                Velg {b.navn ?? b.ident}
+                                                            </Checkbox>
+                                                        }
+                                                    />
+                                                </HStack>
+                                                <BarnReellMottaker
+                                                    form={form}
+                                                    barn={b}
+                                                    barnIndex={valgteBarn.findIndex((v) => v.ident === b.ident)}
+                                                    regel={reellMottakerRegel}
+                                                    valgt={valgteIdenter.includes(b.ident)}
+                                                />
+                                            </VStack>
+                                        </KortRamme>
+                                    );
+                                })}
+                        </HGrid>
+                    </CheckboxGroup>
+                </VStack>
+            </Accordion.Content>
+        </Accordion.Item>
     );
 }

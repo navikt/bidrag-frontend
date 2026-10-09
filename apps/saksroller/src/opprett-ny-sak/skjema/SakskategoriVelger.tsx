@@ -1,4 +1,4 @@
-import { Radio, RadioGroup, Stack } from "@navikt/ds-react";
+import { Select } from "@navikt/ds-react";
 
 import type { Sakskategori } from "./OpprettSakStartContext";
 
@@ -9,16 +9,18 @@ type Props = {
 
 export default function SakskategoriVelger({ value, onChange }: Props) {
     return (
-        <RadioGroup
-            legend="Kategori"
+        <Select
+            label="Kategori"
             size="small"
             value={value}
-            onChange={(nyVerdi) => onChange(nyVerdi as Sakskategori)}
+            onChange={(event) => {
+                const kategori = event.target.value;
+                if (kategori !== "Nasjonal" && kategori !== "Utland") throw new Error("Ukjent sakskategori");
+                onChange(kategori);
+            }}
         >
-            <Stack gap="space-0 space-24" direction={{ xs: "column", sm: "row" }} wrap={false}>
-                <Radio value="Nasjonal">Nasjonal</Radio>
-                <Radio value="Utland">Utland</Radio>
-            </Stack>
-        </RadioGroup>
+            <option value="Nasjonal">Nasjonal</option>
+            <option value="Utland">Utland</option>
+        </Select>
     );
 }

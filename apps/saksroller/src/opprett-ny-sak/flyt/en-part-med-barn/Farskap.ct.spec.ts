@@ -1,13 +1,18 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { testpersoner } from "../../../../playwright/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "../../../../playwright/opprett-ny-sak/network";
+import {
+    expectNoAxeViolations,
+    mockOpprettSakApi,
+    åpneSøskenflokker,
+} from "../../../../playwright/opprett-ny-sak/network";
 
 const STORY = "opprett-ny-sak/flyt/en-part-med-barn/Farskap/Standard";
 
 test("krever barn, bruker arbeidsfordeling FRS og oppretter farskapssak", async ({ mount, page }) => {
     const requests = await mockOpprettSakApi(page);
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
 
     const opprettKnapp = component.getByRole("button", { name: /Opprett$/ });
     await expect(opprettKnapp).toBeEnabled();
@@ -30,6 +35,7 @@ test("krever barn, bruker arbeidsfordeling FRS og oppretter farskapssak", async 
 test("parten det ble startet fra kan endres", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
     const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
 
     await bmKort.getByRole("button", { name: "Endre bidragsmottaker" }).click();
@@ -41,9 +47,10 @@ test("parten det ble startet fra kan endres", async ({ mount, page }) => {
     await expectNoAxeViolations(page, component);
 });
 
-test("nytt barn erstatter det forrige fordi farskap bare kan gjelde ett barn", async ({ mount, page }) => {
-    await mockOpprettSakApi(page);
+test("byttet barn vises valgt og bare siste barn sendes i farskapssaken", async ({ mount, page }) => {
+    const requests = await mockOpprettSakApi(page);
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
     const førsteBarn = component.getByRole("checkbox", { name: /^Velg (?!alle)/ }).first();
     const andreBarn = component.getByRole("checkbox", { name: /^Velg (?!alle)/ }).nth(1);
 
@@ -53,6 +60,14 @@ test("nytt barn erstatter det forrige fordi farskap bare kan gjelde ett barn", a
     await expect(andreBarn).toBeChecked();
     await expect(førsteBarn).not.toBeChecked();
     await expect(component.getByText("1 valgt")).toBeVisible();
+    const ident = await andreBarn.getAttribute("value");
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+    await expect
+        .poll(() => requests.create?.roller)
+        .toEqual([
+            expect.objectContaining({ type: "BM" }),
+            expect.objectContaining({ fodselsnummer: ident, type: "BA" }),
+        ]);
 });
 
 test("viser helsøsken sammen med manuelt valgt barn", async ({ mount, page }) => {
@@ -82,24 +97,25 @@ test("viser helsøsken sammen med manuelt valgt barn", async ({ mount, page }) =
         });
     });
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
 
     await component.getByRole("button", { name: "Legg til nytt barn" }).click();
     const søk = page.getByRole("searchbox", { name: "Søk etter barn" });
     await søk.fill(manueltBarn.ident);
     await søk.press("Enter");
     await component.getByRole("button", { name: "Legg til", exact: true }).click();
+    await åpneSøskenflokker(component);
 
     const søskenValg = component.getByRole("checkbox", { name: `Velg ${søsken.visningsnavn}` });
-    await expect(søskenValg).toHaveCount(2);
-    await expect(søskenValg.nth(0)).toBeVisible();
-    await expect(søskenValg.nth(0)).not.toBeChecked();
-    await expect(søskenValg.nth(1)).not.toBeChecked();
-    await expect(component.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toHaveCount(2);
-    for (const forelder of [testpersoner.bidragspliktig, testpersoner.annenForelder]) {
-        const søskenGruppe = component.getByRole("group", { name: `Velg barn med ${forelder.visningsnavn}` });
-        await expect(søskenGruppe.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toBeChecked();
-        await expect(søskenGruppe.getByRole("checkbox", { name: `Velg ${søsken.visningsnavn}` })).toBeVisible();
-    }
+    await expect(søskenValg).toHaveCount(1);
+    await expect(søskenValg).toBeVisible();
+    await expect(søskenValg).not.toBeChecked();
+    await expect(component.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toBeChecked();
+    await expect(
+        component.getByRole("button", {
+            name: /Test Bidragspliktig og Test Annen Forelder|Test Annen Forelder og Test Bidragspliktig/,
+        }),
+    ).toBeVisible();
     await expect(component.getByText("Barn lagt til manuelt", { exact: true })).toHaveCount(0);
 });
 
@@ -113,12 +129,14 @@ test("viser en melding når tilgang til søskenrelasjoner mangler", async ({ mou
         await route.fulfill({ status: 403 });
     });
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
 
     await component.getByRole("button", { name: "Legg til nytt barn" }).click();
     const søk = page.getByRole("searchbox", { name: "Søk etter barn" });
     await søk.fill(manueltBarn.ident);
     await søk.press("Enter");
     await component.getByRole("button", { name: "Legg til", exact: true }).click();
+    await åpneSøskenflokker(component);
 
     await expect(
         component.getByText("Kunne ikke hente foreldre og søsken for barnet. Du kan søke opp barn manuelt."),
@@ -129,6 +147,7 @@ test("viser en melding når tilgang til søskenrelasjoner mangler", async ({ mou
 test("barnekortet har kopier og Modia utenfor avkrysningen", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
     const barn = component.getByRole("checkbox", { name: /^Velg (?!alle)/ }).first();
 
     await expect(component.getByRole("link", { name: "Åpne personen i Modia" }).first()).toBeVisible();

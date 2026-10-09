@@ -47,18 +47,18 @@ export type OpprettSakFlytValg = {
     inngang?: OpprettSakInngang;
     onOpprettet?: (saksnummer: string) => void;
     onAvbryt?: () => void;
+    onEndret?: (harEndringer: boolean) => void;
 };
 
-/** Personen og rollen skjemaet fylles ut fra, og hvilken flyt som brukes. */
-export type OpprettSakStart = {
-    person: PersonDto;
-    rolle: PartRolle;
-    sakstype: OpprettSakstype;
-};
+/** Sakstype og eventuell person med rolle som skjemaet fylles ut fra. */
+export type OpprettSakStart = { sakstype: OpprettSakstype } & (
+    | { person: PersonDto; rolle: PartRolle }
+    | { person?: undefined; rolle?: undefined }
+);
 
 type OpprettSakStartContext = OpprettSakFlytValg & {
-    startperson: PersonDto;
-    partISaken: PartISaken;
+    startperson?: PersonDto;
+    partISaken?: PartISaken;
     partISakenAlder: number | null;
     sakstype: OpprettSakstype;
     /** Personen flyten ble åpnet for. Kan ikke endres i skjemaet. */
@@ -77,22 +77,24 @@ function OpprettSakStartProvider({
     inngang,
     onOpprettet,
     onAvbryt,
+    onEndret,
 }: PropsWithChildren<
     OpprettSakFlytValg & { start: OpprettSakStart; låstIdent?: string | null; kategori?: Sakskategori }
 >) {
     const value = useMemo(
         () => ({
             startperson: start.person,
-            partISaken: tilPartISaken(start.person, start.rolle),
-            partISakenAlder: beregnAlderForPerson(start.person),
+            partISaken: start.person && start.rolle ? tilPartISaken(start.person, start.rolle) : undefined,
+            partISakenAlder: start.person ? beregnAlderForPerson(start.person) : null,
             sakstype: start.sakstype,
             låstIdent,
             kategori,
             inngang,
             onOpprettet,
             onAvbryt,
+            onEndret,
         }),
-        [start, låstIdent, kategori, inngang, onOpprettet, onAvbryt],
+        [start, låstIdent, kategori, inngang, onOpprettet, onAvbryt, onEndret],
     );
 
     return <OpprettSakStartContext value={value}>{children}</OpprettSakStartContext>;

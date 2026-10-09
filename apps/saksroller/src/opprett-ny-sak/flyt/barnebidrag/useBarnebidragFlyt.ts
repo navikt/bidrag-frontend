@@ -20,6 +20,7 @@ import {
 } from "../../skjema/opprett-sak-schema";
 import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
 import { type ForeldreTilBarn, harFullstendigRelasjon, utledForelderforslag } from "./barnebidrag-forelderforslag";
+import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
 import { rollerEtterValg, rolleSomPart, tilPart } from "./barnebidrag-roller";
 
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined, diskresjonskode: undefined };
@@ -38,10 +39,24 @@ function useBarnkurver(form: UseFormReturn<BarnebidragSkjemaData>) {
         bidragspliktig && bidragsmottaker
             ? [utledFellesBarn(relasjoner, bidragsmottaker)].filter((kurv) => kurv !== null)
             : utledBarnkurverForForelder(relasjoner);
-    const barnkurver = grupperBarnIKurver(kilde ? kurver : []);
+    const kildePart = roller.find((rolle) => rolle.ident === kilde);
+    const barnkurver = grupperBarnIKurver(kilde ? kurver : [], {
+        ident: kilde,
+        visningsnavn: kildePart?.navn,
+    });
     const lasterKurver = !!kilde && isPending;
 
-    return { barnkurver, lasterKurver };
+    const registrerteForeldre = [
+        ...(data?.person ? [data.person] : []),
+        ...relasjoner.flatMap((relasjon) => (relasjon.motpart ? [relasjon.motpart] : [])),
+    ];
+
+    return {
+        barnkurver,
+        lasterKurver,
+        registrerteForeldre,
+        ugyldigForelderrelasjon: harMotpartMedUlikeForelderroller(relasjoner),
+    };
 }
 
 function useForelderforslag(form: UseFormReturn<BarnebidragSkjemaData>, roller: BarnebidragForelderRolle[]) {
@@ -155,11 +170,24 @@ export function useBarnebidragFlyt() {
     const [redigerer, setRedigerer] = useState<ForelderPartRolle>();
     const valgteBarn = form.watch("valgteBarn");
 
-    const { barnkurver, lasterKurver } = useBarnkurver(form);
+    const { barnkurver, lasterKurver, registrerteForeldre, ugyldigForelderrelasjon } = useBarnkurver(form);
     const { foreldreTilBarn, forslag, ledige, forslagsfeil, tilgangsfeil, lasterForeldre } = useForelderforslag(
         form,
         roller,
     );
+    const tilgjengeligeForeldre = useRef(new Map<string, PersonDto>());
+    for (const forelder of [...registrerteForeldre, ...forslag]) {
+        tilgjengeligeForeldre.current.set(forelder.ident, forelder);
+    }
+    for (const forelder of roller) {
+        if (forelder.erKjent && forelder.ident && forelder.navn && !tilgjengeligeForeldre.current.has(forelder.ident)) {
+            tilgjengeligeForeldre.current.set(forelder.ident, {
+                ident: forelder.ident,
+                visningsnavn: forelder.navn,
+                diskresjonskode: forelder.diskresjonskode,
+            });
+        }
+    }
 
     const settPart = (rolle: ForelderPartRolle, part: ForelderPart) => {
         const type = rolle === "bidragspliktig" ? "BP" : "BM";
@@ -201,7 +229,7 @@ export function useBarnebidragFlyt() {
             rolle,
             part: rolleSomPart(roller, rolle === "bidragspliktig" ? "BP" : "BM"),
             forslag: filtrerBortValgteForeldre(
-                forslag,
+                [...tilgjengeligeForeldre.current.values()],
                 redigerer === rolle
                     ? [rolleSomPart(roller, rolle === "bidragspliktig" ? "BP" : "BM")]
                     : [bidragspliktig, bidragsmottaker],
@@ -237,6 +265,7 @@ export function useBarnebidragFlyt() {
         onSubmit,
         innsending,
         meldinger: {
+            ugyldigForelderrelasjon,
             tilgangsfeil,
             forslagsfeil,
             ...relasjonsmeldinger(foreldreTilBarn, bidragspliktig, bidragsmottaker),

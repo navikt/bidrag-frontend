@@ -1,5 +1,5 @@
 import { TrashIcon } from "@navikt/aksel-icons";
-import { Button, InlineMessage, Radio, RadioGroup, VStack } from "@navikt/ds-react";
+import { Button, InlineMessage, Select, VStack } from "@navikt/ds-react";
 
 import { useState } from "react";
 import FunnetPersonInfo from "../person/FunnetPersonInfo.tsx";
@@ -64,31 +64,30 @@ export default function ReellMottakerValgGruppe({
     const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
     const [error, setError] = useState<string>();
 
-    const handleRadioChange = (value: string) => {
+    const handleValgChange = (value: string) => {
         setError(undefined);
-        onValg(valgForRadio(value, { ident: barnIdent, navn: barnNavn }, lagretSamhandler));
+        onValg(valgForMottaker(value, { ident: barnIdent, navn: barnNavn }, lagretSamhandler));
     };
 
     return (
         <VStack gap="space-24">
-            <RadioGroup
+            <Select
                 size="small"
-                legend="Hvem er reell mottaker?"
+                label="Hvem er reell mottaker?"
                 value={disabled ? "" : valg.type || "ingen"}
-                onChange={handleRadioChange}
+                onChange={(event) => handleValgChange(event.target.value)}
                 error={feil}
                 disabled={disabled}
             >
-                <VStack gap="space-0">
-                    <Radio value="ingen" disabled={påkrevd}>
-                        Bidragsmottaker
-                    </Radio>
-                    <Radio disabled={kunSamhandlerSomReellMottaker} value="barnet_selv">
-                        <span className="personnavn">{barnNavn}</span> (barnet selv)
-                    </Radio>
-                    <Radio value="samhandler">Annen person eller samhandler</Radio>
-                </VStack>
-            </RadioGroup>
+                <option value="" disabled />
+                <option value="ingen" disabled={påkrevd}>
+                    Bidragsmottaker
+                </option>
+                <option disabled={kunSamhandlerSomReellMottaker} value="barnet_selv" className="personnavn">
+                    {barnNavn} (barnet selv)
+                </option>
+                <option value="samhandler">Annen person eller samhandler</option>
+            </Select>
 
             {kunSamhandlerSomReellMottaker && (
                 <InlineMessage status="info" size="small">
@@ -116,7 +115,7 @@ export default function ReellMottakerValgGruppe({
     );
 }
 
-function valgForRadio(
+function valgForMottaker(
     value: string,
     barn: { ident: string; navn: string },
     lagretSamhandler: { ident: string; navn: string } | null,

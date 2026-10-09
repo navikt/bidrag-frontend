@@ -1,13 +1,18 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { samhandler, testpersoner } from "../../../../playwright/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "../../../../playwright/opprett-ny-sak/network";
+import {
+    expectNoAxeViolations,
+    mockOpprettSakApi,
+    åpneSøskenflokker,
+} from "../../../../playwright/opprett-ny-sak/network";
 
 const STORY = "opprett-ny-sak/flyt/en-part-med-barn/Oppfostringsbidrag/Standard";
 
 test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppretter sak", async ({ mount, page }) => {
     const requests = await mockOpprettSakApi(page);
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
 
     await component
         .getByRole("checkbox", { name: /^Velg (?!alle)/ })
@@ -17,6 +22,12 @@ test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppre
     await expect(component.getByText(/Barnet selv kan ikke velges som reell mottaker/).first()).toBeVisible();
     await expect(component.getByRole("button", { name: "Legg til reell mottaker" })).toHaveCount(0);
     await expect(component.getByText("Du må registrere reell mottaker")).toHaveCount(0);
+    const mottakerValg = component
+        .getByRole("group", { name: `Velg barn med ${testpersoner.bidragsmottaker.visningsnavn}` })
+        .getByRole("combobox", { name: "Hvem er reell mottaker?" });
+    await expect(mottakerValg).toHaveValue("samhandler");
+    await expect(mottakerValg.getByRole("option", { name: "Bidragsmottaker" })).toBeDisabled();
+    await expect(mottakerValg.getByRole("option", { name: /barnet selv/ })).toBeDisabled();
     const opprettKnapp = component.getByRole("button", { name: /Opprett$/ });
     await expect(opprettKnapp).toBeEnabled();
     await opprettKnapp.click();
@@ -63,30 +74,32 @@ test("viser helsøsken sammen med manuelt valgt barn", async ({ mount, page }) =
         });
     });
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
 
     await component.getByRole("button", { name: "Legg til nytt barn" }).click();
     const søk = page.getByRole("searchbox", { name: "Søk etter barn" });
     await søk.fill(manueltBarn.ident);
     await søk.press("Enter");
     await component.getByRole("button", { name: "Legg til", exact: true }).click();
+    await åpneSøskenflokker(component);
 
     const søskenValg = component.getByRole("checkbox", { name: `Velg ${søsken.visningsnavn}` });
-    await expect(søskenValg).toHaveCount(2);
-    await expect(søskenValg.nth(0)).toBeVisible();
-    await expect(søskenValg.nth(0)).not.toBeChecked();
-    await expect(søskenValg.nth(1)).not.toBeChecked();
-    await expect(component.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toHaveCount(2);
-    for (const forelder of [testpersoner.bidragsmottaker, testpersoner.annenForelder]) {
-        const søskenGruppe = component.getByRole("group", { name: `Velg barn med ${forelder.visningsnavn}` });
-        await expect(søskenGruppe.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toBeChecked();
-        await expect(søskenGruppe.getByRole("checkbox", { name: `Velg ${søsken.visningsnavn}` })).toBeVisible();
-    }
+    await expect(søskenValg).toHaveCount(1);
+    await expect(søskenValg).toBeVisible();
+    await expect(søskenValg).not.toBeChecked();
+    await expect(component.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toBeChecked();
+    await expect(
+        component.getByRole("button", {
+            name: /Test Bidragsmottaker og Test Annen Forelder|Test Annen Forelder og Test Bidragsmottaker/,
+        }),
+    ).toBeVisible();
     await expect(component.getByText("Barn lagt til manuelt", { exact: true })).toHaveCount(0);
 });
 
 test("tømmer søkefeltet ved treff og fjerner valgt samhandler med Fjern reell mottaker", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
+    await åpneSøskenflokker(component);
     await component
         .getByRole("checkbox", { name: /^Velg (?!alle)/ })
         .first()

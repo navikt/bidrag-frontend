@@ -1,7 +1,11 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { testpersoner } from "../../../../playwright/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "../../../../playwright/opprett-ny-sak/network";
+import {
+    expectNoAxeViolations,
+    mockOpprettSakApi,
+    åpneSøskenflokker,
+} from "../../../../playwright/opprett-ny-sak/network";
 
 const STORY = "opprett-ny-sak/flyt/barnebidrag/Barnebidrag";
 const { bidragspliktig: bp, bidragsmottaker: bm, annenForelder, barnUnder18 } = testpersoner;
@@ -39,30 +43,89 @@ async function velgForelder(
 }
 
 test.describe("Start fra forelder med barn", () => {
+    test("søskenflokker starter lukket og åpnes når både BP og BM er valgt", async ({ mount, page }) => {
+        await mockOpprettSakApi(page);
+        const component = await mount(`${STORY}/ForelderMedBarn`);
+        const flokker = component.getByRole("region", { name: "Søskenflokker" });
+        await expect(flokker.getByRole("button", { expanded: false })).toHaveCount(2);
+        await expect(flokker.getByRole("button", { expanded: true })).toHaveCount(0);
+        await expect(barnCheckboxer(component)).toHaveCount(0);
+        const flokk = flokker.getByRole("button", { name: `${bp.visningsnavn} og ${bm.visningsnavn}` });
+        await expect(flokk).toBeVisible();
+
+        await velgForelder(
+            component.getByRole("group", { name: "Bidragsmottaker" }),
+            "bidragsmottaker",
+            bm.visningsnavn,
+        );
+        await expect(flokk).toHaveAttribute("aria-expanded", "true");
+        const barn = barnCheckboxer(component).first();
+        await barn.check();
+        await flokk.click();
+        await expect(flokk).toHaveAttribute("aria-expanded", "false");
+        await expect(barnCheckboxer(component)).toHaveCount(0);
+        await flokk.click();
+        await expect(barn).toBeChecked();
+    });
+
+    test("alle registrerte foreldre beholdes i BP- og BM-listene når et foreldrepar velges", async ({
+        mount,
+        page,
+    }) => {
+        await mockOpprettSakApi(page);
+        await page.route(/\/proxy\/bidrag-person\/motpartbarnrelasjon$/, async (route) => {
+            const { ident } = route.request().postDataJSON() as { ident: string };
+            await route.fulfill({
+                json: { person: { ...annenForelder, ident }, personensMotpartBarnRelasjon: [] },
+            });
+        });
+        const component = await mount(`${STORY}/ForelderMedBarn`);
+        const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
+        const bmValg = bmKort.getByRole("combobox", { name: "Velg bidragsmottaker" });
+        await expect(bmValg.getByRole("option", { name: bm.visningsnavn })).toHaveCount(1);
+        await expect(bmValg.getByRole("option", { name: annenForelder.visningsnavn })).toHaveCount(1);
+
+        await bmValg.selectOption({ label: bm.visningsnavn });
+        await bmKort.getByRole("button", { name: "Endre bidragsmottaker" }).click();
+        await expect(bmValg.getByRole("option", { name: bm.visningsnavn })).toHaveCount(1);
+        await expect(bmValg.getByRole("option", { name: annenForelder.visningsnavn })).toHaveCount(1);
+        await bmValg.selectOption({ label: annenForelder.visningsnavn });
+        await expect(
+            component.getByRole("button", { name: `${bp.visningsnavn} og ${annenForelder.visningsnavn}` }),
+        ).toBeVisible();
+
+        const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
+        await bpKort.getByRole("button", { name: "Endre bidragspliktig" }).click();
+        const bpValg = bpKort.getByRole("combobox", { name: "Velg bidragspliktig" });
+        await expect(bpValg.getByRole("option", { name: bp.visningsnavn })).toHaveCount(1);
+        await expect(bpValg.getByRole("option", { name: bm.visningsnavn })).toHaveCount(1);
+        await expect(bpValg.getByRole("option", { name: annenForelder.visningsnavn })).toHaveCount(1);
+    });
+
     test("reell mottaker er deaktivert og uten valgt alternativ når barnet ikke er valgt", async ({ mount }) => {
         const component = await mount(`${STORY}/ForelderMedBarn`);
+        await åpneSøskenflokker(component);
         const barnValg = barnCheckboxer(component).first();
-        const mottakerGruppe = component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" }).first();
-        const samhandlerValg = mottakerGruppe.getByRole("radio", { name: "Annen person eller samhandler" });
+        const mottakerValg = component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).first();
 
-        await expect(mottakerGruppe).toBeVisible();
-        await expect(samhandlerValg).toBeDisabled();
-        await expect(samhandlerValg).not.toBeChecked();
+        await expect(mottakerValg).toBeVisible();
+        await expect(mottakerValg).toBeDisabled();
+        await expect(mottakerValg).toHaveValue("");
 
         await barnValg.check();
-        await expect(samhandlerValg).toBeEnabled();
-        await samhandlerValg.click();
-        await expect(samhandlerValg).toBeChecked();
+        await expect(mottakerValg).toBeEnabled();
+        await expect(mottakerValg).toHaveValue("ingen");
+        await mottakerValg.selectOption("samhandler");
+        await expect(mottakerValg).toHaveValue("samhandler");
 
         await barnValg.uncheck();
-        await expect(samhandlerValg).toBeDisabled();
-        for (const valg of await mottakerGruppe.getByRole("radio").all()) {
-            await expect(valg).not.toBeChecked();
-        }
+        await expect(mottakerValg).toBeDisabled();
+        await expect(mottakerValg).toHaveValue("");
     });
 
     test("Velg alle velger og fjerner alle barna i kurven", async ({ mount }) => {
         const component = await mount(`${STORY}/ForelderMedBarn`);
+        await åpneSøskenflokker(component);
         const velgAlle = component.getByRole("checkbox", { name: /^Velg alle/ }).first();
         const kurv = component.getByRole("group", { name: /^Velg barn med/ }).first();
 
@@ -80,17 +143,20 @@ test.describe("Start fra forelder med barn", () => {
     test("valgt motpart viser bare felles barn, Endre gir alle kurvene tilbake", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/ForelderMedBarn`);
+        await åpneSøskenflokker(component);
         const førsteBarn = barnCheckboxer(component).first();
         const andreBarn = barnCheckboxer(component).nth(1);
         const førsteBarnIdent = await førsteBarn.getAttribute("value");
         const andreBarnIdent = await andreBarn.getAttribute("value");
 
-        await expect(component.getByRole("heading", { name: "Bidragspliktig og bidragsmottaker" })).toBeVisible();
+        await expect(component.getByRole("heading", { name: "Bidragsmottaker og bidragspliktig" })).toBeVisible();
         const bidragspliktigKort = component.getByRole("group", { name: "Bidragspliktig" });
         await expect(bidragspliktigKort.getByRole("button", { name: "Endre bidragspliktig" })).toBeVisible();
 
-        const andreBarnValg = component.locator(`input[type="checkbox"][value="${andreBarnIdent}"]`);
-        const førsteBarnValg = component.locator(`input[type="checkbox"][value="${førsteBarnIdent}"]`);
+        const andreBarnValg = component.getByRole("checkbox", {
+            name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}`,
+        });
+        const førsteBarnValg = component.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` });
 
         await førsteBarn.check();
         await expect(component.getByRole("searchbox", { name: /Søk etter bidragsmottaker/ })).toHaveCount(0);
@@ -100,6 +166,7 @@ test.describe("Start fra forelder med barn", () => {
             .getByRole("group", { name: "Bidragsmottaker" })
             .getByRole("button", { name: "Endre bidragsmottaker" })
             .click();
+        await åpneSøskenflokker(component);
         await andreBarnValg.check();
         await expect(førsteBarnValg).toHaveCount(0);
         await expect(component.getByText(/Saken vil bli sendt til enhet NAV Test \(4806\)/)).toBeVisible();
@@ -121,6 +188,7 @@ test.describe("Start fra forelder med barn", () => {
     }) => {
         await mockOpprettSakApi(page, { accessAllowed: false });
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
+        await åpneSøskenflokker(component);
         const bpIdent = await component
             .getByRole("group", { name: "Bidragspliktig" })
             .locator(".personident")
@@ -131,7 +199,7 @@ test.describe("Start fra forelder med barn", () => {
         await barnCheckboxer(component).first().check();
 
         await expect(component.getByText(/ikke tilgang til å opprette sak uten bidragsmottaker/)).toBeVisible();
-        await expect(component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" }).first()).toBeVisible();
+        await expect(component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).first()).toBeVisible();
         await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
     });
 
@@ -139,6 +207,7 @@ test.describe("Start fra forelder med barn", () => {
         await mockOpprettSakApi(page);
         await barnetsForeldre(page, [annenForelder.ident]);
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
+        await åpneSøskenflokker(component);
 
         await barnCheckboxer(component).first().check();
 
@@ -148,6 +217,7 @@ test.describe("Start fra forelder med barn", () => {
     test("nullstiller ikke skjemaet ved forsøk på å legge til allerede valgt barn", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/ForelderMedBarn`);
+        await åpneSøskenflokker(component);
         await barnCheckboxer(component).first().check();
         const valgtIdent = await barnCheckboxer(component).first().getAttribute("value");
 
@@ -172,12 +242,14 @@ test.describe("Start fra forelder uten registrerte barn", () => {
         await søk.fill(barnUnder18.ident);
         await søk.press("Enter");
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await åpneSøskenflokker(component);
         await page.mouse.move(0, 0);
     };
 
     test("manuelt lagt til barn står i listen, er valgt og kan velges bort og inn igjen", async ({ mount, page }) => {
         await mockOpprettSakApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
+        await åpneSøskenflokker(component);
         await leggTilBarn(component, page);
 
         const barnValg = component.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` });
@@ -190,7 +262,7 @@ test.describe("Start fra forelder uten registrerte barn", () => {
         await expect(barnValg).toBeChecked();
     });
 
-    test("viser helsøsken under begge foreldrene når én forelder er valgt", async ({ mount, page }) => {
+    test("samler helsøsken og beholder flokken når alle valg fjernes", async ({ mount, page }) => {
         const manueltBarn = {
             ident: genererFnr(),
             visningsnavn: "Test Manuelt Barn",
@@ -233,12 +305,14 @@ test.describe("Start fra forelder uten registrerte barn", () => {
             });
         });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
+        await åpneSøskenflokker(component);
 
         await component.getByRole("button", { name: "Legg til nytt barn" }).click();
         const søk = page.getByRole("searchbox", { name: "Søk etter barn" });
         await søk.fill(manueltBarn.ident);
         await søk.press("Enter");
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await åpneSøskenflokker(component);
         await velgForelder(
             component.getByRole("group", { name: "Bidragsmottaker" }),
             "bidragsmottaker",
@@ -251,18 +325,39 @@ test.describe("Start fra forelder uten registrerte barn", () => {
         ).toBeVisible();
 
         const helsøskenValg = component.getByRole("checkbox", { name: `Velg ${helsøsken.visningsnavn}` });
-        await expect(helsøskenValg).toHaveCount(2);
-        await expect(helsøskenValg.nth(0)).toBeVisible();
-        await expect(helsøskenValg.nth(0)).not.toBeChecked();
-        await expect(helsøskenValg.nth(1)).not.toBeChecked();
+        await expect(helsøskenValg).toHaveCount(1);
+        await expect(helsøskenValg).toBeVisible();
+        await expect(helsøskenValg).not.toBeChecked();
         await expect(component.getByRole("checkbox", { name: `Velg ${halvsøsken.visningsnavn}` })).toHaveCount(0);
-        await expect(component.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toHaveCount(2);
-        for (const forelder of [bp, bm]) {
-            const gruppe = component.getByRole("group", { name: `Velg barn med ${forelder.visningsnavn}` });
-            await expect(gruppe.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toBeChecked();
-            await expect(gruppe.getByRole("checkbox", { name: `Velg ${helsøsken.visningsnavn}` })).toBeVisible();
-        }
+        await expect(component.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` })).toBeChecked();
+        await expect(
+            component.getByRole("button", {
+                name: /Test Bidragspliktig og Test Bidragsmottaker|Test Bidragsmottaker og Test Bidragspliktig/,
+            }),
+        ).toBeVisible();
         await expect(component.getByText("Barn lagt til manuelt", { exact: true })).toHaveCount(0);
+
+        await component.getByRole("button", { name: "Endre bidragsmottaker" }).click();
+        await component.getByRole("button", { name: "Endre bidragspliktig" }).click();
+        const manueltBarnValg = component.getByRole("checkbox", { name: `Velg ${manueltBarn.visningsnavn}` });
+        await manueltBarnValg.uncheck();
+        await expect(component.getByText("0 valgt", { exact: true })).toBeVisible();
+        await expect(manueltBarnValg).toBeVisible();
+        await expect(manueltBarnValg).not.toBeChecked();
+        await expect(helsøskenValg).toBeVisible();
+        await expect(helsøskenValg).not.toBeChecked();
+        await expect(component.getByRole("button", { name: "Foreldre ikke valgt", exact: true })).toHaveCount(0);
+        const flokk = component.getByRole("button", {
+            name: /Test Bidragspliktig og Test Bidragsmottaker|Test Bidragsmottaker og Test Bidragspliktig/,
+        });
+        await expect(flokk).toHaveAttribute("aria-expanded", "true");
+        await flokk.click();
+        await expect(flokk).toHaveAttribute("aria-expanded", "false");
+        await flokk.click();
+        await expect(helsøskenValg).toBeVisible();
+        await manueltBarnValg.check();
+        await expect(manueltBarnValg).toBeChecked();
+        await expect(helsøskenValg).toBeVisible();
     });
 
     test("viser ikke søsken når begge foreldrene ikke er kjent", async ({ mount, page }) => {
@@ -305,12 +400,14 @@ test.describe("Start fra forelder uten registrerte barn", () => {
             });
         });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
+        await åpneSøskenflokker(component);
 
         await component.getByRole("button", { name: "Legg til nytt barn" }).click();
         const søk = page.getByRole("searchbox", { name: "Søk etter barn" });
         await søk.fill(manueltBarn.ident);
         await søk.press("Enter");
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await åpneSøskenflokker(component);
 
         // BP er valgt, BM er ikke valgt ennå. Barnet vises derfor under «Bidragsmottaker ikke valgt».
         const ukjentForelderGruppe = component.getByRole("group", { name: "Bidragsmottaker ikke valgt" });
@@ -327,6 +424,7 @@ test.describe("Start fra forelder uten registrerte barn", () => {
     test("legger til barn, får entydig forelder automatisk og oppretter sak", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page, { parentRelations: { [barnUnder18.ident]: [bm.ident] } });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
+        await åpneSøskenflokker(component);
         const hint = component.getByText("Velg barn nedenfor for å få forslag til foreldre.");
         await expect(hint).toBeVisible();
         await leggTilBarn(component, page);
@@ -354,6 +452,7 @@ test.describe("Start fra forelder uten registrerte barn", () => {
             parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident, annenForelder.ident] },
         });
         const component = await mount(`${STORY}/ForelderUtenBarn`);
+        await åpneSøskenflokker(component);
         await leggTilBarn(component, page);
 
         await expect(component.getByText(/har flere enn 2 registrerte foreldre/)).toBeVisible();
@@ -365,15 +464,19 @@ test.describe("Start fra barn", () => {
         const requests = await mockOpprettSakApi(page);
         await barnetsForeldre(page, [bp.ident, bm.ident]);
         const component = await mount(`${STORY}/BarnUnder18`);
+        await åpneSøskenflokker(component);
         const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
         const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
 
         await expect(component.getByText(barnUnder18.visningsnavn).first()).toBeVisible();
         const startbarn = component.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` });
         await expect(startbarn).toBeChecked();
-        await startbarn.uncheck();
+        await startbarn.click();
+        await åpneSøskenflokker(component);
         await expect(startbarn).not.toBeChecked();
-        await startbarn.check();
+        await startbarn.click();
+        await åpneSøskenflokker(component);
+        await expect(startbarn).toBeChecked();
         await expect(component.getByRole("button", { name: "Legg til nytt barn" })).toBeVisible();
 
         const bpValg = bpKort.getByRole("combobox", { name: "Velg bidragspliktig" });
@@ -432,53 +535,33 @@ test.describe("Start fra barn", () => {
             });
         });
         const component = await mount(`${STORY}/BarnUnder18`);
+        await åpneSøskenflokker(component);
         const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
 
         const søsken = component.getByRole("checkbox", {
             name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}`,
         });
         const helsøskenflokker = component.getByRole("group", { name: /^Velg barn med / });
-        await expect(helsøskenflokker).toHaveCount(2);
+        await expect(helsøskenflokker).toHaveCount(1);
         await expect.poll(() => relasjonskall).toBeGreaterThan(0);
         const startbarn = component.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` });
-        await expect(startbarn).toHaveCount(2);
-        await expect(startbarn.nth(0)).toBeChecked();
-        await expect(startbarn.nth(1)).toBeChecked();
-        await expect(søsken).toHaveCount(2);
-        await expect(søsken.nth(0)).toBeVisible();
-        await expect(søsken.nth(0)).not.toBeChecked();
-        await expect(søsken.nth(1)).not.toBeChecked();
+        await expect(startbarn).toBeChecked();
+        await expect(søsken).toHaveCount(1);
+        await expect(søsken).toBeVisible();
+        await expect(søsken).not.toBeChecked();
         await expect(component.getByText("Barn lagt til manuelt", { exact: true })).toHaveCount(0);
         await component
             .getByRole("group", { name: "Bidragspliktig" })
             .getByRole("combobox", { name: "Velg bidragspliktig" })
             .selectOption({ label: bp.visningsnavn });
 
-        await expect(søsken).toHaveCount(2);
+        await expect(søsken).toHaveCount(1);
         await expect(component.getByRole("checkbox", { name: /Test Barn Over 18/ })).toHaveCount(0);
-        await helsøskenflokker
-            .nth(0)
-            .getByRole("checkbox", { name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}` })
-            .check();
-        await expect(
-            helsøskenflokker
-                .nth(1)
-                .getByRole("checkbox", { name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}` }),
-        ).toBeDisabled();
-        await helsøskenflokker
-            .nth(0)
-            .getByRole("checkbox", { name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}` })
-            .uncheck();
-        const søskenUnderAndreForelder = helsøskenflokker
-            .nth(1)
-            .getByRole("checkbox", { name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}` });
-        await expect(søskenUnderAndreForelder).toBeEnabled();
-        await søskenUnderAndreForelder.check();
-        await expect(
-            helsøskenflokker
-                .nth(0)
-                .getByRole("checkbox", { name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}` }),
-        ).toBeDisabled();
+        await søsken.check();
+        await expect(søsken).toBeChecked();
+        await søsken.uncheck();
+        await expect(søsken).not.toBeChecked();
+        await søsken.check();
 
         await bmKort.getByRole("button", { name: "Endre bidragsmottaker" }).click();
         await expect(
@@ -524,6 +607,7 @@ test.describe("Start fra barn", () => {
             });
         });
         const component = await mount(`${STORY}/BarnUnder18`);
+        await åpneSøskenflokker(component);
         await component
             .getByRole("group", { name: "Bidragspliktig" })
             .getByRole("combobox", { name: "Velg bidragspliktig" })
@@ -543,6 +627,7 @@ test.describe("Start fra barn", () => {
         const requests = await mockOpprettSakApi(page, { accessAllowed: false });
         await barnetsForeldre(page, [bp.ident, bm.ident]);
         const component = await mount(`${STORY}/BarnUnder18`);
+        await åpneSøskenflokker(component);
         const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
         await component
             .getByRole("group", { name: "Bidragspliktig" })
@@ -565,6 +650,7 @@ test.describe("Start fra barn", () => {
     }) => {
         await mockOpprettSakApi(page);
         const component = await mount(`${STORY}/BarnOver18`);
+        await åpneSøskenflokker(component);
 
         const bpKort = component.getByRole("group", { name: "Bidragspliktig" });
         const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
@@ -574,7 +660,7 @@ test.describe("Start fra barn", () => {
         await expect(bmKort.getByRole("combobox", { name: "Velg bidragsmottaker" })).toBeVisible();
         await expect(bpKort.getByRole("option", { name: "Ukjent", exact: true })).toHaveCount(1);
         await expect(bmKort.getByRole("option", { name: "Ukjent", exact: true })).toHaveCount(1);
-        await expect(component.getByRole("radiogroup", { name: "Hvem er reell mottaker?" })).toBeVisible();
+        await expect(component.getByRole("combobox", { name: "Hvem er reell mottaker?" })).toBeVisible();
         await expectNoAxeViolations(page, component);
     });
 });

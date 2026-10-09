@@ -6,6 +6,7 @@ import EnhetOgSubmitSection, { type EnhetOgSubmitSectionProps } from "../innsend
 import { useNyOpprettSakModal } from "../start/opprettSakModalContext";
 import FlytSkjema from "./FlytSkjema";
 import { type Sakskategori, useOpprettSakStart } from "./OpprettSakStartContext";
+import type { BarnMedAlder, ForelderPart } from "./opprett-sak-schema";
 import SakskategoriVelger from "./SakskategoriVelger";
 
 type Props = {
@@ -20,7 +21,14 @@ export default function RolleFlytSide({ onSubmit, status, children, meldinger, i
     const visStatus = status.infoMelding || status.isLoading || (status.harEksisterendeSak && status.eksisterendeSak);
     const formId = useId();
     const modal = useNyOpprettSakModal();
-    const { kategori } = useOpprettSakStart();
+    const { kategori, onEndret } = useOpprettSakStart();
+    const form = useFormContext<{ roller: ForelderPart[]; valgteBarn?: BarnMedAlder[] }>();
+    const roller = form.watch("roller");
+    const valgteBarn = form.watch("valgteBarn");
+    const harEndringer =
+        JSON.stringify(roller) !== JSON.stringify(form.formState.defaultValues?.roller) ||
+        JSON.stringify(valgteBarn ?? []) !== JSON.stringify(form.formState.defaultValues?.valgteBarn ?? []);
+    useEffect(() => onEndret?.(harEndringer), [onEndret, harEndringer]);
 
     return (
         <FlytSkjema id={modal?.formId ?? formId} onSubmit={onSubmit} disabled={innsending.isLoading}>

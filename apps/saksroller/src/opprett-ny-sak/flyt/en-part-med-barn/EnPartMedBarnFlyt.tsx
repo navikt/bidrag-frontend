@@ -52,14 +52,14 @@ const konfig: Record<
 export default function EnPartMedBarnFlyt() {
     const { sakstype, partISaken } = useOpprettSakStart();
 
-    if (!partISaken || (sakstype !== "FARSKAP" && sakstype !== "OPPFOSTRINGSBIDRAG")) {
+    if (sakstype !== "FARSKAP" && sakstype !== "OPPFOSTRINGSBIDRAG") {
         return null;
     }
 
     return <EnPartMedBarnSkjema type={sakstype} partISaken={partISaken} />;
 }
 
-function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken: PartISaken }) {
+function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken?: PartISaken }) {
     const { arbeidsfordeling, rolle, schema } = konfig[type];
     const form = useForm<FarskapsSkjemaSchemaData>({
         resolver: zodResolver(schema),
@@ -152,11 +152,11 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
     );
 }
 
-function lagStartroller(partISaken: PartISaken, kjentRolle: ForelderPartRolle): EnPartMedBarnRolle[] {
+function lagStartroller(partISaken: PartISaken | undefined, kjentRolle: ForelderPartRolle): EnPartMedBarnRolle[] {
     const kjentType = kjentRolle === "bidragspliktig" ? "BP" : "BM";
     const ukjentType = kjentType === "BP" ? "BM" : "BP";
     return [
-        { ...partISaken, type: kjentType, erKjent: true },
+        { ident: "", navn: "", ...partISaken, type: kjentType, erKjent: true },
         { ident: "", navn: "", type: ukjentType, erKjent: false },
     ];
 }

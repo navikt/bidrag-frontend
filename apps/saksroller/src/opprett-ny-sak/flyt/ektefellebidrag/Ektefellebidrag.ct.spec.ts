@@ -20,7 +20,7 @@ test("velger og endrer foreslått ektefelle", async ({ mount, page }) => {
 
     await velgPartner.selectOption({ label: "Test Ektefelle" });
     const endrePartner = component.getByRole("button", { name: "Endre bidragsmottaker" });
-    await expect(component.getByRole("heading", { name: "Bidragspliktig og bidragsmottaker" })).toBeVisible();
+    await expect(component.getByRole("heading", { name: "Bidragsmottaker og bidragspliktig" })).toBeVisible();
     const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
     await expect(bmKort.getByText("Test Ukjent Person", { exact: true })).toBeVisible();
     await expect(component.getByRole("button", { name: /Opprett$/ })).toBeEnabled();

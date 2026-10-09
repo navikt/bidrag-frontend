@@ -80,16 +80,16 @@ export default function ForelderRolleVisning({
     return (
         <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
             <EnkelForelderRolle
-                rolleType="BP"
-                rolle={bp}
-                erNyForelderForKjentRolle={erNyForelderBp}
+                rolleType="BM"
+                rolle={bm}
+                erNyForelderForKjentRolle={erNyForelderBm}
                 form={form}
                 muligeAndreForeldre={muligeAndreForeldre}
             />
             <EnkelForelderRolle
-                rolleType="BM"
-                rolle={bm}
-                erNyForelderForKjentRolle={erNyForelderBm}
+                rolleType="BP"
+                rolle={bp}
+                erNyForelderForKjentRolle={erNyForelderBp}
                 form={form}
                 muligeAndreForeldre={muligeAndreForeldre}
             />

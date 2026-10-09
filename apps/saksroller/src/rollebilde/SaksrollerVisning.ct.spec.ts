@@ -6,6 +6,96 @@ import { mockSaksrollerApi } from "../../playwright/saksroller/network.ts";
 const STORY = "rollebilde/SaksrollerVisning/Standard";
 
 test.describe("SaksrollerVisning", () => {
+    test("byttet RM vises for riktig barn og bare siste RM lagres", async ({ mount, page }) => {
+        const mottaker = { ident: genererFnr(), visningsnavn: "Ny Reell Mottaker", fødselsdato: "1985-01-01" };
+        const { requests } = await mockSaksrollerApi(page, { personOverrides: { [mottaker.ident]: mottaker } });
+        const component = await mount(STORY);
+        await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
+        await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await component.getByRole("button", { name: "Endre reell mottaker" }).click();
+        const dialog = component.getByRole("dialog", { name: "Endre reell mottaker" });
+        await dialog.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("samhandler");
+        const søk = dialog.getByRole("searchbox", { name: "Person- eller samhandlerident" });
+        await søk.fill(mottaker.ident);
+        await søk.press("Enter");
+        await expect(dialog.getByText(mottaker.visningsnavn)).toBeVisible();
+        await dialog.getByRole("button", { name: "Legg til", exact: true }).click();
+        await expect(component.getByText(mottaker.visningsnavn).first()).toBeVisible();
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect
+            .poll(() => requests.update?.roller)
+            .toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        fodselsnummer: testpersoner.barn.ident,
+                        type: "BA",
+                        reellMottaker: { ident: mottaker.ident, verge: false },
+                    }),
+                ]),
+            );
+        expect(requests.update?.roller).toHaveLength(3);
+    });
+
+    test("nytt barn som fjernes sendes ikke ved lagring og lagrede roller beholdes", async ({ mount, page }) => {
+        const nyttBarn = { ident: genererFnr(), visningsnavn: "Angret Barn", fødselsdato: "2016-05-01" };
+        const { requests } = await mockSaksrollerApi(page, { personOverrides: { [nyttBarn.ident]: nyttBarn } });
+        const component = await mount(STORY);
+        await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
+        await expect(component.getByRole("button", { name: "Fjern barn" })).toHaveCount(0);
+        await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+        const søk = component.getByRole("searchbox", { name: "Søk etter barn" });
+        await søk.fill(nyttBarn.ident);
+        await søk.press("Enter");
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await expect(component.getByText(nyttBarn.visningsnavn, { exact: true }).first()).toBeVisible();
+        await component.getByRole("button", { name: "Fjern barn" }).click();
+        await expect(component.getByText(nyttBarn.visningsnavn, { exact: true })).toHaveCount(0);
+        await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect
+            .poll(() => requests.update?.roller)
+            .toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM" }),
+                    expect.objectContaining({ fodselsnummer: testpersoner.bidragspliktig.ident, type: "BP" }),
+                    expect.objectContaining({
+                        fodselsnummer: testpersoner.barn.ident,
+                        type: "BA",
+                        reellMottaker: { ident: testpersoner.barn.ident, verge: false },
+                    }),
+                ]),
+            );
+        expect(requests.update?.roller).toHaveLength(3);
+    });
+
+    test("viser eldste barn først uavhengig av rollerekkefølgen", async ({ mount, page }) => {
+        const yngre = { ident: genererFnr(), visningsnavn: "Yngre Barn", fødselsdato: "2020-01-01" };
+        const eldre = { ident: genererFnr(), visningsnavn: "Eldre Barn", fødselsdato: "2010-01-01" };
+        await mockSaksrollerApi(page, {
+            sak: lagSak({
+                roller: [
+                    lagRolle({ fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM", rolleType: "BM" }),
+                    lagRolle({ fodselsnummer: yngre.ident, type: "BA", rolleType: "BA" }),
+                    lagRolle({ fodselsnummer: eldre.ident, type: "BA", rolleType: "BA" }),
+                ],
+            }),
+            personOverrides: { [yngre.ident]: yngre, [eldre.ident]: eldre },
+        });
+        const component = await mount(STORY);
+        await expect(component.getByText(/^(Eldre Barn|Yngre Barn)$/)).toHaveText(["Eldre Barn", "Yngre Barn"]);
+    });
+
+    test("viser bidragsmottaker før bidragspliktig", async ({ mount, page }) => {
+        await mockSaksrollerApi(page);
+        const component = await mount(STORY);
+        const foreldre = component.getByRole("heading", { name: /^(Bidragsmottaker|Bidragspliktig)$/ });
+        await expect(foreldre).toHaveText(["Bidragsmottaker", "Bidragspliktig"]);
+    });
+
     test("kan legge til første barn når saken ikke har barn", async ({ mount, page }) => {
         await mockSaksrollerApi(page, {
             sak: lagSak({
@@ -91,7 +181,7 @@ test.describe("SaksrollerVisning", () => {
         await expect(component.getByText("Barn i saken (1)")).toBeVisible();
 
         await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
-        await component.getByRole("radio", { name: "Barnet selv" }).check();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
         await expect(component.getByText("Barnet selv", { exact: true })).toBeVisible();
         await expect(component.getByRole("button", { name: "Endre reell mottaker" })).toBeVisible();
@@ -138,7 +228,7 @@ test.describe("SaksrollerVisning", () => {
 
         await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
         await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
-        await component.getByRole("radio", { name: "Barnet selv" }).check();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
 
@@ -157,7 +247,7 @@ test.describe("SaksrollerVisning", () => {
 
         await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
         await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
-        await component.getByRole("radio", { name: "Barnet selv" }).check();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
 
         await expect(component.getByRole("dialog", { name: "Endre reell mottaker" })).toBeVisible();
         expect(requests.update).toBeFalsy();
@@ -171,7 +261,7 @@ test.describe("SaksrollerVisning", () => {
         await expect(component.getByText("Ingen endringer å lagre.")).toHaveCount(0);
     });
 
-    test("farskap: viser samme regel som ved opprett når saken har flere barn", async ({ mount, page }) => {
+    test("dagens avvik fra Favro: flere barn i farskap blokkerer også endring", async ({ mount, page }) => {
         const { requests } = await mockSaksrollerApi(page, {
             sak: lagSak({
                 arbeidsfordeling: "FRS",
@@ -187,7 +277,7 @@ test.describe("SaksrollerVisning", () => {
 
         await expect(component.getByText("Farskap", { exact: true })).toBeVisible();
         await component.getByRole("button", { name: "Legg til reell mottaker" }).first().click();
-        await component.getByRole("radio", { name: "Barnet selv" }).check();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
 

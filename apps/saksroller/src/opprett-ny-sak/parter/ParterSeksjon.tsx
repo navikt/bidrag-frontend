@@ -30,19 +30,22 @@ const UKJENT_FORELDER_VALG = "ukjent";
  */
 export default function ParterSeksjon({
     kort,
-    tittel = "Bidragspliktig og bidragsmottaker",
+    tittel = "Bidragsmottaker og bidragspliktig",
     beskrivelse,
 }: {
     kort: ForelderKortProps[];
     tittel?: string;
     beskrivelse?: string;
 }) {
+    const rolleRekkefølge = { bidragsmottaker: 0, bidragspliktig: 1 };
     return (
         <SkjemaSeksjon tittel={tittel} beskrivelse={beskrivelse}>
             <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
-                {kort.map((props) => (
-                    <ForelderKort key={props.rolle} {...props} />
-                ))}
+                {kort
+                    .toSorted((a, b) => rolleRekkefølge[a.rolle] - rolleRekkefølge[b.rolle])
+                    .map((props) => (
+                        <ForelderKort key={props.rolle} {...props} />
+                    ))}
             </HGrid>
         </SkjemaSeksjon>
     );

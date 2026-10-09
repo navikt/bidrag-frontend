@@ -171,7 +171,8 @@ export type ForelderPartRolle = z.infer<typeof ForelderPartRolleSchema>;
 // ==================== HELPER TYPES ====================
 
 export type Barnkurv = {
-    id: string; // motpart.ident eller "UKJENT"
+    forelder?: { ident?: string; visningsnavn?: string };
+    id: string;
     motpart: {
         ident: string;
         visningsnavn: string;

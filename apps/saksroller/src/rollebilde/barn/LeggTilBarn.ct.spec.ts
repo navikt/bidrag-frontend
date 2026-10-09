@@ -89,7 +89,7 @@ test.describe("LeggTilBarn", () => {
         await component.getByRole("button", { name: "Legg til nytt barn" }).click();
         await component.getByRole("searchbox", { name: "Søk etter barn" }).fill(barnIdent);
         await component.getByRole("searchbox", { name: "Søk etter barn" }).press("Enter");
-        await component.getByRole("radio", { name: "Annen person eller samhandler" }).check();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("samhandler");
         await component.getByRole("button", { name: "Legg til", exact: true }).click();
 
         await expect(component.getByText("Velg eller søk opp en reell mottaker før du legger til.")).toBeVisible();

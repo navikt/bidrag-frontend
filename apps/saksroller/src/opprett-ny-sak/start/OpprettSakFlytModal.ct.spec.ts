@@ -1,7 +1,11 @@
 import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import type { Locator, Page } from "@playwright/test";
 import { barnkurver, testpersoner } from "../../../playwright/opprett-ny-sak/fixtures";
-import { expectNoAxeViolations, mockOpprettSakApi } from "../../../playwright/opprett-ny-sak/network";
+import {
+    expectNoAxeViolations,
+    mockOpprettSakApi,
+    åpneSøskenflokker,
+} from "../../../playwright/opprett-ny-sak/network";
 import type { Modal } from "./OpprettSakFlytModal.story";
 
 const STORY = "opprett-ny-sak/start/OpprettSakFlytModal/Modal";
@@ -16,6 +20,39 @@ async function åpneModal(page: Page, component: Locator) {
 }
 
 test.describe("Opprett sak som modal fra behandling og dokument", () => {
+    test("byttet RM vises for startbarnet og bare siste RM sendes", async ({ mount, page }) => {
+        const requests = await mockOpprettSakApi(page, foreldreTilBarn);
+        const component = await mount<typeof Modal>(STORY, {
+            ident: barnUnder18.ident,
+            rolle: "BA",
+            initialForelderIdent: bp.ident,
+        });
+        const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
+        const rm = dialog.getByRole("combobox", { name: "Hvem er reell mottaker?" });
+        await rm.selectOption("samhandler");
+        const søk = dialog.getByRole("searchbox", { name: "Person- eller samhandlerident" });
+        await søk.fill(testpersoner.annenForelder.ident);
+        await søk.press("Enter");
+        await expect(dialog.getByText(testpersoner.annenForelder.visningsnavn)).toBeVisible();
+        await rm.selectOption("barnet_selv");
+        await expect(rm).toHaveValue("barnet_selv");
+        await expect(dialog.getByText(testpersoner.annenForelder.visningsnavn)).toHaveCount(0);
+        await expect(dialog.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` })).toBeChecked();
+        await dialog.getByRole("button", { name: /Opprett$/ }).click();
+        await expect
+            .poll(() => requests.create?.roller)
+            .toEqual([
+                expect.objectContaining({ fodselsnummer: bp.ident, type: "BP" }),
+                expect.objectContaining({ fodselsnummer: bm.ident, type: "BM" }),
+                expect.objectContaining({
+                    fodselsnummer: barnUnder18.ident,
+                    type: "BA",
+                    reellMottaker: { ident: barnUnder18.ident, verge: false },
+                }),
+            ]);
+    });
+
     test("forhåndsutfyller barn og BP, sender riktig request og gir saksnummeret tilbake", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, {
@@ -26,6 +63,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         });
         const url = page.url();
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         await expect(dialog.getByRole("heading", { name: "Opprett ny sak" })).toHaveCount(0);
         await expect(dialog.getByRole("group", { name: "Bidragspliktig" }).getByText(bp.visningsnavn)).toBeVisible();
@@ -63,6 +101,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await mockOpprettSakApi(page);
         const component = await mount<typeof Modal>(STORY, { ident: bp.ident, eierfogd: "4806" });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         await expect(dialog.getByRole("heading", { name: "Velg rolle" })).toBeVisible();
         await expect(dialog.getByRole("searchbox")).toHaveCount(0);
@@ -80,15 +119,26 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         const bpKort = dialog.getByRole("group", { name: "Bidragspliktig" });
         await expect(bpKort.getByText(bp.visningsnavn)).toBeVisible();
         await expect(bpKort.getByText("Låst", { exact: true })).toBeVisible();
-        await expect(dialog.getByRole("radiogroup", { name: "Kategori" })).toBeVisible();
+        await expect(dialog.getByRole("combobox", { name: "Kategori" })).toBeVisible();
         await expect(dialog.getByRole("heading", { name: "Kategori" })).toHaveCount(0);
-        await expect(dialog.getByRole("radio", { name: "Nasjonal" })).toBeChecked();
+        await expect(dialog.getByRole("combobox", { name: "Kategori" })).toHaveValue("Nasjonal");
     });
 
     test("barn sendt med som BA gir skjemaet direkte, uten rollevalg, og barnet er låst", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page, foreldreTilBarn);
         await page.route(/\/proxy\/bidrag-person\/motpartbarnrelasjon$/, async (route) => {
-            await route.fulfill({ json: { person: bp, personensMotpartBarnRelasjon: barnkurver } });
+            const { ident } = route.request().postDataJSON() as { ident: string };
+            await route.fulfill({
+                json: {
+                    person: ident === bp.ident ? bp : bm,
+                    personensMotpartBarnRelasjon:
+                        ident === bp.ident
+                            ? barnkurver
+                            : barnkurver
+                                  .filter((kurv) => kurv.motpart?.ident === bm.ident)
+                                  .map((kurv) => ({ ...kurv, motpart: bp, forelderrolleMotpart: "FAR" })),
+                },
+            });
         });
         const component = await mount<typeof Modal>(STORY, {
             ident: barnUnder18.ident,
@@ -96,6 +146,8 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             eierfogd: "4806",
         });
         const dialog = await åpneModal(page, component);
+        await expect(dialog.getByRole("region", { name: "Søskenflokker" })).toBeVisible();
+        await åpneSøskenflokker(dialog);
 
         await expect(dialog.getByRole("heading", { name: "Velg rolle" })).toHaveCount(0);
         await expect(dialog.getByRole("radiogroup", { name: /Hvilken rolle har/ })).toHaveCount(0);
@@ -140,6 +192,8 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await mockOpprettSakApi(page);
         const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, rolle: "BA" });
         const dialog = await åpneModal(page, component);
+        await expect(dialog.getByRole("button", { name: "Foreldre ikke valgt", exact: true })).toBeVisible();
+        await åpneSøskenflokker(dialog);
 
         const gruppe = dialog.getByRole("group", { name: "Foreldre ikke valgt" });
         await expect(gruppe.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` })).toBeChecked();
@@ -158,6 +212,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             initialForelderIdent: bp.ident,
         });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         await expect(dialog.getByRole("group", { name: "Bidragspliktig" }).getByText(bp.visningsnavn)).toBeVisible();
         const gruppe = dialog.getByRole("group", { name: "Ikke registrert som felles barn" });
@@ -175,7 +230,18 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         };
         await page.route(/\/proxy\/bidrag-person\/motpartbarnrelasjon$/, async (route) => {
             if (!sluppet) await new Promise<void>((resolve) => ventende.push(resolve));
-            await route.fulfill({ json: { person: bp, personensMotpartBarnRelasjon: barnkurver } });
+            const { ident } = route.request().postDataJSON() as { ident: string };
+            await route.fulfill({
+                json: {
+                    person: ident === bp.ident ? bp : bm,
+                    personensMotpartBarnRelasjon:
+                        ident === bp.ident
+                            ? barnkurver
+                            : barnkurver
+                                  .filter((kurv) => kurv.motpart?.ident === bm.ident)
+                                  .map((kurv) => ({ ...kurv, motpart: bp, forelderrolleMotpart: "FAR" })),
+                },
+            });
         });
         const component = await mount<typeof Modal>(STORY, {
             ident: barnUnder18.ident,
@@ -183,13 +249,13 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             initialForelderIdent: bp.ident,
         });
         const dialog = await åpneModal(page, component);
-
         await expect(dialog.getByRole("status").filter({ hasText: "Henter barn..." })).toBeVisible();
         await expect(dialog.getByText(/ukjent forelder/i)).toHaveCount(0);
 
         svar();
 
         await expect(dialog.getByText("Henter barn...")).toHaveCount(0);
+        await åpneSøskenflokker(dialog);
         const kurv = dialog.getByRole("group", { name: `Velg barn med ${bm.visningsnavn}` });
         await expect(kurv.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` })).toBeChecked();
     });
@@ -198,12 +264,14 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, eierfogd: "4806" });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         const rollevalg = dialog.getByRole("radiogroup", { name: /Hvilken rolle har/ });
         await expect(rollevalg.getByRole("radio", { name: "Bidragspliktig" })).toHaveCount(0);
         await rollevalg.getByRole("radio", { name: "Barn under 18 år" }).click();
 
         await expect(rollevalg).toHaveCount(0);
+        await åpneSøskenflokker(dialog);
         await expect(dialog.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` })).toBeChecked();
     });
 
@@ -215,6 +283,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             initialForelderIdent: bp.ident,
         });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         await dialog.getByRole("button", { name: /Opprett$/ }).click();
 
@@ -226,6 +295,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         const requests = await mockOpprettSakApi(page);
         const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, rolle: "BA" });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         await dialog.getByRole("button", { name: /Opprett$/ }).click();
 
@@ -237,7 +307,14 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         const requests = await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, rolle: "BA" });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
+        await dialog
+            .getByRole("group", { name: "Bidragspliktig" })
+            .getByRole("combobox", { name: "Velg bidragspliktig" })
+            .selectOption({ label: bp.visningsnavn });
+        await expect(dialog.getByRole("group", { name: "Bidragsmottaker" }).getByText(bm.visningsnavn)).toBeVisible();
+        await dialog.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
         await dialog.getByRole("button", { name: "Avbryt" }).click();
 
         await expect(dialog).toBeHidden();
@@ -261,6 +338,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             initialForelderIdent: bp.ident,
         });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         await dialog.getByRole("button", { name: /Opprett$/ }).click();
         await expect(dialog.getByRole("button", { name: "Avbryt" })).toBeDisabled();
@@ -281,6 +359,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
             eierfogd: "9999",
         });
         const dialog = await åpneModal(page, component);
+        await åpneSøskenflokker(dialog);
 
         await expect(
             dialog.getByText("Arbeidsfordelingen gir en annen enhet enn 9999.", { exact: false }),

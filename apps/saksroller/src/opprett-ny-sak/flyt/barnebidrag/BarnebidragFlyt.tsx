@@ -22,22 +22,22 @@ import { useBarnebidragFlyt } from "./useBarnebidragFlyt";
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined };
 
 function lagStartverdier(
-    partISaken: PartISaken,
+    partISaken: PartISaken | undefined,
     alder: number | null,
     fødselsdato: string | undefined,
 ): BarnebidragSkjemaData {
     const søkt: ForelderPart = {
-        ident: partISaken.ident,
-        navn: partISaken.navn,
-        erKjent: true,
-        diskresjonskode: partISaken.diskresjonskode,
+        ident: partISaken?.ident ?? "",
+        navn: partISaken?.navn ?? "",
+        erKjent: partISaken ? true : undefined,
+        diskresjonskode: partISaken?.diskresjonskode,
     };
-    const erBarn = erBarnRolle(partISaken);
+    const erBarn = partISaken && erBarnRolle(partISaken);
 
     return {
         roller: [
-            { ...(partISaken.rolle === "bidragspliktig" ? søkt : IKKE_VALGT), type: "BP" },
-            { ...(partISaken.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT), type: "BM" },
+            { ...(partISaken?.rolle === "bidragspliktig" ? søkt : IKKE_VALGT), type: "BP" },
+            { ...(partISaken?.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT), type: "BM" },
         ] satisfies BarnebidragForelderRolle[],
         valgteBarn: erBarn
             ? [
@@ -62,8 +62,7 @@ function lagStartverdier(
 export default function BarnebidragFlyt() {
     const { partISaken } = useOpprettSakStart();
 
-    if (!partISaken) return null;
-    if (erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} />;
+    if (!partISaken || erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} />;
     return <BarnebidragForForelder partISaken={partISaken} />;
 }
 
@@ -76,22 +75,26 @@ function BarnebidragForForelder({ partISaken }: { partISaken: PartISaken }) {
     const relasjoner = data?.personensMotpartBarnRelasjon ?? [];
 
     if (harMotpartMedUlikeForelderroller(relasjoner)) {
-        return (
-            <Alert variant="error" size="small">
-                Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for{" "}
-                <span className="personnavn">{partISaken.navn}</span>. Kontakt support for å få hjelp.
-            </Alert>
-        );
+        return <ForelderRelasjonFeil navn={partISaken.navn} />;
     }
 
     return <BarnebidragSkjema partISaken={partISaken} />;
 }
 
-function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
+function ForelderRelasjonFeil({ navn }: { navn: string }) {
+    return (
+        <Alert variant="error" size="small">
+            Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for{" "}
+            <span className="personnavn">{navn}</span>. Kontakt support for å få hjelp.
+        </Alert>
+    );
+}
+
+function BarnebidragSkjema({ partISaken }: { partISaken?: PartISaken }) {
     const { partISakenAlder, startperson } = useOpprettSakStart();
     const form = useForm<BarnebidragSkjemaData>({
         resolver: zodResolver(BarnebidragSkjemaSchema),
-        defaultValues: lagStartverdier(partISaken, partISakenAlder, startperson.fødselsdato ?? undefined),
+        defaultValues: lagStartverdier(partISaken, partISakenAlder, startperson?.fødselsdato ?? undefined),
         mode: "onSubmit",
     });
 
@@ -116,6 +119,10 @@ function BarnebidragFlytInnhold() {
         meldinger,
         status,
     } = useBarnebidragFlyt();
+
+    if (meldinger.ugyldigForelderrelasjon) {
+        return <ForelderRelasjonFeil navn={status.partISakenNavn} />;
+    }
 
     return (
         <RolleFlytSide
@@ -154,6 +161,7 @@ function BarnebidragFlytInnhold() {
                 manuellTittel={manuellTittel}
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
+                utvidSøskenflokker={kort.every((forelder) => forelder.part.erKjent !== undefined)}
             />
         </RolleFlytSide>
     );

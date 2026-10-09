@@ -28,7 +28,10 @@ export function useEnPartMedBarnFlyt({
     const { data, isLoading, isError } = useHentPersonMotpartBarnRelasjon(
         partISaken.ident ? { ident: partISaken.ident } : null,
     );
-    const barnkurver = grupperBarnIKurver(partISaken.ident ? (data?.personensMotpartBarnRelasjon ?? []) : []);
+    const barnkurver = grupperBarnIKurver(partISaken.ident ? (data?.personensMotpartBarnRelasjon ?? []) : [], {
+        ident: partISaken.ident,
+        visningsnavn: partISaken.navn,
+    });
 
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,

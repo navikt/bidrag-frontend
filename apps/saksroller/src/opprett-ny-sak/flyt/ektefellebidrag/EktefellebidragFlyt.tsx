@@ -20,7 +20,6 @@ type Part = { ident: string; navn: string; diskresjonskode?: Diskresjonskode };
 
 export default function EktefellebidragFlyt() {
     const { partISaken } = useOpprettSakStart();
-    if (!partISaken) return null;
     return <EktefellebidragSkjema partISaken={partISaken} />;
 }
 
@@ -33,9 +32,9 @@ function useMotparterTil(ident: string) {
     return [...unike.values()];
 }
 
-function startverdier(start: PartISaken): EktefellebidragSkjemaData {
+function startverdier(start: PartISaken | undefined): EktefellebidragSkjemaData {
     const forelder = (type: "BP" | "BM") => {
-        const erStart = start.rolle === tilForelderrolle(type);
+        const erStart = start?.rolle === tilForelderrolle(type);
         return { ident: erStart ? start.ident : "", navn: erStart ? start.navn : "", type, erKjent: true as const };
     };
     return { arbeidsfordeling: "EFS", roller: [forelder("BP"), forelder("BM")], kategori: "Nasjonal" };
@@ -45,9 +44,9 @@ function finnPart(roller: EktefellebidragSkjemaData["roller"], rolle: ForelderPa
     return roller.find((r) => r.type === tilRolletype(rolle)) ?? { ident: "", navn: "" };
 }
 
-function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }) {
+function EktefellebidragSkjema({ partISaken: start }: { partISaken?: PartISaken }) {
     const { låstIdent } = useOpprettSakStart();
-    const startrolle = start.rolle as ForelderPartRolle;
+    const startrolle: ForelderPartRolle = start?.rolle === "bidragsmottaker" ? "bidragsmottaker" : "bidragspliktig";
     const motsattRolle = hentMotsattRolle(startrolle);
 
     const form = useForm<EktefellebidragSkjemaData>({
