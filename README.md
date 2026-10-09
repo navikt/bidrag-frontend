@@ -147,7 +147,14 @@ bruker. Husk at dev-serveren fortsatt må startes på nytt etter endring.
 
 I q1/q2/prod settes `UNLEASH_SERVER_API_URL`/`_TOKEN`/`_ENV` automatisk av Nais via
 secreten fra `ApiToken`-ressursen i `.nais/unleash-apitoken.yaml`, og flaggene styres
-fra Unleash-web.
+fra [Unleash-web](https://bidrag-unleash-web.iap.nav.cloud.nais.io). q1 og q2 deler
+Unleash-miljøet `development`, prod bruker `production`.
+
+### Flagg i bruk
+
+| Flagg | Styrer |
+|-------|--------|
+| `frontend.henvendelser` | Henvendelser-seksjonen i brukeroversikten (`/bruker/:brukerid`). Av betyr at seksjonen ikke vises og at `bidrag-henvendelse` ikke kalles. |
 
 ## Scripts
 
