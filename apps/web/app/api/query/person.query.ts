@@ -35,7 +35,7 @@ export function hentPersonInfoMedMaskering(ident: string, maskeringVedFeil = tru
 /**
  * Henter alle personidenter for en gitt ident.
  */
-export function hentPersonidenter(request: HentePersonidenterRequest, enabled: boolean = true) {
+export function hentPersonidenter(request: HentePersonidenterRequest) {
     return queryOptions({
         queryKey: ["hent_personidenter", request?.ident],
         queryFn: () =>

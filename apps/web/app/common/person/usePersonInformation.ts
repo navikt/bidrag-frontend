@@ -1,5 +1,5 @@
 import type { HentePersonidenterRequest, PersonRequest } from "@bidrag/api/PersonApi";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
     hentGeografiskTilknytning,
     hentPersonAdresser,
@@ -8,8 +8,8 @@ import {
     hentSivilstand,
 } from "~/api/query/person.query.ts";
 
-export function usePersonInformation(request: HentePersonidenterRequest, enabled: boolean = true) {
-    const { data, isLoading, error } = useSuspenseQuery(hentPersonidenter(request, enabled));
+export function usePersonInformation(request: HentePersonidenterRequest) {
+    const { data, isLoading, error } = useQuery(hentPersonidenter(request));
     return {
         personidenter: data,
         isPersonidenterLoading: isLoading,
@@ -18,7 +18,7 @@ export function usePersonInformation(request: HentePersonidenterRequest, enabled
 }
 
 export function useHentSivilstand(request: PersonRequest, enabled: boolean = true) {
-    const { data, isLoading, error } = useSuspenseQuery(hentSivilstand(request, enabled));
+    const { data, isLoading, error } = useQuery(hentSivilstand(request, enabled));
     return {
         sivilstand: data,
         isSivilstandLoading: isLoading,
@@ -33,7 +33,7 @@ export function useHentPersonAdresser(
     } | null,
     enabled: boolean = true,
 ) {
-    const { data, isLoading, error } = useSuspenseQuery(hentPersonAdresser(request, enabled));
+    const { data, isLoading, error } = useQuery(hentPersonAdresser(request, enabled));
     return {
         personadresser: data,
         isPersonAdresserLoading: isLoading,
@@ -42,7 +42,7 @@ export function useHentPersonAdresser(
 }
 
 export function useHentPersoninformasjonDetaljer(request: PersonRequest | null, enabled: boolean = true) {
-    const { data, isLoading, error } = useSuspenseQuery(hentPersoninformasjonDetaljer(request, enabled));
+    const { data, isLoading, error } = useQuery(hentPersoninformasjonDetaljer(request, enabled));
     return {
         personinformasjonDetaljer: data,
         isPersoninformasjonDetaljerLoading: isLoading,
@@ -51,7 +51,7 @@ export function useHentPersoninformasjonDetaljer(request: PersonRequest | null, 
 }
 
 export function useHentGeografiskTilknytning(request: PersonRequest | null, enabled: boolean = true) {
-    const { data, isLoading, error } = useSuspenseQuery(hentGeografiskTilknytning(request, enabled));
+    const { data, isLoading, error } = useQuery(hentGeografiskTilknytning(request, enabled));
     return {
         geografiskTilknytning: data,
         isGeografiskTilknytningLoading: isLoading,

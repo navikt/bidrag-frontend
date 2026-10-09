@@ -2,7 +2,7 @@ import type { PersondetaljerDto } from "@bidrag/api/PersonApi";
 import { useTilgangssjekkBruker } from "@bidrag/common";
 import { CardIcon, ClockDashedIcon, PersonIcon } from "@navikt/aksel-icons";
 import { HStack, Loader, Page, Tabs, VStack } from "@navikt/ds-react";
-import { Link, Outlet, useOutletContext } from "react-router";
+import { NavLink, Outlet, useLocation, useOutletContext } from "react-router";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr";
 import { useHentPersoninformasjonDetaljer } from "~/common/person/usePersonInformation.ts";
 import type { Route } from "./+types/PersonLayout";
@@ -21,6 +21,8 @@ export default function PersonLayout({ params }: Route.ComponentProps) {
     const brukerid = params.brukerid;
     const ident = decodeFnr(brukerid);
     const { harTilgang, TilgangAlert } = useTilgangssjekkBruker(ident);
+    const { pathname } = useLocation();
+
     const {
         personinformasjonDetaljer: detaljer,
         personinformasjonDetaljerError,
@@ -49,7 +51,7 @@ export default function PersonLayout({ params }: Route.ComponentProps) {
     }
 
     const tabDefault = () => {
-        switch (window.location.pathname.split("/").pop()) {
+        switch (pathname.split("/").pop()) {
             case "historikk":
                 return "historikk";
             case "kontoopplysninger":
@@ -61,26 +63,26 @@ export default function PersonLayout({ params }: Route.ComponentProps) {
 
     return (
         <>
-            <Tabs defaultValue={tabDefault()}>
+            <Tabs value={tabDefault()}>
                 <Tabs.List>
                     <Tabs.Tab
                         value="personalia"
                         label="Personalia"
-                        as={Link}
+                        as={NavLink}
                         to={`/bruker/${brukerid}/personopplysninger`}
                         icon={<PersonIcon aria-hidden />}
                     />
                     <Tabs.Tab
                         value="historikk"
                         label="Historikk"
-                        as={Link}
+                        as={NavLink}
                         to={`/bruker/${brukerid}/personopplysninger/historikk`}
                         icon={<ClockDashedIcon aria-hidden />}
                     />
                     <Tabs.Tab
                         value="kontoopplysninger"
                         label="Kontoopplysninger"
-                        as={Link}
+                        as={NavLink}
                         to={`/bruker/${brukerid}/personopplysninger/kontoopplysninger`}
                         icon={<CardIcon aria-hidden />}
                     />
