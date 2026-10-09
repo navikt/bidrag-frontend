@@ -10,7 +10,7 @@ type Props = {
 export default function SakskategoriVelger({ value, onChange }: Props) {
     return (
         <RadioGroup
-            legend="Velg om saken gjelder nasjonal eller internasjonal bidragssak"
+            legend="Kategori"
             size="small"
             value={value}
             onChange={(nyVerdi) => onChange(nyVerdi as Sakskategori)}

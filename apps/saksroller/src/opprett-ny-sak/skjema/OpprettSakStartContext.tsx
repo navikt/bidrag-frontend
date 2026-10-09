@@ -63,6 +63,8 @@ type OpprettSakStartContext = OpprettSakFlytValg & {
     sakstype: OpprettSakstype;
     /** Personen flyten ble åpnet for. Kan ikke endres i skjemaet. */
     låstIdent: string | null;
+    /** Kategori valgt utenfor skjemaet. Uten verdi velges kategori i skjemaet. */
+    kategori?: Sakskategori;
 };
 
 const OpprettSakStartContext = createContext<OpprettSakStartContext>({} as OpprettSakStartContext);
@@ -71,10 +73,13 @@ function OpprettSakStartProvider({
     children,
     start,
     låstIdent = null,
+    kategori,
     inngang,
     onOpprettet,
     onAvbryt,
-}: PropsWithChildren<OpprettSakFlytValg & { start: OpprettSakStart; låstIdent?: string | null }>) {
+}: PropsWithChildren<
+    OpprettSakFlytValg & { start: OpprettSakStart; låstIdent?: string | null; kategori?: Sakskategori }
+>) {
     const value = useMemo(
         () => ({
             startperson: start.person,
@@ -82,11 +87,12 @@ function OpprettSakStartProvider({
             partISakenAlder: beregnAlderForPerson(start.person),
             sakstype: start.sakstype,
             låstIdent,
+            kategori,
             inngang,
             onOpprettet,
             onAvbryt,
         }),
-        [start, låstIdent, inngang, onOpprettet, onAvbryt],
+        [start, låstIdent, kategori, inngang, onOpprettet, onAvbryt],
     );
 
     return <OpprettSakStartContext value={value}>{children}</OpprettSakStartContext>;

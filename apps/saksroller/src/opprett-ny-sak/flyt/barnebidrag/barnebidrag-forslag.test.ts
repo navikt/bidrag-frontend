@@ -69,15 +69,16 @@ describe("utledFellesBarn", () => {
         { motpart: annen, fellesBarn: [halvsøsken] },
     ] as never;
 
-    it("gir bare barn med valgt BM, under maksalder, uten manuelt lagt til", () => {
-        expect(utledFellesBarn(relasjoner, mor.ident, [barn.ident])?.fellesBarn.map((b) => b.ident)).toEqual([
+    it("gir bare barn med valgt BM, under maksalder", () => {
+        expect(utledFellesBarn(relasjoner, mor.ident)?.fellesBarn.map((b) => b.ident)).toEqual([
+            barn.ident,
             søsken.ident,
         ]);
     });
 
     it("gir ingenting uten kjent BM eller felles barn", () => {
-        expect(utledFellesBarn(relasjoner, undefined, [])).toBeNull();
-        expect(utledFellesBarn(relasjoner, far.ident, [])).toBeNull();
+        expect(utledFellesBarn(relasjoner, undefined)).toBeNull();
+        expect(utledFellesBarn(relasjoner, far.ident)).toBeNull();
     });
 });
 

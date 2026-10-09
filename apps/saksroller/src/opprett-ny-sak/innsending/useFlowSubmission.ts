@@ -146,7 +146,6 @@ export function useFlowSubmission<T extends FormMedKategori>({
         enhetError,
         blocked,
         manglerTilgangUtenBm: tilgangUtenBm.mangler,
-        oppsummering: parter,
         submitError: opprettSak.error,
         isLoading: opprettSak.isLoading,
         saksnummer: opprettSak.saksnummer,

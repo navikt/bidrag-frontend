@@ -3,8 +3,14 @@ import { Box, Heading, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import NullstillDialog from "../skjema/NullstillDialog";
 import OpprettSakSkjema from "../skjema/OpprettSakSkjema";
-import { type OpprettSakStart, type OpprettSakstype, useErOppretterSak } from "../skjema/OpprettSakStartContext";
+import {
+    type OpprettSakStart,
+    type OpprettSakstype,
+    type Sakskategori,
+    useErOppretterSak,
+} from "../skjema/OpprettSakStartContext";
 import type { PartRolle } from "../skjema/opprett-sak-schema";
+import SakskategoriVelger from "../skjema/SakskategoriVelger";
 import SkjemaSeksjon, { SkjemaSeksjonKort } from "../skjema/SkjemaSeksjon";
 import SakstypeVelger from "./SakstypeVelger";
 import StartpartVelger from "./StartpartVelger";
@@ -13,6 +19,7 @@ import StartpartVelger from "./StartpartVelger";
 export default function OpprettSakFlyt() {
     const [sakstype, setSakstype] = useState<OpprettSakstype>("BARNEBIDRAG");
     const [start, setStart] = useState<(OpprettSakStart & { versjon: number }) | null>(null);
+    const [kategori, setKategori] = useState<Sakskategori>("Nasjonal");
     const [ventendeSakstype, setVentendeSakstype] = useState<OpprettSakstype | null>(null);
     const oppretter = useErOppretterSak();
 
@@ -39,7 +46,10 @@ export default function OpprettSakFlyt() {
                 </Heading>
                 <SkjemaSeksjon tittel="Type sak">
                     <SkjemaSeksjonKort>
-                        <SakstypeVelger value={sakstype} onVelg={velgSakstype} />
+                        <VStack gap="space-16">
+                            <SakstypeVelger value={sakstype} onVelg={velgSakstype} />
+                            <SakskategoriVelger value={kategori} onChange={(ny) => !oppretter && setKategori(ny)} />
+                        </VStack>
                     </SkjemaSeksjonKort>
                 </SkjemaSeksjon>
                 <StartpartVelger key={sakstype} sakstype={sakstype} harSkjema={!!start} onValgt={startSkjema} />
@@ -49,7 +59,7 @@ export default function OpprettSakFlyt() {
                     beskrivelse="Skjemaet nullstilles når du bytter sakstype."
                     onBekreft={() => ventendeSakstype && byttSakstype(ventendeSakstype)}
                 />
-                {start && <OpprettSakSkjema key={start.versjon} start={start} />}
+                {start && <OpprettSakSkjema key={start.versjon} start={start} kategori={kategori} />}
             </VStack>
         </Box>
     );

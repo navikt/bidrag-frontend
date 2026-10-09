@@ -142,6 +142,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                 <BarnSection
                     form={form}
                     barnkurver={barnkurver}
+                    lasterKurver={lasterKurver}
                     reellMottakerRegel={reellMottakerRegel(sakstype, false)}
                     beskrivelse={beskrivelse}
                     maksEttBarn={type === "FARSKAP"}

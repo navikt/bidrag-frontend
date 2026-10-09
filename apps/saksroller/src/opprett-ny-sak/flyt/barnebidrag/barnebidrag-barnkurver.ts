@@ -15,16 +15,15 @@ function slåSammenUnikeBarn(eksisterende: MotpartBarnRelasjon["fellesBarn"], ny
 
 /**
  * 🔴 Barn BP har sammen med valgt BM, som valgbare barn i saken. Bare relasjonen med BM brukes,
- * så barn fra andre forhold vises aldri. Barn som allerede er lagt til manuelt, utelates.
+ * så barn fra andre forhold vises aldri. Barn som er lagt til manuelt, vises også her når de
+ * er felles barn, sammen med søsknene sine.
  */
 export function utledFellesBarn(
     relasjonerTilBp: MotpartBarnRelasjon[] | undefined,
     bidragsmottakerIdent: string | undefined,
-    manueltLagtTil: string[],
 ): MotpartBarnRelasjon | null {
     const relasjon = relasjonerTilBp?.find((r) => !!bidragsmottakerIdent && r.motpart?.ident === bidragsmottakerIdent);
-    const fellesBarn =
-        relasjon?.fellesBarn.filter((barn) => erUnderMaksAlder(barn) && !manueltLagtTil.includes(barn.ident)) ?? [];
+    const fellesBarn = relasjon?.fellesBarn.filter(erUnderMaksAlder) ?? [];
     return relasjon && fellesBarn.length > 0 ? { ...relasjon, fellesBarn } : null;
 }
 

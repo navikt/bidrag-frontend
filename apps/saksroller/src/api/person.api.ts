@@ -54,24 +54,22 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
     });
 }
 
-function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
+export function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
     return {
         queryKey: ["hent_person_motpart_barn_relasjon", request?.ident],
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
             if (!request) return undefined;
             try {
                 const { data } = await BIDRAG_PERSON_API.motpartbarnrelasjon.getPersonensMotpartBarnRelasjon(request);
-                await SecureLoggerService.info(`Hentet personen motpart-barn relasjon for ident ${request.ident}`);
+                await SecureLoggerService.info("Hentet personen motpart-barn relasjon");
                 return data;
             } catch (e) {
                 const axiosError = e as AxiosError;
                 const status = axiosError?.response?.status;
 
                 if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til relasjoner for person ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til å hente relasjoner for denne personen ${request.ident}`,
-                    );
+                    await SecureLoggerService.warn("Ingen tilgang til personens relasjoner");
+                    throw new TilgangsFeilError("Du har ikke tilgang til å hente personens relasjoner.");
                 }
                 throw e;
             }
@@ -117,9 +115,7 @@ export function hentForeldreinformasjonForBarnQueryOptions(request: PersonReques
                     return [];
                 }
 
-                SecureLoggerService.info(
-                    `Hentet foreldre for barn med ident ${request.ident}. Antall foreldre: ${foreldreIdenter.length}`,
-                ).catch(console.error);
+                SecureLoggerService.info("Hentet foreldre for barn").catch(console.error);
 
                 const foreldreResponses = await Promise.all(
                     foreldreIdenter.map((ident) => BIDRAG_PERSON_API.informasjon.hentPersonPost({ ident })),
@@ -131,10 +127,8 @@ export function hentForeldreinformasjonForBarnQueryOptions(request: PersonReques
                 const status = axiosError?.response?.status;
 
                 if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(`Ingen tilgang til foreldreinfo for barn ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til foreldreinfo for denne personen ${request.ident}`,
-                    );
+                    await SecureLoggerService.warn("Ingen tilgang til foreldreinfo for barn");
+                    throw new TilgangsFeilError("Du har ikke tilgang til foreldreinfo for barnet.");
                 }
                 throw e;
             }

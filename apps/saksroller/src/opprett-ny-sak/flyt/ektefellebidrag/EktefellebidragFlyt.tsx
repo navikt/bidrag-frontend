@@ -96,6 +96,7 @@ function EktefellebidragSkjema({ partISaken: start }: { partISaken: PartISaken }
     ): ForelderKortProps => ({
         rolle,
         part: { ...part, erKjent: part.ident ? true : undefined },
+        valgPlaceholder: "Velg ektefelle eller partner",
         forslag: filtrerBortValgteForeldre(forslag, redigerer === rolle ? [part] : [partISaken, motpart]).filter(
             (person) => person.ident !== låstIdent,
         ),

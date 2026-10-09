@@ -6,7 +6,6 @@ import { type UseFormReturn, useFormContext } from "react-hook-form";
 import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
 import { reellMottakerRegel } from "../../../felles/saksregler";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
-import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { ForelderKortProps } from "../../parter/ParterSeksjon";
 import { filtrerBortValgteForeldre } from "../../parter/part-utils";
@@ -31,22 +30,18 @@ function useBarnkurver(form: UseFormReturn<BarnebidragSkjemaData>) {
     const roller = form.watch("roller");
     const bidragspliktig = rolleSomPart(roller, "BP").ident;
     const bidragsmottaker = rolleSomPart(roller, "BM").ident;
-    const valgteBarn = form.watch("valgteBarn");
 
     const kilde = bidragspliktig || bidragsmottaker;
     const { data, isPending } = useHentPersonMotpartBarnRelasjon(kilde ? { ident: kilde } : null);
     const relasjoner = data?.personensMotpartBarnRelasjon ?? [];
-    const manuelle = valgteBarn.filter((b) => b.manuellLagtTil).map((b) => b.ident);
     const kurver =
         bidragspliktig && bidragsmottaker
-            ? [utledFellesBarn(relasjoner, bidragsmottaker, manuelle)].filter((kurv) => kurv !== null)
+            ? [utledFellesBarn(relasjoner, bidragsmottaker)].filter((kurv) => kurv !== null)
             : utledBarnkurverForForelder(relasjoner);
     const barnkurver = grupperBarnIKurver(kilde ? kurver : []);
     const lasterKurver = !!kilde && isPending;
 
-    useFjernBarnUtenforKurver(form, barnkurver, lasterKurver);
-
-    return barnkurver;
+    return { barnkurver, lasterKurver };
 }
 
 function useForelderforslag(form: UseFormReturn<BarnebidragSkjemaData>, roller: BarnebidragForelderRolle[]) {
@@ -64,7 +59,15 @@ function useForelderforslag(form: UseFormReturn<BarnebidragSkjemaData>, roller: 
     const { forslag, feil } = utledForelderforslag({ foreldreTilBarn, valgteForeldre });
     const ledige = filtrerBortValgteForeldre(forslag, valgteForeldre);
     const tilgangsfeil = foreldreinfo.find((query) => query.error instanceof TilgangsFeilError)?.error;
-    return { foreldreTilBarn, forslag, ledige, forslagsfeil: feil, tilgangsfeil: tilgangsfeil?.message };
+    const lasterForeldre = foreldreinfo.some((query) => query.isPending);
+    return {
+        foreldreTilBarn,
+        forslag,
+        ledige,
+        forslagsfeil: feil,
+        tilgangsfeil: tilgangsfeil?.message,
+        lasterForeldre,
+    };
 }
 
 /** Når nye barn gir én entydig forelder og bare ett kort er tomt, fylles kortet ut. */
@@ -75,7 +78,7 @@ function useFyllUtForelder(
     velg: (rolle: ForelderPartRolle, person: PersonDto) => void,
     erTom: (rolle: ForelderPartRolle) => boolean,
 ) {
-    useFyllUtInitialForelder(forslag, velg, erTom);
+    const venterPåInitialForelder = useFyllUtInitialForelder(forslag, velg, erTom);
     const behandledeBarn = useRef(new Set<string>());
     useEffect(() => {
         const nyeBarn = foreldreTilBarn.filter((b) => b.foreldre && !behandledeBarn.current.has(b.barn.ident));
@@ -87,6 +90,7 @@ function useFyllUtForelder(
             fyllUt(rolle, eneste);
         }
     });
+    return venterPåInitialForelder;
 }
 
 function useFyllUtInitialForelder(
@@ -96,14 +100,32 @@ function useFyllUtInitialForelder(
 ) {
     const initialForelder = useOpprettSakStart().inngang?.initialForelder;
     const utført = useRef(false);
+    const rolle: ForelderPartRolle = initialForelder?.rolle === "BP" ? "bidragspliktig" : "bidragsmottaker";
+    const person = initialForelder && forslag.find((f) => f.ident === initialForelder.ident);
+    const skalFylles = !!person && !utført.current && erTom(rolle);
     useEffect(() => {
-        if (!initialForelder || utført.current) return;
-        const rolle: ForelderPartRolle = initialForelder.rolle === "BP" ? "bidragspliktig" : "bidragsmottaker";
-        const person = forslag.find((f) => f.ident === initialForelder.ident);
-        if (!person || !erTom(rolle)) return;
+        if (!skalFylles || !person) return;
         utført.current = true;
         velg(rolle, person);
     });
+    /** Forelderen fylles ut etter denne renderingen. Til da vet vi ikke hvilke barnlister som gjelder. */
+    return skalFylles;
+}
+
+/**
+ * Tittel for barn som ikke finnes blant felles barn. Skiller mellom forelder som ikke er valgt ennå
+ * og forelder som er satt til ukjent.
+ */
+export function tittelForBarnUtenKurv(bidragspliktig: ForelderPart, bidragsmottaker: ForelderPart): string {
+    const status = (part: ForelderPart) => (part.erKjent === false ? "ukjent" : part.ident ? "valgt" : "ikke valgt");
+    const bp = status(bidragspliktig);
+    const bm = status(bidragsmottaker);
+    if (bp === "ikke valgt" && bm === "ikke valgt") return "Foreldre ikke valgt";
+    if (bm === "ikke valgt") return "Bidragsmottaker ikke valgt";
+    if (bp === "ikke valgt") return "Bidragspliktig ikke valgt";
+    if (bm === "ukjent") return "Med ukjent bidragsmottaker";
+    if (bp === "ukjent") return "Med ukjent bidragspliktig";
+    return "Ikke registrert som felles barn";
 }
 
 function partFraKurv(kurv: Barnkurv): ForelderPart {
@@ -133,8 +155,11 @@ export function useBarnebidragFlyt() {
     const [redigerer, setRedigerer] = useState<ForelderPartRolle>();
     const valgteBarn = form.watch("valgteBarn");
 
-    const barnkurver = useBarnkurver(form);
-    const { foreldreTilBarn, forslag, ledige, forslagsfeil, tilgangsfeil } = useForelderforslag(form, roller);
+    const { barnkurver, lasterKurver } = useBarnkurver(form);
+    const { foreldreTilBarn, forslag, ledige, forslagsfeil, tilgangsfeil, lasterForeldre } = useForelderforslag(
+        form,
+        roller,
+    );
 
     const settPart = (rolle: ForelderPartRolle, part: ForelderPart) => {
         const type = rolle === "bidragspliktig" ? "BP" : "BM";
@@ -152,7 +177,7 @@ export function useBarnebidragFlyt() {
         form.setValue("roller", nye, { shouldDirty: true, shouldValidate: form.formState.isSubmitted });
         setRedigerer(undefined);
     };
-    useFyllUtForelder(
+    const venterPåForelder = useFyllUtForelder(
         foreldreTilBarn,
         ledige,
         (rolle, person) => settPart(rolle, tilPart(person)),
@@ -203,6 +228,9 @@ export function useBarnebidragFlyt() {
     return {
         form,
         barnkurver,
+        /** Barnkurvene eller foreldrene som fyller dem ut, hentes fortsatt. */
+        lasterKurver: lasterKurver || lasterForeldre || venterPåForelder,
+        manuellTittel: tittelForBarnUtenKurv(bidragspliktig, bidragsmottaker),
         onKurvByttet,
         reellMottakerRegel: reellMottakerRegel("Barnebidrag", bidragsmottaker.erKjent === false),
         kort,

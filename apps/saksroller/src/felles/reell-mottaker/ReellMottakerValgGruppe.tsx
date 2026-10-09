@@ -47,7 +47,7 @@ type Props = {
     onValg: (valg: ReellMottakerValg) => void;
     regel: ReellMottakerValgregel;
     feil?: string;
-    readOnly?: boolean;
+    disabled?: boolean;
 };
 
 export default function ReellMottakerValgGruppe({
@@ -58,7 +58,7 @@ export default function ReellMottakerValgGruppe({
     onValg,
     regel,
     feil,
-    readOnly = false,
+    disabled = false,
 }: Props) {
     const påkrevd = regel !== "valgfri";
     const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
@@ -74,11 +74,10 @@ export default function ReellMottakerValgGruppe({
             <RadioGroup
                 size="small"
                 legend="Hvem er reell mottaker?"
-                description={readOnly ? "Velg barnet for å angi reell mottaker" : undefined}
-                value={readOnly ? "" : valg.type || "ingen"}
+                value={disabled ? "" : valg.type || "ingen"}
                 onChange={handleRadioChange}
                 error={feil}
-                readOnly={readOnly}
+                disabled={disabled}
             >
                 <VStack gap="space-0">
                     <Radio value="ingen" disabled={påkrevd}>

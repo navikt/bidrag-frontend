@@ -1,7 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
-import { useFjernBarnUtenforKurver } from "../../barn/useFjernBarnUtenforKurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { FarskapsSkjemaSchemaData, ForelderPartRolle } from "../../skjema/opprett-sak-schema";
 
@@ -30,8 +29,6 @@ export function useEnPartMedBarnFlyt({
         partISaken.ident ? { ident: partISaken.ident } : null,
     );
     const barnkurver = grupperBarnIKurver(partISaken.ident ? (data?.personensMotpartBarnRelasjon ?? []) : []);
-
-    useFjernBarnUtenforKurver(form, barnkurver, isLoading);
 
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,

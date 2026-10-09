@@ -30,7 +30,7 @@ test("valgt rolle fyller ut skjemaet og tømmer søket", async ({ mount, page })
     await expect(component.getByRole("radiogroup", { name: /Hvilken rolle har/ })).toHaveCount(0);
 });
 
-test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ mount, page }) => {
+test("Ctrl+ø sladder navn i valg, personkort og barn", async ({ mount, page }) => {
     await mockOpprettSakApi(page, {
         parentRelations: {
             [testpersoner.barnUnder18.ident]: [testpersoner.bidragspliktig.ident, testpersoner.bidragsmottaker.ident],
@@ -56,12 +56,10 @@ test("Ctrl+ø sladder navn i valg, personkort, barn og oppsummering", async ({ m
     await barnSøk.fill(testpersoner.barnUnder18.ident);
     await barnSøk.press("Enter");
     await component.getByRole("button", { name: "Legg til", exact: true }).click();
-    const oppsummering = component
-        .locator("section")
-        .filter({ has: page.getByRole("heading", { name: "Oppsummering" }) });
-    const partnavn = oppsummering.locator(".personnavn").filter({
-        hasText: testpersoner.bidragspliktig.visningsnavn,
-    });
+    const partnavn = component
+        .locator(".personnavn")
+        .filter({ hasText: testpersoner.bidragspliktig.visningsnavn })
+        .first();
     const motpartnavn = component.locator(".personnavn").filter({
         hasText: testpersoner.bidragsmottaker.visningsnavn,
     });
@@ -124,21 +122,38 @@ test("bytte av sakstype spør før skjemaet nullstilles", async ({ mount, page }
     await expect(barnOverskrift).toHaveCount(0);
 });
 
-test("kategori velges i skjemaet uten å nullstille det", async ({ mount, page }) => {
+test("kategori velges sammen med sakstype uten å nullstille skjemaet", async ({ mount, page }) => {
     await mockOpprettSakApi(page);
     const component = await mount(STORY);
-    const oppsummering = component
-        .locator("section")
-        .filter({ has: page.getByRole("heading", { name: "Oppsummering" }) });
 
-    await expect(component.getByRole("radio", { name: "Utland" })).toHaveCount(0);
-    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
     await expect(component.getByRole("radio", { name: "Nasjonal" })).toBeChecked();
+    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
 
     await component.getByRole("radio", { name: "Utland" }).check();
     await expect(page.getByRole("alertdialog")).toHaveCount(0);
     await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toBeVisible();
-    await expect(oppsummering.getByText("Utland", { exact: true })).toBeVisible();
+    await expect(component.getByRole("radiogroup", { name: "Kategori" })).toHaveCount(1);
+});
+
+test("kategori under type sak brukes i skjemaet og i oppslaget av enhet", async ({ mount, page }) => {
+    const requests = await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+
+    await component.getByRole("radio", { name: "Utland" }).check();
+    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
+
+    await expect(component.getByRole("radio", { name: "Utland" })).toBeChecked();
+    await expect.poll(() => requests.unit.at(-1)?.sakskategori).toBe("U");
+});
+
+test("viser ikke oppsummering", async ({ mount, page }) => {
+    await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+
+    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
+
+    await expect(component.getByRole("heading", { name: "Velg barn saken gjelder for" })).toBeVisible();
+    await expect(component.getByRole("heading", { name: "Oppsummering" })).toHaveCount(0);
 });
 
 test("viser varsel når forslag til barn ikke kan hentes", async ({ mount, page }) => {

@@ -103,8 +103,19 @@ function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
 }
 
 function BarnebidragFlytInnhold() {
-    const { form, barnkurver, onKurvByttet, reellMottakerRegel, kort, onSubmit, innsending, meldinger, status } =
-        useBarnebidragFlyt();
+    const {
+        form,
+        barnkurver,
+        lasterKurver,
+        manuellTittel,
+        onKurvByttet,
+        reellMottakerRegel,
+        kort,
+        onSubmit,
+        innsending,
+        meldinger,
+        status,
+    } = useBarnebidragFlyt();
 
     return (
         <RolleFlytSide
@@ -139,6 +150,8 @@ function BarnebidragFlytInnhold() {
             <BarnSection
                 form={form}
                 barnkurver={barnkurver}
+                lasterKurver={lasterKurver}
+                manuellTittel={manuellTittel}
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
             />

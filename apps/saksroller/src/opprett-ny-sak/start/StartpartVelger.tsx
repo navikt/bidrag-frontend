@@ -36,23 +36,17 @@ const SØKELABEL: Partial<Record<OpprettSakstype, string>> = {
  */
 export default function StartpartVelger({
     sakstype,
-    forhåndsvalgt = null,
-    visSøk = true,
     harSkjema,
     onValgt,
 }: {
     sakstype: OpprettSakstype;
-    forhåndsvalgt?: PersonDto | null;
-    visSøk?: boolean;
     /** Et utfylt skjema nullstilles ved nytt valg, så da spørres det først. */
     harSkjema: boolean;
     onValgt: (person: PersonDto, rolle: PartRolle) => void;
 }) {
     const isLoadingOpprettSak = useErOppretterSak();
     const låstRolle = tvungenRolle(sakstype);
-    const [utkast, setUtkast] = useState<Utkast | null>(() =>
-        forhåndsvalgt ? { person: forhåndsvalgt, rolle: låstRolle } : null,
-    );
+    const [utkast, setUtkast] = useState<Utkast | null>(null);
     const [søkNøkkel, setSøkNøkkel] = useState(0);
     const [viserNullstillDialog, setViserNullstillDialog] = useState(false);
 
@@ -83,18 +77,16 @@ export default function StartpartVelger({
 
     return (
         <SkjemaSeksjon
-            tittel={visSøk ? (SEKSJONSTITTEL[sakstype] ?? "Søk opp person") : "Velg rolle"}
+            tittel={SEKSJONSTITTEL[sakstype] ?? "Søk opp person"}
             beskrivelse={sakstypeTilBeskrivelse(sakstype)}
         >
-            {visSøk && (
-                <SkjemaSeksjonKort>
-                    <SøkPerson
-                        key={søkNøkkel}
-                        label={SØKELABEL[sakstype] ?? "Søk etter person"}
-                        personInformasjon={velgPerson}
-                    />
-                </SkjemaSeksjonKort>
-            )}
+            <SkjemaSeksjonKort>
+                <SøkPerson
+                    key={søkNøkkel}
+                    label={SØKELABEL[sakstype] ?? "Søk etter person"}
+                    personInformasjon={velgPerson}
+                />
+            </SkjemaSeksjonKort>
             {utkast && (
                 <SkjemaSeksjonKort>
                     <VStack gap="space-16" align="start">
@@ -125,7 +117,7 @@ export default function StartpartVelger({
     );
 }
 
-function ValgtPart({ person }: { person: PersonDto }) {
+export function ValgtPart({ person }: { person: PersonDto }) {
     return (
         <VStack gap="space-8">
             <PersonInfo
