@@ -19,7 +19,6 @@ import { ClientOnly } from "~/common/ClientOnly.tsx";
 import RootErrorBoundary from "~/common/components/errorpage/RootErrorBoundary.tsx";
 import { AppLayout } from "~/common/header/AppLayout.tsx";
 import { UnleashContextUpdater } from "~/common/unleash/UnleashContextUpdater.tsx";
-import { NyOpprettSakFlytProvider } from "~/routes/sak/saksroller/opprett-ny-sak/start/NyOpprettSakFlytProvider.tsx";
 import type { Route } from "./+types/root.ts";
 import faviconUrl from "./assets/bisys_favicon.ico";
 
@@ -99,13 +98,11 @@ export default function App({ loaderData }: Route.ComponentProps) {
                 >
                     <UnleashContextUpdater />
                     <KunNySakshistorikkSync />
-                    <NyOpprettSakFlytProvider>
-                        <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
-                            <ClientOnly fallback={<BidragProgressbarFullScreen />}>
-                                <Outlet />
-                            </ClientOnly>
-                        </AppLayout>
-                    </NyOpprettSakFlytProvider>
+                    <AppLayout bruker={navUser} bisysUrl={bisysUrl}>
+                        <ClientOnly fallback={<BidragProgressbarFullScreen />}>
+                            <Outlet />
+                        </ClientOnly>
+                    </AppLayout>
                 </FaroErrorBoundary>
             </FlagProvider>
         </QueryClientWrapper>
