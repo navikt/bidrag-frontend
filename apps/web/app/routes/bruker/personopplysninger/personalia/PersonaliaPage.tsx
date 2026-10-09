@@ -83,15 +83,21 @@ function Personalia({ detaljer }: { detaljer: PersondetaljerDto }) {
                     <Table.Body>
                         <Table.Row>
                             <Table.HeaderCell scope={"row"}>Fornavn</Table.HeaderCell>
-                            <Table.DataCell scope={"row"}>{detaljer.person.fornavn}</Table.DataCell>
+                            <Table.DataCell scope={"row"} className={"personnavn"}>
+                                {detaljer.person.fornavn}
+                            </Table.DataCell>
                         </Table.Row>
                         <Table.Row>
                             <Table.HeaderCell scope={"row"}>Mellomnavn</Table.HeaderCell>
-                            <Table.DataCell scope={"row"}>{detaljer.person.mellomnavn}</Table.DataCell>
+                            <Table.DataCell scope={"row"} className={"personnavn"}>
+                                {detaljer.person.mellomnavn}
+                            </Table.DataCell>
                         </Table.Row>
                         <Table.Row>
                             <Table.HeaderCell scope={"row"}>Etternavn</Table.HeaderCell>
-                            <Table.DataCell scope={"row"}>{detaljer.person.etternavn}</Table.DataCell>
+                            <Table.DataCell scope={"row"} className={"personnavn"}>
+                                {detaljer.person.etternavn}
+                            </Table.DataCell>
                         </Table.Row>
                         <Table.Row>
                             <Table.HeaderCell scope={"row"}>Sivilstand</Table.HeaderCell>

@@ -65,7 +65,9 @@ function PersonidenterHistorikk({ ident }: { ident: string }) {
                         {personidenter.map(({ ident, historisk, gruppe }) => {
                             return (
                                 <Table.Row key={ident}>
-                                    <Table.DataCell scope={"row"}>{ident}</Table.DataCell>
+                                    <Table.DataCell scope={"row"} className={"personident"}>
+                                        {ident}
+                                    </Table.DataCell>
                                     <Table.DataCell scope={"row"}>{formaterGruppeNavn(gruppe)}</Table.DataCell>
                                     <Table.DataCell scope={"row"}>{historisk ? "Historisk" : "Aktiv"}</Table.DataCell>
                                 </Table.Row>
@@ -96,9 +98,15 @@ function Navneendringer({ personhistorikk }: { personhistorikk: PersonDto[] }) {
                         {personhistorikk.map((person) => {
                             return (
                                 <Table.Row>
-                                    <Table.DataCell scope={"row"}>{person.fornavn}</Table.DataCell>
-                                    <Table.DataCell scope={"row"}>{person.mellomnavn}</Table.DataCell>
-                                    <Table.DataCell scope={"row"}>{person.etternavn}</Table.DataCell>
+                                    <Table.DataCell scope={"row"} className={"personident"}>
+                                        {person.fornavn}
+                                    </Table.DataCell>
+                                    <Table.DataCell scope={"row"} className={"personident"}>
+                                        {person.mellomnavn}
+                                    </Table.DataCell>
+                                    <Table.DataCell scope={"row"} className={"personident"}>
+                                        {person.etternavn}
+                                    </Table.DataCell>
                                     {/* TODO ikke implementert henting av navnehistorikk, har satt opp med antatt PersonDto liste*/}
                                     <Table.DataCell scope={"row"}>Ikke implementert enda</Table.DataCell>
                                 </Table.Row>
