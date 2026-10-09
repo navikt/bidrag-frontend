@@ -1,16 +1,12 @@
-import { Box, Heading, Loader, LocalAlert, VStack } from "@navikt/ds-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { useFlag } from "@unleash/proxy-client-react";
-import { Suspense } from "react";
-import { finnOppgaver } from "~/api/query/oppgave.query.ts";
-import { OppgaveTabell } from "~/common/oppgave/OppgaveTabell.tsx";
+import { Box, Heading, LocalAlert, VStack } from "@navikt/ds-react";
+import { OppgaveSeksjon } from "~/common/oppgave/OppgaveSeksjon.tsx";
+import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel.tsx";
 import type { Route } from "./+types/SakOversiktPage";
+
+export const handle: SakSideTittelHandle = { sakSideTittel: "Saksoversikt" };
 
 export default function SakOversiktPage({ params }: Route.ComponentProps) {
     const saksnummer = params.saksnummer;
-    const oppgaveEnabledFlag = useFlag("frontend.oppgaver");
-
-    const { data: oppgaver } = useSuspenseQuery(finnOppgaver({ saksnummer: saksnummer }, oppgaveEnabledFlag));
 
     return (
         <VStack gap={"space-48"}>
@@ -29,9 +25,7 @@ export default function SakOversiktPage({ params }: Route.ComponentProps) {
             <Box borderColor="neutral-subtle" padding="space-16" borderWidth="1" borderRadius="4">
                 <VStack gap="space-16">
                     <Heading size={"small"}>Oppgaver</Heading>
-                    <Suspense fallback={<Loader />}>
-                        <OppgaveTabell oppgaver={oppgaver ?? []} />
-                    </Suspense>
+                    <OppgaveSeksjon søk={{ saksnummer }} />
                 </VStack>
             </Box>
         </VStack>

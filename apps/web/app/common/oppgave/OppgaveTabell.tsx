@@ -1,9 +1,8 @@
 import type { Beskrivelseinnslag, BidragOppgaveDto } from "@bidrag/api/BidragOppgaveApi";
 import { MaskerSensitivInfo, PersonNavn } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils/datoUtils";
-import { BodyLong, Box, Detail, HStack, InlineMessage, Label, Link, List, Table, VStack } from "@navikt/ds-react";
+import { BodyLong, Box, Detail, HStack, Label, Link, List, Table, VStack } from "@navikt/ds-react";
 import { ListItem } from "@navikt/ds-react/List";
-import { useFlag } from "@unleash/proxy-client-react";
 import { Link as RouterLink } from "react-router";
 import { ObfuscateFnrLink } from "~/common/person/ObfuscateFnrLink.tsx";
 
@@ -15,9 +14,9 @@ function BeskrivelseListe({ innslag }: { innslag?: Beskrivelseinnslag[] | null }
     if (!innslag?.length) return <p>Ingen beskrivelser</p>;
 
     return (
-        <VStack gap="space-16" padding="space-16">
+        <VStack as="ol" gap="space-16" padding="space-16" className="list-none">
             {innslag.map((beskrivelse, indeks) => (
-                <VStack gap="space-4" key={`${beskrivelse.tidspunkt ?? "uten-tidspunkt"}-${indeks}`}>
+                <VStack as="li" gap="space-4" key={`${beskrivelse.tidspunkt ?? "uten-tidspunkt"}-${indeks}`}>
                     <HStack gap="space-8" align={"center"}>
                         <Label>
                             {beskrivelse.tidspunkt && (
@@ -49,12 +48,6 @@ function BeskrivelseListe({ innslag }: { innslag?: Beskrivelseinnslag[] | null }
 }
 
 export function OppgaveTabell({ oppgaver }: OppgaveTabellProps) {
-    const enabledFlag = useFlag("frontend.oppgaver");
-
-    if (!enabledFlag) {
-        return <InlineMessage status={"warning"}>Oppgaver er foreløpig ikke tilgjengelig for deg</InlineMessage>;
-    }
-
     if (oppgaver.length === 0) return <p>Ingen oppgaver</p>;
 
     return (
@@ -100,10 +93,12 @@ export function OppgaveTabell({ oppgaver }: OppgaveTabellProps) {
                                 )}
                             </Table.DataCell>
                             <Table.DataCell>
-                                {oppgave.brukerFnr && (
-                                    <Link as={ObfuscateFnrLink} to={`/bruker/${oppgave.brukerFnr}`}>
-                                        <PersonNavn ident={oppgave.brukerFnr || undefined} />
+                                {oppgave.brukerIdent ? (
+                                    <Link as={ObfuscateFnrLink} to={`/bruker/${oppgave.brukerIdent}`}>
+                                        <PersonNavn ident={oppgave.brukerIdent} />
                                     </Link>
+                                ) : (
+                                    "-"
                                 )}
                             </Table.DataCell>
                         </Table.ExpandableRow>

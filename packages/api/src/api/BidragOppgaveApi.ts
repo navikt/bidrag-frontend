@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-/** Minst ett søkekriterium må oppgis: saksnummer, aktør-ID, saksbehandler eller enhetsnummer. */
+/** Minst ett søkekriterium må oppgis: saksnummer eller aktør-ID. */
 export interface FinnOppgaverRequest {
   saksnummer?: string | null;
   /**
@@ -58,7 +58,7 @@ export interface BidragOppgaveDto {
   journalpostId?: string | null;
   tildeltEnhetsnr: string;
   tilordnetRessurs?: string | null;
-  brukerFnr?: string | null;
+  brukerIdent?: string | null;
   saksreferanse?: string | null;
   prioritet: "HOY" | "NORM" | "LAV" | "KRITISK";
   /** @format date */
@@ -129,7 +129,8 @@ export class HttpClient<SecurityDataType = unknown> {
   }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "http://localhost:8080",
+      baseURL:
+        axiosConfig.baseURL || "https://bidrag-oppgave-q2.intern.dev.nav.no",
     });
     this.secure = secure;
     this.format = format;
@@ -243,7 +244,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title bidrag-oppgave
  * @version v1
- * @baseUrl http://localhost:8080
+ * @baseUrl https://bidrag-oppgave-q2.intern.dev.nav.no
  */
 export class Api<
   SecurityDataType extends unknown,

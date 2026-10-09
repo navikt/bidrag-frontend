@@ -1,11 +1,7 @@
 import { PersonNavn } from "@bidrag/common";
 import { Box, Heading, Loader, LocalAlert, VStack } from "@navikt/ds-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { useFlag } from "@unleash/proxy-client-react";
-import { Suspense } from "react";
-import { finnOppgaver } from "~/api/query/oppgave.query.ts";
 import { useHentPersoninformasjon } from "~/api/useApi.ts";
-import { OppgaveTabell } from "~/common/oppgave/OppgaveTabell.tsx";
+import { OppgaveSeksjon } from "~/common/oppgave/OppgaveSeksjon.tsx";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
 import type { Route } from "./+types/BrukerOversikt";
 
@@ -14,9 +10,6 @@ export default function BrukerOversikt({ params }: Route.ComponentProps) {
     const brukerId = params.brukerid;
     const fnr = decodeFnr(brukerId);
     const { data: bruker } = useHentPersoninformasjon({ ident: fnr });
-    const oppgaveEnabledFlag = useFlag("frontend.oppgaver");
-
-    const { data: oppgaver } = useSuspenseQuery(finnOppgaver({ aktoerId: bruker?.aktørId }, oppgaveEnabledFlag));
 
     return (
         <VStack gap={"space-48"}>
@@ -37,9 +30,13 @@ export default function BrukerOversikt({ params }: Route.ComponentProps) {
             <Box borderColor="neutral-subtle" padding="space-16" borderWidth="1" borderRadius="4">
                 <VStack gap="space-16">
                     <Heading size={"small"}>Oppgaver</Heading>
-                    <Suspense fallback={<Loader />}>
-                        <OppgaveTabell oppgaver={oppgaver ?? []} />
-                    </Suspense>
+                    {!bruker ? (
+                        <Loader />
+                    ) : bruker.aktørId ? (
+                        <OppgaveSeksjon søk={{ aktoerId: bruker.aktørId }} />
+                    ) : (
+                        <p>Ingen oppgaver</p>
+                    )}
                 </VStack>
             </Box>
         </VStack>
