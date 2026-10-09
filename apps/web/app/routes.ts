@@ -43,7 +43,7 @@ export default [
     ...redigeringroutes,
 
     route("bruker/:brukerid", "./routes/bruker/BrukerLayout.tsx", [
-        index("./routes/bruker/index.tsx"),
+        index("./routes/bruker/BrukerOversikt.tsx"),
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
         route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
         route("innkreving", "./routes/bruker/innkreving/InnkrevingPage.tsx"),
@@ -58,6 +58,7 @@ export default [
         ...dokumentSakRoutes,
         layout("routes/sak/SakHeaderLayout.tsx", [
             layout("routes/sak/SakStandardLayout.tsx", [
+                index("routes/sak/SakOversiktPage.tsx"),
                 route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
                 route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
                 route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),
