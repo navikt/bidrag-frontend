@@ -1,4 +1,4 @@
-import { Box, VStack } from "@navikt/ds-react";
+import { Alert, Box, Loader, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { useFinnHendelserForSak, useHentFarskapUtelukkedeJournalposter, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
@@ -12,24 +12,14 @@ export const handle: SakSideTittelHandle = { sakSideTittel: "Sakshistorikk" };
 export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;
     const tabTitle = `Sakshistorikk - ${saksnummer}`;
-    const {
-        data: journalposter,
-        error: journalposterError,
-        isLoading: journalposterLoading,
-    } = useHentJournalposter(saksnummer);
-    const { data: farskapUtelukkedeJournalposter } = useHentFarskapUtelukkedeJournalposter(saksnummer);
     const { data: hendelser, error: hendelserError, isLoading: hendelserLoading } = useFinnHendelserForSak(saksnummer);
 
-    if (journalposterLoading || hendelserLoading) {
+    if (hendelserLoading) {
         return <PageLoadingSpinner />;
     }
 
     if (hendelserError) {
         throw hendelserError;
-    }
-
-    if (journalposterError) {
-        throw journalposterError;
     }
 
     return (
@@ -39,13 +29,35 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
                 <SaksLogg saksnummer={saksnummer} hendelser={hendelser ?? []} />
             </TabellKort>
             <TabellKort>
-                <JournalpostTabell
-                    saksnummer={saksnummer}
-                    journalposter={journalposter ?? []}
-                    farskapUtelukkedeJournalposter={farskapUtelukkedeJournalposter ?? []}
-                />
+                <JournalpostSeksjon saksnummer={saksnummer} />
             </TabellKort>
         </VStack>
+    );
+}
+
+/** Journalposter lastes separat, slik at en feil her ikke tar ned resten av sakshistorikken. */
+function JournalpostSeksjon({ saksnummer }: { saksnummer: string }) {
+    const { data: journalposter, error, isLoading } = useHentJournalposter(saksnummer);
+    const { data: farskapUtelukkedeJournalposter } = useHentFarskapUtelukkedeJournalposter(saksnummer);
+
+    if (isLoading) {
+        return <Loader size="medium" title="Henter journalposter" />;
+    }
+
+    if (error) {
+        return (
+            <Alert variant="error" size="small">
+                Kunne ikke hente journalposter.
+            </Alert>
+        );
+    }
+
+    return (
+        <JournalpostTabell
+            saksnummer={saksnummer}
+            journalposter={journalposter ?? []}
+            farskapUtelukkedeJournalposter={farskapUtelukkedeJournalposter ?? []}
+        />
     );
 }
 
