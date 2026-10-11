@@ -135,7 +135,7 @@ const Side = () => {
 
 const GebyrRoller = ({ fieldArrayName }: { fieldArrayName: FieldPathByValue<GebyrFormValues, GebyrFormRolle[]> }) => {
     const fieldArrayType = fieldArrayName.split(".")[2];
-    const { selectedSaksnummer, setSaveErrorState } = useBehandlingProvider();
+    const { setSaveErrorState } = useBehandlingProvider();
     const { gebyrV3: gebyr, virkningstidspunktV3: virkningstidspunkt } = useGetBehandlingV2();
     const { control, setValue, watch } = useFormContext<GebyrFormValues>();
     const gebyrRollerFieldArray = useFieldArray({
@@ -143,21 +143,13 @@ const GebyrRoller = ({ fieldArrayName }: { fieldArrayName: FieldPathByValue<Geby
         name: fieldArrayName,
     });
     const watchFieldArray = useWatch({ control, name: fieldArrayName });
-    const controlledFields = gebyrRollerFieldArray.fields
-        .map((field, index) => {
-            return {
-                ...field,
-                ...watchFieldArray[index],
-                fieldIndex: index,
-            };
-        })
-        .filter((item) => {
-            if (!selectedSaksnummer) {
-                return true;
-            }
-
-            return item.rolle.saksnummer === selectedSaksnummer;
-        });
+    const controlledFields = gebyrRollerFieldArray.fields.map((field, index) => {
+        return {
+            ...field,
+            ...watchFieldArray[index],
+            fieldIndex: index,
+        };
+    });
 
     const updateGebyr = useOnUpdateGebyr();
 
@@ -412,10 +404,8 @@ const GebyrForm = () => {
     const unikeIdenterForGebyr = useMemo(
         () =>
             Array.from(
-                new Set(
-                    saker.flatMap((sak) =>
-                        [...sak.gebyrRoller, ...sak.gebyr18År].map((gebyrRolle) => gebyrRolle.rolle.ident),
-                    ),
+                saker.flatMap((sak) =>
+                    [...sak.gebyrRoller, ...sak.gebyr18År].map((gebyrRolle) => gebyrRolle.rolle.ident),
                 ),
             ).filter((ident): ident is string => Boolean(ident)),
         [saker],
