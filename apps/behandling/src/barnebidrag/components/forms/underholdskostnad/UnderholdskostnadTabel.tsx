@@ -336,13 +336,7 @@ export const UnderholdskostnadTabel = ({
     const tableValideringsfeil = valideringsfeil?.[underholdskostnadType];
     const displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError =
         underholdskostnadType === "tilleggsstønad" && tilleggsstønadsperioderUtenFaktiskTilsynsutgift;
-    // Backend kontrollerer forpleiningen på nytt når andre kostnader endres, så feilen kan oppstå uten at raden lagres
-    const forpleiningOverstigerUnderholdskostnad =
-        underholdskostnadType === "forpleining" ? (valideringsfeil?.forpleiningOverstigerUnderholdskostnad ?? []) : [];
-    const tableHasErrors =
-        tableValideringsfeil ||
-        displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError ||
-        forpleiningOverstigerUnderholdskostnad.length > 0;
+    const tableHasErrors = tableValideringsfeil || displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError;
 
     return (
         <>
@@ -353,26 +347,6 @@ export const UnderholdskostnadTabel = ({
                     </Heading>
                     {displayTilleggsstønadsperioderUtenFaktiskTilsynsutgiftError && (
                         <BodyShort size="small">{text.error.tilleggsstønadsperioderUtenFaktiskTilsynsutgift}</BodyShort>
-                    )}
-                    {forpleiningOverstigerUnderholdskostnad.length > 0 && (
-                        <>
-                            {forpleiningOverstigerUnderholdskostnad.map((periode, index) => (
-                                <BodyShort key={`${periode.fom}-${periode.tom}-${index}`} size="small">
-                                    {periode.tom &&
-                                        removePlaceholder(
-                                            text.alert.forpleiningOverstigerUnderholdskostnad,
-                                            DateToDDMMYYYYString(dateOrNull(periode.fom)),
-                                            DateToDDMMYYYYString(dateOrNull(periode.tom)),
-                                        )}
-                                    {!periode.tom &&
-                                        removePlaceholder(
-                                            text.alert.forpleiningOverstigerUnderholdskostnadLøpende,
-                                            DateToDDMMYYYYString(dateOrNull(periode.fom)),
-                                        )}
-                                </BodyShort>
-                            ))}
-                            <BodyShort size="small">{text.alert.forpleiningOverstigerUnderholdskostnadFiks}</BodyShort>
-                        </>
                     )}
                     {tableValideringsfeil?.overlappendePerioder?.length > 0 && (
                         <>
