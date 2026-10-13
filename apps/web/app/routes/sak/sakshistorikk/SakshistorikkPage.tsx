@@ -38,13 +38,16 @@ export default function SakshistorikkPage({ params }: Route.ComponentProps) {
 /** Journalposter lastes separat, slik at en feil her ikke tar ned resten av sakshistorikken. */
 function JournalpostSeksjon({ saksnummer }: { saksnummer: string }) {
     const { data: journalposter, error, isLoading } = useHentJournalposter(saksnummer);
-    const { data: farskapUtelukkedeJournalposter } = useHentFarskapUtelukkedeJournalposter(saksnummer);
+    const {
+        data: farskapUtelukkedeJournalposter,
+        error: farskapUtelukkedeJournalposterError,
+    } = useHentFarskapUtelukkedeJournalposter(saksnummer);
 
     if (isLoading) {
         return <Loader size="medium" title="Henter journalposter" />;
     }
 
-    if (error) {
+    if (error || farskapUtelukkedeJournalposterError) {
         return (
             <Alert variant="error" size="small">
                 Kunne ikke hente journalposter.
