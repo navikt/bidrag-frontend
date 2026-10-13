@@ -4,9 +4,9 @@ import {
     OpprettSakProvider,
     type OpprettSakRolleType,
     OpprettSakSkjema,
-    useHarNyOpprettSakFlyt,
-} from "@bidrag/common";
+} from "@bidrag/saksroller";
 import { Button, Loader, Modal } from "@navikt/ds-react";
+import { useFlag } from "@unleash/proxy-client-react";
 import { Suspense, useState } from "react";
 
 export interface IOpprettSakModalProps {
@@ -20,8 +20,7 @@ export interface IOpprettSakModalProps {
 
 /**
  * "Opprett sak" ble tidligere lastet inn som en Module Federation-remote fra
- * bidrag-sak-ui. Den funksjonaliteten er nå migrert til `@bidrag/common`
- * (se packages/common/src/react_components/sak/opprett-sak/), og gjenbrukes
+ * bidrag-sak-ui. Den funksjonaliteten er nå migrert til `@bidrag/saksroller`, og gjenbrukes
  * her som en innebygd modal i stedet for at saksbehandler må opprette saken
  * i Bisys.
  *
@@ -31,7 +30,7 @@ export interface IOpprettSakModalProps {
  */
 export default function OpprettSakModal({ ident, bpIdent, navn, rolle, eierfogd, onSubmit }: IOpprettSakModalProps) {
     const [modalOpen, setModalOpen] = useState(false);
-    const harNyFlyt = useHarNyOpprettSakFlyt();
+    const harNyFlyt = useFlag("bisys.ny_rollebilde");
 
     function onClose() {
         setModalOpen(false);

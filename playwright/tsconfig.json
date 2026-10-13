@@ -1,0 +1,7 @@
+{
+    "extends": "../tsconfig.base.json",
+    "include": ["gallery", "vite.config.ts"],
+    "compilerOptions": {
+        "types": ["node", "vite/client"]
+    }
+}

@@ -319,15 +319,16 @@ Appen kaller følgende backends via OBO-token-exchange (Azure AD):
 
 ## Component-testing (Playwright CT)
 
-`apps/web` og `packages/common` har et eksperimentelt oppsett for
+Workspaces i `apps/` og `packages/` deler ett oppsett for
 Playwright component-testing, som et alternativ til Storybook. Mønsteret:
 
 - Hver komponent kan ha en co-lokalisert **story**-fil (`*.story.tsx`, ren
   named export per case) og en tilhørende test (`*.ct.spec.ts`).
 - Playwright starter én frittstående Vite dev-server
-  (`apps/web/playwright/vite.config.ts`) som samler alle `*.story.tsx`-filer
-  fra BÅDE `apps/web` og `packages/common` via `import.meta.glob` i ett felles
-  "galleri" (`apps/web/playwright/gallery/`) — ingen Storybook-avhengighet.
+  (`playwright/vite.config.ts`) som samler alle `*.story.tsx`-filer
+  fra `apps/*/src`, `apps/web/app` og `packages/*/src` via `import.meta.glob`
+  i ett felles galleri (`playwright/gallery/`).
+  Nye workspaces trenger ingen registrering i galleri- eller warmup-konfigurasjonen.
 - Testene mounter en story med `await mount("mappe/Fil/EksportNavn")` og
   asserter med vanlige Playwright-locators.
 
@@ -341,6 +342,9 @@ pnpm test:ct -- packages/common
 
 # Visuell inspeksjon av stories/komponenter (Playwright UI-modus)
 pnpm test:ct:ui
+
+# Start galleriet uten å kjøre tester
+pnpm dev:ct
 
 # Kjør én test om gangen, med 500 ms slowMo og ett sekund pause etter hver test
 pnpm test:ct:slow
@@ -387,7 +391,17 @@ Bruk `genererFnr()` i stedet for å hardkode fødselsnummer i stories og specs.
    `ForelderRolleVisning.ct.spec.ts` for et eksempel som fullfører en hel
    søk-og-legg-til-flyt med mocket nettverkssvar.
 
-Omfanget er foreløpig begrenset til én story-fil per pakke.
+Story-ID-er er relative til `src/` (eller `apps/web/app`) og må være unike
+på tvers av workspaces. Bruk alltid `filsti/Eksportnavn`; galleriet velger
+ikke en eksport automatisk. Galleriet stopper med begge filstier ved en kollisjon.
+Lokale testhjelpere ligger i workspace-ets `playwright/`-mappe og importeres
+med relative stier. Felles hjelpere importeres fra `@bidrag/common` som vist over.
+
+Versjonene for Playwright, axe, Node-typer, Vite og React-pluginen styres i
+`catalog` i `pnpm-workspace.yaml`. Pakker som bruker dem, deklarerer fortsatt
+avhengigheten i sin `package.json`, men refererer til versjonen med `catalog:`.
+Appens Vite-konfigurasjon holdes separat fra CT-serveren, som ikke bruker
+React Router-pluginen eller appens miljø- og CDN-oppsett.
 
 ### AI og Playwright-skills
 

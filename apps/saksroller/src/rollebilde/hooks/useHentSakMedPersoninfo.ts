@@ -1,0 +1,38 @@
+import type { BidragssakDto } from "@bidrag/api/SakApi";
+import { useMemo } from "react";
+import { useHentFlerePersoninformasjonSuspense } from "../../api/person.api";
+import { useHentSakSuspense } from "../../api/sak.api";
+import type { Rolle } from "../../felles/sakvisning-schema.ts";
+import { berikRoller } from "../beregninger/rolleberikelse.ts";
+
+export interface SakMedPersoninfo {
+    sak: BidragssakDto;
+    berikedeRoller: Rolle[];
+    refetch: () => Promise<unknown>;
+    dataUpdatedAt: number;
+}
+
+export function useHentSakMedPersoninfo(saksnummer: string): SakMedPersoninfo {
+    const { data: sak, refetch, dataUpdatedAt } = useHentSakSuspense(saksnummer);
+
+    const sakIdenter = useMemo(() => {
+        return sak.roller.flatMap((r) => (r.fodselsnummer ? [r.fodselsnummer] : []));
+    }, [sak]);
+
+    const personQueries = useHentFlerePersoninformasjonSuspense(sakIdenter, sakIdenter.length > 0);
+
+    const berikedeRoller = useMemo(() => {
+        const personInfoMap = new Map(
+            personQueries.map((q, idx) => [sakIdenter[idx], q.data] as const).filter(([ident, data]) => ident && data),
+        );
+
+        return berikRoller(sak.roller, personInfoMap);
+    }, [sak, personQueries, sakIdenter]);
+
+    return {
+        sak,
+        berikedeRoller,
+        refetch,
+        dataUpdatedAt,
+    };
+}

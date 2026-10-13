@@ -1,0 +1,137 @@
+import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
+import type { Locator, Page } from "@playwright/test";
+import { testpersoner } from "../../../playwright/opprett-ny-sak/fixtures";
+import { expectNoAxeViolations, mockOpprettSakApi } from "../../../playwright/opprett-ny-sak/network";
+import type { Modal } from "./OpprettSakFlytModal.story";
+
+const STORY = "opprett-ny-sak/start/OpprettSakFlytModal/Modal";
+const { bidragspliktig: bp, bidragsmottaker: bm, barnUnder18 } = testpersoner;
+const foreldreTilBarn = { parentRelations: { [barnUnder18.ident]: [bp.ident, bm.ident] } };
+
+async function åpneModal(page: Page, component: Locator) {
+    await component.getByRole("button", { name: "Åpne opprett sak" }).click();
+    const dialog = page.getByRole("dialog", { name: "Opprett sak" });
+    await expect(dialog).toBeVisible();
+    return dialog;
+}
+
+test.describe("Opprett sak som modal fra behandling og dokument", () => {
+    test("forhåndsutfyller barn og BP, sender riktig request og gir saksnummeret tilbake", async ({ mount, page }) => {
+        const requests = await mockOpprettSakApi(page, foreldreTilBarn);
+        const component = await mount<typeof Modal>(STORY, {
+            ident: barnUnder18.ident,
+            rolle: "BA",
+            initialForelderIdent: bp.ident,
+            eierfogd: "4806",
+        });
+        const url = page.url();
+        const dialog = await åpneModal(page, component);
+
+        await expect(dialog.getByRole("heading", { name: "Opprett ny sak" })).toHaveCount(0);
+        await expect(dialog.getByRole("group", { name: "Bidragspliktig" }).getByText(bp.visningsnavn)).toBeVisible();
+        await expect(dialog.getByRole("group", { name: "Bidragsmottaker" }).getByText(bm.visningsnavn)).toBeVisible();
+        await expect(dialog.getByText(/Arbeidsfordelingen gir en annen enhet/)).toHaveCount(0);
+        await expect(dialog.getByRole("button", { name: "Opprett og ny søknad" })).toHaveCount(0);
+        await expect(dialog.getByRole("button", { name: "Opprett og gå til sak" })).toHaveCount(0);
+        const opprett = dialog.getByRole("button", { name: /Opprett$/ });
+        await expect(opprett).toBeVisible();
+        await expect(dialog.locator(".aksel-modal__footer").getByRole("button", { name: /Opprett$/ })).toBeVisible();
+        expect(await opprett.evaluate((button: HTMLButtonElement) => button.form?.tagName)).toBe("FORM");
+        await expectNoAxeViolations(page, component);
+
+        await opprett.click();
+
+        await expect.poll(() => requests.create).toBeTruthy();
+        expect(requests.create).toMatchObject({ eierfogd: "4806", kategori: "N", arbeidsfordeling: "EEN" });
+        expect(requests.create?.roller).toEqual([
+            expect.objectContaining({ fodselsnummer: bp.ident, type: "BP" }),
+            expect.objectContaining({ fodselsnummer: bm.ident, type: "BM" }),
+            expect.objectContaining({ fodselsnummer: barnUnder18.ident, type: "BA" }),
+        ]);
+        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("1234567");
+        await expect(component.getByTestId("ytre-skjema-innsendt")).toHaveValue("false");
+        expect(page.url()).toBe(url);
+        await expect(dialog).toBeHidden();
+        await expect(component.getByTestId("lukket")).toHaveValue("false");
+    });
+
+    test("viser feil fra backend i modalen og lar den stå åpen", async ({ mount, page }) => {
+        await mockOpprettSakApi(page, { ...foreldreTilBarn, createStatus: 500, createBody: "Kunne ikke opprette sak" });
+        const component = await mount<typeof Modal>(STORY, {
+            ident: barnUnder18.ident,
+            rolle: "BA",
+            initialForelderIdent: bp.ident,
+        });
+        const dialog = await åpneModal(page, component);
+
+        await dialog.getByRole("button", { name: /Opprett$/ }).click();
+
+        await expect(dialog.getByText("Kunne ikke opprette sak")).toBeVisible();
+        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("");
+    });
+
+    test("viser valideringsfeil i modalen uten å sende inn", async ({ mount, page }) => {
+        const requests = await mockOpprettSakApi(page);
+        const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, rolle: "BA" });
+        const dialog = await åpneModal(page, component);
+
+        await dialog.getByRole("button", { name: /Opprett$/ }).click();
+
+        await expect(dialog.getByText("Du må registrere bidragspliktig eller velge ukjent")).toBeVisible();
+        expect(requests.create).toBeUndefined();
+    });
+
+    test("Avbryt lukker modalen uten å opprette sak", async ({ mount, page }) => {
+        const requests = await mockOpprettSakApi(page, foreldreTilBarn);
+        const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, rolle: "BA" });
+        const dialog = await åpneModal(page, component);
+
+        await dialog.getByRole("button", { name: "Avbryt" }).click();
+
+        await expect(dialog).toBeHidden();
+        await expect(component.getByTestId("lukket")).toHaveValue("true");
+        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("");
+        expect(requests.create).toBeUndefined();
+    });
+
+    test("modalen kan ikke lukkes mens saken sendes inn", async ({ mount, page }) => {
+        await mockOpprettSakApi(page, foreldreTilBarn);
+        let svar: () => void = () => undefined;
+        await page.route(/\/proxy\/bidrag-sak\/sak$/, async (route) => {
+            await new Promise<void>((resolve) => {
+                svar = resolve;
+            });
+            await route.fulfill({ json: { saksnummer: "1234567" } });
+        });
+        const component = await mount<typeof Modal>(STORY, {
+            ident: barnUnder18.ident,
+            rolle: "BA",
+            initialForelderIdent: bp.ident,
+        });
+        const dialog = await åpneModal(page, component);
+
+        await dialog.getByRole("button", { name: /Opprett$/ }).click();
+        await expect(dialog.getByRole("button", { name: "Avbryt" })).toBeDisabled();
+        await page.keyboard.press("Escape");
+        await expect(dialog).toBeVisible();
+        await expect(component.getByTestId("lukket")).toHaveValue("false");
+
+        svar();
+        await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("1234567");
+    });
+
+    test("viser avvik når arbeidsfordelingen gir en annen enhet enn eierfogd", async ({ mount, page }) => {
+        await mockOpprettSakApi(page, foreldreTilBarn);
+        const component = await mount<typeof Modal>(STORY, {
+            ident: barnUnder18.ident,
+            rolle: "BA",
+            initialForelderIdent: bp.ident,
+            eierfogd: "9999",
+        });
+        const dialog = await åpneModal(page, component);
+
+        await expect(
+            dialog.getByText("Arbeidsfordelingen gir en annen enhet enn 9999.", { exact: false }),
+        ).toBeVisible();
+    });
+});

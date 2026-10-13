@@ -179,37 +179,6 @@ export const useRefetchFFInfoFn = (reloadWindow?: boolean) => {
     };
 };
 
-export const useRegistrerBarnTilSak = (saksnummer: string, gjelderBarnIdent: string, onSuccess?: () => void) => {
-    const refetchFFInfo = useRefetchFFInfoFn();
-    return useMutation({
-        mutationFn: async () => {
-            if (!saksnummer) {
-                throw new Error("Du må velge en sak før du kan legge den til");
-            }
-            try {
-                const oppdatertSak = SAK_API.sak.oppdaterSak({
-                    saksnummer: saksnummer,
-                    roller: [
-                        {
-                            rolleType: Rolletype.BA,
-                            type: Rolletype.BA,
-                            foedselsnummer: gjelderBarnIdent,
-                            mottagerErVerge: false,
-                            rollehistorikk: [],
-                        },
-                    ],
-                });
-                console.log("oppdatertSak med roller", oppdatertSak);
-            } catch (e) {
-                LoggerService.error("Feil ved oppdatering av sak", e);
-            }
-        },
-        onSuccess: () => {
-            onSuccess?.();
-            refetchFFInfo();
-        },
-    });
-};
 export const useGetArbeidsforhold = (): ArbeidsforholdGrunnlagDto[] => {
     const behandling = useGetBehandlingV2();
     return behandling.aktiveGrunnlagsdata?.arbeidsforhold;

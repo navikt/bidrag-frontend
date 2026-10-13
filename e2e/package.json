@@ -10,8 +10,8 @@
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
-        "@playwright/test": "^1.62.1",
-        "@types/node": "^25.9.3",
+        "@playwright/test": "catalog:",
+        "@types/node": "catalog:",
         "typescript": "catalog:"
     }
 }
