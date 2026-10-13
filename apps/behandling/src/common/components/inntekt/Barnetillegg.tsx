@@ -15,7 +15,7 @@ import { formatterBeløp } from "../../../utils/number-utils";
 import elementId from "../../constants/elementIds";
 import text from "../../constants/texts";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
-import { erSkattefrittBarnetillegg } from "../../helpers/inntektFormHelpers";
+import { erSkattesatsIkkeRelevant } from "../../helpers/inntektFormHelpers";
 import { useGetBehandlingV2 } from "../../hooks/useApiData";
 import { hentVisningsnavn } from "../../hooks/useVisningsnavn";
 import type { InntektFormPeriode, InntektFormValues } from "../../types/inntektFormValues";
@@ -95,7 +95,7 @@ const BeløpMånedDagsats = ({ item, field }: { item: InntektFormPeriode; field:
 };
 
 const Skattesats = ({ item, field }: { item: InntektFormPeriode; field: string }) => {
-    if (erSkattefrittBarnetillegg(item.inntektstype)) {
+    if (erSkattesatsIkkeRelevant(item.inntektstype, item.skattesats)) {
         return (
             <Tooltip content="Barnetillegget er skattefritt">
                 <BodyShort size="small" textColor="subtle" className="h-6 flex items-center justify-end" tabIndex={0}>
@@ -193,7 +193,7 @@ export const Barnetillegg = () => {
             }
         }
 
-        const skattesatsErRelevant = !erSkattefrittBarnetillegg(periode.inntektstype);
+        const skattesatsErRelevant = !erSkattesatsIkkeRelevant(periode.inntektstype, periode.skattesats);
         if (erBidrag && skattesatsErRelevant && (periode.skattesats === undefined || periode.skattesats < 0)) {
             setError(`${fieldName}.skattesats`, {
                 type: "notValid",
