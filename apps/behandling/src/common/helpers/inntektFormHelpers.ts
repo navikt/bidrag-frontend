@@ -71,6 +71,10 @@ export const inntekterTablesViewRules = {
     },
 };
 
+// Barnetillegg fra tiltakspenger og Forsvaret er skattefrie, og trenger ingen skattesats.
+export const erSkattefrittBarnetillegg = (inntektstype?: Inntektstype | "") =>
+    inntektstype === Inntektstype.BARNETILLEGG_TILTAKSPENGER || inntektstype === Inntektstype.BARNETILLEGG_FORSVARET;
+
 export const ekplisitteYtelser = [
     Inntektsrapportering.KONTANTSTOTTE,
     Inntektsrapportering.UTVIDET_BARNETRYGD,
@@ -257,7 +261,7 @@ export const createPayload = (periode: InntektFormPeriode, virkningsdato: Date):
             gjelderId: periode.gjelderRolleId,
             gjelderBarnId: periode.gjelderBarnId,
             gjelderBarn: periode.gjelderBarn,
-            skatteprosent: periode.inntektstype === Inntektstype.BARNETILLEGG_FORSVARET ? null : periode.skattesats,
+            skatteprosent: erSkattefrittBarnetillegg(periode.inntektstype) ? null : periode.skattesats,
             inntektstype: periode.inntektstype ? periode.inntektstype : null,
         },
     };
