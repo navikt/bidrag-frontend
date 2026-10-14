@@ -97,6 +97,11 @@ env:
   - name: FOERSTESIDEGENERATOR_AUDIENCE
     value: api://dev-fss.teamdokumenthandtering.foerstesidegenerator/.default
 
+  - name: BIDRAG_OPPGAVE_URL
+    value: http://bidrag-oppgave-q2
+  - name: BIDRAG_OPPGAVE_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-oppgave-q2/.default
+
 unleash:
   host: bidrag-unleash-api.nav.cloud.nais.io
   environment: development
@@ -113,6 +118,7 @@ outbound:
     - application: bidrag-behandling-q2
     - application: bidrag-kodeverk
     - application: bidrag-dokument-produksjon
+    - application: bidrag-oppgave-q2
   external:
     - bidrag-sak-q2.dev-fss-pub.nais.io
     - bidrag-organisasjon.dev-fss-pub.nais.io
