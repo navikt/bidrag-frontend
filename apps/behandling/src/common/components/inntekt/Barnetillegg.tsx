@@ -8,13 +8,14 @@ import {
     TypeBehandling,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { ObjectUtils, PersonNavnIdent, RolleTag, RolleTypeAbbreviation } from "@bidrag/common";
-import { Alert, BodyShort, Box, Heading, Table } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, Heading, Table, Tooltip } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
 import type { OppdatereInntektRequestLosnet } from "../../../types/apiSpecFix";
 import { formatterBeløp } from "../../../utils/number-utils";
 import elementId from "../../constants/elementIds";
 import text from "../../constants/texts";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
+import { erSkattesatsIkkeRelevant } from "../../helpers/inntektFormHelpers";
 import { useGetBehandlingV2 } from "../../hooks/useApiData";
 import { hentVisningsnavn } from "../../hooks/useVisningsnavn";
 import type { InntektFormPeriode, InntektFormValues } from "../../types/inntektFormValues";
@@ -34,8 +35,12 @@ import {
 import { useInntektTableProvider } from "./InntektTableContext";
 import { Opplysninger } from "./Opplysninger";
 
-const ignorerBarnetilleggTyper = [Inntektstype.BARNETILLEGG_SUMMERT, Inntektstype.BARNETILLEGG_TILTAKSPENGER];
-const ignorerBarnetilleggBidragTyper = [Inntektstype.BARNETILLEGG_SUMMERT];
+const SKJULTE_BARNETILLEGGSTYPER_UTENFOR_BIDRAG = [
+    Inntektstype.BARNETILLEGG_SUMMERT,
+    Inntektstype.BARNETILLEGG_TILTAKSPENGER,
+    Inntektstype.BARNETILLEGG_FORSVARET,
+];
+const SKJULTE_BARNETILLEGGSTYPER_I_BIDRAG = [Inntektstype.BARNETILLEGG_SUMMERT];
 const Beskrivelse = ({ item, field }: { item: InntektFormPeriode; field: string }) => {
     const { type } = useBehandlingProvider();
 
@@ -49,8 +54,8 @@ const Beskrivelse = ({ item, field }: { item: InntektFormPeriode; field: string 
                     .filter(([, text]) => text.includes("BARNETILLEGG"))
                     .filter(([value]) =>
                         type !== TypeBehandling.BIDRAG
-                            ? !ignorerBarnetilleggTyper.includes(value as Inntektstype)
-                            : !ignorerBarnetilleggBidragTyper.includes(value as Inntektstype),
+                            ? !SKJULTE_BARNETILLEGGSTYPER_UTENFOR_BIDRAG.includes(value as Inntektstype)
+                            : !SKJULTE_BARNETILLEGGSTYPER_I_BIDRAG.includes(value as Inntektstype),
                     )
                     .map(([value, text]) => ({
                         value: Inntektstype[value],
@@ -90,6 +95,16 @@ const BeløpMånedDagsats = ({ item, field }: { item: InntektFormPeriode; field:
 };
 
 const Skattesats = ({ item, field }: { item: InntektFormPeriode; field: string }) => {
+    if (erSkattesatsIkkeRelevant(item.inntektstype, item.skattesats)) {
+        return (
+            <Tooltip content="Barnetillegget er skattefritt">
+                <BodyShort size="small" textColor="subtle" className="h-6 flex items-center justify-end" tabIndex={0}>
+                    Ikke relevant
+                </BodyShort>
+            </Tooltip>
+        );
+    }
+
     return (
         <>
             {item.erRedigerbart || item.kanBarnetilleggSkattesatsRedigeres ? (
@@ -178,7 +193,8 @@ export const Barnetillegg = () => {
             }
         }
 
-        if (erBidrag && (periode.skattesats === undefined || periode.skattesats < 0)) {
+        const skattesatsErRelevant = !erSkattesatsIkkeRelevant(periode.inntektstype, periode.skattesats);
+        if (erBidrag && skattesatsErRelevant && (periode.skattesats === undefined || periode.skattesats < 0)) {
             setError(`${fieldName}.skattesats`, {
                 type: "notValid",
                 message: text.error.barnetilleggSkattesats,
