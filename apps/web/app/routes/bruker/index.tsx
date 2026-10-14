@@ -1,12 +1,15 @@
 import { PersonNavn } from "@bidrag/common";
 import { Heading, LocalAlert, VStack } from "@navikt/ds-react";
+import { useFlag } from "@unleash/proxy-client-react";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
+import { HenvendelseSeksjon } from "~/routes/bruker/henvendelser/HenvendelseTabell.tsx";
 import type { Route } from "./+types/index";
 
 export default function BrukerIndex({ params }: Route.ComponentProps) {
     const { decodeFnr } = useObfuscateFnr();
     const brukerId = params.brukerid;
     const fnr = decodeFnr(brukerId);
+    const visHenvendelser = useFlag("frontend.henvendelser");
 
     return (
         <VStack gap={"space-48"}>
@@ -23,6 +26,7 @@ export default function BrukerIndex({ params }: Route.ComponentProps) {
                     være begrenset eller utilgjengelig.
                 </LocalAlert.Content>
             </LocalAlert>
+            {visHenvendelser && <HenvendelseSeksjon ident={fnr} />}
         </VStack>
     );
 }

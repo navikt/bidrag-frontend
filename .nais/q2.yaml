@@ -66,6 +66,11 @@ env:
   - name: BIDRAG_DOKUMENT_PRODUKSJON_AUDIENCE
     value: api://dev-gcp.bidrag.bidrag-dokument-produksjon/.default
 
+  - name: BIDRAG_HENVENDELSE_URL
+    value: http://bidrag-henvendelse-q2
+  - name: BIDRAG_HENVENDELSE_AUDIENCE
+    value: api://dev-gcp.bidrag.bidrag-henvendelse-q2/.default
+
   - name: BISYS_URL
     value: https://wasapp-q2.adeo.no/rtv-bidrag/
   - name: MODIA_URL
@@ -113,6 +118,7 @@ outbound:
     - application: bidrag-behandling-q2
     - application: bidrag-kodeverk
     - application: bidrag-dokument-produksjon
+    - application: bidrag-henvendelse-q2
   external:
     - bidrag-sak-q2.dev-fss-pub.nais.io
     - bidrag-organisasjon.dev-fss-pub.nais.io
