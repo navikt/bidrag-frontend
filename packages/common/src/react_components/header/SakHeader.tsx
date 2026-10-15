@@ -109,6 +109,7 @@ const mapSaksnummerRoller = (roller: HeaderRolle[]): SaksnummerRoller[] => {
 
     return saksnummerOrder
         .filter((s): s is string => s !== undefined)
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
         .map((saksnummer) => {
             const rollerISak = roller
                 .filter((rolle) => rolle.saksnummer === saksnummer || rolle.rolletype === Rolletype.BP)
