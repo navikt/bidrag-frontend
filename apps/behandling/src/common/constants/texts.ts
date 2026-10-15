@@ -259,7 +259,7 @@ const tekster = {
         tilleggstønad: "Tilleggstønad",
         tilOgMed: "Til og med",
         totalt: "Totalt",
-        totaltInntekt: "Totalt inntekt",
+        totaltInntekt: "Total inntekt",
         totalt12Måned: "Totalt (12 mnd)",
         totalTilsysnsutgift: "Total tilsynsutgift",
         type: "Type",
