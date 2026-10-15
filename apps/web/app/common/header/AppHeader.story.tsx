@@ -1,6 +1,6 @@
 import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FlagProvider, useFlagsStatus } from "@unleash/proxy-client-react";
+import { FlagProvider } from "@unleash/proxy-client-react";
 import { useMemo } from "react";
 import { createMemoryRouter, Outlet, RouterProvider, useLocation, useRouteLoaderData } from "react-router";
 import { UnleashClient } from "unleash-proxy-client";
@@ -49,7 +49,26 @@ function HeaderScenario({ scenario }: { scenario: "person" | "sak" }) {
                 clientKey: "playwright",
                 appName: "bidrag-frontend-playwright",
                 disableMetrics: true,
-                disableRefresh: true,
+                bootstrap: [
+                    {
+                        name: "frontend.sok-fnr-sak",
+                        enabled: true,
+                        impressionData: false,
+                        variant: { name: "disabled", enabled: false },
+                    },
+                    {
+                        name: "bisys.ny_sakside",
+                        enabled: scenario === "sak",
+                        impressionData: false,
+                        variant: { name: "disabled", enabled: false },
+                    },
+                    {
+                        name: "bisys.ny_brukeroversikt",
+                        enabled: false,
+                        impressionData: false,
+                        variant: { name: "disabled", enabled: false },
+                    },
+                ],
             }),
         [scenario],
     );
@@ -84,18 +103,11 @@ function HeaderScenario({ scenario }: { scenario: "person" | "sak" }) {
 
     return (
         <QueryClientProvider client={queryKlient}>
-            <FlagProvider unleashClient={unleashKlient}>
-                <Flaggstatus />
+            <FlagProvider unleashClient={unleashKlient} startClient={false}>
                 <RouterProvider router={ruter} />
             </FlagProvider>
         </QueryClientProvider>
     );
-}
-
-function Flaggstatus() {
-    const { flagsReady } = useFlagsStatus();
-
-    return <span hidden data-testid="flagg-klare" data-ready={String(flagsReady)} />;
 }
 
 export const PersonsøkMedBrukerindeksAv = () => <HeaderScenario scenario="person" />;

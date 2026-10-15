@@ -1,22 +1,8 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { FnrObfuscator } from "~/common/person/FnrObfuscator.ts";
 
 const PERSONSCENARIO = "common/header/AppHeader/PersonsøkMedBrukerindeksAv";
 const SAKSCENARIO = "common/header/AppHeader/SakssøkMedSaksindeksPå";
-
-async function mockFlagg(page: Page, scenario: "person" | "sak", nySakside: boolean) {
-    await page.route(`**/unleash/proxy/${scenario}**`, async (route) => {
-        await route.fulfill({
-            json: {
-                toggles: [
-                    { name: "frontend.sok-fnr-sak", enabled: true },
-                    { name: "bisys.ny_sakside", enabled: nySakside },
-                    { name: "bisys.ny_brukeroversikt", enabled: false },
-                ],
-            },
-        });
-    });
-}
 
 test.use({ reuseContext: false });
 
@@ -25,13 +11,11 @@ test.describe("App-headeren", () => {
         await page.route("**/proxy/bidrag-admin/endringslogg**", (route) => route.fulfill({ json: [] }));
     });
     test("åpner person i Bisys uten gammel returkontekst når brukerindeksflagget er av", async ({ mount, page }) => {
-        await mockFlagg(page, "person", false);
         await page.route("https://bisys.example/**", async (route) => {
             await route.fulfill({ status: 200, contentType: "text/html", body: "Bisys-test" });
         });
 
         const header = await mount(PERSONSCENARIO);
-        await expect(header.getByTestId("flagg-klare")).toHaveAttribute("data-ready", "true");
         await expect(header.getByRole("link", { name: "Tilbake til Behandling" })).toBeVisible();
         const ident = await header.getByTestId("testident").inputValue();
 
@@ -51,12 +35,8 @@ test.describe("App-headeren", () => {
 
     test("åpner saksindeksen med Bisys-sesjon og uten gammel returkontekst når saksindeksflagget er på", async ({
         mount,
-        page,
     }) => {
-        await mockFlagg(page, "sak", true);
-
         const header = await mount(SAKSCENARIO);
-        await expect(header.getByTestId("flagg-klare")).toHaveAttribute("data-ready", "true");
         await expect(header.getByRole("link", { name: "Tilbake til Behandling" })).toBeVisible();
 
         const søk = header.getByRole("searchbox", { name: "Søk" });
@@ -70,10 +50,7 @@ test.describe("App-headeren", () => {
     });
 
     test("viser headerinnhold og innlogget bruker med utlogging", async ({ mount, page }) => {
-        await mockFlagg(page, "person", false);
-
         const header = await mount(PERSONSCENARIO);
-        await expect(header.getByTestId("flagg-klare")).toHaveAttribute("data-ready", "true");
         await expect(header.getByRole("link", { name: "Bidrag", exact: true })).toHaveAttribute("href", "/");
         await expect(header.getByRole("searchbox", { name: "Søk" })).toBeVisible();
         await expect(header.getByRole("link", { name: "Tilbake til Behandling" })).toBeVisible();
