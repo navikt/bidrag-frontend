@@ -260,14 +260,14 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await expect(kurv.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` })).toBeChecked();
     });
 
-    test("barn uten rolle får rollevalg først, uten foreldreroller", async ({ mount, page }) => {
+    test("barn uten rolle får rollevalg først, uten roller for feil alder", async ({ mount, page }) => {
         await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, { ident: barnUnder18.ident, eierfogd: "4806" });
         const dialog = await åpneModal(page, component);
-        await åpneSøskenflokker(dialog);
 
         const rollevalg = dialog.getByRole("radiogroup", { name: /Hvilken rolle har/ });
-        await expect(rollevalg.getByRole("radio", { name: "Bidragspliktig" })).toHaveCount(0);
+        await expect(rollevalg.getByRole("radio", { name: "Barn under 18 år" })).toBeVisible();
+        await expect(rollevalg.getByRole("radio", { name: "Barn over 18 år" })).toHaveCount(0);
         await rollevalg.getByRole("radio", { name: "Barn under 18 år" }).click();
 
         await expect(rollevalg).toHaveCount(0);

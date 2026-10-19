@@ -68,6 +68,17 @@ test.describe("Start fra forelder med barn", () => {
         await expect(barn).toBeChecked();
     });
 
+    test("eneste søskenflokk er åpen fra start", async ({ mount, page }) => {
+        await mockOpprettSakApi(page);
+        const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
+        await expect(component.getByText("Henter barn...", { exact: true })).toHaveCount(0);
+        const flokker = component.getByRole("region", { name: "Søskenflokker" });
+
+        await expect(flokker.getByRole("button", { expanded: true })).toHaveCount(1);
+        await expect(flokker.getByRole("button", { expanded: false })).toHaveCount(0);
+        await expect(barnCheckboxer(component)).toHaveCount(1);
+    });
+
     test("alle registrerte foreldre beholdes i BP- og BM-listene når et foreldrepar velges", async ({
         mount,
         page,
@@ -212,6 +223,50 @@ test.describe("Start fra forelder med barn", () => {
         await barnCheckboxer(component).first().check();
 
         await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toBeVisible();
+    });
+
+    test("barn med ukjent forelder velges ett om gangen, uten Velg alle", async ({ mount, page }) => {
+        await mockOpprettSakApi(page);
+        const component = await mount(`${STORY}/ForelderMedKjentOgUkjentMotpart`);
+        await åpneSøskenflokker(component);
+        const ukjentKurv = component.getByRole("group", { name: "Velg barn med ukjent forelder" });
+        const barnNummerTo = ukjentKurv.getByRole("checkbox", {
+            name: `Velg ${testpersoner.barnUnder18NummerTo.visningsnavn}`,
+        });
+        const barnOver18 = ukjentKurv.getByRole("checkbox", { name: `Velg ${testpersoner.barnOver18.visningsnavn}` });
+
+        await expect(component.getByRole("checkbox", { name: "Velg alle: Velg barn med ukjent forelder" })).toHaveCount(
+            0,
+        );
+        await expect(component.getByRole("checkbox", { name: /^Velg alle: Velg barn med Test/ })).toHaveCount(1);
+
+        await barnNummerTo.check();
+        await expect(barnNummerTo).toBeChecked();
+        await expect(
+            component.getByRole("group", { name: "Bidragsmottaker" }).getByText("Bidragsmottaker markert som ukjent"),
+        ).toBeVisible();
+
+        await barnOver18.check();
+        await expect(barnOver18).toBeChecked();
+        await expect(barnNummerTo).not.toBeChecked();
+    });
+
+    test("barn med kjent motpart setter forelderen og erstatter barn med ukjent forelder", async ({ mount, page }) => {
+        await mockOpprettSakApi(page);
+        const component = await mount(`${STORY}/ForelderMedKjentOgUkjentMotpart`);
+        await åpneSøskenflokker(component);
+        const ukjentBarn = component.getByRole("checkbox", { name: `Velg ${testpersoner.barnOver18.visningsnavn}` });
+        await ukjentBarn.check();
+
+        await component.getByRole("checkbox", { name: `Velg ${barnUnder18.visningsnavn}` }).check();
+
+        const bmKort = component.getByRole("group", { name: "Bidragsmottaker" });
+        await expect(bmKort.getByText(bm.visningsnavn)).toBeVisible();
+        await expect(ukjentBarn).toHaveCount(0);
+
+        await bmKort.getByRole("button", { name: "Endre bidragsmottaker" }).click();
+        const bmValg = bmKort.getByRole("combobox", { name: "Velg bidragsmottaker" });
+        await expect(bmValg.getByRole("option", { name: "Ukjent" })).toHaveCount(1);
     });
 
     test("nullstiller ikke skjemaet ved forsøk på å legge til allerede valgt barn", async ({ mount, page }) => {

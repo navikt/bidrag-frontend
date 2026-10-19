@@ -79,7 +79,7 @@ export default function ReellMottakerValgGruppe({
                 error={feil}
                 disabled={disabled}
             >
-                <option value="" disabled />
+                {disabled && <option value="" disabled />}
                 <option value="ingen" disabled={påkrevd}>
                     Bidragsmottaker
                 </option>

@@ -48,7 +48,7 @@ export default function RolleFlytSide({ onSubmit, status, children, meldinger, i
 /** Kategori velges sammen med sakstypen på siden. Skjemaet holder verdien som sendes inn. */
 function SynkKategori({ kategori }: { kategori: Sakskategori }) {
     const { setValue } = useFormContext<{ kategori: Sakskategori }>();
-    useEffect(() => setValue("kategori", kategori, { shouldDirty: true }), [kategori, setValue]);
+    useEffect(() => setValue("kategori", kategori), [kategori, setValue]);
     return null;
 }
 

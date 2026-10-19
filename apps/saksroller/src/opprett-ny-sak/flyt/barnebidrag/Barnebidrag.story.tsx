@@ -1,4 +1,9 @@
-import { barnkurver, testpersoner, ukjentBarnkurv } from "../../../../playwright/opprett-ny-sak/fixtures";
+import {
+    barnkurver,
+    kjentOgUkjentBarnkurv,
+    testpersoner,
+    ukjentBarnkurv,
+} from "../../../../playwright/opprett-ny-sak/fixtures";
 import { OpprettSakSkjemaStory } from "../../../../playwright/opprett-ny-sak/OpprettSak.story";
 
 export const ForelderMedBarn = () => (
@@ -19,6 +24,17 @@ export const ForelderUkjentBidragsmottaker = () => (
             person: testpersoner.bidragspliktig,
             rolle: "bidragspliktig",
             relasjoner: ukjentBarnkurv,
+        }}
+    />
+);
+
+export const ForelderMedKjentOgUkjentMotpart = () => (
+    <OpprettSakSkjemaStory
+        scenario={{
+            sakstype: "BARNEBIDRAG",
+            person: testpersoner.bidragspliktig,
+            rolle: "bidragspliktig",
+            relasjoner: kjentOgUkjentBarnkurv,
         }}
     />
 );

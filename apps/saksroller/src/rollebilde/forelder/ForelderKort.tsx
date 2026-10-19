@@ -35,7 +35,7 @@ function tilPerson(forelder: ForelderKortPerson | null): PersonDto | null {
     };
 }
 
-export function ForelderKortInnhold({ forelder, ...resten }: Omit<FellesProps, "ukjentTekst" | "actions">) {
+export function ForelderKortInnhold({ forelder, ...resten }: Omit<FellesProps, "ukjentTekst" | "actions" | "height">) {
     return <PersonRolleKortInnhold person={tilPerson(forelder)} {...resten} />;
 }
 

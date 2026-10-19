@@ -56,12 +56,11 @@ function ForelderKort(props: ForelderKortProps) {
     const ident = part.ident;
     const erKjent = part.erKjent === true && !!ident;
     const [valgtPerson, setValgtPerson] = useState<Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">>();
-    const rolleTag =
-        part.erKjent === false ? (
-            <Tag variant="moderate" data-color="neutral" size="small">
-                {rolle === "bidragspliktig" ? "BP" : "BM"}
-            </Tag>
-        ) : undefined;
+    const rolleTag = !erKjent ? (
+        <Tag variant="moderate" data-color="neutral" size="small">
+            {rolle === "bidragspliktig" ? "BP" : "BM"}
+        </Tag>
+    ) : undefined;
     const handlinger: ForelderKortProps = {
         ...props,
         onVelg: (person) => {
@@ -84,7 +83,9 @@ function ForelderKort(props: ForelderKortProps) {
                 }
                 rolle={rolle === "bidragspliktig" ? "BP" : "BM"}
                 height="100%"
-                ukjentTekst={part.erKjent === undefined ? `Velg ${rolle}` : `${rolle} markert som ukjent`}
+                ukjentTekst={
+                    part.erKjent === undefined ? `Velg ${rolle}` : `${hentForelderRolleLabel(rolle)} markert som ukjent`
+                }
                 søktIdent={valgtPerson?.ident === ident ? valgtPerson?.søktIdent : undefined}
                 tags={props.låst && erKjent ? <LåstPartTag /> : rolleTag}
                 actions={!props.låst && <Handlinger {...handlinger} />}

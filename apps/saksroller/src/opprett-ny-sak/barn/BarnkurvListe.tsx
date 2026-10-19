@@ -42,6 +42,7 @@ export default function BarnkurvListe({
     utvidSøskenflokker = false,
 }: Props) {
     const valgteBarn = form.watch("valgteBarn") || [];
+    const { låstIdent } = useOpprettSakStart();
     const harManueltValgtBarn = valgteBarn.some((barn) => barn.manuellLagtTil);
     const [aktivKurvId, settAktivKurvId] = useState<string | null>(null);
     const låstKurvId =
@@ -66,7 +67,10 @@ export default function BarnkurvListe({
     const velgIKurv = (valgteIdenter: string[], kurvId: string) => {
         if (harManueltValgtBarn && låstKurvId && låstKurvId !== kurvId) return;
 
-        const valg = beregnBarnkurvValg(barnkurver, form.getValues("valgteBarn") || [], valgteIdenter, kurvId);
+        const nåværendeBarn = form.getValues("valgteBarn") || [];
+        const erUkjentKurv = barnkurver.some((kurv) => kurv.id === kurvId && !kurv.motpart);
+        const identer = erUkjentKurv ? begrensTilSisteIdent(valgteIdenter, nåværendeBarn, låstIdent) : valgteIdenter;
+        const valg = beregnBarnkurvValg(barnkurver, nåværendeBarn, identer, kurvId);
         if (!valg) return;
 
         settValgteBarn(valg.valgteBarn);
@@ -92,14 +96,18 @@ export default function BarnkurvListe({
         if (nyeValg.length === 0) onKurvByttet?.(null);
     };
 
+    const visManuelle = !laster && manuelleBarn.length > 0;
+    // Uten motpart vet vi ikke hvor barnet hører hjemme før alt er hentet. Da vises lasting i stedet.
+    const synligeKurver = barnkurver.filter((kurv) => kurv.motpart || !laster);
+    const antallGrupper = synligeKurver.length + (visManuelle ? 1 : 0);
+
     const gruppe = {
         form,
         valgteBarn,
         reellMottakerRegel,
-        utvidSøskenflokker,
+        utvidSøskenflokker: utvidSøskenflokker || antallGrupper === 1,
     };
 
-    const visManuelle = !laster && manuelleBarn.length > 0;
     const erManuelt = (ident: string) => valgteBarn.some((b) => b.ident === ident && b.manuellLagtTil);
     const ukjenteKurver = barnkurver.filter((kurv) => !kurv.motpart);
     const antallUkjente = ukjenteKurver.length + (visManuelle && !manuellTittel ? 1 : 0);
@@ -109,9 +117,7 @@ export default function BarnkurvListe({
     return (
         <VStack gap="space-16">
             <Accordion as="section" aria-label="Søskenflokker" size="small" indent={false}>
-                {barnkurver.map((kurv) => {
-                    // Uten motpart vet vi ikke hvor barnet hører hjemme før alt er hentet. Vis lasting i stedet.
-                    if (!kurv.motpart && laster) return null;
+                {synligeKurver.map((kurv) => {
                     const motpartNavn = kurv.motpart?.visningsnavn ?? "ukjent forelder";
                     const ident = !kurv.motpart
                         ? ukjentNummer(ukjenteKurver.indexOf(kurv) + 1).trim()
@@ -142,7 +148,7 @@ export default function BarnkurvListe({
                             barn={kurv.barn}
                             disabled={låstKurvId !== null && låstKurvId !== kurv.id}
                             onChange={(identer) => velgIKurv(identer, kurv.id)}
-                            visVelgAlle={!maksEttBarn}
+                            visVelgAlle={!maksEttBarn && !!kurv.motpart}
                         />
                     );
                 })}
@@ -172,6 +178,13 @@ export default function BarnkurvListe({
 function begrensTilSisteValg(nyeValg: BarnMedAlder[], forrigeValg: BarnMedAlder[]) {
     if (nyeValg.length <= 1) return nyeValg;
     return nyeValg.filter((barn) => !forrigeValg.some((forrige) => forrige.ident === barn.ident)).slice(-1);
+}
+
+/** Barn med ukjent forelder velges ett om gangen. Et låst startbarn blir stående. */
+function begrensTilSisteIdent(valgteIdenter: string[], forrigeValg: BarnMedAlder[], låstIdent?: string | null) {
+    if (valgteIdenter.length <= 1) return valgteIdenter;
+    if (låstIdent && valgteIdenter.includes(låstIdent)) return [låstIdent];
+    return valgteIdenter.filter((ident) => !forrigeValg.some((barn) => barn.ident === ident)).slice(-1);
 }
 
 function useManuelleBarn(valgteBarn: BarnMedAlder[]) {

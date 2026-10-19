@@ -121,7 +121,7 @@ function PersonIdentLine({
 >) {
     return (
         <HStack asChild align="center">
-            <BodyShort textColor="subtle" size="small">
+            <BodyShort as="div" textColor="subtle" size="small">
                 {erSamhandlerIdent ? (
                     <SamhandlerIdent ident={ident} navn={navn} samhandlerNavn={samhandlerNavn} />
                 ) : (
