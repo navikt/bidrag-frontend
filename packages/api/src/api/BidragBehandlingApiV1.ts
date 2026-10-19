@@ -6970,6 +6970,23 @@ export class Api<
       }),
 
     /**
+     * @description Henter barnetilleggstypene som er skattefrie og ikke har skatteprosent
+     *
+     * @tags inntektstype-controller
+     * @name HentSkattefrieBarnetilleggstyper
+     * @request GET:/api/v1/inntektstype/skattefrie-barnetillegg
+     * @secure
+     */
+    hentSkattefrieBarnetilleggstyper: (params: RequestParams = {}) =>
+      this.request<Inntektstype[], any>({
+        path: `/api/v1/inntektstype/skattefrie-barnetillegg`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * No description
      *
      * @tags notat-opplysninger-controller

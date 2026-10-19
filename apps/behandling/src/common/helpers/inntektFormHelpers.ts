@@ -3,7 +3,6 @@ import {
     type InntektDtoV2,
     type InntekterDtoRolle,
     Inntektsrapportering,
-    Inntektstype,
     type InntektValideringsfeil,
     type InntektValideringsfeilV2Dto,
     Kilde,
@@ -70,12 +69,6 @@ export const inntekterTablesViewRules = {
         [Rolletype.BA]: [InntektTableType.SKATTEPLIKTIG],
     },
 };
-
-// Barnetillegg fra tiltakspenger og Forsvaret er skattefrie, og trenger ingen skattesats. Beregningen ignorerer alltid
-// skattesatsen for tiltakspenger, men bruker en skattesats for Forsvaret hvis den er lagt inn.
-export const erSkattesatsIkkeRelevant = (inntektstype?: Inntektstype | "", skattesats?: number | null) =>
-    inntektstype === Inntektstype.BARNETILLEGG_TILTAKSPENGER ||
-    (inntektstype === Inntektstype.BARNETILLEGG_FORSVARET && !skattesats);
 
 export const ekplisitteYtelser = [
     Inntektsrapportering.KONTANTSTOTTE,
@@ -263,9 +256,7 @@ export const createPayload = (periode: InntektFormPeriode, virkningsdato: Date):
             gjelderId: periode.gjelderRolleId,
             gjelderBarnId: periode.gjelderBarnId,
             gjelderBarn: periode.gjelderBarn,
-            skatteprosent: erSkattesatsIkkeRelevant(periode.inntektstype, periode.skattesats)
-                ? null
-                : periode.skattesats,
+            skatteprosent: periode.skattesats,
             inntektstype: periode.inntektstype ? periode.inntektstype : null,
         },
     };

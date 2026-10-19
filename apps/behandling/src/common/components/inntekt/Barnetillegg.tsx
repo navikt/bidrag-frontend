@@ -15,8 +15,7 @@ import { formatterBeløp } from "../../../utils/number-utils";
 import elementId from "../../constants/elementIds";
 import text from "../../constants/texts";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
-import { erSkattesatsIkkeRelevant } from "../../helpers/inntektFormHelpers";
-import { useGetBehandlingV2 } from "../../hooks/useApiData";
+import { useGetBehandlingV2, useSkattefrieBarnetilleggstyper } from "../../hooks/useApiData";
 import { hentVisningsnavn } from "../../hooks/useVisningsnavn";
 import type { InntektFormPeriode, InntektFormValues } from "../../types/inntektFormValues";
 import { FormControlledSelectField } from "../formFields/FormControlledSelectField";
@@ -95,7 +94,8 @@ const BeløpMånedDagsats = ({ item, field }: { item: InntektFormPeriode; field:
 };
 
 const Skattesats = ({ item, field }: { item: InntektFormPeriode; field: string }) => {
-    if (erSkattesatsIkkeRelevant(item.inntektstype, item.skattesats)) {
+    const skattefrieBarnetilleggstyper = useSkattefrieBarnetilleggstyper();
+    if (skattefrieBarnetilleggstyper.includes(item.inntektstype as Inntektstype)) {
         return (
             <Tooltip content="Barnetillegget er skattefritt">
                 <BodyShort size="small" textColor="subtle" className="h-6 flex items-center justify-end" tabIndex={0}>
@@ -153,6 +153,7 @@ const Beløpstype = ({ item, field }: { item: InntektFormPeriode; field: string 
 };
 export const Barnetillegg = () => {
     const { inntekterV2: inntektRoller } = useGetBehandlingV2();
+    const skattefrieBarnetilleggstyper = useSkattefrieBarnetilleggstyper();
     const { type } = useBehandlingProvider();
     const { gjelderRolleId } = useInntektTableProvider();
     const { getValues, clearErrors, getFieldState, setError, setValue } = useFormContext<InntektFormValues>();
@@ -193,7 +194,7 @@ export const Barnetillegg = () => {
             }
         }
 
-        const skattesatsErRelevant = !erSkattesatsIkkeRelevant(periode.inntektstype, periode.skattesats);
+        const skattesatsErRelevant = !skattefrieBarnetilleggstyper.includes(periode.inntektstype as Inntektstype);
         if (erBidrag && skattesatsErRelevant && (periode.skattesats === undefined || periode.skattesats < 0)) {
             setError(`${fieldName}.skattesats`, {
                 type: "notValid",
