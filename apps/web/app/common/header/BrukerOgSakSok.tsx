@@ -3,14 +3,30 @@ import { HStack, Search } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { type BidragLenke, useBidragLenker } from "~/common/navigation/useBidragLenker.ts";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
 
 export function BrukerOgSakSok() {
     const [search, setSearch] = useState<string>("");
     const [searchError, setSearchError] = useState<string>();
+    const { sakLenke, brukerLenke } = useBidragLenker();
     const navigate = useNavigate();
     const { encodeFnr } = useObfuscateFnr();
     const enabledFlag = useFlag("frontend.sok-fnr-sak");
+
+    async function navigerTil(lenke: BidragLenke | undefined) {
+        if (!lenke) {
+            setSearchError("Fant ikke adressen til Bisys. Prøv igjen senere.");
+            return;
+        }
+        if (lenke.ekstern) {
+            window.location.assign(lenke.href);
+        } else {
+            await navigate(lenke.href);
+        }
+        setSearch("");
+        setSearchError(undefined);
+    }
 
     async function doSearch() {
         setSearchError("");
@@ -19,16 +35,12 @@ export function BrukerOgSakSok() {
 
         if (isFnr) {
             const obfuscatedFnr = encodeFnr(search);
-            await navigate({ pathname: `/bruker/${obfuscatedFnr}` });
-            setSearch("");
-            setSearchError(undefined);
+            await navigerTil(brukerLenke(obfuscatedFnr));
             return;
         }
 
         if (isSak) {
-            await navigate({ pathname: `/sak/${search}` });
-            setSearch("");
-            setSearchError(undefined);
+            await navigerTil(sakLenke(search));
             return;
         }
         setSearchError("Ugyldig søk. Søk på fødselsnummer eller saksnummer.");
