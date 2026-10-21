@@ -9,10 +9,10 @@ import {
     Rolletype,
     TypeBehandling,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import {toISODateString} from "@bidrag/common";
-import type {OppdatereInntektRequestLosnet} from "../../types/apiSpecFix";
-import {firstDayOfMonth, isAfterDate, isAfterEqualsDate} from "../../utils/date-utils";
-import type {InntektFormPeriode, InntektFormValues} from "../types/inntektFormValues";
+import { toISODateString } from "@bidrag/common";
+import type { OppdatereInntektRequestLosnet } from "../../types/apiSpecFix";
+import { firstDayOfMonth, isAfterDate, isAfterEqualsDate } from "../../utils/date-utils";
+import type { InntektFormPeriode, InntektFormValues } from "../types/inntektFormValues";
 
 export enum InntektTableType {
     SKATTEPLIKTIG = "SKATTEPLIKTIG",
@@ -159,7 +159,8 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.barnetillegg.reduce((acc, inntektBarn) => {
                     // BP er alltid del av alle saker i behandlingen, og filtreres derfor aldri bort.
-                    const barnetillegFraSammeSak = inntektRolle.gjelder.rolletype === Rolletype.BP ||
+                    const barnetillegFraSammeSak =
+                        inntektRolle.gjelder.rolletype === Rolletype.BP ||
                         inntektBarn.gjelderBarn.saksnummer === inntektRolle.gjelder.saksnummer;
 
                     if (barnetillegFraSammeSak) {
@@ -180,7 +181,8 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.kontantstøtte.reduce((acc, inntektBarn) => {
                     // BP er alltid del av alle saker i behandlingen, og filtreres derfor aldri bort.
-                    const kontantstøtteFraSammeSak = inntektRolle.gjelder.rolletype === Rolletype.BP ||
+                    const kontantstøtteFraSammeSak =
+                        inntektRolle.gjelder.rolletype === Rolletype.BP ||
                         inntektBarn.gjelderBarn.saksnummer === inntektRolle.gjelder.saksnummer;
 
                     if (kontantstøtteFraSammeSak) {
