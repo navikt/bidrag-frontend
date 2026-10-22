@@ -1,4 +1,4 @@
-import { Behandlingstype, Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { Behandlingstype, type RolleSoknadDto, Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
 import { Box, CopyButton } from "@navikt/ds-react";
 import { type ComponentType, type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -111,15 +111,17 @@ const FF_BEHANDLINGSTYPER = new Set<Behandlingstype | null | undefined>([
     Behandlingstype.FORHOLDSMESSIG_FORDELING_KLAGE,
 ]);
 
+const hentSøknaderISak = (roller: HeaderRolle[], saksnummer: string) =>
+    roller
+        .filter((i) => i.rolletype === Rolletype.BA)
+        .filter((rolle) => rolle.saksnummer === saksnummer)
+        .flatMap((rolle) => rolle.søknader ?? []);
+
 /**
  * Sorteringsvekt for en sak basert på søknadene til rollene i saken:
  * 0 = inneholder hovedsøknaden, 1 = ingen FF-søknader, 2 = både FF- og andre søknader, 3 = kun FF-søknader.
  */
-const getSaksnummerSortWeight = (roller: HeaderRolle[], saksnummer: string, hovedsøknadsid?: number | null) => {
-    const søknader = roller
-        .filter((i) => i.rolletype === Rolletype.BA)
-        .filter((rolle) => rolle.saksnummer === saksnummer)
-        .flatMap((rolle) => rolle.søknader ?? []);
+const getSaksnummerSortWeight = (søknader: RolleSoknadDto[], hovedsøknadsid?: number | null) => {
     if (hovedsøknadsid != null && søknader.some((søknad) => søknad.søknadsId === hovedsøknadsid)) {
         return 0;
     }
@@ -128,13 +130,31 @@ const getSaksnummerSortWeight = (roller: HeaderRolle[], saksnummer: string, hove
     return antallFF === søknader.length ? 3 : 2;
 };
 
+/** Eldste `søknadFomDato` blant søknadene i saken. Saker uten dato sorteres sist. */
+const getEldsteSøknadFomDato = (søknader: RolleSoknadDto[]) =>
+    søknader.reduce((eldste, søknad) => {
+        const tid = søknad.søknadFomDato ? new Date(søknad.søknadFomDato).getTime() : Number.NaN;
+        return Number.isNaN(tid) ? eldste : Math.min(eldste, tid);
+    }, Number.POSITIVE_INFINITY);
+
 const mapSaksnummerRoller = (roller: HeaderRolle[], hovedsøknadsid?: number | null): SaksnummerRoller[] => {
     const saksnummerOrder = Array.from(new Set(roller.map((rolle) => rolle.saksnummer)));
 
     return saksnummerOrder
         .filter((s): s is string => s !== undefined)
-        .map((saksnummer) => ({ saksnummer, vekt: getSaksnummerSortWeight(roller, saksnummer, hovedsøknadsid) }))
-        .sort((a, b) => a.vekt - b.vekt)
+        .map((saksnummer) => {
+            const søknader = hentSøknaderISak(roller, saksnummer);
+            return {
+                saksnummer,
+                vekt: getSaksnummerSortWeight(søknader, hovedsøknadsid),
+                eldsteFomDato: getEldsteSøknadFomDato(søknader),
+            };
+        })
+        .sort((a, b) => {
+            if (a.vekt !== b.vekt) return a.vekt - b.vekt;
+            if (a.eldsteFomDato === b.eldsteFomDato) return 0;
+            return a.eldsteFomDato < b.eldsteFomDato ? -1 : 1;
+        })
         .map(({ saksnummer }) => {
             const rollerISak = roller
                 .filter((rolle) => rolle.saksnummer === saksnummer || rolle.rolletype === Rolletype.BP)
