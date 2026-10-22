@@ -73,8 +73,8 @@ const Vedtak = () => {
             {erVedtakFattet && !lesemodus && <Alert variant="warning">Vedtak er fattet for behandling</Alert>}
             {!erVedtakFattet && erDelvedtakFattet && !lesemodus && (
                 <Alert variant="warning">
-                    Vedtak er delvis fattet. Det har skjedd en feil ved fatting av vedtak.
-                    Prøv å på nytt eller opprett fagsystemsak hvis det fortsatt feiler.
+                    Vedtak er delvis fattet. Det har skjedd en feil ved fatting av vedtak. Prøv å på nytt eller opprett
+                    fagsystemsak hvis det fortsatt feiler.
                 </Alert>
             )}
             <div className="grid gap-y-2">
