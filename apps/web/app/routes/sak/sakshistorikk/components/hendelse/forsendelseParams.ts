@@ -21,7 +21,7 @@ export function lagForsendelseParams(
         ...(hendelse.behandlingsid && { behandlingId: hendelse.behandlingsid }),
         ...(hendelse.stonadType && { stonadType: hendelse.stonadType }),
         ...(hendelse.engangsbelopType && { engangsbelopType: hendelse.engangsbelopType }),
-        ...(hendelse.behandlingstype && { behandlingType: hendelse.behandlingstype }),
+        ...(hendelse.behandlingstype && !hendelse.stonadType && !hendelse.engangsbelopType && { behandlingType: hendelse.behandlingstype }),
         ...(hendelse.behandlingstype && { soknadType: hendelse.behandlingstype }),
         ...(erFattetBeregnet(hendelse) && { erFattetBeregnet: "true" }),
         ...(hendelse.søktAv && { soknadFra: hendelse.søktAv }),
