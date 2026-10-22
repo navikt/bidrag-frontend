@@ -1,11 +1,11 @@
-import {Behandlingstype, Rolletype, Stonadstype} from "@bidrag/api/BidragBehandlingApiV1";
-import {ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon} from "@navikt/aksel-icons";
-import {Box, CopyButton} from "@navikt/ds-react";
-import {type ComponentType, type CSSProperties, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {useHentFodselsdatoer} from "../../api";
-import type {IRolleDetaljer} from "../../types";
-import {RolleTypeAbbreviation, RolleTypeFullName} from "../../types";
-import ExpandedRoles, {type HeaderRolle, type SaksnummerRoller} from "./ExpandedRoles";
+import { Behandlingstype, Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
+import { Box, CopyButton } from "@navikt/ds-react";
+import { type ComponentType, type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHentFodselsdatoer } from "../../api";
+import type { IRolleDetaljer } from "../../types";
+import { RolleTypeAbbreviation, RolleTypeFullName } from "../../types";
+import ExpandedRoles, { type HeaderRolle, type SaksnummerRoller } from "./ExpandedRoles";
 
 type TypeBehandling = string;
 
@@ -116,7 +116,10 @@ const FF_BEHANDLINGSTYPER = new Set<Behandlingstype | null | undefined>([
  * 0 = inneholder hovedsøknaden, 1 = ingen FF-søknader, 2 = både FF- og andre søknader, 3 = kun FF-søknader.
  */
 const getSaksnummerSortWeight = (roller: HeaderRolle[], saksnummer: string, hovedsøknadsid?: number | null) => {
-    const søknader = roller.filter(i=>i.rolletype === Rolletype.BA).filter((rolle) => rolle.saksnummer === saksnummer).flatMap((rolle) => rolle.søknader ?? []);
+    const søknader = roller
+        .filter((i) => i.rolletype === Rolletype.BA)
+        .filter((rolle) => rolle.saksnummer === saksnummer)
+        .flatMap((rolle) => rolle.søknader ?? []);
     if (hovedsøknadsid != null && søknader.some((søknad) => søknad.søknadsId === hovedsøknadsid)) {
         return 0;
     }
