@@ -71,12 +71,6 @@ const Vedtak = () => {
     return (
         <VedtakProvider className="grid gap-y-8  w-[1150px]">
             {erVedtakFattet && !lesemodus && <Alert variant="warning">Vedtak er fattet for behandling</Alert>}
-            {!erVedtakFattet && erDelvedtakFattet && !lesemodus && (
-                <Alert variant="warning">
-                    Vedtak er delvis fattet. Det har skjedd en feil ved fatting av vedtak. Prøv å på nytt eller opprett
-                    fagsystemsak hvis det fortsatt feiler.
-                </Alert>
-            )}
             <div className="grid gap-y-2">
                 <Heading level="2" size="medium">
                     {text.title.vedtak}
@@ -109,7 +103,7 @@ const Vedtak = () => {
                     }
                 />
             )}
-            {kanViseFatteVedtakKnapp && !lesemodus && (
+            {kanViseFatteVedtakKnapp && (!lesemodus || erDelvedtakFattet) && (
                 <FatteVedtakButtons
                     isBeregningError={isBeregningError}
                     disabled={!kanBehandlesINyLøsning || !beregning.resultat.kanFatteVedtak}

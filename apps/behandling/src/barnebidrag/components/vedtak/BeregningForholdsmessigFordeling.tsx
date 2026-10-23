@@ -330,6 +330,7 @@ const ForholdsmessigFordelingBeregningAndreBarn = ({
     nyBeregningRevurdering?: boolean;
 }) => {
     const {
+        periode,
         beregningsdetaljer: { forholdsmessigFordeling },
         kanFatteVedtakForRevurderingsbarn,
     } = useBidragBeregningPeriode();
@@ -350,9 +351,10 @@ const ForholdsmessigFordelingBeregningAndreBarn = ({
     }));
     const bpsBarnIkkeSøknadsbarn = beregningBarn.filter(
         (b) =>
-            !b.erSøknadsbarn && (nyBeregningRevurdering || !kanFatteVedtakForRevurderingsbarn || !b.erRevurderingsbarn),
+            b.erRevurderingsbarn || !b.erSøknadsbarn && (nyBeregningRevurdering || !kanFatteVedtakForRevurderingsbarn || !b.erRevurderingsbarn),
     );
 
+    console.log(bpsBarnIkkeSøknadsbarn, beregningBarn, sumFordeling, periode)
     return (
         <VStack gap={"space-2"} className="mb-2">
             <BpsPrivatAvtalerTabellIkkeTilFordeling

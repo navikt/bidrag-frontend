@@ -640,6 +640,7 @@ function BehandlingProvider({ props, children }: PropsWithChildren<BehandlingPro
                 vedtaksperre ||
                 vedtakId != null ||
                 behandling.erVedtakFattet ||
+                behandling.erDelvedtakFattet ||
                 queryLesemodus ||
                 behandling.kanBehandlesINyLøsning === false ||
                 (behandling.vedtakstype === Vedtakstype.ALDERSJUSTERING &&
