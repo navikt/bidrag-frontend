@@ -1,4 +1,5 @@
 import {
+    Behandlingstype,
     type SakshendelseDto,
     SoknadGruppeKombinasjon,
     SoktAvType,
@@ -57,13 +58,13 @@ describe("lagForsendelseParams", () => {
 
     it("sender behandlingType for søknadsgrupper uten stønads-/engangsbeløptype", () => {
         const params = lagForsendelseParams(
-            hendelse({ søknadsgruppe: SoknadGruppeKombinasjon.FARSKAP }),
+            hendelse({ søknadsgruppe: SoknadGruppeKombinasjon.FARSKAP, behandlingstype: Behandlingstype.ENDRING }),
             "42",
             null,
             null,
         );
 
-        expect(params.get("behandlingType")).toBe("FARSKAP");
+        expect(params.get("behandlingType")).toBe("ENDRING");
         expect(params.has("erFattetBeregnet")).toBe(false);
         expect(params.has("enhet")).toBe(false);
     });

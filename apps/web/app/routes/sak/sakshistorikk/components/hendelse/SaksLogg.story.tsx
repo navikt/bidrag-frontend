@@ -24,7 +24,10 @@ function hendelse(overrides: Partial<SakshendelseDto>): SakshendelseDto {
         erKlageberettigetVedtak: false,
         erLukket: false,
         fraBbm: false,
+        behandlingstype: null,
         barnObjektNumre: [],
+        erHovedsøknad: false,
+        erDelAvFF: false,
         ...overrides,
     };
 }
