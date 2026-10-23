@@ -189,7 +189,7 @@ const createInitialValues = (
     };
 };
 
-const createPayload = (values: VirkningstidspunktFormValuesPerBarn, rolleId?: number): OppdatereVirkningstidspunkt => {
+const createPayload = (values: VirkningstidspunktFormValuesPerBarn, saksnummer: string, rolleId?: number): OppdatereVirkningstidspunkt => {
     const årsak = [...årsakListe, ...årsakListe18årsBidrag, ...harLøpendeBidragÅrsakListe].find(
         (value) => value === values.årsakAvslag,
     );
@@ -203,6 +203,7 @@ const createPayload = (values: VirkningstidspunktFormValuesPerBarn, rolleId?: nu
     ].find((value) => value === values.årsakAvslag);
 
     let payload: OppdatereVirkningstidspunkt = {
+        saksnummer,
         rolleId,
         virkningstidspunkt: values.virkningstidspunkt,
         årsak,
@@ -717,7 +718,7 @@ const VirkningstidspunktBarn = ({
     const onSave = useCallback(
         (values: VirkningstidspunktFormValuesPerBarn) => {
             oppdaterBehandling.mutation.mutate(
-                createPayload(values, vurderSeparat ? selectedVirkningstidspunkt.rolle.id : null),
+                createPayload(values, selectedVirkningstidspunkt.rolle.saksnummer, vurderSeparat ? selectedVirkningstidspunkt.rolle.id : null),
                 {
                     onSuccess: (response) => {
                         refreshFF();
