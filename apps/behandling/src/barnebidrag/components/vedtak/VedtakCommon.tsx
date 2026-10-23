@@ -156,7 +156,10 @@ export const TableRowResultatAvslag = ({
                             </tbody>
                         </table>
                     </Table.DataCell>
-                    <Table.DataCell textSize="small" colSpan={3}></Table.DataCell>
+                    <Table.DataCell textSize="small" colSpan={2}></Table.DataCell>
+                    <Table.DataCell textSize="small">
+                        {formatterBeløpForBeregning(periode.bpsAndelBeløp - periode.underholdskostnad * 0.5)}
+                    </Table.DataCell>
                 </>
             ) : (
                 <Table.DataCell textSize="small" colSpan={5}></Table.DataCell>
