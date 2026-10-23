@@ -1,12 +1,7 @@
-import {
-    type SakshendelseDto,
-    SoknadGruppeKombinasjon,
-    SoktAvType,
-    Stonadstype,
-    Vedtakstype,
-} from "@bidrag/api/SakApi";
-import { describe, expect, it } from "vitest";
-import { erFattetBeregnet, lagForsendelseParams } from "./forsendelseParams";
+import {type SakshendelseDto, SoknadGruppeKombinasjon, SoktAvType, Stonadstype, Vedtakstype,} from "@bidrag/api/SakApi";
+import {Behandlingstype} from "@bidrag/api/SakApi";
+import {describe, expect, it} from "vitest";
+import {erFattetBeregnet, lagForsendelseParams} from "./forsendelseParams";
 
 const hendelse = (overrides: Partial<SakshendelseDto> = {}) =>
     ({ søknadsid: "42", fraBbm: false, barnObjektNumre: [], ...overrides }) as SakshendelseDto;
@@ -57,13 +52,13 @@ describe("lagForsendelseParams", () => {
 
     it("sender behandlingType for søknadsgrupper uten stønads-/engangsbeløptype", () => {
         const params = lagForsendelseParams(
-            hendelse({ søknadsgruppe: SoknadGruppeKombinasjon.FARSKAP }),
+            hendelse({ søknadsgruppe: SoknadGruppeKombinasjon.FARSKAP, behandlingstype: Behandlingstype.ENDRING }),
             "42",
             null,
             null,
         );
 
-        expect(params.get("behandlingType")).toBe("FARSKAP");
+        expect(params.get("behandlingType")).toBe("ENDRING");
         expect(params.has("erFattetBeregnet")).toBe(false);
         expect(params.has("enhet")).toBe(false);
     });
