@@ -30,9 +30,6 @@ const tekster = {
         enEllerFlereSivilstandPerioderEndret: "En eller flere sivilstandsperioder har blitt endret",
         feilIPeriodisering: "Feil i periodisering",
         feilVedInnhentingAvOffentligData: "Data fra offentlig registre feiler",
-        forpleiningOverstigerUnderholdskostnad: "Forpleiningen overstiger underholdskostnaden i perioden {} - {}.",
-        forpleiningOverstigerUnderholdskostnadFiks: "Reduser beløpet eller endre periodene for forpleining.",
-        forpleiningOverstigerUnderholdskostnadLøpende: "Forpleiningen overstiger underholdskostnaden fra {}.",
         gebyrHarBlittEndret: "Gebyr",
         gebyrHarBlittEndretDescription:
             "Inntektsendringen har endret gebyrvurderingen. Kontroller om gebyrvurderingen er korrekt.",
@@ -88,7 +85,6 @@ const tekster = {
     error: {
         dagsatsVerdi: "Dagsats kan ikke være 0 eller mindre",
         forpleiningVerdi: "Beløp kan ikke være 0 eller mindre",
-        forpleiningOverstigerUnderholdskostnad: "Beløp kan ikke være høyere enn underholdskostnaden",
         månedsbeløpVerdi: "Månedsbeløp kan ikke være 0 eller mindre",
         datoIkkeGyldig: "Dato er ikke gyldig",
         datoMåFyllesUt: "Dato må fylles ut",
