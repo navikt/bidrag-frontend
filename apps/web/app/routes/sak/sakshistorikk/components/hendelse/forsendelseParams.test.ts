@@ -1,7 +1,13 @@
-import {type SakshendelseDto, SoknadGruppeKombinasjon, SoktAvType, Stonadstype, Vedtakstype,} from "@bidrag/api/SakApi";
-import {Behandlingstype} from "@bidrag/api/SakApi";
-import {describe, expect, it} from "vitest";
-import {erFattetBeregnet, lagForsendelseParams} from "./forsendelseParams";
+import {
+    Behandlingstype,
+    type SakshendelseDto,
+    SoknadGruppeKombinasjon,
+    SoktAvType,
+    Stonadstype,
+    Vedtakstype,
+} from "@bidrag/api/SakApi";
+import { describe, expect, it } from "vitest";
+import { erFattetBeregnet, lagForsendelseParams } from "./forsendelseParams";
 
 const hendelse = (overrides: Partial<SakshendelseDto> = {}) =>
     ({ søknadsid: "42", fraBbm: false, barnObjektNumre: [], ...overrides }) as SakshendelseDto;
