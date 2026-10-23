@@ -64,7 +64,7 @@ describe("lagForsendelseParams", () => {
             null,
         );
 
-        expect(params.get("behandlingType")).toBe("ENDRING");
+        expect(params.get("behandlingType")).toBe("FARSKAP");
         expect(params.has("erFattetBeregnet")).toBe(false);
         expect(params.has("enhet")).toBe(false);
     });
