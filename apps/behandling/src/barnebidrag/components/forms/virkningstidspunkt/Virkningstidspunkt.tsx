@@ -860,7 +860,7 @@ const VirkningstidspunktBarn = ({
             selectedVirkningstidspunkt.etterfølgendeVedtak && behandling.erKlageEllerOmgjøring
                 ? dateOrNull(selectedVirkningstidspunkt.etterfølgendeVedtak?.virkningstidspunkt)
                 : null;
-        console.log("asdsad", selectedVirkningstidspunkt, item.rolle.id)
+        console.log("asdsad", selectedVirkningstidspunkt, item.rolle.id);
         const opphørsdato = dateOrNull(selectedVirkningstidspunkt.opphørsdato);
         if (opphørsdato) return deductMonths(opphørsdato, 1);
         if (etterfølgendeVedtak) return deductMonths(etterfølgendeVedtak, 1);
