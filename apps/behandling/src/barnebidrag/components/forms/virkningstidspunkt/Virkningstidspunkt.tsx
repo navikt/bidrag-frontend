@@ -360,6 +360,7 @@ const Opphør = ({
             {
                 idRolle: vurderSeparat ? selectedBarnsVirkningstidspunkt.rolle.id : null,
                 opphørsdato: values.opphørsdato,
+                saksnummer: selectedBarnsVirkningstidspunkt.rolle.saksnummer,
                 simulerEndring: false,
             },
             {
@@ -859,6 +860,7 @@ const VirkningstidspunktBarn = ({
             selectedVirkningstidspunkt.etterfølgendeVedtak && behandling.erKlageEllerOmgjøring
                 ? dateOrNull(selectedVirkningstidspunkt.etterfølgendeVedtak?.virkningstidspunkt)
                 : null;
+        console.log("asdsad", selectedVirkningstidspunkt, item.rolle.id)
         const opphørsdato = dateOrNull(selectedVirkningstidspunkt.opphørsdato);
         if (opphørsdato) return deductMonths(opphørsdato, 1);
         if (etterfølgendeVedtak) return deductMonths(etterfølgendeVedtak, 1);
@@ -1144,8 +1146,8 @@ const VirkningstidspunktBarn = ({
 };
 
 const BeregnTilVelger = ({ initialValues }) => {
-    const { lesemodus } = useBehandlingProvider();
-    const { erKlageEllerOmgjøring, virkningstidspunktV3, saksnummer } = useGetBehandlingV2();
+    const { lesemodus, selectedSaksnummer } = useBehandlingProvider();
+    const { erKlageEllerOmgjøring, virkningstidspunktV3 } = useGetBehandlingV2();
     const { setValue, getValues } = useFormContext<VirkningstidspunktFormValues>();
     const enhet = useQueryParams().get("enhet");
     const sessionState = useQueryParams().get("sessionState");
@@ -1161,7 +1163,7 @@ const BeregnTilVelger = ({ initialValues }) => {
 
     const updateBeregnTilDato = (beregnTil: BeregnTil) => {
         oppdaterBeregnTilDato.mutation.mutate(
-            { beregnTil: beregnTil },
+            { beregnTil: beregnTil, saksnummer: selectedSaksnummer },
             {
                 onSuccess: (response) => {
                     oppdaterBeregnTilDato.queryClientUpdater((currentData) => {
@@ -1234,7 +1236,7 @@ const BeregnTilVelger = ({ initialValues }) => {
                     {virkningstidspunktV3.etterfølgendeVedtak && (
                         <Link
                             className="w-max"
-                            to={`/sak/${saksnummer}/vedtak/${virkningstidspunktV3.etterfølgendeVedtak?.vedtaksid}/?steg=vedtak&enhet=${enhet}&sessionState=${sessionState}`}
+                            to={`/sak/${selectedSaksnummer}/vedtak/${virkningstidspunktV3.etterfølgendeVedtak?.vedtaksid}/?steg=vedtak&enhet=${enhet}&sessionState=${sessionState}`}
                             target="_blank"
                             rel="noreferrer"
                         >
