@@ -15,6 +15,8 @@ export type ForelderKortProps = {
     forslag?: PersonDto[];
     valgPlaceholder?: string;
     kanSettesUkjent?: boolean;
+    /** Et valgt barn har en forelder saksbehandler ikke har tilgang til. */
+    harSkjultForelder?: boolean;
     feil?: string;
     /** Parten kan ikke endres, fordi flyten ble åpnet for denne personen. */
     låst?: boolean;
@@ -100,6 +102,7 @@ function Handlinger({
     forslag = [],
     valgPlaceholder,
     kanSettesUkjent = true,
+    harSkjultForelder = false,
     feil,
     onVelg,
     onUkjent,
@@ -120,6 +123,7 @@ function Handlinger({
                     forslag={forslag}
                     valgPlaceholder={valgPlaceholder}
                     kanSettesUkjent={kanSettesUkjent}
+                    harSkjultForelder={harSkjultForelder}
                     onVelg={onVelg}
                     onUkjent={onUkjent}
                 />
@@ -139,11 +143,13 @@ function VelgForelder({
     forslag,
     valgPlaceholder,
     kanSettesUkjent,
+    harSkjultForelder,
     onVelg,
     onUkjent,
 }: Pick<ForelderKortProps, "part" | "rolle" | "onVelg" | "onUkjent" | "valgPlaceholder"> & {
     forslag: PersonDto[];
     kanSettesUkjent: boolean;
+    harSkjultForelder: boolean;
 }) {
     const velgForelder = (verdi: string) => {
         if (verdi === UKJENT_FORELDER_VALG) {
@@ -160,7 +166,7 @@ function VelgForelder({
 
     return (
         <>
-            {(forslag.length > 0 || kanSettesUkjent) && (
+            {(forslag.length > 0 || kanSettesUkjent || harSkjultForelder) && (
                 <Select
                     label={`Velg ${rolle}`}
                     hideLabel
@@ -174,6 +180,7 @@ function VelgForelder({
                             {person.visningsnavn}
                         </option>
                     ))}
+                    {harSkjultForelder && <option disabled>Forelder kan ikke vises</option>}
                     {kanSettesUkjent && <option value={UKJENT_FORELDER_VALG}>Ukjent</option>}
                 </Select>
             )}

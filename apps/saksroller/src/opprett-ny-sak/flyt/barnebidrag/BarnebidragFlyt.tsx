@@ -1,18 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert } from "@navikt/ds-react";
+import { Alert, BodyLong, LocalAlert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjonSuspense } from "../../../api/person.api";
+import BekreftAdvarsel from "../../../felles/bekreftelse/BekreftAdvarsel";
+import Relasjonskontrollmelding from "../../../felles/bekreftelse/Relasjonskontrollmelding";
 import { MYNDYG_BARN_ALDER } from "../../../felles/saksregler";
 import BarnSection from "../../barn/BarnSection";
 import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";
 import ParterSeksjon from "../../parter/ParterSeksjon";
-import UfullstendigRelasjonValgteBarnAlert from "../../parter/UfullstendigRelasjonValgteBarnAlert";
 import { useOpprettSakStart } from "../../skjema/OpprettSakStartContext";
 import {
     type BarnebidragForelderRolle,
     type BarnebidragSkjemaData,
     BarnebidragSkjemaSchema,
     type ForelderPart,
+    finnOpprettSakAdvarsler,
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
 import RolleFlytSide from "../../skjema/RolleFlytSide";
@@ -117,6 +119,8 @@ function BarnebidragFlytInnhold() {
         onSubmit,
         innsending,
         meldinger,
+        relasjonsbekreftelse,
+        barnMedUfullstendigRelasjon,
         status,
     } = useBarnebidragFlyt();
 
@@ -130,17 +134,35 @@ function BarnebidragFlytInnhold() {
             status={status}
             meldinger={
                 <>
-                    {meldinger.tilgangsfeil && (
-                        <Alert variant="info" size="small">
-                            {meldinger.tilgangsfeil}. Legg til forelder manuelt.
-                        </Alert>
+                    {meldinger.barnMedSkjultForelder.length > 0 && (
+                        <LocalAlert status="warning" size="small" as="div">
+                            <LocalAlert.Header>
+                                <LocalAlert.Title>Forelder kan ikke vises</LocalAlert.Title>
+                            </LocalAlert.Header>
+                            <LocalAlert.Content>
+                                <BodyLong size="small">
+                                    {meldinger.barnMedSkjultForelder.join(", ")} har en forelder du ikke har tilgang
+                                    til. Det kan skyldes at forelderen er egen ansatt eller har fortrolig adresse. Saken
+                                    må behandles av en enhet som har tilgang.
+                                </BodyLong>
+                            </LocalAlert.Content>
+                        </LocalAlert>
                     )}
                     {meldinger.forslagsfeil && (
                         <Alert variant="warning" size="small">
                             {meldinger.forslagsfeil}
                         </Alert>
                     )}
-                    {meldinger.ufullstendigRelasjon && <UfullstendigRelasjonValgteBarnAlert />}
+                    <Relasjonskontrollmelding relasjonskontroll={meldinger.relasjonskontroll} />
+                    <BekreftAdvarsel
+                        tittel="Ufullstendig relasjon"
+                        bekreftTekst="Jeg har kontrollert relasjonen mellom barna og foreldrene"
+                        feilmelding="Du må bekrefte at du har kontrollert relasjonene"
+                        bekreftelse={relasjonsbekreftelse}
+                    >
+                        {barnMedUfullstendigRelasjon.map((barn) => barn.navn || barn.ident).join(", ")} har manglende
+                        eller ufullstendig relasjon til partene.
+                    </BekreftAdvarsel>
                     {meldinger.bidragsmottakerUtenBarn && <BMUtenBarnAlert />}
                 </>
             }
@@ -162,6 +184,10 @@ function BarnebidragFlytInnhold() {
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
                 utvidSøskenflokker={kort.every((forelder) => forelder.part.erKjent !== undefined)}
+                advarsler={finnOpprettSakAdvarsler(
+                    { roller: form.watch("roller"), valgteBarn: form.watch("valgteBarn") },
+                    "Barnebidrag",
+                )}
             />
         </RolleFlytSide>
     );

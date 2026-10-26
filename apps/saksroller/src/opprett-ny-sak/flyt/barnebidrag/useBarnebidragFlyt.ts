@@ -4,6 +4,8 @@ import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { type UseFormReturn, useFormContext } from "react-hook-form";
 import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
+import { relasjonskontrollStatus } from "../../../felles/bekreftelse/Relasjonskontrollmelding";
+import { useBekreftelse } from "../../../felles/bekreftelse/useBekreftelse";
 import { reellMottakerRegel } from "../../../felles/saksregler";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
@@ -19,7 +21,7 @@ import {
     type ForelderPartRolle,
 } from "../../skjema/opprett-sak-schema";
 import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
-import { type ForeldreTilBarn, harFullstendigRelasjon, utledForelderforslag } from "./barnebidrag-forelderforslag";
+import { barnMedUfullstendigRelasjon, type ForeldreTilBarn, utledForelderforslag } from "./barnebidrag-forelderforslag";
 import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
 import { rollerEtterValg, rolleSomPart, tilPart } from "./barnebidrag-roller";
 
@@ -66,22 +68,28 @@ function useForelderforslag(form: UseFormReturn<BarnebidragSkjemaData>, roller: 
     });
     const foreldreTilBarn: ForeldreTilBarn[] = valgteBarn.map((barn, index) => ({
         barn,
-        foreldre: foreldreinfo[index]?.data,
+        foreldre: foreldreinfo[index]?.error instanceof TilgangsFeilError ? [] : foreldreinfo[index]?.data,
     }));
     const valgteForeldre = roller
         .filter((rolle) => rolle.erKjent && rolle.ident)
         .map((part) => ({ ident: part.ident ?? "", navn: part.navn ?? "" }));
     const { forslag, feil } = utledForelderforslag({ foreldreTilBarn, valgteForeldre });
     const ledige = filtrerBortValgteForeldre(forslag, valgteForeldre);
-    const tilgangsfeil = foreldreinfo.find((query) => query.error instanceof TilgangsFeilError)?.error;
+    const barnMedSkjultForelder = valgteBarn
+        .filter((_, index) => foreldreinfo[index]?.error instanceof TilgangsFeilError)
+        .map((barn) => barn.navn || barn.ident);
     const lasterForeldre = foreldreinfo.some((query) => query.isPending);
     return {
         foreldreTilBarn,
         forslag,
         ledige,
         forslagsfeil: feil,
-        tilgangsfeil: tilgangsfeil?.message,
+        barnMedSkjultForelder,
         lasterForeldre,
+        relasjonskontroll: relasjonskontrollStatus({
+            isError: foreldreinfo.some((query) => query.isError && !(query.error instanceof TilgangsFeilError)),
+            isLoading: lasterForeldre,
+        }),
     };
 }
 
@@ -147,19 +155,6 @@ function partFraKurv(kurv: Barnkurv): ForelderPart {
     return kurv.motpart ? tilPart(kurv.motpart as PersonDto) : UKJENT;
 }
 
-function relasjonsmeldinger(
-    foreldreTilBarn: ForeldreTilBarn[],
-    bidragspliktig: ForelderPart,
-    bidragsmottaker: ForelderPart,
-) {
-    const harBarn = foreldreTilBarn.length > 0;
-    const fullstendig = harFullstendigRelasjon(foreldreTilBarn, bidragspliktig.ident, bidragsmottaker.ident);
-    return {
-        ufullstendigRelasjon: harBarn && fullstendig === false,
-        bidragsmottakerUtenBarn: erKjentPart(bidragsmottaker) && !harBarn,
-    };
-}
-
 export function useBarnebidragFlyt() {
     const form = useFormContext<BarnebidragSkjemaData>();
     const { låstIdent } = useOpprettSakStart();
@@ -171,10 +166,8 @@ export function useBarnebidragFlyt() {
     const valgteBarn = form.watch("valgteBarn");
 
     const { barnkurver, lasterKurver, registrerteForeldre, ugyldigForelderrelasjon } = useBarnkurver(form);
-    const { foreldreTilBarn, forslag, ledige, forslagsfeil, tilgangsfeil, lasterForeldre } = useForelderforslag(
-        form,
-        roller,
-    );
+    const { foreldreTilBarn, forslag, ledige, forslagsfeil, barnMedSkjultForelder, lasterForeldre, relasjonskontroll } =
+        useForelderforslag(form, roller);
     const tilgjengeligeForeldre = useRef(new Map<string, PersonDto>());
     for (const forelder of [...registrerteForeldre, ...forslag]) {
         tilgjengeligeForeldre.current.set(forelder.ident, forelder);
@@ -218,10 +211,19 @@ export function useBarnebidragFlyt() {
         if (kurv) settPart(bidragspliktig.ident ? "bidragsmottaker" : "bidragspliktig", partFraKurv(kurv));
     };
 
+    const ufullstendigRelasjon = barnMedUfullstendigRelasjon(
+        foreldreTilBarn,
+        bidragspliktig.ident,
+        bidragsmottaker.ident,
+    );
+    const relasjonsbekreftelse = useBekreftelse((ufullstendigRelasjon ?? []).map((barn) => barn.ident));
+
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
         form,
         roller,
         valgteBarn,
+        kanFortsette: relasjonsbekreftelse.krevBekreftelse,
+        relasjonskontroll,
     });
 
     const kort = FORELDERROLLER.map(
@@ -235,6 +237,7 @@ export function useBarnebidragFlyt() {
                     : [bidragspliktig, bidragsmottaker],
             ).filter((f) => f.ident !== låstIdent),
             låst: !!låstIdent && rolleSomPart(roller, rolle === "bidragspliktig" ? "BP" : "BM").ident === låstIdent,
+            harSkjultForelder: barnMedSkjultForelder.length > 0,
             feil: form.formState.errors.roller?.[finnRolleIndex(roller, rolle === "bidragspliktig" ? "BP" : "BM")]
                 ?.ident?.message,
             onVelg: (person) => velg(rolle, person),
@@ -266,10 +269,13 @@ export function useBarnebidragFlyt() {
         innsending,
         meldinger: {
             ugyldigForelderrelasjon,
-            tilgangsfeil,
+            barnMedSkjultForelder,
             forslagsfeil,
-            ...relasjonsmeldinger(foreldreTilBarn, bidragspliktig, bidragsmottaker),
+            bidragsmottakerUtenBarn: erKjentPart(bidragsmottaker) && foreldreTilBarn.length === 0,
+            relasjonskontroll,
         },
+        relasjonsbekreftelse,
+        barnMedUfullstendigRelasjon: ufullstendigRelasjon ?? [],
         status: {
             ...sakStatus,
             partISakenNavn: (primær === "bidragspliktig" ? bidragspliktig : bidragsmottaker).navn ?? "",

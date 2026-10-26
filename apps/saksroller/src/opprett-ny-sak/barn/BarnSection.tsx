@@ -1,5 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Alert, Tag } from "@navikt/ds-react";
+import { Alert, InlineMessage, Tag } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { alderForBarn, tilBarn, validerNyttBarn } from "../../felles/barn/barn-regler";
@@ -23,6 +23,7 @@ interface BarnSectionProps<T extends { valgteBarn: BarnMedAlder[] }> {
     /** Barnkurvene eller foreldrene som avgjør dem, hentes. Viser lasting så barn ikke hopper mellom grupper. */
     lasterKurver?: boolean;
     utvidSøskenflokker?: boolean;
+    advarsler?: string[];
 }
 
 type BarnForm = UseFormReturn<{ valgteBarn: BarnMedAlder[] }>;
@@ -37,6 +38,7 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
     maksEttBarn = false,
     lasterKurver = false,
     utvidSøskenflokker = false,
+    advarsler = [],
 }: BarnSectionProps<T>) {
     const barnForm = form as unknown as BarnForm;
     const valgteBarn = barnForm.watch("valgteBarn");
@@ -105,6 +107,12 @@ export default function BarnSection<T extends { valgteBarn: BarnMedAlder[] }>({
             />
 
             <LeggTilBarnSøk søk={søk} visSøk={visSøk} onÅpne={() => setVisSøk(true)} />
+
+            {advarsler.map((melding) => (
+                <InlineMessage key={melding} status="warning" size="small">
+                    {melding}
+                </InlineMessage>
+            ))}
 
             {valgteBarn.length === 0 && form.formState.errors.valgteBarn && (
                 <Alert variant="error" size="small">

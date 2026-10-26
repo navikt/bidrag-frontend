@@ -13,6 +13,7 @@ import {
     FarskapsSkjemaSchema,
     type FarskapsSkjemaSchemaData,
     type ForelderPartRolle,
+    finnOpprettSakAdvarsler,
     OppfostringsbidragSkjemaSchema,
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
@@ -146,6 +147,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                     reellMottakerRegel={reellMottakerRegel(sakstype, false)}
                     beskrivelse={beskrivelse}
                     maksEttBarn={type === "FARSKAP"}
+                    advarsler={finnOpprettSakAdvarsler({ roller: form.watch("roller"), valgteBarn }, sakstype)}
                 />
             )}
         </RolleFlytSide>

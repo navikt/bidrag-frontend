@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type SakParter, type Sakstype, validerSak } from "../../felles/saksregler";
+import { finnSaksadvarsler, type SakParter, type Sakstype, validerSak } from "../../felles/saksregler";
 // Samme forretningsregler gjelder for nye og eksisterende saker, så disse gjenbrukes fra
 // sakvisning i stedet for å dupliseres.
 import { type Diskresjonskode, DiskresjonskodeSchema, ReellMottakerFelterSchema } from "../../felles/sakvisning-schema";
@@ -106,7 +106,7 @@ function tilSakParter({ roller, valgteBarn = [] }: SkjemaMedParter): SakParter {
 }
 
 function leggTilSaksfeil(data: SkjemaMedParter, sakstype: Sakstype, ctx: z.RefinementCtx) {
-    for (const feil of validerSak(tilSakParter(data), sakstype)) {
+    for (const feil of validerSak(tilSakParter(data), sakstype, "opprett")) {
         const path =
             feil.gjelder === "barn"
                 ? ["valgteBarn", feil.indeks, feil.felt]
@@ -115,6 +115,10 @@ function leggTilSaksfeil(data: SkjemaMedParter, sakstype: Sakstype, ctx: z.Refin
                   : rolleFelt(data.roller, feil.gjelder).identPath;
         leggTilFeil(ctx, path, feil.melding);
     }
+}
+
+export function finnOpprettSakAdvarsler(data: SkjemaMedParter, sakstype: Sakstype): string[] {
+    return finnSaksadvarsler(tilSakParter(data), sakstype, "opprett").map((advarsel) => advarsel.melding);
 }
 
 /** Parten er valgt i skjemaet og ikke satt som ukjent. */

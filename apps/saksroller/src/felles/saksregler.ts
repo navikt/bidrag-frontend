@@ -25,12 +25,23 @@ export function sakstypeForArbeidsfordeling(arbeidsfordeling: string | undefined
     }
 }
 
-/** Partene i en sak, uavhengig av hvordan skjemaet lagrer dem. `bp` og `bm` er identen når parten er kjent. */
+/**
+ * Partene i en sak, uavhengig av hvordan skjemaet lagrer dem. `bp` og `bm` er identen når parten er kjent.
+ * `erLagret` betyr at barnet allerede er lagret i saken.
+ */
 export type SakParter = {
     bp?: string;
     bm?: string;
     bidragsmottakerErUkjent: boolean;
-    barn: Array<ReellMottakerSkjemaverdi & { ident: string; erMyndig: boolean }>;
+    barn: Array<
+        ReellMottakerSkjemaverdi & {
+            ident: string;
+            erMyndig: boolean;
+            alder?: number;
+            navn?: string;
+            erLagret?: boolean;
+        }
+    >;
 };
 
 /** Hvor feilen hører hjemme. Hvert skjema oversetter dette til sine egne feltstier. */
@@ -48,15 +59,19 @@ const PÅKREVDE_FORELDRE: Record<Sakstype, Array<"BP" | "BM">> = {
 
 const FORELDERROLLE = { BP: "bidragspliktig", BM: "bidragsmottaker" } as const;
 
+export type Sakskontekst = "opprett" | "endre";
+
+export type Saksadvarsel = { gjelder: "barnliste"; melding: string };
+
 /**
  * Forretningsreglene for partene i en sak. Brukes både når saken opprettes og når rollene endres.
  * 🔴 Endringer her påvirker hvilke saker som kan lagres.
  */
-export function validerSak(parter: SakParter, sakstype: Sakstype): Saksfeil[] {
+export function validerSak(parter: SakParter, sakstype: Sakstype, kontekst: Sakskontekst): Saksfeil[] {
     return [
         ...validerForeldre(parter, sakstype),
-        ...validerAntallBarn(parter, sakstype),
-        ...validerReellMottakere(parter, sakstype),
+        ...validerAntallBarn(parter, sakstype, kontekst),
+        ...validerReellMottakere(parter, sakstype, kontekst),
     ];
 }
 
@@ -79,15 +94,59 @@ function validerForeldre(parter: SakParter, sakstype: Sakstype): Saksfeil[] {
     return feil;
 }
 
-function validerAntallBarn(parter: SakParter, sakstype: Sakstype): Saksfeil[] {
-    const barnPåkrevd = sakstype !== "Ektefellebidrag" && (sakstype !== "Barnebidrag" || !parter.bm?.trim());
+function validerAntallBarn(parter: SakParter, sakstype: Sakstype, kontekst: Sakskontekst): Saksfeil[] {
+    const barnPåkrevd = sakstype === "Barnebidrag" && !parter.bm?.trim();
     if (barnPåkrevd && parter.barn.length === 0) {
         return [{ gjelder: "barnliste", melding: "Du må velge minst ett barn." }];
     }
-    if (sakstype === "Farskap" && parter.barn.length > 1) {
+    if (kontekst === "opprett" && erFarskapMedFlereBarn(parter, sakstype)) {
         return [{ gjelder: "barnliste", melding: "En farskapssak kan bare gjelde ett barn." }];
     }
     return [];
+}
+
+/** Regler som gir advarsel, men ikke stopper lagring. */
+export function finnSaksadvarsler(parter: SakParter, sakstype: Sakstype, kontekst: Sakskontekst): Saksadvarsel[] {
+    const advarsler: Saksadvarsel[] = [];
+    if (erSakMedBarnUtenBarn(parter, sakstype)) {
+        advarsler.push({ gjelder: "barnliste", melding: INGEN_BARN_ADVARSEL[kontekst] });
+    }
+    if (kontekst === "endre" && erFarskapMedFlereBarn(parter, sakstype)) {
+        advarsler.push({ gjelder: "barnliste", melding: "En farskapssak bør bare gjelde ett barn." });
+    }
+    for (const barn of parter.barn) {
+        if (
+            kontekst === "endre" &&
+            sakstype !== "Oppfostringsbidrag" &&
+            !parter.bm?.trim() &&
+            !barn.reellMottakerType
+        ) {
+            advarsler.push({
+                gjelder: "barnliste",
+                melding: `${barn.navn ?? barn.ident} har ingen reell mottaker, og saken mangler bidragsmottaker.`,
+            });
+        }
+        if (!barn.erLagret && barn.alder !== undefined && barn.alder > MAKS_ALDER_BARN) {
+            advarsler.push({
+                gjelder: "barnliste",
+                melding: `${barn.navn ?? barn.ident} er ${barn.alder} år, over maksalderen for barn på ${MAKS_ALDER_BARN} år.`,
+            });
+        }
+    }
+    return advarsler;
+}
+
+const INGEN_BARN_ADVARSEL: Record<Sakskontekst, string> = {
+    opprett: "Du har ikke valgt barn. Saken blir opprettet uten barn.",
+    endre: "Saken har ingen barn.",
+};
+
+function erSakMedBarnUtenBarn(parter: SakParter, sakstype: Sakstype): boolean {
+    return (sakstype === "Farskap" || sakstype === "Oppfostringsbidrag") && parter.barn.length === 0;
+}
+
+function erFarskapMedFlereBarn(parter: SakParter, sakstype: Sakstype): boolean {
+    return sakstype === "Farskap" && parter.barn.length > 1;
 }
 
 /** BP og BM kan ikke være samme person. */
@@ -122,6 +181,11 @@ export function reellMottakerRegel(sakstype: Sakstype, bidragsmottakerErUkjent: 
     }
 }
 
+/** 🔴 Ved endring krever bidrag-sak reell mottaker bare for myndige barn. Manglende BM gir en advarsel. */
+export function reellMottakerRegelVedEndring(sakstype: Sakstype): ReellMottakerRegel {
+    return reellMottakerRegel(sakstype, false);
+}
+
 /** Valget saksbehandler får for ett barn, eller `undefined` når valget ikke er aktuelt. */
 export function reellMottakerValgregel(
     regel: ReellMottakerRegel,
@@ -139,8 +203,11 @@ export function reellMottakerValgregel(
     }
 }
 
-function validerReellMottakere(parter: SakParter, sakstype: Sakstype): Saksfeil[] {
-    const regel = reellMottakerRegel(sakstype, parter.bidragsmottakerErUkjent);
+function validerReellMottakere(parter: SakParter, sakstype: Sakstype, kontekst: Sakskontekst): Saksfeil[] {
+    const regel =
+        kontekst === "endre"
+            ? reellMottakerRegelVedEndring(sakstype)
+            : reellMottakerRegel(sakstype, parter.bidragsmottakerErUkjent);
     return parter.barn.flatMap((barn, indeks) =>
         validerReellMottaker(barn, reellMottakerGrunn(regel, barn.erMyndig)).map(({ felt, melding }) => ({
             gjelder: "barn" as const,

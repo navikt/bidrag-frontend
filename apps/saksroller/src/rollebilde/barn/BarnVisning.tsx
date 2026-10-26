@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort.tsx";
 import { KortRamme } from "../../felles/person/PersonRolleKort.tsx";
 import { tilReellMottakerValg } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
-import { reellMottakerRegel, reellMottakerValgregel, type Sakstype } from "../../felles/saksregler.ts";
+import { reellMottakerRegelVedEndring, reellMottakerValgregel, type Sakstype } from "../../felles/saksregler.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
 import ReellMottakerRad from "./ReellMottakerRad.tsx";
@@ -14,7 +14,6 @@ import { useBarnReellMottaker } from "./useBarnReellMottaker.tsx";
 interface BarnVisningProps {
     rolle: BarnRolle;
     index: number;
-    bidragsmottakerIdent: string | undefined;
     erNyttBarn?: boolean;
     hentOgNullstillSamhandler: (barnIndex: number, isLeggTilBarn: boolean) => { ident: string; navn: string } | null;
     closeEditorSignal?: number;
@@ -24,7 +23,6 @@ interface BarnVisningProps {
 export default function BarnVisning({
     rolle,
     index,
-    bidragsmottakerIdent,
     erNyttBarn,
     hentOgNullstillSamhandler,
     closeEditorSignal,
@@ -83,10 +81,8 @@ export default function BarnVisning({
                         onAvbryt={handleLukkReellMottaker}
                         onBekreft={handleBekreftReellMottaker}
                         regel={
-                            reellMottakerValgregel(
-                                reellMottakerRegel(sakstype, !bidragsmottakerIdent),
-                                rolle.erMyndig ?? false,
-                            ) ?? "valgfri"
+                            reellMottakerValgregel(reellMottakerRegelVedEndring(sakstype), rolle.erMyndig ?? false) ??
+                            "valgfri"
                         }
                     />
                 )}

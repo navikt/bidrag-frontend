@@ -9,27 +9,37 @@ import {
 
 const STORY = "opprett-ny-sak/flyt/en-part-med-barn/Farskap/Standard";
 
-test("krever barn, bruker arbeidsfordeling FRS og oppretter farskapssak", async ({ mount, page }) => {
+test("advarer uten barn, bruker arbeidsfordeling FRS og oppretter farskapssak", async ({ mount, page }) => {
     const requests = await mockOpprettSakApi(page);
     const component = await mount(STORY);
     await åpneSøskenflokker(component);
+    const ingenBarnAdvarsel = component.getByText("Du har ikke valgt barn. Saken blir opprettet uten barn.");
 
-    const opprettKnapp = component.getByRole("button", { name: /Opprett$/ });
-    await expect(opprettKnapp).toBeEnabled();
-    await opprettKnapp.click();
-    await expect(component.getByText("Du må velge minst ett barn.")).toBeVisible();
+    await expect(ingenBarnAdvarsel).toBeVisible();
 
     await component
         .getByRole("checkbox", { name: /^Velg (?!alle)/ })
         .first()
         .check();
+    await expect(ingenBarnAdvarsel).toHaveCount(0);
     await expect.poll(() => requests.unit.some((request) => request.arbeidsfordeling === "FRS")).toBe(true);
     await expectNoAxeViolations(page, component);
 
-    await opprettKnapp.click();
+    await component.getByRole("button", { name: /Opprett$/ }).click();
     await expect.poll(() => requests.create).toBeTruthy();
     expect(requests.create).toMatchObject({ arbeidsfordeling: "FRS" });
     expect((requests.create?.roller as { type: string }[]).map((r) => r.type)).toContain("BA");
+});
+
+test("farskapssak kan opprettes uten barn", async ({ mount, page }) => {
+    const requests = await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+    await åpneSøskenflokker(component);
+
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+
+    await expect.poll(() => requests.create).toBeTruthy();
+    expect((requests.create?.roller as { type: string }[]).map((r) => r.type)).not.toContain("BA");
 });
 
 test("parten det ble startet fra kan endres", async ({ mount, page }) => {

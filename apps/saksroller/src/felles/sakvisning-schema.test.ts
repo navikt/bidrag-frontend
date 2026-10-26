@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Sakstype } from "./saksregler.ts";
-import { lagSakRedigeringSchema, type Rolle, type SakRedigeringData } from "./sakvisning-schema.ts";
+import { finnRolleadvarsler, lagSakRedigeringSchema, type Rolle, type SakRedigeringData } from "./sakvisning-schema.ts";
 
 const BM = "11111111111";
 const BP = "22222222222";
@@ -22,11 +22,13 @@ describe("lagSakRedigeringSchema", () => {
         expect(valider("Barnebidrag", [rolle("BM", BM), rolle("BP", BP), rolle("BA", BARN)])).toEqual([]);
     });
 
-    it("krever reell mottaker når BM har tomt fødselsnummer", () => {
-        expect(valider("Barnebidrag", [rolle("BM", ""), rolle("BA", BARN)])).toEqual([
+    it("krever reell mottaker for myndig barn, men ikke når bare BM mangler", () => {
+        expect(
+            valider("Barnebidrag", [rolle("BM", ""), rolle("BA", BARN), rolle("BA", BARN_2, { erMyndig: true })]),
+        ).toEqual([
             {
-                path: ["roller", 1, "reellMottaker"],
-                message: "Reell mottaker må registreres når bidragsmottaker er ukjent",
+                path: ["roller", 2, "reellMottaker"],
+                message: "Reell mottaker må registreres for barn over 18 år",
             },
         ]);
     });
@@ -45,10 +47,11 @@ describe("lagSakRedigeringSchema", () => {
         ]);
     });
 
-    it("følger sakstypen fra saken, ikke rollene: farskap med BP og BM gjelder bare ett barn", () => {
-        expect(valider("Farskap", [rolle("BM", BM), rolle("BP", BP), rolle("BA", BARN), rolle("BA", BARN_2)])).toEqual([
-            { path: ["roller", "root"], message: "En farskapssak kan bare gjelde ett barn." },
-        ]);
+    it("følger sakstypen fra saken, ikke rollene: farskap med BP, BM og flere barn gir advarsel, ikke sperre", () => {
+        const roller = [rolle("BM", BM), rolle("BP", BP), rolle("BA", BARN), rolle("BA", BARN_2)];
+        expect(valider("Farskap", roller)).toEqual([]);
+        expect(finnRolleadvarsler(roller, "Farskap")).toEqual(["En farskapssak bør bare gjelde ett barn."]);
+        expect(finnRolleadvarsler(roller, "Barnebidrag")).toEqual([]);
     });
 
     it("krever bidragspliktig og samhandler med ident for hvert barn i oppfostringsbidrag", () => {

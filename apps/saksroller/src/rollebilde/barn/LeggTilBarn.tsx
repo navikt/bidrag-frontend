@@ -16,7 +16,7 @@ import {
 } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 import {
     MYNDYG_BARN_ALDER,
-    reellMottakerRegel,
+    reellMottakerRegelVedEndring,
     reellMottakerValgregel,
     type Sakstype,
 } from "../../felles/saksregler.ts";
@@ -51,10 +51,7 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
         validerNyttBarn(person, { identerISaken: roller.map((rolle) => rolle.fodselsnummer) });
 
     const finnReellMottakerValgregel = (person: PersonDto): ReellMottakerValgregel | undefined =>
-        reellMottakerValgregel(
-            reellMottakerRegel(sakstype, !roller.find((rolle) => rolle.type === "BM")?.fodselsnummer),
-            alderForBarn(person) >= MYNDYG_BARN_ALDER,
-        );
+        reellMottakerValgregel(reellMottakerRegelVedEndring(sakstype), alderForBarn(person) >= MYNDYG_BARN_ALDER);
 
     const søk = useBarnSøk({
         valider: (person) => {

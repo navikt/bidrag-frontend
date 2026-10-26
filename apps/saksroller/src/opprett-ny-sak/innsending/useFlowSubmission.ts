@@ -3,6 +3,7 @@ import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
 import { type SubmitEvent, useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useSjekkTilgangOpprettSakUtenBm } from "../../api/sak.api";
+import type { Relasjonskontroll } from "../../felles/bekreftelse/Relasjonskontrollmelding";
 import { useEksisterendeSakSjekk } from "../eksisterende-sak/useEksisterendeSakSjekk";
 import type { BarnebidragForelderRolle, BarnMedAlder, ForelderPartRolle, Motpart } from "../skjema/opprett-sak-schema";
 import type { EnhetOgSubmitSectionProps } from "./EnhetOgSubmitSection";
@@ -22,6 +23,9 @@ type UseFlowSubmissionProps<T extends FormMedKategori> = {
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     erEktefellebidrag?: boolean;
     roller: BarnebidragForelderRolle[];
+    /** Kalles ved innsending. `false` stopper innsendingen, for eksempel når en advarsel ikke er bekreftet. */
+    kanFortsette?: () => boolean;
+    relasjonskontroll?: Relasjonskontroll;
 };
 
 function tilEksisterendeSakPart(part: Motpart, rolle: ForelderPartRolle) {
@@ -53,6 +57,7 @@ function useSendInn<T extends FormMedKategori>(
     innsending: ReturnType<typeof useOpprettSakHandling>,
     parter: Omit<OpprettSakParter, "kategori">,
     kanSendeInn: boolean,
+    kanFortsette: () => boolean,
 ) {
     const { opprettSak, isLoading, saksnummer, nullstillResultat } = innsending;
     const senderInn = useRef(false);
@@ -78,6 +83,11 @@ function useSendInn<T extends FormMedKategori>(
     });
     return (event: SubmitEvent) => {
         event.stopPropagation();
+        if (!kanFortsette()) {
+            event.preventDefault();
+            void form.trigger();
+            return;
+        }
         return sendInn(event);
     };
 }
@@ -94,6 +104,8 @@ export function useFlowSubmission<T extends FormMedKategori>({
     valgteBarn = [],
     arbeidsfordeling,
     erEktefellebidrag,
+    kanFortsette = () => true,
+    relasjonskontroll,
 }: UseFlowSubmissionProps<T>) {
     const { bidragspliktig: valgtBidragspliktig, bidragsmottaker: valgtBidragsmottaker } = parterFraRoller(roller);
     const {
@@ -136,8 +148,9 @@ export function useFlowSubmission<T extends FormMedKategori>({
         isLoadingEnhet ||
         !enhet ||
         Boolean(enhetError) ||
-        tilgangUtenBm.blokkert;
-    const onSubmit = useSendInn(form, opprettSak, parter, !blocked);
+        tilgangUtenBm.blokkert ||
+        Boolean(relasjonskontroll);
+    const onSubmit = useSendInn(form, opprettSak, parter, !blocked, kanFortsette);
 
     const innsending: EnhetOgSubmitSectionProps = {
         enhet,
