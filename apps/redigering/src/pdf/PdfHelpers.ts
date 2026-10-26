@@ -1,12 +1,14 @@
 import { LoggerService } from "@bidrag/common";
 import {
     PDFArray,
+    PDFCatalog,
     PDFDict,
     PDFDocument,
     PDFName,
     type PDFObject,
     type PDFPage,
     PDFPageLeaf,
+    PDFPageTree,
     PDFRawStream,
     PDFRef,
     PDFStream,
@@ -292,15 +294,47 @@ export async function debugRepairPDF(pdfDoc: PDFDocument) {
     }
 }
 
+/**
+ * pdf-lib oppretter kun PDFCatalog/PDFPageTree for dicts med `/Type /Catalog` og `/Type /Pages`.
+ * Mangler disse i Root (korrupt PDF), blir `pdfDoc.catalog` en vanlig PDFDict, og alle
+ * sideoperasjoner feiler med "this.catalog.Pages is not a function".
+ */
+export function ensureValidCatalog(pdfDoc: PDFDocument): void {
+    const context = pdfDoc.context;
+    const rootRef = context.trailerInfo.Root;
+    let catalog = pdfDoc.catalog as PDFDict;
+    if (!(rootRef instanceof PDFRef) || !(catalog instanceof PDFDict)) return;
+
+    if (!(catalog instanceof PDFCatalog)) {
+        LoggerService.warn("PDF mangler gyldig /Type /Catalog i Root. Gjenoppretter katalog.");
+        catalog = PDFCatalog.fromMapWithContext(catalog.asMap(), context);
+        catalog.set(PDFName.of("Type"), PDFName.of("Catalog"));
+        context.assign(rootRef, catalog);
+        (pdfDoc as unknown as { catalog: PDFCatalog }).catalog = catalog as PDFCatalog;
+    }
+
+    const pagesRef = catalog.get(PDFName.of("Pages"));
+    const pages = pagesRef instanceof PDFRef ? context.lookup(pagesRef) : undefined;
+    if (pagesRef instanceof PDFRef && pages instanceof PDFDict && !(pages instanceof PDFPageTree)) {
+        LoggerService.warn("PDF mangler gyldig /Type /Pages i sidetreet. Gjenoppretter sidetre.");
+        const pageTree = PDFPageTree.fromMapWithContext(pages.asMap(), context);
+        pageTree.set(PDFName.of("Type"), PDFName.of("Pages"));
+        context.assign(pagesRef, pageTree);
+    }
+}
+
 export async function lastGyldigPDF(pdfBytearray: PdfBytes) {
     try {
         const pdfDoc = await PDFDocument.load(pdfBytearray);
+        ensureValidCatalog(pdfDoc);
         // Sjekk om sidene kan lastes. Hvis ikke så betyr det at PDF er korrupt
         pdfDoc.getPages();
         return pdfDoc;
     } catch (e) {
         LoggerService.warn("Kunne ikke hente sider for PDF pga corrupt PDF fil. Fortsetter uten PDFBox-reparasjon", e);
-        return await PDFDocument.load(pdfBytearray);
+        const pdfDoc = await PDFDocument.load(pdfBytearray);
+        ensureValidCatalog(pdfDoc);
+        return pdfDoc;
     }
 }
 

@@ -16,6 +16,7 @@ import type { EditDocumentMetadata } from "../types/EditorTypes";
 import { PdfAConverter } from "./PdfAConverter";
 import { getErrorMessage, isPageTreeCorruptionError } from "./PdfErrorUtils";
 import {
+    ensureValidCatalog,
     fixMissingPages,
     flattenForm,
     hasInvalidXObject,
@@ -883,6 +884,7 @@ export class PdfProducer {
     private async normalizePdfAfterFix(): Promise<void> {
         const normalizedBytes = await this.pdfDocument.save();
         this.pdfDocument = await PDFDocument.load(normalizedBytes);
+        ensureValidCatalog(this.pdfDocument);
         const pageRefsAfterLoad = this.getCurrentPageRefOrder();
         // Prefer the canonical editorVisiblePageRefOrder as the order to preserve, rather than
         // a snapshot of pageRefsAfterLoad taken before this reorder step. A pre-recovery snapshot
