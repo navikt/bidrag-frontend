@@ -320,6 +320,73 @@ export function ensureValidCatalog(pdfDoc: PDFDocument): void {
         const pageTree = PDFPageTree.fromMapWithContext(pages.asMap(), context);
         pageTree.set(PDFName.of("Type"), PDFName.of("Pages"));
         context.assign(pagesRef, pageTree);
+    } else if (!(pages instanceof PDFDict)) {
+        rebuildPageTreeFromLeaves(pdfDoc, catalog as PDFCatalog);
+    }
+}
+
+// /Pages is missing or points to a non-existent object, so pdf-lib cannot traverse the tree at all.
+// Build a new root page tree from all page leaves in the document, ordered by object number.
+function rebuildPageTreeFromLeaves(pdfDoc: PDFDocument, catalog: PDFCatalog): void {
+    const context = pdfDoc.context;
+    const objects = context.enumerateIndirectObjects();
+
+    // Prefer an existing root page tree (no Parent) that is just unlinked from the catalog,
+    // since it keeps the original page order and inherited attributes intact.
+    const orphanRoots = objects.filter(([, obj]) => obj instanceof PDFPageTree && !obj.get(PDFName.of("Parent"))) as [
+        PDFRef,
+        PDFPageTree,
+    ][];
+    if (orphanRoots.length === 1) {
+        LoggerService.warn("PDF-katalogen mangler kobling til sidetreet. Kobler til eksisterende sidetre.");
+        catalog.set(PDFName.of("Pages"), orphanRoots[0][0]);
+        return;
+    }
+
+    LoggerService.warn("PDF mangler sidetre (/Pages). Bygger nytt sidetre fra sideobjektene.");
+    const leaves = objects
+        .filter(([, obj]) => obj instanceof PDFPageLeaf)
+        .sort(([a], [b]) => a.objectNumber - b.objectNumber || a.generationNumber - b.generationNumber);
+
+    const pageTree = PDFPageTree.withContext(context);
+    const pageTreeRef = context.register(pageTree);
+    const kids = pageTree.Kids();
+    for (const [ref, leaf] of leaves) {
+        // Leaves often inherit Resources/MediaBox from their old parents. Copy them onto the
+        // leaf before reparenting, otherwise the pages render blank.
+        copyInheritedAttributes(leaf as PDFPageLeaf, context);
+        kids.push(ref);
+        (leaf as PDFPageLeaf).set(PDFName.of("Parent"), pageTreeRef);
+    }
+    pageTree.set(PDFName.of("Count"), context.obj(leaves.length));
+    catalog.set(PDFName.of("Pages"), pageTreeRef);
+}
+
+const INHERITABLE_PAGE_ATTRIBUTES = ["Resources", "MediaBox", "CropBox", "Rotate"];
+
+function copyInheritedAttributes(leaf: PDFPageLeaf, context: PDFDocument["context"]): void {
+    const visited = new Set<PDFObject>();
+    let parent = context.lookup(leaf.get(PDFName.of("Parent")));
+    while (parent instanceof PDFDict && !visited.has(parent)) {
+        visited.add(parent);
+        for (const key of INHERITABLE_PAGE_ATTRIBUTES) {
+            const name = PDFName.of(key);
+            const value = parent.get(name);
+            if (value !== undefined && leaf.get(name) === undefined) leaf.set(name, value);
+        }
+        parent = context.lookup(parent.get(PDFName.of("Parent")));
+    }
+    if (!leaf.get(PDFName.of("Resources"))) leaf.set(PDFName.of("Resources"), context.obj({}));
+    if (!leaf.get(PDFName.of("MediaBox"))) leaf.set(PDFName.of("MediaBox"), context.obj([0, 0, 595.28, 841.89]));
+}
+
+export async function harManglendeSidetre(pdfBytearray: PdfBytes): Promise<boolean> {
+    try {
+        const pdfDoc = await PDFDocument.load(pdfBytearray);
+        const pagesRef = pdfDoc.catalog.get(PDFName.of("Pages"));
+        return !(pdfDoc.context.lookup(pagesRef) instanceof PDFDict);
+    } catch {
+        return false;
     }
 }
 
