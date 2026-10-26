@@ -28,11 +28,7 @@ import { useQueryParams } from "../../../common/hooks/useQueryParams";
 import { hentVisningsnavn } from "../../../common/hooks/useVisningsnavn";
 import { formatterBeløpForBeregning, formatterProsent } from "../../../utils/number-utils";
 import { VedtaksListeBeregning } from "../Vedtakliste";
-import {
-    DetaljertBeregningBidrag,
-    sluttberegningResultat,
-    visBeregningsdetaljerVedAvslag,
-} from "./DetaljertBeregningBidrag";
+import { DetaljertBeregningBidrag, visBeregningsdetaljerVedAvslag } from "./DetaljertBeregningBidrag";
 
 type VedtakContextProps = {
     skalIndeksreguleres: Map<string, boolean>;
@@ -130,7 +126,6 @@ export const TableRowResultatAvslag = ({
 }) => {
     const { virkningstidspunktV3 } = useGetBehandlingV2();
     const barnDetaljer = virkningstidspunktV3.barn.find((b) => b.rolle.ident === barn.barn.ident);
-    const visUOgAndel = sluttberegningResultat(periode) === Resultatkode.BIDRAG_IKKE_BEREGNET_DELT_BOSTED;
     return (
         <>
             <Table.DataCell textSize="small">
@@ -138,32 +133,7 @@ export const TableRowResultatAvslag = ({
                 {periode.periode.til ? dateToDDMMYYYYString(deductDays(new Date(periode.periode.til), 1)) : ""}
             </Table.DataCell>
 
-            {visUOgAndel ? (
-                <>
-                    <Table.DataCell textSize="small">
-                        {formatterBeløpForBeregning(periode.underholdskostnad)}
-                    </Table.DataCell>
-                    <Table.DataCell textSize="small">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td className="w-[45px]" align="right">
-                                        {formatterProsent(periode.bpsAndelU)}
-                                    </td>
-                                    <td className="w-[10px]">/</td>
-                                    <td>{formatterBeløpForBeregning(periode.bpsAndelBeløp)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </Table.DataCell>
-                    <Table.DataCell textSize="small" colSpan={2}></Table.DataCell>
-                    <Table.DataCell textSize="small">
-                        {formatterBeløpForBeregning(periode.bpsAndelBeløp - periode.underholdskostnad * 0.5)}
-                    </Table.DataCell>
-                </>
-            ) : (
-                <Table.DataCell textSize="small" colSpan={5}></Table.DataCell>
-            )}
+            <Table.DataCell textSize="small" colSpan={5}></Table.DataCell>
 
             <Table.DataCell textSize="small">{barnDetaljer.harLøpendeBidrag ? "Opphør" : "Avslag"}</Table.DataCell>
 
