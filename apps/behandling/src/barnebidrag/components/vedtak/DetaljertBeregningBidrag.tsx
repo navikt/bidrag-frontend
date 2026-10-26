@@ -24,7 +24,11 @@ import { IndeksreguleringDetaljer } from "./IndeksreguleringDetaljer";
 import { NettoBarnetilleggTable } from "./NettoBarnetilleggTable";
 
 // Beregnede avslag der grunnlaget for avslaget vises i detaljene
-const avslagMedBeregningsdetaljer = [Resultatkode.BIDRAG_IKKE_BEREGNET_DELT_BOSTED, Resultatkode.BARNETERSELVFORSORGET];
+const avslagMedBeregningsdetaljer = [
+    Resultatkode.BIDRAG_IKKE_BEREGNET_DELT_BOSTED,
+    Resultatkode.BARNETERSELVFORSORGET,
+    Resultatkode.FULLT_UNDERHOLDT_AV_OFFENTLIG,
+];
 
 // periode.resultatKode er ikke satt for beregnede avslag, så resultatet hentes fra sluttberegningen
 export const sluttberegningResultat = (periode: ResultatBarnebidragsberegningPeriodeDto) =>
