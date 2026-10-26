@@ -1,5 +1,5 @@
 import { InformationSquareIcon } from "@navikt/aksel-icons";
-import { Box, Heading, HGrid, InfoCard, VStack } from "@navikt/ds-react";
+import { Box, Heading, HGrid, InfoCard, InlineMessage, VStack } from "@navikt/ds-react";
 import { type ComponentProps, useState } from "react";
 import type { Sakstype } from "../../felles/saksregler.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
@@ -23,24 +23,24 @@ function IngenBarnMelding() {
 export type BarnISakenProps = {
     barn: BarnRolle[];
     roller: SakRedigeringData["roller"];
-    bidragsmottakerIdent: string | undefined;
     dataUpdatedAt: number;
     hentOgNullstillSamhandler: ComponentProps<typeof BarnVisning>["hentOgNullstillSamhandler"];
     sakstype: Sakstype;
     muligeBarn: ComponentProps<typeof LeggTilBarn>["søsken"];
     funnetPersonISak: (fnr: string) => boolean;
+    advarsler?: string[];
 };
 
 /** Barna i saken som kort, med «Legg til barn» og forslag. */
 export default function BarnISaken({
     barn,
     roller,
-    bidragsmottakerIdent,
     dataUpdatedAt,
     hentOgNullstillSamhandler,
     sakstype,
     muligeBarn,
     funnetPersonISak,
+    advarsler = [],
 }: BarnISakenProps) {
     const [visSøk, setVisSøk] = useState(false);
 
@@ -50,14 +50,18 @@ export default function BarnISaken({
                 <Heading level="2" size="small">
                     Barn i saken ({barn.length})
                 </Heading>
-                {barn.length === 0 && <IngenBarnMelding />}
-                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24" align="start">
+                {barn.length === 0 && advarsler.length === 0 && <IngenBarnMelding />}
+                {advarsler.map((melding) => (
+                    <InlineMessage key={melding} status="warning" size="small">
+                        {melding}
+                    </InlineMessage>
+                ))}
+                <HGrid columns={{ xs: 1, lg: 2, xl: 3 }} gap="space-24">
                     {barn.map((barnRolle, idx) => (
                         <BarnVisning
                             key={barnnøkkel(barnRolle, idx)}
                             rolle={barnRolle}
                             index={roller.indexOf(barnRolle)}
-                            bidragsmottakerIdent={bidragsmottakerIdent}
                             closeEditorSignal={dataUpdatedAt}
                             hentOgNullstillSamhandler={hentOgNullstillSamhandler}
                             erNyttBarn={!funnetPersonISak(barnRolle.fodselsnummer)}

@@ -5,8 +5,16 @@ import type { Rolle } from "../../felles/sakvisning-schema";
 export function finnDuplikatForelderFeil(roller: Rolle[], rolleType: "BP" | "BM", person: PersonDto): string | null {
     const denAndreForelderenType = rolleType === "BM" ? "BP" : "BM";
     const denAndreForelderen = roller.find((rolle) => rolle.type === denAndreForelderenType);
+    return finnFeilHvisDenAndreForelderen(person, rolleType, denAndreForelderen?.fodselsnummer);
+}
 
-    if (!erSammeForelder(person.ident, denAndreForelderen?.fodselsnummer)) {
+/** Feilmelding når personen allerede er valgt som den andre forelderen, ellers `null`. */
+export function finnFeilHvisDenAndreForelderen(
+    person: PersonDto,
+    rolleType: "BP" | "BM",
+    denAndreForelderensIdent: string | undefined,
+): string | null {
+    if (!erSammeForelder(person.ident, denAndreForelderensIdent)) {
         return null;
     }
 

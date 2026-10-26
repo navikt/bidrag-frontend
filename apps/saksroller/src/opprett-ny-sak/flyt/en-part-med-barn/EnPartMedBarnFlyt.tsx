@@ -13,6 +13,7 @@ import {
     FarskapsSkjemaSchema,
     type FarskapsSkjemaSchemaData,
     type ForelderPartRolle,
+    finnOpprettSakAdvarsler,
     OppfostringsbidragSkjemaSchema,
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
@@ -52,14 +53,14 @@ const konfig: Record<
 export default function EnPartMedBarnFlyt() {
     const { sakstype, partISaken } = useOpprettSakStart();
 
-    if (!partISaken || (sakstype !== "FARSKAP" && sakstype !== "OPPFOSTRINGSBIDRAG")) {
+    if (sakstype !== "FARSKAP" && sakstype !== "OPPFOSTRINGSBIDRAG") {
         return null;
     }
 
     return <EnPartMedBarnSkjema type={sakstype} partISaken={partISaken} />;
 }
 
-function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken: PartISaken }) {
+function EnPartMedBarnSkjema({ type, partISaken }: { type: Flyttype; partISaken?: PartISaken }) {
     const { arbeidsfordeling, rolle, schema } = konfig[type];
     const form = useForm<FarskapsSkjemaSchemaData>({
         resolver: zodResolver(schema),
@@ -142,20 +143,22 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                 <BarnSection
                     form={form}
                     barnkurver={barnkurver}
+                    lasterKurver={lasterKurver}
                     reellMottakerRegel={reellMottakerRegel(sakstype, false)}
                     beskrivelse={beskrivelse}
                     maksEttBarn={type === "FARSKAP"}
+                    advarsler={finnOpprettSakAdvarsler({ roller: form.watch("roller"), valgteBarn }, sakstype)}
                 />
             )}
         </RolleFlytSide>
     );
 }
 
-function lagStartroller(partISaken: PartISaken, kjentRolle: ForelderPartRolle): EnPartMedBarnRolle[] {
+function lagStartroller(partISaken: PartISaken | undefined, kjentRolle: ForelderPartRolle): EnPartMedBarnRolle[] {
     const kjentType = kjentRolle === "bidragspliktig" ? "BP" : "BM";
     const ukjentType = kjentType === "BP" ? "BM" : "BP";
     return [
-        { ...partISaken, type: kjentType, erKjent: true },
+        { ident: "", navn: "", ...partISaken, type: kjentType, erKjent: true },
         { ident: "", navn: "", type: ukjentType, erKjent: false },
     ];
 }

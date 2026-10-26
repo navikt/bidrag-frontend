@@ -4,16 +4,25 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { alderForBarn, validerNyttBarn } from "../../felles/barn/barn-regler.ts";
 import { BarnPersonInfo, LeggTilBarnSøk, useBarnSøk } from "../../felles/person-søk/BarnSøk.tsx";
+import ReellMottakerValgGruppe, {
+    type ReellMottakerValg,
+    type ReellMottakerValgregel,
+    useLagretSamhandler,
+} from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
+import {
+    initialiserValg,
+    kanBekrefteReellMottaker,
+    MANGLER_REELL_MOTTAKER_MELDING,
+} from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 import {
     MYNDYG_BARN_ALDER,
-    reellMottakerRegel,
+    reellMottakerRegelVedEndring,
     reellMottakerValgregel,
     type Sakstype,
 } from "../../felles/saksregler.ts";
 import type { SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import { lagBarnRolle } from "./legg-til-barn-utils.ts";
-import ReellMottakerVelger from "./ReellMottakerVelger.tsx";
 
 interface LeggTilBarnProps {
     søsken?: PersonDto[];
@@ -23,20 +32,26 @@ interface LeggTilBarnProps {
 }
 
 export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSøk }: LeggTilBarnProps) {
-    const [valgtBarn, setValgtBarn] = useState<PersonDto | null>(null);
-    const [visReellMottaker, setVisReellMottaker] = useState(false);
+    const [valgtReellMottaker, setValgtReellMottaker] = useState<{
+        barnIdent: string;
+        valg: ReellMottakerValg;
+    }>();
+    const [reellMottakerFeil, setReellMottakerFeil] = useState<{ barnIdent: string; melding: string }>();
 
-    useRegistrerÅpenRedigering("legg-til-barn", visSøk || visReellMottaker);
+    useRegistrerÅpenRedigering("legg-til-barn", visSøk);
 
     const form = useFormContext<SakRedigeringData>();
     const roller = form.watch("roller") || [];
 
-    const tilgjengeligeSøsken = søsken.filter(
-        (søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident),
-    );
+    const tilgjengeligeSøsken = søsken
+        .filter((søskenBarn) => !roller.some((rolle) => rolle.fodselsnummer === søskenBarn.ident))
+        .sort((a, b) => alderForBarn(b) - alderForBarn(a));
 
     const finnValideringsfeil = (person: PersonDto) =>
         validerNyttBarn(person, { identerISaken: roller.map((rolle) => rolle.fodselsnummer) });
+
+    const finnReellMottakerValgregel = (person: PersonDto): ReellMottakerValgregel | undefined =>
+        reellMottakerValgregel(reellMottakerRegelVedEndring(sakstype), alderForBarn(person) >= MYNDYG_BARN_ALDER);
 
     const søk = useBarnSøk({
         valider: (person) => {
@@ -55,61 +70,123 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
             return;
         }
 
-        const nyttBarn = lagBarnRolle(person);
+        const regel = finnReellMottakerValgregel(person);
+        const barn = { ident: person.ident, navn: person.visningsnavn };
+        const valg = initialiserValg(
+            valgtReellMottaker?.barnIdent === person.ident ? valgtReellMottaker.valg : {},
+            regel ?? "valgfri",
+            barn,
+        );
+        if (!kanBekrefteReellMottaker(valg, regel)) {
+            setReellMottakerFeil({ barnIdent: person.ident, melding: MANGLER_REELL_MOTTAKER_MELDING });
+            return;
+        }
+
+        const nyttBarn = {
+            ...lagBarnRolle(person),
+            reellMottakerType: valg.type,
+            reellMottaker: valg.ident,
+            reellMottakerNavn: valg.navn,
+        };
 
         form.setValue("roller", [...roller, nyttBarn], { shouldValidate: true });
 
-        const harBidragsmottaker = roller.some((rolle) => rolle.type === "BM" && rolle.fodselsnummer);
-
         søk.nullstill();
-
-        if (nyttBarn.erMyndig || !harBidragsmottaker) {
-            setValgtBarn(person);
-            setVisReellMottaker(true);
-            setVisSøk(false);
-        } else if (tilgjengeligeSøsken.length <= 1) {
+        setValgtReellMottaker(undefined);
+        setReellMottakerFeil(undefined);
+        if (tilgjengeligeSøsken.length <= 1) {
             søk.lukk();
         }
     };
 
-    const resetEtterReellMottaker = () => {
-        setVisReellMottaker(false);
-        setValgtBarn(null);
-        søk.nullstill();
-    };
-
-    if (visReellMottaker && valgtBarn) {
-        const rolleIndex = roller.findIndex((rolle) => rolle.fodselsnummer === valgtBarn.ident);
-        return (
-            <ReellMottakerVelger
-                barnNavn={valgtBarn.visningsnavn ?? "Barnet"}
-                barnIdent={valgtBarn.ident}
-                verdi={{}}
-                onAvbryt={resetEtterReellMottaker}
-                onBekreft={(valg) => {
-                    form.setValue(`roller.${rolleIndex}.reellMottakerType`, valg.type);
-                    form.setValue(`roller.${rolleIndex}.reellMottaker`, valg.ident);
-                    form.setValue(`roller.${rolleIndex}.reellMottakerNavn`, valg.navn, { shouldValidate: true });
-                    resetEtterReellMottaker();
-                }}
-                regel={
-                    reellMottakerValgregel(
-                        reellMottakerRegel(sakstype, !roller.find((rolle) => rolle.type === "BM")?.fodselsnummer),
-                        alderForBarn(valgtBarn) >= MYNDYG_BARN_ALDER,
-                    ) ?? "valgfri"
-                }
-            />
-        );
-    }
-
     const harBeggeForeldre = roller.some((i) => i.type === "BP") && roller.some((i) => i.type === "BM");
+    const funnetBarn = søk.funnetBarn;
+    const funnetBarnValgregel = funnetBarn ? finnReellMottakerValgregel(funnetBarn.person) : undefined;
 
     return (
-        <LeggTilBarnSøk søk={søk} visSøk={visSøk} onÅpne={() => setVisSøk(true)}>
+        <LeggTilBarnSøk
+            søk={søk}
+            visSøk={visSøk}
+            onÅpne={() => setVisSøk(true)}
+            innholdPåFunnetBarn={
+                funnetBarn &&
+                funnetBarnValgregel && (
+                    <NyttBarnReellMottaker
+                        key={funnetBarn.person.ident}
+                        barn={funnetBarn.person}
+                        regel={funnetBarnValgregel}
+                        valg={
+                            valgtReellMottaker?.barnIdent === funnetBarn.person.ident
+                                ? valgtReellMottaker.valg
+                                : undefined
+                        }
+                        feil={
+                            reellMottakerFeil?.barnIdent === funnetBarn.person.ident
+                                ? reellMottakerFeil.melding
+                                : undefined
+                        }
+                        onValg={(valg) => setValgtReellMottaker({ barnIdent: funnetBarn.person.ident, valg })}
+                        onFeil={(melding) =>
+                            setReellMottakerFeil(melding ? { barnIdent: funnetBarn.person.ident, melding } : undefined)
+                        }
+                    />
+                )
+            }
+        >
             {tilgjengeligeSøsken.length > 0 && (
-                <SøskenListe søsken={tilgjengeligeSøsken} harBeggeForeldre={harBeggeForeldre} onVelg={leggTil} />
+                <SøskenListe
+                    søsken={tilgjengeligeSøsken}
+                    harBeggeForeldre={harBeggeForeldre}
+                    onVelg={(person) => {
+                        try {
+                            søk.håndterSøk(person);
+                        } catch (error) {
+                            søk.setFeil(error instanceof Error ? error.message : String(error));
+                        }
+                    }}
+                />
             )}
         </LeggTilBarnSøk>
+    );
+}
+
+function NyttBarnReellMottaker({
+    barn,
+    regel,
+    valg: lagretValg,
+    feil,
+    onValg,
+    onFeil,
+}: {
+    barn: PersonDto;
+    regel: ReellMottakerValgregel;
+    valg?: ReellMottakerValg;
+    feil?: string;
+    onValg: (valg: ReellMottakerValg) => void;
+    onFeil: (feil: string) => void;
+}) {
+    const valg = initialiserValg(lagretValg ?? {}, regel, {
+        ident: barn.ident,
+        navn: barn.visningsnavn,
+    });
+    const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(valg);
+
+    const handleValg = (nyttValg: ReellMottakerValg) => {
+        huskSamhandler(valg, nyttValg);
+        onValg(nyttValg);
+        onFeil("");
+    };
+
+    return (
+        <ReellMottakerValgGruppe
+            barnNavn={barn.visningsnavn}
+            barnIdent={barn.ident}
+            valg={valg}
+            lagretSamhandler={lagretSamhandler}
+            onValg={handleValg}
+            regel={regel}
+            feil={feil}
+        />
     );
 }
 

@@ -70,7 +70,7 @@ const bisysOppgavelisteDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/opp
  */
 function hentSakBrukerFraUrl(pathname: string, searchParams: URLSearchParams): ReturKontekst {
     return {
-        saksnummer: pathname.match(/^\/sak\/([^/]+)/)?.[1] ?? searchParams.get(SAKSNR_PARAM) ?? undefined,
+        saksnummer: pathname.match(/^\/sak\/(\d+)/)?.[1] ?? searchParams.get(SAKSNR_PARAM) ?? undefined,
         brukerid: pathname.match(/^\/bruker\/([^/]+)/)?.[1] ?? undefined,
     };
 }
@@ -143,6 +143,13 @@ const BISYS_RETUR_VERDI = "bisys";
  * Rekkefølgen avgjør prioritet ved overlappende treff.
  */
 const STANDARD_RETUR_MÅL: StandardReturMål[] = [
+    {
+        label: "Bisys",
+        id: () => "sak",
+        undersider: ["ny", "opprett"],
+        undersideSti: (_id, side) => `/sak/${side}`,
+        destinasjon: bisysOppgavelisteDestinasjon,
+    },
     {
         label: "Sak",
         id: ({ saksnummer }) => saksnummer,

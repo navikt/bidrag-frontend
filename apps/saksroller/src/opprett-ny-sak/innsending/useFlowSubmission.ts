@@ -22,6 +22,8 @@ type UseFlowSubmissionProps<T extends FormMedKategori> = {
     arbeidsfordeling?: "BBF" | "EEN" | "EFS" | "FRS" | "INH" | "OPS";
     erEktefellebidrag?: boolean;
     roller: BarnebidragForelderRolle[];
+    kanFortsette?: () => boolean;
+    lasterRelasjoner?: boolean;
 };
 
 function tilEksisterendeSakPart(part: Motpart, rolle: ForelderPartRolle) {
@@ -53,6 +55,7 @@ function useSendInn<T extends FormMedKategori>(
     innsending: ReturnType<typeof useOpprettSakHandling>,
     parter: Omit<OpprettSakParter, "kategori">,
     kanSendeInn: boolean,
+    kanFortsette: () => boolean,
 ) {
     const { opprettSak, isLoading, saksnummer, nullstillResultat } = innsending;
     const senderInn = useRef(false);
@@ -78,6 +81,11 @@ function useSendInn<T extends FormMedKategori>(
     });
     return (event: SubmitEvent) => {
         event.stopPropagation();
+        if (!kanFortsette()) {
+            event.preventDefault();
+            void form.trigger();
+            return;
+        }
         return sendInn(event);
     };
 }
@@ -94,6 +102,8 @@ export function useFlowSubmission<T extends FormMedKategori>({
     valgteBarn = [],
     arbeidsfordeling,
     erEktefellebidrag,
+    kanFortsette = () => true,
+    lasterRelasjoner = false,
 }: UseFlowSubmissionProps<T>) {
     const { bidragspliktig: valgtBidragspliktig, bidragsmottaker: valgtBidragsmottaker } = parterFraRoller(roller);
     const {
@@ -136,8 +146,9 @@ export function useFlowSubmission<T extends FormMedKategori>({
         isLoadingEnhet ||
         !enhet ||
         Boolean(enhetError) ||
-        tilgangUtenBm.blokkert;
-    const onSubmit = useSendInn(form, opprettSak, parter, !blocked);
+        tilgangUtenBm.blokkert ||
+        lasterRelasjoner;
+    const onSubmit = useSendInn(form, opprettSak, parter, !blocked, kanFortsette);
 
     const innsending: EnhetOgSubmitSectionProps = {
         enhet,
@@ -146,7 +157,6 @@ export function useFlowSubmission<T extends FormMedKategori>({
         enhetError,
         blocked,
         manglerTilgangUtenBm: tilgangUtenBm.mangler,
-        oppsummering: parter,
         submitError: opprettSak.error,
         isLoading: opprettSak.isLoading,
         saksnummer: opprettSak.saksnummer,

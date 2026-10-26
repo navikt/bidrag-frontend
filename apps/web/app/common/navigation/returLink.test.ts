@@ -92,6 +92,13 @@ describe("finnStandardReturMål", () => {
         });
     });
 
+    it("ny sak uten saksnummer går tilbake til Bisys", () => {
+        expect(finnStandardReturMål("/sak/ny", { saksnummer: "ny" })).toEqual({
+            label: "Bisys",
+            sti: "/bisys/oppgaveliste",
+        });
+    });
+
     it("registrering av journalpost utenfor sakskontekst faller til Oppgaveliste", () => {
         expect(finnStandardReturMål("/journalpost/456", {})).toEqual({
             label: "Oppgaveliste",

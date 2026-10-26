@@ -34,19 +34,20 @@ export function utledForelderforslag({
 }
 
 /**
- * `false` når minst ett valgt barn ikke har både BP og BM som registrerte foreldre.
+ * Valgte barn som ikke har alle kjente foreldre (BP og BM) registrert som foreldre.
  * `undefined` mens foreldreinformasjon lastes, slik at varselet ikke blinker.
  */
-export function harFullstendigRelasjon(
+export function barnMedUfullstendigRelasjon(
     foreldreTilBarn: ForeldreTilBarn[],
     bidragspliktigIdent?: string,
     bidragsmottakerIdent?: string,
-): boolean | undefined {
-    if (foreldreTilBarn.length === 0) return true;
+): ForeldreTilBarn["barn"][] | undefined {
     if (foreldreTilBarn.some((b) => b.foreldre === undefined)) return undefined;
     const kjenteForeldre = [bidragspliktigIdent, bidragsmottakerIdent].filter((ident): ident is string => !!ident);
-    return foreldreTilBarn.every(({ foreldre = [] }) => {
-        const identer = foreldre.map((f) => f.ident);
-        return kjenteForeldre.every((ident) => identer.includes(ident));
-    });
+    return foreldreTilBarn
+        .filter(({ foreldre = [] }) => {
+            const identer = foreldre.map((f) => f.ident);
+            return !kjenteForeldre.every((ident) => identer.includes(ident));
+        })
+        .map(({ barn }) => barn);
 }

@@ -118,15 +118,32 @@ export function BarnReellMottaker<TFieldValues extends FieldValues>({
     barn,
     barnIndex,
     regel,
+    valgt,
 }: {
     form: UseFormReturn<TFieldValues>;
     barn: { ident: string; navn: string; erMyndig: boolean };
     barnIndex: number;
     regel: ReellMottakerRegel;
+    valgt: boolean;
 }) {
     const valgregel = reellMottakerValgregel(regel, barn.erMyndig);
-    if (!valgregel || barnIndex === -1) {
+    if (!valgregel) {
         return null;
+    }
+    if (!valgt || barnIndex === -1) {
+        return (
+            <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">
+                <ReellMottakerValgGruppe
+                    barnNavn={barn.navn}
+                    barnIdent={barn.ident}
+                    valg={{}}
+                    lagretSamhandler={null}
+                    onValg={() => {}}
+                    regel={valgregel}
+                    disabled
+                />
+            </Box>
+        );
     }
     return (
         <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">

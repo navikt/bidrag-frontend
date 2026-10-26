@@ -7,8 +7,6 @@ import { useTestQueryClient } from "../../../playwright/saksroller/useTestQueryC
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import BarnVisning from "./BarnVisning.tsx";
 
-const BM_IDENT = genererFnr();
-
 function lagBarn(overrides: Partial<BarnRolle> = {}): BarnRolle {
     return {
         fodselsnummer: genererFnr(),
@@ -46,7 +44,6 @@ function BarnVisningScenario({ initialRoller, erNyttBarnIndex }: BarnVisningScen
                                 key={rolle.fodselsnummer}
                                 rolle={rolle}
                                 index={index}
-                                bidragsmottakerIdent={BM_IDENT}
                                 erNyttBarn={index === erNyttBarnIndex}
                                 hentOgNullstillSamhandler={() => null}
                                 sakstype="Barnebidrag"

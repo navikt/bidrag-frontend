@@ -1,18 +1,22 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { Alert, Button, HGrid, VStack } from "@navikt/ds-react";
+import { Alert, Button, HGrid, Select, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import SøkPerson from "../../felles/person-søk/SøkPerson";
 import RolleForelderKort from "../../rollebilde/forelder/ForelderKort";
+import { finnFeilHvisDenAndreForelderen } from "../../rollebilde/forelder/forelder-regler";
 import type { ForelderPart, ForelderPartRolle } from "../skjema/opprett-sak-schema";
 import SkjemaSeksjon from "../skjema/SkjemaSeksjon";
-import { hentForelderRolleLabel } from "./part-utils";
+import LåstPartTag from "./LåstPartTag";
+import { hentForelderRolleLabel, tilRolletype } from "./part-utils";
 
 export type ForelderKortProps = {
     rolle: ForelderPartRolle;
     part: ForelderPart;
     forslag?: PersonDto[];
+    valgPlaceholder?: string;
     kanSettesUkjent?: boolean;
+    harSkjultForelder?: boolean;
     feil?: string;
     /** Parten kan ikke endres, fordi flyten ble åpnet for denne personen. */
     låst?: boolean;
@@ -21,35 +25,51 @@ export type ForelderKortProps = {
     onEndre: () => void;
 };
 
+const UKJENT_FORELDER_VALG = "ukjent";
+
 /**
  * Felles partsseksjon med ett redigerbart kort per part, uansett hvem saken ble startet fra.
  */
 export default function ParterSeksjon({
     kort,
-    tittel = "Bidragspliktig og bidragsmottaker",
+    tittel = "Bidragsmottaker og bidragspliktig",
     beskrivelse,
 }: {
     kort: ForelderKortProps[];
     tittel?: string;
     beskrivelse?: string;
 }) {
+    const rolleRekkefølge = { bidragsmottaker: 0, bidragspliktig: 1 };
     return (
         <SkjemaSeksjon tittel={tittel} beskrivelse={beskrivelse}>
-            <HGrid columns={{ xs: 1, md: 2 }} gap="space-16" align="start">
-                {kort.map((props) => (
-                    <ForelderKort key={props.rolle} {...props} />
-                ))}
+            <HGrid columns={{ xs: 1, md: 2 }} gap="space-16">
+                {kort
+                    .toSorted((a, b) => rolleRekkefølge[a.rolle] - rolleRekkefølge[b.rolle])
+                    .map((props) => (
+                        <ForelderKort
+                            key={props.rolle}
+                            {...props}
+                            denAndreForelderensIdent={kort.find((k) => k.rolle !== props.rolle)?.part.ident}
+                        />
+                    ))}
             </HGrid>
         </SkjemaSeksjon>
     );
 }
 
-function ForelderKort(props: ForelderKortProps) {
+type DenAndreForelderen = { denAndreForelderensIdent?: string };
+
+function ForelderKort(props: ForelderKortProps & DenAndreForelderen) {
     const { rolle, part } = props;
     const ident = part.ident;
     const erKjent = part.erKjent === true && !!ident;
     const [valgtPerson, setValgtPerson] = useState<Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">>();
-    const handlinger: ForelderKortProps = {
+    const rolleTag = !erKjent ? (
+        <Tag variant="moderate" data-color="neutral" size="small">
+            {rolle === "bidragspliktig" ? "BP" : "BM"}
+        </Tag>
+    ) : undefined;
+    const handlinger: ForelderKortProps & DenAndreForelderen = {
         ...props,
         onVelg: (person) => {
             setValgtPerson(person);
@@ -70,8 +90,12 @@ function ForelderKort(props: ForelderKortProps) {
                         : null
                 }
                 rolle={rolle === "bidragspliktig" ? "BP" : "BM"}
-                ukjentTekst={part.erKjent === undefined ? "Ikke valgt" : "Ukjent - ikke registrert"}
+                height="100%"
+                ukjentTekst={
+                    part.erKjent === undefined ? `Velg ${rolle}` : `${hentForelderRolleLabel(rolle)} markert som ukjent`
+                }
                 søktIdent={valgtPerson?.ident === ident ? valgtPerson?.søktIdent : undefined}
+                tags={props.låst && erKjent ? <LåstPartTag /> : rolleTag}
                 actions={!props.låst && <Handlinger {...handlinger} />}
             />
         </VStack>
@@ -82,25 +106,32 @@ function Handlinger({
     rolle,
     part,
     forslag = [],
+    valgPlaceholder,
     kanSettesUkjent = true,
+    harSkjultForelder = false,
     feil,
+    denAndreForelderensIdent,
     onVelg,
     onUkjent,
     onEndre,
-}: ForelderKortProps) {
+}: ForelderKortProps & DenAndreForelderen) {
     const erKjent = part.erKjent === true && !!part.ident;
 
     return (
         <VStack gap="space-8" align="start">
-            {erKjent ? (
+            {erKjent || part.erKjent === false ? (
                 <Button type="button" size="small" variant="tertiary" onClick={onEndre}>
                     Endre {rolle}
                 </Button>
             ) : (
                 <VelgForelder
                     rolle={rolle}
+                    part={part}
                     forslag={forslag}
-                    kanSettesUkjent={kanSettesUkjent && part.erKjent !== false}
+                    valgPlaceholder={valgPlaceholder}
+                    kanSettesUkjent={kanSettesUkjent}
+                    harSkjultForelder={harSkjultForelder}
+                    denAndreForelderensIdent={denAndreForelderensIdent}
                     onVelg={onVelg}
                     onUkjent={onUkjent}
                 />
@@ -116,30 +147,60 @@ function Handlinger({
 
 function VelgForelder({
     rolle,
+    part,
     forslag,
+    valgPlaceholder,
     kanSettesUkjent,
+    harSkjultForelder,
+    denAndreForelderensIdent,
     onVelg,
     onUkjent,
-}: Pick<ForelderKortProps, "rolle" | "onVelg" | "onUkjent"> & { forslag: PersonDto[]; kanSettesUkjent: boolean }) {
+}: Pick<ForelderKortProps, "part" | "rolle" | "onVelg" | "onUkjent" | "valgPlaceholder"> &
+    DenAndreForelderen & {
+        forslag: PersonDto[];
+        kanSettesUkjent: boolean;
+        harSkjultForelder: boolean;
+    }) {
+    const velgSøktForelder = (person: PersonDto) => {
+        const feil = finnFeilHvisDenAndreForelderen(person, tilRolletype(rolle), denAndreForelderensIdent);
+        if (feil) throw new Error(feil);
+        onVelg(person);
+    };
+
+    const velgForelder = (verdi: string) => {
+        if (verdi === UKJENT_FORELDER_VALG) {
+            onUkjent();
+            return;
+        }
+
+        if (!verdi) return;
+
+        const person = forslag.find((forslag) => forslag.ident === verdi);
+        if (!person) throw new Error("Fant ikke den valgte forelderen blant forslagene");
+        onVelg(person);
+    };
+
     return (
         <>
-            {forslag.map((person) => (
-                <Button
-                    key={person.ident}
-                    type="button"
+            {(forslag.length > 0 || kanSettesUkjent || harSkjultForelder) && (
+                <Select
+                    label={`Velg ${rolle}`}
+                    hideLabel
                     size="small"
-                    variant="secondary"
-                    onClick={() => onVelg(person)}
+                    value={part.erKjent === false ? UKJENT_FORELDER_VALG : ""}
+                    onChange={(event) => velgForelder(event.target.value)}
                 >
-                    Bruk <span className="personnavn">{person.visningsnavn}</span>
-                </Button>
-            ))}
-            <SøkPerson label={`Søk etter ${rolle}`} personInformasjon={onVelg} />
-            {kanSettesUkjent && (
-                <Button type="button" size="small" variant="secondary-neutral" onClick={onUkjent}>
-                    Registrer {rolle} som ukjent
-                </Button>
+                    <option value="">{valgPlaceholder ?? "Velg forelder"}</option>
+                    {forslag.map((person) => (
+                        <option key={person.ident} value={person.ident}>
+                            {person.visningsnavn}
+                        </option>
+                    ))}
+                    {harSkjultForelder && <option disabled>Forelder kan ikke vises</option>}
+                    {kanSettesUkjent && <option value={UKJENT_FORELDER_VALG}>Ukjent</option>}
+                </Select>
             )}
+            <SøkPerson label={`Søk etter ${rolle}`} personInformasjon={velgSøktForelder} />
         </>
     );
 }

@@ -18,6 +18,7 @@ export default function PersonSamhandlerSøk({
     onError,
     onQueryChange,
     inkluderSamhandler = false,
+    tømVedTreff = false,
 }: {
     valgIdent?: string;
     label?: string;
@@ -25,6 +26,7 @@ export default function PersonSamhandlerSøk({
     onError: (feil: string) => void;
     onQueryChange?: () => void;
     inkluderSamhandler?: boolean;
+    tømVedTreff?: boolean;
 }) {
     const {
         samhandlerPersonFn,
@@ -40,6 +42,7 @@ export default function PersonSamhandlerSøk({
         onError,
         onQueryChange,
         inkluderSamhandler,
+        tømVedTreff,
     });
 
     function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {

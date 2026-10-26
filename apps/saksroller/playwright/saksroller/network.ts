@@ -9,6 +9,7 @@ type MockOptions = {
     updateStatus?: number;
     updateBody?: unknown;
     personOverrides?: Record<string, Record<string, unknown>>;
+    foreldreTilBarn?: (barnIdent: string) => string[];
 };
 
 export async function mockSaksrollerApi(page: Page, options: MockOptions = {}) {
@@ -24,7 +25,8 @@ export async function mockSaksrollerApi(page: Page, options: MockOptions = {}) {
     await mockPersonOgRelasjoner(page, {
         testpersoner,
         personOverrides: options.personOverrides,
-        foreldreTilBarn: () => [testpersoner.bidragsmottaker.ident, testpersoner.bidragspliktig.ident],
+        foreldreTilBarn:
+            options.foreldreTilBarn ?? (() => [testpersoner.bidragsmottaker.ident, testpersoner.bidragspliktig.ident]),
         motpartPerson: null,
     });
     await page.route(/\/proxy\/bidrag-sak\/sak\/oppdater\/roller$/, async (route) => {

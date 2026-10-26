@@ -24,9 +24,7 @@ describe("validerNyttBarn", () => {
         );
     });
 
-    it("avviser barn over maksalder", () => {
-        expect(validerNyttBarn({ ...barn, fødselsdato: "1990-01-01" }, { identerISaken: [] })).toMatch(
-            /kan ikke legges til\. Maks alder er 24 år\.$/,
-        );
+    it("godtar barn over maksalder, som gir advarsel i stedet", () => {
+        expect(validerNyttBarn({ ...barn, fødselsdato: "1990-01-01" }, { identerISaken: [] })).toBeUndefined();
     });
 });

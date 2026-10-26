@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { PencilIcon, XMarkIcon } from "@navikt/aksel-icons";
-import { Button, HStack, Tag, VStack } from "@navikt/ds-react";
+import { PencilIcon, TrashIcon } from "@navikt/aksel-icons";
+import { Button, Tag, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { PersonSøkInnhold } from "../../felles/person-søk/PersonSøkWrapper.tsx";
@@ -64,6 +64,9 @@ export default function ForelderVisning({ form, rolle, erNyForelder, søktIdent,
                         </Tag>
                     )
                 }
+                headingActions={
+                    erNyForelder && <FjernForelderHandling onFjern={() => fjernRolle(form, rolle.fodselsnummer)} />
+                }
             >
                 <RollehistorikkVisning
                     rollehistorikk={rolle.rollehistorikk}
@@ -71,13 +74,7 @@ export default function ForelderVisning({ form, rolle, erNyForelder, søktIdent,
                     saksnummer={form.getValues("saksnummer")}
                 />
             </ForelderKortInnhold>
-            {erNyForelder && (
-                <ForelderHandlinger
-                    visEndre={!visSøk}
-                    onEndre={() => setVisSøk(true)}
-                    onFjern={() => fjernRolle(form, rolle.fodselsnummer)}
-                />
-            )}
+            {erNyForelder && <ForelderHandlinger visEndre={!visSøk} onEndre={() => setVisSøk(true)} />}
 
             {visSøk && (
                 <RedigeringsRamme tittel={`Endre ${forelderRolleNavn}`} onAvbryt={() => setVisSøk(false)}>
@@ -102,31 +99,25 @@ function forelderRolletype(rolle: Rolle) {
     return rolle.type === "BP" || rolle.type === "BM" ? rolle.type : undefined;
 }
 
-function ForelderHandlinger({
-    visEndre,
-    onEndre,
-    onFjern,
-}: {
-    visEndre: boolean;
-    onEndre: () => void;
-    onFjern: () => void;
-}) {
+function ForelderHandlinger({ visEndre, onEndre }: { visEndre: boolean; onEndre: () => void }) {
+    if (!visEndre) return null;
+
     return (
-        <HStack gap="space-8" wrap={false}>
-            {visEndre && (
-                <Button
-                    variant="tertiary"
-                    type="button"
-                    size="small"
-                    icon={<PencilIcon aria-hidden />}
-                    onClick={onEndre}
-                >
-                    Endre
-                </Button>
-            )}
-            <Button type="button" size="small" variant="tertiary" icon={<XMarkIcon aria-hidden />} onClick={onFjern}>
-                Fjern
-            </Button>
-        </HStack>
+        <Button variant="tertiary" type="button" size="small" icon={<PencilIcon aria-hidden />} onClick={onEndre}>
+            Endre
+        </Button>
+    );
+}
+
+function FjernForelderHandling({ onFjern }: { onFjern: () => void }) {
+    return (
+        <Button
+            type="button"
+            size="small"
+            variant="tertiary"
+            icon={<TrashIcon aria-hidden />}
+            aria-label="Fjern forelder"
+            onClick={onFjern}
+        />
     );
 }

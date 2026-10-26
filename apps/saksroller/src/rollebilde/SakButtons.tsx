@@ -1,5 +1,5 @@
-import { ExclamationmarkTriangleIcon, FloppydiskIcon } from "@navikt/aksel-icons";
-import { BodyLong, Button, Dialog, HStack, InlineMessage, LocalAlert } from "@navikt/ds-react";
+import { FloppydiskIcon } from "@navikt/aksel-icons";
+import { Button, HStack, InlineMessage, LocalAlert } from "@navikt/ds-react";
 import { type RefObject, useEffect, useState } from "react";
 
 import { gåTilBisys } from "../felles/bisys-lenker";
@@ -11,9 +11,9 @@ export type SakButtonsProps = {
     onRefetch: () => Promise<unknown>;
     feilmelding?: string | null;
     valideringsFeil?: string | null;
-    harAdvarsel: boolean;
+    krevBekreftelse: () => boolean;
     harEndringer: boolean;
-    relasjonskontroll?: "venter" | "feilet";
+    lasterRelasjoner?: boolean;
     suksessmelding?: string | null;
     statusRef?: RefObject<HTMLDivElement | null>;
     statusResetKey: number;
@@ -22,15 +22,14 @@ export type SakButtonsProps = {
 function useSakLagring({
     onSubmit,
     onRefetch,
-    harAdvarsel,
+    krevBekreftelse,
     harEndringer,
-    relasjonskontroll,
+    lasterRelasjoner,
     statusResetKey,
 }: Pick<
     SakButtonsProps,
-    "onSubmit" | "onRefetch" | "harAdvarsel" | "harEndringer" | "relasjonskontroll" | "statusResetKey"
+    "onSubmit" | "onRefetch" | "krevBekreftelse" | "harEndringer" | "lasterRelasjoner" | "statusResetKey"
 >) {
-    const [bekreftHandling, setBekreftHandling] = useState<Lagrehandling | null>(null);
     const [ingenEndringer, setIngenEndringer] = useState(false);
     const [lagrer, setLagrer] = useState(false);
 
@@ -54,11 +53,10 @@ function useSakLagring({
     };
 
     const lagre = async (handling: Lagrehandling) => {
-        if (lagrer || relasjonskontroll) return;
+        if (lagrer || lasterRelasjoner) return;
         setLagrer(true);
         try {
             await lagrehandlinger[handling]();
-            setBekreftHandling(null);
         } catch {
             return;
         } finally {
@@ -67,17 +65,15 @@ function useSakLagring({
     };
 
     const velgLagrehandling = (handling: Lagrehandling) => {
-        if (lagrer || relasjonskontroll) return;
+        if (lagrer || lasterRelasjoner) return;
         if (!harEndringer) {
             setIngenEndringer(true);
-        } else if (harAdvarsel) {
-            setBekreftHandling(handling);
-        } else {
+        } else if (krevBekreftelse()) {
             void lagre(handling);
         }
     };
 
-    return { lagrer, ingenEndringer, bekreftHandling, setBekreftHandling, lagre, velgLagrehandling };
+    return { lagrer, ingenEndringer, velgLagrehandling };
 }
 
 export default function SakButtons({
@@ -85,19 +81,19 @@ export default function SakButtons({
     onRefetch,
     feilmelding,
     valideringsFeil,
-    harAdvarsel,
+    krevBekreftelse,
     harEndringer,
-    relasjonskontroll,
+    lasterRelasjoner,
     suksessmelding,
     statusRef,
     statusResetKey,
 }: SakButtonsProps) {
-    const { lagrer, ingenEndringer, bekreftHandling, setBekreftHandling, lagre, velgLagrehandling } = useSakLagring({
+    const { lagrer, ingenEndringer, velgLagrehandling } = useSakLagring({
         onSubmit,
         onRefetch,
-        harAdvarsel,
+        krevBekreftelse,
         harEndringer,
-        relasjonskontroll,
+        lasterRelasjoner,
         statusResetKey,
     });
 
@@ -108,7 +104,6 @@ export default function SakButtons({
                 visIngenEndringer={ingenEndringer && !harEndringer}
                 feilmelding={feilmelding}
                 valideringsFeil={valideringsFeil}
-                relasjonskontroll={relasjonskontroll}
                 statusRef={statusRef}
             />
 
@@ -119,7 +114,7 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå til ny søknad skjermbildet"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={Boolean(relasjonskontroll) || lagrer}
+                    disabled={lasterRelasjoner || lagrer}
                     onClick={() => velgLagrehandling("nySoknad")}
                 >
                     Lagre og ny søknad
@@ -130,7 +125,7 @@ export default function SakButtons({
                     size="xsmall"
                     title="Lagre og gå tilbake til sak"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={Boolean(relasjonskontroll) || lagrer}
+                    disabled={lasterRelasjoner || lagrer}
                     onClick={() => velgLagrehandling("gaaTilSak")}
                 >
                     Lagre og gå til sak
@@ -139,23 +134,12 @@ export default function SakButtons({
                     type="button"
                     size="xsmall"
                     icon={<FloppydiskIcon title="lagre" fontSize="1.5rem" />}
-                    disabled={Boolean(relasjonskontroll) || lagrer}
+                    disabled={lasterRelasjoner || lagrer}
                     onClick={() => velgLagrehandling("bliVaerende")}
                 >
                     Lagre
                 </Button>
             </HStack>
-
-            {bekreftHandling && (
-                <BekreftLagringDialog
-                    feilmelding={feilmelding}
-                    lagrer={lagrer}
-                    onBekreft={() => {
-                        if (!lagrer) void lagre(bekreftHandling);
-                    }}
-                    onAvbryt={() => setBekreftHandling(null)}
-                />
-            )}
         </>
     );
 }
@@ -165,14 +149,12 @@ function Statusmeldinger({
     visIngenEndringer,
     feilmelding,
     valideringsFeil,
-    relasjonskontroll,
     statusRef,
 }: {
     suksessmelding?: string | null;
     visIngenEndringer: boolean;
     feilmelding?: string | null;
     valideringsFeil?: string | null;
-    relasjonskontroll?: "venter" | "feilet";
     statusRef?: RefObject<HTMLDivElement | null>;
 }) {
     return (
@@ -187,18 +169,6 @@ function Statusmeldinger({
                 </div>
             )}
             {visIngenEndringer && <InlineMessage status="info">Ingen endringer å lagre.</InlineMessage>}
-            {relasjonskontroll === "venter" && (
-                <InlineMessage status="info">Kontrollerer relasjonen mellom barna og foreldrene.</InlineMessage>
-            )}
-            {relasjonskontroll === "feilet" && (
-                <LocalAlert status="error">
-                    <LocalAlert.Header>
-                        <LocalAlert.Title>
-                            Kunne ikke kontrollere relasjonen mellom barna og foreldrene. Oppdater siden og prøv igjen.
-                        </LocalAlert.Title>
-                    </LocalAlert.Header>
-                </LocalAlert>
-            )}
             {feilmelding && (
                 <LocalAlert status="error" ref={statusRef} tabIndex={-1}>
                     <LocalAlert.Header>
@@ -214,59 +184,5 @@ function Statusmeldinger({
                 </LocalAlert>
             )}
         </>
-    );
-}
-
-function BekreftLagringDialog({
-    feilmelding,
-    lagrer,
-    onBekreft,
-    onAvbryt,
-}: {
-    feilmelding?: string | null;
-    lagrer: boolean;
-    onBekreft: () => void;
-    onAvbryt: () => void;
-}) {
-    return (
-        <Dialog
-            open
-            onOpenChange={(open) => {
-                if (!open && !lagrer) {
-                    onAvbryt();
-                }
-            }}
-        >
-            <Dialog.Popup width="small" role="alertdialog" aria-label="Bekreft lagring av saksroller">
-                <Dialog.Header>
-                    <Dialog.Title className="flex items-center gap-2 text-ax-warning-900">
-                        <ExclamationmarkTriangleIcon aria-hidden fontSize="1.25rem" />
-                        Advarsel
-                    </Dialog.Title>
-                    <Dialog.Description>
-                        Det finnes en relasjonsadvarsel. Kontroller før du lagrer endringene.
-                    </Dialog.Description>
-                </Dialog.Header>
-                <Dialog.Body>
-                    {feilmelding ? (
-                        <LocalAlert status="error" size="small">
-                            <LocalAlert.Header>
-                                <LocalAlert.Title>{feilmelding}</LocalAlert.Title>
-                            </LocalAlert.Header>
-                        </LocalAlert>
-                    ) : (
-                        <BodyLong size="small">Du kan fortsatt lagre hvis dette er forventet.</BodyLong>
-                    )}
-                </Dialog.Body>
-                <Dialog.Footer>
-                    <Button type="button" size="small" loading={lagrer} onClick={onBekreft}>
-                        Lagre
-                    </Button>
-                    <Button type="button" size="small" variant="secondary" onClick={onAvbryt}>
-                        Avbryt
-                    </Button>
-                </Dialog.Footer>
-            </Dialog.Popup>
-        </Dialog>
     );
 }
