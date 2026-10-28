@@ -16,8 +16,10 @@ import type { EditDocumentMetadata } from "../types/EditorTypes";
 import { PdfAConverter } from "./PdfAConverter";
 import { getErrorMessage, isPageTreeCorruptionError } from "./PdfErrorUtils";
 import {
+    ensureValidCatalog,
     fixMissingPages,
     flattenForm,
+    harManglendeSidetre,
     hasInvalidXObject,
     lastGyldigPDF,
     PdfProducerHelpers,
@@ -102,7 +104,18 @@ export class PdfProducer {
     }
 
     private async loadPdf() {
+        const pageTreeMissing = await harManglendeSidetre(this.pdfBlob);
         this.pdfDocument = await lastGyldigPDF(this.pdfBlob);
+        if (pageTreeMissing) {
+            // pdf-lib cannot resolve /Pages, so its view of page contents is unreliable (pages
+            // render blank even after rebuilding the tree). pdfjs renders these files correctly,
+            // so rasterize the original via pdfjs and continue with that clean document.
+            LoggerService.warn("PDF mangler sidetre. Rekonstruerer dokumentet via pdfjs.");
+            if (await this.rebuildDocumentViaPdfjs(this.getOriginalPdfBytes())) {
+                this.requiresOriginalPdfRasterization = true;
+                return;
+            }
+        }
         // Repair broken parent chain before any other operation.
         // Some PDFs have PDFPageLeaf nodes whose Parent ref points to a non-PDFPageTree object.
         // This causes "Parent.ascend is not a function" in every inheritable-attribute lookup
@@ -883,6 +896,7 @@ export class PdfProducer {
     private async normalizePdfAfterFix(): Promise<void> {
         const normalizedBytes = await this.pdfDocument.save();
         this.pdfDocument = await PDFDocument.load(normalizedBytes);
+        ensureValidCatalog(this.pdfDocument);
         const pageRefsAfterLoad = this.getCurrentPageRefOrder();
         // Prefer the canonical editorVisiblePageRefOrder as the order to preserve, rather than
         // a snapshot of pageRefsAfterLoad taken before this reorder step. A pre-recovery snapshot
