@@ -1,0 +1,24 @@
+name: "Deploy localauth"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".nais/localauth.yaml"
+      - ".github/workflows/deploy-localauth.yml"
+
+jobs:
+  deploy:
+    name: "Deploy localauth til dev-gcp"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Deploy til dev-gcp
+        uses: nais/deploy/actions/deploy@7ad7c2b833e1db74a80954e3ee6bb6ac060a8ae7 # v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/localauth.yaml
