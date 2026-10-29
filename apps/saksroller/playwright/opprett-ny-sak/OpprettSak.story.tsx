@@ -12,7 +12,6 @@ import OpprettSakFlyt from "../../src/opprett-ny-sak/start/OpprettSakFlyt";
 import OpprettSakFlytInnbygget from "../../src/opprett-ny-sak/start/OpprettSakFlytInnbygget";
 import { OpprettSakFlytModal } from "../../src/opprett-ny-sak/start/OpprettSakFlytModal";
 import { testpersoner } from "./fixtures";
-import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
 type Scenario = {
     sakstype: OpprettSakstype;
@@ -129,16 +128,16 @@ function YtreSkjema({ children }: { children: ReactNode }) {
 }
 
 function StoryRouter({ content }: { content: ReactNode }) {
-    const queryClient = useMemo(() => {
-        const client = new QueryClient({
-            defaultOptions: {
-                queries: { retry: false, staleTime: Infinity },
-                mutations: { retry: false },
-            },
-        });
-        seedStatiskEnhetsinfo(client);
-        return client;
-    }, []);
+    const queryClient = useMemo(
+        () =>
+            new QueryClient({
+                defaultOptions: {
+                    queries: { retry: false, staleTime: Infinity },
+                    mutations: { retry: false },
+                },
+            }),
+        [],
+    );
     const router = useMemo(
         () =>
             createMemoryRouter(

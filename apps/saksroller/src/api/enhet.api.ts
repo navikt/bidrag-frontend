@@ -1,7 +1,6 @@
 import { BIDRAG_ORGANISASJON_API, TilgangsFeilError } from "@bidrag/api";
-import type { EnhetDto, HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
+import type { HentEnhetRequest } from "@bidrag/api/OrganisasjonApi";
 import { SecureLoggerService } from "@bidrag/common";
-import { useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 export function hentPersonGeografiskEnhetQueryOptions(request: HentEnhetRequest | null, enabled: boolean = true) {
@@ -40,33 +39,4 @@ export function hentPersonGeografiskEnhetQueryOptions(request: HentEnhetRequest 
         },
         throwOnError: false,
     };
-}
-
-/** Navnet på en enhet. Deler cache med web via `hent_enhet_info`. */
-export function useEnhetsnavn(enhetsnummer: string, aktiv: boolean) {
-    const { data, isLoading, isFetching, error } = useQuery<EnhetDto, AxiosError | TilgangsFeilError>({
-        queryKey: ["hent_enhet_info", enhetsnummer],
-        queryFn: async () => {
-            try {
-                const { data } = await BIDRAG_ORGANISASJON_API.enhet.hentEnhetInfo(enhetsnummer);
-                await SecureLoggerService.info(`Hentet enhetsinformasjon for enhet ${enhetsnummer}`);
-                return data;
-            } catch (e) {
-                const status = (e as AxiosError)?.response?.status;
-                if (status === 403 || status === 401) {
-                    await SecureLoggerService.warn(
-                        `Ingen tilgang til å hente enhetsinformasjon for enhet ${enhetsnummer}`,
-                    );
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til å hente informasjon om denne enheten ${enhetsnummer}`,
-                    );
-                }
-                throw e;
-            }
-        },
-        enabled: aktiv && !!enhetsnummer,
-        retry: (failureCount, error) => !(error instanceof TilgangsFeilError) && failureCount < 1,
-        throwOnError: false,
-    });
-    return { navn: data?.navn, isLoading: isLoading || isFetching, error };
 }

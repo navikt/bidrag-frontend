@@ -310,7 +310,7 @@ test("kategori velges sammen med sakstype uten å nullstille skjemaet", async ({
     await expect(component.getByRole("combobox", { name: "Kategori" })).toHaveCount(1);
 });
 
-test("valgt kategori brukes i skjemaet og i oppslaget av enhet", async ({ mount, page }) => {
+test("valgt kategori brukes i skjemaet og sendes som søknad i oppslaget av enhet", async ({ mount, page }) => {
     const requests = await mockOpprettSakApi(page);
     const component = await mount(STORY);
 
@@ -318,7 +318,44 @@ test("valgt kategori brukes i skjemaet og i oppslaget av enhet", async ({ mount,
     await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
 
     await expect(component.getByRole("combobox", { name: "Kategori" })).toHaveValue("Utland");
-    await expect.poll(() => requests.unit.at(-1)?.sakskategori).toBe("U");
+    await expect.poll(() => requests.unit.at(-1)).toMatchObject({ sakskategori: "U", behandlingstype: "SØKNAD" });
+});
+
+async function velgEktefellebidragMedBpOgBm(component: Locator) {
+    await component.getByRole("combobox", { name: "Velg sakstype" }).selectOption("EKTEFELLEBIDRAG");
+    await velgStartpart(component, testpersoner.bidragspliktig.ident, "Bidragspliktig");
+    const motpartSøk = component.getByRole("searchbox", { name: "Søk etter bidragsmottaker" });
+    await motpartSøk.fill(testpersoner.bidragsmottaker.ident);
+    await motpartSøk.press("Enter");
+    await expect(component.getByText(testpersoner.bidragsmottaker.visningsnavn).first()).toBeVisible();
+}
+
+test("enheten hentes i ett oppslag med BM som hovedident og de andre partene som biidenter", async ({
+    mount,
+    page,
+}) => {
+    const requests = await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+
+    await velgEktefellebidragMedBpOgBm(component);
+
+    await expect
+        .poll(() => requests.unit.at(-1))
+        .toMatchObject({
+            ident: testpersoner.bidragsmottaker.ident,
+            biidenter: [testpersoner.bidragspliktig.ident],
+        });
+});
+
+test("skjermet enhet fra arbeidsfordelingen vises og sendes som eierfogd", async ({ mount, page }) => {
+    const requests = await mockOpprettSakApi(page, { unit: { nummer: "2103", navn: "NAV Vikafossen" } });
+    const component = await mount(STORY);
+
+    await velgEktefellebidragMedBpOgBm(component);
+    await expect(component.getByText(/Saken vil bli sendt til enhet NAV Vikafossen \(2103\)/)).toBeVisible();
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+
+    await expect.poll(() => requests.create).toMatchObject({ eierfogd: "2103" });
 });
 
 test("viser ikke oppsummering", async ({ mount, page }) => {

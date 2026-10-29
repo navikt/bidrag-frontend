@@ -5,8 +5,6 @@ import { finnSaksadvarsler, type SakParter, type Sakstype, validerSak } from "..
 import { type Diskresjonskode, DiskresjonskodeSchema, ReellMottakerFelterSchema } from "../../felles/sakvisning-schema";
 import { tilForelderrolle } from "../parter/part-utils";
 
-export { DiskresjonskodeSchema };
-
 // ==================== BASE SCHEMAS ====================
 
 const ArbeidsfordelingSchema = z.enum(["BBF", "EEN", "EFS", "FRS", "INH", "OPS"]);
