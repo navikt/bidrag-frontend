@@ -867,10 +867,10 @@ const SamværMenuButton = ({
             valideringsfeil?.overlappendePerioder?.length > 0
         );
     };
-    const samværValideringsFeil = samvær.barn?.some(checkForValidationErrorInSamvær);
     const barnIValgtSak = samvær.barn.filter((barn) =>
         erDelAvValgtSaksnummer(getSaksnummerForIdent(roller, barn.gjelderBarn), selectedSaksnummer),
     );
+    const samværValideringsFeil = barnIValgtSak?.some(checkForValidationErrorInSamvær);
     const displaySubmenu = vurderSeparatSamvær && barnIValgtSak.length > 1;
 
     return (

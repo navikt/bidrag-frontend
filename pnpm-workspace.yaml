@@ -7,6 +7,16 @@ allowBuilds:
 # Denne trengs for bygging av Docker-image, men vi bør kanskje finne en annen løsning
 #forceLegacyDeploy: true
 
+# Sikkerhetsfikser for transitive avhengigheter (pnpm audit --audit-level high).
+# Fjern når foreldrepakkene selv drar inn patchede versjoner.
+overrides:
+  "proxy-addr@<2.0.8": "^2.0.8"
+  "compression@<1.8.2": "^1.8.2"
+  "body-parser@>=2.0.0 <2.4.0": "^2.4.0"
+  "undici@>=8.0.0 <8.12.2": "^8.12.2"
+  "source-map-js@<1.2.2": "^1.2.2"
+  "shell-quote@<1.9.0": "^1.9.0"
+
 packages:
   - "apps/*"
   - "packages/*"
@@ -17,7 +27,7 @@ catalog:
   "@playwright/test": "^1.62.1"
   playwright: "^1.62.1"
   "@types/node": "^25.9.3"
-  vite: "^8.0.16"
+  vite: "^8.3.5"
   "@vitejs/plugin-react": "^6.1.0"
   react: "^19.2.7"
   react-dom: "^19.2.7"
@@ -28,12 +38,12 @@ catalog:
   "@navikt/ds-tailwind": "^8.16.1"
   "@navikt/aksel-icons": "^8.13.1"
   "@tanstack/react-query": "^5.101.0"
-  "react-router": "^8.0.0"
-  "@react-router/node": "^8.0.0"
-  "@react-router/serve": "^8.0.0"
-  "@react-router/dev": "^8.0.0"
+  "react-router": "^8.5.0"
+  "@react-router/node": "^8.5.0"
+  "@react-router/serve": "^8.5.0"
+  "@react-router/dev": "^8.5.0"
   "@tailwindcss/vite": "^4.3.1"
   "tailwindcss": "^4.3.1"
-  "zod": "^4.1.12"
+  "zod": "^4.6.7"
   typescript: "^6.0.3"
-  axios: "^1.6.5"
+  axios: "^1.20.0"

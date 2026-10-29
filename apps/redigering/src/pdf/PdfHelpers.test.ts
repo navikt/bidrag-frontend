@@ -1,7 +1,7 @@
 import { type PDFDict, PDFDocument, PDFName, type PDFPageLeaf, PDFRef, RotationTypes } from "@cantoo/pdf-lib";
 import { describe, expect, it } from "vitest";
 
-import { hasInvalidXObject, repairBrokenParentChain } from "./PdfHelpers";
+import { ensureValidCatalog, hasInvalidXObject, lastGyldigPDF, repairBrokenParentChain } from "./PdfHelpers";
 
 describe("repairBrokenParentChain", () => {
     it("reparents a page leaf whose Parent points to a plain dict instead of a page tree node", async () => {
@@ -83,5 +83,36 @@ describe("hasInvalidXObject", () => {
         page.node.set(PDFName.of("Resources"), resourcesDict);
 
         expect(hasInvalidXObject(pdfDoc)).toBe(true);
+    });
+});
+
+describe("ensureValidCatalog", () => {
+    it("recovers a Root catalog and page tree that are missing /Type", async () => {
+        const original = await PDFDocument.create();
+        original.addPage([100, 100]);
+        original.addPage([100, 100]);
+        original.catalog.delete(PDFName.of("Type"));
+        original.catalog.Pages().delete(PDFName.of("Type"));
+        const bytes = await original.save({ useObjectStreams: false });
+
+        const broken = await PDFDocument.load(bytes);
+        expect(() => broken.getPages()).toThrow("this.catalog.Pages is not a function");
+
+        const pdfDoc = await lastGyldigPDF(bytes);
+        expect(pdfDoc.getPages()).toHaveLength(2);
+
+        const reloaded = await PDFDocument.load(await pdfDoc.save());
+        expect(reloaded.getPageCount()).toBe(2);
+    });
+
+    it("leaves a valid document untouched", async () => {
+        const pdfDoc = await PDFDocument.create();
+        pdfDoc.addPage([100, 100]);
+        const catalog = pdfDoc.catalog;
+
+        ensureValidCatalog(pdfDoc);
+
+        expect(pdfDoc.catalog).toBe(catalog);
+        expect(pdfDoc.getPageCount()).toBe(1);
     });
 });

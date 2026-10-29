@@ -175,10 +175,6 @@ export const getSaksnummerMedNyeOpplysninger = (behandling: BehandlingDtoV2): Se
             });
         });
 
-        endringer.arbeidsforhold?.forEach((arbeidsforhold) => {
-            leggTilForIdent(arbeidsforhold.partPersonId);
-        });
-
         if (endringer.stønadTilBarnetilsyn) {
             Object.keys(endringer.stønadTilBarnetilsyn.stønadTilBarnetilsyn ?? {}).forEach(leggTilForIdent);
             Object.keys(endringer.stønadTilBarnetilsyn.grunnlag ?? {}).forEach(leggTilForIdent);
