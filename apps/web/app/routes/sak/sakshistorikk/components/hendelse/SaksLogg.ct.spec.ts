@@ -66,4 +66,24 @@ test.describe("SaksLogg", () => {
         await expect(component.getByText("Endring fra bidragsmottaker")).toBeVisible();
         await expect(component.getByText("Sak avsluttet")).toHaveCount(0);
     });
+
+    test("skjuler feilregistrerte hendelser og hendelser med samme søknadsid som standard, og viser dem med avkrysningsboks", async ({
+        mount,
+        page,
+    }) => {
+        await mockSkrivetilgang(page);
+        const component = await mount(STORY);
+
+        await expect(component.getByText("Feilregistrert søknad")).toHaveCount(0);
+        await expect(component.getByText("Søknad fra bidragspliktig")).toHaveCount(0);
+        await expect(component.getByText("Søknad fra bidragsmottaker")).toBeVisible();
+
+        await component.getByRole("checkbox", { name: "Vis feilregistrerte" }).check();
+
+        await expect(component.getByText("Feilregistrert søknad")).toBeVisible();
+        await expect(component.getByText("Søknad fra bidragspliktig")).toBeVisible();
+
+        await component.getByRole("checkbox", { name: "Vis feilregistrerte" }).uncheck();
+        await expect(component.getByText("Feilregistrert søknad")).toHaveCount(0);
+    });
 });
