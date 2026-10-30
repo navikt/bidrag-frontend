@@ -11,6 +11,7 @@ import {
     type FaktiskTilsynsutgiftDto,
     type GebyrDtoV3,
     type HusstandsmedlemGrunnlagDto,
+    type Inntektstype,
     type OppdaterBeregnTilDatoRequestDto,
     type OppdatereBegrunnelseRequest,
     type OppdatereBoforholdRequestV2,
@@ -123,6 +124,7 @@ export const QueryKeys = {
     behandlingVersion: "V1",
     virkningstidspunkt: (behandlingId: string) => ["virkningstidspunkt", QueryKeys.behandlingVersion, behandlingId],
     visningsnavn: () => ["visningsnavn", QueryKeys.behandlingVersion],
+    skattefrieBarnetilleggstyper: () => ["skattefrieBarnetilleggstyper", QueryKeys.behandlingVersion],
     beregningForskudd: () => ["beregning_forskudd", QueryKeys.behandlingVersion],
     beregningSærbidrag: () => ["beregning_særbidrag", QueryKeys.behandlingVersion],
     beregnBarnebidrag: (endelig: boolean) => ["beregning_barnebidrag", QueryKeys.behandlingVersion, endelig],
@@ -655,6 +657,14 @@ export const useHarTilgangSak = (saksnummer: string): boolean => {
         staleTime: Infinity,
     });
     return response;
+};
+export const useSkattefrieBarnetilleggstyper = (): Inntektstype[] => {
+    const { data } = useSuspenseQuery({
+        queryKey: QueryKeys.skattefrieBarnetilleggstyper(),
+        queryFn: async () => (await BEHANDLING_API_V1.api.hentSkattefrieBarnetilleggstyper()).data,
+        staleTime: Infinity,
+    });
+    return data;
 };
 export const useGetBehandlingV2 = (): BehandlingDtoV2 => {
     const { behandlingId, vedtakId } = useBehandlingProvider();
