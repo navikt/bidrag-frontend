@@ -397,6 +397,7 @@ export enum Inntektstype {
   BARNETILLEGG_KLP = "BARNETILLEGG_KLP",
   BARNETILLEGG_SPK = "BARNETILLEGG_SPK",
   BARNETILLEGG_TILTAKSPENGER = "BARNETILLEGG_TILTAKSPENGER",
+  BARNETILLEGG_FORSVARET = "BARNETILLEGG_FORSVARET",
   BARNETILLEGG_SUMMERT = "BARNETILLEGG_SUMMERT",
 }
 
@@ -7008,6 +7009,23 @@ export class Api<
         path: `/api/v1/visningsnavn`,
         method: "GET",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Henter barnetilleggstypene som er skattefrie og ikke har skatteprosent
+     *
+     * @tags inntektstype-controller
+     * @name HentSkattefrieBarnetilleggstyper
+     * @request GET:/api/v1/inntektstype/skattefrie-barnetillegg
+     * @secure
+     */
+    hentSkattefrieBarnetilleggstyper: (params: RequestParams = {}) =>
+      this.request<Inntektstype[], any>({
+        path: `/api/v1/inntektstype/skattefrie-barnetillegg`,
+        method: "GET",
+        secure: true,
+        format: "json",
         ...params,
       }),
 
