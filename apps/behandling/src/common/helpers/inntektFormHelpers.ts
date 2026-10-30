@@ -158,7 +158,9 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
                 // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.barnetillegg.reduce((acc, inntektBarn) => {
+                    // BP er alltid del av alle saker i behandlingen, og filtreres derfor aldri bort.
                     const barnetillegFraSammeSak =
+                        inntektRolle.gjelder.rolletype === Rolletype.BP ||
                         inntektBarn.gjelderBarn.saksnummer === inntektRolle.gjelder.saksnummer;
 
                     if (barnetillegFraSammeSak) {
@@ -178,7 +180,9 @@ export const createInitialValues = (inntekter: InntekterDtoRolle[], virkningsdat
                 // biome-ignore lint/performance/noAccumulatingSpread: false positive
                 ...acc,
                 [inntektRolle.gjelder.id]: inntektRolle.inntekter.kontantstøtte.reduce((acc, inntektBarn) => {
+                    // BP er alltid del av alle saker i behandlingen, og filtreres derfor aldri bort.
                     const kontantstøtteFraSammeSak =
+                        inntektRolle.gjelder.rolletype === Rolletype.BP ||
                         inntektBarn.gjelderBarn.saksnummer === inntektRolle.gjelder.saksnummer;
 
                     if (kontantstøtteFraSammeSak) {

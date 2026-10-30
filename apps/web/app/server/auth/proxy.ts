@@ -44,7 +44,7 @@ const logErrorResponse = async (request: Request, backendResponse: Response, sub
     }
 };
 
-const TIMEOUT_MS = 60_000;
+const TIMEOUT_MS = 120_000;
 
 async function proxyRequest(request: Request, app: string, context: Route.LoaderArgs["context"]): Promise<Response> {
     // Middleware har allerede satt ID-en. Fallback er kun en sikring for kall utenom kjeden.

@@ -15,4 +15,5 @@ export const SOKNAD_LABELS = {
     [SoktAvType.VERGE]: "Verge",
     [SoktAvType.KOMMUNE]: "Kommune",
     [SoktAvType.KLAGE_ANKE]: "Klage og anke",
+    [SoktAvType.AUTOMATISK]: "Automatisk",
 } as const;
