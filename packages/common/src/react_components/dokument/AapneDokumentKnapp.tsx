@@ -73,7 +73,7 @@ export default function AapneDokumentKnapp({
     const åpneSomSammenslåttToggleErPå = useFlag(AAPNE_SOM_SAMMENSLATT_TOGGLE);
 
     const kanÅpnesDirekte = status === DokumentStatusDto.FERDIGSTILT && Boolean(dokumentreferanse);
-    const kanÅpnesMedMbdok = status === DokumentStatusDto.UNDER_REDIGERING && Boolean(dokumentreferanse);
+    const kanÅpnesMedMbdok = (status === DokumentStatusDto.UNDER_REDIGERING || journalpostId.startsWith("BID")) && Boolean(dokumentreferanse);
     const extraParams = new URLSearchParams(extraQueryParams).toString();
     const dokumentHref = lagDokumentHref(
         journalpostId,
