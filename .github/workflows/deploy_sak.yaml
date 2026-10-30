@@ -1,0 +1,91 @@
+name: Deploy
+on:
+  workflow_dispatch:
+
+  push:
+    paths:
+      - 'familieveileder/**'
+    branches-ignore:
+      - "dependabot/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  APP_NAME: bidrag_sak_ui
+  BUCKET_DEV: bidrag-ui-static-files-dev
+  BUCKET_PROD: bidrag-ui-static-files-prod
+
+jobs:
+  build:
+    name: Lint, test og bygg
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm prettier
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - if: inputs.upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+
+  deploy-q1:
+    name: Deploy til q1
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICEUSER_KEY_DEV }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gsutil -m rsync -R -d dist "gs://${BUCKET_DEV}/${APP_NAME}/feature/static"
+
+  deploy-q2:
+    name: Deploy til q2
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICEUSER_KEY_DEV }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gsutil -m rsync -R -d dist "gs://${BUCKET_DEV}/${APP_NAME}/main/static"
+
+  deploy-prod:
+    name: Deploy til prod
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICEUSER_KEY_PROD }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gsutil -m rsync -R -d dist "gs://${BUCKET_PROD}/${APP_NAME}/static"
