@@ -1,13 +1,14 @@
 import type { SakshendelseDto } from "@bidrag/api/SakApi";
 import { useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
-import { Heading, HStack, Pagination, VStack } from "@navikt/ds-react";
+import { Checkbox, Heading, HStack, Pagination, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useMemo, useState } from "react";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";
+import { filtrerFeilregistrerteHendelser } from "./feilregistrerteHendelser";
 import { NotatLink } from "./NotatLink";
 import { ResultatLink } from "./ResultatLink";
 import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
@@ -17,6 +18,7 @@ const ROWS_PER_PAGE = 6;
 export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string; hendelser: SakshendelseDto[] }) {
     const { sort, handleSort, sortData } = useSort<SakshendelseDto>();
     const [page, setPage] = useState(1);
+    const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
     const { bisysSessionParams } = useBisysLink();
     const { enhet, sessionState } = bisysSessionParams;
 
@@ -31,7 +33,8 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
           ]
         : [];
 
-    const sortedData = sortData(hendelser);
+    const filtrerteHendelser = filtrerFeilregistrerteHendelser(hendelser, visFeilregistrerte);
+    const sortedData = sortData(filtrerteHendelser);
     const pageCount = Math.ceil(sortedData.length / ROWS_PER_PAGE);
     const currentPage = Math.min(page, pageCount || 1);
     const paginatedData = useMemo(
@@ -41,7 +44,19 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
 
     return (
         <VStack gap={"space-16"}>
-            <Heading size="medium">Sakslogg</Heading>
+            <HStack gap="space-16" align="center">
+                <Heading size="medium">Sakslogg</Heading>
+                <Checkbox
+                    size="small"
+                    checked={visFeilregistrerte}
+                    onChange={(e) => {
+                        setPage(1);
+                        setVisFeilregistrerte(e.target.checked);
+                    }}
+                >
+                    Vis feilregistrerte
+                </Checkbox>
+            </HStack>
 
             <DataGrid
                 data={paginatedData}
