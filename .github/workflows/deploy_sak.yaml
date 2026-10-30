@@ -27,7 +27,10 @@ jobs:
   build:
     name: Lint, test og bygg
     runs-on: ubuntu-latest
-
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v6
       - name: Setup
