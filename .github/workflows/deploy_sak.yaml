@@ -20,14 +20,14 @@ env:
   APP_NAME: bidrag_sak_ui
   BUCKET_DEV: bidrag-ui-static-files-dev
   BUCKET_PROD: bidrag-ui-static-files-prod
-
+defaults:
+  run:
+    working-directory: ./familieveileder
 jobs:
   build:
     name: Lint, test og bygg
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./familieveileder
+
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
