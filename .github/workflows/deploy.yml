@@ -65,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Deploy til dev-gcp q1
-        uses: nais/deploy/actions/deploy@7b60caaded00332e9aa117a8342daa0876851dfe # v2
+        uses: nais/deploy/actions/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50 # v3
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/unleash-apitoken.yaml,.nais/nais.yaml
@@ -85,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Deploy til dev-gcp q2
-        uses: nais/deploy/actions/deploy@7b60caaded00332e9aa117a8342daa0876851dfe # v2
+        uses: nais/deploy/actions/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50 # v3
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/unleash-apitoken.yaml,.nais/nais.yaml
@@ -106,7 +106,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Deploy til prod-gcp
-        uses: nais/deploy/actions/deploy@7b60caaded00332e9aa117a8342daa0876851dfe # v2
+        uses: nais/deploy/actions/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50 # v3
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/unleash-apitoken.yaml,.nais/nais.yaml
