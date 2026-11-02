@@ -39,7 +39,7 @@ export function OpprettForholdsmessigFordelingPanelContent({
     const detaljer = useGetForholdsmessigFordelingDetaljer();
     const [manueltOverstyrteRevurderingsdatoer, setManueltOverstyrteRevurderingsdatoer] = useState<
         Record<string, string | undefined>
-    >({});
+    >(() => Object.fromEntries(detaljer.barn.map((b) => [`${b.ident}|${b.stønadstype}`, undefined])));
     const harRevurderingssoknader = detaljer.søknaderRevurdering.length > 0;
     const revurderingssøknaderErDelAvFF = detaljer.søknaderRevurdering.some((s) => s.erDelAvFF);
     const kanOppretteFF = tilgangOppretteFF && !harRevurderingssoknader;
@@ -49,16 +49,14 @@ export function OpprettForholdsmessigFordelingPanelContent({
     const opprettFFFn = useMutation({
         retry: false,
         mutationFn: () => {
-            const detaljerBarn = Object.entries(manueltOverstyrteRevurderingsdatoer)
-                .filter(([, manueltOverstyrtRevurderingFraDato]) => !!manueltOverstyrtRevurderingFraDato)
-                .map(
-                    ([key, manueltOverstyrtRevurderingFraDato]) =>
-                        ({
-                            ident: key.split("|")[0],
-                            stønadstype: key.split("|")[1],
-                            manueltOverstyrtRevurderingFraDato: manueltOverstyrtRevurderingFraDato as string,
-                        }) as OpprettFFRequestBarnDetaljer,
-                );
+            const detaljerBarn = Object.entries(manueltOverstyrteRevurderingsdatoer).map(
+                ([key, manueltOverstyrtRevurderingFraDato]) =>
+                    ({
+                        ident: key.split("|")[0],
+                        stønadstype: key.split("|")[1],
+                        manueltOverstyrtRevurderingFraDato,
+                    }) as OpprettFFRequestBarnDetaljer,
+            );
 
             const requestBody: OpprettFFRequest = {
                 detaljerBarn: detaljerBarn,
