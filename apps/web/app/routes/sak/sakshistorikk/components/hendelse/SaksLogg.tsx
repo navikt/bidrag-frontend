@@ -5,12 +5,13 @@ import { Checkbox, Heading, HStack, Pagination, VStack } from "@navikt/ds-react"
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useMemo, useState } from "react";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
+import { AvkortetCelle, tabellMedAvkortetSisteKolonne } from "../AvkortetCelle";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";
 import { filtrerFeilregistrerteHendelser } from "./feilregistrerteHendelser";
 import { NotatLink } from "./NotatLink";
-import { ResultatLink } from "./ResultatLink";
+import { getResultatTekst, ResultatLink } from "./ResultatLink";
 import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
 
 const ROWS_PER_PAGE = 6;
@@ -60,13 +61,13 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
 
             <DataGrid
                 data={paginatedData}
+                className={tabellMedAvkortetSisteKolonne}
                 getRowId={(h) => h.hendelseId ?? `${h.opprettetTidspunkt}-${h.type}`}
                 settings={{
                     zebraStripes: true,
                     rowDensity: "tight",
                     textSize: "small",
-                    truncateContent: true,
-                    stickyColumns: { start: 1, end: 1 },
+                    stickyColumns: { start: 1 },
                 }}
                 columns={[
                     {
@@ -136,12 +137,14 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                         id: "resultat",
                         header: "Resultat",
                         bodyCell: (h) => (
-                            <ResultatLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                            />
+                            <AvkortetCelle tekst={getResultatTekst(h) ?? ""}>
+                                <ResultatLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                />
+                            </AvkortetCelle>
                         ),
                     },
                 ]}

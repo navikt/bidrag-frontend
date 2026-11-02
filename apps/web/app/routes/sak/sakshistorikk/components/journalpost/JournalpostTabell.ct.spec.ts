@@ -5,6 +5,10 @@ const BASE_STORY = "routes/sak/sakshistorikk/components/journalpost/JournalpostT
 const STORY_TOM = `${BASE_STORY}/TomListe`;
 const STORY_BLANDET = `${BASE_STORY}/BlandedeJournalposter`;
 const STORY_FARSKAP = `${BASE_STORY}/MedFarskapsutelukkede`;
+const STORY_LANG_BESKRIVELSE = `${BASE_STORY}/LangBeskrivelse`;
+
+// Gir en tabell på ca. 1200 px, som på sakshistorikksiden i et vindu på 1536 px.
+const BREDT_VINDU = 1265;
 
 async function mockSak(page: Page) {
     await page.route(/\/proxy\/bidrag-sak\/sak\/2024(?:%2F|\/)1234(?:\?.*)?$/i, async (route) => {
@@ -116,5 +120,33 @@ test.describe("JournalpostTabell", () => {
 
         await expect(component.getByRole("link", { name: "Dokument under redigering" })).toBeVisible();
         await expect(component.getByRole("link", { name: "Ferdigstilt vedlegg under produksjon" })).toBeVisible();
+    });
+
+    test("viser alle kolonner uten sideveis rulling i et bredt vindu når beskrivelsen er lang", async ({
+        mount,
+        page,
+    }) => {
+        await mockSak(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANG_BESKRIVELSE);
+
+        const tabell = component.locator(".aksel-data-table__scroll-wrapper");
+        await expect(component.getByRole("columnheader", { name: "Status" })).toBeVisible();
+        await expect(component.getByRole("columnheader", { name: "Gjelder" })).toBeVisible();
+        expect(await tabell.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+    });
+
+    test("viser hele beskrivelsen i en tooltip når teksten er kuttet", async ({ mount, page }) => {
+        await mockSak(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANG_BESKRIVELSE);
+
+        await component
+            .getByText(/^Orientering og varsel om barnebidrag/)
+            .first()
+            .hover();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Orientering og varsel om barnebidrag for revurdering etter endring i inntekt for begge parter i hele perioden",
+        );
     });
 });

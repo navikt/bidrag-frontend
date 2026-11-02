@@ -2,6 +2,10 @@ import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import type { Page } from "@playwright/test";
 
 const STORY = "routes/sak/sakshistorikk/components/hendelse/SaksLogg/ForskjelligeHendelser";
+const STORY_LANGT_RESULTAT = "routes/sak/sakshistorikk/components/hendelse/SaksLogg/LangtResultat";
+
+// Gir en tabell på ca. 1200 px, som på sakshistorikksiden i et vindu på 1536 px.
+const BREDT_VINDU = 1265;
 
 async function mockSkrivetilgang(page: Page) {
     await page.route("**/proxy/bidrag-sak/sak/**/kanSkrive**", async (route) => {
@@ -85,5 +89,32 @@ test.describe("SaksLogg", () => {
 
         await component.getByRole("checkbox", { name: "Vis feilregistrerte" }).uncheck();
         await expect(component.getByText("Feilregistrert søknad")).toHaveCount(0);
+    });
+
+    test("viser alle kolonner uten sideveis rulling i et bredt vindu når resultatet er langt", async ({
+        mount,
+        page,
+    }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        const tabell = component.locator(".aksel-data-table__scroll-wrapper");
+        await expect(component.getByRole("columnheader", { name: "Resultat" })).toBeVisible();
+        expect(await tabell.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+    });
+
+    test("viser hele resultatet i en tooltip når teksten er kuttet", async ({ mount, page }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        await component
+            .getByText(/^Bidraget ble ikke aldersjustert/)
+            .first()
+            .hover();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Bidraget ble ikke aldersjustert fordi grunnlaget i vedtaket er justert ned til evne, og det gjelder hele perioden",
+        );
     });
 });
