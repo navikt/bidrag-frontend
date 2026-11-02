@@ -8,8 +8,7 @@ registries:
 updates:
 
   - package-ecosystem: "npm"
-    registries:
-      - npm-github
+    registries: "*"
     directory: "/"
     schedule:
       interval: "weekly"
