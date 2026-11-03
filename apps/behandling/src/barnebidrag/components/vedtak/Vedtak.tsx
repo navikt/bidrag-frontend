@@ -27,12 +27,12 @@ import {
     GammelVersjonAvBeregningVarsel,
     GrunnlagFraVedtakButton,
     NesteIndeksår,
+    SaksreskontroPåminnelseVarsel,
     VedtakProvider,
     VedtakResultatBarn,
     VedtakTableBody,
     VedtakTableHeader,
 } from "./VedtakCommon";
-import {SaksreskontroPåminnelseVarsel} from "./VedtakCommon";
 
 const Vedtak = () => {
     const { behandlingId, activeStep, lesemodus } = useBehandlingProvider();

@@ -31,12 +31,12 @@ import {
     ForholdsmessigFordelingVarsel,
     GammelVersjonAvBeregningVarsel,
     NesteIndeksår,
+    SaksreskontroPåminnelseVarsel,
     VedtakProvider,
     VedtakResultatBarn,
     VedtakTableBody,
     VedtakTableHeader,
 } from "./VedtakCommon";
-import {SaksreskontroPåminnelseVarsel} from "./VedtakCommon";
 
 const VedtakEndelig = () => {
     const { behandlingId, activeStep, lesemodus } = useBehandlingProvider();
