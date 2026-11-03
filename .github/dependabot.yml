@@ -10,6 +10,8 @@ updates:
   - package-ecosystem: "npm"
     registries: "*"
     directory: "/"
+    registries:
+      - npm-github
     schedule:
       interval: "weekly"
     cooldown:
