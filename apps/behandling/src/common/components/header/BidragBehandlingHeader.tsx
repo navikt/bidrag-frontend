@@ -39,7 +39,7 @@ export const Header = memo(() => {
     const { behandlingId, vedtakId, selectedSaksnummer, setSelectedSaksnummer, setSelectedRoller } =
         useBehandlingProvider();
     const behandling = useGetBehandlingV2();
-    const { roller, type, saksnummer } = behandling;
+    const { roller, type, saksnummer, søknadsid } = behandling;
     const personsQueries = usePersonsQueries(roller);
 
     const saksnummerMedValideringsfeil = useMemo(() => getSaksnummerMedValideringsfeil(behandling), [behandling]);
@@ -79,6 +79,7 @@ export const Header = memo(() => {
             HeaderTittel={HeaderTittel}
             saksnummerMedValideringsfeil={saksnummerMedValideringsfeil}
             saksnummerMedNyeOpplysninger={saksnummerMedNyeOpplysninger}
+            hovedsøknadsid={søknadsid}
         />
     );
 });

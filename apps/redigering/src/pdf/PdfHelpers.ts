@@ -1,12 +1,14 @@
 import { LoggerService } from "@bidrag/common";
 import {
     PDFArray,
+    PDFCatalog,
     PDFDict,
     PDFDocument,
     PDFName,
     type PDFObject,
     type PDFPage,
     PDFPageLeaf,
+    PDFPageTree,
     PDFRawStream,
     PDFRef,
     PDFStream,
@@ -292,15 +294,114 @@ export async function debugRepairPDF(pdfDoc: PDFDocument) {
     }
 }
 
+/**
+ * pdf-lib oppretter kun PDFCatalog/PDFPageTree for dicts med `/Type /Catalog` og `/Type /Pages`.
+ * Mangler disse i Root (korrupt PDF), blir `pdfDoc.catalog` en vanlig PDFDict, og alle
+ * sideoperasjoner feiler med "this.catalog.Pages is not a function".
+ */
+export function ensureValidCatalog(pdfDoc: PDFDocument): void {
+    const context = pdfDoc.context;
+    const rootRef = context.trailerInfo.Root;
+    let catalog = pdfDoc.catalog as PDFDict;
+    if (!(rootRef instanceof PDFRef) || !(catalog instanceof PDFDict)) return;
+
+    if (!(catalog instanceof PDFCatalog)) {
+        LoggerService.warn("PDF mangler gyldig /Type /Catalog i Root. Gjenoppretter katalog.");
+        catalog = PDFCatalog.fromMapWithContext(catalog.asMap(), context);
+        catalog.set(PDFName.of("Type"), PDFName.of("Catalog"));
+        context.assign(rootRef, catalog);
+        (pdfDoc as unknown as { catalog: PDFCatalog }).catalog = catalog as PDFCatalog;
+    }
+
+    const pagesRef = catalog.get(PDFName.of("Pages"));
+    const pages = pagesRef instanceof PDFRef ? context.lookup(pagesRef) : undefined;
+    if (pagesRef instanceof PDFRef && pages instanceof PDFDict && !(pages instanceof PDFPageTree)) {
+        LoggerService.warn("PDF mangler gyldig /Type /Pages i sidetreet. Gjenoppretter sidetre.");
+        const pageTree = PDFPageTree.fromMapWithContext(pages.asMap(), context);
+        pageTree.set(PDFName.of("Type"), PDFName.of("Pages"));
+        context.assign(pagesRef, pageTree);
+    } else if (!(pages instanceof PDFDict)) {
+        rebuildPageTreeFromLeaves(pdfDoc, catalog as PDFCatalog);
+    }
+}
+
+// /Pages is missing or points to a non-existent object, so pdf-lib cannot traverse the tree at all.
+// Build a new root page tree from all page leaves in the document, ordered by object number.
+function rebuildPageTreeFromLeaves(pdfDoc: PDFDocument, catalog: PDFCatalog): void {
+    const context = pdfDoc.context;
+    const objects = context.enumerateIndirectObjects();
+
+    // Prefer an existing root page tree (no Parent) that is just unlinked from the catalog,
+    // since it keeps the original page order and inherited attributes intact.
+    const orphanRoots = objects.filter(([, obj]) => obj instanceof PDFPageTree && !obj.get(PDFName.of("Parent"))) as [
+        PDFRef,
+        PDFPageTree,
+    ][];
+    if (orphanRoots.length === 1) {
+        LoggerService.warn("PDF-katalogen mangler kobling til sidetreet. Kobler til eksisterende sidetre.");
+        catalog.set(PDFName.of("Pages"), orphanRoots[0][0]);
+        return;
+    }
+
+    LoggerService.warn("PDF mangler sidetre (/Pages). Bygger nytt sidetre fra sideobjektene.");
+    const leaves = objects
+        .filter(([, obj]) => obj instanceof PDFPageLeaf)
+        .sort(([a], [b]) => a.objectNumber - b.objectNumber || a.generationNumber - b.generationNumber);
+
+    const pageTree = PDFPageTree.withContext(context);
+    const pageTreeRef = context.register(pageTree);
+    const kids = pageTree.Kids();
+    for (const [ref, leaf] of leaves) {
+        // Leaves often inherit Resources/MediaBox from their old parents. Copy them onto the
+        // leaf before reparenting, otherwise the pages render blank.
+        copyInheritedAttributes(leaf as PDFPageLeaf, context);
+        kids.push(ref);
+        (leaf as PDFPageLeaf).set(PDFName.of("Parent"), pageTreeRef);
+    }
+    pageTree.set(PDFName.of("Count"), context.obj(leaves.length));
+    catalog.set(PDFName.of("Pages"), pageTreeRef);
+}
+
+const INHERITABLE_PAGE_ATTRIBUTES = ["Resources", "MediaBox", "CropBox", "Rotate"];
+
+function copyInheritedAttributes(leaf: PDFPageLeaf, context: PDFDocument["context"]): void {
+    const visited = new Set<PDFObject>();
+    let parent = context.lookup(leaf.get(PDFName.of("Parent")));
+    while (parent instanceof PDFDict && !visited.has(parent)) {
+        visited.add(parent);
+        for (const key of INHERITABLE_PAGE_ATTRIBUTES) {
+            const name = PDFName.of(key);
+            const value = parent.get(name);
+            if (value !== undefined && leaf.get(name) === undefined) leaf.set(name, value);
+        }
+        parent = context.lookup(parent.get(PDFName.of("Parent")));
+    }
+    if (!leaf.get(PDFName.of("Resources"))) leaf.set(PDFName.of("Resources"), context.obj({}));
+    if (!leaf.get(PDFName.of("MediaBox"))) leaf.set(PDFName.of("MediaBox"), context.obj([0, 0, 595.28, 841.89]));
+}
+
+export async function harManglendeSidetre(pdfBytearray: PdfBytes): Promise<boolean> {
+    try {
+        const pdfDoc = await PDFDocument.load(pdfBytearray);
+        const pagesRef = pdfDoc.catalog.get(PDFName.of("Pages"));
+        return !(pdfDoc.context.lookup(pagesRef) instanceof PDFDict);
+    } catch {
+        return false;
+    }
+}
+
 export async function lastGyldigPDF(pdfBytearray: PdfBytes) {
     try {
         const pdfDoc = await PDFDocument.load(pdfBytearray);
+        ensureValidCatalog(pdfDoc);
         // Sjekk om sidene kan lastes. Hvis ikke så betyr det at PDF er korrupt
         pdfDoc.getPages();
         return pdfDoc;
     } catch (e) {
         LoggerService.warn("Kunne ikke hente sider for PDF pga corrupt PDF fil. Fortsetter uten PDFBox-reparasjon", e);
-        return await PDFDocument.load(pdfBytearray);
+        const pdfDoc = await PDFDocument.load(pdfBytearray);
+        ensureValidCatalog(pdfDoc);
+        return pdfDoc;
     }
 }
 

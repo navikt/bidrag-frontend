@@ -58,6 +58,33 @@ describe("proxy", () => {
         expect(await response.text()).toBe("ok");
     });
 
+    describe("X-Enhet", () => {
+        async function backendHeaders(headers: HeadersInit) {
+            const fetchMock = vi.fn().mockResolvedValue(new Response("ok"));
+            vi.stubGlobal("fetch", fetchMock);
+            await proxyRequest(new Request("http://frontend/proxy/bidrag-sak/vedtak", { headers }));
+            return new Headers(fetchMock.mock.calls[0]?.[1]?.headers);
+        }
+
+        it("beholder X-Enhet fra klienten", async () => {
+            const headers = await backendHeaders({
+                "X-Enhet": "4806",
+                Referer: "http://frontend/sak/123?enhet=4833",
+            });
+            expect(headers.get("X-Enhet")).toBe("4806");
+        });
+
+        it("henter enhet fra Referer når headeren mangler", async () => {
+            const headers = await backendHeaders({ Referer: "http://frontend/sak/123?enhet=4833" });
+            expect(headers.get("X-Enhet")).toBe("4833");
+        });
+
+        it("setter ikke X-Enhet når Referer mangler enhet eller er ugyldig", async () => {
+            expect((await backendHeaders({ Referer: "http://frontend/sak/123" })).has("X-Enhet")).toBe(false);
+            expect((await backendHeaders({ Referer: "ikke en url" })).has("X-Enhet")).toBe(false);
+        });
+    });
+
     it("genererer en gyldig ID når proxyen kalles uten kontekst", async () => {
         const fetchMock = vi.fn().mockResolvedValue(new Response("ok"));
         vi.stubGlobal("fetch", fetchMock);

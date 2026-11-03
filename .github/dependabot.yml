@@ -8,6 +8,7 @@ registries:
 updates:
 
   - package-ecosystem: "npm"
+    registries: "*"
     directory: "/"
     registries:
       - npm-github
@@ -16,42 +17,29 @@ updates:
     cooldown:
       default-days: 7
     groups:
-      npm-minor-patch:
-        patterns: ["*"]
-        update-types: ["minor", "patch"]
-      npm-major:
-        patterns: ["*"]
-        update-types: ["major"]
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+      aksel:
+        patterns:
+          - '@navikt/ds*'
+          - '@navikt/aksel*'
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-    groups:
-      github-actions:
-        patterns: ["*"]
+      interval: 'daily'
 
   - package-ecosystem: "docker"
     directories:
       - "/"
     schedule:
       interval: "weekly"
-    groups:
-      docker-minor-patch:
-        patterns: ["*"]
-        update-types: ["minor", "patch"]
-      docker-major:
-        patterns: ["*"]
-        update-types: ["major"]
 
   - package-ecosystem: "docker-compose"
     directory: "/"
     schedule:
       interval: "weekly"
-    groups:
-      docker-compose-minor-patch:
-        patterns: ["*"]
-        update-types: ["minor", "patch"]
-      docker-compose-major:
-        patterns: ["*"]
-        update-types: ["major"]

@@ -69,7 +69,6 @@ export default function DokumentValgMulti({
         <div className="w-100">
             {renderVarselAutomatiskValgt()}
             <CheckboxGroup
-                disabled={automatiskOpprettDokumenter?.length > 0}
                 legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 error={errors?.dokumenter?.message}
             >
@@ -149,6 +148,7 @@ function DokumentRow({ row, index }: DokumentRowProps) {
                     size="small"
                     value={row.malId}
                     defaultChecked={row.autovalgt}
+                    disabled={row.autovalgt}
                     onBlur={(e) => {
                         methods.onBlur(e);
                         const malId = e.target.value;

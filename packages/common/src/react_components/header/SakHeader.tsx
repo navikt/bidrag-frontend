@@ -1,4 +1,4 @@
-import { Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { Behandlingstype, type RolleSoknadDto, Rolletype, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { ArrowsCirclepathIcon, ChevronDownIcon, ChevronUpIcon, ExclamationmarkTriangleIcon } from "@navikt/aksel-icons";
 import { Box, CopyButton } from "@navikt/ds-react";
 import { type ComponentType, type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,6 +26,8 @@ interface ISakHeaderNewProps {
     saksnummerMedValideringsfeil?: Set<string>;
     /** Saksnummer som har nye opplysninger (ikke-aktiverte endringer) - fanen markeres da med et oppdateringsikon. */
     saksnummerMedNyeOpplysninger?: Set<string>;
+    /** Søknadsid til behandlingen - saken som inneholder denne søknaden vises først. */
+    hovedsøknadsid?: number | null;
 }
 
 /** Legacy props for backwards compatibility */
@@ -104,12 +106,56 @@ const compareRoller = (a: HeaderRolle, b: HeaderRolle) => {
     return a.id - b.id;
 };
 
-const mapSaksnummerRoller = (roller: HeaderRolle[]): SaksnummerRoller[] => {
+const FF_BEHANDLINGSTYPER = new Set<Behandlingstype | null | undefined>([
+    Behandlingstype.FORHOLDSMESSIG_FORDELING,
+    Behandlingstype.FORHOLDSMESSIG_FORDELING_KLAGE,
+]);
+
+const hentSøknaderISak = (roller: HeaderRolle[], saksnummer: string) =>
+    roller
+        .filter((i) => i.rolletype === Rolletype.BA)
+        .filter((rolle) => rolle.saksnummer === saksnummer)
+        .flatMap((rolle) => rolle.søknader ?? []);
+
+/**
+ * Sorteringsvekt for en sak basert på søknadene til rollene i saken:
+ * 0 = inneholder hovedsøknaden, 1 = ingen FF-søknader, 2 = både FF- og andre søknader, 3 = kun FF-søknader.
+ */
+const getSaksnummerSortWeight = (søknader: RolleSoknadDto[], hovedsøknadsid?: number | null) => {
+    if (hovedsøknadsid != null && søknader.some((søknad) => søknad.søknadsId === hovedsøknadsid)) {
+        return 0;
+    }
+    const antallFF = søknader.filter((søknad) => FF_BEHANDLINGSTYPER.has(søknad.behandlingstype)).length;
+    if (antallFF === 0) return 1;
+    return antallFF === søknader.length ? 3 : 2;
+};
+
+/** Eldste `søknadFomDato` blant søknadene i saken. Saker uten dato sorteres sist. */
+const getEldsteSøknadFomDato = (søknader: RolleSoknadDto[]) =>
+    søknader.reduce((eldste, søknad) => {
+        const tid = søknad.søknadFomDato ? new Date(søknad.søknadFomDato).getTime() : Number.NaN;
+        return Number.isNaN(tid) ? eldste : Math.min(eldste, tid);
+    }, Number.POSITIVE_INFINITY);
+
+const mapSaksnummerRoller = (roller: HeaderRolle[], hovedsøknadsid?: number | null): SaksnummerRoller[] => {
     const saksnummerOrder = Array.from(new Set(roller.map((rolle) => rolle.saksnummer)));
 
     return saksnummerOrder
         .filter((s): s is string => s !== undefined)
         .map((saksnummer) => {
+            const søknader = hentSøknaderISak(roller, saksnummer);
+            return {
+                saksnummer,
+                vekt: getSaksnummerSortWeight(søknader, hovedsøknadsid),
+                eldsteFomDato: getEldsteSøknadFomDato(søknader),
+            };
+        })
+        .sort((a, b) => {
+            if (a.vekt !== b.vekt) return a.vekt - b.vekt;
+            if (a.eldsteFomDato === b.eldsteFomDato) return 0;
+            return a.eldsteFomDato < b.eldsteFomDato ? -1 : 1;
+        })
+        .map(({ saksnummer }) => {
             const rollerISak = roller
                 .filter((rolle) => rolle.saksnummer === saksnummer || rolle.rolletype === Rolletype.BP)
                 .sort((a, b) => compareRoller(a, b));
@@ -349,6 +395,7 @@ function HeaderRenderer({
     HeaderTittel,
     saksnummerMedValideringsfeil,
     saksnummerMedNyeOpplysninger,
+    hovedsøknadsid,
 }: HeaderRendererProps) {
     // Henter fødselsdatoer for barnerollene fra BIDRAG_PERSON, slik at sorteringen under kan
     // bruke reell alder i stedet for å parse fødselsnummeret. Faller tilbake til ident-parsing
@@ -369,8 +416,8 @@ function HeaderRenderer({
 
     // Calculate grouped saksnummer
     const saksnummerRoller = useMemo(
-        () => mapSaksnummerRoller(rollerMedPersonNavn),
-        [rollerMedPersonNavn, fodselsdatoer],
+        () => mapSaksnummerRoller(rollerMedPersonNavn, hovedsøknadsid),
+        [rollerMedPersonNavn, fodselsdatoer, hovedsøknadsid],
     );
     const harFlereSaksnummer = saksnummerRoller.length > 1;
 

@@ -24,12 +24,30 @@ function hendelse(overrides: Partial<SakshendelseDto>): SakshendelseDto {
         erKlageberettigetVedtak: false,
         erLukket: false,
         fraBbm: false,
+        behandlingstype: null,
         barnObjektNumre: [],
+        erHovedsøknad: false,
+        erDelAvFF: false,
         ...overrides,
     };
 }
 
 const hendelser: SakshendelseDto[] = [
+    hendelse({
+        hendelseId: "hendelse-feilregistrert",
+        opprettetTidspunkt: "2024-05-09T12:00:00Z",
+        type: HendelseType.FEILREGISTRERT,
+        typeBeskrivelse: "Feilregistrert søknad",
+        resultat: null,
+        søknadsid: "soknad-feil",
+    }),
+    hendelse({
+        hendelseId: "hendelse-soknad-feilregistrert",
+        opprettetTidspunkt: "2024-05-08T12:00:00Z",
+        type: HendelseType.SOKNADBP,
+        typeBeskrivelse: "Søknad fra bidragspliktig",
+        søknadsid: "soknad-feil",
+    }),
     hendelse({
         hendelseId: "hendelse-soknad",
         type: HendelseType.SOKNADBM,

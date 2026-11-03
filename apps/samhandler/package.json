@@ -13,11 +13,10 @@
         "@bidrag/common": "workspace:*",
         "@navikt/aksel-icons": "catalog:",
         "@navikt/ds-react": "catalog:",
-        "react-hook-form": "^7.85.0",
-        "tailwindcss": "catalog:",
-        "axios": "catalog:"
+        "axios": "catalog:",
+        "react-hook-form": "^7.86.0",
+        "tailwindcss": "catalog:"
     },
-
     "peerDependencies": {
         "@tanstack/react-query": "catalog:",
         "react": "catalog:",

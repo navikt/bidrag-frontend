@@ -57,7 +57,7 @@ const GebyrRolleRad = ({ gebyrRolle }: { gebyrRolle: GebyrRolleV2Dto }) => {
                     <PersonNavnIdent ident={rolle.ident} />
                 </HStack>
             </Table.DataCell>
-            <Table.DataCell>{formatterBeløp(gebyrDetaljer.inntekt.skattepliktigInntekt)}</Table.DataCell>
+            <Table.DataCell>{formatterBeløp(gebyrDetaljer.inntekt.totalInntekt)}</Table.DataCell>
             <Table.DataCell>{gebyrDetaljer.endeligIlagtGebyr ? text.select.ilagt : text.select.fritatt}</Table.DataCell>
             <Table.DataCell>{gebyrDetaljer.begrunnelse}</Table.DataCell>
         </Table.Row>
@@ -110,7 +110,7 @@ export const GebyrOppsummering = () => {
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell>Rolle</Table.HeaderCell>
-                                <Table.HeaderCell>{text.label.skattepliktigeInntekt}</Table.HeaderCell>
+                                <Table.HeaderCell>{text.label.totaltInntekt}</Table.HeaderCell>
                                 <Table.HeaderCell>{text.label.gebyr}</Table.HeaderCell>
                                 <Table.HeaderCell>{text.label.begrunnelse}</Table.HeaderCell>
                             </Table.Row>
