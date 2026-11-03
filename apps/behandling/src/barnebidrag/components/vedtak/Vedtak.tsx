@@ -32,6 +32,7 @@ import {
     VedtakTableBody,
     VedtakTableHeader,
 } from "./VedtakCommon";
+import {SaksreskontroPåminnelseVarsel} from "./VedtakCommon";
 
 const Vedtak = () => {
     const { behandlingId, activeStep, lesemodus } = useBehandlingProvider();
@@ -90,6 +91,7 @@ const Vedtak = () => {
                 <VedtakUgyldigBeregning resultat={beregning?.resultat?.ugyldigBeregning} />
                 <VedtakResultat />
                 <GebyrOppsummering />
+                <SaksreskontroPåminnelseVarsel />
             </div>
 
             {kanViseFatteVedtakKnapp && !isFetching && (
