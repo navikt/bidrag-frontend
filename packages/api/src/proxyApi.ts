@@ -17,7 +17,8 @@ export function proxy<T extends AxiosClient>(api: T, options: UseApiOptions): T 
         // Legg til header for at Unleash i backend kan hente ut hvilken enhet SB tilhører. Da kan det toggle også styres basert på enhet
         const enhet =
             typeof window !== "undefined"
-                ? (new URLSearchParams(window.location.search).get("enhet") ?? window.sessionStorage.getItem("bisys.enhet"))
+                ? (new URLSearchParams(window.location.search).get("enhet") ??
+                  window.sessionStorage.getItem("bisys.enhet"))
                 : null;
         if (enhet && !config.headers.has(ENHET_HEADER)) {
             config.headers.set(ENHET_HEADER, enhet);
@@ -28,6 +29,7 @@ export function proxy<T extends AxiosClient>(api: T, options: UseApiOptions): T 
         (response) => response,
         async (error: AxiosError) => {
             const headers = error.response?.headers;
+            // biome-ignore lint/complexity/useLiteralKeys: Usikker om literalKeys kan brekke noe så lar det være for nå
             const warningMessage = headers?.["warning"];
             error.message = warningMessage ? warningMessage : error.message;
             return Promise.reject(error);
