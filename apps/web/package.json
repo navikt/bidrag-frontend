@@ -21,7 +21,7 @@
         "@bidrag/samhandler": "workspace:*",
         "@bidrag/utils": "workspace:*",
         "@grafana/faro-react": "^2.7.1",
-        "@grafana/faro-web-sdk": "^2.7.1",
+        "@grafana/faro-web-sdk": "^2.13.0",
         "@hookform/resolvers": "^6.0.2",
         "@navikt/aksel-icons": "catalog:",
         "@navikt/ds-css": "catalog:",
