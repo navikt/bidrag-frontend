@@ -27,6 +27,7 @@ import {
     GammelVersjonAvBeregningVarsel,
     GrunnlagFraVedtakButton,
     NesteIndeksår,
+    SaksreskontroPåminnelseVarsel,
     VedtakProvider,
     VedtakResultatBarn,
     VedtakTableBody,
@@ -90,6 +91,7 @@ const Vedtak = () => {
                 <VedtakUgyldigBeregning resultat={beregning?.resultat?.ugyldigBeregning} />
                 <VedtakResultat />
                 <GebyrOppsummering />
+                <SaksreskontroPåminnelseVarsel />
             </div>
 
             {kanViseFatteVedtakKnapp && !isFetching && (
