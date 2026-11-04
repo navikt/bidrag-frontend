@@ -136,6 +136,16 @@ test.describe("JournalpostTabell", () => {
         expect(await tabell.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
     });
 
+    test("viser ikonet i full størrelse når beskrivelsen er kuttet", async ({ mount, page }) => {
+        await mockSak(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANG_BESKRIVELSE);
+
+        const ikon = component.getByRole("row").filter({ hasText: "(lenke)" }).getByRole("img", { name: "Åpne" });
+        const bredde = await ikon.evaluate((el) => el.getBoundingClientRect().width);
+        expect(bredde).toBeGreaterThanOrEqual(14);
+    });
+
     test("viser hele beskrivelsen i en tooltip når teksten er kuttet", async ({ mount, page }) => {
         await mockSak(page);
         await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
