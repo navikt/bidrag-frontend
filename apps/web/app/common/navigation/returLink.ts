@@ -25,7 +25,7 @@ interface ReturKontekst {
 /** Et løst returmål: stien det skal navigeres til, og eventuelle parametere den trenger. */
 interface ReturDestinasjon {
     sti: string;
-    params?: Record<string, string>;
+    params?: Record<string, string> | URLSearchParams;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
