@@ -1,7 +1,17 @@
-import { Behandlingstype, type ForholdsmessigFordelingBarnDto, SoktAvType } from "@bidrag/api/BidragBehandlingApiV1";
+import { BEHANDLING_API_V1 } from "@bidrag/api";
+import {
+    Behandlingstype,
+    type ForholdsmessigFordelingBarnDto,
+    type OppdaterRevurderingsdatoBarn,
+    SoktAvType,
+    type Stonadstype,
+} from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, Button, Dialog, Heading, HStack, VStack } from "@navikt/ds-react";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useGetBehandlingV2 } from "../../common/hooks/useApiData";
+import { useGetBehandlingV2, useRefetchFFInfoFn } from "../../common/hooks/useApiData";
+import useFeatureToogle from "../../common/hooks/useFeatureToggle";
+import { kanEndreRevurderingsdato } from "./BarnDetaljer";
 import { BarnListe } from "./BarnListe";
 export function harÅpenEgetTiltakUtenInnkreving(barn: ForholdsmessigFordelingBarnDto[]) {
     return barn.some((b) =>
@@ -29,23 +39,94 @@ export function EgetTiltakNavBidragVarsel({ barn }: { barn: ForholdsmessigFordel
     );
 }
 export default function ForholdsmessigFordelingInfo() {
-    const { forholdsmessigFordeling, lesemodus } = useGetBehandlingV2();
+    const { forholdsmessigFordeling, lesemodus, id } = useGetBehandlingV2();
+    const { tilgangOppretteFF } = useFeatureToogle();
+    const refetchFF = useRefetchFFInfoFn(true);
 
     const [modalOpen, setModalOpen] = useState(false);
+    const [endredeRevurderingsdatoer, setEndredeRevurderingsdatoer] = useState<Record<string, string | undefined>>({});
+
+    const oppdaterRevurderingsdatoFn = useMutation({
+        retry: false,
+        mutationFn: () => {
+            const barn = Object.entries(endredeRevurderingsdatoer)
+                .filter(([, dato]) => !!dato)
+                .map(([nøkkel, dato]) => {
+                    const [ident, stønadstype] = nøkkel.split("|");
+                    return {
+                        ident,
+                        stønadstype: stønadstype as Stonadstype,
+                        revurderingFraDato: dato as string,
+                    } satisfies OppdaterRevurderingsdatoBarn;
+                });
+            return BEHANDLING_API_V1.api.oppdaterRevurderingsdato(id, { barn });
+        },
+        onSuccess: () => {
+            setEndredeRevurderingsdatoer({});
+            refetchFF();
+        },
+    });
 
     if (!forholdsmessigFordeling) return null;
 
     const erLesemodusVedtak = lesemodus?.fattetTidspunkt !== undefined;
+    const kanEndreRevurderingsdatoer =
+        tilgangOppretteFF && !lesemodus && forholdsmessigFordeling.barn.some(kanEndreRevurderingsdato);
+    const harEndringer = Object.values(endredeRevurderingsdatoer).some((dato) => !!dato);
+
+    function handleOpenChange(open: boolean) {
+        setModalOpen(open);
+        if (!open) {
+            setEndredeRevurderingsdatoer({});
+            oppdaterRevurderingsdatoFn.reset();
+        }
+    }
     return (
         <>
-            <Dialog open={modalOpen} onOpenChange={setModalOpen} aria-label="Forholdsmessig fordeling detaljer">
+            <Dialog open={modalOpen} onOpenChange={handleOpenChange} aria-label="Forholdsmessig fordeling detaljer">
                 <Dialog.Popup className="w-fit" position="center">
                     <Dialog.Header>Forholdsmessig fordeling detaljer</Dialog.Header>
                     <Dialog.Body className="min-w-[700px]">
                         <VStack gap="space-2">
-                            <BarnListe barn={forholdsmessigFordeling.barn} />
+                            {oppdaterRevurderingsdatoFn.isError && (
+                                <Alert variant="error" size="small">
+                                    Noe gikk galt ved oppdatering av revurderingsdato. Vennligst prøv på nytt
+                                </Alert>
+                            )}
+                            <BarnListe
+                                barn={forholdsmessigFordeling.barn}
+                                endredeRevurderingsdatoer={endredeRevurderingsdatoer}
+                                onRevurderingsdatoChange={
+                                    kanEndreRevurderingsdatoer
+                                        ? (nøkkel, dato) =>
+                                              setEndredeRevurderingsdatoer((current) => ({
+                                                  ...current,
+                                                  [nøkkel]: dato,
+                                              }))
+                                        : undefined
+                                }
+                            />
                         </VStack>
                     </Dialog.Body>
+                    {kanEndreRevurderingsdatoer && (
+                        <Dialog.Footer>
+                            <HStack
+                                gap="space-2"
+                                justify="end"
+                                className="pt-2 border-t border-[var(--ax-border-neutral-subtle)]"
+                            >
+                                <Button
+                                    size="small"
+                                    variant="primary"
+                                    disabled={!harEndringer}
+                                    onClick={() => oppdaterRevurderingsdatoFn.mutate()}
+                                    loading={oppdaterRevurderingsdatoFn.isPending}
+                                >
+                                    Oppdater revurderingsdato
+                                </Button>
+                            </HStack>
+                        </Dialog.Footer>
+                    )}
                 </Dialog.Popup>
             </Dialog>
             <Alert
