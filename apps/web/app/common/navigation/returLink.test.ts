@@ -1,5 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { finnStandardReturMål } from "./returLink.ts";
+import { byggHref, finnStandardReturMål } from "./returLink.ts";
+
+describe("byggHref", () => {
+    it("tar med enhet fra URL-en når målet ikke har enhet i params", () => {
+        const href = byggHref(
+            { sti: "/sak/123/behandling/1", params: undefined },
+            new URLSearchParams("enhet=4806&sessionState=abc"),
+        );
+        expect(href).toBe("/sak/123/behandling/1?sessionState=abc&enhet=4806");
+    });
+
+    it("beholder enhet fra målets params", () => {
+        const href = byggHref(
+            { sti: "/forsendelse/9", params: new URLSearchParams({ enhet: "4806" }) },
+            new URLSearchParams("enhet=4806"),
+        );
+        expect(href).toBe("/forsendelse/9?enhet=4806");
+    });
+
+    it("legger ikke til enhet når URL-en mangler den", () => {
+        const href = byggHref({ sti: "/sak/123", params: undefined }, new URLSearchParams("sessionState=abc"));
+        expect(href).toBe("/sak/123?sessionState=abc");
+    });
+});
 
 describe("finnStandardReturMål", () => {
     it("treffer sakas indeksside eksakt", () => {
