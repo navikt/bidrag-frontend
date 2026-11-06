@@ -1,4 +1,5 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
+import { harAnnenRegistrertForelder } from "../../../felles/relasjon/annen-forelder";
 
 export type ForeldreTilBarn = { barn: { ident: string; navn: string }; foreldre: PersonDto[] | undefined };
 
@@ -6,15 +7,8 @@ type Forelderforslag = { forslag: PersonDto[]; feil?: string };
 
 /**
  * Registrerte foreldre til valgte barn, som forslag til BP/BM-kortene.
- * Gir en advarsel når et barn har begge foreldre registrert og en valgt forelder ikke er en av dem.
  */
-export function utledForelderforslag({
-    foreldreTilBarn,
-    valgteForeldre,
-}: {
-    foreldreTilBarn: ForeldreTilBarn[];
-    valgteForeldre: { ident: string; navn: string }[];
-}): Forelderforslag {
+export function utledForelderforslag({ foreldreTilBarn }: { foreldreTilBarn: ForeldreTilBarn[] }): Forelderforslag {
     const forslag = new Map<string, PersonDto>();
     let feil: string | undefined;
 
@@ -22,10 +16,6 @@ export function utledForelderforslag({
         if (foreldre.length > 2) {
             feil = `Dette barnet (${barn.ident}) har flere enn 2 registrerte foreldre i systemet. Dette kan skyldes feil i data. Kontakt support.`;
             continue;
-        }
-        const ikkeForelder = valgteForeldre.find((valgt) => !foreldre.some((f) => f.ident === valgt.ident));
-        if (ikkeForelder && foreldre.length === 2) {
-            feil ??= `Er du sikker på at dette er riktig barn? Dette barnet (${barn.ident}) har begge foreldre registrert, men ${ikkeForelder.navn} (${ikkeForelder.ident}) er ikke en av dem.`;
         }
         for (const forelder of foreldre) forslag.set(forelder.ident, forelder);
     }
@@ -49,5 +39,20 @@ export function barnMedUfullstendigRelasjon(
             const identer = foreldre.map((f) => f.ident);
             return !kjenteForeldre.every((ident) => identer.includes(ident));
         })
+        .map(({ barn }) => barn);
+}
+
+/** Valgte barn der Folkeregisteret har en annen forelder enn valgt BP eller BM. */
+export function barnMedAnnenForelder(
+    foreldreTilBarn: ForeldreTilBarn[],
+    valgteForeldre: (string | undefined)[],
+): ForeldreTilBarn["barn"][] {
+    return foreldreTilBarn
+        .filter(({ foreldre = [] }) =>
+            harAnnenRegistrertForelder(
+                foreldre.map((f) => f.ident),
+                valgteForeldre,
+            ),
+        )
         .map(({ barn }) => barn);
 }

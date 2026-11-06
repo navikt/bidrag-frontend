@@ -347,15 +347,43 @@ test("enheten hentes i ett oppslag med BM som hovedident og de andre partene som
         });
 });
 
-test("skjermet enhet fra arbeidsfordelingen vises og sendes som eierfogd", async ({ mount, page }) => {
-    const requests = await mockOpprettSakApi(page, { unit: { nummer: "2103", navn: "NAV Vikafossen" } });
+test("BM med kode 6 vises med diskresjon, og enheten fra arbeidsfordelingen sendes som eierfogd", async ({
+    mount,
+    page,
+}) => {
+    const requests = await mockOpprettSakApi(page, {
+        unit: { nummer: "2103", navn: "NAV Vikafossen" },
+        personOverrides: {
+            [testpersoner.bidragsmottaker.ident]: { ...testpersoner.bidragsmottaker, diskresjonskode: "SPSF" },
+        },
+    });
     const component = await mount(STORY);
 
     await velgEktefellebidragMedBpOgBm(component);
-    await expect(component.getByText(/Saken vil bli sendt til enhet NAV Vikafossen \(2103\)/)).toBeVisible();
+    await expect(component.getByText("Strengt fortrolig (kode 6)")).toBeVisible();
+    await expect(component.getByText(/sender saken til NAV Vikafossen \(2103\).*Enheten er skjermet/)).toBeVisible();
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+    await expect(component.getByText("Du må bekrefte enheten saken sendes til")).toBeVisible();
+    expect(requests.create).toBeUndefined();
+
+    await component
+        .getByRole("checkbox", { name: "Jeg har kontrollert at saken skal sendes til NAV Vikafossen (2103)" })
+        .check();
     await component.getByRole("button", { name: /Opprett$/ }).click();
 
     await expect.poll(() => requests.create).toMatchObject({ eierfogd: "2103" });
+});
+
+test("🔴 krever bekreftelse når saken sendes til en annen enhet enn saksbehandlers", async ({ mount, page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem("bisys.enhet", "4812"));
+    const requests = await mockOpprettSakApi(page);
+    const component = await mount(STORY);
+
+    await velgEktefellebidragMedBpOgBm(component);
+    await expect(component.getByText(/sender saken til NAV Test \(4806\), ikke til 4812\./)).toBeVisible();
+    await component.getByRole("button", { name: /Opprett$/ }).click();
+    await expect(component.getByText("Du må bekrefte enheten saken sendes til")).toBeVisible();
+    expect(requests.create).toBeUndefined();
 });
 
 test("viser ikke oppsummering", async ({ mount, page }) => {

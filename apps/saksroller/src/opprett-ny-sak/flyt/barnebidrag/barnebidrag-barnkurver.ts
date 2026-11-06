@@ -14,7 +14,7 @@ function slåSammenUnikeBarn(eksisterende: MotpartBarnRelasjon["fellesBarn"], ny
 }
 
 /**
- * 🔴 Barn BP har sammen med valgt BM, som valgbare barn i saken. Bare relasjonen med BM brukes,
+ * Barn BP har sammen med valgt BM, som valgbare barn i saken. Bare relasjonen med BM brukes,
  * så barn fra andre forhold vises aldri. Barn som er lagt til manuelt, vises også her når de
  * er felles barn, sammen med søsknene sine.
  */

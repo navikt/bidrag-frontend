@@ -42,6 +42,7 @@ function berikBarnRolle(
         reellMottager: rolle.reellMottager ?? undefined,
         reellMottaker: rolle.reellMottaker?.ident,
         reellMottakerType: utledReellMottakerType(rolle),
+        reellMottakerErVerge: rolle.reellMottaker?.verge ?? false,
         alder: alder ?? undefined,
         erMyndig: (alder ?? 0) >= MYNDYG_BARN_ALDER,
     } as BarnRolle;

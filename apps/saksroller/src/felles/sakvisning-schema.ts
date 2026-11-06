@@ -22,6 +22,7 @@ const RolleSchema = z.object({
     reellMottaker: z.string().optional(),
     reellMottakerType: z.string().optional(),
     reellMottakerNavn: z.string().optional(),
+    reellMottakerErVerge: z.boolean().optional(),
     mottagerErVerge: z.boolean(),
     samhandlerIdent: z.string().optional(),
     foedselsnummer: z.string().optional(),
@@ -39,6 +40,7 @@ export const ReellMottakerFelterSchema = z.object({
     reellMottakerType: z.enum(["barnet_selv", "samhandler"]).optional(),
     reellMottaker: z.string().optional(),
     reellMottakerNavn: z.string().optional(),
+    reellMottakerErVerge: z.boolean().optional(),
 });
 
 const BarnRolleSchema = RolleSchema.extend(ReellMottakerFelterSchema.shape);

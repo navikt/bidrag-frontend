@@ -58,7 +58,7 @@ export type Saksadvarsel = { gjelder: "barnliste"; melding: string };
 
 /**
  * Forretningsreglene for partene i en sak. Brukes både når saken opprettes og når rollene endres.
- * 🔴 Endringer her påvirker hvilke saker som kan lagres.
+ * Endringer her påvirker hvilke saker som kan lagres.
  */
 export function validerSak(parter: SakParter, sakstype: Sakstype, kontekst: Sakskontekst): Saksfeil[] {
     const feil: Saksfeil[] = [];
@@ -141,7 +141,7 @@ export type ReellMottakerRegel =
     | { type: "etter-barn"; bidragsmottakerErUkjent: boolean }
     | { type: "alltid-samhandler" };
 
-/** 🔴 Farskap følger bidrag-sak, som krever reell mottaker for myndige barn i alle saker. */
+/** Farskap følger bidrag-sak, som krever reell mottaker for myndige barn i alle saker. */
 export function reellMottakerRegel(sakstype: Sakstype, bidragsmottakerErUkjent: boolean): ReellMottakerRegel {
     switch (sakstype) {
         case "Ektefellebidrag":
@@ -155,7 +155,7 @@ export function reellMottakerRegel(sakstype: Sakstype, bidragsmottakerErUkjent: 
     }
 }
 
-/** 🔴 Ved endring krever bidrag-sak reell mottaker bare for myndige barn. Manglende BM gir en advarsel. */
+/** Ved endring krever bidrag-sak reell mottaker bare for myndige barn. Manglende BM gir en advarsel. */
 export function reellMottakerRegelVedEndring(sakstype: Sakstype): ReellMottakerRegel {
     return reellMottakerRegel(sakstype, false);
 }

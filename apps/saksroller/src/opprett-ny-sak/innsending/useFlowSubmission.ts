@@ -1,9 +1,13 @@
 import { Rolletype } from "@bidrag/api/SakApi";
+import { getBisysSessionParams } from "@bidrag/common";
 import { sakskategoriTilEnum } from "@bidrag/utils/visningsnavnUtils";
 import { type SubmitEvent, useEffect, useRef } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useSjekkTilgangOpprettSakUtenBm } from "../../api/sak.api";
+import { useBekreftelse } from "../../felles/bekreftelse/useBekreftelse";
+import { enheterSakenFlyttesFra, erSkjermetEnhet, måBekrefteEnhet } from "../../felles/enheter";
 import { useEksisterendeSakSjekk } from "../eksisterende-sak/useEksisterendeSakSjekk";
+import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import type { BarnebidragForelderRolle, BarnMedAlder, ForelderPartRolle, Motpart } from "../skjema/opprett-sak-schema";
 import type { EnhetOgSubmitSectionProps } from "./EnhetOgSubmitSection";
 import type { OpprettSakParter, OpprettSakRolle } from "./opprett-sak-request";
@@ -50,6 +54,19 @@ function useTilgangUtenBm(
     };
 }
 
+function useEnhetsvarsel(enhet: string | null) {
+    const innloggetEnhet = getBisysSessionParams(new URLSearchParams(window.location.search)).enhet;
+    const eierfogd = useOpprettSakStart().inngang?.eierfogd;
+    const måBekrefte = måBekrefteEnhet({ enhet, innloggetEnhet, eierfogd });
+    return {
+        flyttesFra: enheterSakenFlyttesFra({ enhet, innloggetEnhet, eierfogd }),
+        erSkjermet: !!enhet && erSkjermetEnhet(enhet),
+        bekreftelse: useBekreftelse(måBekrefte && enhet ? [enhet] : []),
+    };
+}
+
+export type Enhetsvarsel = ReturnType<typeof useEnhetsvarsel>;
+
 function useSendInn<T extends FormMedKategori>(
     form: UseFormReturn<T>,
     innsending: ReturnType<typeof useOpprettSakHandling>,
@@ -93,7 +110,7 @@ function useSendInn<T extends FormMedKategori>(
 /**
  * Felles innsending for alle flyter: enhet, sjekk av eksisterende sak og tilgang, ut fra partene i skjemaet.
  *
- * 🔴 Tilgang til å opprette barnebidragssak uten BM håndheves bare her, ikke i bidrag-sak.
+ * Tilgang til å opprette barnebidragssak uten BM håndheves bare her, ikke i bidrag-sak.
  * Sjekken gjelder bare EEN: oppfostring (OPS) har aldri BM, og farskap og ektefelle har alltid BM.
  */
 export function useFlowSubmission<T extends FormMedKategori>({
@@ -120,6 +137,7 @@ export function useFlowSubmission<T extends FormMedKategori>({
     });
 
     const tilgangUtenBm = useTilgangUtenBm(valgtBidragsmottaker, arbeidsfordeling);
+    const enhetsvarsel = useEnhetsvarsel(isLoadingEnhet ? null : enhet);
 
     const {
         harEksisterendeSak,
@@ -148,13 +166,17 @@ export function useFlowSubmission<T extends FormMedKategori>({
         Boolean(enhetError) ||
         tilgangUtenBm.blokkert ||
         lasterRelasjoner;
-    const onSubmit = useSendInn(form, opprettSak, parter, !blocked, kanFortsette);
+    const onSubmit = useSendInn(form, opprettSak, parter, !blocked, () => {
+        const enhetBekreftet = enhetsvarsel.bekreftelse.krevBekreftelse();
+        return kanFortsette() && enhetBekreftet;
+    });
 
     const innsending: EnhetOgSubmitSectionProps = {
         enhet,
         enhetNavn,
         isLoadingEnhet,
         enhetError,
+        enhetsvarsel,
         blocked,
         manglerTilgangUtenBm: tilgangUtenBm.mangler,
         submitError: opprettSak.error,
@@ -196,7 +218,9 @@ function lagRoller(barnebidragRoller: BarnebidragForelderRolle[], barn: BarnMedA
         ...barn.map((barnRolle) => ({
             type: Rolletype.BA,
             fodselsnummer: barnRolle.ident,
-            reellMottaker: barnRolle.reellMottaker ? { ident: barnRolle.reellMottaker, verge: false } : null,
+            reellMottaker: barnRolle.reellMottaker
+                ? { ident: barnRolle.reellMottaker, verge: barnRolle.reellMottakerErVerge ?? false }
+                : null,
         })),
     ];
 }

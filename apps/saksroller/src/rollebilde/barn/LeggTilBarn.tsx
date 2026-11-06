@@ -10,6 +10,7 @@ import ReellMottakerValgGruppe, {
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
 import {
+    fraReellMottakerValg,
     initialiserValg,
     kanBekrefteReellMottaker,
     MANGLER_REELL_MOTTAKER_MELDING,
@@ -87,6 +88,7 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
             reellMottakerType: valg.type,
             reellMottaker: valg.ident,
             reellMottakerNavn: valg.navn,
+            reellMottakerErVerge: fraReellMottakerValg(valg).reellMottakerErVerge,
         };
 
         form.setValue("roller", [...roller, nyttBarn], { shouldValidate: true });

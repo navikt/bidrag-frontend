@@ -1,14 +1,16 @@
 import { TrashIcon } from "@navikt/aksel-icons";
-import { Button, InlineMessage, Select, VStack } from "@navikt/ds-react";
+import { Button, Checkbox, InlineMessage, Select, VStack } from "@navikt/ds-react";
 
 import { useState } from "react";
 import FunnetPersonInfo from "../person/FunnetPersonInfo.tsx";
 import ReellMottakerSøk from "./ReellMottakerSøk.tsx";
+import { erPersonSomReellMottaker } from "./reell-mottaker-valg.ts";
 
 export type ReellMottakerValg = {
     type?: "barnet_selv" | "samhandler";
     ident?: string;
     navn?: string;
+    verge?: boolean;
 };
 
 export type ReellMottakerValgregel = "valgfri" | "påkrevd" | "kun-samhandler";
@@ -111,6 +113,22 @@ export default function ReellMottakerValgGruppe({
                     onError={setError}
                 />
             )}
+
+            {!disabled &&
+                valg.type === "samhandler" &&
+                (erPersonSomReellMottaker(valg) ? (
+                    <Checkbox
+                        size="small"
+                        checked={valg.verge ?? false}
+                        onChange={(event) => onValg({ ...valg, verge: event.target.checked })}
+                    >
+                        Reell mottaker er verge for barnet
+                    </Checkbox>
+                ) : (
+                    <InlineMessage status="info" size="small">
+                        Verge kan registreres når reell mottaker er en person.
+                    </InlineMessage>
+                ))}
         </VStack>
     );
 }

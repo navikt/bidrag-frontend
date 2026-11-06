@@ -48,7 +48,7 @@ const EnPartMedBarnRolleSchema = ForelderPartSchema.extend({
 /**
  * Samme skjema uansett om saken startes fra en forelder eller fra barnet. Alle parter kan endres.
  * `erKjent` på BP og BM: `undefined` er ikke avklart, `false` er registrert som ukjent.
- * 🔴 Saken kan opprettes uten barn når bidragsmottaker er kjent.
+ * Saken kan opprettes uten barn når bidragsmottaker er kjent.
  */
 export const BarnebidragSkjemaSchema = z
     .object({

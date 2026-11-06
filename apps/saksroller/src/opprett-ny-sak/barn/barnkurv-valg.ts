@@ -4,7 +4,13 @@ type Barn = BarnMedAlder;
 
 /** Barnet uten reell mottaker, for barn som velges på nytt. */
 export function utenReellMottaker(barn: Barn): Barn {
-    return { ...barn, reellMottakerType: undefined, reellMottaker: undefined, reellMottakerNavn: undefined };
+    return {
+        ...barn,
+        reellMottakerType: undefined,
+        reellMottaker: undefined,
+        reellMottakerNavn: undefined,
+        reellMottakerErVerge: undefined,
+    };
 }
 
 export function beregnBarnkurvValg(

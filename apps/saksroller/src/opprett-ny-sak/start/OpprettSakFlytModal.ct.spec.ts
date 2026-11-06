@@ -72,7 +72,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await expect(dialog.getByRole("group", { name: "Bidragspliktig", exact: true }).getByText("Låst")).toHaveCount(
             0,
         );
-        await expect(dialog.getByText(/Arbeidsfordelingen gir en annen enhet/)).toHaveCount(0);
+        await expect(dialog.getByText("Saken sendes til en annen enhet")).toHaveCount(0);
         await expect(dialog.getByRole("button", { name: "Opprett og ny søknad" })).toHaveCount(0);
         await expect(dialog.getByRole("button", { name: "Opprett og gå til sak" })).toHaveCount(0);
         const opprett = dialog.getByRole("button", { name: /Opprett$/ });
@@ -350,7 +350,7 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await expect(component.getByTestId("opprettet-saksnummer")).toHaveValue("1234567");
     });
 
-    test("viser avvik når arbeidsfordelingen gir en annen enhet enn eierfogd", async ({ mount, page }) => {
+    test("🔴 krever bekreftelse når arbeidsfordelingen gir en annen enhet enn eierfogd", async ({ mount, page }) => {
         await mockOpprettSakApi(page, foreldreTilBarn);
         const component = await mount<typeof Modal>(STORY, {
             ident: barnUnder18.ident,
@@ -361,8 +361,9 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         const dialog = await åpneModal(page, component);
         await åpneSøskenflokker(dialog);
 
+        await expect(dialog.getByText(/sender saken til NAV Test \(4806\), ikke til 9999\./)).toBeVisible();
         await expect(
-            dialog.getByText("Arbeidsfordelingen gir en annen enhet enn 9999.", { exact: false }),
+            dialog.getByRole("checkbox", { name: "Jeg har kontrollert at saken skal sendes til NAV Test (4806)" }),
         ).toBeVisible();
     });
 });
