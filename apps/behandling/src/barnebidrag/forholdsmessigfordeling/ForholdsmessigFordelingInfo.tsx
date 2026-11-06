@@ -51,20 +51,19 @@ export default function ForholdsmessigFordelingInfo() {
         mutationFn: () => {
             try {
                 const barn = Object.entries(endredeRevurderingsdatoer)
-                .filter(([, dato]) => !!dato)
-                .map(([nøkkel, dato]) => {
-                    const [ident, stønadstype] = nøkkel.split("|");
-                    return {
-                        ident,
-                        stønadstype: stønadstype as Stonadstype,
-                        revurderingFraDato: dato as string,
-                    } satisfies OppdaterRevurderingsdatoBarn;
-                });
-                return BEHANDLING_API_V1.api.oppdaterRevurderingsdato(id, { barn }); 
+                    .filter(([, dato]) => !!dato)
+                    .map(([nøkkel, dato]) => {
+                        const [ident, stønadstype] = nøkkel.split("|");
+                        return {
+                            ident,
+                            stønadstype: stønadstype as Stonadstype,
+                            revurderingFraDato: dato as string,
+                        } satisfies OppdaterRevurderingsdatoBarn;
+                    });
+                return BEHANDLING_API_V1.api.oppdaterRevurderingsdato(id, { barn });
             } catch (e) {
-                console.error(e)
+                console.error(e);
             }
-        
         },
         onSuccess: () => {
             setEndredeRevurderingsdatoer({});
