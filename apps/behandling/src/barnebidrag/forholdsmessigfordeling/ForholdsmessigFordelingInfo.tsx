@@ -49,7 +49,8 @@ export default function ForholdsmessigFordelingInfo() {
     const oppdaterRevurderingsdatoFn = useMutation({
         retry: false,
         mutationFn: () => {
-            const barn = Object.entries(endredeRevurderingsdatoer)
+            try {
+                const barn = Object.entries(endredeRevurderingsdatoer)
                 .filter(([, dato]) => !!dato)
                 .map(([nøkkel, dato]) => {
                     const [ident, stønadstype] = nøkkel.split("|");
@@ -59,7 +60,11 @@ export default function ForholdsmessigFordelingInfo() {
                         revurderingFraDato: dato as string,
                     } satisfies OppdaterRevurderingsdatoBarn;
                 });
-            return BEHANDLING_API_V1.api.oppdaterRevurderingsdato(id, { barn });
+                return BEHANDLING_API_V1.api.oppdaterRevurderingsdato(id, { barn }); 
+            } catch (e) {
+                console.error(e)
+            }
+        
         },
         onSuccess: () => {
             setEndredeRevurderingsdatoer({});
