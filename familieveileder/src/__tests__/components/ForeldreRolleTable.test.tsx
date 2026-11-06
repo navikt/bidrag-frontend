@@ -5,7 +5,7 @@ import type { Mock } from "vitest";
 
 import ForeldreRolleTable from "../../components/table/foreldre-rolle-table/ForeldreRolleTable";
 import { RolleType } from "../../types/rolleveileder";
-import { IFamilierelasjonTableData } from "../../types/table";
+import type { IFamilierelasjonTableData } from "../../types/table";
 import { BPWithTwoMotpart, createValgteRoller, FODSELSNUMMER } from "../mockdata/personMock";
 
 const selectedIdents = (data: IFamilierelasjonTableData[]) => data.map((d) => d.fodselsnummer);
@@ -25,7 +25,7 @@ describe("ForeldreRolleTable", () => {
                 familieenhet={familieenhet}
                 valgteRoller={createValgteRoller(FODSELSNUMMER, "22222", ["33333"])}
                 onSelect={onSelect}
-            />
+            />,
         );
     });
 

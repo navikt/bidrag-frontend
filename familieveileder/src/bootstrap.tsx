@@ -12,5 +12,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         rolle={RolleType.BP}
         valgteRoller={{ bp: DEV_FODSELSNUMMER, bm: "", barn: [] }}
         onSubmit={(rolleveileder) => console.log("onSubmit", rolleveileder)}
-    />
+    />,
 );

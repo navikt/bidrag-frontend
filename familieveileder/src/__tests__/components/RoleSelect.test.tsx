@@ -24,7 +24,7 @@ describe("RoleSelect", () => {
 
     it("renders custom roles and testId", () => {
         render(
-            <RoleSelect name={NAME} defaultValue="" onSelectRole={vi.fn()} roles={[RolleType.BA]} testId="custom-id" />
+            <RoleSelect name={NAME} defaultValue="" onSelectRole={vi.fn()} roles={[RolleType.BA]} testId="custom-id" />,
         );
         const select = screen.getByTestId("custom-id") as HTMLSelectElement;
         expect(Array.from(select.options).map((o) => o.value)).toEqual(["", RolleType.BA]);

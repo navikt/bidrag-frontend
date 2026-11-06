@@ -1,5 +1,5 @@
 import { Select } from "@navikt/ds-react";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { type ChangeEvent, useEffect, useState } from "react";
 
 import { RolleType } from "../../../types/rolleveileder";
 

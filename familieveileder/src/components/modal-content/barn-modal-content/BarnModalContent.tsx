@@ -1,13 +1,12 @@
 import { Alert, Button, Heading } from "@navikt/ds-react";
-import { SyntheticEvent, useEffect, useState } from "react";
-import React from "react";
+import React, { type SyntheticEvent, useEffect, useState } from "react";
 
-import { PersonFamilierelasjonerResponse } from "../../../types/personsearch";
-import { RolleType, Rolleveileder } from "../../../types/rolleveileder";
-import { IBarnRolleTableData } from "../../../types/table";
+import type { PersonFamilierelasjonerResponse } from "../../../types/personsearch";
+import { RolleType, type Rolleveileder } from "../../../types/rolleveileder";
+import type { IBarnRolleTableData } from "../../../types/table";
 import { getMotpartRolleType } from "../../../utils/personUtils";
 import DefaultButton from "../../button/default-button/DefaultButton";
-import { ISelectData } from "../../select/role-select/RoleSelect";
+import type { ISelectData } from "../../select/role-select/RoleSelect";
 import BarnRolleTable from "../../table/barn-rolle-tabel/BarnRolleTable";
 import { createBarnRolleTableData } from "../../table/barn-rolle-tabel/BarnRolleTableUtils";
 
@@ -29,7 +28,11 @@ export default function BarnModalContent({
     useEffect(() => {
         if (familierelasjoner) {
             setTableData(
-                createBarnRolleTableData(familierelasjoner?.personensMor, familierelasjoner?.personensFar, valgteRoller)
+                createBarnRolleTableData(
+                    familierelasjoner?.personensMor,
+                    familierelasjoner?.personensFar,
+                    valgteRoller,
+                ),
             );
         }
     }, [familierelasjoner, valgteRoller]);

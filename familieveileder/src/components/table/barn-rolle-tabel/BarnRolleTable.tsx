@@ -2,8 +2,8 @@ import { Table } from "@navikt/ds-react";
 import React from "react";
 
 import { HEADER } from "../../../constants/table";
-import { IBarnRolleTableData } from "../../../types/table";
-import RoleSelect, { ISelectData } from "../../select/role-select/RoleSelect";
+import type { IBarnRolleTableData } from "../../../types/table";
+import RoleSelect, { type ISelectData } from "../../select/role-select/RoleSelect";
 
 interface IBarnRolleTableProps {
     tableData: IBarnRolleTableData[];

@@ -1,7 +1,6 @@
-import { RelasjonType } from "../../types/personsearch";
-import { ForelderrolleType } from "../../types/personsearch";
+import { ForelderrolleType, RelasjonType } from "../../types/personsearch";
 import { RolleType } from "../../types/rolleveileder";
-import { IFamilierelasjonTableData } from "../../types/table";
+import type { IFamilierelasjonTableData } from "../../types/table";
 import {
     getFamileenhetByMotpartFodselsnummer,
     getFamilieenhetUtenMotpart,

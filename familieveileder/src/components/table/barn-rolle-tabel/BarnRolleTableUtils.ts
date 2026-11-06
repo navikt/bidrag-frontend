@@ -1,6 +1,6 @@
-import { PersonInfoDto, RelasjonType } from "../../../types/personsearch";
-import { Rolleveileder } from "../../../types/rolleveileder";
-import { IBarnRolleTableData } from "../../../types/table";
+import { type PersonInfoDto, RelasjonType } from "../../../types/personsearch";
+import type { Rolleveileder } from "../../../types/rolleveileder";
+import type { IBarnRolleTableData } from "../../../types/table";
 import { getRolleType } from "../../../utils/personUtils";
 
 /**
@@ -9,7 +9,7 @@ import { getRolleType } from "../../../utils/personUtils";
 export function createBarnRolleTableData(
     mor: PersonInfoDto | undefined | null,
     far: PersonInfoDto | undefined | null,
-    valgteRoller: Rolleveileder
+    valgteRoller: Rolleveileder,
 ): IBarnRolleTableData[] {
     const morRolle = mor &&
         mor !== null && {

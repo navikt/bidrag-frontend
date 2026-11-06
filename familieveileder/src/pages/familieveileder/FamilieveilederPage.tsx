@@ -3,8 +3,7 @@ import { Button, Modal } from "@navikt/ds-react";
 import React, { useState } from "react";
 
 import RolleveilederModalContent from "../../components/modal-content/rolleveileder-modal-content/RolleveilederModalContent";
-import { RolleType } from "../../types/rolleveileder";
-import { Rolleveileder } from "../../types/rolleveileder";
+import type { RolleType, Rolleveileder } from "../../types/rolleveileder";
 import PageWrapper from "../PageWrapper";
 
 export interface IFamilieveilederProps {

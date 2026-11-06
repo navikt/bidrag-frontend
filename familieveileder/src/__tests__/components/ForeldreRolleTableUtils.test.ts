@@ -16,7 +16,7 @@ describe("createFamilierelasjonData", () => {
         const result = createFamilierelasjonData(
             RolleType.BP,
             familieenhet,
-            createValgteRoller(FODSELSNUMMER, "22222", ["44444"])
+            createValgteRoller(FODSELSNUMMER, "22222", ["44444"]),
         );
 
         expect(result).toEqual([
@@ -52,7 +52,7 @@ describe("createFamilierelasjonData", () => {
         const [motpart] = createFamilierelasjonData(
             RolleType.BM,
             enhet,
-            createValgteRoller("55555", FODSELSNUMMER, [])
+            createValgteRoller("55555", FODSELSNUMMER, []),
         );
 
         expect(motpart.rolle).toBe(RolleType.BP);
@@ -64,7 +64,7 @@ describe("createFamilierelasjonData", () => {
         const [motpart] = createFamilierelasjonData(
             RolleType.BP,
             familieenhet,
-            createValgteRoller(FODSELSNUMMER, "12345", [])
+            createValgteRoller(FODSELSNUMMER, "12345", []),
         );
         expect(motpart.isChecked).toBe(false);
     });

@@ -1,11 +1,10 @@
 import { Checkbox, Table } from "@navikt/ds-react";
-import { ChangeEvent, useEffect, useState } from "react";
-import React from "react";
+import React, { type ChangeEvent, useEffect, useState } from "react";
 
 import { HEADER } from "../../../constants/table";
-import { FamileenhetDto } from "../../../types/personsearch";
-import { RolleType, Rolleveileder } from "../../../types/rolleveileder";
-import { IFamilierelasjonTableData } from "../../../types/table";
+import type { FamileenhetDto } from "../../../types/personsearch";
+import type { RolleType, Rolleveileder } from "../../../types/rolleveileder";
+import type { IFamilierelasjonTableData } from "../../../types/table";
 import createFamilierelasjonData from "./ForeldreRolleTableUtils";
 
 interface IForeldreRolleTableDataProps {

@@ -2,7 +2,7 @@ import { Table } from "@navikt/ds-react";
 import React from "react";
 
 import { HEADER } from "../../../constants/table";
-import { RolleType } from "../../../types/rolleveileder";
+import type { RolleType } from "../../../types/rolleveileder";
 
 interface IRolleveilederTableProps {
     rolle: RolleType;

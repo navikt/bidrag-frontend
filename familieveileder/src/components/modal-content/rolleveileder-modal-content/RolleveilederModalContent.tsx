@@ -1,9 +1,9 @@
 import { Loader, Modal } from "@navikt/ds-react";
-import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
+import React, { type SyntheticEvent, useEffect, useMemo, useState } from "react";
 
-import { IFamilieveilederProps } from "../../../pages/familieveileder/FamilieveilederPage";
+import type { IFamilieveilederProps } from "../../../pages/familieveileder/FamilieveilederPage";
 import PersonSearchService from "../../../service/PersonSearchService";
-import { PersonFamilierelasjonerResponse } from "../../../types/personsearch";
+import type { PersonFamilierelasjonerResponse } from "../../../types/personsearch";
 import { RolleType } from "../../../types/rolleveileder";
 import RolleveilederTable from "../../table/rolleveileder-table/RolleveilederTable";
 import BarnModalContent from "../barn-modal-content/BarnModalContent";
@@ -31,10 +31,10 @@ export default function RolleveilederModalContent({
             (familierelasjoner?.personensFamilieenheter ?? []).map((f) => ({
                 ...f,
                 fellesBarn: f.fellesBarn.filter(
-                    (value, index, self) => index === self.findIndex((t) => t.ident === value.ident)
+                    (value, index, self) => index === self.findIndex((t) => t.ident === value.ident),
                 ),
             })),
-        [familierelasjoner]
+        [familierelasjoner],
     );
 
     useEffect(() => {

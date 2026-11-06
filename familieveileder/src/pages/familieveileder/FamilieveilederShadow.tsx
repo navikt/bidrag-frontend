@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import { createCustomElement, createEventsForFunctionProps, getParsedProps } from "../../customElementLoader";
-import FamilieveilederPage, { IFamilieveilederProps } from "./FamilieveilederPage";
+import FamilieveilederPage, { type IFamilieveilederProps } from "./FamilieveilederPage";
 
 const parentElementId = "bidrag-sak-ui_familieveileder";
 const appName = "familie-veileder";
@@ -18,7 +18,7 @@ const App = (props: IFamilieveilederProps) => {
         if (isCreating.current) return;
         isCreating.current = true;
     }, []);
-    //@ts-ignore
+    //@ts-expect-error
     return <familie-veileder id={id.current} {...getParsedProps(props, appName)}></familie-veileder>;
 };
 

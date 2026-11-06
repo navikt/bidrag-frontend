@@ -2,7 +2,7 @@ import "../index.css";
 import "@navikt/ds-css";
 
 import { Provider } from "@navikt/ds-react";
-import React, { PropsWithChildren, useRef } from "react";
+import React, { type PropsWithChildren, useRef } from "react";
 
 interface IPageWrapperProps {
     name: string;

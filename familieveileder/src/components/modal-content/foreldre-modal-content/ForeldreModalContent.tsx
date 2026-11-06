@@ -1,10 +1,9 @@
 import { Select } from "@navikt/ds-react";
-import { ChangeEvent, useEffect, useState } from "react";
-import React from "react";
+import React, { type ChangeEvent, useEffect, useState } from "react";
 
-import { FamileenhetDto } from "../../../types/personsearch";
-import { RolleType, Rolleveileder } from "../../../types/rolleveileder";
-import { IFamilierelasjonTableData } from "../../../types/table";
+import type { FamileenhetDto } from "../../../types/personsearch";
+import { RolleType, type Rolleveileder } from "../../../types/rolleveileder";
+import type { IFamilierelasjonTableData } from "../../../types/table";
 import { includesSomeElement } from "../../../utils/arrayUtils";
 import {
     getFamileenhetByMotpartFodselsnummer,
@@ -14,7 +13,7 @@ import {
 } from "../../../utils/personUtils";
 import DefaultButton from "../../button/default-button/DefaultButton";
 import ForeldreRolleTable from "../../table/foreldre-rolle-table/ForeldreRolleTable";
-import { IRolleveilederModalProps } from "../rolleveileder-modal-content/RolleveilederModalContent";
+import type { IRolleveilederModalProps } from "../rolleveileder-modal-content/RolleveilederModalContent";
 
 interface IForeldreModalContentProps extends IRolleveilederModalProps {
     personensFamilieenheter: FamileenhetDto[];
@@ -51,7 +50,7 @@ export default function ForeldreModalContent({
         if (selectedMotpart) {
             setSelectedFamilieenhet(
                 getFamileenhetByMotpartFodselsnummer(personensFamilieenheter, selectedMotpart) ??
-                    ukjentFamilieenhet(personensFamilieenheter)
+                    ukjentFamilieenhet(personensFamilieenheter),
             );
         } else {
             // Motpart and Barn has not been selected, choose the first element as default value
@@ -62,8 +61,8 @@ export default function ForeldreModalContent({
                 const motpart = personensFamilieenheter.find((familie) =>
                     includesSomeElement(
                         valgteRoller.barn,
-                        familie.fellesBarn.map((barn) => barn.ident)
-                    )
+                        familie.fellesBarn.map((barn) => barn.ident),
+                    ),
                 );
                 setSelectedFamilieenhet(motpart);
             }
@@ -85,7 +84,7 @@ export default function ForeldreModalContent({
     function handleSubmit() {
         const motpartRolleType = getMotpartRolleType(rolle);
         const selectedBarn = getFamilierelasjonByRolle(selectedPersoner, RolleType.BA).map(
-            (barn) => barn.fodselsnummer
+            (barn) => barn.fodselsnummer,
         );
         const selectedMotpart = getFamilierelasjonByRolle(selectedPersoner, motpartRolleType)?.[0]?.fodselsnummer;
 

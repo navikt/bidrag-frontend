@@ -20,7 +20,7 @@ describe("BarnModalContent", () => {
                 valgteRoller={valgteRoller}
                 onSubmit={onSubmit}
                 onClose={onClose}
-            />
+            />,
         );
         return { onSubmit, onClose };
     }
@@ -85,11 +85,11 @@ describe("BarnModalContent", () => {
                 valgteRoller={createValgteRoller("", "", [FODSELSNUMMER])}
                 onSubmit={vi.fn()}
                 onClose={onClose}
-            />
+            />,
         );
 
         expect(screen.getByTestId("test-error-barn-modal-content").textContent).toContain(
-            "Det finnes ikke registrerte foreldre for barnet"
+            "Det finnes ikke registrerte foreldre for barnet",
         );
         expect(screen.queryByRole("table")).toBeNull();
         await userEvent.click(screen.getByRole("button", { name: "Avbryt" }));

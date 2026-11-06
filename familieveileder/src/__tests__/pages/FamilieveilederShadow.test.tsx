@@ -15,7 +15,7 @@ describe("FamilieveilederShadow", () => {
 
     beforeEach(() => {
         vi.spyOn(PersonSearchService.prototype, "hentFamilierelasjoner").mockResolvedValue(
-            BPWithTwoMotpart(FODSELSNUMMER)
+            BPWithTwoMotpart(FODSELSNUMMER),
         );
     });
 
@@ -26,7 +26,7 @@ describe("FamilieveilederShadow", () => {
                 rolle={RolleType.BP}
                 valgteRoller={valgteRoller}
                 onSubmit={onSubmit}
-            />
+            />,
         );
         const element = result.container.querySelector(ELEMENT_NAME) as HTMLElement;
         await waitFor(() => expect(element.shadowRoot?.getElementById("bidrag-sak-ui")).toBeTruthy());

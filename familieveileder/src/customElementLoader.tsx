@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM, { Root } from "react-dom/client";
+import type React from "react";
+import ReactDOM, { type Root } from "react-dom/client";
 
 import { createShadowContainer } from "./styleLoader.js";
 
@@ -50,7 +50,7 @@ export const getParsedProps = (props: object, appName: string) =>
                 return { [`event_${propKey}`]: getEventname(appName, propKey) };
             }
             return { [propKey]: JSON.stringify(props[propKey]) };
-        })
+        }),
     );
 
 const handleEvent = (props: object, name: string, inputs: any) => {
@@ -78,7 +78,7 @@ export const createCustomElement = (
     name: string,
     props: object,
     RenderElement: (props: any) => React.JSX.Element,
-    parentElementId?: string
+    parentElementId?: string,
 ) => {
     if (customElements.get(name) == null) {
         customElements.define(
@@ -131,7 +131,7 @@ export const createCustomElement = (
 
                             const parsedInput = this.parseJson(this.props[propKey]);
                             return { [propKey]: parsedInput };
-                        })
+                        }),
                     );
                 }
 
@@ -156,7 +156,7 @@ export const createCustomElement = (
                     this.props = { ...this.props, [actualPropName]: newValue };
                     this.render();
                 }
-            }
+            },
         );
     }
 };

@@ -1,6 +1,5 @@
 import { Button } from "@navikt/ds-react";
-import { ButtonHTMLAttributes } from "react";
-import React from "react";
+import React, { type ButtonHTMLAttributes } from "react";
 
 interface IDefaultButton extends ButtonHTMLAttributes<HTMLButtonElement> {
     title: string;

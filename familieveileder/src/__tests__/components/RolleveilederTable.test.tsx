@@ -14,13 +14,13 @@ describe("RolleveilederTable", () => {
         expect(
             within(headerRow)
                 .getAllByRole("columnheader")
-                .map((c) => c.textContent)
+                .map((c) => c.textContent),
         ).toEqual(HEADER.ROLLEVEILEDER);
         expect(within(bodyRow).getByRole("rowheader").textContent).toBe(RolleType.BP);
         expect(
             within(bodyRow)
                 .getAllByRole("cell")
-                .map((c) => c.textContent)
+                .map((c) => c.textContent),
         ).toEqual([FODSELSNUMMER, "Far"]);
     });
 });

@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import React from "react";
 import type { Mock } from "vitest";
 
-import { ISelectData } from "../../components/select/role-select/RoleSelect";
+import type { ISelectData } from "../../components/select/role-select/RoleSelect";
 import BarnRolleTable from "../../components/table/barn-rolle-tabel/BarnRolleTable";
 import { createBarnRolleTableData } from "../../components/table/barn-rolle-tabel/BarnRolleTableUtils";
 import { HEADER } from "../../constants/table";
@@ -22,7 +22,7 @@ describe("BarnRolleTable", () => {
             <BarnRolleTable
                 tableData={createBarnRolleTableData(personensMor, personensFar, valgteRoller)}
                 onSelectRole={onSelectRole}
-            />
+            />,
         );
     });
 
@@ -31,7 +31,7 @@ describe("BarnRolleTable", () => {
         expect(
             within(table)
                 .getAllByRole("columnheader")
-                .map((c) => c.textContent)
+                .map((c) => c.textContent),
         ).toEqual(HEADER.FAMILIERELASJON.slice(1));
         expect(screen.getAllByTestId(/test-role-select/i)).toHaveLength(2);
     });
@@ -43,8 +43,8 @@ describe("BarnRolleTable", () => {
                 within(r)
                     .getAllByRole("cell")
                     .slice(1)
-                    .map((c) => c.textContent)
-            )
+                    .map((c) => c.textContent),
+            ),
         ).toEqual([
             ["FAR", "99999", "Far"],
             ["MOR", "88888", "Mor"],

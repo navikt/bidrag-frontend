@@ -1,13 +1,13 @@
-import { FamileenhetDto } from "../types/personsearch";
-import { RolleType, Rolleveileder } from "../types/rolleveileder";
-import { IFamilierelasjonTableData } from "../types/table";
+import type { FamileenhetDto } from "../types/personsearch";
+import { RolleType, type Rolleveileder } from "../types/rolleveileder";
+import type { IFamilierelasjonTableData } from "../types/table";
 
 /**
  * Filtrerer familierelasjoner på rolle.
  */
 export function getFamilierelasjonByRolle(
     personList: IFamilierelasjonTableData[],
-    rolle: RolleType
+    rolle: RolleType,
 ): IFamilierelasjonTableData[] {
     return personList.filter((person) => person.rolle === rolle);
 }
@@ -17,7 +17,7 @@ export function getFamilierelasjonByRolle(
  */
 export function getFamileenhetByMotpartFodselsnummer(
     personList: FamileenhetDto[],
-    fodselsnummer: string
+    fodselsnummer: string,
 ): FamileenhetDto {
     return personList.find((familieenhet) => familieenhet.motpart?.ident === fodselsnummer);
 }

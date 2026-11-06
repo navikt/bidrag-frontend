@@ -10,7 +10,7 @@ describe("createBarnRolleTableData", () => {
         const result = createBarnRolleTableData(
             personensMor,
             personensFar,
-            createValgteRoller(personensFar.ident, personensMor.ident, [FODSELSNUMMER])
+            createValgteRoller(personensFar.ident, personensMor.ident, [FODSELSNUMMER]),
         );
 
         expect(result).toEqual([

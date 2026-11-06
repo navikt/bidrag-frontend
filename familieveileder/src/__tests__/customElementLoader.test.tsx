@@ -71,7 +71,7 @@ describe("createEventListener", () => {
                 },
             },
             APP_NAME,
-            "onSubmit"
+            "onSubmit",
         );
 
         expect(() => window.dispatchEvent(new CustomEvent(eventName, { detail: "sensitiv" }))).not.toThrow();

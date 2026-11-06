@@ -3,8 +3,8 @@ import React from "react";
 
 import RolleveilederModalContent from "../../components/modal-content/rolleveileder-modal-content/RolleveilederModalContent";
 import PersonSearchService from "../../service/PersonSearchService";
-import { ForelderrolleType, PersonFamilierelasjonerResponse } from "../../types/personsearch";
-import { RolleType, Rolleveileder } from "../../types/rolleveileder";
+import { ForelderrolleType, type PersonFamilierelasjonerResponse } from "../../types/personsearch";
+import { RolleType, type Rolleveileder } from "../../types/rolleveileder";
 import {
     BA,
     BAWithoutForeldre,
@@ -31,7 +31,7 @@ function renderContent(rolle: RolleType, valgteRoller: Rolleveileder) {
             valgteRoller={valgteRoller}
             onClose={vi.fn()}
             testId={TEST_ID}
-        />
+        />,
     );
 }
 
@@ -62,7 +62,7 @@ describe("RolleveilederModalContent", () => {
             expect(
                 within(rolleveilederTable)
                     .getAllByRole("cell")
-                    .map((c) => c.textContent)
+                    .map((c) => c.textContent),
             ).toEqual([FODSELSNUMMER, "Far"]);
         });
 
@@ -77,7 +77,7 @@ describe("RolleveilederModalContent", () => {
 
             await screen.findByTestId("test-foreldre-modal-content");
             expect(
-                (screen.getAllByTestId("test-foreldre-rolle-table-select") as HTMLInputElement[]).map((c) => c.value)
+                (screen.getAllByTestId("test-foreldre-rolle-table-select") as HTMLInputElement[]).map((c) => c.value),
             ).toEqual(["22222", "33333"]);
         });
     });

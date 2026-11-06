@@ -1,12 +1,12 @@
 import {
-    FamileenhetDto,
+    type FamileenhetDto,
     FolkeregisteridentifikatorType,
     ForelderrolleType,
     GtType,
-    PersonFamilierelasjonerResponse,
-    PersonInfoDto,
+    type PersonFamilierelasjonerResponse,
+    type PersonInfoDto,
 } from "../../types/personsearch";
-import { Rolleveileder } from "../../types/rolleveileder";
+import type { Rolleveileder } from "../../types/rolleveileder";
 
 export const FODSELSNUMMER = "11111111111";
 
@@ -44,7 +44,7 @@ export function createPersonInfo(navn: string, ident: string): PersonInfoDto {
 export function createFamilieenheter(
     forelderrolleMotpart: ForelderrolleType,
     motpart: PersonInfoDto | null,
-    barn: PersonInfoDto[]
+    barn: PersonInfoDto[],
 ): FamileenhetDto {
     return { forelderrolleMotpart, motpart, fellesBarn: barn };
 }

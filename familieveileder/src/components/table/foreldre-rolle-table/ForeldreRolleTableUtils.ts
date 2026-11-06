@@ -1,6 +1,6 @@
-import { FamileenhetDto, RelasjonType } from "../../../types/personsearch";
-import { RolleType, Rolleveileder } from "../../../types/rolleveileder";
-import { IFamilierelasjonTableData } from "../../../types/table";
+import { type FamileenhetDto, RelasjonType } from "../../../types/personsearch";
+import { RolleType, type Rolleveileder } from "../../../types/rolleveileder";
+import type { IFamilierelasjonTableData } from "../../../types/table";
 import { getMotpartRolleType } from "../../../utils/personUtils";
 
 /**
@@ -9,7 +9,7 @@ import { getMotpartRolleType } from "../../../utils/personUtils";
 export default function createFamilierelasjonData(
     rolle: RolleType,
     familieenhet: FamileenhetDto,
-    valgteRoller: Rolleveileder
+    valgteRoller: Rolleveileder,
 ): IFamilierelasjonTableData[] {
     const { fellesBarn } = familieenhet;
     const role = getMotpartRolleType(rolle);
@@ -34,7 +34,7 @@ export default function createFamilierelasjonData(
                 isChecked: !!valgteRoller.barn.find((selectedBarn) => selectedBarn === barn.ident),
             },
         ],
-        []
+        [],
     );
 
     return [motpartRow, ...barnRow].filter((row) => row && row !== null);

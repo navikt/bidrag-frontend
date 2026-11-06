@@ -4,7 +4,7 @@ import React from "react";
 
 import ForeldreModalContent from "../../components/modal-content/foreldre-modal-content/ForeldreModalContent";
 import { ForelderrolleType } from "../../types/personsearch";
-import { RolleType, Rolleveileder } from "../../types/rolleveileder";
+import { RolleType, type Rolleveileder } from "../../types/rolleveileder";
 import {
     BPWithTwoMotpart,
     createFamilieenheter,
@@ -34,7 +34,7 @@ describe("ForeldreModalContent", () => {
                 personensFamilieenheter={personensFamilieenheter}
                 onSubmit={onSubmit}
                 onClose={onClose}
-            />
+            />,
         );
         return { onSubmit, onClose };
     }
@@ -78,7 +78,7 @@ describe("ForeldreModalContent", () => {
         await userEvent.selectOptions(getMotpartSelect(), UKJENT);
 
         expect(
-            (screen.getAllByTestId("test-foreldre-rolle-table-select") as HTMLInputElement[]).map((c) => c.value)
+            (screen.getAllByTestId("test-foreldre-rolle-table-select") as HTMLInputElement[]).map((c) => c.value),
         ).toEqual(["55555"]);
     });
 

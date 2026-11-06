@@ -1,5 +1,5 @@
 import { HTTPStatus } from "../enum/HttpStatus";
-import { PersonFamilierelasjonerResponse } from "../types/personsearch";
+import type { PersonFamilierelasjonerResponse } from "../types/personsearch";
 
 export const FAMILIERELASJONER_PATH = "/rtv-bidrag/api/v1/person/";
 

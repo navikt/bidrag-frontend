@@ -4,7 +4,7 @@ import React from "react";
 
 import FamilieveilederPage from "../../pages/familieveileder/FamilieveilederPage";
 import PersonSearchService from "../../service/PersonSearchService";
-import { RolleType, Rolleveileder } from "../../types/rolleveileder";
+import { RolleType, type Rolleveileder } from "../../types/rolleveileder";
 import { BPWithTwoMotpart, createValgteRoller, FODSELSNUMMER } from "../mockdata/personMock";
 
 const OPEN_BUTTON_NAME = "Åpne rolleveileder";
@@ -37,7 +37,7 @@ describe("FamilieveilederPage", () => {
                 rolle={RolleType.BP}
                 onSubmit={onSubmit}
                 valgteRoller={createValgteRoller(FODSELSNUMMER, valgteMotpart.motpart.ident, [allBarn[0]])}
-            />
+            />,
         );
     });
 
@@ -65,7 +65,7 @@ describe("FamilieveilederPage", () => {
         await userEvent.click(screen.getByTestId("test-velg-knapp"));
 
         expect(onSubmit).toHaveBeenCalledExactlyOnceWith(
-            createValgteRoller(FODSELSNUMMER, valgteMotpart.motpart.ident, allBarn)
+            createValgteRoller(FODSELSNUMMER, valgteMotpart.motpart.ident, allBarn),
         );
     });
 
@@ -88,7 +88,7 @@ describe("FamilieveilederPage", () => {
         await userEvent.click(screen.getByTestId("test-velg-knapp"));
 
         expect(onSubmit).toHaveBeenCalledExactlyOnceWith(
-            createValgteRoller(FODSELSNUMMER, valgteMotpart.motpart.ident, [])
+            createValgteRoller(FODSELSNUMMER, valgteMotpart.motpart.ident, []),
         );
     });
 
