@@ -14,7 +14,7 @@
         "@bidrag/api": "workspace:*",
         "@bidrag/common": "workspace:*",
         "@bidrag/utils": "workspace:*",
-        "@hookform/resolvers": "^5.4.0",
+        "@hookform/resolvers": "^6.0.2",
         "@navikt/aksel-icons": "catalog:",
         "@navikt/ds-react": "catalog:",
         "axios": "catalog:",

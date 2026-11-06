@@ -31,6 +31,7 @@ import {
     ForholdsmessigFordelingVarsel,
     GammelVersjonAvBeregningVarsel,
     NesteIndeksår,
+    SaksreskontroPåminnelseVarsel,
     VedtakProvider,
     VedtakResultatBarn,
     VedtakTableBody,
@@ -104,6 +105,7 @@ const VedtakEndelig = () => {
                 <ForholdsmessigFordelingVarsel />
                 <VedtakUgyldigBeregning resultat={beregning?.resultat?.ugyldigBeregning} />
                 <VedtakResultat />
+                <SaksreskontroPåminnelseVarsel />
             </div>
             {kanViseFatteVedtakKnapp && !isFetching && (
                 <OverstyrFatteVedtakRevurderingSwitch
