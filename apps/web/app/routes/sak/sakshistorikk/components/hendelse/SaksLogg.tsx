@@ -61,7 +61,7 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
 
             <DataGrid
                 data={paginatedData}
-                className={`${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-4 [&_tr>*:first-child>*]:whitespace-nowrap`}
+                className={`${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-4`}
                 getRowId={(h) => h.hendelseId ?? `${h.opprettetTidspunkt}-${h.type}`}
                 settings={{
                     zebraStripes: true,

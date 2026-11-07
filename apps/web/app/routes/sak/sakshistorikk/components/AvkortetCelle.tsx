@@ -3,13 +3,14 @@ import { type ReactNode, useRef, useState } from "react";
 
 /**
  * Klasser for en `DataGrid` med `AvkortetCelle` i siste kolonne. Siste kolonne tar plassen de andre
- * kolonnene ikke bruker, men minst 12rem, slik at teksten er lesbar. Halv cellepadding og
- * overskrifter over flere linjer gjør at tabellen tar mindre plass i et smalt vindu. Er vinduet
+ * kolonnene ikke bruker, men minst 12rem, slik at teksten er lesbar. Teksten i de andre cellene
+ * brytes ikke, fordi `w-full` ellers gir de andre kolonnene minste mulige bredde. Halv cellepadding
+ * og overskrifter over flere linjer gjør at tabellen tar mindre plass i et smalt vindu. Er vinduet
  * for smalt likevel, ruller alle kolonnene sammen sideveis. Linjene er ett hakk mørkere enn
  * standard, slik at radene er lettere å skille.
  */
 export const tabellMedAvkortetSisteKolonne =
-    "[&_tr>*:last-child]:w-full [&_tr>*:last-child]:min-w-48 [&_th_*]:whitespace-normal [&_td>*]:px-2 [&_th>*]:px-2 [--ax-border-neutral-subtle:var(--ax-neutral-500)]";
+    "[&_tr>*:last-child]:w-full [&_tr>*:last-child]:min-w-48 [&_th_*]:whitespace-normal [&_td:not(:last-child)>*]:whitespace-nowrap [&_td>*]:px-2 [&_th>*]:px-2 [--ax-border-neutral-subtle:var(--ax-neutral-500)]";
 
 /**
  * Tabellcelle for en lang tekst i siste kolonne. `w-0 min-w-full` gjør at teksten ikke bestemmer
