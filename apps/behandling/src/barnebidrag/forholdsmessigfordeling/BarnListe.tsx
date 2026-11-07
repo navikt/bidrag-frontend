@@ -1,7 +1,7 @@
 import type { ForholdsmessigFordelingBarnDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, BodyShort, HStack, Label, VStack } from "@navikt/ds-react";
 import { useGetBehandlingV2 } from "../../common/hooks/useApiData";
-import BarnDetaljerFF, { BarnDetaljerOpprettFF } from "./BarnDetaljer";
+import BarnDetaljerFF, { BarnDetaljerOpprettFF, type EndretRevurderingsdato } from "./BarnDetaljer";
 
 interface BarnListeProps {
     skalBehandlesAvEnhet?: string;
@@ -75,8 +75,8 @@ export function BarnListeOpprettFF({
 }
 
 interface BarnListeFFProps extends BarnListeProps {
-    endredeRevurderingsdatoer?: Record<string, string | undefined>;
-    onRevurderingsdatoChange?: (barnNøkkel: string, dato?: string) => void;
+    endredeRevurderingsdatoer?: EndretRevurderingsdato[];
+    onRevurderingsdatoChange?: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
 }
 
 export function BarnListe({ barn, endredeRevurderingsdatoer, onRevurderingsdatoChange }: BarnListeFFProps) {

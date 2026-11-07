@@ -4,14 +4,13 @@ import {
     type ForholdsmessigFordelingBarnDto,
     type OppdaterRevurderingsdatoBarn,
     SoktAvType,
-    type Stonadstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import { Alert, Button, Dialog, Heading, HStack, VStack } from "@navikt/ds-react";
+import { Alert, Button, Dialog, Heading, HStack, LocalAlert, VStack } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useGetBehandlingV2, useRefetchFFInfoFn } from "../../common/hooks/useApiData";
 import useFeatureToogle from "../../common/hooks/useFeatureToggle";
-import { kanEndreRevurderingsdato } from "./BarnDetaljer";
+import { type EndretRevurderingsdato, kanEndreRevurderingsdato } from "./BarnDetaljer";
 import { BarnListe } from "./BarnListe";
 export function harÅpenEgetTiltakUtenInnkreving(barn: ForholdsmessigFordelingBarnDto[]) {
     return barn.some((b) =>
@@ -44,29 +43,27 @@ export default function ForholdsmessigFordelingInfo() {
     const refetchFF = useRefetchFFInfoFn(true);
 
     const [modalOpen, setModalOpen] = useState(false);
-    const [endredeRevurderingsdatoer, setEndredeRevurderingsdatoer] = useState<Record<string, string | undefined>>({});
+    const [endredeRevurderingsdatoer, setEndredeRevurderingsdatoer] = useState<EndretRevurderingsdato[]>([]);
 
     const oppdaterRevurderingsdatoFn = useMutation({
         retry: false,
         mutationFn: () => {
             try {
-                const barn = Object.entries(endredeRevurderingsdatoer)
-                    .filter(([, dato]) => !!dato)
-                    .map(([nøkkel, dato]) => {
-                        const [ident, stønadstype] = nøkkel.split("|");
-                        return {
-                            ident,
-                            stønadstype: stønadstype as Stonadstype,
-                            revurderingFraDato: dato as string,
-                        } satisfies OppdaterRevurderingsdatoBarn;
-                    });
+                const barn = endredeRevurderingsdatoer.map(
+                    (endret) =>
+                        ({
+                            ident: endret.ident,
+                            stønadstype: endret.stønadstype,
+                            nyRevurderingsdato: endret.dato,
+                        }) satisfies OppdaterRevurderingsdatoBarn,
+                );
                 return BEHANDLING_API_V1.api.oppdaterRevurderingsdato(id, { barn });
             } catch (e) {
                 console.error(e);
             }
         },
         onSuccess: () => {
-            setEndredeRevurderingsdatoer({});
+            setEndredeRevurderingsdatoer([]);
             refetchFF();
         },
     });
@@ -76,14 +73,24 @@ export default function ForholdsmessigFordelingInfo() {
     const erLesemodusVedtak = lesemodus?.fattetTidspunkt !== undefined;
     const kanEndreRevurderingsdatoer =
         tilgangOppretteFF && !lesemodus && forholdsmessigFordeling.barn.some(kanEndreRevurderingsdato);
-    const harEndringer = Object.values(endredeRevurderingsdatoer).some((dato) => !!dato);
+    const harEndringer = endredeRevurderingsdatoer.length > 0;
 
     function handleOpenChange(open: boolean) {
         setModalOpen(open);
         if (!open) {
-            setEndredeRevurderingsdatoer({});
+            setEndredeRevurderingsdatoer([]);
             oppdaterRevurderingsdatoFn.reset();
         }
+    }
+    function oppdaterRevurderingsdato(barn: ForholdsmessigFordelingBarnDto, nyDato?: string) {
+        setEndredeRevurderingsdatoer((current) => {
+            const andreBarn = current.filter(
+                (endret) => endret.ident !== barn.ident || endret.stønadstype !== barn.stønadstype,
+            );
+            return nyDato
+                ? [...andreBarn, { ident: barn.ident, stønadstype: barn.stønadstype, dato: nyDato }]
+                : andreBarn;
+        });
     }
     return (
         <>
@@ -93,21 +100,15 @@ export default function ForholdsmessigFordelingInfo() {
                     <Dialog.Body className="min-w-[700px]">
                         <VStack gap="space-2">
                             {oppdaterRevurderingsdatoFn.isError && (
-                                <Alert variant="error" size="small">
+                                <LocalAlert status="error" size="small">
                                     Noe gikk galt ved oppdatering av revurderingsdato. Vennligst prøv på nytt
-                                </Alert>
+                                </LocalAlert>
                             )}
                             <BarnListe
                                 barn={forholdsmessigFordeling.barn}
                                 endredeRevurderingsdatoer={endredeRevurderingsdatoer}
                                 onRevurderingsdatoChange={
-                                    kanEndreRevurderingsdatoer
-                                        ? (nøkkel, dato) =>
-                                              setEndredeRevurderingsdatoer((current) => ({
-                                                  ...current,
-                                                  [nøkkel]: dato,
-                                              }))
-                                        : undefined
+                                    kanEndreRevurderingsdatoer ? oppdaterRevurderingsdato : undefined
                                 }
                             />
                         </VStack>

@@ -26,13 +26,17 @@ import {
 } from "../../utils/date-utils";
 import LøpendeBidragListe from "./LøpendeBidragListe";
 
-interface BarnDetaljerFFProps {
-    barn: ForholdsmessigFordelingBarnDto[];
-    endredeRevurderingsdatoer?: Record<string, string | undefined>;
-    onRevurderingsdatoChange?: (barnNøkkel: string, dato?: string) => void;
+export interface EndretRevurderingsdato {
+    ident: string;
+    stønadstype: Stonadstype;
+    dato: string;
 }
 
-export const barnNøkkel = (barn: ForholdsmessigFordelingBarnDto) => `${barn.ident}|${barn.stønadstype}`;
+interface BarnDetaljerFFProps {
+    barn: ForholdsmessigFordelingBarnDto[];
+    endredeRevurderingsdatoer?: EndretRevurderingsdato[];
+    onRevurderingsdatoChange?: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
+}
 
 const hentSystemopprettetFFSøknad = (barn: ForholdsmessigFordelingBarnDto) => {
     const søknader = barn.åpneBehandlinger.filter(
@@ -287,21 +291,21 @@ function renderIkkeAlleBarnISøknaden(
 
 function EndreRevurderingsdatoMonthPicker({
     barn,
-    endretDato,
+    nyRevurderingsdato,
     onChange,
 }: {
     barn: ForholdsmessigFordelingBarnDto;
-    endretDato?: string;
-    onChange: (barnNøkkel: string, dato?: string) => void;
+    nyRevurderingsdato?: string;
+    onChange: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
 }) {
     const { søktFomDato } = useGetBehandlingV2();
     const gjeldendeDato = hentGjeldendeRevurderingsdato(barn);
-    const aktivDato = dateOrNull(endretDato ?? gjeldendeDato) ?? undefined;
+    const aktivDato = dateOrNull(nyRevurderingsdato ?? gjeldendeDato) ?? undefined;
 
     const handleMonthChange = (dato: Date | undefined) => {
         const nyDato = toISODateString(dato ?? undefined) ?? undefined;
         const erGjeldendeDato = !nyDato || DateToMMYYYYString(dato) === DateToMMYYYYString(dateOrNull(gjeldendeDato));
-        onChange(barnNøkkel(barn), erGjeldendeDato ? undefined : nyDato);
+        onChange(barn, erGjeldendeDato ? undefined : nyDato);
     };
 
     return (
@@ -413,7 +417,12 @@ export default function BarnDetaljerFF({
                         {onRevurderingsdatoChange && kanEndreRevurderingsdato(barn) && (
                             <EndreRevurderingsdatoMonthPicker
                                 barn={barn}
-                                endretDato={endredeRevurderingsdatoer?.[barnNøkkel(barn)]}
+                                nyRevurderingsdato={
+                                    endredeRevurderingsdatoer?.find(
+                                        (endret) =>
+                                            endret.ident === barn.ident && endret.stønadstype === barn.stønadstype,
+                                    )?.dato
+                                }
                                 onChange={onRevurderingsdatoChange}
                             />
                         )}
