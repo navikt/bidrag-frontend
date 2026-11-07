@@ -2,6 +2,7 @@ import { expect, type Locator, type Page, test } from "@playwright/test";
 
 const STANDARD_STORY = "routes/sak/SakLayouts/StandardMedSidemeny";
 const DOKUMENTER_STORY = "routes/sak/SakLayouts/DokumenterMedSidemeny";
+const STANDARD_OG_DOKUMENTER_STORY = "routes/sak/SakLayouts/StandardOgDokumenter";
 const UTEN_FELLES_HEADER_STORY = "routes/sak/SakLayouts/UtenFellesHeader";
 const UTEN_TILGANG_STORY = "routes/sak/SakLayouts/UtenTilgang";
 
@@ -103,6 +104,19 @@ test.describe("sakslayouter", () => {
         await meny.getByRole("button", { name: "Vis meny" }).click();
         await expect(meny.getByRole("link", { name: "Sakshistorikk" })).toBeVisible();
         expect((await målLayout(component)).sideinnholdsbredde).toBe(breddeFør);
+    });
+
+    test("sidemenyen forblir skjult når saksbehandler går til en side med en annen layout", async ({ mount, page }) => {
+        await mockSakHeaderKall(page);
+        const component = await mount(STANDARD_OG_DOKUMENTER_STORY);
+        const meny = component.getByRole("navigation", { name: "Sakmeny" });
+
+        await meny.getByRole("button", { name: "Skjul meny" }).click();
+        await component.getByRole("link", { name: "Gå til dokumentvisning" }).click();
+
+        await expect(component.getByRole("heading", { name: "Dokumentvisning" })).toBeVisible();
+        await expect(meny.getByRole("button", { name: "Vis meny" })).toBeVisible();
+        await expect(meny.getByRole("link")).toHaveCount(0);
     });
 
     test("dokumentlayout viser toppavstand, sidemeny og full bredde uten gutters", async ({ mount, page }) => {

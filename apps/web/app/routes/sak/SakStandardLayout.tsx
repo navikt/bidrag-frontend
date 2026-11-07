@@ -1,9 +1,10 @@
 // routes/sak/SakStandardLayout.tsx
 
 import { HGrid, Loader, Page } from "@navikt/ds-react";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { Outlet, useMatches, useParams } from "react-router";
 import SakMeny from "~/routes/sak/SakMeny.tsx";
+import { useSakMenyKollapset } from "~/routes/sak/SakMenyKollapset.tsx";
 
 /**
  * Route-`handle` for sider med brede tabeller. `brukHeleBredden` fjerner den tomme høyrekolonnen
@@ -15,7 +16,7 @@ export interface SakStandardLayoutHandle {
 
 export default function SakStandardLayout() {
     const { saksnummer = "" } = useParams();
-    const [menyKollapset, setMenyKollapset] = useState(false);
+    const [menyKollapset, setMenyKollapset] = useSakMenyKollapset();
     const menykolonne = menyKollapset ? "max-content" : "14rem";
     const brukHeleBredden = useMatches().some(
         (match) => (match.handle as SakStandardLayoutHandle | undefined)?.brukHeleBredden,
