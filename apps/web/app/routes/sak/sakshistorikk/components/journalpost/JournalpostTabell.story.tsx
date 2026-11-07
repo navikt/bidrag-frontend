@@ -138,3 +138,34 @@ export const TomListe = () => <Scenario data={[]} />;
 export const BlandedeJournalposter = () => <Scenario />;
 
 export const MedFarskapsutelukkede = () => <Scenario farskapData={farskapUtelukkedeJournalposter} />;
+
+const langBeskrivelse =
+    "Orientering og varsel om barnebidrag for revurdering etter endring i inntekt for begge parter i hele perioden";
+
+const journalposterMedLangBeskrivelse: JournalpostDto[] = [
+    journalpost({
+        journalpostId: "BID-4001",
+        dokumentType: "U",
+        dokumentDato: "2024-06-10",
+        journalfortDato: "2024-06-10",
+        journalforendeEnhet: "4806",
+        fagomrade: "BID",
+        innhold: langBeskrivelse,
+        status: JournalpostStatus.UNDER_OPPRETTELSE,
+        gjelderAktor: { ident: gjelderIdent },
+    }),
+    journalpost({
+        journalpostId: "BID-4002",
+        dokumentType: "X",
+        dokumentDato: "2024-06-11",
+        journalfortDato: "2024-06-11",
+        journalforendeEnhet: "4833",
+        fagomrade: "FAR",
+        innhold: `${langBeskrivelse} (lenke)`,
+        status: JournalpostStatus.RESERVERT,
+        gjelderAktor: { ident: gjelderIdent },
+    }),
+    ...journalposter,
+];
+
+export const LangBeskrivelse = () => <Scenario data={journalposterMedLangBeskrivelse} />;

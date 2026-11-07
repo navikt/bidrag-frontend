@@ -35,6 +35,7 @@ import { useRef, useState } from "react";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
 import { medReturMål, RETUR_PARAM, SAKSNR_PARAM } from "~/common/navigation/returLink.ts";
+import { AvkortetCelle, tabellMedAvkortetSisteKolonne } from "../AvkortetCelle";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
 import { journalstatusDisplayVerdi, standardSort, visesSomForsendelse } from "./journalpostUtils";
@@ -73,14 +74,20 @@ const erUnderProduksjon = (dok: DokumentDto) => {
         dok.status ?? DokumentStatusDto.FERDIGSTILT,
     );
 };
-function TruncatedText(props: { tittel: string; maxWith?: string }) {
+function TruncatedText(props: { tittel: string }) {
     return (
-        <HStack maxWidth={props.maxWith ?? "40ch"}>
-            <BodyShort size={"small"} truncate>
-                {props.tittel}
-            </BodyShort>
-        </HStack>
+        <BodyShort size={"small"} truncate>
+            {props.tittel}
+        </BodyShort>
     );
+}
+
+function beskrivelseTekst(rad: JournalpostRad) {
+    if (rad.erVedlegg && rad.dok) {
+        return rad.dok.tittel ?? rad.dok.dokumentreferanse ?? "";
+    }
+    const antall = rad.jp.dokumenter?.length ?? 0;
+    return antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
 }
 
 export default function JournalpostTabell({
@@ -234,13 +241,11 @@ export default function JournalpostTabell({
         const journalpostId = jp.journalpostId;
         if (rad.erVedlegg && rad.dok) {
             // Håndtering av vedlegg i expandable row
-            const dok = rad.dok;
-            const tekst = dok.tittel ?? dok.dokumentreferanse ?? "";
-            return renderDokumentLink(dok, tekst, journalpostId);
+            return renderDokumentLink(rad.dok, beskrivelseTekst(rad), journalpostId);
         }
 
         const antall = rad.jp.dokumenter?.length ?? 0;
-        const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
+        const tekst = beskrivelseTekst(rad);
 
         if (jp.status === JournalpostStatus.UNDER_OPPRETTELSE) {
             return <TruncatedText tittel={tekst} />;
@@ -355,7 +360,9 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            bodyCell: beskrivelseCelle,
+            bodyCell: (rad: JournalpostRad) => (
+                <AvkortetCelle tekst={beskrivelseTekst(rad)}>{beskrivelseCelle(rad)}</AvkortetCelle>
+            ),
         },
     ];
 
@@ -454,7 +461,7 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
-                    className="[&_tbody_tr:has(td:first-child_button)]:cursor-pointer"
+                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-1`}
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
                     //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
@@ -462,8 +469,6 @@ export default function JournalpostTabell({
                         zebraStripes: true,
                         rowDensity: "tight",
                         textSize: "small",
-                        truncateContent: true,
-                        stickyColumns: { end: 1 },
                     }}
                     columns={columnDefinitions}
                 >

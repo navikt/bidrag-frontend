@@ -3,6 +3,7 @@ import { Page, VStack } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router";
 import { useHentSak } from "~/api/useApi.ts";
+import { SakMenyKollapsetProvider } from "./SakMenyKollapset";
 
 export default function SakBaseLayout() {
     const { saksnummer = "" } = useParams();
@@ -24,5 +25,9 @@ export default function SakBaseLayout() {
         );
     }
 
-    return <Outlet context={sak} />;
+    return (
+        <SakMenyKollapsetProvider>
+            <Outlet context={sak} />
+        </SakMenyKollapsetProvider>
+    );
 }
