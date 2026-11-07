@@ -28,7 +28,7 @@ import { useQueryParams } from "../../../common/hooks/useQueryParams";
 import { hentVisningsnavn } from "../../../common/hooks/useVisningsnavn";
 import { formatterBeløpForBeregning, formatterProsent } from "../../../utils/number-utils";
 import { VedtaksListeBeregning } from "../Vedtakliste";
-import { DetaljertBeregningBidrag } from "./DetaljertBeregningBidrag";
+import { DetaljertBeregningBidrag, visBeregningsdetaljerVedAvslag } from "./DetaljertBeregningBidrag";
 
 type VedtakContextProps = {
     skalIndeksreguleres: Map<string, boolean>;
@@ -654,11 +654,12 @@ export const VedtakTableBody = ({
     }
 
     function renderTable(periode: ResultatBarnebidragsberegningPeriodeDto) {
+        const visAvslagsdetaljer = visBeregningsdetaljerVedAvslag(periode);
         const skjulBeregning =
             periode.beregningsdetaljer === undefined ||
-            periode.erBeregnetAvslag ||
+            (periode.erBeregnetAvslag && !visAvslagsdetaljer) ||
             periode.erDirekteAvslag ||
-            periode.erOpphør ||
+            (periode.erOpphør && !visAvslagsdetaljer) ||
             periode.resultatKode === Resultatkode.INNVILGET_VEDTAK ||
             (!erBisysVedtak && vedtakstype === Vedtakstype.ALDERSJUSTERING);
 
