@@ -1,7 +1,15 @@
 import { useFlag } from "@unleash/proxy-client-react";
 import { SideNav, type SideNavItem } from "~/common/navigation/SideNav.tsx";
 
-export default function SakMeny({ saksnummer }: { saksnummer: string }) {
+export default function SakMeny({
+    saksnummer,
+    kollapset,
+    onKollapsetChange,
+}: {
+    saksnummer: string;
+    kollapset?: boolean;
+    onKollapsetChange?: (kollapset: boolean) => void;
+}) {
     const visSakside = useFlag("bisys.ny_sakside");
     const visSaksroller = useFlag("bisys.ny_rollebilde");
     const items: SideNavItem[] = [
@@ -14,5 +22,5 @@ export default function SakMeny({ saksnummer }: { saksnummer: string }) {
         { label: "Dokumenter", href: `/sak/${saksnummer}/dokumenter` },
     ];
 
-    return <SideNav items={items} ariaLabel="Sakmeny" />;
+    return <SideNav items={items} ariaLabel="Sakmeny" kollapset={kollapset} onKollapsetChange={onKollapsetChange} />;
 }

@@ -84,6 +84,27 @@ test.describe("sakslayouter", () => {
         expect(await component.evaluate((root) => root.scrollWidth)).toBeLessThanOrEqual(1024);
     });
 
+    test("standardlayout gir innholdet mer plass når sidemenyen skjules, og viser den igjen", async ({
+        mount,
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1024, height: 768 });
+        await mockSakHeaderKall(page);
+        const component = await mount(STANDARD_STORY);
+        const meny = component.getByRole("navigation", { name: "Sakmeny" });
+        const breddeFør = (await målLayout(component)).sideinnholdsbredde;
+
+        await meny.getByRole("button", { name: "Skjul meny" }).click();
+        await expect(meny.getByRole("link")).toHaveCount(0);
+        const kollapset = await målLayout(component);
+        expect(kollapset.sideinnholdsbredde).toBeGreaterThan(breddeFør + 100);
+        expect(kollapset.avstandFraSidemeny).toBe(32);
+
+        await meny.getByRole("button", { name: "Vis meny" }).click();
+        await expect(meny.getByRole("link", { name: "Sakshistorikk" })).toBeVisible();
+        expect((await målLayout(component)).sideinnholdsbredde).toBe(breddeFør);
+    });
+
     test("dokumentlayout viser toppavstand, sidemeny og full bredde uten gutters", async ({ mount, page }) => {
         await page.setViewportSize({ width: 1920, height: 1080 });
         await mockSakHeaderKall(page);

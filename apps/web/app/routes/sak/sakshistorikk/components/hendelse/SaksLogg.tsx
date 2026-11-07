@@ -67,7 +67,6 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                     zebraStripes: true,
                     rowDensity: "tight",
                     textSize: "small",
-                    stickyColumns: { start: 1 },
                 }}
                 columns={[
                     {

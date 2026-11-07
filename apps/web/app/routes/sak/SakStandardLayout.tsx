@@ -1,7 +1,7 @@
 // routes/sak/SakStandardLayout.tsx
 
 import { HGrid, Loader, Page } from "@navikt/ds-react";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, useMatches, useParams } from "react-router";
 import SakMeny from "~/routes/sak/SakMeny.tsx";
 
@@ -15,6 +15,8 @@ export interface SakStandardLayoutHandle {
 
 export default function SakStandardLayout() {
     const { saksnummer = "" } = useParams();
+    const [menyKollapset, setMenyKollapset] = useState(false);
+    const menykolonne = menyKollapset ? "max-content" : "14rem";
     const brukHeleBredden = useMatches().some(
         (match) => (match.handle as SakStandardLayoutHandle | undefined)?.brukHeleBredden,
     );
@@ -23,15 +25,15 @@ export default function SakStandardLayout() {
         <HGrid
             columns={
                 brukHeleBredden
-                    ? "14rem minmax(0, 1fr)"
-                    : { xs: "14rem minmax(0, 1fr)", "2xl": "14rem minmax(0, 1fr) 14rem" }
+                    ? `${menykolonne} minmax(0, 1fr)`
+                    : { xs: `${menykolonne} minmax(0, 1fr)`, "2xl": `${menykolonne} minmax(0, 1fr) 14rem` }
             }
             gap="space-32"
             marginBlock="space-32 space-0"
             paddingInline={brukHeleBredden ? "space-16" : { xs: "space-16", "2xl": "space-0" }}
             minWidth="0"
         >
-            <SakMeny saksnummer={saksnummer} />
+            <SakMeny saksnummer={saksnummer} kollapset={menyKollapset} onKollapsetChange={setMenyKollapset} />
             <Page.Block width="2xl">
                 <Suspense fallback={<Loader size="medium" />}>
                     <Outlet />
