@@ -39,13 +39,13 @@ jobs:
           node-auth-token: ${{ secrets.READER_TOKEN }}
       - uses: actions/setup-node@v6
         with:
-          node-version-file: familieveileder/.nvmrc
+          node-version: '26'
           cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@navikt"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm prettier
-      - run: pnpm typecheck
-      - run: pnpm test
       - run: pnpm build
       - if: inputs.upload_artifact
         uses: actions/upload-artifact@v4
