@@ -5,9 +5,9 @@ import {
     type OppdaterRevurderingsdatoBarn,
     SoktAvType,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import { Alert, Button, Dialog, Heading, HStack, LocalAlert, VStack } from "@navikt/ds-react";
+import { Alert, Button, Dialog, Heading, HStack, Loader, LocalAlert, VStack } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useGetBehandlingV2, useRefetchFFInfoFn } from "../../common/hooks/useApiData";
 import useFeatureToogle from "../../common/hooks/useFeatureToggle";
 import { type EndretRevurderingsdato, kanEndreRevurderingsdato } from "./BarnDetaljer";
@@ -104,13 +104,15 @@ export default function ForholdsmessigFordelingInfo() {
                                     Noe gikk galt ved oppdatering av revurderingsdato. Vennligst prøv på nytt
                                 </LocalAlert>
                             )}
-                            <BarnListe
-                                barn={forholdsmessigFordeling.barn}
-                                endredeRevurderingsdatoer={endredeRevurderingsdatoer}
-                                onRevurderingsdatoChange={
-                                    kanEndreRevurderingsdatoer ? oppdaterRevurderingsdato : undefined
-                                }
-                            />
+                            <Suspense fallback={<Loader size="medium" />}>
+                                <BarnListe
+                                    barn={forholdsmessigFordeling.barn}
+                                    endredeRevurderingsdatoer={endredeRevurderingsdatoer}
+                                    onRevurderingsdatoChange={
+                                        kanEndreRevurderingsdatoer ? oppdaterRevurderingsdato : undefined
+                                    }
+                                />
+                            </Suspense>
                         </VStack>
                     </Dialog.Body>
                     {kanEndreRevurderingsdatoer && (

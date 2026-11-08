@@ -349,7 +349,7 @@ export default function BarnDetaljerFF({
         }
         return <BodyShort size="small">Del av hovedbehandling{behandlingerInfo}</BodyShort>;
     }
-    const detaljer = useGetForholdsmessigFordelingDetaljer();
+    const { løpendeBidragBarn } = useGetBehandlingV2();
     return (
         <Box
             background="neutral-soft"
@@ -376,7 +376,7 @@ export default function BarnDetaljerFF({
                 </HStack>
             </Box>
             {barn.map((barn, index) => {
-                const beregningBarn = detaljer.løpendeBidragBarn?.find(
+                const beregningBarn = løpendeBidragBarn?.find(
                     (b) => b.gjelderBarnIdent === barn.ident && b.gjelderStønadstype === barn.stønadstype,
                 );
                 const harOpprettetFF = barn.harOpprettetForholdsmessigFordeling;
