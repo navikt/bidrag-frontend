@@ -28,13 +28,14 @@ import { useQueryParams } from "../../../common/hooks/useQueryParams";
 import { hentVisningsnavn } from "../../../common/hooks/useVisningsnavn";
 import { formatterBeløpForBeregning, formatterProsent } from "../../../utils/number-utils";
 import { VedtaksListeBeregning } from "../Vedtakliste";
-import { DetaljertBeregningBidrag } from "./DetaljertBeregningBidrag";
+import { DetaljertBeregningBidrag, visBeregningsdetaljerVedAvslag } from "./DetaljertBeregningBidrag";
 
 type VedtakContextProps = {
     skalIndeksreguleres: Map<string, boolean>;
     setSkalIndeksreguleres: (barnId: string, value: boolean) => void;
 };
 export const VedtakContext = createContext<VedtakContextProps | null>(null);
+
 export function useVedtakProvider() {
     const context = useContext(VedtakContext);
     if (!context) {
@@ -306,6 +307,23 @@ export const ForholdsmessigFordelingVarsel = () => {
         </Alert>
     );
 };
+
+export const SaksreskontroPåminnelseVarsel = () => {
+    const { forholdsmessigFordeling, roller } = useGetBehandlingV2();
+    const harFlereSaksnummer = Array.from(new Set(roller.map((rolle) => rolle.saksnummer))).length > 1;
+
+    // Vises bare for FF med flere saker
+    if (forholdsmessigFordeling == null || !harFlereSaksnummer) return null;
+
+    return (
+        <Alert variant="info" size="small">
+            <Heading size="xsmall">Lagre saksreskontro</Heading>
+            <BodyShort size="small" className="w-max">
+                {"Husk å lagre saksreskontro og beløpshistorikk før vedtak fattes."}
+            </BodyShort>
+        </Alert>
+    );
+};
 export const VedtakResultatBarn = ({ barn }: { barn: ResultatRolle }) => (
     <div className="my-4 flex items-center gap-x-2">
         <RolleTag
@@ -340,6 +358,7 @@ export const VedtakTableHeader = ({
 }) => {
     const { erBisysVedtak, vedtakstype } = useGetBehandlingV2();
     const visEvne = erBisysVedtak || vedtakstype !== Vedtakstype.ALDERSJUSTERING;
+
     function renderRows() {
         if (avvistAldersjustering) {
             return (
@@ -456,6 +475,7 @@ export const VedtakTableHeader = ({
             </Table.Row>
         );
     }
+
     return <Table.Header>{renderRows()}</Table.Header>;
 };
 
@@ -608,6 +628,7 @@ export const VedtakTableBody = ({
 
         return classes.trim();
     }
+
     function findPeriodWithLowestFom(
         periods: ResultatBarnebidragsberegningPeriodeDto[],
     ): ResultatBarnebidragsberegningPeriodeDto | undefined {
@@ -631,12 +652,14 @@ export const VedtakTableBody = ({
         if (førstePeriode.periode.fom === periode.periode.fom) return true;
         return false;
     }
+
     function renderTable(periode: ResultatBarnebidragsberegningPeriodeDto) {
+        const visAvslagsdetaljer = visBeregningsdetaljerVedAvslag(periode);
         const skjulBeregning =
             periode.beregningsdetaljer === undefined ||
-            periode.erBeregnetAvslag ||
+            (periode.erBeregnetAvslag && !visAvslagsdetaljer) ||
             periode.erDirekteAvslag ||
-            periode.erOpphør ||
+            (periode.erOpphør && !visAvslagsdetaljer) ||
             periode.resultatKode === Resultatkode.INNVILGET_VEDTAK ||
             (!erBisysVedtak && vedtakstype === Vedtakstype.ALDERSJUSTERING);
 
@@ -776,6 +799,7 @@ export const VedtakTableBody = ({
             </Table.ExpandableRow>
         );
     }
+
     return (
         <Table.Body>
             {resultatBarn.perioder.map((periode) => {
