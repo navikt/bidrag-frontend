@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useBekreftelse } from "../../felles/bekreftelse/useBekreftelse.ts";
 import { type Sakstype, sakstypeForArbeidsfordeling } from "../../felles/saksregler.ts";
-import { lagSakRedigeringSchema, type SakRedigeringData } from "../../felles/sakvisning-schema.ts";
+import { finnRolleadvarsler, lagSakRedigeringSchema, type SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useEndringssporing } from "../endringer/useEndringssporing.ts";
 import { useSaksrollerSubmit } from "../lagring/useSaksrollerSubmit.ts";
 import { useHarÅpneRedigeringer } from "../RedigeringRegisterContext.tsx";
@@ -36,12 +37,6 @@ function useSaksrollerForm({
     useInitialiserSaksrollerForm({ berikedeRoller, dataUpdatedAt, reset, saksnummer, onDataReset });
 
     return { formMethods, roller };
-}
-
-function relasjonskontrollStatus({ isError, isLoading }: { isError: boolean; isLoading: boolean }) {
-    if (isError) return "feilet" as const;
-    if (isLoading) return "venter" as const;
-    return undefined;
 }
 
 /**
@@ -84,13 +79,15 @@ export function useSaksrollerVisning(saksnummer: string) {
         muligeBarnPerMotpart,
     });
 
+    const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
     const relasjonskontroll = useBarnMedUfullstendigRelasjon({
-        barnIdenter,
+        barnIdenter: barnIdenter.filter((ident) => !funnetPersonISak(ident)),
         bidragspliktigIdent: bp?.fodselsnummer,
         bidragsmottakerIdent: bm?.fodselsnummer,
         harSak: !!sak,
     });
     const { barnMedUfullstendigRelasjon } = relasjonskontroll;
+    const relasjonsbekreftelse = useBekreftelse(barnMedUfullstendigRelasjon);
 
     const { endringsliste, harEndringer } = useEndringssporing({
         opprinneligeRoller: berikedeRoller,
@@ -104,10 +101,9 @@ export function useSaksrollerVisning(saksnummer: string) {
         setFeilmelding,
         setValideringsFeil,
         setSuksessmelding,
-        lagringBlokkert: relasjonskontroll.isLoading || relasjonskontroll.isError,
+        lagringBlokkert: relasjonskontroll.isLoading,
     });
 
-    const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
     const erNyPerson = (fnr?: string) => (fnr ? !funnetPersonISak(fnr) : undefined);
     const samletFeilmelding = feilmelding || feil;
     return {
@@ -121,10 +117,16 @@ export function useSaksrollerVisning(saksnummer: string) {
         aktiveRoller,
         sakstype,
         muligeBarn,
+        barnAdvarsler: finnRolleadvarsler(
+            aktiveRoller,
+            sakstype,
+            sak.roller.flatMap((rolle) => (rolle.fodselsnummer ? [rolle.fodselsnummer] : [])),
+        ),
         muligeAndreForeldre,
         dataUpdatedAt,
         hentOgNullstillSamhandler,
         barnMedUfullstendigRelasjon,
+        relasjonsbekreftelse,
         endringsliste,
         isPending,
         nullstillStatusmeldinger,
@@ -137,8 +139,8 @@ export function useSaksrollerVisning(saksnummer: string) {
             onRefetch: refetch,
             feilmelding: samletFeilmelding || undefined,
             valideringsFeil,
-            harAdvarsel: barnMedUfullstendigRelasjon.length > 0,
-            relasjonskontroll: relasjonskontrollStatus(relasjonskontroll),
+            krevBekreftelse: relasjonsbekreftelse.krevBekreftelse,
+            lasterRelasjoner: relasjonskontroll.isLoading,
             harEndringer,
             suksessmelding,
             statusRef,

@@ -1,9 +1,10 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { ClockDashedIcon, ExternalLinkIcon } from "@navikt/aksel-icons";
-import { Box, Button, Detail, Heading, HStack, Modal, Table, VStack } from "@navikt/ds-react";
+import { Button, Detail, Heading, HStack, Modal, Table, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 
 import PersonInfo from "../felles/person/PersonInfo.tsx";
+import { KortRamme } from "../felles/person/PersonRolleKort.tsx";
 import type { Rolle, Rollehistorikk } from "../felles/sakvisning-schema.ts";
 
 type Props = {
@@ -37,7 +38,7 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
             </Button>
 
             {isOpen && (
-                <Modal open onClose={() => setIsOpen(false)} width="medium" aria-label="Rollehistorikk">
+                <Modal open onClose={() => setIsOpen(false)} width="medium" placement="top" aria-label="Rollehistorikk">
                     <Modal.Header closeButton>
                         <VStack gap="space-2">
                             {saksnummer && <Detail>Sak {saksnummer}</Detail>}
@@ -52,13 +53,7 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
                     <Modal.Body>
                         <VStack gap="space-16">
                             {rolle?.fodselsnummer && (
-                                <Box
-                                    background="raised"
-                                    borderColor="neutral-subtleA"
-                                    borderWidth="1"
-                                    borderRadius="12"
-                                    padding="space-12"
-                                >
+                                <KortRamme>
                                     <PersonInfo
                                         truncate
                                         navn={rolle.navn}
@@ -66,7 +61,7 @@ export default function RollehistorikkVisning({ rollehistorikk, rolle, saksnumme
                                         fødselsdato={rolle.fødselsdato}
                                         rolle={rolle.type}
                                     />
-                                </Box>
+                                </KortRamme>
                             )}
 
                             <Table size="small" className="w-full">

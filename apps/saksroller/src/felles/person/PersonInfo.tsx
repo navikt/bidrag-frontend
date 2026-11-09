@@ -8,7 +8,7 @@ import {
     useBidragCommons,
 } from "@bidrag/common";
 import { beregnAlder } from "@bidrag/utils";
-import { BodyShort, Box, HStack, Link, Skeleton, VStack } from "@navikt/ds-react";
+import { BodyShort, Box, CopyButton, HStack, Link, Skeleton, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
@@ -114,42 +114,34 @@ function PersonIdentLine({
     erSamhandlerIdent,
     personAlder,
     visKopieringsknapp,
+    visModiaLenke,
 }: Pick<
     PersonInfoContentProps,
-    "ident" | "navn" | "samhandlerNavn" | "erSamhandlerIdent" | "personAlder" | "visKopieringsknapp"
+    "ident" | "navn" | "samhandlerNavn" | "erSamhandlerIdent" | "personAlder" | "visKopieringsknapp" | "visModiaLenke"
 >) {
     return (
         <HStack asChild align="center">
-            <BodyShort textColor="subtle" size="small">
+            <BodyShort as="div" textColor="subtle" size="small">
                 {erSamhandlerIdent ? (
                     <SamhandlerIdent ident={ident} navn={navn} samhandlerNavn={samhandlerNavn} />
                 ) : (
-                    <PersonNavnIdent variant="ident" ident={ident} showCopyButton={visKopieringsknapp} />
+                    <PersonNavnIdent variant="ident" ident={ident} />
                 )}
                 {personAlder !== undefined && ` (${personAlder} år)`}
+                {visKopieringsknapp && <CopyButton copyText={ident} size="small" />}
+                {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} />}
             </BodyShort>
         </HStack>
     );
 }
 
 function PersonInfoLayout(props: PersonInfoContentProps) {
-    const {
-        ident,
-        navn,
-        visningsnavn,
-        erMaskert,
-        erSamhandlerIdent,
-        visModiaLenke,
-        tags,
-        headingActions,
-        truncate,
-        children,
-    } = props;
+    const { navn, visningsnavn, erMaskert, erSamhandlerIdent, tags, headingActions, truncate, children } = props;
     return (
         <HStack gap="space-4" align="start" wrap={false}>
             <RolleTagForPerson {...props} />
             <VStack flexGrow="1" minWidth="0">
-                <HStack justify="space-between" wrap={false}>
+                <HStack align="start" justify="space-between" wrap={false}>
                     <VStack gap="space-1" minWidth="0">
                         <HStack gap="space-4" align="center">
                             {!erSamhandlerIdent && (
@@ -166,11 +158,10 @@ function PersonInfoLayout(props: PersonInfoContentProps) {
                                 </Box>
                             )}
                             {tags}
-                            {headingActions}
                         </HStack>
                         <PersonIdentLine {...props} />
                     </VStack>
-                    {visModiaLenke && !erSamhandlerIdent && <ModiaLink ident={ident} compact />}
+                    {headingActions}
                 </HStack>
                 {children}
             </VStack>

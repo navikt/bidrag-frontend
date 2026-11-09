@@ -9,12 +9,14 @@ export function usePersonSamhandlerSøk({
     onError,
     onQueryChange,
     inkluderSamhandler,
+    tømVedTreff = false,
 }: {
     valgIdent?: string;
     onResult: (data: PersonDto) => void | Promise<void>;
     onError: (feil: string) => void;
     onQueryChange?: () => void;
     inkluderSamhandler: boolean;
+    tømVedTreff?: boolean;
 }) {
     const samhandlerPersonFn = useHentSamhandlerEllerPersonForIdent(inkluderSamhandler);
     const [searchErrorMessage, setSearchErrorMessage] = useState<string>();
@@ -52,6 +54,7 @@ export function usePersonSamhandlerSøk({
                 setNyttFødselsnummerInfo({ ident: data.ident, søktIdent: data.søktIdent });
                 try {
                     await onResult(data);
+                    if (tømVedTreff) setSearchValue("");
                 } catch (err) {
                     const feil = err instanceof Error ? err.message : "En feil oppstod";
                     setSearchErrorMessage(feil);

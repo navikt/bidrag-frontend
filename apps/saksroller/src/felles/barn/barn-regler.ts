@@ -47,12 +47,8 @@ export function validerNyttBarn(
         return `${personBeskrivelse(person)} finnes allerede i listen over barn som kan legges til. Vennligst velg fra listen over.`;
     }
 
-    const alder = beregnAlderForPerson(person);
-    if (alder == null) {
+    if (beregnAlderForPerson(person) == null) {
         return "Kunne ikke beregne alder for barnet.";
-    }
-    if (alder > MAKS_ALDER_BARN) {
-        return `${person.visningsnavn ?? "Barnet"} er ${alder} år og kan ikke legges til. Maks alder er ${MAKS_ALDER_BARN} år.`;
     }
 
     return undefined;

@@ -3,7 +3,9 @@ import { PersonTallShortIcon, PlusIcon } from "@navikt/aksel-icons";
 import { Box, Button, InlineMessage } from "@navikt/ds-react";
 import { type ReactNode, useState } from "react";
 
+import { BarnKortInnhold } from "../person/BarnKort.tsx";
 import PersonInfo from "../person/PersonInfo.tsx";
+import { KortRamme } from "../person/PersonRolleKort.tsx";
 import RedigeringsRamme from "../RedigeringsRamme.tsx";
 import { PersonSøkInnhold } from "./PersonSøkWrapper.tsx";
 
@@ -77,11 +79,13 @@ export function LeggTilBarnSøk({
     søk,
     visSøk,
     onÅpne,
+    innholdPåFunnetBarn,
     children,
 }: {
     søk: ReturnType<typeof useBarnSøk>;
     visSøk: boolean;
     onÅpne: () => void;
+    innholdPåFunnetBarn?: ReactNode;
     children?: ReactNode;
 }) {
     if (!visSøk) {
@@ -95,12 +99,22 @@ export function LeggTilBarnSøk({
             onAvbryt={søk.lukk}
             actions={<BarnSøkHandlinger søk={søk} />}
         >
-            <BarnSøkInnhold søk={søk}>{children}</BarnSøkInnhold>
+            <BarnSøkInnhold søk={søk} innholdPåFunnetBarn={innholdPåFunnetBarn}>
+                {children}
+            </BarnSøkInnhold>
         </RedigeringsRamme>
     );
 }
 
-function BarnSøkInnhold({ søk, children }: { søk: ReturnType<typeof useBarnSøk>; children?: ReactNode }) {
+function BarnSøkInnhold({
+    søk,
+    innholdPåFunnetBarn,
+    children,
+}: {
+    søk: ReturnType<typeof useBarnSøk>;
+    innholdPåFunnetBarn?: ReactNode;
+    children?: ReactNode;
+}) {
     return (
         <PersonSøkInnhold
             beskrivelse="Søk opp barnet som skal legges til i saken"
@@ -115,9 +129,19 @@ function BarnSøkInnhold({ søk, children }: { søk: ReturnType<typeof useBarnS�
                         </InlineMessage>
                     )}
                     {søk.funnetBarn && (
-                        <Box padding="space-16" borderRadius="8" background="neutral-soft">
-                            <BarnPersonInfo {...søk.funnetBarn} />
-                        </Box>
+                        <KortRamme>
+                            <BarnKortInnhold
+                                barn={{
+                                    ident: søk.funnetBarn.person.ident,
+                                    navn: søk.funnetBarn.person.visningsnavn,
+                                    fødselsdato: søk.funnetBarn.person.fødselsdato,
+                                    alder: søk.funnetBarn.alder,
+                                    diskresjonskode: søk.funnetBarn.person.diskresjonskode,
+                                }}
+                            >
+                                {innholdPåFunnetBarn}
+                            </BarnKortInnhold>
+                        </KortRamme>
                     )}
                 </>
             }

@@ -25,6 +25,8 @@ test.describe("ForelderRolleVisning", () => {
         await expect(component.getByText("Kari Nordmann")).toBeVisible();
 
         await expect(component.getByRole("button", { name: "Legg til person" })).toHaveCount(0);
+        await expect(component.getByRole("button", { name: "Endre", exact: true })).toHaveCount(0);
+        await expect(component.getByRole("button", { name: /Fjern/ })).toHaveCount(0);
     });
 
     test("bidragsmottaker mangler (unntak) - viser 'Ukjent - ikke registrert' og 'Legg til person'", async ({

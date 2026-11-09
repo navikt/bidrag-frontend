@@ -16,7 +16,6 @@ export function useBarnMedUfullstendigRelasjon({
 }): {
     barnMedUfullstendigRelasjon: string[];
     isLoading: boolean;
-    isError: boolean;
 } {
     const beggeForeldreKjent = Boolean(bidragsmottakerIdent && bidragspliktigIdent);
 
@@ -37,10 +36,11 @@ export function useBarnMedUfullstendigRelasjon({
         : !bidragsmottakerIdent || !bidragspliktigIdent
           ? barnIdenter
           : barnIdenter.filter((_, i) => {
-                const relasjon = relasjonsoppslag[i]?.data;
+                const { data: relasjon, isError } = relasjonsoppslag[i] ?? {};
                 return (
-                    relasjon !== undefined &&
-                    harUfullstendigRelasjon(relasjon, bidragsmottakerIdent, bidragspliktigIdent)
+                    isError ||
+                    (relasjon !== undefined &&
+                        harUfullstendigRelasjon(relasjon, bidragsmottakerIdent, bidragspliktigIdent))
                 );
             });
 
@@ -49,6 +49,5 @@ export function useBarnMedUfullstendigRelasjon({
     return {
         barnMedUfullstendigRelasjon,
         isLoading: aktivtOppslag && relasjonsoppslag.some((resultat) => resultat.isFetching),
-        isError: aktivtOppslag && relasjonsoppslag.some((resultat) => resultat.isError),
     };
 }

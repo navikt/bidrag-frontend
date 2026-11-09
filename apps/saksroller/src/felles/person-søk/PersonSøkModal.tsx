@@ -6,7 +6,7 @@ export default function PersonSøkModal({ tittel, onAvbryt, ikon, actions, child
     const { saksnummer: sak } = useParams();
 
     return (
-        <Modal open onClose={onAvbryt} width="medium" aria-label={tittel}>
+        <Modal open onClose={onAvbryt} width="medium" placement="top" aria-label={tittel}>
             <Modal.Header>
                 <VStack gap="space-2">
                     {sak && <Detail>Sak {sak}</Detail>}

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type SakParter, type Saksfeil, type Sakstype, validerSak } from "./saksregler";
+import { finnSaksadvarsler, type SakParter, type Saksfeil, type Sakstype, validerSak } from "./saksregler";
 
 const RolleTypeSchema = z.enum(["BP", "BM", "BA", "RM"]);
 
@@ -48,16 +48,19 @@ const SakRedigeringObjektSchema = z.object({
     roller: z.array(RolleSchema),
 });
 
-function tilSakParter(roller: Rolle[]): SakParter {
+function tilSakParter(roller: Rolle[], lagredeIdenter: string[] = []): SakParter {
     const ident = (type: RolleType) => roller.find((r) => r.type === type && r.fodselsnummer?.trim())?.fodselsnummer;
     const bm = ident("BM");
     return {
         bp: ident("BP"),
         bm,
         bidragsmottakerErUkjent: !bm,
-        barn: roller
-            .filter(erBarn)
-            .map((barn) => ({ ...(barn as BarnRolle), ident: barn.fodselsnummer, erMyndig: barn.erMyndig === true })),
+        barn: roller.filter(erBarn).map((barn) => ({
+            ...(barn as BarnRolle),
+            ident: barn.fodselsnummer,
+            erMyndig: barn.erMyndig === true,
+            erLagret: lagredeIdenter.includes(barn.fodselsnummer),
+        })),
     };
 }
 
@@ -71,10 +74,16 @@ function feltsti(roller: Rolle[], feil: Saksfeil): (string | number)[] {
     return indeks >= 0 ? ["roller", indeks, "fodselsnummer"] : ["roller", "root"];
 }
 
+export function finnRolleadvarsler(roller: Rolle[], sakstype: Sakstype, lagredeIdenter: string[] = []): string[] {
+    return finnSaksadvarsler(tilSakParter(roller, lagredeIdenter), sakstype, "endre").map(
+        (advarsel) => advarsel.melding,
+    );
+}
+
 /** Skjema for endring av roller. Reglene er de samme som når saken opprettes, gitt sakens faste sakstype. */
 export function lagSakRedigeringSchema(sakstype: Sakstype) {
     return SakRedigeringObjektSchema.superRefine((data, ctx) => {
-        for (const feil of validerSak(tilSakParter(data.roller), sakstype)) {
+        for (const feil of validerSak(tilSakParter(data.roller), sakstype, "endre")) {
             ctx.addIssue({ code: "custom", path: feltsti(data.roller, feil), message: feil.melding });
         }
     });

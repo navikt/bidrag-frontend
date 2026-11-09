@@ -6,12 +6,13 @@ import LasterSkeleton from "../skjema/LasterSkeleton";
 import OpprettSakSkjema from "../skjema/OpprettSakSkjema";
 import type { PartRolle } from "../skjema/opprett-sak-schema";
 import { tilPartRolle } from "./inngang";
+import ModalRolleVelger from "./ModalRolleVelger";
 import type { NyOpprettSakFlytProps } from "./opprettSakModalContext";
-import StartpartVelger from "./StartpartVelger";
 
 /**
  * Flyten slik behandling og dokument viser den i en modal. Saken er alltid barnebidrag, og
- * personen modalen åpnes for kan ikke byttes. Uten kjent rolle velger saksbehandleren rollen først.
+ * personen modalen åpnes for kan ikke byttes. Uten kjent rolle velger saksbehandleren rollen
+ * for denne personen først. Det er ikke mulig å søke opp en annen person.
  */
 export default function OpprettSakFlytInnbygget({
     ident,
@@ -53,13 +54,7 @@ export default function OpprettSakFlytInnbygget({
                     onAvbryt={onAvbryt}
                 />
             ) : (
-                <StartpartVelger
-                    sakstype="BARNEBIDRAG"
-                    forhåndsvalgt={person}
-                    visSøk={false}
-                    harSkjema={false}
-                    onValgt={(_, valgt) => setValgtRolle(valgt)}
-                />
+                <ModalRolleVelger person={person} onVelg={setValgtRolle} />
             )}
         </VStack>
     );

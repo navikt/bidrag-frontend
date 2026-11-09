@@ -33,7 +33,7 @@ export function beregnBarnkurvValg(
         .filter(
             (barn) => valgteIdenter.includes(barn.ident) && !eksisterendeValg.some((valg) => valg.ident === barn.ident),
         )
-        .map((barn) => ({ ...utenReellMottaker(barn), manuellLagtTil: false }));
+        .map((barn) => ({ ...utenReellMottaker(barn), manuellLagtTil: barn.manuellLagtTil ?? false }));
 
     return {
         kurv,
