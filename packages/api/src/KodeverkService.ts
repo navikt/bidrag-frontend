@@ -1,12 +1,19 @@
-import { BIDRAG_KODEVERK_API } from "@bidrag/api";
-import type { KodeverkBetydning, KodeverkKoderBetydningerResponse } from "@bidrag/api/BidragKodeverkApi";
-import type { LandkodeLand, PostnummerPoststed } from "../types/api/KodeverkTypes";
+import { BIDRAG_KODEVERK_API } from "./api";
+import type { KodeverkBetydning, KodeverkKoderBetydningerResponse } from "./api/BidragKodeverkApi";
+
+export interface PostnummerPoststed {
+    [postnummer: string]: string;
+}
+
+export interface LandkodeLand {
+    [landkode: string]: string;
+}
 
 const SPRAAK = "nb";
 
 function erFortsattGyldig(gyldigTil?: string): boolean {
     if (!gyldigTil) return true;
-    const [year, month, day] = gyldigTil.split("-").map(Number);
+    const [year = Number.NaN, month = Number.NaN, day = Number.NaN] = gyldigTil.split("-").map(Number);
     const gyldigTilDato = new Date(year, month - 1, day);
     const idag = new Date();
     idag.setHours(0, 0, 0, 0);
@@ -33,7 +40,7 @@ function mapTilKodeVisningstekst<T extends Record<string, string>>(response: Kod
         });
 }
 
-export default class KodeverkService {
+export class KodeverkService {
     async getPostnummere(): Promise<PostnummerPoststed[]> {
         const { data } = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("Postnummer");
         return mapTilKodeVisningstekst<PostnummerPoststed>(data);
@@ -42,7 +49,7 @@ export default class KodeverkService {
     async getLandkoder(): Promise<LandkodeLand[]> {
         const { data } = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("LandkoderISO2");
         return mapTilKodeVisningstekst<LandkodeLand>(data).sort((a, b) =>
-            Object.values(a)[0].localeCompare(Object.values(b)[0], "nb"),
+            (Object.values(a)[0] ?? "").localeCompare(Object.values(b)[0] ?? "", "nb"),
         );
     }
 }

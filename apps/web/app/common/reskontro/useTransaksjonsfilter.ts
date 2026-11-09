@@ -1,3 +1,4 @@
+import type { Transaksjon } from "@bidrag/api/BidragReskontroApi";
 import { parseDateQueryParam } from "@bidrag/utils/datoUtils";
 import { isAfter, isBefore } from "date-fns";
 import { useMemo } from "react";
@@ -12,16 +13,19 @@ import {
     PARAM_TIL,
 } from "~/common/reskontro/konstanter.ts";
 import { isTransaksjonGruppe, transaksjonstypeGrupper } from "~/common/reskontro/transaksjonstyper.ts";
-import { useBrukerTransaksjoner } from "./useBrukerTransaksjoner.ts";
 
-export function useBrukerTransaksjonsfilter(ident: string) {
-    const { alletransaksjoner, unikeMottakere, unikeBarn } = useBrukerTransaksjoner(ident);
+interface Transaksjonsdata {
+    alletransaksjoner: Transaksjon[];
+    unikeMottakere: string[];
+    unikeBarn: string[];
+}
+
+export function useTransaksjonsfilter({ alletransaksjoner, unikeMottakere, unikeBarn }: Transaksjonsdata) {
     const { search: searchString } = useLocation();
 
-    const mottakerMapper = new IdentQueryParamMapper(unikeMottakere);
-    const barnMapper = new IdentQueryParamMapper(unikeBarn);
-
     const filtrertData = useMemo(() => {
+        const mottakerMapper = new IdentQueryParamMapper(unikeMottakere);
+        const barnMapper = new IdentQueryParamMapper(unikeBarn);
         const params = new URLSearchParams(searchString);
         const allekoder = params.getAll(PARAM_KODER);
         const enkeltKoder = allekoder.filter((k) => !isTransaksjonGruppe(k));
@@ -48,7 +52,7 @@ export function useBrukerTransaksjonsfilter(ident: string) {
             if (til && t.dato && isBefore(til, t.dato)) return false;
             return true;
         });
-    }, [alletransaksjoner, searchString]);
+    }, [alletransaksjoner, unikeMottakere, unikeBarn, searchString]);
 
     return {
         totalTransCount: alletransaksjoner.length,

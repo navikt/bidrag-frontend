@@ -1,6 +1,5 @@
+import { KodeverkService } from "@bidrag/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
-
-import KodeverkService from "../services/KodeverkService";
 
 export const useHentPostnummer = () => {
     const { data: postnummer } = useSuspenseQuery({

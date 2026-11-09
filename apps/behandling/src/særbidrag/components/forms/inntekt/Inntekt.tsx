@@ -1,5 +1,6 @@
 import { type OppdatereInntektBegrunnelseRequest, Rolletype, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent, type RolleType } from "@bidrag/common";
+import { scrollToHash } from "@bidrag/common/utils/WindowUtils";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -22,7 +23,6 @@ import { useOnSaveInntektBegrunnelse } from "../../../../common/hooks/useOnSaveI
 import { usePageTabs } from "../../../../common/hooks/usePageTabs";
 import { useVirkningsdato } from "../../../../common/hooks/useVirkningsdato";
 import type { InntektFormValues } from "../../../../common/types/inntektFormValues";
-import { scrollToHash } from "../../../../utils/window-utils";
 
 import { SærligeutgifterStepper } from "../../../enum/SærligeutgifterStepper";
 

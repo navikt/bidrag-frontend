@@ -1,4 +1,5 @@
 import { Rolletype } from "@bidrag/api/BidragDokumentProduksjonApi";
+import { scrollToHash } from "@bidrag/common/utils/WindowUtils";
 import { Heading } from "@navikt/ds-react";
 import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -10,7 +11,6 @@ import { QueryErrorWrapper } from "../../../../common/components/query-error-bou
 import text from "../../../../common/constants/texts";
 import { useGetBehandlingV2 } from "../../../../common/hooks/useApiData";
 import { useVirkningsdato } from "../../../../common/hooks/useVirkningsdato";
-import { scrollToHash } from "../../../../utils/window-utils";
 
 import { createInitialValues } from "../helpers/BoforholdFormHelpers";
 import { Begrunnelse } from "./Begrunnelse";
