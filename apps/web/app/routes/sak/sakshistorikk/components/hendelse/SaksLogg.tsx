@@ -10,6 +10,7 @@ import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";
 import { filtrerFeilregistrerteHendelser } from "./feilregistrerteHendelser";
+import { hendelseTekst } from "./hendelseTekst";
 import { NotatLink } from "./NotatLink";
 import { getResultatTekst, ResultatLink } from "./ResultatLink";
 import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
@@ -120,7 +121,7 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                         id: "typeBeskrivelse",
                         header: "Hendelse",
                         isSortable: true,
-                        bodyCell: (h) => h.typeBeskrivelse,
+                        bodyCell: (h) => hendelseTekst(h),
                     },
                     {
                         id: "enhet",
