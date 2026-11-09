@@ -17,11 +17,28 @@ export type ReellMottakerFeil = {
 };
 
 export function tilReellMottakerValg(verdi: ReellMottakerSkjemaverdi): ReellMottakerValg {
-    return { type: verdi.reellMottakerType, ident: verdi.reellMottaker, navn: verdi.reellMottakerNavn };
+    return {
+        type: verdi.reellMottakerType,
+        ident: verdi.reellMottaker,
+        navn: verdi.reellMottakerNavn,
+        verge: verdi.reellMottakerErVerge,
+    };
 }
 
 export function fraReellMottakerValg(valg: ReellMottakerValg): ReellMottakerSkjemaverdi {
-    return { reellMottakerType: valg.type, reellMottaker: valg.ident, reellMottakerNavn: valg.navn };
+    return {
+        reellMottakerType: valg.type,
+        reellMottaker: valg.ident,
+        reellMottakerNavn: valg.navn,
+        reellMottakerErVerge: erPersonSomReellMottaker(valg) ? valg.verge : undefined,
+    };
+}
+
+const SAMHANDLER_ID = /^[89]\d{10}$/;
+
+/** Verge kan bare registreres når reell mottaker er en annen person enn barnet, som i Bisys. */
+export function erPersonSomReellMottaker(valg: ReellMottakerValg): boolean {
+    return valg.type === "samhandler" && Boolean(valg.ident) && !SAMHANDLER_ID.test(valg.ident ?? "");
 }
 
 /** Startvalg når regelen krever reell mottaker. Beholder valget når det allerede oppfyller regelen. */

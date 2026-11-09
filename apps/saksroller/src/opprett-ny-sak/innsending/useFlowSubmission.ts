@@ -196,7 +196,9 @@ function lagRoller(barnebidragRoller: BarnebidragForelderRolle[], barn: BarnMedA
         ...barn.map((barnRolle) => ({
             type: Rolletype.BA,
             fodselsnummer: barnRolle.ident,
-            reellMottaker: barnRolle.reellMottaker ? { ident: barnRolle.reellMottaker, verge: false } : null,
+            reellMottaker: barnRolle.reellMottaker
+                ? { ident: barnRolle.reellMottaker, verge: barnRolle.reellMottakerErVerge ?? false }
+                : null,
         })),
     ];
 }

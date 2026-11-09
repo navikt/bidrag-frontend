@@ -20,7 +20,7 @@ export default function ReellMottakerRad({ harReellMottaker, reellMottakerInfo, 
                     <HStack gap="space-12" align="center" justify="space-between" paddingBlock="space-8">
                         <HStack gap="space-8" align="center" minWidth="0">
                             <RolleTag rolleType={RolleTypeAbbreviation.RM} />
-                            <BodyLong size="small" textColor="subtle" truncate>
+                            <BodyLong as="div" size="small" textColor="subtle" truncate>
                                 {reellMottakerInfo}
                             </BodyLong>
                         </HStack>

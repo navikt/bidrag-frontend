@@ -12,16 +12,16 @@ type Props = {
     handlinger?: ReactNode;
 };
 
-export function FunnetPersonInnhold({ navn, ident }: { navn: string; ident?: string }) {
+export function FunnetPersonInnhold({ navn, ident, tags }: { navn: string; ident?: string; tags?: ReactNode }) {
     return (
         <VStack gap="space-4">
-            <PersonInfo ident={ident ?? ""} navn={navn} />
+            <PersonInfo ident={ident ?? ""} navn={navn} tags={tags} />
             <SamhandlerKontonummerMelding ident={ident} />
         </VStack>
     );
 }
 
-function SamhandlerKontonummerMelding({ ident }: { ident?: string }) {
+export function SamhandlerKontonummerMelding({ ident }: { ident?: string }) {
     const erSamhandlerIdent = ident ? IdentUtils.isSamhandlerId(ident) : false;
     const { data } = useHentSamhandler(ident ?? "", erSamhandlerIdent);
     const manglerKontonummer =

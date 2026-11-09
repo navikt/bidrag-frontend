@@ -6,6 +6,7 @@ import { mockSaksrollerApi } from "../../playwright/saksroller/network.ts";
 const STORY = "rollebilde/SaksrollerVisning/Standard";
 const nyttBarn = { ident: genererFnr(), visningsnavn: "Nytt Barn", fødselsdato: "2016-05-01" };
 const annenForelderIdent = genererFnr();
+const VERGE_INFO = "Verge kan registreres når reell mottaker er en person.";
 async function leggTilNyttBarn(component: import("@playwright/test").Locator) {
     await component.getByRole("button", { name: "Legg til nytt barn" }).click();
     const søk = component.getByRole("searchbox", { name: "Søk etter barn" });
@@ -45,6 +46,37 @@ test.describe("SaksrollerVisning", () => {
                 ]),
             );
         expect(requests.update?.roller).toHaveLength(3);
+    });
+
+    test("🔴 verge for reell mottaker som er person sendes ved lagring", async ({ mount, page }) => {
+        const mottaker = { ident: genererFnr(), visningsnavn: "Verge Person", fødselsdato: "1985-01-01" };
+        const { requests } = await mockSaksrollerApi(page, { personOverrides: { [mottaker.ident]: mottaker } });
+        const component = await mount(STORY);
+        await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
+        await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("barnet_selv");
+        await expect(component.getByRole("checkbox", { name: "Reell mottaker er verge for barnet" })).toHaveCount(0);
+        await component.getByRole("combobox", { name: "Hvem er reell mottaker?" }).selectOption("samhandler");
+        await expect(component.getByText(VERGE_INFO)).toBeVisible();
+        const søk = component.getByRole("searchbox", { name: "Person- eller samhandlerident" });
+        await søk.fill(mottaker.ident);
+        await søk.press("Enter");
+        await expect(component.getByText(mottaker.visningsnavn)).toBeVisible();
+        await expect(component.getByText(VERGE_INFO)).toHaveCount(0);
+        await component.getByRole("checkbox", { name: "Reell mottaker er verge for barnet" }).check();
+        await component.getByRole("button", { name: "Legg til", exact: true }).click();
+        await expect(component.getByText(/\(verge\)/).first()).toBeVisible();
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect
+            .poll(() => requests.update?.roller)
+            .toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        fodselsnummer: testpersoner.barn.ident,
+                        reellMottaker: { ident: mottaker.ident, verge: true },
+                    }),
+                ]),
+            );
     });
 
     test("nytt barn som fjernes sendes ikke ved lagring og lagrede roller beholdes", async ({ mount, page }) => {

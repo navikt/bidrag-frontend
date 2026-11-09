@@ -32,16 +32,23 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
     const reellMottakerTypePath = `${fieldPath}.reellMottakerType` as FieldPath<TFieldValues>;
     const reellMottakerPath = `${fieldPath}.reellMottaker` as FieldPath<TFieldValues>;
     const reellMottakerNavnPath = `${fieldPath}.reellMottakerNavn` as FieldPath<TFieldValues>;
+    const reellMottakerErVergePath = `${fieldPath}.reellMottakerErVerge` as FieldPath<TFieldValues>;
     const setDynamiskFeltVerdi = (
         path: FieldPath<TFieldValues>,
-        value: string | undefined,
+        value: string | boolean | undefined,
         options?: Parameters<typeof form.setValue>[2],
     ) => form.setValue(path, value as PathValue<TFieldValues, FieldPath<TFieldValues>>, options);
 
     const reellMottakerType = form.watch(reellMottakerTypePath);
     const reellMottaker = form.watch(reellMottakerPath);
     const reellMottakerNavn = form.watch(reellMottakerNavnPath);
-    const skjemaverdi: ReellMottakerSkjemaverdi = { reellMottakerType, reellMottaker, reellMottakerNavn };
+    const reellMottakerErVerge = form.watch(reellMottakerErVergePath);
+    const skjemaverdi: ReellMottakerSkjemaverdi = {
+        reellMottakerType,
+        reellMottaker,
+        reellMottakerNavn,
+        reellMottakerErVerge,
+    };
     const reellMottakerFeil = form.getFieldState(reellMottakerPath, form.formState).error?.message;
     const valg = tilReellMottakerValg(skjemaverdi);
     const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(valg);
@@ -50,6 +57,7 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
         setDynamiskFeltVerdi(reellMottakerTypePath, nyVerdi.reellMottakerType, options);
         setDynamiskFeltVerdi(reellMottakerPath, nyVerdi.reellMottaker, options);
         setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn, options);
+        setDynamiskFeltVerdi(reellMottakerErVergePath, nyVerdi.reellMottakerErVerge, options);
     };
 
     const oppdaterValg = (nyttValg: ReellMottakerValg) => {

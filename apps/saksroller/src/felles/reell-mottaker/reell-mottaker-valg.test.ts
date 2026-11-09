@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+    erPersonSomReellMottaker,
     fraReellMottakerValg,
     initialiserReellMottaker,
     initialiserValg,
@@ -75,5 +76,23 @@ describe("initialiserValg", () => {
         { regel: "kun-samhandler", valg: samhandler, forventet: samhandler },
     ] as const)("$regel med $valg gir $forventet", ({ regel, valg, forventet }) => {
         expect(initialiserValg(valg, regel, barn)).toEqual(forventet);
+    });
+});
+
+describe("🔴 verge for reell mottaker", () => {
+    it.each([
+        { valg: { type: "samhandler" as const, ident: "12345678901" }, forventet: true },
+        { valg: { type: "samhandler" as const, ident: "80000123456" }, forventet: false },
+        { valg: { type: "samhandler" as const, ident: undefined }, forventet: false },
+        { valg: { type: "barnet_selv" as const, ident: "12345678901" }, forventet: false },
+        { valg: { type: undefined, ident: undefined }, forventet: false },
+    ])("$valg.type med ident $valg.ident kan ha verge: $forventet", ({ valg, forventet }) => {
+        expect(erPersonSomReellMottaker(valg)).toBe(forventet);
+    });
+
+    it("tar ikke med verge når reell mottaker er samhandler", () => {
+        const skjemaverdi = fraReellMottakerValg({ type: "samhandler", ident: "80000123456", verge: true });
+
+        expect(skjemaverdi.reellMottakerErVerge).toBeUndefined();
     });
 });
