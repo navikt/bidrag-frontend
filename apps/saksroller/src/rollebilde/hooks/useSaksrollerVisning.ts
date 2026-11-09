@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useBekreftelse } from "../../felles/bekreftelse/useBekreftelse.ts";
+import { useRelasjonsregler } from "../../felles/relasjon/useRelasjonsregler.ts";
 import { type Sakstype, sakstypeForArbeidsfordeling } from "../../felles/saksregler.ts";
 import { finnRolleadvarsler, lagSakRedigeringSchema, type SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useEndringssporing } from "../endringer/useEndringssporing.ts";
@@ -86,13 +86,17 @@ export function useSaksrollerVisning(saksnummer: string) {
         bidragsmottakerIdent: bm?.fodselsnummer,
         harSak: !!sak,
     });
-    const { barnMedUfullstendigRelasjon } = relasjonskontroll;
-    const relasjonsbekreftelse = useBekreftelse(barnMedUfullstendigRelasjon);
+    const { barnMedUfullstendigRelasjon, barnMedAnnenForelder } = relasjonskontroll;
+    const relasjonsregler = useRelasjonsregler({
+        ufullstendige: barnMedUfullstendigRelasjon,
+        annenForelder: barnMedAnnenForelder,
+        harOppslagsfeil: relasjonskontroll.harOppslagsfeil,
+    });
 
     const { endringsliste, harEndringer } = useEndringssporing({
         opprinneligeRoller: berikedeRoller,
         nåværendeRoller: aktiveRoller,
-        barnMedUfullstendigRelasjon,
+        barnMedUfullstendigRelasjon: [...barnMedUfullstendigRelasjon, ...barnMedAnnenForelder],
         dataOppdatertNøkkel: dataUpdatedAt,
         onNyEndring: nullstillStatusmeldinger,
     });
@@ -126,7 +130,8 @@ export function useSaksrollerVisning(saksnummer: string) {
         dataUpdatedAt,
         hentOgNullstillSamhandler,
         barnMedUfullstendigRelasjon,
-        relasjonsbekreftelse,
+        barnMedAnnenForelder,
+        relasjonsregler,
         endringsliste,
         isPending,
         nullstillStatusmeldinger,
@@ -139,7 +144,7 @@ export function useSaksrollerVisning(saksnummer: string) {
             onRefetch: refetch,
             feilmelding: samletFeilmelding || undefined,
             valideringsFeil,
-            krevBekreftelse: relasjonsbekreftelse.krevBekreftelse,
+            krevBekreftelse: relasjonsregler.kanFortsette,
             lasterRelasjoner: relasjonskontroll.isLoading,
             harEndringer,
             suksessmelding,

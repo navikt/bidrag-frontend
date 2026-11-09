@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, BodyLong, LocalAlert } from "@navikt/ds-react";
+import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjonSuspense } from "../../../api/person.api";
-import BekreftAdvarsel from "../../../felles/bekreftelse/BekreftAdvarsel";
+import Relasjonsmeldinger from "../../../felles/relasjon/Relasjonsmeldinger";
 import { MYNDYG_BARN_ALDER } from "../../../felles/saksregler";
 import BarnSection from "../../barn/BarnSection";
 import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";
@@ -118,8 +118,9 @@ function BarnebidragFlytInnhold() {
         onSubmit,
         innsending,
         meldinger,
-        relasjonsbekreftelse,
+        relasjonsregler,
         barnMedUfullstendigRelasjon,
+        barnMedAnnenForelder,
         status,
     } = useBarnebidragFlyt();
 
@@ -133,34 +134,18 @@ function BarnebidragFlytInnhold() {
             status={status}
             meldinger={
                 <>
-                    {meldinger.barnMedSkjultForelder.length > 0 && (
-                        <LocalAlert status="warning" size="small" as="div">
-                            <LocalAlert.Header>
-                                <LocalAlert.Title>Forelder kan ikke vises</LocalAlert.Title>
-                            </LocalAlert.Header>
-                            <LocalAlert.Content>
-                                <BodyLong size="small">
-                                    {meldinger.barnMedSkjultForelder.join(", ")} har en forelder du ikke har tilgang
-                                    til. Det kan skyldes at forelderen er egen ansatt eller har fortrolig adresse. Saken
-                                    må behandles av en enhet som har tilgang.
-                                </BodyLong>
-                            </LocalAlert.Content>
-                        </LocalAlert>
-                    )}
                     {meldinger.forslagsfeil && (
                         <Alert variant="warning" size="small">
                             {meldinger.forslagsfeil}
                         </Alert>
                     )}
-                    <BekreftAdvarsel
-                        tittel="Ufullstendig relasjon"
-                        bekreftTekst="Jeg har kontrollert relasjonen mellom barna og foreldrene"
-                        feilmelding="Du må bekrefte at du har kontrollert relasjonene"
-                        bekreftelse={relasjonsbekreftelse}
-                    >
-                        {barnMedUfullstendigRelasjon.map((barn) => barn.navn || barn.ident).join(", ")} har manglende
-                        eller ufullstendig relasjon til partene.
-                    </BekreftAdvarsel>
+                    <Relasjonsmeldinger
+                        regler={relasjonsregler}
+                        ufullstendigeNavn={barnMedUfullstendigRelasjon.map((barn) => barn.navn || barn.ident)}
+                        annenForelderNavn={barnMedAnnenForelder.map((barn) => barn.navn || barn.ident)}
+                        skjultForelderNavn={meldinger.barnMedSkjultForelder.map((barn) => barn.navn || barn.ident)}
+                        handling="opprettes"
+                    />
                     {meldinger.bidragsmottakerUtenBarn && <BMUtenBarnAlert />}
                 </>
             }

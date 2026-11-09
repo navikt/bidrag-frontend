@@ -3,9 +3,9 @@ import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { BodyLong, Box, Heading, HStack, InfoCard, Loader, LocalAlert, Page, VStack } from "@navikt/ds-react";
 import { Suspense } from "react";
 import { FormProvider } from "react-hook-form";
-import BekreftAdvarsel from "../felles/bekreftelse/BekreftAdvarsel.tsx";
-import type { Bekreftelse } from "../felles/bekreftelse/useBekreftelse.ts";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "../felles/enheter.ts";
+import Relasjonsmeldinger from "../felles/relasjon/Relasjonsmeldinger.tsx";
+import type { Relasjonsregler } from "../felles/relasjon/useRelasjonsregler.ts";
 import type { SakRedigeringData } from "../felles/sakvisning-schema.ts";
 import BarnISaken from "./barn/BarnISaken.tsx";
 import Endringsoppsummering from "./endringer/Endringsoppsummering.tsx";
@@ -100,19 +100,20 @@ function LagrerOverlay() {
 function EndringerOgLagring({
     endringsliste,
     barnMedUfullstendigRelasjon,
-    relasjonsbekreftelse,
+    barnMedAnnenForelder,
+    relasjonsregler,
     aktiveRoller,
     sakButtons,
 }: {
     endringsliste: Endringsrad[];
     barnMedUfullstendigRelasjon: string[];
-    relasjonsbekreftelse: Bekreftelse;
+    barnMedAnnenForelder: string[];
+    relasjonsregler: Relasjonsregler;
     aktiveRoller: SakRedigeringData["roller"];
     sakButtons: SakButtonsProps;
 }) {
-    const navn = barnMedUfullstendigRelasjon.map(
-        (ident) => aktiveRoller.find((rolle) => rolle.fodselsnummer === ident)?.navn ?? ident,
-    );
+    const navn = (identer: string[]) =>
+        identer.map((ident) => aktiveRoller.find((rolle) => rolle.fodselsnummer === ident)?.navn ?? ident);
     return (
         <>
             <Suspense
@@ -131,14 +132,12 @@ function EndringerOgLagring({
                 <Endringsoppsummering endringsliste={endringsliste} />
             </Suspense>
             <VStack gap="space-12">
-                <BekreftAdvarsel
-                    tittel="Ufullstendig relasjon"
-                    bekreftTekst="Jeg har kontrollert relasjonen mellom barna og foreldrene"
-                    feilmelding="Du må bekrefte at du har kontrollert relasjonene"
-                    bekreftelse={relasjonsbekreftelse}
-                >
-                    {navn.join(", ")} har manglende eller ufullstendig relasjon til partene.
-                </BekreftAdvarsel>
+                <Relasjonsmeldinger
+                    regler={relasjonsregler}
+                    ufullstendigeNavn={navn(barnMedUfullstendigRelasjon)}
+                    annenForelderNavn={navn(barnMedAnnenForelder)}
+                    handling="lagres"
+                />
                 <SakButtons {...sakButtons} />
             </VStack>
         </>
@@ -206,7 +205,8 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                         <EndringerOgLagring
                                             endringsliste={visning.endringsliste}
                                             barnMedUfullstendigRelasjon={visning.barnMedUfullstendigRelasjon}
-                                            relasjonsbekreftelse={visning.relasjonsbekreftelse}
+                                            barnMedAnnenForelder={visning.barnMedAnnenForelder}
+                                            relasjonsregler={visning.relasjonsregler}
                                             aktiveRoller={visning.aktiveRoller}
                                             sakButtons={visning.sakButtons}
                                         />

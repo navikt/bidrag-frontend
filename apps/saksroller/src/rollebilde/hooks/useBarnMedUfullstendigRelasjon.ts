@@ -1,8 +1,13 @@
 import { BIDRAG_PERSON_API } from "@bidrag/api";
 import { SecureLoggerService } from "@bidrag/common";
 import { useQueries } from "@tanstack/react-query";
-import { harUfullstendigRelasjon } from "../beregninger/ufullstendig-relasjon.ts";
+import { harAnnenRegistrertForelder } from "../../felles/relasjon/annen-forelder.ts";
+import { harUfullstendigRelasjon, registrerteForeldre } from "../beregninger/ufullstendig-relasjon.ts";
 
+/**
+ * Kontrollerer relasjonen mellom nye barn og partene.
+ * Mangler BP eller BM, regnes alle barna som ufullstendige. Feilet oppslag er ikke ufullstendig, men stopper lagring.
+ */
 export function useBarnMedUfullstendigRelasjon({
     barnIdenter,
     bidragsmottakerIdent,
@@ -15,9 +20,11 @@ export function useBarnMedUfullstendigRelasjon({
     harSak: boolean;
 }): {
     barnMedUfullstendigRelasjon: string[];
+    barnMedAnnenForelder: string[];
+    harOppslagsfeil: boolean;
     isLoading: boolean;
 } {
-    const beggeForeldreKjent = Boolean(bidragsmottakerIdent && bidragspliktigIdent);
+    const aktivtOppslag = harSak && Boolean(bidragsmottakerIdent || bidragspliktigIdent);
 
     const relasjonsoppslag = useQueries({
         queries: barnIdenter.map((ident) => ({
@@ -27,27 +34,37 @@ export function useBarnMedUfullstendigRelasjon({
                 await SecureLoggerService.info(`Hentet forelder-barn relasjon for ident ${ident}`);
                 return data;
             },
-            enabled: harSak && beggeForeldreKjent,
+            enabled: aktivtOppslag,
         })),
     });
+
+    const barnMedAnnenForelder = !aktivtOppslag
+        ? []
+        : barnIdenter.filter((_, i) => {
+              const relasjon = relasjonsoppslag[i]?.data;
+              return (
+                  relasjon !== undefined &&
+                  harAnnenRegistrertForelder(registrerteForeldre(relasjon), [bidragspliktigIdent, bidragsmottakerIdent])
+              );
+          });
 
     const barnMedUfullstendigRelasjon = !harSak
         ? []
         : !bidragsmottakerIdent || !bidragspliktigIdent
-          ? barnIdenter
-          : barnIdenter.filter((_, i) => {
-                const { data: relasjon, isError } = relasjonsoppslag[i] ?? {};
+          ? barnIdenter.filter((ident) => !barnMedAnnenForelder.includes(ident))
+          : barnIdenter.filter((ident, i) => {
+                const relasjon = relasjonsoppslag[i]?.data;
                 return (
-                    isError ||
-                    (relasjon !== undefined &&
-                        harUfullstendigRelasjon(relasjon, bidragsmottakerIdent, bidragspliktigIdent))
+                    relasjon !== undefined &&
+                    !barnMedAnnenForelder.includes(ident) &&
+                    harUfullstendigRelasjon(relasjon, bidragsmottakerIdent, bidragspliktigIdent)
                 );
             });
 
-    const aktivtOppslag = harSak && beggeForeldreKjent;
-
     return {
         barnMedUfullstendigRelasjon,
+        barnMedAnnenForelder,
+        harOppslagsfeil: aktivtOppslag && relasjonsoppslag.some((resultat) => resultat.isError),
         isLoading: aktivtOppslag && relasjonsoppslag.some((resultat) => resultat.isFetching),
     };
 }

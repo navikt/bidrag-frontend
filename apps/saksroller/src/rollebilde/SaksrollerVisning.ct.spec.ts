@@ -4,6 +4,15 @@ import { lagRolle, lagSak, testpersoner } from "../../playwright/saksroller/fixt
 import { mockSaksrollerApi } from "../../playwright/saksroller/network.ts";
 
 const STORY = "rollebilde/SaksrollerVisning/Standard";
+const nyttBarn = { ident: genererFnr(), visningsnavn: "Nytt Barn", fødselsdato: "2016-05-01" };
+const annenForelderIdent = genererFnr();
+async function leggTilNyttBarn(component: import("@playwright/test").Locator) {
+    await component.getByRole("button", { name: "Legg til nytt barn" }).click();
+    const søk = component.getByRole("searchbox", { name: "Søk etter barn" });
+    await søk.fill(nyttBarn.ident);
+    await søk.press("Enter");
+    await component.getByRole("button", { name: "Legg til", exact: true }).click();
+}
 
 test.describe("SaksrollerVisning", () => {
     test("byttet RM vises for riktig barn og bare siste RM lagres", async ({ mount, page }) => {
@@ -113,6 +122,57 @@ test.describe("SaksrollerVisning", () => {
             .check();
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
         await expect.poll(() => requests.update).toBeTruthy();
+    });
+
+    test("🔴 nytt barn med annen forelder i Folkeregisteret stopper lagring", async ({ mount, page }) => {
+        const { requests } = await mockSaksrollerApi(page, {
+            personOverrides: { [nyttBarn.ident]: nyttBarn },
+            foreldreTilBarn: (ident) =>
+                ident === nyttBarn.ident
+                    ? [testpersoner.bidragsmottaker.ident, annenForelderIdent]
+                    : [testpersoner.bidragsmottaker.ident, testpersoner.bidragspliktig.ident],
+        });
+        const component = await mount(STORY);
+        await leggTilNyttBarn(component);
+
+        await expect(
+            component.getByText(/Nytt Barn har en annen forelder i Folkeregisteret.*Saken kan ikke lagres/),
+        ).toBeVisible();
+        await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        expect(requests.update).toBeUndefined();
+    });
+
+    test("🔴 annen forelder må bekreftes før lagring når flagget tillater det", async ({ mount, page }) => {
+        const { requests } = await mockSaksrollerApi(page, {
+            personOverrides: { [nyttBarn.ident]: nyttBarn },
+            foreldreTilBarn: (ident) =>
+                ident === nyttBarn.ident
+                    ? [testpersoner.bidragsmottaker.ident, annenForelderIdent]
+                    : [testpersoner.bidragsmottaker.ident, testpersoner.bidragspliktig.ident],
+        });
+        const component = await mount("rollebilde/SaksrollerVisning/AnnenForelderTillatt");
+        await leggTilNyttBarn(component);
+
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect(component.getByText("Du må bekrefte at du har kontrollert foreldrene")).toBeVisible();
+        expect(requests.update).toBeUndefined();
+
+        await component.getByRole("checkbox", { name: "Jeg har kontrollert at foreldrene er riktige" }).check();
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect.poll(() => requests.update).toBeTruthy();
+    });
+
+    test("🔴 feilet relasjonsoppslag stopper lagring", async ({ mount, page }) => {
+        const { requests } = await mockSaksrollerApi(page, { personOverrides: { [nyttBarn.ident]: nyttBarn } });
+        await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, (route) => route.fulfill({ status: 500 }));
+        const component = await mount(STORY);
+        await leggTilNyttBarn(component);
+
+        await expect(component.getByText("Kunne ikke kontrollere relasjonene")).toBeVisible();
+        await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        expect(requests.update).toBeUndefined();
     });
 
     test("viser eldste barn først uavhengig av rollerekkefølgen", async ({ mount, page }) => {
