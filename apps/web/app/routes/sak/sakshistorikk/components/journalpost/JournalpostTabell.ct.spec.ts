@@ -162,6 +162,23 @@ test.describe("JournalpostTabell", () => {
         expect(await bakgrunn("Enkelt dokument")).not.toBe(samlelenke);
     });
 
+    test("viser rader med internt notat (X) med grå tekst, og rader med I og U med vanlig tekst", async ({
+        mount,
+        page,
+    }) => {
+        await mockSak(page);
+        const component = await mount(STORY_BLANDET);
+        const farge = (dokDato: string) =>
+            component
+                .getByRole("cell", { name: dokDato, exact: true })
+                .first()
+                .evaluate((el) => getComputedStyle(el).color);
+
+        const x = await farge("14.05.2024");
+        expect(x).not.toBe(await farge("12.05.2024"));
+        expect(await farge("12.05.2024")).toBe(await farge("10.05.2024"));
+    });
+
     test("viser ikonet i full størrelse når beskrivelsen er kuttet", async ({ mount, page }) => {
         await mockSak(page);
         await page.setViewportSize({ width: BREDT_VINDU, height: 800 });

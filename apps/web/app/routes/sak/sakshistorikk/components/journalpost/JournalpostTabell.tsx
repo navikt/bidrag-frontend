@@ -320,7 +320,12 @@ export default function JournalpostTabell({
             id: "dokumentType",
             header: "K",
             isSortable: false,
-            bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : rad.jp.dokumentType),
+            // Markøren gir rader med X (internt notat) grå tekst, se className på DataGrid.
+            bodyCell: (rad: JournalpostRad) => {
+                if (rad.erVedlegg) return "";
+                if (rad.jp.dokumentType === "X") return <span data-internt-notat>X</span>;
+                return rad.jp.dokumentType;
+            },
         },
         {
             id: "dokumentDato",
@@ -466,7 +471,7 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
-                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-1 [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft)`}
+                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-1 [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft) [&_tbody_tr:has([data-internt-notat])]:text-(color:--ax-neutral-600)`}
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
                     //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
