@@ -47,9 +47,12 @@ interface JournalpostRad {
     dok?: DokumentDto;
     erVedlegg: boolean;
     vedlegg: JournalpostRad[];
+    /** Grå bakgrunn. Vedlegg har samme bakgrunn som journalposten, slik at de synlig hører sammen. */
+    stripet: boolean;
 }
 
-function byggRad(jp: JournalpostDto): JournalpostRad {
+function byggRad(jp: JournalpostDto, indeks: number): JournalpostRad {
+    const stripet = indeks % 2 === 1;
     const dokumenter = jp.dokumenter ?? [];
     const jpId =
         jp.journalpostId ??
@@ -63,10 +66,11 @@ function byggRad(jp: JournalpostDto): JournalpostRad {
                   dok,
                   erVedlegg: true,
                   vedlegg: [],
+                  stripet,
               }))
             : [];
 
-    return { id: jpId, jp, erVedlegg: false, vedlegg };
+    return { id: jpId, jp, erVedlegg: false, vedlegg, stripet };
 }
 
 const erUnderProduksjon = (dok: DokumentDto) => {
@@ -183,7 +187,7 @@ export default function JournalpostTabell({
     const erFiltrert = antallJournalposterFiltrert !== antallJournalposterTotalt;
 
     const sorterteJournalposter = sortData(filtrerteJournalposter);
-    const rader: JournalpostRad[] = sorterteJournalposter.map(byggRad);
+    const rader: JournalpostRad[] = sorterteJournalposter.map((jp, indeks) => byggRad(jp, indeks));
 
     const dataGridSort: import("@navikt/ds-react/PREVIEW/DataGrid").DataGrid.Table.SortEntry[] = sort
         ? [
@@ -268,7 +272,8 @@ export default function JournalpostTabell({
             id: "expand",
             header: "",
             sortable: false,
-            bodyCell: () => "",
+            // Markøren gir raden grå bakgrunn, se className på DataGrid.
+            bodyCell: (rad: JournalpostRad) => (rad.stripet ? <span data-stripet hidden /> : ""),
         },
         harDokumenterUnderOpprettelse && {
             id: "slett",
@@ -461,12 +466,11 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
-                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-1`}
+                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-1 [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft)`}
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
                     //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
                     settings={{
-                        zebraStripes: true,
                         rowDensity: "tight",
                         textSize: "small",
                     }}

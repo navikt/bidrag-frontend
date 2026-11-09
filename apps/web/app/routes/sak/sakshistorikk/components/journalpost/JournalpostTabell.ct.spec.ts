@@ -136,6 +136,32 @@ test.describe("JournalpostTabell", () => {
         expect(await tabell.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
     });
 
+    test("gir vedleggene samme bakgrunn som journalposten, og stripene følger journalpostene", async ({
+        mount,
+        page,
+    }) => {
+        await mockSak(page);
+        const component = await mount(STORY_BLANDET);
+        const bakgrunn = (tekst: string) =>
+            component
+                .getByRole("row")
+                .filter({ hasText: tekst })
+                .first()
+                .evaluate((el) => getComputedStyle(el).backgroundColor);
+
+        await component
+            .getByRole("row")
+            .filter({ hasText: "Ferdigstilt samlelenke" })
+            .getByRole("button", { name: "Vis under-rader" })
+            .click();
+
+        const samlelenke = await bakgrunn("Ferdigstilt samlelenke");
+        expect(await bakgrunn("Ferdigstilt hoveddokument")).toBe(samlelenke);
+        expect(await bakgrunn("Ferdigstilt vedlegg")).toBe(samlelenke);
+        expect(await bakgrunn("Samling med dokument under produksjon")).not.toBe(samlelenke);
+        expect(await bakgrunn("Enkelt dokument")).not.toBe(samlelenke);
+    });
+
     test("viser ikonet i full størrelse når beskrivelsen er kuttet", async ({ mount, page }) => {
         await mockSak(page);
         await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
