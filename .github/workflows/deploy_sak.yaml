@@ -37,19 +37,11 @@ jobs:
         uses: ./.github/actions/setup
         with:
           node-auth-token: ${{ secrets.READER_TOKEN }}
-      - uses: actions/setup-node@v6
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          node-version: '24'
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@navikt"
-      - name: Installere node moduler
-        shell: bash
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ inputs.node-auth-token }}
+          node-auth-token: ${{ secrets.READER_TOKEN }}
+
       - run: pnpm build
       - if: inputs.upload_artifact
         uses: actions/upload-artifact@v4
