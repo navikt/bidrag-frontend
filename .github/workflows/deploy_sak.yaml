@@ -37,10 +37,6 @@ jobs:
         uses: ./.github/actions/setup
         with:
           node-auth-token: ${{ secrets.READER_TOKEN }}
-      - name: Setup
-        uses: ./.github/actions/setup
-        with:
-          node-auth-token: ${{ secrets.READER_TOKEN }}
 
       - run: pnpm build
       - if: inputs.upload_artifact
