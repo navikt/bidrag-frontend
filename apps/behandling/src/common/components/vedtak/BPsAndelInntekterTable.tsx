@@ -10,11 +10,13 @@ type BPsAndelProps = {
     inntekter: ResultatBeregningInntekterDto;
     bpsAndel: DelberegningBidragspliktigesAndel;
     forskuddssats: number;
+    inntektBBMultiplikator: number;
 };
 
 export const BPsAndelInntekterTable = ({
     inntekter,
     forskuddssats,
+    inntektBBMultiplikator,
 }: Omit<BPsAndelProps, "bpsAndel" | "delberegningUnderholdskostnad">) => {
     return (
         <CalculationTabell
@@ -34,7 +36,7 @@ export const BPsAndelInntekterTable = ({
                         <>
                             {inntekter.inntektBarn > 0 && (
                                 <BodyShort size="small">
-                                    {formatterBeløpForBeregning(inntekter.inntektBarn)} - 30 x{" "}
+                                    {formatterBeløpForBeregning(inntekter.inntektBarn)} - {inntektBBMultiplikator} x{" "}
                                     {formatterBeløpForBeregning(forskuddssats)}
                                 </BodyShort>
                             )}
