@@ -71,7 +71,7 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                 columns={[
                     {
                         id: "behandle",
-                        header: "",
+                        header: "Behandle",
                         bodyCell: (h) => (
                             <BehandleLink
                                 saksnummer={saksnummer}
@@ -83,29 +83,25 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                         ),
                     },
                     {
-                        id: "forsendelelse",
-                        header: "",
+                        id: "opprett",
+                        header: "Opprett",
                         bodyCell: (h) => (
-                            <BrevLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                                kanSkrive={kanSkrive}
-                            />
-                        ),
-                    },
-                    {
-                        id: "notat",
-                        header: "",
-                        bodyCell: (h) => (
-                            <NotatLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                                kanSkrive={kanSkrive}
-                            />
+                            <HStack gap="space-8" wrap={false}>
+                                <BrevLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                    kanSkrive={kanSkrive}
+                                />
+                                <NotatLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                    kanSkrive={kanSkrive}
+                                />
+                            </HStack>
                         ),
                     },
                     {

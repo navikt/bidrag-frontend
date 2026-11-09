@@ -54,6 +54,24 @@ test.describe("SaksLogg", () => {
         ).toHaveAttribute("href", /\/sak\/2024\/1234\/vedtak\/vedtak-3/);
     });
 
+    test("viser lenkene for forsendelse og notat i én kolonne med overskriften Opprett", async ({ mount, page }) => {
+        await mockSkrivetilgang(page);
+        const component = await mount(STORY);
+
+        const overskrifter = component.getByRole("columnheader");
+        await expect(overskrifter.nth(0)).toHaveText("Behandle");
+        await expect(overskrifter.nth(1)).toHaveText("Opprett");
+        await expect(overskrifter.nth(2)).toHaveText("Dato");
+
+        const opprettCelle = component
+            .getByRole("row")
+            .filter({ hasText: "Søknad fra bidragsmottaker" })
+            .getByRole("cell")
+            .nth(1);
+        await expect(opprettCelle.getByRole("link", { name: "Opprett forsendelse" })).toBeVisible();
+        await expect(opprettCelle.getByRole("link", { name: "Opprett notat" })).toBeVisible();
+    });
+
     test("viser paginering når saksloggen har mer enn seks hendelser", async ({ mount, page }) => {
         await mockSkrivetilgang(page);
         const component = await mount(STORY);
