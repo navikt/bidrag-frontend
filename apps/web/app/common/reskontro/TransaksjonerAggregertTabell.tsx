@@ -12,11 +12,16 @@ import { TransaksjonType } from "~/common/reskontro/TransaksjonType.tsx";
 interface TransaksjonerAggregertTabellProps {
     transaksjoner: Transaksjon[];
     totalTransCount: number;
+    detaljPaddingInline?: "space-0" | "space-4";
 }
 
 const ROWS_PER_PAGE = 50;
 
-export function TransaksjonerAggregertTabell({ transaksjoner, totalTransCount }: TransaksjonerAggregertTabellProps) {
+export function TransaksjonerAggregertTabell({
+    transaksjoner,
+    totalTransCount,
+    detaljPaddingInline = "space-4",
+}: TransaksjonerAggregertTabellProps) {
     const aggregater = useMemo(
         () => aggregerTransaksjoner(transaksjoner).sort((a, b) => sortByDateAsc(b.dato, a.dato)),
         [transaksjoner],
@@ -45,7 +50,7 @@ export function TransaksjonerAggregertTabell({ transaksjoner, totalTransCount }:
                     return 0;
             }
         });
-    }, [aggregater, sort?.orderBy, sort?.direction]);
+    }, [aggregater, sort]);
 
     const paginertData = useMemo(
         () => sortertData.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE),
@@ -100,7 +105,7 @@ export function TransaksjonerAggregertTabell({ transaksjoner, totalTransCount }:
                             togglePlacement="right"
                             expandOnRowClick
                             content={
-                                <Box padding="space-4">
+                                <Box paddingBlock="space-4" paddingInline={detaljPaddingInline}>
                                     <DetaljTransaksjonerTabell transaksjoner={aggregat.transaksjoner} />
                                 </Box>
                             }

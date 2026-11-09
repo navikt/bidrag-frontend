@@ -1,5 +1,6 @@
 import "./sideMenu.css";
 
+import { scrollToHash } from "@bidrag/common/utils/WindowUtils";
 import {
     ArrowsCirclepathIcon,
     BellDotIcon,
@@ -9,7 +10,6 @@ import {
 } from "@navikt/aksel-icons";
 import { BodyShort, Button, VStack } from "@navikt/ds-react";
 import { type ReactElement, type ReactNode, useEffect, useState } from "react";
-import { scrollToHash } from "../../../utils/window-utils";
 import { useBehandlingProvider } from "../../context/BehandlingContext";
 
 export const MenuButton = ({

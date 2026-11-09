@@ -1,11 +1,11 @@
+import { KodeverkService, type LandkodeLand, type PostnummerPoststed } from "@bidrag/api";
 import type { KodeverkHierarkiResponse, KodeverkKoderBetydningerResponse } from "@bidrag/api/BidragKodeverkApi";
 import { StringUtils } from "@bidrag/common";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useBidragKodeverkApi } from "../api/api";
-import KodeverkService from "../api/KodeverkService";
 import { visAndreVedleggskoder, visVedleggskoder } from "../constants/ettersendingConstants";
-import type { KodeBeskrivelse, LandkodeLand, PostnummerPoststed } from "../types/KodeverkTypes";
+import type { KodeBeskrivelse } from "../types/KodeverkTypes";
 export const KodeverkQueryKeys = {
     landkoder: ["landkoder"],
     postnummere: ["postnummere"],

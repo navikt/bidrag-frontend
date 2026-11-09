@@ -1,4 +1,5 @@
 import { BidragContainer } from "@bidrag/common";
+import { scrollToHash } from "@bidrag/common/utils/WindowUtils";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 import BrukerveiledningBarnebidragKlage from "./barnebidrag/docs/BrukerveiledningBarnebidragKlage.mdx";
@@ -6,7 +7,6 @@ import BrukerveiledningBarnebidragV1 from "./barnebidrag/docs/BrukerveiledningBa
 import PageWrapper from "./common/PageWrapper";
 import BrukerveiledningForskudd from "./forskudd/docs/BrukerveiledningForskudd.mdx";
 import BrukerveiledningSærbidrag from "./særbidrag/docs/BrukerveiledningSærbidrag.mdx";
-import { scrollToHash } from "./utils/window-utils";
 
 export function ForskuddBrukerveiledningPage() {
     useEffect(scrollToHash, []);

@@ -1,9 +1,8 @@
+import { scrollToHash } from "@bidrag/common/utils/WindowUtils";
 import { HGrid, HStack } from "@navikt/ds-react";
 import { useEffect } from "react";
-
 import Brukerveiledning from "./docs/Brukerveiledning.mdx";
 import PageWrapper from "./pages/PageWrapper";
-import { scrollToHash } from "./utils/window-utils";
 
 export function ForsendelseBrukerveiledningPage() {
     useEffect(scrollToHash, []);
