@@ -3,6 +3,10 @@ export function queryParams(): Record<string, string> {
 }
 
 export function scrollToHash() {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+        return;
+    }
+
     if (window.location.hash) {
         document.getElementById(window.location.hash.replace("#", ""))?.scrollIntoView(true);
     }
