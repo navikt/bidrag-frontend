@@ -39,6 +39,8 @@ jobs:
           node-auth-token: ${{ secrets.READER_TOKEN }}
 
       - run: pnpm build
+        env:
+          NODE_AUTH_TOKEN: ${{ inputs.node-auth-token }}
       - if: inputs.upload_artifact
         uses: actions/upload-artifact@v4
         with:
