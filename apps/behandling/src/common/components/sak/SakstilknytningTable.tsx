@@ -63,7 +63,7 @@ export default function SakstilknytningTable({ gjelderBarnIdent, onClose }: Saks
                             fodselsnummer: gjelderBarnIdent,
                             mottagerErVerge: false,
                             rollehistorikk: [],
-                            reellMottaker: erBarnOver18År ? null : { ident: gjelderBarnIdent, verge: false },
+                            reellMottaker: erBarnOver18År ? { ident: gjelderBarnIdent, verge: false } : null,
                         },
                     ],
                 });
@@ -184,36 +184,36 @@ function RollerExpandableContent(sak: Sak) {
             </Heading>
             <HGrid className="w-max" gap={"space-4"} columns={2}>
                 {sak.roller
-                    .filter((rolle) => rolle.type !== Rolletype.FR && rolle.type !== Rolletype.RM)
-                    .sort(sortBehandlingRoller)
-                    .map((rolle) => (
-                        <div className={`flex flex-col gap-2 `} key={rolle.fodselsnummer}>
-                            <div className="w-full inline-flex ">
-                                <PersonNavnIdent rolle={tilRolleType(rolle.type)} ident={rolle.fodselsnummer} />
-                            </div>
-                            {finnesRm && rolle.type === Rolletype.BA ? (
-                                rolle.reellMottaker ? (
-                                    <div className="ml-[0.5em] text-slate-500">
-                                        <PersonNavnIdent
-                                            rolle={tilRolleType(Rolletype.RM)}
-                                            ident={rolle.reellMottaker.ident}
-                                        />
-                                        {rolle.reellMottaker.verge && (
-                                            <>
-                                                <span className="mx-1">/</span>
-                                                <span className="personident">{"Verge"}</span>
-                                            </>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="ml-[0.5em] text-slate-500">
-                                        <RolleTag rolleType={tilRolleType(Rolletype.RM)} />
-                                        <span className="ml-2 personnavn">Ingen reell mottaker</span>
-                                    </div>
-                                )
-                            ) : null}
+                .filter((rolle) => rolle.type !== Rolletype.FR && rolle.type !== Rolletype.RM)
+                .sort(sortBehandlingRoller)
+                .map((rolle) => (
+                    <div className={`flex flex-col gap-2 `} key={rolle.fodselsnummer}>
+                        <div className="w-full inline-flex ">
+                            <PersonNavnIdent rolle={tilRolleType(rolle.type)} ident={rolle.fodselsnummer} />
                         </div>
-                    ))}
+                        {finnesRm && rolle.type === Rolletype.BA ? (
+                            rolle.reellMottaker ? (
+                                <div className="ml-[0.5em] text-slate-500">
+                                    <PersonNavnIdent
+                                        rolle={tilRolleType(Rolletype.RM)}
+                                        ident={rolle.reellMottaker.ident}
+                                    />
+                                    {rolle.reellMottaker.verge && (
+                                        <>
+                                            <span className="mx-1">/</span>
+                                            <span className="personident">{"Verge"}</span>
+                                        </>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="ml-[0.5em] text-slate-500">
+                                    <RolleTag rolleType={tilRolleType(Rolletype.RM)} />
+                                    <span className="ml-2 personnavn">Ingen reell mottaker</span>
+                                </div>
+                            )
+                        ) : null}
+                    </div>
+                ))}
             </HGrid>
         </div>
     );
@@ -259,3 +259,4 @@ function createRow(sak: Sak, setRegistrerSak: (saksnummer: Sak) => void, registr
         isSelected: isSelected,
     };
 }
+
