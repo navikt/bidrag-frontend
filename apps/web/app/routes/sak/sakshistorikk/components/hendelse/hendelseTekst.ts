@@ -5,7 +5,7 @@ import { HendelseType, type SakshendelseDto } from "@bidrag/api/SakApi";
  * hendelsestyper viser teksten fra backend.
  */
 const TYDELIGERE_TEKST: Partial<Record<HendelseType, string>> = {
-    [HendelseType.G4]: "Avsluttet – G4-land",
+    [HendelseType.G4]: "Kan ikke behandles foreløpig – G4",
     [HendelseType.VEDTAK_FTK]: "Vedtak fylkestrygdekontor",
     [HendelseType.GJELDER_ENDRET]: "Landtilknytning endret",
     [HendelseType.KONVENSJONSKOДЕREGISTRERT]: "Bidragskonvensjon registrert",

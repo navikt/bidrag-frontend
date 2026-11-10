@@ -7,7 +7,7 @@ describe("hendelseTekst", () => {
         expect(hendelseTekst({ type: HendelseType.GJELDER_ENDRET, typeBeskrivelse: "Gjelder endret" }, true)).toBe(
             "Landtilknytning endret",
         );
-        expect(hendelseTekst({ type: HendelseType.G4, typeBeskrivelse: "G4" }, true)).toBe("Avsluttet – G4-land");
+        expect(hendelseTekst({ type: HendelseType.G4, typeBeskrivelse: "G4" }, true)).toBe("Kan ikke behandles foreløpig – G4");
     });
 
     it("viser teksten fra backend for andre hendelsestyper", () => {
