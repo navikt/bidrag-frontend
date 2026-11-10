@@ -3,6 +3,7 @@ import { useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
 import { Checkbox, Heading, HStack, Pagination, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
+import { useFlag } from "@unleash/proxy-client-react";
 import { useMemo, useState } from "react";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
 import { AvkortetCelle, tabellMedAvkortetSisteKolonne } from "../AvkortetCelle";
@@ -25,6 +26,7 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
     const { enhet, sessionState } = bisysSessionParams;
 
     const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);
+    const tydeligereHendelsetekster = useFlag("bisys.sakshistorikk_tydeligere_hendelsetekster");
 
     const sortOrder: DataGrid.Table.SortEntry[] = sort
         ? [
@@ -121,7 +123,7 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                         id: "typeBeskrivelse",
                         header: "Hendelse",
                         isSortable: true,
-                        bodyCell: (h) => hendelseTekst(h),
+                        bodyCell: (h) => hendelseTekst(h, tydeligereHendelsetekster),
                     },
                     {
                         id: "enhet",

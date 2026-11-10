@@ -4,13 +4,19 @@ import { hendelseTekst } from "./hendelseTekst";
 
 describe("hendelseTekst", () => {
     it("viser tydeligere tekst for hendelsestyper med uklar tekst fra Bisys", () => {
-        expect(hendelseTekst({ type: HendelseType.GJELDER_ENDRET, typeBeskrivelse: "Gjelder endret" })).toBe(
+        expect(hendelseTekst({ type: HendelseType.GJELDER_ENDRET, typeBeskrivelse: "Gjelder endret" }, true)).toBe(
             "Landtilknytning endret",
         );
-        expect(hendelseTekst({ type: HendelseType.G4, typeBeskrivelse: "G4" })).toBe("Avsluttet – G4-land");
+        expect(hendelseTekst({ type: HendelseType.G4, typeBeskrivelse: "G4" }, true)).toBe("Avsluttet – G4-land");
     });
 
     it("viser teksten fra backend for andre hendelsestyper", () => {
-        expect(hendelseTekst({ type: HendelseType.VEDTAK, typeBeskrivelse: "Vedtak" })).toBe("Vedtak");
+        expect(hendelseTekst({ type: HendelseType.VEDTAK, typeBeskrivelse: "Vedtak" }, true)).toBe("Vedtak");
+    });
+
+    it("viser teksten fra backend når tydeligere tekster er slått av", () => {
+        expect(hendelseTekst({ type: HendelseType.GJELDER_ENDRET, typeBeskrivelse: "Gjelder endret" }, false)).toBe(
+            "Gjelder endret",
+        );
     });
 });

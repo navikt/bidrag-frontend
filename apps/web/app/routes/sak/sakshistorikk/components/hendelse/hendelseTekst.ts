@@ -13,6 +13,10 @@ const TYDELIGERE_TEKST: Partial<Record<HendelseType, string>> = {
     [HendelseType.OPPJUSTERING11AR]: "Forskudd oppjustert, barn 11 år",
 };
 
-export function hendelseTekst(hendelse: Pick<SakshendelseDto, "type" | "typeBeskrivelse">): string {
+export function hendelseTekst(
+    hendelse: Pick<SakshendelseDto, "type" | "typeBeskrivelse">,
+    tydeligere: boolean,
+): string {
+    if (!tydeligere) return hendelse.typeBeskrivelse;
     return TYDELIGERE_TEKST[hendelse.type] ?? hendelse.typeBeskrivelse;
 }
