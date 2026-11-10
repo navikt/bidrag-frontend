@@ -4,10 +4,10 @@ import {
     SoktAvType,
     Stonadstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
-import {PersonNavnIdent} from "@bidrag/common";
-import {Alert, BodyShort, Box, HGrid, HStack, Label, Tag, VStack} from "@navikt/ds-react";
+import { PersonNavnIdent } from "@bidrag/common";
+import { Alert, BodyShort, Box, HGrid, HStack, Label, Tag, VStack } from "@navikt/ds-react";
 import BehandlingLenke from "../../common/components/BehandlingLenke";
-import {PopoverMonthPicker} from "../../common/components/date-picker/PopoverMonthPicker";
+import { PopoverMonthPicker } from "../../common/components/date-picker/PopoverMonthPicker";
 import SakLenke from "../../common/components/SakLenke";
 import Søknadslenke from "../../common/components/Søknadslenke";
 import {
@@ -15,12 +15,12 @@ import {
     useGetForholdsmessigFordelingDetaljer,
     useHarTilgangSak,
 } from "../../common/hooks/useApiData";
-import {hentVisningsnavn} from "../../common/hooks/useVisningsnavn";
+import { hentVisningsnavn } from "../../common/hooks/useVisningsnavn";
 import {
     addMonthsIgnoreDay,
-    dateOrNull,
     DateToDDMMYYYYString,
     DateToMMYYYYString,
+    dateOrNull,
     maxOfDate,
     toISODateString,
 } from "../../utils/date-utils";
@@ -43,8 +43,8 @@ const hentSystemopprettetFFSøknad = (barn: ForholdsmessigFordelingBarnDto) => {
         (b) =>
             b.søknadsid &&
             b.søktAvType === SoktAvType.AUTOMATISK &&
-            (b.behandlingstype === Behandlingstype.FORHOLDSMESSIG_FORDELING
-                || b.behandlingstype === Behandlingstype.FORHOLDSMESSIG_FORDELING_KLAGE),
+            (b.behandlingstype === Behandlingstype.FORHOLDSMESSIG_FORDELING ||
+                b.behandlingstype === Behandlingstype.FORHOLDSMESSIG_FORDELING_KLAGE),
     );
     return søknader.length === 1 ? søknader[0] : undefined;
 };
