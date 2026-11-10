@@ -1091,6 +1091,8 @@ const VirkningstidspunktBarn = ({
                             readonly={
                                 lesemodus ||
                                 vedtakstype === Vedtakstype.ALDERSJUSTERING ||
+                                // Virkningstidspunkt for R-barn endres via FF dialog istedenfor VTP bildet
+                                selectedVirkningstidspunkt.rolle.erRevurdering ||
                                 selectedVirkningstidspunkt.kanEndreVirkningstidspunkt === false
                             }
                             required

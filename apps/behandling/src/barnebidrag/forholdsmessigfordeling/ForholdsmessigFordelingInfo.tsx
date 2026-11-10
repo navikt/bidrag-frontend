@@ -8,10 +8,12 @@ import {
 import { Alert, Button, Dialog, Heading, HStack, Loader, LocalAlert, VStack } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
+import { BehandlingAlert } from "../../common/components/BehandlingAlert.tsx";
 import { useGetBehandlingV2, useRefetchFFInfoFn } from "../../common/hooks/useApiData";
 import useFeatureToogle from "../../common/hooks/useFeatureToggle";
 import { type EndretRevurderingsdato, kanEndreRevurderingsdato } from "./BarnDetaljer";
 import { BarnListe } from "./BarnListe";
+
 export function harÅpenEgetTiltakUtenInnkreving(barn: ForholdsmessigFordelingBarnDto[]) {
     return barn.some((b) =>
         b.åpneBehandlinger.some(
@@ -37,6 +39,7 @@ export function EgetTiltakNavBidragVarsel({ barn }: { barn: ForholdsmessigFordel
         </Alert>
     );
 }
+
 export default function ForholdsmessigFordelingInfo() {
     const { forholdsmessigFordeling, lesemodus, id } = useGetBehandlingV2();
     const { tilgangOppretteFF } = useFeatureToogle();
@@ -82,6 +85,7 @@ export default function ForholdsmessigFordelingInfo() {
             oppdaterRevurderingsdatoFn.reset();
         }
     }
+
     function oppdaterRevurderingsdato(barn: ForholdsmessigFordelingBarnDto, nyDato?: string) {
         setEndredeRevurderingsdatoer((current) => {
             const andreBarn = current.filter(
@@ -92,6 +96,7 @@ export default function ForholdsmessigFordelingInfo() {
                 : andreBarn;
         });
     }
+
     return (
         <>
             <Dialog open={modalOpen} onOpenChange={handleOpenChange} aria-label="Forholdsmessig fordeling detaljer">
@@ -117,21 +122,25 @@ export default function ForholdsmessigFordelingInfo() {
                     </Dialog.Body>
                     {kanEndreRevurderingsdatoer && (
                         <Dialog.Footer>
-                            <HStack
-                                gap="space-2"
-                                justify="end"
-                                className="pt-2 border-t border-[var(--ax-border-neutral-subtle)]"
-                            >
-                                <Button
-                                    size="small"
-                                    variant="primary"
-                                    disabled={!harEndringer}
-                                    onClick={() => oppdaterRevurderingsdatoFn.mutate()}
-                                    loading={oppdaterRevurderingsdatoFn.isPending}
-                                >
-                                    Oppdater revurderingsdato
-                                </Button>
-                            </HStack>
+                            <VStack gap="space-8" className="pt-2 border-t border-[var(--ax-border-neutral-subtle)]">
+                                {harEndringer && (
+                                    <BehandlingAlert variant="warning">
+                                        Virkningstidspunkt er endret, dette kan påvirke beregningen. <br /> Inntekter og
+                                        boforhold må vurderes på nytt. Vurder også om det må varsles på nytt.
+                                    </BehandlingAlert>
+                                )}
+                                <HStack gap="space-2" justify="end">
+                                    <Button
+                                        size="small"
+                                        variant="primary"
+                                        disabled={!harEndringer}
+                                        onClick={() => oppdaterRevurderingsdatoFn.mutate()}
+                                        loading={oppdaterRevurderingsdatoFn.isPending}
+                                    >
+                                        Oppdater revurderingsdato
+                                    </Button>
+                                </HStack>
+                            </VStack>
                         </Dialog.Footer>
                     )}
                 </Dialog.Popup>

@@ -5,7 +5,7 @@ import {
     Stonadstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent } from "@bidrag/common";
-import { Alert, BodyShort, Box, HGrid, HStack, Label, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, HGrid, HStack, Label, Tag, VStack } from "@navikt/ds-react";
 import BehandlingLenke from "../../common/components/BehandlingLenke";
 import { PopoverMonthPicker } from "../../common/components/date-picker/PopoverMonthPicker";
 import SakLenke from "../../common/components/SakLenke";
@@ -310,16 +310,23 @@ function EndreRevurderingsdatoMonthPicker({
 
     return (
         <VStack gap="space-2" className="pt-1">
-            <PopoverMonthPicker
-                label="Endre revurderingsdato"
-                value={DateToDDMMYYYYString(aktivDato)}
-                onChange={handleMonthChange}
-                defaultSelected={aktivDato}
-                fromDate={dateOrNull(søktFomDato) ?? undefined}
-                toDate={addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1)}
-                inputFormat="dd.MM.yyyy"
-                size="small"
-            />
+            <HStack gap="space-2" align="end">
+                <PopoverMonthPicker
+                    label="Endre revurderingsdato"
+                    value={DateToDDMMYYYYString(aktivDato)}
+                    onChange={handleMonthChange}
+                    defaultSelected={aktivDato}
+                    fromDate={dateOrNull(søktFomDato) ?? undefined}
+                    toDate={addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1)}
+                    inputFormat="dd.MM.yyyy"
+                    size="small"
+                />
+                {nyRevurderingsdato && (
+                    <Tag variant="warning" size="small">
+                        Endret fra {DateToMMYYYYString(dateOrNull(gjeldendeDato)) ?? "ingen dato"}
+                    </Tag>
+                )}
+            </HStack>
         </VStack>
     );
 }
