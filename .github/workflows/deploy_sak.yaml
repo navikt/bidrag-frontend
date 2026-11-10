@@ -1,0 +1,97 @@
+name: Deploy familieveileder
+on:
+  workflow_dispatch:
+
+  push:
+    paths:
+      - .github/workflows/deploy_sak.yaml
+      - 'familieveileder/**'
+    branches-ignore:
+      - "dependabot/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  APP_NAME: bidrag_sak_ui
+  BUCKET_DEV: bidrag-ui-static-files-dev
+  BUCKET_PROD: bidrag-ui-static-files-prod
+defaults:
+  run:
+    working-directory: ./familieveileder
+jobs:
+  build:
+    name: Lint, test og bygg
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          node-auth-token: ${{ secrets.READER_TOKEN }}
+
+      - run: pnpm build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+
+  deploy:
+    name: Deploy til ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: q1
+            env_file: env/.env.q1
+            gcp_key: GCP_SERVICEUSER_KEY_DEV
+            bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/feature/static
+          - environment: q2
+            env_file: env/.env.q2
+            gcp_key: GCP_SERVICEUSER_KEY_DEV
+            bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/main/static
+          - environment: prod
+            env_file: env/.env.prod
+            gcp_key: GCP_SERVICEUSER_KEY_PROD
+            bucket_path: bidrag-ui-static-files-prod/bidrag_sak_ui/static
+    steps:
+      - name: Hopp over prod utenfor main
+        id: gate
+        run: echo "skip=${{ matrix.environment == 'prod' && github.ref != 'refs/heads/main' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.gate.outputs.skip != 'true'
+        uses: actions/checkout@v6
+      - if: steps.gate.outputs.skip != 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.gate.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - if: steps.gate.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Last miljøvariabler
+        if: steps.gate.outputs.skip != 'true'
+        run: cat "${{ matrix.env_file }}" >> "$GITHUB_ENV"
+      - if: steps.gate.outputs.skip != 'true'
+        run: pnpm build
+      - if: steps.gate.outputs.skip != 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets[matrix.gcp_key] }}
+      - if: steps.gate.outputs.skip != 'true'
+        uses: google-github-actions/setup-gcloud@v2
+      - if: steps.gate.outputs.skip != 'true'
+        run: gsutil -m rsync -R -d dist "gs://${{ matrix.bucket_path }}"
