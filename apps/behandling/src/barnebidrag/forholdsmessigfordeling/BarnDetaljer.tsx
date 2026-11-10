@@ -36,6 +36,7 @@ interface BarnDetaljerFFProps {
     barn: ForholdsmessigFordelingBarnDto[];
     endredeRevurderingsdatoer?: EndretRevurderingsdato[];
     onRevurderingsdatoChange?: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
+    lagrerRevurderingsdatoer?: boolean;
 }
 
 const hentSystemopprettetFFSøknad = (barn: ForholdsmessigFordelingBarnDto) => {
@@ -294,9 +295,11 @@ function EndreRevurderingsdatoMonthPicker({
     barn,
     nyRevurderingsdato,
     onChange,
+    disabled,
 }: {
     barn: ForholdsmessigFordelingBarnDto;
     nyRevurderingsdato?: string;
+    disabled?: boolean;
     onChange: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
 }) {
     const { søktFomDato } = useGetBehandlingV2();
@@ -321,6 +324,7 @@ function EndreRevurderingsdatoMonthPicker({
                     toDate={addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1)}
                     inputFormat="dd.MM.yyyy"
                     size="small"
+                    disabled={disabled}
                 />
                 {nyRevurderingsdato && (
                     <Tag variant="warning" size="small">
@@ -336,6 +340,7 @@ export default function BarnDetaljerFF({
     barn,
     endredeRevurderingsdatoer,
     onRevurderingsdatoChange,
+    lagrerRevurderingsdatoer,
 }: BarnDetaljerFFProps) {
     if (barn.length === 0) return null;
     const saksnr = barn[0].saksnr;
@@ -432,6 +437,7 @@ export default function BarnDetaljerFF({
                                     )?.dato
                                 }
                                 onChange={onRevurderingsdatoChange}
+                                disabled={lagrerRevurderingsdatoer}
                             />
                         )}
                         <LøpendeBidragListe

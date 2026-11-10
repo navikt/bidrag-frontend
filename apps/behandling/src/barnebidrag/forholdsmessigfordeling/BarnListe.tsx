@@ -77,9 +77,15 @@ export function BarnListeOpprettFF({
 interface BarnListeFFProps extends BarnListeProps {
     endredeRevurderingsdatoer?: EndretRevurderingsdato[];
     onRevurderingsdatoChange?: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
+    lagrerRevurderingsdatoer?: boolean;
 }
 
-export function BarnListe({ barn, endredeRevurderingsdatoer, onRevurderingsdatoChange }: BarnListeFFProps) {
+export function BarnListe({
+    barn,
+    endredeRevurderingsdatoer,
+    onRevurderingsdatoChange,
+    lagrerRevurderingsdatoer,
+}: BarnListeFFProps) {
     const groupedBarn = barn.reduce(
         (acc, b) => {
             const key = b.saksnr || "unknown";
@@ -98,6 +104,7 @@ export function BarnListe({ barn, endredeRevurderingsdatoer, onRevurderingsdatoC
                             barn={group}
                             endredeRevurderingsdatoer={endredeRevurderingsdatoer}
                             onRevurderingsdatoChange={onRevurderingsdatoChange}
+                            lagrerRevurderingsdatoer={lagrerRevurderingsdatoer}
                         />
                     </div>
                 ))}

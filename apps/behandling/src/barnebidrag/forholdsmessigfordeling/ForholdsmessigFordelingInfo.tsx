@@ -116,6 +116,7 @@ export default function ForholdsmessigFordelingInfo() {
                                     onRevurderingsdatoChange={
                                         kanEndreRevurderingsdatoer ? oppdaterRevurderingsdato : undefined
                                     }
+                                    lagrerRevurderingsdatoer={oppdaterRevurderingsdatoFn.isPending}
                                 />
                             </Suspense>
                         </VStack>
