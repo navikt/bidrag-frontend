@@ -144,7 +144,7 @@ function EnPartMedBarnInnhold({ type }: { type: Flyttype }) {
                     form={form}
                     barnkurver={barnkurver}
                     lasterKurver={lasterKurver}
-                    reellMottakerRegel={reellMottakerRegel(sakstype, false)}
+                    reellMottakerRegel={reellMottakerRegel(sakstype)}
                     beskrivelse={beskrivelse}
                     maksEttBarn={type === "FARSKAP"}
                     advarsler={finnOpprettSakAdvarsler({ roller: form.watch("roller"), valgteBarn }, sakstype)}

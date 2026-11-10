@@ -27,7 +27,7 @@ export function useBekreftelse(identer: string[]) {
                 return neste;
             });
         },
-        krevBekreftelse: () => {
+        bekreftetEllerVisFeil: () => {
             if (!bekreftet) setHarForsøktUtenBekreftelse(true);
             return bekreftet;
         },

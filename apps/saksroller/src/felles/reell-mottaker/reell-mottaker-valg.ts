@@ -1,3 +1,4 @@
+import { IdentUtils } from "@bidrag/common";
 import type { z } from "zod";
 import type { ReellMottakerFelterSchema } from "../sakvisning-schema";
 import type { ReellMottakerValg, ReellMottakerValgregel } from "./ReellMottakerValgGruppe";
@@ -34,11 +35,9 @@ export function fraReellMottakerValg(valg: ReellMottakerValg): ReellMottakerSkje
     };
 }
 
-const SAMHANDLER_ID = /^[89]\d{10}$/;
-
 /** Verge kan bare registreres når reell mottaker er en annen person enn barnet, som i Bisys. */
 export function erPersonSomReellMottaker(valg: ReellMottakerValg): boolean {
-    return valg.type === "samhandler" && Boolean(valg.ident) && !SAMHANDLER_ID.test(valg.ident ?? "");
+    return valg.type === "samhandler" && Boolean(valg.ident) && !IdentUtils.isSamhandlerId(valg.ident ?? "");
 }
 
 /** Startvalg når regelen krever reell mottaker. Beholder valget når det allerede oppfyller regelen. */

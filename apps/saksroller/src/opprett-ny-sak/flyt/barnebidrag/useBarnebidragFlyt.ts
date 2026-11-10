@@ -4,8 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { type UseFormReturn, useFormContext } from "react-hook-form";
 import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
-import { useRelasjonsregler } from "../../../felles/relasjon/useRelasjonsregler";
-import { reellMottakerRegel } from "../../../felles/saksregler";
+import { reellMottakerRegel, reellMottakerRegelUkjentBidragsmottaker } from "../../../felles/saksregler";
 import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { ForelderKortProps } from "../../parter/ParterSeksjon";
@@ -20,14 +19,10 @@ import {
     type ForelderPartRolle,
 } from "../../skjema/opprett-sak-schema";
 import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
-import {
-    barnMedAnnenForelder,
-    barnMedUfullstendigRelasjon,
-    type ForeldreTilBarn,
-    utledForelderforslag,
-} from "./barnebidrag-forelderforslag";
+import { type ForeldreTilBarn, utledForelderforslag } from "./barnebidrag-forelderforslag";
 import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
 import { rollerEtterValg, rolleSomPart, tilPart } from "./barnebidrag-roller";
+import { useBarnebidragRelasjonsregler, useTilgjengeligeForeldre } from "./useBarnebidragRelasjoner";
 
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined, diskresjonskode: undefined };
 const UKJENT: ForelderPart = { ...IKKE_VALGT, erKjent: false };
@@ -180,19 +175,7 @@ export function useBarnebidragFlyt() {
         barnMedOppslagsfeil,
         lasterForeldre,
     } = useForelderforslag(form, roller);
-    const tilgjengeligeForeldre = useRef(new Map<string, PersonDto>());
-    for (const forelder of [...registrerteForeldre, ...forslag]) {
-        tilgjengeligeForeldre.current.set(forelder.ident, forelder);
-    }
-    for (const forelder of roller) {
-        if (forelder.erKjent && forelder.ident && forelder.navn && !tilgjengeligeForeldre.current.has(forelder.ident)) {
-            tilgjengeligeForeldre.current.set(forelder.ident, {
-                ident: forelder.ident,
-                visningsnavn: forelder.navn,
-                diskresjonskode: forelder.diskresjonskode,
-            });
-        }
-    }
+    const tilgjengeligeForeldre = useTilgjengeligeForeldre([...registrerteForeldre, ...forslag], roller);
 
     const settPart = (rolle: ForelderPartRolle, part: ForelderPart) => {
         const type = rolle === "bidragspliktig" ? "BP" : "BM";
@@ -223,22 +206,12 @@ export function useBarnebidragFlyt() {
         if (kurv) settPart(bidragspliktig.ident ? "bidragsmottaker" : "bidragspliktig", partFraKurv(kurv));
     };
 
-    const foreldreTilBarnUtenFeil = foreldreTilBarn.filter(({ barn }) => !barnMedOppslagsfeil.includes(barn.ident));
-    const annenForelder = barnMedAnnenForelder(foreldreTilBarnUtenFeil, [bidragspliktig.ident, bidragsmottaker.ident]);
-    const ufullstendigRelasjon = barnMedUfullstendigRelasjon(
-        foreldreTilBarnUtenFeil,
-        bidragspliktig.ident,
-        bidragsmottaker.ident,
-    )?.filter(
-        (barn) =>
-            !annenForelder.some((annet) => annet.ident === barn.ident) &&
-            !barnMedSkjultForelder.some((skjult) => skjult.ident === barn.ident),
-    );
-    const relasjonsregler = useRelasjonsregler({
-        ufullstendige: (ufullstendigRelasjon ?? []).map((barn) => barn.ident),
-        annenForelder: annenForelder.map((barn) => barn.ident),
-        harOppslagsfeil: barnMedOppslagsfeil.length > 0,
-        skjultForelder: barnMedSkjultForelder.map((barn) => barn.ident),
+    const { relasjonsregler, ufullstendigRelasjon, annenForelder } = useBarnebidragRelasjonsregler({
+        foreldreTilBarn,
+        bidragspliktig,
+        bidragsmottaker,
+        barnMedSkjultForelder,
+        barnMedOppslagsfeil,
     });
 
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({
@@ -254,7 +227,7 @@ export function useBarnebidragFlyt() {
             rolle,
             part: rolleSomPart(roller, rolle === "bidragspliktig" ? "BP" : "BM"),
             forslag: filtrerBortValgteForeldre(
-                [...tilgjengeligeForeldre.current.values()],
+                tilgjengeligeForeldre,
                 redigerer === rolle
                     ? [rolleSomPart(roller, rolle === "bidragspliktig" ? "BP" : "BM")]
                     : [bidragspliktig, bidragsmottaker],
@@ -285,7 +258,10 @@ export function useBarnebidragFlyt() {
         lasterKurver: lasterKurver || lasterForeldre || venterPåForelder,
         manuellTittel: tittelForBarnUtenKurv(bidragspliktig, bidragsmottaker),
         onKurvByttet,
-        reellMottakerRegel: reellMottakerRegel("Barnebidrag", bidragsmottaker.erKjent === false),
+        reellMottakerRegel:
+            bidragsmottaker.erKjent === false
+                ? reellMottakerRegelUkjentBidragsmottaker
+                : reellMottakerRegel("Barnebidrag"),
         kort,
         onSubmit,
         innsending,

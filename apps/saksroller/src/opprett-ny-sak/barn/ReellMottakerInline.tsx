@@ -12,7 +12,7 @@ import {
     type ReellMottakerSkjemaverdi,
     tilReellMottakerValg,
 } from "../../felles/reell-mottaker/reell-mottaker-valg";
-import { type ReellMottakerRegel, reellMottakerValgregel } from "../../felles/saksregler";
+import type { ReellMottakerRegel } from "../../felles/saksregler";
 
 type Props<TFieldValues extends FieldValues> = {
     form: UseFormReturn<TFieldValues>;
@@ -134,7 +134,7 @@ export function BarnReellMottaker<TFieldValues extends FieldValues>({
     regel: ReellMottakerRegel;
     valgt: boolean;
 }) {
-    const valgregel = reellMottakerValgregel(regel, barn.erMyndig);
+    const valgregel = regel(barn.erMyndig);
     if (!valgregel) {
         return null;
     }

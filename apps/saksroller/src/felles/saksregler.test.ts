@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     finnSaksadvarsler,
     reellMottakerRegel,
-    reellMottakerValgregel,
+    reellMottakerRegelUkjentBidragsmottaker,
     type SakParter,
     type Sakstype,
     sakstypeForArbeidsfordeling,
@@ -230,23 +230,21 @@ describe("finnSaksadvarsler", () => {
     });
 });
 
-describe("reellMottakerValgregel", () => {
-    it.each<{ sakstype: Sakstype; bmUkjent: boolean; erMyndig: boolean; forventet: string | undefined }>([
-        { sakstype: "Barnebidrag", bmUkjent: false, erMyndig: false, forventet: "valgfri" },
-        { sakstype: "Barnebidrag", bmUkjent: false, erMyndig: true, forventet: "påkrevd" },
-        { sakstype: "Barnebidrag", bmUkjent: true, erMyndig: false, forventet: "påkrevd" },
-        { sakstype: "Farskap", bmUkjent: false, erMyndig: false, forventet: undefined },
-        { sakstype: "Farskap", bmUkjent: false, erMyndig: true, forventet: "påkrevd" },
-        { sakstype: "Oppfostringsbidrag", bmUkjent: true, erMyndig: false, forventet: "kun-samhandler" },
-        { sakstype: "Oppfostringsbidrag", bmUkjent: true, erMyndig: true, forventet: "kun-samhandler" },
-        { sakstype: "Ektefellebidrag", bmUkjent: false, erMyndig: true, forventet: undefined },
-    ])("$sakstype, BM ukjent=$bmUkjent, myndig=$erMyndig gir $forventet", ({
-        sakstype,
-        bmUkjent,
-        erMyndig,
-        forventet,
-    }) => {
-        expect(reellMottakerValgregel(reellMottakerRegel(sakstype, bmUkjent), erMyndig)).toBe(forventet);
+describe("reellMottakerRegel", () => {
+    it.each<{ sakstype: Sakstype; erMyndig: boolean; forventet: string | undefined }>([
+        { sakstype: "Barnebidrag", erMyndig: false, forventet: "valgfri" },
+        { sakstype: "Barnebidrag", erMyndig: true, forventet: "påkrevd" },
+        { sakstype: "Farskap", erMyndig: false, forventet: undefined },
+        { sakstype: "Farskap", erMyndig: true, forventet: "påkrevd" },
+        { sakstype: "Oppfostringsbidrag", erMyndig: false, forventet: "kun-samhandler" },
+        { sakstype: "Oppfostringsbidrag", erMyndig: true, forventet: "kun-samhandler" },
+        { sakstype: "Ektefellebidrag", erMyndig: true, forventet: undefined },
+    ])("$sakstype, myndig=$erMyndig gir $forventet", ({ sakstype, erMyndig, forventet }) => {
+        expect(reellMottakerRegel(sakstype)(erMyndig)).toBe(forventet);
+    });
+
+    it.each([false, true])("ukjent bidragsmottaker krever reell mottaker, myndig=%s", (erMyndig) => {
+        expect(reellMottakerRegelUkjentBidragsmottaker(erMyndig)).toBe("påkrevd");
     });
 });
 

@@ -15,12 +15,7 @@ import {
     kanBekrefteReellMottaker,
     MANGLER_REELL_MOTTAKER_MELDING,
 } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
-import {
-    MYNDYG_BARN_ALDER,
-    reellMottakerRegelVedEndring,
-    reellMottakerValgregel,
-    type Sakstype,
-} from "../../felles/saksregler.ts";
+import { MYNDYG_BARN_ALDER, reellMottakerRegel, type Sakstype } from "../../felles/saksregler.ts";
 import type { SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
 import { lagBarnRolle } from "./legg-til-barn-utils.ts";
@@ -52,7 +47,7 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
         validerNyttBarn(person, { identerISaken: roller.map((rolle) => rolle.fodselsnummer) });
 
     const finnReellMottakerValgregel = (person: PersonDto): ReellMottakerValgregel | undefined =>
-        reellMottakerValgregel(reellMottakerRegelVedEndring(sakstype), alderForBarn(person) >= MYNDYG_BARN_ALDER);
+        reellMottakerRegel(sakstype)(alderForBarn(person) >= MYNDYG_BARN_ALDER);
 
     const søk = useBarnSøk({
         valider: (person) => {

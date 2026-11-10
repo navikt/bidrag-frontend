@@ -128,60 +128,30 @@ export function erSammeForelder(bp: string | undefined, bm: string | undefined):
     return !!bp?.trim() && bp === bm;
 }
 
-/**
- * Hvordan reell mottaker behandles for barna i saken.
- * - `skjult`: saken har ikke reell mottaker.
- * - `kun-myndige`: påkrevd for myndige barn, ellers ikke aktuelt.
- * - `etter-barn`: påkrevd for myndige barn og når bidragsmottaker er ukjent, ellers valgfri.
- * - `alltid-samhandler`: påkrevd for alle barn, og må være en samhandler.
- */
-export type ReellMottakerRegel =
-    | { type: "skjult" }
-    | { type: "kun-myndige" }
-    | { type: "etter-barn"; bidragsmottakerErUkjent: boolean }
-    | { type: "alltid-samhandler" };
+/** Valget saksbehandler får for reell mottaker på et barn, eller `undefined` når valget ikke er aktuelt. */
+export type ReellMottakerRegel = (barnErMyndig: boolean) => ReellMottakerValgregel | undefined;
 
-/** 🔴 Farskap følger bidrag-sak, som krever reell mottaker for myndige barn i alle saker. */
-export function reellMottakerRegel(sakstype: Sakstype, bidragsmottakerErUkjent: boolean): ReellMottakerRegel {
+/** 🔴 Reell mottaker per sakstype. Farskap følger bidrag-sak, som krever reell mottaker for myndige barn. */
+export function reellMottakerRegel(sakstype: Sakstype): ReellMottakerRegel {
     switch (sakstype) {
         case "Ektefellebidrag":
-            return { type: "skjult" };
+            return () => undefined;
         case "Farskap":
-            return { type: "kun-myndige" };
+            return (erMyndig) => (erMyndig ? "påkrevd" : undefined);
         case "Oppfostringsbidrag":
-            return { type: "alltid-samhandler" };
+            return () => "kun-samhandler";
         case "Barnebidrag":
-            return { type: "etter-barn", bidragsmottakerErUkjent };
+            return (erMyndig) => (erMyndig ? "påkrevd" : "valgfri");
     }
 }
 
-/** 🔴 Ved endring krever bidrag-sak reell mottaker bare for myndige barn. Manglende BM gir en advarsel. */
-export function reellMottakerRegelVedEndring(sakstype: Sakstype): ReellMottakerRegel {
-    return reellMottakerRegel(sakstype, false);
-}
-
-/** Valget saksbehandler får for ett barn, eller `undefined` når valget ikke er aktuelt. */
-export function reellMottakerValgregel(
-    regel: ReellMottakerRegel,
-    erMyndig: boolean,
-): ReellMottakerValgregel | undefined {
-    switch (regel.type) {
-        case "skjult":
-            return undefined;
-        case "kun-myndige":
-            return erMyndig ? "påkrevd" : undefined;
-        case "alltid-samhandler":
-            return "kun-samhandler";
-        case "etter-barn":
-            return erMyndig || regel.bidragsmottakerErUkjent ? "påkrevd" : "valgfri";
-    }
-}
+/** Når barnebidrag opprettes uten kjent bidragsmottaker, må reell mottaker registreres for alle barn. */
+export const reellMottakerRegelUkjentBidragsmottaker: ReellMottakerRegel = () => "påkrevd";
 
 function validerReellMottakere(parter: SakParter, sakstype: Sakstype, kontekst: Sakskontekst): Saksfeil[] {
-    const regel =
-        kontekst === "endre"
-            ? reellMottakerRegelVedEndring(sakstype)
-            : reellMottakerRegel(sakstype, parter.bidragsmottakerErUkjent);
+    const ukjentBidragsmottaker =
+        kontekst === "opprett" && sakstype === "Barnebidrag" && parter.bidragsmottakerErUkjent;
+    const regel = ukjentBidragsmottaker ? reellMottakerRegelUkjentBidragsmottaker : reellMottakerRegel(sakstype);
     return parter.barn.flatMap((barn, indeks) =>
         validerReellMottaker(barn, reellMottakerGrunn(regel, barn.erMyndig)).map(({ felt, melding }) => ({
             gjelder: "barn" as const,
@@ -193,7 +163,7 @@ function validerReellMottakere(parter: SakParter, sakstype: Sakstype, kontekst: 
 }
 
 function reellMottakerGrunn(regel: ReellMottakerRegel, erMyndig: boolean): ReellMottakerValideringsgrunn | null {
-    const valgregel = reellMottakerValgregel(regel, erMyndig);
+    const valgregel = regel(erMyndig);
     if (valgregel === "kun-samhandler") return "alltid";
     if (valgregel !== "påkrevd") return null;
     return erMyndig ? "myndig-barn" : "ukjent-bidragsmottaker";

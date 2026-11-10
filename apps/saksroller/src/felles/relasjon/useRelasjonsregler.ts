@@ -34,16 +34,10 @@ export function useRelasjonsregler({
         annenForelderStopper,
         harOppslagsfeil,
         kanFortsette: () => {
-            const relasjonBekreftet = relasjonsbekreftelse.krevBekreftelse();
-            const annenForelderBekreftet = annenForelderBekreftelse.krevBekreftelse();
-            const skjultForelderBekreftet = skjultForelderBekreftelse.krevBekreftelse();
-            return (
-                !harOppslagsfeil &&
-                !annenForelderStopper &&
-                relasjonBekreftet &&
-                annenForelderBekreftet &&
-                skjultForelderBekreftet
-            );
+            const alleBekreftet = [relasjonsbekreftelse, annenForelderBekreftelse, skjultForelderBekreftelse]
+                .map((bekreftelse) => bekreftelse.bekreftetEllerVisFeil())
+                .every(Boolean);
+            return !harOppslagsfeil && !annenForelderStopper && alleBekreftet;
         },
     };
 }
