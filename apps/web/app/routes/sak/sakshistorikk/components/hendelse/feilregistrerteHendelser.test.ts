@@ -18,7 +18,7 @@ describe("filtrerFeilregistrerteHendelser", () => {
     ];
 
     it("skjuler feilregistrerte hendelser og andre hendelser med samme søknadsid", () => {
-        expect(ider(filtrerFeilregistrerteHendelser(hendelser, false))).toEqual(["soknad-b", "uten-soknad"]);
+        expect(ider(filtrerFeilregistrerteHendelser(hendelser, false))).toEqual(["vedtak-a", "soknad-b", "uten-soknad"]);
     });
 
     it("skjuler ikke hendelser uten søknadsid selv om en feilregistrert hendelse mangler søknadsid", () => {
