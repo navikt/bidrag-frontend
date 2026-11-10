@@ -25,12 +25,13 @@ describe("filtrerFeilregistrerteHendelser", () => {
         const resultat = filtrerFeilregistrerteHendelser(
             [
                 hendelse("uten-soknad"),
+                hendelse("vedtak-a", { søknadsid: "A" }),
                 hendelse("tom-soknad", { søknadsid: "" }),
                 hendelse("feil", { type: HendelseType.FEILREGISTRERT, søknadsid: "" }),
             ],
             false,
         );
-        expect(ider(resultat)).toEqual(["uten-soknad", "tom-soknad"]);
+        expect(ider(resultat)).toEqual(["uten-soknad", "vedtak-a", "tom-soknad"]);
     });
 
     it("returnerer alle hendelser når feilregistrerte skal vises", () => {
