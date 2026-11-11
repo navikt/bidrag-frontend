@@ -1,14 +1,17 @@
 import { PersonNavn } from "@bidrag/common";
 import { Heading, Link, LocalAlert, VStack } from "@navikt/ds-react";
+import { useFlag } from "@unleash/proxy-client-react";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import { useBidragLenker } from "~/common/navigation/useBidragLenker.ts";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
+import { HenvendelseSeksjon } from "~/routes/bruker/henvendelser/HenvendelseTabell.tsx";
 import type { Route } from "./+types/index";
 
 export default function BrukerIndex({ params }: Pick<Route.ComponentProps, "params">) {
     const { decodeFnr } = useObfuscateFnr();
     const brukerId = params.brukerid;
     const fnr = decodeFnr(brukerId);
+    const visHenvendelser = useFlag("frontend.henvendelser");
 
     return (
         <VStack gap={"space-48"}>
@@ -27,6 +30,7 @@ export default function BrukerIndex({ params }: Pick<Route.ComponentProps, "para
                     </ClientOnly>
                 </LocalAlert.Content>
             </LocalAlert>
+            {visHenvendelser && <HenvendelseSeksjon ident={fnr} />}
         </VStack>
     );
 }
