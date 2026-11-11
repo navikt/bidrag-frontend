@@ -12,3 +12,4 @@
 @source "../../dokument/src/**/*.{tsx,ts,mdx}";
 @source "../../forsendelse/src/**/*.{tsx,ts,mdx}";
 @source "../../redigering/src/**/*.{tsx,ts,mdx}";
+@source "../../saksroller/src/**/*.{tsx,ts}";

@@ -138,6 +138,7 @@ const Side = () => {
 
     useEffect(() => {
         updateBegrunnelseError(oppdaterSamvær);
+        setPreviousValues(getValues(`${oppdaterSamvær?.barn.id}.begrunnelse`) ?? "");
     }, [oppdaterSamvær?.barn.id]);
 
     const onSave = useCallback(
@@ -190,7 +191,7 @@ const Side = () => {
             }
         });
         return () => subscription.unsubscribe();
-    }, [oppdaterSamvær.gjelderBarn, debouncedOnSave, watch]);
+    }, [oppdaterSamvær.barn.id, oppdaterSamvær.gjelderBarn, debouncedOnSave, watch]);
 
     return (
         <Fragment key={oppdaterSamvær.id}>
@@ -304,7 +305,7 @@ const Main = () => {
                 <Switch
                     value="erLikForAlle"
                     checked={vurderSeparat}
-                    readOnly={lesemodus || !samværSak.kanVurdereSamlet}
+                    readOnly={lesemodus || !samværSak?.kanVurdereSamlet}
                     onChange={(e) => {
                         if (e.target.checked) {
                             setVurderSeparat(e.target.checked);
@@ -351,7 +352,9 @@ const Main = () => {
                 </Tabs>
             )}
             {(visibleSamværBarn.length === 1 || !vurderSeparat) && (
+                // key tvinger remount ved bytte av barn/sak; useFieldArray leser ikke inn felter på nytt når name endres
                 <SamværBarn
+                    key={visibleSamværBarn[0].barn.id}
                     gjelderBarn={visibleSamværBarn[0].gjelderBarn}
                     gjelderBarnId={visibleSamværBarn[0].barn.id}
                 />
@@ -444,19 +447,17 @@ export const SamværBarn = ({ gjelderBarn, gjelderBarnId }: { gjelderBarn: strin
                 // Set datoTom til null ellers resettes den ikke
                 perioder.replace(
                     response.samværBarn
-                        .find((s) => s.gjelderBarn === gjelderBarn)
+                        .find((s) => s.barn.id === gjelderBarnId)
                         .perioder.map((d) => createSamværsperiodeInitialValues(d)),
                 );
 
                 if (!vurderSeparat) {
-                    samværBarn.barn
-                        .filter((barn) => barn.id !== gjelderBarnId)
+                    response.samværBarn
+                        .filter((barn) => barn.barn.id !== gjelderBarnId)
                         .forEach((barn) => {
                             setValue(
-                                `${barn.id}.perioder`,
-                                response.samværBarn
-                                    .find((s) => s.barn.id === barn.barn.id)
-                                    .perioder.map((d) => createSamværsperiodeInitialValues(d)),
+                                `${barn.barn.id}.perioder`,
+                                barn.perioder.map((d) => createSamværsperiodeInitialValues(d)),
                             );
                         });
                 }
@@ -508,7 +509,7 @@ export const SamværBarn = ({ gjelderBarn, gjelderBarnId }: { gjelderBarn: strin
                                 const samværperioder = getValues(`${gjelderBarnId}.perioder`);
                                 perioder.remove(samværperioder.length - 1);
                             } else {
-                                setValue(`${gjelderBarn}.perioder`, createSamværInitialValues(samvær).perioder);
+                                setValue(`${gjelderBarnId}.perioder`, createSamværInitialValues(samvær).perioder);
                             }
                         },
                     });
@@ -573,14 +574,13 @@ export const SamværBarn = ({ gjelderBarn, gjelderBarnId }: { gjelderBarn: strin
 
     const removeAndCleanUpPeriodeAndErrors = (index: number) => {
         clearErrors(`${gjelderBarnId}.perioder.${index}`);
-        const perioderValues = getValues(`${gjelderBarn}.perioder`);
+        const perioderValues = getValues(`${gjelderBarnId}.perioder`);
         const prevIndex = index - 1;
         const previousPeriode = perioderValues?.[prevIndex];
 
         if (previousPeriode && index === perioderValues.length - 1) {
             updatePreviousPeriodeTom(prevIndex, previousPeriode, previousPeriodeTom);
         }
-        clearErrors(`${gjelderBarn}.perioder.${index}`);
         perioder.remove(index);
         setEditableRow(undefined);
     };

@@ -47,6 +47,14 @@ export default [
         route("reskontro", "./routes/bruker/reskontro/BrukerReskontroOversiktPage.tsx"),
         route("sumprsak", "./routes/bruker/sum_pr_sak/SumPrSakPage.tsx"),
         route("innkreving", "./routes/bruker/innkreving/InnkrevingPage.tsx"),
+        route("personopplysninger", "./routes/bruker/personopplysninger/PersonLayout.tsx", [
+            index("./routes/bruker/personopplysninger/personalia/PersonaliaPage.tsx"),
+            route("historikk", "./routes/bruker/personopplysninger/historikk/HistorikkPage.tsx"),
+            route(
+                "kontoopplysninger",
+                "./routes/bruker/personopplysninger/kontoopplysninger/KontoopplysningerPage.tsx",
+            ),
+        ]),
     ]),
 
     route("samhandler/søk", "./routes/samhandler/SamhandlerSøk.tsx"),
@@ -58,6 +66,7 @@ export default [
         ...dokumentSakRoutes,
         layout("routes/sak/SakHeaderLayout.tsx", [
             layout("routes/sak/SakStandardLayout.tsx", [
+                index("routes/sak/index.tsx"),
                 route("fogdhistorikk", "routes/sak/fogdhistorikk/FogdhistorikkPage.tsx"),
                 route("belopshistorikk", "routes/sak/beløpshistorikk/BeløpshistorikkPage.tsx"),
                 route("sakshistorikk", "routes/sak/sakshistorikk/SakshistorikkPage.tsx"),

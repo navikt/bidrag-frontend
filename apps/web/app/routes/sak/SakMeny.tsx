@@ -2,8 +2,10 @@ import { useFlag } from "@unleash/proxy-client-react";
 import { SideNav, type SideNavItem } from "~/common/navigation/SideNav.tsx";
 
 export default function SakMeny({ saksnummer }: { saksnummer: string }) {
+    const visSakside = useFlag("bisys.ny_sakside");
     const visSaksroller = useFlag("bisys.ny_rollebilde");
     const items: SideNavItem[] = [
+        ...(visSakside ? [{ label: "Sak", href: `/sak/${saksnummer}` }] : []),
         { label: "Fogdhistorikk", href: `/sak/${saksnummer}/fogdhistorikk` },
         { label: "Beløpshistorikk", href: `/sak/${saksnummer}/belopshistorikk` },
         { label: "Sakshistorikk", href: `/sak/${saksnummer}/sakshistorikk` },

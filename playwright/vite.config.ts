@@ -1,0 +1,38 @@
+import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+
+/** Vite-server for Playwright-galleriet. */
+export default defineConfig({
+    root: fileURLToPath(new URL("..", import.meta.url)),
+    envDir: false,
+    plugins: [react(), tailwindcss()],
+    resolve: {
+        alias: {
+            "~": fileURLToPath(new URL("../apps/web/app", import.meta.url)),
+        },
+    },
+    server: {
+        port: 3178,
+        strictPort: true,
+        // Playwrights mount() gjør page.goto() og deretter page.evaluate().
+        // goto() resolver på load-eventet, så et full-reload fra Vite i
+        // mellomtiden river ned JS-konteksten og gir "Execution context was
+        // destroyed, most likely because of a navigation". Galleriet har ingen
+        // nytte av HMR fordi hver mount() laster siden på nytt. Filovervåking
+        // må likevel være aktiv, slik at neste mount bruker oppdaterte stories.
+        hmr: false,
+        // Forhåndstransformerer galleri-inngangen og story-filene ved oppstart
+        // slik at første mount() ikke venter på lazy kompilering.
+        warmup: {
+            clientFiles: [
+                "./playwright/gallery/main.tsx",
+                "./playwright/gallery/stories.ts",
+                "./apps/web/app/**/*.story.tsx",
+                "./packages/*/src/**/*.story.tsx",
+                "./apps/*/src/**/*.story.tsx",
+            ],
+        },
+    },
+});

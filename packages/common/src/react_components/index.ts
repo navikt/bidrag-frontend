@@ -19,20 +19,6 @@ export { default as RolleCard } from "./roller/RolleCard";
 export { default as RolleDetaljer } from "./roller/RolleDetaljer";
 export { default as RolleTag } from "./roller/RolleTag";
 export { default as SaveStatusIndicator } from "./SaveStatusIndicator";
-export {
-    NyOpprettSakFlytContext,
-    type NyOpprettSakFlytProps,
-    OpprettSakFlytModal,
-    useHarNyOpprettSakFlyt,
-    useNyOpprettSakModal,
-} from "./sak/opprett-sak/NyOpprettSakFlyt";
-export {
-    type IOpprettSakPageProps,
-    SakProvider as OpprettSakProvider,
-    useSakContext as useOpprettSakContext,
-} from "./sak/opprett-sak/OpprettSakContext";
-export { default as OpprettSakSkjema } from "./sak/opprett-sak/OpprettSakSkjema";
-export { RolleType as OpprettSakRolleType } from "./sak/opprett-sak/RolleType";
 export { default as SamhandlerSokButton } from "./samhandler/SamhandlerSokButton";
 export { useTilgangssjekkBruker } from "./tilgang/useTilgangSjekkBruker";
 export { useTilgangssjekkSak } from "./tilgang/useTilgangssjekkSak";

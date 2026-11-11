@@ -36,10 +36,7 @@ export default defineConfig({
         },
     ],
     webServer: {
-        // Rydd opp eventuell hengende prosess.
-        command:
-            "lsof -ti tcp:3178 | xargs kill -9 2>/dev/null || true; node node_modules/vite/bin/vite.js --config playwright/vite.config.ts",
-        cwd: "./apps/web",
+        command: "pnpm exec vite --config playwright/vite.config.ts",
         url: galleryUrl,
         reuseExistingServer: !process.env.CI,
     },

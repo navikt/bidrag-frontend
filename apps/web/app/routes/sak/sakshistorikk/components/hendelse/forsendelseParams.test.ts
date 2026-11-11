@@ -1,4 +1,5 @@
 import {
+    Behandlingstype,
     type SakshendelseDto,
     SoknadGruppeKombinasjon,
     SoktAvType,
@@ -57,7 +58,7 @@ describe("lagForsendelseParams", () => {
 
     it("sender behandlingType for søknadsgrupper uten stønads-/engangsbeløptype", () => {
         const params = lagForsendelseParams(
-            hendelse({ søknadsgruppe: SoknadGruppeKombinasjon.FARSKAP }),
+            hendelse({ søknadsgruppe: SoknadGruppeKombinasjon.FARSKAP, behandlingstype: Behandlingstype.ENDRING }),
             "42",
             null,
             null,

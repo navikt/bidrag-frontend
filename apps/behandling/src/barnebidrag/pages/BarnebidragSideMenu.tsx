@@ -220,8 +220,7 @@ const UnderholdskostnadMenuButton = ({
             !!valideringsfeil?.stønadTilBarnetilsyn ||
             !!valideringsfeil?.tilleggsstønad ||
             !!valideringsfeil?.forpleining ||
-            !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length ||
-            !!valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length
+            !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length
         );
     });
 
@@ -265,9 +264,7 @@ const UnderholdskostnadMenuButton = ({
                                     !!underhold.valideringsfeil?.stønadTilBarnetilsyn ||
                                     !!underhold.valideringsfeil?.tilleggsstønad ||
                                     !!underhold.valideringsfeil?.forpleining ||
-                                    !!underhold.valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift
-                                        .length ||
-                                    !!underhold.valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length)
+                                    !!underhold.valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length)
                             }
                             active={
                                 activeButton ===
@@ -393,9 +390,7 @@ const UnderholdskostnadMenuButton = ({
                                                     (!!underhold?.valideringsfeil?.forpleining?.overlappendePerioder
                                                         .length ||
                                                         !!underhold?.valideringsfeil?.forpleining?.fremtidigePerioder
-                                                            .length ||
-                                                        !!underhold.valideringsfeil
-                                                            ?.forpleiningOverstigerUnderholdskostnad.length)
+                                                            .length)
                                                 }
                                                 size="small"
                                                 active={
@@ -872,10 +867,10 @@ const SamværMenuButton = ({
             valideringsfeil?.overlappendePerioder?.length > 0
         );
     };
-    const samværValideringsFeil = samvær.barn?.some(checkForValidationErrorInSamvær);
     const barnIValgtSak = samvær.barn.filter((barn) =>
         erDelAvValgtSaksnummer(getSaksnummerForIdent(roller, barn.gjelderBarn), selectedSaksnummer),
     );
+    const samværValideringsFeil = barnIValgtSak?.some(checkForValidationErrorInSamvær);
     const displaySubmenu = vurderSeparatSamvær && barnIValgtSak.length > 1;
 
     return (

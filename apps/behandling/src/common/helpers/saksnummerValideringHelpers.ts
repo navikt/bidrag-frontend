@@ -27,8 +27,7 @@ const harUnderholdskostnadValideringsfeil = (valideringsfeil?: Underholdskostnad
         !!valideringsfeil?.stønadTilBarnetilsyn ||
         !!valideringsfeil?.tilleggsstønad ||
         !!valideringsfeil?.forpleining ||
-        !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length ||
-        !!valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length
+        !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length
     );
 
 const harSamværValideringsfeil = (valideringsfeil?: SamvaerValideringsfeilDto | null) =>
@@ -174,10 +173,6 @@ export const getSaksnummerMedNyeOpplysninger = (behandling: BehandlingDtoV2): Se
             liste?.forEach((medlem) => {
                 leggTilForIdent(medlem.ident);
             });
-        });
-
-        endringer.arbeidsforhold?.forEach((arbeidsforhold) => {
-            leggTilForIdent(arbeidsforhold.partPersonId);
         });
 
         if (endringer.stønadTilBarnetilsyn) {

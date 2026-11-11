@@ -44,7 +44,19 @@ const logErrorResponse = async (request: Request, backendResponse: Response, sub
     }
 };
 
-const TIMEOUT_MS = 60_000;
+const TIMEOUT_MS = 120_000;
+const ENHET_HEADER = "X-Enhet";
+
+// Fallback for kall som ikke går via proxy()-klientene i @bidrag/api: siden kallet ble gjort fra har enhet i URL-en.
+function hentEnhetFraReferer(request: Request): string | null {
+    const referer = request.headers.get("referer");
+    if (!referer) return null;
+    try {
+        return new URL(referer).searchParams.get("enhet");
+    } catch {
+        return null;
+    }
+}
 
 async function proxyRequest(request: Request, app: string, context: Route.LoaderArgs["context"]): Promise<Response> {
     // Middleware har allerede satt ID-en. Fallback er kun en sikring for kall utenom kjeden.
@@ -74,6 +86,10 @@ async function proxyRequest(request: Request, app: string, context: Route.Loader
         headers.set(correlationIdHeader, correlationId);
         headers.set("Authorization", `Bearer ${oboToken}`);
         headers.delete("host");
+        if (!headers.has(ENHET_HEADER)) {
+            const enhet = hentEnhetFraReferer(request);
+            if (enhet) headers.set(ENHET_HEADER, enhet);
+        }
 
         const backendResponse = await fetch(backendUrl.toString(), {
             signal: AbortSignal.timeout(TIMEOUT_MS),

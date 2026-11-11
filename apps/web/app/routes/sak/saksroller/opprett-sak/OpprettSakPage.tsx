@@ -1,4 +1,9 @@
-import { OpprettSakProvider, type OpprettSakRolleType, OpprettSakSkjema, useOpprettSakContext } from "@bidrag/common";
+import {
+    OpprettSakProvider,
+    type OpprettSakRolleType,
+    OpprettSakSkjema,
+    useOpprettSakContext,
+} from "@bidrag/saksroller";
 import { Heading, Loader, Modal } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
 import { Suspense } from "react";
