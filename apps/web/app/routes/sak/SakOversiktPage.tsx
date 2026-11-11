@@ -1,4 +1,6 @@
-import { Box, Heading, LocalAlert, VStack } from "@navikt/ds-react";
+import { Box, Heading, Link, LocalAlert, VStack } from "@navikt/ds-react";
+import { ClientOnly } from "~/common/ClientOnly.tsx";
+import { useBidragLenker } from "~/common/navigation/useBidragLenker.ts";
 import { OppgaveSeksjon } from "~/common/oppgave/OppgaveSeksjon.tsx";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel.tsx";
 import type { Route } from "./+types/SakOversiktPage";
@@ -11,14 +13,18 @@ export default function SakOversiktPage({ params }: Route.ComponentProps) {
     return (
         <VStack gap={"space-48"}>
             <title>Sak {saksnummer}</title>
-            <Heading size={"medium"}>Oversikt sak {saksnummer}</Heading>
+            <Heading size={"medium"} level={"1"}>
+                Sak {saksnummer}
+            </Heading>
             <LocalAlert status={"announcement"}>
                 <LocalAlert.Header>
-                    <LocalAlert.Title>Under konstruksjon</LocalAlert.Title>
+                    <LocalAlert.Title>Under arbeid</LocalAlert.Title>
                 </LocalAlert.Header>
                 <LocalAlert.Content>
-                    Denne siden er under utvikling og vil bli ferdigstilt i fremtidige versjoner. Funksjonalitet kan
-                    være begrenset eller utilgjengelig.
+                    Saksoversikten er under utvikling.{" "}
+                    <ClientOnly>
+                        <BisysSakLenke saksnummer={saksnummer} />
+                    </ClientOnly>
                 </LocalAlert.Content>
             </LocalAlert>
 
@@ -30,4 +36,9 @@ export default function SakOversiktPage({ params }: Route.ComponentProps) {
             </Box>
         </VStack>
     );
+}
+
+function BisysSakLenke({ saksnummer }: { saksnummer: string }) {
+    const lenke = useBidragLenker().bisysSakLenke(saksnummer);
+    return lenke ? <Link href={lenke.href}>Åpne saken i Bisys</Link> : null;
 }

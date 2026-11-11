@@ -1,6 +1,8 @@
 import { PersonNavn } from "@bidrag/common";
-import { Box, Heading, Loader, LocalAlert, VStack } from "@navikt/ds-react";
+import { Box, Heading, Link, Loader, LocalAlert, VStack } from "@navikt/ds-react";
 import { useHentPersoninformasjon } from "~/api/useApi.ts";
+import { ClientOnly } from "~/common/ClientOnly.tsx";
+import { useBidragLenker } from "~/common/navigation/useBidragLenker.ts";
 import { OppgaveSeksjon } from "~/common/oppgave/OppgaveSeksjon.tsx";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
 import type { Route } from "./+types/BrukerOversikt";
@@ -19,11 +21,13 @@ export default function BrukerOversikt({ params }: Route.ComponentProps) {
             </Heading>
             <LocalAlert status={"announcement"}>
                 <LocalAlert.Header>
-                    <LocalAlert.Title>Under konstruksjon</LocalAlert.Title>
+                    <LocalAlert.Title>Under arbeid</LocalAlert.Title>
                 </LocalAlert.Header>
                 <LocalAlert.Content>
-                    Denne siden er under utvikling og vil bli ferdigstilt i fremtidige versjoner. Funksjonalitet kan
-                    være begrenset eller utilgjengelig.
+                    Brukeroversikten er under utvikling.{" "}
+                    <ClientOnly>
+                        <BisysBrukerLenke brukerId={brukerId} />
+                    </ClientOnly>
                 </LocalAlert.Content>
             </LocalAlert>
 
@@ -41,4 +45,9 @@ export default function BrukerOversikt({ params }: Route.ComponentProps) {
             </Box>
         </VStack>
     );
+}
+
+function BisysBrukerLenke({ brukerId }: { brukerId: string }) {
+    const lenke = useBidragLenker().bisysBrukerLenke(brukerId);
+    return lenke ? <Link href={lenke.href}>Åpne brukeroversikten i Bisys</Link> : null;
 }

@@ -137,8 +137,8 @@ export const OverstyrFatteVedtakRevurderingSwitch = ({
             <Alert variant="info" size="small" className="mb-4">
                 <Heading size="xsmall">
                     {skalFatteVedtakForRevurderingsbarn
-                        ? "[Beregningen] fatter vedtak for revurderingsbarna"
-                        : "[Beregningen] fatter ikke vedtak for revurderingsbarna"}
+                        ? "Beregningen fatter vedtak for revurderingsbarna"
+                        : "Beregningen fatter ikke vedtak for revurderingsbarna"}
                 </Heading>
                 <BodyShort size="small" className="">
                     {renderInfoText()}

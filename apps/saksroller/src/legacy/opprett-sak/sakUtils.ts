@@ -18,7 +18,7 @@ const STANDARDVERDIER: Pick<
     ansatt: false,
     inhabilitet: false,
     levdeAdskilt: false,
-    arbeidsfordeling: Arbeidsfordeling.BBF,
+    arbeidsfordeling: Arbeidsfordeling.EEN,
 };
 
 function tilRolleDto(fodselsnummer: string | undefined, rolle: RolleType, reellMottaker?: string): RolleDto {

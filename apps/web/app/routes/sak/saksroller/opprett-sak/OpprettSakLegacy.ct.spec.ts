@@ -42,7 +42,7 @@ function forventetRequest(valgteBarn: { ident: string; reellMottager?: string }[
     return {
         eierfogd: "4806",
         kategori: "N",
-        arbeidsfordeling: Arbeidsfordeling.BBF,
+        arbeidsfordeling: Arbeidsfordeling.EEN,
         ansatt: false,
         inhabilitet: false,
         levdeAdskilt: false,
