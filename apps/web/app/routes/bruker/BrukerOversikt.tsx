@@ -1,14 +1,17 @@
 import { PersonNavn } from "@bidrag/common";
-import { Heading, Link, LocalAlert, VStack } from "@navikt/ds-react";
+import { Box, Heading, Link, Loader, LocalAlert, VStack } from "@navikt/ds-react";
+import { useHentPersoninformasjon } from "~/api/useApi.ts";
 import { ClientOnly } from "~/common/ClientOnly.tsx";
 import { useBidragLenker } from "~/common/navigation/useBidragLenker.ts";
+import { OppgaveSeksjon } from "~/common/oppgave/OppgaveSeksjon.tsx";
 import { useObfuscateFnr } from "~/common/person/useObfuscateFnr.ts";
-import type { Route } from "./+types/index";
+import type { Route } from "./+types/BrukerOversikt";
 
-export default function BrukerIndex({ params }: Pick<Route.ComponentProps, "params">) {
+export default function BrukerOversikt({ params }: Route.ComponentProps) {
     const { decodeFnr } = useObfuscateFnr();
     const brukerId = params.brukerid;
     const fnr = decodeFnr(brukerId);
+    const { data: bruker } = useHentPersoninformasjon({ ident: fnr });
 
     return (
         <VStack gap={"space-48"}>
@@ -27,6 +30,19 @@ export default function BrukerIndex({ params }: Pick<Route.ComponentProps, "para
                     </ClientOnly>
                 </LocalAlert.Content>
             </LocalAlert>
+
+            <Box borderColor="neutral-subtle" padding="space-16" borderWidth="1" borderRadius="4">
+                <VStack gap="space-16">
+                    <Heading size={"small"}>Oppgaver</Heading>
+                    {!bruker ? (
+                        <Loader />
+                    ) : bruker.aktørId ? (
+                        <OppgaveSeksjon søk={{ aktoerId: bruker.aktørId }} />
+                    ) : (
+                        <p>Ingen oppgaver</p>
+                    )}
+                </VStack>
+            </Box>
         </VStack>
     );
 }

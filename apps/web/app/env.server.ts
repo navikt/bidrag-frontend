@@ -32,6 +32,8 @@ const EnvSchema = z.object({
     BIDRAG_DOKUMENT_PRODUKSJON_AUDIENCE: NonEmpty,
     BIDRAG_DOKUMENT_ARKIV_URL: z.url(),
     BIDRAG_DOKUMENT_ARKIV_AUDIENCE: NonEmpty,
+    BIDRAG_OPPGAVE_URL: z.url(),
+    BIDRAG_OPPGAVE_AUDIENCE: NonEmpty,
     BISYS_URL: z.url(),
     MODIA_URL: z.url(),
     PERSONSOK_URL: z.url(),

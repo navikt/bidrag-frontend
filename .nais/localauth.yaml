@@ -29,6 +29,11 @@ spec:
       # uncomment below if you don't use the default tenant in dev
       # tenant: nav.no
   accessPolicy:
+    inbound:
+      rules:
+        - application: azure-token-generator
+          namespace: nais
+          cluster: dev-gcp
     outbound:
       rules:
         - application: "*"
