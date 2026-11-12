@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { byggHref, finnStandardReturMål } from "./returLink.ts";
 
 describe("byggHref", () => {
@@ -21,6 +21,38 @@ describe("byggHref", () => {
     it("legger ikke til enhet når URL-en mangler den", () => {
         const href = byggHref({ sti: "/sak/123", params: undefined }, new URLSearchParams("sessionState=abc"));
         expect(href).toBe("/sak/123?sessionState=abc");
+    });
+
+    it("legger ikke til enhet på oppgavelisten, selv når URL-en har den", () => {
+        const href = byggHref(
+            { sti: "/bisys/oppgaveliste", params: undefined },
+            new URLSearchParams("enhet=4806&sessionState=abc"),
+        );
+        expect(href).toBe("/bisys/oppgaveliste?sessionState=abc");
+    });
+
+    it("legger ikke til enhet på oppgavelisten, selv når den finnes i sesjonslagringen", () => {
+        const lagring = new Map([["bisys.enhet", "4806"]]);
+        vi.stubGlobal("window", {
+            sessionStorage: {
+                getItem: (nøkkel: string) => lagring.get(nøkkel) ?? null,
+                setItem: (nøkkel: string, verdi: string) => lagring.set(nøkkel, verdi),
+            },
+        });
+        try {
+            const href = byggHref({ sti: "/bisys/oppgaveliste", params: undefined }, new URLSearchParams());
+            expect(href).toBe("/bisys/oppgaveliste");
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+    it("returveien fra journalsiden gir oppgavelisten uten enhet, selv når URL-en har den", () => {
+        for (const path of ["/journal/456", "/journalpost/456"]) {
+            const mål = finnStandardReturMål(path, {});
+            expect(mål && byggHref(mål, new URLSearchParams("enhet=4806&sessionState=abc"))).toBe(
+                "/bisys/oppgaveliste?sessionState=abc",
+            );
+        }
     });
 });
 
