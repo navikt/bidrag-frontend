@@ -169,3 +169,44 @@ const journalposterMedLangBeskrivelse: JournalpostDto[] = [
 ];
 
 export const LangBeskrivelse = () => <Scenario data={journalposterMedLangBeskrivelse} />;
+
+// Fødselsattesten ble mottatt 12.02, men skannet og journalført 05.03. Joark gir da dokumentDato 05.03 og
+// mottattDato 12.02.
+const joarkJournalpost = (
+    journalpostId: string,
+    dokumentType: string,
+    mottattDato: string,
+    journalfortDato: string,
+    fagomrade: string,
+    innhold: string,
+) =>
+    journalpost({
+        journalpostId,
+        dokumentType,
+        dokumentDato: journalfortDato,
+        mottattDato,
+        journalfortDato,
+        journalforendeEnhet: "4865",
+        fagomrade,
+        innhold,
+        status: JournalpostStatus.JOURNALFORT,
+        gjelderAktor: { ident: gjelderIdent },
+    });
+
+export const SentSkannetDokument = () => (
+    <Scenario
+        data={[
+            joarkJournalpost("JOARK-5001", "I", "2025-02-12", "2025-03-05", "FAR", "Fødselsattest m/apostille"),
+            joarkJournalpost(
+                "JOARK-5002",
+                "U",
+                "2025-03-04",
+                "2025-03-04",
+                "FAR",
+                "Anerkjennelse av farskap fastsatt i utlandet",
+            ),
+            joarkJournalpost("JOARK-5003", "I", "2025-02-28", "2025-02-28", "FAR", "Fødselsattest"),
+            joarkJournalpost("JOARK-5004", "X", "2025-02-04", "2025-02-04", "BID", "Referat samtale"),
+        ]}
+    />
+);

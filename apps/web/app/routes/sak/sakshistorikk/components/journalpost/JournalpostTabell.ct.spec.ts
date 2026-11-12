@@ -6,6 +6,7 @@ const STORY_TOM = `${BASE_STORY}/TomListe`;
 const STORY_BLANDET = `${BASE_STORY}/BlandedeJournalposter`;
 const STORY_FARSKAP = `${BASE_STORY}/MedFarskapsutelukkede`;
 const STORY_LANG_BESKRIVELSE = `${BASE_STORY}/LangBeskrivelse`;
+const STORY_SENT_SKANNET = `${BASE_STORY}/SentSkannetDokument`;
 
 // Gir en tabell på ca. 1200 px, som på sakshistorikksiden i et vindu på 1536 px.
 const BREDT_VINDU = 1265;
@@ -160,6 +161,21 @@ test.describe("JournalpostTabell", () => {
         expect(await bakgrunn("Ferdigstilt vedlegg")).toBe(samlelenke);
         expect(await bakgrunn("Samling med dokument under produksjon")).not.toBe(samlelenke);
         expect(await bakgrunn("Enkelt dokument")).not.toBe(samlelenke);
+    });
+
+    test("sorterer journalposter fra Joark etter Dok.dato, også når dokumentet ble skannet senere", async ({
+        mount,
+        page,
+    }) => {
+        await mockSak(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_SENT_SKANNET);
+        await expect(component.getByText("Referat samtale")).toBeVisible();
+
+        const dokDatoer = await component
+            .locator("tbody tr")
+            .evaluateAll((rader) => rader.map((rad) => rad.querySelectorAll("td")[3]?.textContent?.trim()));
+        expect(dokDatoer).toEqual(["04.03.2025", "28.02.2025", "12.02.2025", "04.02.2025"]);
     });
 
     test("viser pilen for vedlegg midt i en smal første kolonne", async ({ mount, page }) => {
