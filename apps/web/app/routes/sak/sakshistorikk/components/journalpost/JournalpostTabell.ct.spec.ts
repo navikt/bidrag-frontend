@@ -6,6 +6,7 @@ const STORY_TOM = `${BASE_STORY}/TomListe`;
 const STORY_BLANDET = `${BASE_STORY}/BlandedeJournalposter`;
 const STORY_FARSKAP = `${BASE_STORY}/MedFarskapsutelukkede`;
 const STORY_LANG_BESKRIVELSE = `${BASE_STORY}/LangBeskrivelse`;
+const STORY_UTEN_VEDLEGG = `${BASE_STORY}/UtenVedlegg`;
 
 // Gir en tabell på ca. 1200 px, som på sakshistorikksiden i et vindu på 1536 px.
 const BREDT_VINDU = 1265;
@@ -160,6 +161,35 @@ test.describe("JournalpostTabell", () => {
         expect(await bakgrunn("Ferdigstilt vedlegg")).toBe(samlelenke);
         expect(await bakgrunn("Samling med dokument under produksjon")).not.toBe(samlelenke);
         expect(await bakgrunn("Enkelt dokument")).not.toBe(samlelenke);
+    });
+
+    for (const [story, beskrivelse, indeksForK] of [
+        [STORY_BLANDET, "med", 2],
+        [STORY_UTEN_VEDLEGG, "uten", 1],
+    ] as const) {
+        test(`viser kolonnen for vedlegg bare når en journalpost har vedlegg (${beskrivelse} vedlegg)`, async ({
+            mount,
+            page,
+        }) => {
+            await mockSak(page);
+            const component = await mount(story);
+            await expect(component.getByRole("columnheader", { name: "K", exact: true })).toBeVisible();
+
+            const overskrifter = await component.getByRole("columnheader").allTextContents();
+            expect(overskrifter.findIndex((tekst) => tekst.trim() === "K")).toBe(indeksForK);
+        });
+    }
+
+    test("gir annenhver journalpost bakgrunn også uten kolonnen for vedlegg", async ({ mount, page }) => {
+        await mockSak(page);
+        const component = await mount(STORY_UTEN_VEDLEGG);
+        await expect(component.getByText("Enkelt dokument", { exact: true })).toBeVisible();
+        const bakgrunner = await component
+            .locator("tbody tr")
+            .evaluateAll((rader) => rader.map((rad) => getComputedStyle(rad).backgroundColor));
+
+        expect(bakgrunner.length).toBeGreaterThan(1);
+        expect(bakgrunner[0]).not.toBe(bakgrunner[1]);
     });
 
     test("viser rader med internt notat (X) med grå tekst, og rader med I og U med vanlig tekst", async ({

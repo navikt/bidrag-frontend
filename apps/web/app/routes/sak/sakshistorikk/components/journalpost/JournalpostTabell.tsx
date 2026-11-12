@@ -188,6 +188,7 @@ export default function JournalpostTabell({
 
     const sorterteJournalposter = sortData(filtrerteJournalposter);
     const rader: JournalpostRad[] = sorterteJournalposter.map((jp, indeks) => byggRad(jp, indeks));
+    const harVedlegg = rader.some((rad) => rad.vedlegg.length > 0);
 
     const dataGridSort: import("@navikt/ds-react/PREVIEW/DataGrid").DataGrid.Table.SortEntry[] = sort
         ? [
@@ -268,12 +269,12 @@ export default function JournalpostTabell({
     };
 
     const basisKolonner = [
-        {
+        // Kolonnen for å vise vedlegg vises bare når minst én journalpost har vedlegg.
+        harVedlegg && {
             id: "expand",
             header: "",
             sortable: false,
-            // Markøren gir raden grå bakgrunn, se className på DataGrid.
-            bodyCell: (rad: JournalpostRad) => (rad.stripet ? <span data-stripet hidden /> : ""),
+            bodyCell: () => "",
         },
         harDokumenterUnderOpprettelse && {
             id: "slett",
@@ -320,11 +321,24 @@ export default function JournalpostTabell({
             id: "dokumentType",
             header: "K",
             isSortable: false,
-            // Markøren gir rader med X (internt notat) grå tekst, se className på DataGrid.
+            // Markørene gir rader grå bakgrunn (stripet) og rader med X (internt notat) grå tekst, se
+            // className på DataGrid.
             bodyCell: (rad: JournalpostRad) => {
-                if (rad.erVedlegg) return "";
-                if (rad.jp.dokumentType === "X") return <span data-internt-notat>X</span>;
-                return rad.jp.dokumentType;
+                const stripe = rad.stripet ? <span data-stripet hidden /> : null;
+                if (rad.erVedlegg) return stripe;
+                if (rad.jp.dokumentType === "X")
+                    return (
+                        <>
+                            {stripe}
+                            <span data-internt-notat>X</span>
+                        </>
+                    );
+                return (
+                    <>
+                        {stripe}
+                        {rad.jp.dokumentType}
+                    </>
+                );
             },
         },
         {
@@ -387,8 +401,13 @@ export default function JournalpostTabell({
     const synligeBasisKolonner = basisKolonner.filter(
         (kolonne): kolonne is Exclude<typeof kolonne, false> => kolonne !== false,
     );
+    const etterGjelder = synligeBasisKolonner.findIndex((kolonne) => kolonne.id === "gjelderAktor") + 1;
     const columnDefinitions = harBlandingFarBid
-        ? [...synligeBasisKolonner.slice(0, 6), fagomradeKolonne, ...synligeBasisKolonner.slice(6)]
+        ? [
+              ...synligeBasisKolonner.slice(0, etterGjelder),
+              fagomradeKolonne,
+              ...synligeBasisKolonner.slice(etterGjelder),
+          ]
         : synligeBasisKolonner;
 
     return (
@@ -471,7 +490,7 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
-                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-1 [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft) [&_tbody_tr:has([data-internt-notat])]:text-(color:--ax-neutral-600)`}
+                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} ${harVedlegg ? "[&_tr>*:first-child>*]:px-1" : ""} [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft) [&_tbody_tr:has([data-internt-notat])]:text-(color:--ax-neutral-600)`}
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
                     //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
