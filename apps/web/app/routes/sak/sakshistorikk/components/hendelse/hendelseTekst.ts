@@ -20,3 +20,11 @@ export function hendelseTekst(
     if (!tydeligere) return hendelse.typeBeskrivelse;
     return TYDELIGERE_TEKST[hendelse.type] ?? hendelse.typeBeskrivelse;
 }
+
+/** Sorterer hendelser på teksten som vises i kolonnen Hendelse. */
+export function sammenlignHendelseTekst(tydeligere: boolean) {
+    return (
+        a: Pick<SakshendelseDto, "type" | "typeBeskrivelse">,
+        b: Pick<SakshendelseDto, "type" | "typeBeskrivelse">,
+    ) => hendelseTekst(a, tydeligere).localeCompare(hendelseTekst(b, tydeligere), "nb");
+}

@@ -11,7 +11,7 @@ import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";
 import { filtrerFeilregistrerteHendelser } from "./feilregistrerteHendelser";
-import { hendelseTekst } from "./hendelseTekst";
+import { hendelseTekst, sammenlignHendelseTekst } from "./hendelseTekst";
 import { NotatLink } from "./NotatLink";
 import { getResultatTekst, ResultatLink } from "./ResultatLink";
 import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
@@ -19,14 +19,16 @@ import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle
 const ROWS_PER_PAGE = 6;
 
 export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string; hendelser: SakshendelseDto[] }) {
-    const { sort, handleSort, sortData } = useSort<SakshendelseDto>();
+    const tydeligereHendelsetekster = useFlag("bisys.sakshistorikk_tydeligere_hendelsetekster");
+    const { sort, handleSort, sortData } = useSort<SakshendelseDto>({
+        customComparators: { typeBeskrivelse: sammenlignHendelseTekst(tydeligereHendelsetekster) },
+    });
     const [page, setPage] = useState(1);
     const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
     const { bisysSessionParams } = useBisysLink();
     const { enhet, sessionState } = bisysSessionParams;
 
     const { data: kanSkrive = false } = useHarSkrivetilgang(saksnummer, enhet);
-    const tydeligereHendelsetekster = useFlag("bisys.sakshistorikk_tydeligere_hendelsetekster");
 
     const sortOrder: DataGrid.Table.SortEntry[] = sort
         ? [

@@ -1,6 +1,6 @@
 import { HendelseType } from "@bidrag/api/SakApi";
 import { describe, expect, it } from "vitest";
-import { hendelseTekst } from "./hendelseTekst";
+import { hendelseTekst, sammenlignHendelseTekst } from "./hendelseTekst";
 
 describe("hendelseTekst", () => {
     it("viser tydeligere tekst for hendelsestyper med uklar tekst fra Bisys", () => {
@@ -20,5 +20,21 @@ describe("hendelseTekst", () => {
         expect(hendelseTekst({ type: HendelseType.GJELDER_ENDRET, typeBeskrivelse: "Gjelder endret" }, false)).toBe(
             "Gjelder endret",
         );
+    });
+
+    it("sorterer på teksten som vises", () => {
+        const hendelser = [
+            { type: HendelseType.GJELDER_ENDRET, typeBeskrivelse: "Gjelder endret" },
+            { type: HendelseType.INDEKSREGULERT, typeBeskrivelse: "Indeksregulering" },
+        ];
+
+        expect([...hendelser].sort(sammenlignHendelseTekst(true)).map((h) => h.type)).toEqual([
+            HendelseType.INDEKSREGULERT,
+            HendelseType.GJELDER_ENDRET,
+        ]);
+        expect([...hendelser].sort(sammenlignHendelseTekst(false)).map((h) => h.type)).toEqual([
+            HendelseType.GJELDER_ENDRET,
+            HendelseType.INDEKSREGULERT,
+        ]);
     });
 });

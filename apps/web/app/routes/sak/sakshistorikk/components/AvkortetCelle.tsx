@@ -1,5 +1,5 @@
 import { Tooltip } from "@navikt/ds-react";
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 /**
  * Klasser for en `DataGrid` med `AvkortetCelle` i siste kolonne. Siste kolonne tar plassen de andre
@@ -21,6 +21,12 @@ export const tabellMedAvkortetSisteKolonne =
 export function AvkortetCelle({ tekst, children }: { tekst: string; children?: ReactNode }) {
     const ref = useRef<HTMLDivElement>(null);
     const [åpen, setÅpen] = useState(false);
+    // Uten lenke eller knapp i cellen må cellen selv kunne få fokus, slik at tastaturbrukere kan åpne tooltipen.
+    const [harFokuserbartInnhold, setHarFokuserbartInnhold] = useState(false);
+
+    useEffect(() => {
+        setHarFokuserbartInnhold(ref.current?.querySelector("a[href], button") != null);
+    });
 
     // Innholdet kan kutte teksten selv (f.eks. `BodyShort truncate`), så sjekk også underelementene.
     const erAvkortet = () => {
@@ -38,7 +44,11 @@ export function AvkortetCelle({ tekst, children }: { tekst: string; children?: R
             onOpenChange={(skalÅpnes) => setÅpen(skalÅpnes && erAvkortet())}
             className="max-w-[60ch] whitespace-normal text-left"
         >
-            <div ref={ref} className="w-0 min-w-full truncate [&_*]:min-w-0 [&_a]:max-w-full [&_svg]:shrink-0">
+            <div
+                ref={ref}
+                tabIndex={harFokuserbartInnhold ? undefined : 0}
+                className="w-0 min-w-full truncate [&_*]:min-w-0 [&_a]:max-w-full [&_svg]:shrink-0"
+            >
                 {children ?? tekst}
             </div>
         </Tooltip>

@@ -135,4 +135,29 @@ test.describe("SaksLogg", () => {
             "Bidraget ble ikke aldersjustert fordi grunnlaget i vedtaket er justert ned til evne, og det gjelder hele perioden",
         );
     });
+
+    test("viser hele resultatet i en tooltip med tastaturet når teksten er kuttet og ikke er en lenke", async ({
+        mount,
+        page,
+    }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        const celle = component.getByRole("row").filter({ hasText: "Avvist" }).getByRole("cell").last();
+        await celle.locator("[tabindex='0']").focus();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Bidraget ble ikke aldersjustert fordi grunnlaget i vedtaket er justert ned til evne, og det gjelder hele perioden",
+        );
+    });
+
+    test("gjør ikke celler med lenke fokuserbare en gang til", async ({ mount, page }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        const celle = component.getByRole("row").filter({ hasText: "(lenke)" }).getByRole("cell").last();
+        await expect(celle.getByRole("link")).toBeVisible();
+        await expect(celle.locator("[tabindex='0']")).toHaveCount(0);
+    });
 });
