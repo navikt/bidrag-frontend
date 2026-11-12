@@ -1,6 +1,11 @@
-import { type ForholdsmessigFordelingBarnDto, Stonadstype } from "@bidrag/api/BidragBehandlingApiV1";
+import {
+    Behandlingstype,
+    type ForholdsmessigFordelingBarnDto,
+    SoktAvType,
+    Stonadstype,
+} from "@bidrag/api/BidragBehandlingApiV1";
 import { PersonNavnIdent } from "@bidrag/common";
-import { Alert, BodyShort, Box, HGrid, HStack, Label, VStack } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, HGrid, HStack, Label, Tag, VStack } from "@navikt/ds-react";
 import BehandlingLenke from "../../common/components/BehandlingLenke";
 import { PopoverMonthPicker } from "../../common/components/date-picker/PopoverMonthPicker";
 import SakLenke from "../../common/components/SakLenke";
@@ -21,9 +26,35 @@ import {
 } from "../../utils/date-utils";
 import LøpendeBidragListe from "./LøpendeBidragListe";
 
+export interface EndretRevurderingsdato {
+    ident: string;
+    stønadstype: Stonadstype;
+    dato: string;
+}
+
 interface BarnDetaljerFFProps {
     barn: ForholdsmessigFordelingBarnDto[];
+    endredeRevurderingsdatoer?: EndretRevurderingsdato[];
+    onRevurderingsdatoChange?: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
+    lagrerRevurderingsdatoer?: boolean;
 }
+
+const hentSystemopprettetFFSøknad = (barn: ForholdsmessigFordelingBarnDto) => {
+    const søknader = barn.åpneBehandlinger.filter(
+        (b) =>
+            b.søknadsid &&
+            b.søktAvType === SoktAvType.AUTOMATISK &&
+            (b.behandlingstype === Behandlingstype.FORHOLDSMESSIG_FORDELING ||
+                b.behandlingstype === Behandlingstype.FORHOLDSMESSIG_FORDELING_KLAGE),
+    );
+    return søknader.length === 1 ? søknader[0] : undefined;
+};
+
+export const kanEndreRevurderingsdato = (barn: ForholdsmessigFordelingBarnDto) =>
+    barn.erRevurdering && hentSystemopprettetFFSøknad(barn) !== undefined;
+
+export const hentGjeldendeRevurderingsdato = (barn: ForholdsmessigFordelingBarnDto) =>
+    hentSystemopprettetFFSøknad(barn)?.søktFraDato ?? undefined;
 
 interface BarnDetaljerOpprettFFProps {
     barn: ForholdsmessigFordelingBarnDto[];
@@ -260,7 +291,57 @@ function renderIkkeAlleBarnISøknaden(
     );
 }
 
-export default function BarnDetaljerFF({ barn }: BarnDetaljerFFProps) {
+function EndreRevurderingsdatoMonthPicker({
+    barn,
+    nyRevurderingsdato,
+    onChange,
+    disabled,
+}: {
+    barn: ForholdsmessigFordelingBarnDto;
+    nyRevurderingsdato?: string;
+    disabled?: boolean;
+    onChange: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
+}) {
+    const { søktFomDato } = useGetBehandlingV2();
+    const gjeldendeDato = hentGjeldendeRevurderingsdato(barn);
+    const aktivDato = dateOrNull(nyRevurderingsdato ?? gjeldendeDato) ?? undefined;
+
+    const handleMonthChange = (dato: Date | undefined) => {
+        const nyDato = toISODateString(dato ?? undefined) ?? undefined;
+        const erGjeldendeDato = !nyDato || DateToMMYYYYString(dato) === DateToMMYYYYString(dateOrNull(gjeldendeDato));
+        onChange(barn, erGjeldendeDato ? undefined : nyDato);
+    };
+
+    return (
+        <VStack gap="space-2" className="pt-1">
+            <HStack gap="space-2" align="end">
+                <PopoverMonthPicker
+                    label="Endre revurderingsdato"
+                    value={DateToDDMMYYYYString(aktivDato)}
+                    onChange={handleMonthChange}
+                    defaultSelected={aktivDato}
+                    fromDate={dateOrNull(søktFomDato) ?? undefined}
+                    toDate={addMonthsIgnoreDay(maxOfDate(søktFomDato, new Date()), 1)}
+                    inputFormat="dd.MM.yyyy"
+                    size="small"
+                    disabled={disabled}
+                />
+                {nyRevurderingsdato && (
+                    <Tag variant="warning" size="small">
+                        Endret fra {DateToMMYYYYString(dateOrNull(gjeldendeDato)) ?? "ingen dato"}
+                    </Tag>
+                )}
+            </HStack>
+        </VStack>
+    );
+}
+
+export default function BarnDetaljerFF({
+    barn,
+    endredeRevurderingsdatoer,
+    onRevurderingsdatoChange,
+    lagrerRevurderingsdatoer,
+}: BarnDetaljerFFProps) {
     if (barn.length === 0) return null;
     const saksnr = barn[0].saksnr;
     const bidragsmottaker = barn[0].bidragsmottaker;
@@ -281,7 +362,7 @@ export default function BarnDetaljerFF({ barn }: BarnDetaljerFFProps) {
         }
         return <BodyShort size="small">Del av hovedbehandling{behandlingerInfo}</BodyShort>;
     }
-    const detaljer = useGetForholdsmessigFordelingDetaljer();
+    const { løpendeBidragBarn } = useGetBehandlingV2();
     return (
         <Box
             background="neutral-soft"
@@ -308,7 +389,7 @@ export default function BarnDetaljerFF({ barn }: BarnDetaljerFFProps) {
                 </HStack>
             </Box>
             {barn.map((barn, index) => {
-                const beregningBarn = detaljer.løpendeBidragBarn?.find(
+                const beregningBarn = løpendeBidragBarn?.find(
                     (b) => b.gjelderBarnIdent === barn.ident && b.gjelderStønadstype === barn.stønadstype,
                 );
                 const harOpprettetFF = barn.harOpprettetForholdsmessigFordeling;
@@ -346,6 +427,19 @@ export default function BarnDetaljerFF({ barn }: BarnDetaljerFFProps) {
                                 <BodyShort size="small">{renderType(barn)}</BodyShort>
                             </div>
                         </HGrid>
+                        {onRevurderingsdatoChange && kanEndreRevurderingsdato(barn) && (
+                            <EndreRevurderingsdatoMonthPicker
+                                barn={barn}
+                                nyRevurderingsdato={
+                                    endredeRevurderingsdatoer?.find(
+                                        (endret) =>
+                                            endret.ident === barn.ident && endret.stønadstype === barn.stønadstype,
+                                    )?.dato
+                                }
+                                onChange={onRevurderingsdatoChange}
+                                disabled={lagrerRevurderingsdatoer}
+                            />
+                        )}
                         <LøpendeBidragListe
                             løpendeBidrag={beregningBarn?.løpendeBidragPerioder ?? []}
                             harOpprettetFF={harOpprettetFF}

@@ -12,6 +12,7 @@ interface PopoverMonthPickerProps {
     inputFormat?: string;
     size?: "small" | "medium";
     className?: string;
+    disabled?: boolean;
 }
 
 export function PopoverMonthPicker({
@@ -25,6 +26,7 @@ export function PopoverMonthPicker({
     inputFormat = "MM.yyyy",
     size = "small",
     className,
+    disabled,
 }: PopoverMonthPickerProps) {
     const triggerRef = useRef<HTMLDivElement>(null);
     const uniqueId = useId().replace(/:/g, "");
@@ -49,6 +51,7 @@ export function PopoverMonthPicker({
                     description={description}
                     value={value || ""}
                     size={size}
+                    disabled={disabled}
                     id="popover-monthpicker-input"
                     style={{ cursor: "pointer" }}
                 />

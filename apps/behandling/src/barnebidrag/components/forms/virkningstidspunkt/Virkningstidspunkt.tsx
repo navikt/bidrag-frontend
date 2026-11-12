@@ -1091,6 +1091,8 @@ const VirkningstidspunktBarn = ({
                             readonly={
                                 lesemodus ||
                                 vedtakstype === Vedtakstype.ALDERSJUSTERING ||
+                                // Virkningstidspunkt for R-barn endres via FF dialog istedenfor VTP bildet
+                                selectedVirkningstidspunkt.rolle.erRevurdering ||
                                 selectedVirkningstidspunkt.kanEndreVirkningstidspunkt === false
                             }
                             required
@@ -1101,7 +1103,7 @@ const VirkningstidspunktBarn = ({
 
             {showChangedVirkningsDatoAlert && !erInnkreving && (
                 <BehandlingAlert variant="warning" className={"w-[488px]"}>
-                    <div dangerouslySetInnerHTML={{ __html: text.alert.endretVirkningstidspunkt }}></div>
+                    <div dangerouslySetInnerHTML={{ __html: text.alert.endretVirkningstidspunktBidrag }}></div>
                 </BehandlingAlert>
             )}
 
