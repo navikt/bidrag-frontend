@@ -162,6 +162,20 @@ test.describe("JournalpostTabell", () => {
         expect(await bakgrunn("Enkelt dokument")).not.toBe(samlelenke);
     });
 
+    test("viser pilen for vedlegg midt i en smal første kolonne", async ({ mount, page }) => {
+        await mockSak(page);
+        const component = await mount(STORY_BLANDET);
+        const pil = component.getByRole("button", { name: "Vis under-rader" }).first();
+
+        const { kolonne, venstre, hoyre } = await pil.evaluate((knapp) => {
+            const celle = (knapp.closest("td") as HTMLElement).getBoundingClientRect();
+            const k = knapp.getBoundingClientRect();
+            return { kolonne: celle.width, venstre: k.left - celle.left, hoyre: celle.right - k.right };
+        });
+        expect(kolonne).toBeLessThanOrEqual(36);
+        expect(Math.abs(venstre - hoyre)).toBeLessThanOrEqual(1);
+    });
+
     test("viser rader med internt notat (X) med grå tekst, og rader med I og U med vanlig tekst", async ({
         mount,
         page,
