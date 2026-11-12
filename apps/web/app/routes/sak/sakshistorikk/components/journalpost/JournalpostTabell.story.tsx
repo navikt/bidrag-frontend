@@ -169,5 +169,3 @@ const journalposterMedLangBeskrivelse: JournalpostDto[] = [
 ];
 
 export const LangBeskrivelse = () => <Scenario data={journalposterMedLangBeskrivelse} />;
-
-export const UtenVedlegg = () => <Scenario data={journalposter.filter((jp) => (jp.dokumenter?.length ?? 0) <= 1)} />;
