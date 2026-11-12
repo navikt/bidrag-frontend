@@ -38,7 +38,7 @@ import { medReturMål, RETUR_PARAM, SAKSNR_PARAM } from "~/common/navigation/ret
 import { AvkortetCelle, tabellMedAvkortetSisteKolonne } from "../AvkortetCelle";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
-import { journalstatusDisplayVerdi, standardSort, visesSomForsendelse } from "./journalpostUtils";
+import { dokumentDato, journalstatusDisplayVerdi, standardSort, visesSomForsendelse } from "./journalpostUtils";
 import PersonIdentMedRolle from "./PersonIdentMedRolle";
 
 interface JournalpostRad {
@@ -109,6 +109,7 @@ export default function JournalpostTabell({
         customComparators: {
             status: (a, b) => journalstatusDisplayVerdi(a).localeCompare(journalstatusDisplayVerdi(b)),
             gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
+            dokumentDato: (a, b) => (dokumentDato(a) ?? "").localeCompare(dokumentDato(b) ?? ""),
         },
     });
 
@@ -137,10 +138,8 @@ export default function JournalpostTabell({
     };
 
     const finnDokDato = (jp: JournalpostDto) => {
-        if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato !== null) {
-            return jp.mottattDato ? formaterDato(jp.mottattDato) : "";
-        }
-        return jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
+        const dato = dokumentDato(jp);
+        return dato ? formaterDato(dato) : "";
     };
 
     const lukkSlettBekreftelse = () => {
