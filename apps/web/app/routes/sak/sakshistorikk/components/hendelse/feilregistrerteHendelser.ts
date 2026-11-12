@@ -17,6 +17,9 @@ export function filtrerFeilregistrerteHendelser(
     );
 
     return hendelser.filter(
-        (h) => h.type !== HendelseType.FEILREGISTRERT && !(h.søknadsid && feilregistrerteSøknadsider.has(h.søknadsid)),
+        // Vedtak kan ikke bli feilregistrert så ikke filtrer på det
+        (h) =>
+            h.type === HendelseType.VEDTAK ||
+            (h.type !== HendelseType.FEILREGISTRERT && !(h.søknadsid && feilregistrerteSøknadsider.has(h.søknadsid))),
     );
 }
