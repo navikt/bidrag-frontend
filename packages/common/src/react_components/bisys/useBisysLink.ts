@@ -23,7 +23,9 @@ export function useBisysLink() {
     if (bisysSessionParams.sessionState) {
         bisysQueryParams.set("sessionState", bisysSessionParams.sessionState);
     }
-    if (bisysSessionParams.enhet) {
+    if (!bisysLinkTarget || bisysLinkTarget === "oppgaveliste") {
+        bisysQueryParams.delete("enhet");
+    } else if (bisysSessionParams.enhet) {
         bisysQueryParams.set("enhet", bisysSessionParams.enhet);
     }
 

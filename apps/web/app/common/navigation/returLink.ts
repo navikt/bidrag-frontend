@@ -61,7 +61,8 @@ const bisysBrukeroversiktDestinasjon = (ident: string): ReturDestinasjon => ({
     sti: "/bisys/brukeroversikt",
     params: { ident },
 });
-const bisysOppgavelisteDestinasjon = (): ReturDestinasjon => ({ sti: "/bisys/oppgaveliste" });
+const BISYS_OPPGAVELISTE_STI = "/bisys/oppgaveliste";
+const bisysOppgavelisteDestinasjon = (): ReturDestinasjon => ({ sti: BISYS_OPPGAVELISTE_STI });
 
 /**
  * Ruteparametere leses fra stien fordi headeren ligger utenfor rutekonteksten til sidene.
@@ -274,14 +275,14 @@ function lesEksplisittReturMål(
 
 /**
  * Bygger den ferdige lenken. Bisys-parameterne må følge med tilbake for at
- * Bisys-lenken på målsiden fortsatt skal virke.
+ * Bisys-lenken på målsiden fortsatt skal virke. Oppgavelisten skal ikke få `enhet`.
  */
 export function byggHref({ sti, params }: ReturDestinasjon, searchParams: URLSearchParams): string {
     const { sessionState, enhet } = getBisysSessionParams(searchParams);
 
     const queryParams = new URLSearchParams(params);
     if (sessionState) queryParams.set("sessionState", sessionState);
-    if (enhet) queryParams.set("enhet", enhet);
+    if (enhet && sti !== BISYS_OPPGAVELISTE_STI) queryParams.set("enhet", enhet);
 
     const query = queryParams.toString();
     return query ? `${sti}?${query}` : sti;

@@ -36,7 +36,7 @@ export const Periode = ({
         dateOrNull(boforholdBarn?.beregnFra) ?? virkningsOrSoktFraDato,
     );
     const fieldIsDatoTom = field === "datoTom";
-    const [fom, tom] = useFomTomDato(fieldIsDatoTom, datoFra, barn.gjelderBarn?.id);
+    const [fom, tom] = useFomTomDato(fieldIsDatoTom, datoFra);
     const isSærbidragTypeAndFieldIsDatoFom = type === TypeBehandling.SAeRBIDRAG && !fieldIsDatoTom;
 
     const validateFomOgTom = () => {
