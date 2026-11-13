@@ -106,6 +106,19 @@ test.describe("sakslayouter", () => {
         expect((await målLayout(component)).sideinnholdsbredde).toBe(breddeFør);
     });
 
+    test("viser hva knappen for sidemenyen gjør i en tooltip", async ({ mount, page }) => {
+        await mockSakHeaderKall(page);
+        const component = await mount(STANDARD_STORY);
+        const meny = component.getByRole("navigation", { name: "Sakmeny" });
+
+        await meny.getByRole("button", { name: "Skjul meny" }).hover();
+        await expect(page.getByRole("tooltip")).toHaveText("Skjul meny");
+
+        await meny.getByRole("button", { name: "Skjul meny" }).click();
+        await meny.getByRole("button", { name: "Vis meny" }).hover();
+        await expect(page.getByRole("tooltip")).toHaveText("Vis meny");
+    });
+
     test("sidemenyen forblir skjult når saksbehandler går til en side med en annen layout", async ({ mount, page }) => {
         await mockSakHeaderKall(page);
         const component = await mount(STANDARD_OG_DOKUMENTER_STORY);
