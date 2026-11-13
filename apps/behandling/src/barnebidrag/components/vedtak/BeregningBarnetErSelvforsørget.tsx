@@ -4,7 +4,7 @@ import { useBidragBeregningPeriode } from "./DetaljertBeregningBidrag";
 
 export const BeregningBarnetErSelvforsørget = () => {
     const { beregningsdetaljer } = useBidragBeregningPeriode();
-    const forskuddssats = beregningsdetaljer.forskuddssats;
+    const { forskuddssats, maksInntektBBMultiplikator } = beregningsdetaljer;
     return (
         <ResultatDescription
             title="Barnet er selvforsørget"
@@ -17,8 +17,8 @@ export const BeregningBarnetErSelvforsørget = () => {
                 {
                     label: "Grense for selvforsørget",
                     labelBold: true,
-                    value: `100 x ${formatterBeløpForBeregning(forskuddssats)}`,
-                    result: formatterBeløpForBeregning(forskuddssats * 100, true),
+                    value: `${maksInntektBBMultiplikator} x ${formatterBeløpForBeregning(forskuddssats)}`,
+                    result: formatterBeløpForBeregning(forskuddssats * maksInntektBBMultiplikator, true),
                 },
             ]}
         />
