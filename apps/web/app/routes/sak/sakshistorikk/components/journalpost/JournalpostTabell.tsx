@@ -467,8 +467,6 @@ export default function JournalpostTabell({
                     data={rader}
                     // Første kolonne (pil for vedlegg) er smal, og pilen står midt i kolonnen.
                     className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child]:w-9 [&_tr>*:first-child]:min-w-9 [&_tr>*:first-child]:max-w-9 [&_tr>*:first-child>*]:px-0 [&_[class*=nested-toggle]]:inset-x-0! [&_[class*=nested-toggle]]:justify-center [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft)`}
-                    // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
-                    //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
                     settings={{
                         rowDensity: "tight",
