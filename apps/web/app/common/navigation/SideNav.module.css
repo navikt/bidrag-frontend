@@ -5,6 +5,16 @@
     border-color: var(--ax-border-neutral-subtle);
 }
 
+.kollapset {
+    width: max-content;
+}
+
+.toggle {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--ax-space-8) var(--ax-space-8) 0;
+}
+
 .list {
     display: flex;
     flex-direction: column;

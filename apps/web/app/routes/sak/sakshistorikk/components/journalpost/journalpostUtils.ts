@@ -49,6 +49,18 @@ export function visesSomForsendelse(jp: JournalpostDto): boolean {
     return (jp.journalpostId?.startsWith("BIF") ?? false) && !erNotat;
 }
 
+/**
+ * Datoen som vises som Dok.dato, og som journalen sorteres etter, som i Bisys. For journalposter fra
+ * Joark er `dokumentDato` datoen journalposten ble opprettet (for eksempel ved skanning), mens
+ * `mottattDato` kan rettes til datoen dokumentet faktisk ble mottatt.
+ */
+export function dokumentDato(jp: JournalpostDto): string | null | undefined {
+    if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato != null) {
+        return jp.mottattDato;
+    }
+    return jp.dokumentDato;
+}
+
 export function standardSort(a: JournalpostDto, b: JournalpostDto): number {
     const klarTilPrint = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.KLAR_FOR_DISTRIBUSJON;
     const underOpprettelse = (jp: JournalpostDto) => jp.status === JournalpostStatusEnum.UNDER_OPPRETTELSE;
@@ -58,7 +70,7 @@ export function standardSort(a: JournalpostDto, b: JournalpostDto): number {
         Number(klarTilPrint(b)) - Number(klarTilPrint(a)) ||
         Number(underOpprettelse(b)) - Number(underOpprettelse(a)) ||
         Number(erForsendelse(b)) - Number(erForsendelse(a)) ||
-        (b.dokumentDato ?? "").localeCompare(a.dokumentDato ?? "") ||
+        (dokumentDato(b) ?? "").localeCompare(dokumentDato(a) ?? "") ||
         (b.journalpostId ?? "").localeCompare(a.journalpostId ?? "")
     );
 }

@@ -2,12 +2,16 @@ import { Alert, Box, Loader, VStack } from "@navikt/ds-react";
 import type { ReactNode } from "react";
 import { useFinnHendelserForSak, useHentFarskapUtelukkedeJournalposter, useHentJournalposter } from "~/api/useApi.ts";
 import PageLoadingSpinner from "~/common/components/loadingspinner/PageLoadingSpinner";
+import type { SakStandardLayoutHandle } from "~/routes/sak/SakStandardLayout";
 import type { SakSideTittelHandle } from "~/routes/sak/sakSideTittel";
 import type { Route } from "./+types/SakshistorikkPage";
 import SaksLogg from "./components/hendelse/SaksLogg.tsx";
 import JournalpostTabell from "./components/journalpost/JournalpostTabell";
 
-export const handle: SakSideTittelHandle = { sakSideTittel: "Sakshistorikk" };
+export const handle: SakSideTittelHandle & SakStandardLayoutHandle = {
+    sakSideTittel: "Sakshistorikk",
+    brukHeleBredden: true,
+};
 
 export default function SakshistorikkPage({ params }: Route.ComponentProps) {
     const { saksnummer } = params;
