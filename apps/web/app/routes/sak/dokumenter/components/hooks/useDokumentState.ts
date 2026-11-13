@@ -1,7 +1,7 @@
 import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import { standardSort } from "../../../sakshistorikk/components/journalpost/journalpostUtils";
+import { dokumentDato, standardSort } from "../../../sakshistorikk/components/journalpost/journalpostUtils";
 import { useSort } from "../../../sakshistorikk/components/useSort";
 import {
     byggDokumenter,
@@ -155,6 +155,7 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
         defaultUnsorted: standardSort,
         customComparators: {
             gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
+            dokumentDato: (a, b) => (dokumentDato(a) ?? "").localeCompare(dokumentDato(b) ?? ""),
         },
     });
 
@@ -166,6 +167,7 @@ export function useDokumentState(journalposter: JournalpostDto[], options?: UseD
         defaultUnsorted: standardSort,
         customComparators: {
             gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
+            dokumentDato: (a, b) => (dokumentDato(a) ?? "").localeCompare(dokumentDato(b) ?? ""),
         },
     });
 

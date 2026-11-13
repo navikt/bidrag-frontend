@@ -5,6 +5,7 @@ import { PaperclipIcon } from "@navikt/aksel-icons";
 import { HStack, Tag } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import JournalpostStatusTag from "~/routes/sak/sakshistorikk/components/journalpost/JournalpostStatusTag.tsx";
+import { dokumentDato } from "~/routes/sak/sakshistorikk/components/journalpost/journalpostUtils";
 import PersonIdentMedRolle from "../../sakshistorikk/components/journalpost/PersonIdentMedRolle";
 import type { SaksDokument } from "../types";
 import { DokumentKategoriTag } from "../utils/dokumentKategori";
@@ -209,8 +210,10 @@ export function SaksdokumentTabell({
             header: "Dok.dato",
             isSortable: true,
             width: { defaultValue: scaledPx(110) },
-            bodyCell: (rad: DokumentRad) =>
-                rad.erVedlegg ? "" : rad.jp.dokumentDato ? formaterDato(rad.jp.dokumentDato) : "",
+            bodyCell: (rad: DokumentRad) => {
+                const dato = rad.erVedlegg ? null : dokumentDato(rad.jp);
+                return dato ? formaterDato(dato) : "";
+            },
         },
         {
             id: "journalfortDato",
