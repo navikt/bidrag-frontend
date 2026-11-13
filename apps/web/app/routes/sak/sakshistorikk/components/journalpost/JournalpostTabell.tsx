@@ -32,6 +32,7 @@ import {
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
+import { Link as RouterLink } from "react-router";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
 import { medReturMål, RETUR_PARAM, SAKSNR_PARAM } from "~/common/navigation/returLink.ts";
@@ -377,12 +378,13 @@ export default function JournalpostTabell({
         bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.fagomrade ?? "-")),
     };
 
-    // "fagomrade" settes inn mellom "gjelderAktor" og "status" når saken har blanding av far/bidrag.
+    // "fagomrade" settes inn etter "journalforendeEnhet" når saken har blanding av far/bidrag.
     const synligeBasisKolonner = basisKolonner.filter(
         (kolonne): kolonne is Exclude<typeof kolonne, false> => kolonne !== false,
     );
+    const etterEnhet = synligeBasisKolonner.findIndex((kolonne) => kolonne.id === "journalforendeEnhet") + 1;
     const columnDefinitions = harBlandingFarBid
-        ? [...synligeBasisKolonner.slice(0, 6), fagomradeKolonne, ...synligeBasisKolonner.slice(6)]
+        ? [...synligeBasisKolonner.slice(0, etterEnhet), fagomradeKolonne, ...synligeBasisKolonner.slice(etterEnhet)]
         : synligeBasisKolonner;
 
     return (
@@ -452,8 +454,8 @@ export default function JournalpostTabell({
                 </HStack>
                 <HStack gap="space-4">
                     <Button
-                        as="a"
-                        href={medReturMål(`/sak/${saksnummer}/dokumenter`, "sakshistorikk", jpParams())}
+                        as={RouterLink}
+                        to={medReturMål(`/sak/${saksnummer}/dokumenter`, "sakshistorikk", jpParams())}
                         variant="tertiary"
                         size="xsmall"
                         icon={<FilePdfIcon aria-hidden />}
