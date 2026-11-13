@@ -192,10 +192,7 @@ test.describe("JournalpostTabell", () => {
         expect(Math.abs(venstre - hoyre)).toBeLessThanOrEqual(1);
     });
 
-    test("viser rader med internt notat (X) med grå tekst, og rader med I og U med vanlig tekst", async ({
-        mount,
-        page,
-    }) => {
+    test("viser rader med internt notat (X) med samme tekstfarge som rader med I og U", async ({ mount, page }) => {
         await mockSak(page);
         const component = await mount(STORY_BLANDET);
         const farge = (dokDato: string) =>
@@ -204,8 +201,7 @@ test.describe("JournalpostTabell", () => {
                 .first()
                 .evaluate((el) => getComputedStyle(el).color);
 
-        const x = await farge("14.05.2024");
-        expect(x).not.toBe(await farge("12.05.2024"));
+        expect(await farge("14.05.2024")).toBe(await farge("12.05.2024"));
         expect(await farge("12.05.2024")).toBe(await farge("10.05.2024"));
     });
 

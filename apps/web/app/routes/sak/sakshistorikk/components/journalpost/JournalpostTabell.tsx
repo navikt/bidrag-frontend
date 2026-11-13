@@ -319,12 +319,7 @@ export default function JournalpostTabell({
             id: "dokumentType",
             header: "K",
             isSortable: false,
-            // Markøren gir rader med X (internt notat) grå tekst, se className på DataGrid.
-            bodyCell: (rad: JournalpostRad) => {
-                if (rad.erVedlegg) return "";
-                if (rad.jp.dokumentType === "X") return <span data-internt-notat>X</span>;
-                return rad.jp.dokumentType;
-            },
+            bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : rad.jp.dokumentType),
         },
         {
             id: "dokumentDato",
@@ -471,7 +466,7 @@ export default function JournalpostTabell({
                 <DataGrid
                     data={rader}
                     // Første kolonne (pil for vedlegg) er smal, og pilen står midt i kolonnen.
-                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child]:w-9 [&_tr>*:first-child]:min-w-9 [&_tr>*:first-child]:max-w-9 [&_tr>*:first-child>*]:px-0 [&_[class*=nested-toggle]]:inset-x-0! [&_[class*=nested-toggle]]:justify-center [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft) [&_tbody_tr:has([data-internt-notat])]:text-(color:--ax-neutral-600)`}
+                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child]:w-9 [&_tr>*:first-child]:min-w-9 [&_tr>*:first-child]:max-w-9 [&_tr>*:first-child>*]:px-0 [&_[class*=nested-toggle]]:inset-x-0! [&_[class*=nested-toggle]]:justify-center [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft)`}
                     // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
                     //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
                     getRowId={(rad) => rad.id}
