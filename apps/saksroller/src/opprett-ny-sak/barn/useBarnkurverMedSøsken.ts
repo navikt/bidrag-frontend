@@ -5,7 +5,7 @@ import {
     hentPersonMotpartBarnRelasjonQueryOptions,
 } from "../../api/person.api";
 import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
-import { grupperBarnIKurver } from "./barnkurver";
+import { grupperBarnIKurver, slåSammenBarnkurver } from "./barnkurver";
 
 export function useBarnkurverMedSøsken(barnkurver: Barnkurv[], valgteBarn: BarnMedAlder[]) {
     const tillagteBarn = useRef(new Map<string, BarnMedAlder>());
@@ -76,51 +76,4 @@ export function useBarnkurverMedSøsken(barnkurver: Barnkurv[], valgteBarn: Barn
         feil: [...foreldreSøk, ...relasjonerSøk].some((søk) => søk.isError),
         laster: [...foreldreSøk, ...relasjonerSøk].some((søk) => søk.isPending),
     };
-}
-
-function slåSammenBarnkurver(barnkurver: Barnkurv[], søskenkurver: Barnkurv[], harManuelleBarn: boolean) {
-    const resultat: Barnkurv[] = [];
-    const grupper = new Map<string, Barnkurv>();
-    const visteBarnPerGruppe = new Map<string, Set<string>>();
-    const visteBarn = new Set<string>();
-
-    const kurverFraForeldre = harManuelleBarn ? [] : barnkurver;
-
-    for (const kurv of [...kurverFraForeldre, ...søskenkurver]) {
-        const nøkkel =
-            kurv.forelder?.ident && kurv.motpart?.ident
-                ? [kurv.forelder.ident, kurv.motpart.ident].sort().join("-")
-                : kurv.motpart
-                  ? `motpart-${kurv.motpart.ident}`
-                  : "ukjent-forelder";
-        const settForGruppe = harManuelleBarn ? (visteBarnPerGruppe.get(nøkkel) ?? new Set<string>()) : visteBarn;
-        const nyeBarn = kurv.barn.filter((barn) => {
-            if (settForGruppe.has(barn.ident)) return false;
-            settForGruppe.add(barn.ident);
-            return true;
-        });
-        if (harManuelleBarn) visteBarnPerGruppe.set(nøkkel, settForGruppe);
-        if (nyeBarn.length === 0) continue;
-
-        const eksisterende = grupper.get(nøkkel);
-        if (eksisterende) {
-            eksisterende.barn.push(...nyeBarn);
-        } else {
-            const forelderKurv = barnkurver.find(
-                (kandidat) =>
-                    kandidat.forelder?.ident &&
-                    kandidat.motpart?.ident &&
-                    [kandidat.forelder.ident, kandidat.motpart.ident].sort().join("-") === nøkkel,
-            );
-            const nyKurv = {
-                ...(forelderKurv ?? kurv),
-                id: kurv.forelder?.ident && kurv.motpart?.ident ? nøkkel : kurv.motpart ? kurv.id : "UKJENT",
-                barn: nyeBarn,
-            };
-            grupper.set(nøkkel, nyKurv);
-            resultat.push(nyKurv);
-        }
-    }
-
-    return resultat;
 }

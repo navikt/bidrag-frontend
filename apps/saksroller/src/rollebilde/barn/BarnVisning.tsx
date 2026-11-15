@@ -62,15 +62,16 @@ export default function BarnVisning({
                     headingActions={erNyttBarn && <FjernBarnHandling onFjern={handleFjernBarn} />}
                 >
                     {!visReellMottaker && (
-                        <ReellMottakerRad
-                            harReellMottaker={harReellMottaker}
-                            reellMottakerInfo={reellMottakerInfo}
-                            onEndre={handleÅpneReellMottaker}
-                            onLeggTil={handleÅpneReellMottaker}
-                        />
+                        <>
+                            <ReellMottakerRad
+                                harReellMottaker={harReellMottaker}
+                                reellMottakerInfo={reellMottakerInfo}
+                                onEndre={handleÅpneReellMottaker}
+                                onLeggTil={handleÅpneReellMottaker}
+                            />
+                            <ReellMottakerFeil melding={reellMottakerFeil} />
+                        </>
                     )}
-
-                    {!visReellMottaker && <ReellMottakerFeil melding={reellMottakerFeil} />}
                 </BarnKortInnhold>
 
                 {visReellMottaker && (

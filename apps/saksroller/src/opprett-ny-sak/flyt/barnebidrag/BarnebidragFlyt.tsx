@@ -12,6 +12,7 @@ import {
     type BarnebidragForelderRolle,
     type BarnebidragSkjemaData,
     BarnebidragSkjemaSchema,
+    type BarnMedAlder,
     type ForelderPart,
     finnOpprettSakAdvarsler,
     type PartISaken,
@@ -27,33 +28,37 @@ function lagStartverdier(
     alder: number | null,
     fødselsdato: string | undefined,
 ): BarnebidragSkjemaData {
-    const søkt: ForelderPart = {
-        ident: partISaken?.ident ?? "",
-        navn: partISaken?.navn ?? "",
-        erKjent: partISaken ? true : undefined,
-        diskresjonskode: partISaken?.diskresjonskode,
-    };
+    const søkt: ForelderPart = partISaken
+        ? {
+              ident: partISaken.ident,
+              navn: partISaken.navn,
+              erKjent: true,
+              diskresjonskode: partISaken.diskresjonskode,
+          }
+        : IKKE_VALGT;
+    const rolle = partISaken?.rolle;
     const erBarn = partISaken && erBarnRolle(partISaken);
 
     return {
         roller: [
-            { ...(partISaken?.rolle === "bidragspliktig" ? søkt : IKKE_VALGT), type: "BP" },
-            { ...(partISaken?.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT), type: "BM" },
+            { ...(rolle === "bidragspliktig" ? søkt : IKKE_VALGT), type: "BP" },
+            { ...(rolle === "bidragsmottaker" ? søkt : IKKE_VALGT), type: "BM" },
         ] satisfies BarnebidragForelderRolle[],
-        valgteBarn: erBarn
-            ? [
-                  {
-                      ident: partISaken.ident,
-                      navn: partISaken.navn,
-                      fødselsdato,
-                      alder: alder ?? 0,
-                      erMyndig: partISaken.rolle === "barn_over_18" || (alder ?? 0) >= MYNDYG_BARN_ALDER,
-                      manuellLagtTil: true,
-                      diskresjonskode: partISaken.diskresjonskode,
-                  },
-              ]
-            : [],
+        valgteBarn: erBarn ? [lagStartbarn(partISaken, alder, fødselsdato)] : [],
         kategori: "Nasjonal",
+    };
+}
+
+function lagStartbarn(part: PartISaken, alder: number | null, fødselsdato: string | undefined): BarnMedAlder {
+    const barnetsAlder = alder ?? 0;
+    return {
+        ident: part.ident,
+        navn: part.navn,
+        fødselsdato,
+        alder: barnetsAlder,
+        erMyndig: part.rolle === "barn_over_18" || barnetsAlder >= MYNDYG_BARN_ALDER,
+        manuellLagtTil: true,
+        diskresjonskode: part.diskresjonskode,
     };
 }
 

@@ -108,24 +108,7 @@ export function useBarnReellMottaker({
         }
         if (rolle.reellMottakerType === "samhandler") {
             const navn = rolle.reellMottakerNavn ?? (samhandlerInfo ? (samhandlerInfo.navn ?? "") : undefined);
-            if (navn !== undefined && rolle.reellMottaker && IdentUtils.isSamhandlerId(rolle.reellMottaker)) {
-                return <SamhandlerInfo navn={navn} ident={rolle.reellMottaker} />;
-            }
-            if (navn !== undefined) {
-                return (
-                    <FunnetPersonInnhold
-                        navn={navn}
-                        ident={rolle.reellMottaker}
-                        tags={
-                            rolle.reellMottakerErVerge && (
-                                <BodyShort size="small" textColor="subtle">
-                                    (verge)
-                                </BodyShort>
-                            )
-                        }
-                    />
-                );
-            }
+            return registrertReellMottakerInfo(rolle, navn);
         }
         return "Ikke registrert";
     };
@@ -142,4 +125,24 @@ export function useBarnReellMottaker({
             setVisReellMottaker(false);
         },
     };
+}
+
+function registrertReellMottakerInfo(rolle: BarnRolle, navn: string | undefined): ReactNode {
+    if (navn === undefined) return "Ikke registrert";
+    if (rolle.reellMottaker && IdentUtils.isSamhandlerId(rolle.reellMottaker)) {
+        return <SamhandlerInfo navn={navn} ident={rolle.reellMottaker} />;
+    }
+    return (
+        <FunnetPersonInnhold
+            navn={navn}
+            ident={rolle.reellMottaker}
+            tags={
+                rolle.reellMottakerErVerge && (
+                    <BodyShort size="small" textColor="subtle">
+                        (verge)
+                    </BodyShort>
+                )
+            }
+        />
+    );
 }

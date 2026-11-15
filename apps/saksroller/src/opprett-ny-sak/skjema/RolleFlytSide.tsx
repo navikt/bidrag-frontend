@@ -5,7 +5,7 @@ import EksisterendeSakStatus, { type EksisterendeSakStatusProps } from "../eksis
 import EnhetOgSubmitSection, { type EnhetOgSubmitSectionProps } from "../innsending/EnhetOgSubmitSection";
 import { useNyOpprettSakModal } from "../start/opprettSakModalContext";
 import FlytSkjema from "./FlytSkjema";
-import { type Sakskategori, useOpprettSakStart } from "./OpprettSakStartContext";
+import { type OpprettSakFlytValg, type Sakskategori, useOpprettSakStart } from "./OpprettSakStartContext";
 import type { BarnMedAlder, ForelderPart } from "./opprett-sak-schema";
 import SakskategoriVelger from "./SakskategoriVelger";
 
@@ -22,13 +22,7 @@ export default function RolleFlytSide({ onSubmit, status, children, meldinger, i
     const formId = useId();
     const modal = useNyOpprettSakModal();
     const { kategori, onEndret } = useOpprettSakStart();
-    const form = useFormContext<{ roller: ForelderPart[]; valgteBarn?: BarnMedAlder[] }>();
-    const roller = form.watch("roller");
-    const valgteBarn = form.watch("valgteBarn");
-    const harEndringer =
-        JSON.stringify(roller) !== JSON.stringify(form.formState.defaultValues?.roller) ||
-        JSON.stringify(valgteBarn ?? []) !== JSON.stringify(form.formState.defaultValues?.valgteBarn ?? []);
-    useEffect(() => onEndret?.(harEndringer), [onEndret, harEndringer]);
+    useVarsleEndringer(onEndret);
 
     return (
         <FlytSkjema id={modal?.formId ?? formId} onSubmit={onSubmit} disabled={innsending.isLoading}>
@@ -43,6 +37,16 @@ export default function RolleFlytSide({ onSubmit, status, children, meldinger, i
             </VStack>
         </FlytSkjema>
     );
+}
+
+function useVarsleEndringer(onEndret: OpprettSakFlytValg["onEndret"]) {
+    const form = useFormContext<{ roller: ForelderPart[]; valgteBarn?: BarnMedAlder[] }>();
+    const roller = form.watch("roller");
+    const valgteBarn = form.watch("valgteBarn");
+    const harEndringer =
+        JSON.stringify(roller) !== JSON.stringify(form.formState.defaultValues?.roller) ||
+        JSON.stringify(valgteBarn ?? []) !== JSON.stringify(form.formState.defaultValues?.valgteBarn ?? []);
+    useEffect(() => onEndret?.(harEndringer), [onEndret, harEndringer]);
 }
 
 function SynkKategori({ kategori }: { kategori: Sakskategori }) {

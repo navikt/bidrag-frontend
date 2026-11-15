@@ -27,12 +27,19 @@ interface LeggTilBarnProps {
     setVisSøk: (visSøk: boolean) => void;
 }
 
+type BarnReellMottakerValg = {
+    barnIdent: string;
+    valg: ReellMottakerValg;
+};
+
+type BarnReellMottakerFeil = {
+    barnIdent: string;
+    melding: string;
+};
+
 export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSøk }: LeggTilBarnProps) {
-    const [valgtReellMottaker, setValgtReellMottaker] = useState<{
-        barnIdent: string;
-        valg: ReellMottakerValg;
-    }>();
-    const [reellMottakerFeil, setReellMottakerFeil] = useState<{ barnIdent: string; melding: string }>();
+    const [valgtReellMottaker, setValgtReellMottaker] = useState<BarnReellMottakerValg>();
+    const [reellMottakerFeil, setReellMottakerFeil] = useState<BarnReellMottakerFeil>();
 
     useRegistrerÅpenRedigering("legg-til-barn", visSøk);
 
@@ -80,10 +87,7 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
 
         const nyttBarn = {
             ...lagBarnRolle(person),
-            reellMottakerType: valg.type,
-            reellMottaker: valg.ident,
-            reellMottakerNavn: valg.navn,
-            reellMottakerErVerge: fraReellMottakerValg(valg).reellMottakerErVerge,
+            ...fraReellMottakerValg(valg),
         };
 
         form.setValue("roller", [...roller, nyttBarn], { shouldValidate: true });
@@ -112,16 +116,8 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
                         key={funnetBarn.person.ident}
                         barn={funnetBarn.person}
                         regel={funnetBarnValgregel}
-                        valg={
-                            valgtReellMottaker?.barnIdent === funnetBarn.person.ident
-                                ? valgtReellMottaker.valg
-                                : undefined
-                        }
-                        feil={
-                            reellMottakerFeil?.barnIdent === funnetBarn.person.ident
-                                ? reellMottakerFeil.melding
-                                : undefined
-                        }
+                        valg={valgtReellMottaker}
+                        feil={reellMottakerFeil}
                         onValg={(valg) => setValgtReellMottaker({ barnIdent: funnetBarn.person.ident, valg })}
                         onFeil={(melding) =>
                             setReellMottakerFeil(melding ? { barnIdent: funnetBarn.person.ident, melding } : undefined)
@@ -150,19 +146,21 @@ export default function LeggTilBarn({ søsken = [], sakstype, visSøk, setVisSø
 function NyttBarnReellMottaker({
     barn,
     regel,
-    valg: lagretValg,
-    feil,
+    valg: valgtReellMottaker,
+    feil: reellMottakerFeil,
     onValg,
     onFeil,
 }: {
     barn: PersonDto;
     regel: ReellMottakerValgregel;
-    valg?: ReellMottakerValg;
-    feil?: string;
+    valg?: BarnReellMottakerValg;
+    feil?: BarnReellMottakerFeil;
     onValg: (valg: ReellMottakerValg) => void;
     onFeil: (feil: string) => void;
 }) {
-    const valg = initialiserValg(lagretValg ?? {}, regel, {
+    const lagretValg = valgtReellMottaker?.barnIdent === barn.ident ? valgtReellMottaker.valg : {};
+    const feil = reellMottakerFeil?.barnIdent === barn.ident ? reellMottakerFeil.melding : undefined;
+    const valg = initialiserValg(lagretValg, regel, {
         ident: barn.ident,
         navn: barn.visningsnavn,
     });

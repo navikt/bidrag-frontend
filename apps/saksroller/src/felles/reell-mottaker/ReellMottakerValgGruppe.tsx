@@ -114,22 +114,28 @@ export default function ReellMottakerValgGruppe({
                 />
             )}
 
-            {!disabled &&
-                valg.type === "samhandler" &&
-                (erPersonSomReellMottaker(valg) ? (
-                    <Checkbox
-                        size="small"
-                        checked={valg.verge ?? false}
-                        onChange={(event) => onValg({ ...valg, verge: event.target.checked })}
-                    >
-                        Reell mottaker er verge for barnet
-                    </Checkbox>
-                ) : (
-                    <InlineMessage status="info" size="small">
-                        Verge kan registreres når reell mottaker er en person.
-                    </InlineMessage>
-                ))}
+            <VergeValg valg={valg} disabled={disabled} onValg={onValg} />
         </VStack>
+    );
+}
+
+function VergeValg({ valg, disabled, onValg }: Pick<Props, "valg" | "disabled" | "onValg">) {
+    if (disabled || valg.type !== "samhandler") return null;
+    if (!erPersonSomReellMottaker(valg)) {
+        return (
+            <InlineMessage status="info" size="small">
+                Verge kan registreres når reell mottaker er en person.
+            </InlineMessage>
+        );
+    }
+    return (
+        <Checkbox
+            size="small"
+            checked={valg.verge ?? false}
+            onChange={(event) => onValg({ ...valg, verge: event.target.checked })}
+        >
+            Reell mottaker er verge for barnet
+        </Checkbox>
     );
 }
 

@@ -64,11 +64,6 @@ function ForelderKort(props: ForelderKortProps & DenAndreForelderen) {
     const ident = part.ident;
     const erKjent = part.erKjent === true && !!ident;
     const [valgtPerson, setValgtPerson] = useState<Pick<ISamhandlerPersonInfo, "ident" | "søktIdent">>();
-    const rolleTag = !erKjent ? (
-        <Tag variant="moderate" data-color="neutral" size="small">
-            {rolle === "bidragspliktig" ? "BP" : "BM"}
-        </Tag>
-    ) : undefined;
     const handlinger: ForelderKortProps & DenAndreForelderen = {
         ...props,
         onVelg: (person) => {
@@ -89,16 +84,26 @@ function ForelderKort(props: ForelderKortProps & DenAndreForelderen) {
                           }
                         : null
                 }
-                rolle={rolle === "bidragspliktig" ? "BP" : "BM"}
+                rolle={tilRolletype(rolle)}
                 height="100%"
                 ukjentTekst={
                     part.erKjent === undefined ? `Velg ${rolle}` : `${hentForelderRolleLabel(rolle)} markert som ukjent`
                 }
                 søktIdent={valgtPerson?.ident === ident ? valgtPerson?.søktIdent : undefined}
-                tags={props.låst && erKjent ? <LåstPartTag /> : rolleTag}
+                tags={forelderTag(rolle, erKjent, props.låst)}
                 actions={!props.låst && <Handlinger {...handlinger} />}
             />
         </VStack>
+    );
+}
+
+function forelderTag(rolle: ForelderPartRolle, erKjent: boolean, låst: boolean | undefined) {
+    if (låst && erKjent) return <LåstPartTag />;
+    if (erKjent) return null;
+    return (
+        <Tag variant="moderate" data-color="neutral" size="small">
+            {tilRolletype(rolle)}
+        </Tag>
     );
 }
 

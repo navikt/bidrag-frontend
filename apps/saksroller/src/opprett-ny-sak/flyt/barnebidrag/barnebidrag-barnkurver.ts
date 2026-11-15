@@ -1,5 +1,21 @@
 import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { erUnderMaksAlder } from "../../../felles/barn/barn-regler";
+import { grupperBarnIKurver } from "../../barn/barnkurver";
+import type { Barnkurv } from "../../skjema/opprett-sak-schema";
+
+export function barnkurverForForeldre(
+    relasjoner: MotpartBarnRelasjon[],
+    bidragspliktig: string | undefined,
+    bidragsmottaker: string | undefined,
+    forelder: Barnkurv["forelder"],
+): Barnkurv[] {
+    if (!bidragspliktig && !bidragsmottaker) return [];
+    const kurver =
+        bidragspliktig && bidragsmottaker
+            ? [utledFellesBarn(relasjoner, bidragsmottaker)].filter((kurv) => kurv !== null)
+            : utledBarnkurverForForelder(relasjoner);
+    return grupperBarnIKurver(kurver, forelder);
+}
 
 function slåSammenUnikeBarn(eksisterende: MotpartBarnRelasjon["fellesBarn"], nye: MotpartBarnRelasjon["fellesBarn"]) {
     const identer = new Set(eksisterende.map((barn) => barn.ident));

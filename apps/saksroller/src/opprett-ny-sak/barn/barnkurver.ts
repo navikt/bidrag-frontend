@@ -25,3 +25,48 @@ export function grupperBarnIKurver(relasjoner: MotpartBarnRelasjon[], forelder?:
         };
     });
 }
+
+export function slåSammenBarnkurver(barnkurver: Barnkurv[], søskenkurver: Barnkurv[], harManuelleBarn: boolean) {
+    const resultat: Barnkurv[] = [];
+    const grupper = new Map<string, Barnkurv>();
+    const visteBarnPerGruppe = new Map<string, Set<string>>();
+    const kurverFraForeldre = harManuelleBarn ? [] : barnkurver;
+
+    for (const kurv of [...kurverFraForeldre, ...søskenkurver]) {
+        const { gruppenøkkel: nøkkel, id } = barnkurvNøkler(kurv);
+        const dedupliseringsnøkkel = harManuelleBarn ? nøkkel : "alle-barn";
+        const settForGruppe = visteBarnPerGruppe.get(dedupliseringsnøkkel) ?? new Set<string>();
+        const nyeBarn = kurv.barn.filter((barn) => {
+            if (settForGruppe.has(barn.ident)) return false;
+            settForGruppe.add(barn.ident);
+            return true;
+        });
+        visteBarnPerGruppe.set(dedupliseringsnøkkel, settForGruppe);
+        if (nyeBarn.length === 0) continue;
+
+        const eksisterende = grupper.get(nøkkel);
+        if (eksisterende) {
+            eksisterende.barn.push(...nyeBarn);
+            continue;
+        }
+
+        const forelderKurv = barnkurver.find((kandidat) => foreldreparNøkkel(kandidat) === nøkkel);
+        const nyKurv = { ...(forelderKurv ?? kurv), id, barn: nyeBarn };
+        grupper.set(nøkkel, nyKurv);
+        resultat.push(nyKurv);
+    }
+
+    return resultat;
+}
+
+function barnkurvNøkler(kurv: Barnkurv) {
+    const foreldrepar = foreldreparNøkkel(kurv);
+    if (foreldrepar) return { gruppenøkkel: foreldrepar, id: foreldrepar };
+    if (kurv.motpart) return { gruppenøkkel: `motpart-${kurv.motpart.ident}`, id: kurv.id };
+    return { gruppenøkkel: "ukjent-forelder", id: "UKJENT" };
+}
+
+function foreldreparNøkkel(kurv: Barnkurv): string | undefined {
+    if (!kurv.forelder?.ident || !kurv.motpart?.ident) return undefined;
+    return [kurv.forelder.ident, kurv.motpart.ident].sort().join("-");
+}

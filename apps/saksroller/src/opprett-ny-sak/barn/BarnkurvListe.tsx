@@ -7,7 +7,15 @@ import type { ReellMottakerRegel } from "../../felles/saksregler";
 import LåstPartTag from "../parter/LåstPartTag";
 import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import type { Barnkurv, BarnMedAlder } from "../skjema/opprett-sak-schema";
-import { beregnBarnkurvValg, utenReellMottaker } from "./barnkurv-valg";
+import {
+    begrensTilSisteIdent,
+    begrensTilSisteValg,
+    beregnBarnkurvValg,
+    finnKurvbytte,
+    finnLåstKurvId,
+    harRegistrerteBarnIKurv,
+    utenReellMottaker,
+} from "./barnkurv-valg";
 import { BarnReellMottaker } from "./ReellMottakerInline";
 
 type Props = {
@@ -41,20 +49,8 @@ export default function BarnkurvListe({
 }: Props) {
     const valgteBarn = form.watch("valgteBarn") || [];
     const { låstIdent } = useOpprettSakStart();
-    const harManueltValgtBarn = valgteBarn.some((barn) => barn.manuellLagtTil);
     const [aktivKurvId, settAktivKurvId] = useState<string | null>(null);
-    const låstKurvId =
-        harManueltValgtBarn &&
-        aktivKurvId &&
-        barnkurver.some(
-            (kurv) =>
-                kurv.id === aktivKurvId &&
-                kurv.barn.some((barn) =>
-                    valgteBarn.some((valgtBarn) => !valgtBarn.manuellLagtTil && valgtBarn.ident === barn.ident),
-                ),
-        )
-            ? aktivKurvId
-            : null;
+    const låstKurvId = finnLåstKurvId(barnkurver, valgteBarn, aktivKurvId);
     const synligeBarnIdenter = new Set(barnkurver.flatMap((kurv) => kurv.barn.map((barn) => barn.ident)));
     const manuelleBarn = useManuelleBarn(valgteBarn).filter((barn) => !synligeBarnIdenter.has(barn.ident));
 
@@ -63,7 +59,7 @@ export default function BarnkurvListe({
     };
 
     const velgIKurv = (valgteIdenter: string[], kurvId: string) => {
-        if (harManueltValgtBarn && låstKurvId && låstKurvId !== kurvId) return;
+        if (låstKurvId && låstKurvId !== kurvId) return;
 
         const nåværendeBarn = form.getValues("valgteBarn") || [];
         const erUkjentKurv = barnkurver.some((kurv) => kurv.id === kurvId && !kurv.motpart);
@@ -72,16 +68,10 @@ export default function BarnkurvListe({
         if (!valg) return;
 
         settValgteBarn(valg.valgteBarn);
-        const kurv = barnkurver.find((barnkurv) => barnkurv.id === kurvId);
-        const kurvHarValgteBarn = kurv?.barn.some((barn) =>
-            valg.valgteBarn.some((valgtBarn) => !valgtBarn.manuellLagtTil && valgtBarn.ident === barn.ident),
-        );
+        const kurvHarValgteBarn = harRegistrerteBarnIKurv(valg.kurv, valg.valgteBarn);
         settAktivKurvId(kurvHarValgteBarn ? kurvId : null);
-        if (valg.valgteBarn.length === 0) {
-            onKurvByttet?.(null);
-        } else if (kurvHarValgteBarn && valg.aktivKurv?.id !== kurvId) {
-            onKurvByttet?.(valg.kurv);
-        }
+        const kurvbytte = finnKurvbytte(valg.kurv, valg.aktivKurv, valg.valgteBarn);
+        if (kurvbytte !== undefined) onKurvByttet?.(kurvbytte);
     };
 
     const velgManuelle = (valgteIdenter: string[]) => {
@@ -105,7 +95,6 @@ export default function BarnkurvListe({
         utvidSøskenflokker: utvidSøskenflokker || antallGrupper === 1,
     };
 
-    const erManuelt = (ident: string) => valgteBarn.some((b) => b.ident === ident && b.manuellLagtTil);
     const ukjenteKurver = barnkurver.filter((kurv) => !kurv.motpart);
     const antallUkjente = ukjenteKurver.length + (visManuelle && !manuellTittel ? 1 : 0);
     const ukjentNummer = (nummer: number) => (antallUkjente > 1 ? ` ${nummer}` : "");
@@ -113,51 +102,31 @@ export default function BarnkurvListe({
     return (
         <VStack gap="space-16">
             <Accordion as="section" aria-label="Søskenflokker" size="small" indent={false}>
-                {kurverMedKjentPlassering.map((kurv) => {
-                    const motpartNavn = kurv.motpart?.visningsnavn ?? "ukjent forelder";
-                    const ident = !kurv.motpart
-                        ? ukjentNummer(ukjenteKurver.indexOf(kurv) + 1).trim()
-                        : kurv.motpart.ident
-                          ? `(${kurv.motpart.ident})`
-                          : "";
-                    const tittelUtenMotpart =
-                        !kurv.motpart && manuellTittel && kurv.barn.some((b) => erManuelt(b.ident))
-                            ? manuellTittel
-                            : null;
-                    return (
-                        <BarnGruppe
-                            key={kurv.id}
-                            {...gruppe}
-                            tittel={
-                                tittelUtenMotpart ?? (
-                                    <>
-                                        <span className="personnavn">
-                                            {kurv.forelder?.visningsnavn || kurv.forelder?.ident || "Ukjent forelder"}
-                                        </span>
-                                        {" og "}
-                                        <span className="personnavn">{motpartNavn}</span>
-                                        {!kurv.motpart && ident && ` ${ident}`}
-                                    </>
-                                )
-                            }
-                            legend={tittelUtenMotpart ?? `Velg barn med ${motpartNavn}`}
-                            barn={kurv.barn}
-                            disabled={låstKurvId !== null && låstKurvId !== kurv.id}
-                            onChange={(identer) => velgIKurv(identer, kurv.id)}
-                            visVelgAlle={!maksEttBarn && !!kurv.motpart}
-                        />
-                    );
-                })}
-                {visManuelle && (
+                {kurverMedKjentPlassering.map((kurv) => (
                     <BarnGruppe
+                        key={kurv.id}
                         {...gruppe}
-                        tittel={manuellTittel ?? `Med ukjent forelder${ukjentNummer(antallUkjente)}`}
-                        legend={manuellTittel ?? `Velg barn med ukjent forelder${ukjentNummer(antallUkjente)}`}
-                        barn={manuelleBarn}
-                        onChange={velgManuelle}
-                        visVelgAlle={!maksEttBarn}
+                        {...barnkurvVisning(
+                            kurv,
+                            valgteBarn,
+                            manuellTittel,
+                            ukjentNummer(ukjenteKurver.indexOf(kurv) + 1),
+                        )}
+                        barn={kurv.barn}
+                        disabled={låstKurvId !== null && låstKurvId !== kurv.id}
+                        onChange={(identer) => velgIKurv(identer, kurv.id)}
+                        visVelgAlle={!maksEttBarn && !!kurv.motpart}
                     />
-                )}
+                ))}
+                <ManuelleBarnGruppe
+                    {...gruppe}
+                    vis={visManuelle}
+                    manuellTittel={manuellTittel}
+                    ukjentNummer={ukjentNummer(antallUkjente)}
+                    barn={manuelleBarn}
+                    onChange={velgManuelle}
+                    visVelgAlle={!maksEttBarn}
+                />
             </Accordion>
             {laster && (
                 <VStack gap="space-8" role="status" aria-live="polite">
@@ -171,15 +140,45 @@ export default function BarnkurvListe({
     );
 }
 
-function begrensTilSisteValg(nyeValg: BarnMedAlder[], forrigeValg: BarnMedAlder[]) {
-    if (nyeValg.length <= 1) return nyeValg;
-    return nyeValg.filter((barn) => !forrigeValg.some((forrige) => forrige.ident === barn.ident)).slice(-1);
+function barnkurvVisning(
+    kurv: Barnkurv,
+    valgteBarn: BarnMedAlder[],
+    manuellTittel: string | undefined,
+    ukjentNummer: string,
+) {
+    const harManueltBarn = kurv.barn.some((barn) =>
+        valgteBarn.some((valgtBarn) => valgtBarn.ident === barn.ident && valgtBarn.manuellLagtTil),
+    );
+    if (!kurv.motpart && manuellTittel && harManueltBarn) {
+        return { tittel: manuellTittel, legend: manuellTittel };
+    }
+
+    const motpartNavn = kurv.motpart?.visningsnavn ?? "ukjent forelder";
+    return {
+        tittel: <BarnkurvTittel kurv={kurv} motpartNavn={motpartNavn} ukjentNummer={ukjentNummer} />,
+        legend: `Velg barn med ${motpartNavn}`,
+    };
 }
 
-function begrensTilSisteIdent(valgteIdenter: string[], forrigeValg: BarnMedAlder[], låstIdent?: string | null) {
-    if (valgteIdenter.length <= 1) return valgteIdenter;
-    if (låstIdent && valgteIdenter.includes(låstIdent)) return [låstIdent];
-    return valgteIdenter.filter((ident) => !forrigeValg.some((barn) => barn.ident === ident)).slice(-1);
+function BarnkurvTittel({
+    kurv,
+    motpartNavn,
+    ukjentNummer,
+}: {
+    kurv: Barnkurv;
+    motpartNavn: string;
+    ukjentNummer: string;
+}) {
+    return (
+        <>
+            <span className="personnavn">
+                {kurv.forelder?.visningsnavn || kurv.forelder?.ident || "Ukjent forelder"}
+            </span>
+            {" og "}
+            <span className="personnavn">{motpartNavn}</span>
+            {!kurv.motpart && ukjentNummer}
+        </>
+    );
 }
 
 function useManuelleBarn(valgteBarn: BarnMedAlder[]) {
@@ -194,6 +193,35 @@ function useManuelleBarn(valgteBarn: BarnMedAlder[]) {
     return [...lagtTil.current.values()];
 }
 
+type BarnGruppeProps = {
+    tittel?: ReactNode;
+    legend: string;
+    barn: BarnMedAlder[];
+    onChange: (valgteIdenter: string[]) => void;
+    form: Props["form"];
+    valgteBarn: BarnMedAlder[];
+    reellMottakerRegel: ReellMottakerRegel;
+    visVelgAlle: boolean;
+    disabled?: boolean;
+    utvidSøskenflokker: boolean;
+};
+
+function ManuelleBarnGruppe({
+    vis,
+    manuellTittel,
+    ukjentNummer,
+    ...gruppe
+}: Omit<BarnGruppeProps, "tittel" | "legend"> & { vis: boolean; manuellTittel?: string; ukjentNummer: string }) {
+    if (!vis) return null;
+    return (
+        <BarnGruppe
+            {...gruppe}
+            tittel={manuellTittel ?? `Med ukjent forelder${ukjentNummer}`}
+            legend={manuellTittel ?? `Velg barn med ukjent forelder${ukjentNummer}`}
+        />
+    );
+}
+
 function BarnGruppe({
     tittel,
     legend,
@@ -205,18 +233,7 @@ function BarnGruppe({
     visVelgAlle,
     disabled = false,
     utvidSøskenflokker,
-}: {
-    tittel?: ReactNode;
-    legend: string;
-    barn: BarnMedAlder[];
-    onChange: (valgteIdenter: string[]) => void;
-    form: Props["form"];
-    valgteBarn: BarnMedAlder[];
-    reellMottakerRegel: ReellMottakerRegel;
-    visVelgAlle: boolean;
-    disabled?: boolean;
-    utvidSøskenflokker: boolean;
-}) {
+}: BarnGruppeProps) {
     const valgteIdenter = barn.filter((b) => valgteBarn.some((v) => v.ident === b.ident)).map((b) => b.ident);
     const harValgteBarn = valgteIdenter.length > 0;
     const [open, setOpen] = useState(utvidSøskenflokker || harValgteBarn);

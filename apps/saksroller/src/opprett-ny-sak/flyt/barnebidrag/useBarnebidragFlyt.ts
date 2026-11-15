@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { type UseFormReturn, useFormContext } from "react-hook-form";
 import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
 import { reellMottakerRegel, reellMottakerRegelUkjentBidragsmottaker } from "../../../felles/saksregler";
-import { grupperBarnIKurver } from "../../barn/barnkurver";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { ForelderKortProps } from "../../parter/ParterSeksjon";
 import { filtrerBortValgteForeldre } from "../../parter/part-utils";
@@ -18,7 +17,7 @@ import {
     type ForelderPart,
     type ForelderPartRolle,
 } from "../../skjema/opprett-sak-schema";
-import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
+import { barnkurverForForeldre } from "./barnebidrag-barnkurver";
 import { type ForeldreTilBarn, utledForelderforslag } from "./barnebidrag-forelderforslag";
 import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
 import { rollerEtterValg, rolleSomPart, tilPart } from "./barnebidrag-roller";
@@ -36,12 +35,8 @@ function useBarnkurver(form: UseFormReturn<BarnebidragSkjemaData>) {
     const kilde = bidragspliktig || bidragsmottaker;
     const { data, isPending } = useHentPersonMotpartBarnRelasjon(kilde ? { ident: kilde } : null);
     const relasjoner = data?.personensMotpartBarnRelasjon ?? [];
-    const kurver =
-        bidragspliktig && bidragsmottaker
-            ? [utledFellesBarn(relasjoner, bidragsmottaker)].filter((kurv) => kurv !== null)
-            : utledBarnkurverForForelder(relasjoner);
     const kildePart = roller.find((rolle) => rolle.ident === kilde);
-    const barnkurver = grupperBarnIKurver(kilde ? kurver : [], {
+    const barnkurver = barnkurverForForeldre(relasjoner, bidragspliktig, bidragsmottaker, {
         ident: kilde,
         visningsnavn: kildePart?.navn,
     });
@@ -248,9 +243,9 @@ export function useBarnebidragFlyt() {
         }),
     );
 
-    const [primær, sekundær] = bidragspliktig.ident
-        ? (["bidragspliktig", "bidragsmottaker"] as const)
-        : (["bidragsmottaker", "bidragspliktig"] as const);
+    const [partISaken, motpart]: [ForelderPart, ForelderPart] = bidragspliktig.ident
+        ? [bidragspliktig, bidragsmottaker]
+        : [bidragsmottaker, bidragspliktig];
 
     return {
         form,
@@ -272,12 +267,12 @@ export function useBarnebidragFlyt() {
             bidragsmottakerUtenBarn: erKjentPart(bidragsmottaker) && foreldreTilBarn.length === 0,
         },
         relasjonsregler,
-        barnMedUfullstendigRelasjon: ufullstendigRelasjon ?? [],
+        barnMedUfullstendigRelasjon: ufullstendigRelasjon,
         barnMedAnnenForelder: annenForelder,
         status: {
             ...sakStatus,
-            partISakenNavn: (primær === "bidragspliktig" ? bidragspliktig : bidragsmottaker).navn ?? "",
-            motpartNavn: (sekundær === "bidragspliktig" ? bidragspliktig : bidragsmottaker).navn,
+            partISakenNavn: partISaken.navn ?? "",
+            motpartNavn: motpart.navn,
         },
     };
 }
