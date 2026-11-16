@@ -32,7 +32,7 @@ export function DokumentKnapp({
         Boolean(dokument.journalpostTittel?.trim()) &&
         dokument.journalpostTittel?.trim() === dokument.tittel.trim();
 
-    const tittelFargeClass = isSelected ? "text-gray-900" : kanÅpnes ? "text-[var(--a-text-action)]" : "text-gray-500";
+    const tittelFargeClass = isSelected || kanÅpnes ? "text-gray-900" : "text-gray-500";
 
     const backgroundClass = isSelected ? "bg-[var(--a-surface-action-subtle,#cce1ff)]" : "bg-transparent";
     const borderClass = isSelected
