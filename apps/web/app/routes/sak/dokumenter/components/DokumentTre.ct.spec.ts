@@ -57,7 +57,7 @@ test.describe("DokumentTre", () => {
         await expect(søknad).toHaveAttribute("aria-expanded", "false");
     });
 
-    test("viser vedlegg med svart tekst", async ({ mount, page }) => {
+    test("viser vedlegg med svart, halvfet tekst", async ({ mount, page }) => {
         const component = await mount(STORY);
         await journalpostHeader(component, "Søknad om barnebidrag").click();
 
@@ -75,5 +75,8 @@ test.describe("DokumentTre", () => {
         });
 
         expect(farge).toBe(svart);
+        expect(Number(await vedleggTekst.evaluate((el) => getComputedStyle(el).fontWeight))).toBeGreaterThanOrEqual(
+            600,
+        );
     });
 });

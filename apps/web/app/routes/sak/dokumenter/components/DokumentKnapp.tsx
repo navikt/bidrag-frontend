@@ -60,7 +60,7 @@ export function DokumentKnapp({
             <HStack gap="space-1" align="center" wrap={false} className="w-full min-w-0">
                 {!erHoveddokument && <Detail className="text-gray-500 shrink-0 font-normal">↳</Detail>}
                 <Detail
-                    weight={isSelected || erHoveddokument ? "semibold" : "regular"}
+                    weight={isSelected || erHoveddokument || kanÅpnes ? "semibold" : "regular"}
                     className={`truncate flex-1 min-w-0 ${
                         tittelDupliserer ? "text-gray-600" : tittelFargeClass
                     } ${kanÅpnes && !isSelected && !tittelDupliserer ? "hover:underline" : ""}`}
