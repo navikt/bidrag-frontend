@@ -18,7 +18,7 @@ const dokument = (dokumentreferanse: string, tittel: string) => ({
 
 // Søknaden ble mottatt 06.01.2025, men skannet og journalført 02.10.2026. Joark gir da dokumentDato
 // 02.10.2026 og mottattDato 06.01.2025.
-const journalposter: JournalpostDto[] = [
+export const journalposter: JournalpostDto[] = [
     {
         journalpostId: "JOARK-6001",
         dokumentType: "I",
