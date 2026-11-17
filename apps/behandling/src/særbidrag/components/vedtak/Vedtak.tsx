@@ -48,7 +48,7 @@ const Vedtak = () => {
 
 const VedtakResultat = () => {
     const { data: beregnetSærbidrag } = useGetBeregningSærbidrag();
-    const { medInnkreving, erBisysVedtak } = useGetBehandlingV2();
+    const { medInnkreving, erBisysVedtak, lesemodus } = useGetBehandlingV2();
 
     function renderResultat() {
         if (beregnetSærbidrag.feil) return null;
@@ -58,7 +58,7 @@ const VedtakResultat = () => {
             Resultatkode.ALLE_UTGIFTER_ER_FORELDET,
         ].includes(beregnetSærbidrag.resultat?.resultatKode);
         const erBeregningeAvslag = !erBisysVedtak && beregnetSærbidrag.resultat?.resultatKode !== Resultatkode.SAeRBIDRAGINNVILGET;
-        const erInnvilgetVedtak = erBisysVedtak && beregnetSærbidrag.resultat.resultatKode === Resultatkode.INNVILGET_VEDTAK
+        const erInnvilgetVedtak = erBisysVedtak && lesemodus.erManuellVedtak
         const resultat = beregnetSærbidrag.resultat;
         if (erDirekteAvslag) {
             return (
@@ -73,7 +73,7 @@ const VedtakResultat = () => {
                 </div>
             );
         }
-        if (erAvslagSomInneholderUtgifter || erBisysVedtak) {
+        if (erAvslagSomInneholderUtgifter) {
             return (
                 <div>
                     <Heading size="small">Avslag</Heading>
@@ -113,21 +113,16 @@ const VedtakResultat = () => {
                     <VStack gap={"space-2"}>
                         <ResultatDescription
                             data={[
-                                resultat.resultatKode === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS && {
-                                    label: "Forskuddssats",
-                                    value: formatterBeløp(resultat.forskuddssats, true),
+                                {
+                                    label: "Årsak",
+                                    value: hentVisningsnavn(resultat.resultatKode),
                                 },
                                 {
-                                    label: "Kravbeløp",
-                                    value: formatterBeløp(resultat.beregning?.totalKravbeløp, true),
-                                },
-                                {
-                                    label: "Godkjent beløp",
-                                    value: formatterBeløp(resultat.beregning?.totalGodkjentBeløp, true),
+                                    label: "Beløp",
+                                    value: formatterBeløp(resultat.beløpSomInnkreves, true),
                                 },
                             ].filter((d) => d)}
                         />
-                        <UtgifterLagtTilGrunnAccordion />
                     </VStack>
                 </div>
             );

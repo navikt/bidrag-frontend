@@ -66,14 +66,14 @@ function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
             step: SærligeutgifterStepper.INNTEKT,
             visible: true,
             interactive:
-                behandling.vedtakstype !== Vedtakstype.OPPHOR &&
+                behandling.vedtakstype !== Vedtakstype.OPPHOR &&!behandling.lesemodus?.erManuellVedtak &&
                 (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
         },
         {
             step: SærligeutgifterStepper.BOFORHOLD,
             visible: true,
             interactive:
-                behandling.vedtakstype !== Vedtakstype.OPPHOR &&
+                behandling.vedtakstype !== Vedtakstype.OPPHOR && !behandling.lesemodus?.erManuellVedtak &&
                 (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
         },
 

@@ -254,6 +254,7 @@ const Main = ({
     const [avslag, erMaksBeløpMed] = getValues(["avslag", "maksGodkjentBeløpTaMed"]);
     const erAvslagValgt =
         avslag !== "" && avslag !== undefined && avslag !== null && !AvslagListeEtterUtgifterErUtfylt.includes(avslag);
+    const erManuellVedtak = behandling.lesemodus?.erManuellVedtak
     const erAvslagSomInneholderUtgifter =
         avslag !== "" && avslag !== undefined && avslag !== null && AvslagListeEtterUtgifterErUtfylt.includes(avslag);
     const erKonfirmasjon = behandling.utgift.kategori.kategori === Saerbidragskategori.KONFIRMASJON;
@@ -275,7 +276,7 @@ const Main = ({
                         <BodyShort size="small">{hentVisningsnavn(behandling.utgift.kategori.kategori)}</BodyShort>
                     </div>
                 )}
-                {behandling.utgift.kategori.kategori === Saerbidragskategori.ANNET && (
+                {behandling.utgift.kategori.kategori === Saerbidragskategori.ANNET && !erManuellVedtak && (
                     <div className="flex gap-x-2">
                         <Label size="small">{text.label.kategori}:</Label>
                         <BodyShort size="small">
@@ -302,7 +303,7 @@ const Main = ({
                 )}
             </FlexRow>
             <FlexRow>
-                <FormControlledSelectField name="avslag" label={text.label.avslagsGrunn} className="w-max">
+                {!erManuellVedtak && <FormControlledSelectField name="avslag" label={text.label.avslagsGrunn} className="w-max">
                     {!erAvslagSomInneholderUtgifter && <option value="">{text.select.avslagPlaceholder}</option>}
                     {AvslagListe.map((value) => (
                         <option key={value} value={value}>
@@ -316,9 +317,13 @@ const Main = ({
                                 {hentVisningsnavnVedtakstype(value, behandling.vedtakstype)}
                             </option>
                         ))}
-                </FormControlledSelectField>
+                </FormControlledSelectField>}
+                {erManuellVedtak &&  <div className="flex gap-x-2">
+                    <Label size="small">Årsak:</Label>
+                    <BodyShort size="small">{behandling.lesemodus?.resultatkodeVisningsnavn}</BodyShort>
+                </div> }
             </FlexRow>
-            {!erAvslagValgt && (
+            {!erAvslagValgt && !erManuellVedtak && (
                 <>
                     <Box background="neutral-soft" className="overflow-hidden grid gap-2 py-2 px-4 text-wrap">
                         <FlexRow>
