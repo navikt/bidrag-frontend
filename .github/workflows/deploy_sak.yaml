@@ -22,7 +22,7 @@ env:
   BUCKET_PROD: bidrag-ui-static-files-prod
 defaults:
   run:
-    working-directory: ./familieveileder
+    working-directory: familieveileder
 jobs:
   build:
     name: Lint, test og bygg
