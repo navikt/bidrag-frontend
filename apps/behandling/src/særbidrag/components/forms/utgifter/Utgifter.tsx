@@ -259,6 +259,8 @@ const Main = ({
     const erKonfirmasjon = behandling.utgift.kategori.kategori === Saerbidragskategori.KONFIRMASJON;
     const maksGodkjentBeløpBegrunnelseMutationStatus = useFieldMutationStatus(mutation, "maksGodkjentBeløpBegrunnelse");
 
+    // Hvis grunnlag er overført fra Bisys så kan det være avslagsgrunner som ikke finnes i ny løsning
+    const avslagFinnesIkkeIValgbarListe = !AvslagListe.some((b)=>avslag === b)
     return (
         <>
             <FlexRow className="gap-x-12">
@@ -278,8 +280,7 @@ const Main = ({
                         <Label size="small">{text.label.kategori}:</Label>
                         <BodyShort size="small">
                             {hentVisningsnavn(behandling.utgift.kategori.kategori) +
-                                ": " +
-                                behandling.utgift?.kategori?.beskrivelse}
+                                (behandling.utgift?.kategori?.beskrivelse ? `: ${behandling.utgift?.kategori?.beskrivelse}` : "")}
                         </BodyShort>
                     </div>
                 )}
@@ -308,6 +309,7 @@ const Main = ({
                             {hentVisningsnavnVedtakstype(value, behandling.vedtakstype)}
                         </option>
                     ))}
+                    {avslagFinnesIkkeIValgbarListe && <option value={avslag}>{hentVisningsnavnVedtakstype(avslag, behandling.vedtakstype)}</option>}
                     {erAvslagSomInneholderUtgifter &&
                         AvslagListeEtterUtgifterErUtfylt.map((value) => (
                             <option key={value} value={value} disabled>

@@ -48,7 +48,7 @@ const Vedtak = () => {
 
 const VedtakResultat = () => {
     const { data: beregnetSærbidrag } = useGetBeregningSærbidrag();
-    const { medInnkreving } = useGetBehandlingV2();
+    const { medInnkreving, erBisysVedtak } = useGetBehandlingV2();
 
     function renderResultat() {
         if (beregnetSærbidrag.feil) return null;
@@ -57,7 +57,8 @@ const VedtakResultat = () => {
             Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS,
             Resultatkode.ALLE_UTGIFTER_ER_FORELDET,
         ].includes(beregnetSærbidrag.resultat?.resultatKode);
-        const erBeregningeAvslag = beregnetSærbidrag.resultat?.resultatKode !== Resultatkode.SAeRBIDRAGINNVILGET;
+        const erBeregningeAvslag = !erBisysVedtak && beregnetSærbidrag.resultat?.resultatKode !== Resultatkode.SAeRBIDRAGINNVILGET;
+        const erInnvilgetVedtak = erBisysVedtak && beregnetSærbidrag.resultat.resultatKode === Resultatkode.INNVILGET_VEDTAK
         const resultat = beregnetSærbidrag.resultat;
         if (erDirekteAvslag) {
             return (
@@ -72,7 +73,7 @@ const VedtakResultat = () => {
                 </div>
             );
         }
-        if (erAvslagSomInneholderUtgifter) {
+        if (erAvslagSomInneholderUtgifter || erBisysVedtak) {
             return (
                 <div>
                     <Heading size="small">Avslag</Heading>
@@ -83,6 +84,35 @@ const VedtakResultat = () => {
                                     label: "Årsak",
                                     value: hentVisningsnavn(resultat.resultatKode),
                                 },
+                                resultat.resultatKode === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS && {
+                                    label: "Forskuddssats",
+                                    value: formatterBeløp(resultat.forskuddssats, true),
+                                },
+                                {
+                                    label: "Kravbeløp",
+                                    value: formatterBeløp(resultat.beregning?.totalKravbeløp, true),
+                                },
+                                {
+                                    label: "Godkjent beløp",
+                                    value: formatterBeløp(resultat.beregning?.totalGodkjentBeløp, true),
+                                },
+                            ].filter((d) => d)}
+                        />
+                        <UtgifterLagtTilGrunnAccordion />
+                    </VStack>
+                </div>
+            );
+        }
+
+        if (erInnvilgetVedtak) {
+            return (
+                <div>
+                    <Heading spacing size="small">
+                        Særbidrag innvilget
+                    </Heading>
+                    <VStack gap={"space-2"}>
+                        <ResultatDescription
+                            data={[
                                 resultat.resultatKode === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS && {
                                     label: "Forskuddssats",
                                     value: formatterBeløp(resultat.forskuddssats, true),
