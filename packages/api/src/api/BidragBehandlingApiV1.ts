@@ -86,6 +86,7 @@ export enum Grunnlagstype {
   UTGIFT_DIREKTE_BETALT = "UTGIFT_DIREKTE_BETALT",
   UTGIFTMAKSGODKJENTBELOP = "UTGIFT_MAKS_GODKJENT_BELØP",
   UTGIFTSPOSTER = "UTGIFTSPOSTER",
+  SAERBIDRAGRIMELIGAINNVILGE = "SÆRBIDRAG_RIMELIG_Å_INNVILGE",
   SLUTTBEREGNING_FORSKUDD = "SLUTTBEREGNING_FORSKUDD",
   DELBEREGNING_SUM_INNTEKT = "DELBEREGNING_SUM_INNTEKT",
   DELBEREGNING_BARN_I_HUSSTAND = "DELBEREGNING_BARN_I_HUSSTAND",
@@ -2013,11 +2014,25 @@ export interface SaerbidragKategoriDto {
   beskrivelse?: string | null;
 }
 
+export interface SaerbidragRimeligAInnvilgeDto {
+  /** Om barnets inntekt er lik eller høyere enn 100 ganger forskuddssats. Saksbehandler må da vurdere om det er rimelig å innvilge særbidrag */
+  barnetsInntektErOverGrensen: boolean;
+  rimeligÅInnvilge: boolean;
+  begrunnelse?: string | null;
+  valideringsfeil?: SaerbidragRimeligAInnvilgeValideringsfeil | null;
+}
+
+export interface SaerbidragRimeligAInnvilgeValideringsfeil {
+  /** Begrunnelse for om det er rimelig å innvilge særbidrag mangler */
+  manglerBegrunnelse: boolean;
+}
+
 export interface SaerbidragUtgifterDto {
   avslag?: Resultatkode | null;
   kategori: SaerbidragKategoriDto;
   beregning?: UtgiftBeregningDto | null;
   maksGodkjentBeløp?: MaksGodkjentBelopDto | null;
+  rimeligÅInnvilge?: SaerbidragRimeligAInnvilgeDto | null;
   /** Saksbehandlers begrunnelse */
   begrunnelse: BegrunnelseDto;
   begrunnelseFraOpprinneligVedtak?: BegrunnelseDto | null;
@@ -2422,6 +2437,8 @@ export interface OppdatereUtgiftRequest {
   avslag?: Resultatkode | null;
   beløpDirekteBetaltAvBp?: number | null;
   maksGodkjentBeløp?: MaksGodkjentBelopDto | null;
+  /** Oppdater saksbehandlers vurdering av om det er rimelig å innvilge særbidrag når barnet er selvforsørget */
+  rimeligÅInnvilge?: RimeligAInnvilgeDto | null;
   /** Legg til eller endre en utgift. Utgift kan ikke endres eller oppdateres hvis avslag er satt */
   nyEllerEndretUtgift?: OppdatereUtgift | null;
   /**
@@ -2435,6 +2452,12 @@ export interface OppdatereUtgiftRequest {
   notat?: OppdatereBegrunnelse | null;
 }
 
+export interface RimeligAInnvilgeDto {
+  /** Om det er rimelig å innvilge særbidrag selv om barnets inntekt er lik eller høyere enn 100 ganger forskuddssats */
+  rimeligÅInnvilge: boolean;
+  begrunnelse?: string | null;
+}
+
 export interface OppdatereUtgiftResponse {
   /** Utgiftspost som ble oppdatert */
   oppdatertUtgiftspost?: UtgiftspostDto | null;
@@ -2446,6 +2469,7 @@ export interface OppdatereUtgiftResponse {
   begrunnelse?: string | null;
   beregning?: UtgiftBeregningDto | null;
   maksGodkjentBeløp?: MaksGodkjentBelopDto | null;
+  rimeligÅInnvilge?: RimeligAInnvilgeDto | null;
   avslag?: Resultatkode | null;
   valideringsfeil?: UtgiftValideringsfeilDto | null;
   totalBeregning: TotalBeregningUtgifterDto[];
@@ -4015,6 +4039,7 @@ export interface BeregningValideringsfeil {
   gebyr?: GebyrValideringsfeilDto[] | null;
   /** @uniqueItems true */
   underholdskostnad?: UnderholdskostnadValideringsfeil[] | null;
+  særbidragRimeligÅInnvilge?: SaerbidragRimeligAInnvilgeValideringsfeil | null;
   /** @uniqueItems true */
   måBekrefteNyeOpplysninger: MaBekrefteNyeOpplysninger[];
 }
