@@ -1,7 +1,7 @@
 import type { ForholdsmessigFordelingBarnDto } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, BodyShort, HStack, Label, VStack } from "@navikt/ds-react";
 import { useGetBehandlingV2 } from "../../common/hooks/useApiData";
-import BarnDetaljerFF, { BarnDetaljerOpprettFF } from "./BarnDetaljer";
+import BarnDetaljerFF, { BarnDetaljerOpprettFF, type EndretRevurderingsdato } from "./BarnDetaljer";
 
 interface BarnListeProps {
     skalBehandlesAvEnhet?: string;
@@ -74,7 +74,18 @@ export function BarnListeOpprettFF({
     );
 }
 
-export function BarnListe({ barn }: BarnListeProps) {
+interface BarnListeFFProps extends BarnListeProps {
+    endredeRevurderingsdatoer?: EndretRevurderingsdato[];
+    onRevurderingsdatoChange?: (barn: ForholdsmessigFordelingBarnDto, dato?: string) => void;
+    lagrerRevurderingsdatoer?: boolean;
+}
+
+export function BarnListe({
+    barn,
+    endredeRevurderingsdatoer,
+    onRevurderingsdatoChange,
+    lagrerRevurderingsdatoer,
+}: BarnListeFFProps) {
     const groupedBarn = barn.reduce(
         (acc, b) => {
             const key = b.saksnr || "unknown";
@@ -89,7 +100,12 @@ export function BarnListe({ barn }: BarnListeProps) {
             <VStack gap="space-2">
                 {Object.values(groupedBarn).map((group) => (
                     <div key={group[0].saksnr || "unknown"}>
-                        <BarnDetaljerFF barn={group} />
+                        <BarnDetaljerFF
+                            barn={group}
+                            endredeRevurderingsdatoer={endredeRevurderingsdatoer}
+                            onRevurderingsdatoChange={onRevurderingsdatoChange}
+                            lagrerRevurderingsdatoer={lagrerRevurderingsdatoer}
+                        />
                     </div>
                 ))}
             </VStack>
