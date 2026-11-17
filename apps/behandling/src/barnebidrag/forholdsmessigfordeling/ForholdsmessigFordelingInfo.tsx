@@ -126,8 +126,8 @@ export default function ForholdsmessigFordelingInfo() {
                             <VStack gap="space-8" className="pt-2 border-t border-[var(--ax-border-neutral-subtle)]">
                                 {harEndringer && (
                                     <BehandlingAlert variant="warning">
-                                        Virkningstidspunkt er endret, dette kan påvirke beregningen. <br /> Inntekter,
-                                        samvær og boforhold må vurderes på nytt. Vurder også om det må varsles på nytt.
+                                        Virkningstidspunktet er endret, dette kan påvirke beregningen. <br/>
+                                        Vurder om ny periode samsvarer med det partene er varslet om i alle steg i beregningen.
                                     </BehandlingAlert>
                                 )}
                                 <HStack gap="space-2" justify="end">
