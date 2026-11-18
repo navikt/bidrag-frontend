@@ -1,13 +1,12 @@
-import {Vedtakstype} from "@bidrag/api/BidragBehandlingApiV1";
-import {Resultatkode} from "@bidrag/api/BidragBehandlingApiV1";
-import {type PropsWithChildren, useMemo, useState} from "react";
-import {useParams} from "react-router";
+import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { type PropsWithChildren, useState, useMemo } from "react";
+import { useParams } from "react-router";
 import text from "../../common/constants/texts";
-import {BehandlingProvider} from "../../common/context/BehandlingContext";
-import {useBehandlingV2} from "../../common/hooks/useApiData";
+import { BehandlingProvider } from "../../common/context/BehandlingContext";
+import { useBehandlingV2 } from "../../common/hooks/useApiData";
 
-import {STEPS, STEPS as SærligeutgifterSteps} from "../constants/steps";
-import {SærligeutgifterStepper} from "../enum/SærligeutgifterStepper";
+import { STEPS, STEPS as SærligeutgifterSteps } from "../constants/steps";
+import { SærligeutgifterStepper } from "../enum/SærligeutgifterStepper";
 
 export type InntektTables =
     | `småbarnstillegg.${string}`
@@ -67,17 +66,15 @@ function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
             step: SærligeutgifterStepper.INNTEKT,
             visible: true,
             interactive:
-                behandling.vedtakstype !== Vedtakstype.OPPHOR &&!behandling.lesemodus?.erManuellVedtak &&
-                ((behandling.erBisysVedtak && behandling.utgift.avslag === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS) ||
-                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null)),
+                behandling.vedtakstype !== Vedtakstype.OPPHOR &&
+                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
         },
         {
             step: SærligeutgifterStepper.BOFORHOLD,
             visible: true,
             interactive:
-                behandling.vedtakstype !== Vedtakstype.OPPHOR && !behandling.lesemodus?.erManuellVedtak &&
-                ((behandling.erBisysVedtak && behandling.utgift.avslag === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS) ||
-                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null)),
+                behandling.vedtakstype !== Vedtakstype.OPPHOR &&
+                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
         },
 
         {
