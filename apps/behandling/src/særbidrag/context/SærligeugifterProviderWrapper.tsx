@@ -68,16 +68,16 @@ function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
             visible: true,
             interactive:
                 behandling.vedtakstype !== Vedtakstype.OPPHOR &&!behandling.lesemodus?.erManuellVedtak &&
-                (behandling.erBisysVedtak && behandling.utgift.avslag === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS) ||
-                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
+                ((behandling.erBisysVedtak && behandling.utgift.avslag === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS) ||
+                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null)),
         },
         {
             step: SærligeutgifterStepper.BOFORHOLD,
             visible: true,
             interactive:
                 behandling.vedtakstype !== Vedtakstype.OPPHOR && !behandling.lesemodus?.erManuellVedtak &&
-                (behandling.erBisysVedtak && behandling.utgift.avslag === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS) ||
-                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
+                ((behandling.erBisysVedtak && behandling.utgift.avslag === Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS) ||
+                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null)),
         },
 
         {
