@@ -22,6 +22,8 @@ const tekster = {
         endreAvslagsgrunn: "Er du sikker på at du vil endre avslagsgrunn?",
         endreAvslagsgrunnTilBidragspliktigErDød:
             "Er du sikker på at du vil endre avslagsgrunn til Bidragspliktig er død?",
+        endretVirkningstidspunktBidrag:
+            "Virkningstidspunktet er endret. Dette kan påvirke beregningen. <br> Inntekter, samvær og boforhold må manuelt vurderes på nytt",
         endretVirkningstidspunkt:
             "Virkningstidspunktet er endret. Dette kan påvirke beregningen. <br> Inntekter og boforhold må manuelt vurderes på nytt",
         endringer: "Følgende endringer har blitt utført:",
