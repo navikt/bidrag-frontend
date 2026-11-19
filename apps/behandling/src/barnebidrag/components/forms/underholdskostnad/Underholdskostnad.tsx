@@ -5,7 +5,8 @@ import {
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { ModiaLink, RolleTypeAbbreviation } from "@bidrag/common";
-import { BodyShort, Tabs } from "@navikt/ds-react";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
+import { BodyShort } from "@navikt/ds-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext, useWatch } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
