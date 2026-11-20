@@ -1,6 +1,6 @@
 import { ChevronLeftDoubleIcon, ChevronRightDoubleIcon } from "@navikt/aksel-icons";
-import { Button } from "@navikt/ds-react";
-import { useState } from "react";
+import { Button, Tooltip } from "@navikt/ds-react";
+import { useId, useState } from "react";
 import { NavLink } from "react-router";
 import styles from "./SideNav.module.css";
 
@@ -26,6 +26,7 @@ interface SideNavProps {
  */
 export function SideNav({ items, ariaLabel = "Sidemeny", kollapset, onKollapsetChange }: SideNavProps) {
     const [egenKollapset, setEgenKollapset] = useState(false);
+    const listeId = useId();
     const erKollapset = kollapset ?? egenKollapset;
     const settKollapset = (verdi: boolean) => {
         setEgenKollapset(verdi);
@@ -35,22 +36,25 @@ export function SideNav({ items, ariaLabel = "Sidemeny", kollapset, onKollapsetC
     return (
         <nav aria-label={ariaLabel} className={erKollapset ? `${styles.nav} ${styles.kollapset}` : styles.nav}>
             <div className={styles.toggle}>
-                <Button
-                    size="small"
-                    variant="tertiary-neutral"
-                    icon={
-                        erKollapset ? (
-                            <ChevronRightDoubleIcon title="Vis meny" />
-                        ) : (
-                            <ChevronLeftDoubleIcon title="Skjul meny" />
-                        )
-                    }
-                    aria-expanded={!erKollapset}
-                    onClick={() => settKollapset(!erKollapset)}
-                />
+                <Tooltip content={erKollapset ? "Vis meny" : "Skjul meny"}>
+                    <Button
+                        size="small"
+                        variant="tertiary-neutral"
+                        icon={
+                            erKollapset ? (
+                                <ChevronRightDoubleIcon title="Vis meny" />
+                            ) : (
+                                <ChevronLeftDoubleIcon title="Skjul meny" />
+                            )
+                        }
+                        aria-expanded={!erKollapset}
+                        aria-controls={erKollapset ? undefined : listeId}
+                        onClick={() => settKollapset(!erKollapset)}
+                    />
+                </Tooltip>
             </div>
             {!erKollapset && (
-                <ul className={styles.list}>
+                <ul id={listeId} className={styles.list}>
                     {items.map((item) => (
                         <li key={item.href} className={styles.listItem}>
                             <NavLink to={item.href} className={styles.link} end={!item.isNotEnd}>

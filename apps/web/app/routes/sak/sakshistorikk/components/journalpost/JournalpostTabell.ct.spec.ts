@@ -205,6 +205,37 @@ test.describe("JournalpostTabell", () => {
         expect(await farge("12.05.2024")).toBe(await farge("10.05.2024"));
     });
 
+    test("viser Fag rett etter Enhet, både med og uten slett-kolonnen", async ({ mount, page }) => {
+        await mockSak(page);
+        for (const story of [STORY_BLANDET, STORY_LANG_BESKRIVELSE]) {
+            const component = await mount(story);
+            const overskrifter = await component.locator("thead th").allTextContents();
+            const enhet = overskrifter.indexOf("Enhet");
+            expect(enhet).toBeGreaterThan(0);
+            expect(overskrifter[enhet + 1]).toBe("Fag");
+            await component.unmount();
+        }
+    });
+
+    test("går til Dokumentvisning uten å laste siden på nytt", async ({ mount, page }) => {
+        await mockSak(page);
+        const component = await mount(STORY_BLANDET);
+        const sidelastinger: string[] = [];
+        page.on("request", (request) => {
+            if (request.resourceType() === "document") sidelastinger.push(request.url());
+        });
+
+        await page.evaluate(() => {
+            (window as unknown as { merke?: number }).merke = 1;
+        });
+
+        await component.getByRole("button", { name: "Dokumentvisning" }).click();
+        await page.waitForLoadState();
+
+        expect(sidelastinger).toEqual([]);
+        expect(await page.evaluate(() => (window as unknown as { merke?: number }).merke)).toBe(1);
+    });
+
     test("viser ikonet i full størrelse når beskrivelsen er kuttet", async ({ mount, page }) => {
         await mockSak(page);
         await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
