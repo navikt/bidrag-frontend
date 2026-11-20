@@ -1195,6 +1195,19 @@ export const useUpdateUtgifter = () => {
                             valideringsfeil: response.valideringsfeil,
                             totalBeregning: response.totalBeregning,
                             maksGodkjentBeløp: response.maksGodkjentBeløp,
+                            rimeligÅInnvilge:
+                                currentData.utgift.rimeligÅInnvilge && response.rimeligÅInnvilge
+                                    ? {
+                                          ...currentData.utgift.rimeligÅInnvilge,
+                                          rimeligÅInnvilge: response.rimeligÅInnvilge.rimeligÅInnvilge,
+                                          begrunnelse: response.rimeligÅInnvilge.begrunnelse,
+                                          valideringsfeil:
+                                              currentData.utgift.rimeligÅInnvilge.barnetsInntektErOverGrensen &&
+                                              !response.rimeligÅInnvilge.begrunnelse?.trim()
+                                                  ? { manglerBegrunnelse: true }
+                                                  : null,
+                                      }
+                                    : currentData.utgift.rimeligÅInnvilge,
                             begrunnelse:
                                 input.triggeredBy === "begrunnelse"
                                     ? { innhold: response.begrunnelse, kunINotat: response.begrunnelse }

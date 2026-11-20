@@ -8,6 +8,7 @@ import { SærligeutgifterStepper } from "../../enum/SærligeutgifterStepper";
 import Vedtak from "../vedtak/Vedtak";
 import Boforhold from "./boforhold/Boforhold";
 import Inntekt from "./inntekt/Inntekt";
+import RimeligAaInnvilge from "./rimeligAaInnvilge/RimeligAaInnvilge";
 import Utgifter from "./utgifter/Utgifter";
 
 const SærligeutgifterForm = memo(({ activeStep }: { activeStep: string }) => {
@@ -29,6 +30,8 @@ const SærligeutgifterForm = memo(({ activeStep }: { activeStep: string }) => {
             return <Inntekt />;
         case SærligeutgifterStepper.BOFORHOLD:
             return <Boforhold />;
+        case SærligeutgifterStepper.RIMELIG_Å_INNVILGE:
+            return <RimeligAaInnvilge />;
         case SærligeutgifterStepper.VEDTAK:
             return <Vedtak />;
         default:

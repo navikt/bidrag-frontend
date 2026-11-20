@@ -1,5 +1,5 @@
 import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
-import { type PropsWithChildren, useState, useMemo } from "react";
+import { type PropsWithChildren, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import text from "../../common/constants/texts";
 import { BehandlingProvider } from "../../common/context/BehandlingContext";
@@ -76,7 +76,14 @@ function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
                 behandling.vedtakstype !== Vedtakstype.OPPHOR &&
                 (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
         },
-
+        {
+            step: SærligeutgifterStepper.RIMELIG_Å_INNVILGE,
+            visible: true,
+            interactive:
+                behandling.vedtakstype !== Vedtakstype.OPPHOR &&
+                (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null) &&
+                !!behandling.utgift.rimeligÅInnvilge?.barnetsInntektErOverGrensen,
+        },
         {
             step: SærligeutgifterStepper.VEDTAK,
             visible: true,
@@ -97,6 +104,7 @@ function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
             JSON.stringify(pageErrorsOrUnsavedState),
             behandling.vedtakstype,
             behandling.utgift.avslag,
+            behandling.utgift.rimeligÅInnvilge?.barnetsInntektErOverGrensen,
             JSON.stringify(sideMenu),
         ],
     );

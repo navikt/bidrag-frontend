@@ -551,6 +551,16 @@ export default function VedtakWrapper({ feil, steps, children }: PropsWithChildr
                 ),
             );
         }
+        if (feilInnhold.særbidragRimeligÅInnvilge?.manglerBegrunnelse && "rimeligAaInnvilge" in steps) {
+            feilliste.push(
+                FeilmeldingComponent(
+                    undefined,
+                    <ErrorSummary.Item onClick={() => onStepChange(steps.rimeligAaInnvilge)}>
+                        {texts.title.rimeligÅInnvilge}: {texts.error.manglerBegrunnelse}
+                    </ErrorSummary.Item>,
+                ),
+            );
+        }
         if (feilInnhold.sivilstand != null) {
             feilliste.push(
                 FeilmeldingComponent(

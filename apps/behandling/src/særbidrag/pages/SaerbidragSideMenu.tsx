@@ -344,6 +344,32 @@ const BoforholdMenuButton = ({
     );
 };
 
+const RimeligAaInnvilgeMenuButton = ({
+    activeButton,
+    step,
+    interactive,
+}: {
+    activeButton: string;
+    step: string;
+    interactive: boolean;
+}) => {
+    const { onStepChange } = useBehandlingProvider();
+    const {
+        utgift: { rimeligÅInnvilge },
+    } = useGetBehandlingV2();
+
+    return (
+        <MenuButton
+            step={step}
+            title={text.title.rimeligÅInnvilge}
+            onStepChange={() => onStepChange(STEPS[SærligeutgifterStepper.RIMELIG_Å_INNVILGE])}
+            interactive={interactive}
+            active={activeButton === SærligeutgifterStepper.RIMELIG_Å_INNVILGE}
+            valideringsfeil={interactive && !!rimeligÅInnvilge?.valideringsfeil?.manglerBegrunnelse}
+        />
+    );
+};
+
 const VedtakMenuButton = ({ activeButton, step }: { activeButton: string; step: string }) => {
     const { onStepChange, isGrunnlagLoading } = useBehandlingProvider();
     return (
@@ -361,6 +387,7 @@ const menuButtonMap = {
     [SærligeutgifterStepper.UTGIFT]: UtgiftMenuButton,
     [SærligeutgifterStepper.INNTEKT]: InntektMenuButton,
     [SærligeutgifterStepper.BOFORHOLD]: BoforholdMenuButton,
+    [SærligeutgifterStepper.RIMELIG_Å_INNVILGE]: RimeligAaInnvilgeMenuButton,
     [SærligeutgifterStepper.VEDTAK]: VedtakMenuButton,
 };
 
