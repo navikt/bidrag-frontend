@@ -186,7 +186,7 @@ export const BeregningForholdsmessigFordeling = () => {
                 )}
             </VStack>
         );
-    } else if (inneholderRevurderingsbarn && forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk) {
+    } else if (periodeInneholderRevurderingsbarn && forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk) {
         return <BeregningForholdsmessigFordelingRevurdering />;
     }
     return <BeregningForholdsmessigFordelingSøknadsbarn />;
