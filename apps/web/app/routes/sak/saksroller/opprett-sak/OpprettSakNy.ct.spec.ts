@@ -22,6 +22,11 @@ async function mockOpprettSak(page: Page, feil = false) {
 
 async function velgBarnOgOpprett(page: Page) {
     const dialog = page.getByRole("dialog");
+    await expect(
+        dialog
+            .getByRole("region", { name: "Søskenflokker" })
+            .getByRole("button", { name: `${person.visningsnavn} og ${motpart.visningsnavn}` }),
+    ).toHaveAttribute("aria-expanded", "true");
     await dialog.getByRole("checkbox", { name: `Velg ${barn.visningsnavn}`, exact: true }).check();
     await expect(
         dialog.getByRole("group", { name: "Bidragspliktig", exact: true }).getByText(motpart.visningsnavn),

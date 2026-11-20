@@ -15,7 +15,7 @@ const flytkomponenter = {
 } as const;
 
 /**
- * Skjemaet for valgt sakstype, fylt ut fra startpersonen. Brukes både på siden og i modalen.
+ * Skjemaet for valgt sakstype. Siden starter tom, mens modalen fylles ut fra startpersonen.
  * Gi ny `key` for å starte skjemaet på nytt.
  */
 export default function OpprettSakSkjema(props: Omit<ComponentProps<typeof OpprettSakStartProvider>, "children">) {

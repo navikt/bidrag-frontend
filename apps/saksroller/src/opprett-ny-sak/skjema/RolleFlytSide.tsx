@@ -1,14 +1,13 @@
 import { VStack } from "@navikt/ds-react";
-import { type ComponentProps, type ReactNode, useId } from "react";
+import { type ComponentProps, type ReactNode, useEffect, useId } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import EksisterendeSakStatus, { type EksisterendeSakStatusProps } from "../eksisterende-sak/EksisterendeSakStatus";
 import EnhetOgSubmitSection, { type EnhetOgSubmitSectionProps } from "../innsending/EnhetOgSubmitSection";
-import Oppsummering from "../innsending/Oppsummering";
 import { useNyOpprettSakModal } from "../start/opprettSakModalContext";
 import FlytSkjema from "./FlytSkjema";
-import type { Sakskategori } from "./OpprettSakStartContext";
+import { type OpprettSakFlytValg, type Sakskategori, useOpprettSakStart } from "./OpprettSakStartContext";
+import type { BarnMedAlder, ForelderPart } from "./opprett-sak-schema";
 import SakskategoriVelger from "./SakskategoriVelger";
-import SkjemaSeksjon, { SkjemaSeksjonKort } from "./SkjemaSeksjon";
 
 type Props = {
     onSubmit: ComponentProps<typeof FlytSkjema>["onSubmit"];
@@ -22,13 +21,14 @@ export default function RolleFlytSide({ onSubmit, status, children, meldinger, i
     const visStatus = status.infoMelding || status.isLoading || (status.harEksisterendeSak && status.eksisterendeSak);
     const formId = useId();
     const modal = useNyOpprettSakModal();
+    const { kategori, onEndret } = useOpprettSakStart();
+    useVarsleEndringer(onEndret);
 
     return (
         <FlytSkjema id={modal?.formId ?? formId} onSubmit={onSubmit} disabled={innsending.isLoading}>
             <VStack gap="space-24" aria-busy={status.isLoading}>
-                <KategoriSeksjon />
+                {kategori ? <SynkKategori kategori={kategori} /> : <KategoriVelger />}
                 {children}
-                {innsending.oppsummering && <Oppsummering {...innsending.oppsummering} />}
                 <VStack gap="space-12">
                     {visStatus && <EksisterendeSakStatus {...status} />}
                     {meldinger}
@@ -39,17 +39,29 @@ export default function RolleFlytSide({ onSubmit, status, children, meldinger, i
     );
 }
 
-function KategoriSeksjon() {
+function useVarsleEndringer(onEndret: OpprettSakFlytValg["onEndret"]) {
+    const form = useFormContext<{ roller: ForelderPart[]; valgteBarn?: BarnMedAlder[] }>();
+    const roller = form.watch("roller");
+    const valgteBarn = form.watch("valgteBarn");
+    const harEndringer =
+        JSON.stringify(roller) !== JSON.stringify(form.formState.defaultValues?.roller) ||
+        JSON.stringify(valgteBarn ?? []) !== JSON.stringify(form.formState.defaultValues?.valgteBarn ?? []);
+    useEffect(() => onEndret?.(harEndringer), [onEndret, harEndringer]);
+}
+
+function SynkKategori({ kategori }: { kategori: Sakskategori }) {
+    const { setValue } = useFormContext<{ kategori: Sakskategori }>();
+    useEffect(() => setValue("kategori", kategori), [kategori, setValue]);
+    return null;
+}
+
+function KategoriVelger() {
     const { control } = useFormContext<{ kategori: Sakskategori }>();
     return (
-        <SkjemaSeksjon tittel="Kategori">
-            <SkjemaSeksjonKort>
-                <Controller
-                    control={control}
-                    name="kategori"
-                    render={({ field }) => <SakskategoriVelger value={field.value} onChange={field.onChange} />}
-                />
-            </SkjemaSeksjonKort>
-        </SkjemaSeksjon>
+        <Controller
+            control={control}
+            name="kategori"
+            render={({ field }) => <SakskategoriVelger value={field.value} onChange={field.onChange} />}
+        />
     );
 }

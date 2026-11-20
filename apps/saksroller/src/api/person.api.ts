@@ -54,7 +54,7 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
     });
 }
 
-function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
+export function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
     return {
         queryKey: ["hent_person_motpart_barn_relasjon", request?.ident],
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
@@ -69,9 +69,7 @@ function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null
 
                 if (status === 403 || status === 401) {
                     await SecureLoggerService.warn(`Ingen tilgang til relasjoner for person ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til å hente relasjoner for denne personen ${request.ident}`,
-                    );
+                    throw new TilgangsFeilError("Du har ikke tilgang til å hente personens relasjoner.");
                 }
                 throw e;
             }
@@ -132,9 +130,7 @@ export function hentForeldreinformasjonForBarnQueryOptions(request: PersonReques
 
                 if (status === 403 || status === 401) {
                     await SecureLoggerService.warn(`Ingen tilgang til foreldreinfo for barn ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til foreldreinfo for denne personen ${request.ident}`,
-                    );
+                    throw new TilgangsFeilError("Du har ikke tilgang til foreldreinfo for barnet.");
                 }
                 throw e;
             }

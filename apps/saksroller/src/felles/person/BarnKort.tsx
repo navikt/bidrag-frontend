@@ -14,6 +14,7 @@ type BarnKortPerson = {
 
 type Props = {
     barn: BarnKortPerson;
+    tags?: ReactNode;
     headingActions?: ReactNode;
     children?: ReactNode;
 };

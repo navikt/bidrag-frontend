@@ -1,5 +1,21 @@
 import type { MotpartBarnRelasjon } from "@bidrag/api/PersonApi";
 import { erUnderMaksAlder } from "../../../felles/barn/barn-regler";
+import { grupperBarnIKurver } from "../../barn/barnkurver";
+import type { Barnkurv } from "../../skjema/opprett-sak-schema";
+
+export function barnkurverForForeldre(
+    relasjoner: MotpartBarnRelasjon[],
+    bidragspliktig: string | undefined,
+    bidragsmottaker: string | undefined,
+    forelder: Barnkurv["forelder"],
+): Barnkurv[] {
+    if (!bidragspliktig && !bidragsmottaker) return [];
+    const kurver =
+        bidragspliktig && bidragsmottaker
+            ? [utledFellesBarn(relasjoner, bidragsmottaker)].filter((kurv) => kurv !== null)
+            : utledBarnkurverForForelder(relasjoner);
+    return grupperBarnIKurver(kurver, forelder);
+}
 
 function slåSammenUnikeBarn(eksisterende: MotpartBarnRelasjon["fellesBarn"], nye: MotpartBarnRelasjon["fellesBarn"]) {
     const identer = new Set(eksisterende.map((barn) => barn.ident));
@@ -15,16 +31,15 @@ function slåSammenUnikeBarn(eksisterende: MotpartBarnRelasjon["fellesBarn"], ny
 
 /**
  * 🔴 Barn BP har sammen med valgt BM, som valgbare barn i saken. Bare relasjonen med BM brukes,
- * så barn fra andre forhold vises aldri. Barn som allerede er lagt til manuelt, utelates.
+ * så barn fra andre forhold vises aldri. Barn som er lagt til manuelt, vises også her når de
+ * er felles barn, sammen med søsknene sine.
  */
 export function utledFellesBarn(
     relasjonerTilBp: MotpartBarnRelasjon[] | undefined,
     bidragsmottakerIdent: string | undefined,
-    manueltLagtTil: string[],
 ): MotpartBarnRelasjon | null {
     const relasjon = relasjonerTilBp?.find((r) => !!bidragsmottakerIdent && r.motpart?.ident === bidragsmottakerIdent);
-    const fellesBarn =
-        relasjon?.fellesBarn.filter((barn) => erUnderMaksAlder(barn) && !manueltLagtTil.includes(barn.ident)) ?? [];
+    const fellesBarn = relasjon?.fellesBarn.filter(erUnderMaksAlder) ?? [];
     return relasjon && fellesBarn.length > 0 ? { ...relasjon, fellesBarn } : null;
 }
 

@@ -8,7 +8,11 @@ import ReellMottakerValgGruppe, {
     type ReellMottakerValgregel,
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
-import { initialiserValg } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
+import {
+    initialiserValg,
+    kanBekrefteReellMottaker,
+    MANGLER_REELL_MOTTAKER_MELDING,
+} from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;
@@ -28,21 +32,15 @@ export default function ReellMottakerVelger({
     regel,
 }: ReellMottakerVelgerProps) {
     const [valideringsfeil, setValideringsfeil] = useState<string | undefined>();
-    const påkrevd = regel !== "valgfri";
     // Utkast, slik at endringsoppsummeringen først oppdateres ved bekreftelse.
     const [utkast, setUtkast] = useState<ReellMottakerValg>(() =>
         initialiserValg(verdi, regel, { ident: barnIdent ?? "", navn: barnNavn }),
     );
     const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(utkast);
 
-    const kanBekrefte =
-        utkast.type === "samhandler"
-            ? Boolean(utkast.ident)
-            : !påkrevd || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
-
     const handleBekreft = () => {
-        if (!kanBekrefte) {
-            setValideringsfeil("Velg eller søk opp en reell mottaker før du legger til.");
+        if (!kanBekrefteReellMottaker(utkast, regel)) {
+            setValideringsfeil(MANGLER_REELL_MOTTAKER_MELDING);
             return;
         }
         setValideringsfeil(undefined);

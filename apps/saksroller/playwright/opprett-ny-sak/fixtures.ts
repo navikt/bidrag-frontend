@@ -65,3 +65,16 @@ export const ukjentBarnkurv = [
         fellesBarn: [testpersoner.barnOver18],
     },
 ];
+
+export const kjentOgUkjentBarnkurv = [
+    {
+        forelderrolleMotpart: "MOR" as const,
+        motpart: testpersoner.bidragsmottaker,
+        fellesBarn: [testpersoner.barnUnder18],
+    },
+    {
+        forelderrolleMotpart: "UKJENT" as const,
+        motpart: null,
+        fellesBarn: [testpersoner.barnUnder18NummerTo, testpersoner.barnOver18],
+    },
+];

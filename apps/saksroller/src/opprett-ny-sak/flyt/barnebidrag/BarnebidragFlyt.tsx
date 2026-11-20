@@ -2,17 +2,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHentPersonMotpartBarnRelasjonSuspense } from "../../../api/person.api";
+import Relasjonsmeldinger from "../../../felles/relasjon/Relasjonsmeldinger";
 import { MYNDYG_BARN_ALDER } from "../../../felles/saksregler";
 import BarnSection from "../../barn/BarnSection";
 import BMUtenBarnAlert from "../../barn/BMUtenBarnAlert";
 import ParterSeksjon from "../../parter/ParterSeksjon";
-import UfullstendigRelasjonValgteBarnAlert from "../../parter/UfullstendigRelasjonValgteBarnAlert";
 import { useOpprettSakStart } from "../../skjema/OpprettSakStartContext";
 import {
     type BarnebidragForelderRolle,
     type BarnebidragSkjemaData,
     BarnebidragSkjemaSchema,
+    type BarnMedAlder,
     type ForelderPart,
+    finnOpprettSakAdvarsler,
     type PartISaken,
 } from "../../skjema/opprett-sak-schema";
 import RolleFlytSide from "../../skjema/RolleFlytSide";
@@ -22,37 +24,41 @@ import { useBarnebidragFlyt } from "./useBarnebidragFlyt";
 const IKKE_VALGT: ForelderPart = { ident: "", navn: "", erKjent: undefined };
 
 function lagStartverdier(
-    partISaken: PartISaken,
+    partISaken: PartISaken | undefined,
     alder: number | null,
     fødselsdato: string | undefined,
 ): BarnebidragSkjemaData {
-    const søkt: ForelderPart = {
-        ident: partISaken.ident,
-        navn: partISaken.navn,
-        erKjent: true,
-        diskresjonskode: partISaken.diskresjonskode,
-    };
-    const erBarn = erBarnRolle(partISaken);
+    const søkt: ForelderPart = partISaken
+        ? {
+              ident: partISaken.ident,
+              navn: partISaken.navn,
+              erKjent: true,
+              diskresjonskode: partISaken.diskresjonskode,
+          }
+        : IKKE_VALGT;
+    const rolle = partISaken?.rolle;
+    const erBarn = partISaken && erBarnRolle(partISaken);
 
     return {
         roller: [
-            { ...(partISaken.rolle === "bidragspliktig" ? søkt : IKKE_VALGT), type: "BP" },
-            { ...(partISaken.rolle === "bidragsmottaker" ? søkt : IKKE_VALGT), type: "BM" },
+            { ...(rolle === "bidragspliktig" ? søkt : IKKE_VALGT), type: "BP" },
+            { ...(rolle === "bidragsmottaker" ? søkt : IKKE_VALGT), type: "BM" },
         ] satisfies BarnebidragForelderRolle[],
-        valgteBarn: erBarn
-            ? [
-                  {
-                      ident: partISaken.ident,
-                      navn: partISaken.navn,
-                      fødselsdato,
-                      alder: alder ?? 0,
-                      erMyndig: partISaken.rolle === "barn_over_18" || (alder ?? 0) >= MYNDYG_BARN_ALDER,
-                      manuellLagtTil: true,
-                      diskresjonskode: partISaken.diskresjonskode,
-                  },
-              ]
-            : [],
+        valgteBarn: erBarn ? [lagStartbarn(partISaken, alder, fødselsdato)] : [],
         kategori: "Nasjonal",
+    };
+}
+
+function lagStartbarn(part: PartISaken, alder: number | null, fødselsdato: string | undefined): BarnMedAlder {
+    const barnetsAlder = alder ?? 0;
+    return {
+        ident: part.ident,
+        navn: part.navn,
+        fødselsdato,
+        alder: barnetsAlder,
+        erMyndig: part.rolle === "barn_over_18" || barnetsAlder >= MYNDYG_BARN_ALDER,
+        manuellLagtTil: true,
+        diskresjonskode: part.diskresjonskode,
     };
 }
 
@@ -62,8 +68,7 @@ function lagStartverdier(
 export default function BarnebidragFlyt() {
     const { partISaken } = useOpprettSakStart();
 
-    if (!partISaken) return null;
-    if (erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} />;
+    if (!partISaken || erBarnRolle(partISaken)) return <BarnebidragSkjema partISaken={partISaken} />;
     return <BarnebidragForForelder partISaken={partISaken} />;
 }
 
@@ -76,22 +81,26 @@ function BarnebidragForForelder({ partISaken }: { partISaken: PartISaken }) {
     const relasjoner = data?.personensMotpartBarnRelasjon ?? [];
 
     if (harMotpartMedUlikeForelderroller(relasjoner)) {
-        return (
-            <Alert variant="error" size="small">
-                Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for{" "}
-                <span className="personnavn">{partISaken.navn}</span>. Kontakt support for å få hjelp.
-            </Alert>
-        );
+        return <ForelderRelasjonFeil navn={partISaken.navn} />;
     }
 
     return <BarnebidragSkjema partISaken={partISaken} />;
 }
 
-function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
+function ForelderRelasjonFeil({ navn }: { navn: string }) {
+    return (
+        <Alert variant="error" size="small">
+            Samme motpart er registrert med flere forelderroller (f.eks. både mor og far) for{" "}
+            <span className="personnavn">{navn}</span>. Kontakt support for å få hjelp.
+        </Alert>
+    );
+}
+
+function BarnebidragSkjema({ partISaken }: { partISaken?: PartISaken }) {
     const { partISakenAlder, startperson } = useOpprettSakStart();
     const form = useForm<BarnebidragSkjemaData>({
         resolver: zodResolver(BarnebidragSkjemaSchema),
-        defaultValues: lagStartverdier(partISaken, partISakenAlder, startperson.fødselsdato ?? undefined),
+        defaultValues: lagStartverdier(partISaken, partISakenAlder, startperson?.fødselsdato ?? undefined),
         mode: "onSubmit",
     });
 
@@ -103,8 +112,26 @@ function BarnebidragSkjema({ partISaken }: { partISaken: PartISaken }) {
 }
 
 function BarnebidragFlytInnhold() {
-    const { form, barnkurver, onKurvByttet, reellMottakerRegel, kort, onSubmit, innsending, meldinger, status } =
-        useBarnebidragFlyt();
+    const {
+        form,
+        barnkurver,
+        lasterKurver,
+        manuellTittel,
+        onKurvByttet,
+        reellMottakerRegel,
+        kort,
+        onSubmit,
+        innsending,
+        meldinger,
+        relasjonsregler,
+        barnMedUfullstendigRelasjon,
+        barnMedAnnenForelder,
+        status,
+    } = useBarnebidragFlyt();
+
+    if (meldinger.ugyldigForelderrelasjon) {
+        return <ForelderRelasjonFeil navn={status.partISakenNavn} />;
+    }
 
     return (
         <RolleFlytSide
@@ -112,17 +139,18 @@ function BarnebidragFlytInnhold() {
             status={status}
             meldinger={
                 <>
-                    {meldinger.tilgangsfeil && (
-                        <Alert variant="info" size="small">
-                            {meldinger.tilgangsfeil}. Legg til forelder manuelt.
-                        </Alert>
-                    )}
                     {meldinger.forslagsfeil && (
                         <Alert variant="warning" size="small">
                             {meldinger.forslagsfeil}
                         </Alert>
                     )}
-                    {meldinger.ufullstendigRelasjon && <UfullstendigRelasjonValgteBarnAlert />}
+                    <Relasjonsmeldinger
+                        regler={relasjonsregler}
+                        ufullstendigeNavn={barnMedUfullstendigRelasjon.map((barn) => barn.navn || barn.ident)}
+                        annenForelderNavn={barnMedAnnenForelder.map((barn) => barn.navn || barn.ident)}
+                        skjultForelderNavn={meldinger.barnMedSkjultForelder.map((barn) => barn.navn || barn.ident)}
+                        handling="opprettes"
+                    />
                     {meldinger.bidragsmottakerUtenBarn && <BMUtenBarnAlert />}
                 </>
             }
@@ -139,8 +167,15 @@ function BarnebidragFlytInnhold() {
             <BarnSection
                 form={form}
                 barnkurver={barnkurver}
+                lasterKurver={lasterKurver}
+                manuellTittel={manuellTittel}
                 reellMottakerRegel={reellMottakerRegel}
                 onKurvByttet={onKurvByttet}
+                utvidSøskenflokker={kort.every((forelder) => forelder.part.erKjent !== undefined)}
+                advarsler={finnOpprettSakAdvarsler(
+                    { roller: form.watch("roller"), valgteBarn: form.watch("valgteBarn") },
+                    "Barnebidrag",
+                )}
             />
         </RolleFlytSide>
     );

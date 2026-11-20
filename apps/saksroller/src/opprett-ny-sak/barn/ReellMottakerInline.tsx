@@ -12,7 +12,7 @@ import {
     type ReellMottakerSkjemaverdi,
     tilReellMottakerValg,
 } from "../../felles/reell-mottaker/reell-mottaker-valg";
-import { type ReellMottakerRegel, reellMottakerValgregel } from "../../felles/saksregler";
+import type { ReellMottakerRegel } from "../../felles/saksregler";
 
 type Props<TFieldValues extends FieldValues> = {
     form: UseFormReturn<TFieldValues>;
@@ -32,16 +32,23 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
     const reellMottakerTypePath = `${fieldPath}.reellMottakerType` as FieldPath<TFieldValues>;
     const reellMottakerPath = `${fieldPath}.reellMottaker` as FieldPath<TFieldValues>;
     const reellMottakerNavnPath = `${fieldPath}.reellMottakerNavn` as FieldPath<TFieldValues>;
+    const reellMottakerErVergePath = `${fieldPath}.reellMottakerErVerge` as FieldPath<TFieldValues>;
     const setDynamiskFeltVerdi = (
         path: FieldPath<TFieldValues>,
-        value: string | undefined,
+        value: string | boolean | undefined,
         options?: Parameters<typeof form.setValue>[2],
     ) => form.setValue(path, value as PathValue<TFieldValues, FieldPath<TFieldValues>>, options);
 
     const reellMottakerType = form.watch(reellMottakerTypePath);
     const reellMottaker = form.watch(reellMottakerPath);
     const reellMottakerNavn = form.watch(reellMottakerNavnPath);
-    const skjemaverdi: ReellMottakerSkjemaverdi = { reellMottakerType, reellMottaker, reellMottakerNavn };
+    const reellMottakerErVerge = form.watch(reellMottakerErVergePath);
+    const skjemaverdi: ReellMottakerSkjemaverdi = {
+        reellMottakerType,
+        reellMottaker,
+        reellMottakerNavn,
+        reellMottakerErVerge,
+    };
     const reellMottakerFeil = form.getFieldState(reellMottakerPath, form.formState).error?.message;
     const valg = tilReellMottakerValg(skjemaverdi);
     const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(valg);
@@ -50,6 +57,7 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
         setDynamiskFeltVerdi(reellMottakerTypePath, nyVerdi.reellMottakerType, options);
         setDynamiskFeltVerdi(reellMottakerPath, nyVerdi.reellMottaker, options);
         setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn, options);
+        setDynamiskFeltVerdi(reellMottakerErVergePath, nyVerdi.reellMottakerErVerge, options);
     };
 
     const oppdaterValg = (nyttValg: ReellMottakerValg) => {
@@ -118,15 +126,32 @@ export function BarnReellMottaker<TFieldValues extends FieldValues>({
     barn,
     barnIndex,
     regel,
+    valgt,
 }: {
     form: UseFormReturn<TFieldValues>;
     barn: { ident: string; navn: string; erMyndig: boolean };
     barnIndex: number;
     regel: ReellMottakerRegel;
+    valgt: boolean;
 }) {
-    const valgregel = reellMottakerValgregel(regel, barn.erMyndig);
-    if (!valgregel || barnIndex === -1) {
+    const valgregel = regel(barn.erMyndig);
+    if (!valgregel) {
         return null;
+    }
+    if (!valgt || barnIndex === -1) {
+        return (
+            <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">
+                <ReellMottakerValgGruppe
+                    barnNavn={barn.navn}
+                    barnIdent={barn.ident}
+                    valg={{}}
+                    lagretSamhandler={null}
+                    onValg={() => {}}
+                    regel={valgregel}
+                    disabled
+                />
+            </Box>
+        );
     }
     return (
         <Box marginBlock="space-4 space-0" paddingBlock="space-4 space-0">

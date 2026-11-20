@@ -11,6 +11,7 @@ import type { InngangRolle } from "../../src/opprett-ny-sak/start/inngang";
 import OpprettSakFlyt from "../../src/opprett-ny-sak/start/OpprettSakFlyt";
 import OpprettSakFlytInnbygget from "../../src/opprett-ny-sak/start/OpprettSakFlytInnbygget";
 import { OpprettSakFlytModal } from "../../src/opprett-ny-sak/start/OpprettSakFlytModal";
+import { TestFlagg } from "../felles/TestFlagg";
 import { testpersoner } from "./fixtures";
 import { seedStatiskEnhetsinfo } from "./queryCacheSeed";
 
@@ -33,8 +34,8 @@ function ScenarioBootstrap({ scenario }: { scenario: Scenario }) {
     return <OpprettSakSkjema start={start} />;
 }
 
-export function OpprettSakSkjemaStory({ scenario }: { scenario: Scenario }) {
-    return <StoryRouter content={<ScenarioBootstrap scenario={scenario} />} />;
+export function OpprettSakSkjemaStory({ scenario, flagg }: { scenario: Scenario; flagg?: string[] }) {
+    return <StoryRouter content={<ScenarioBootstrap scenario={scenario} />} flagg={flagg} />;
 }
 
 export function OpprettSakFlytStory() {
@@ -128,7 +129,7 @@ function YtreSkjema({ children }: { children: ReactNode }) {
     );
 }
 
-function StoryRouter({ content }: { content: ReactNode }) {
+function StoryRouter({ content, flagg }: { content: ReactNode; flagg?: string[] }) {
     const queryClient = useMemo(() => {
         const client = new QueryClient({
             defaultOptions: {
@@ -149,22 +150,24 @@ function StoryRouter({ content }: { content: ReactNode }) {
                         loader: () => ({ bisysUrl: "" }),
                         element: (
                             <QueryClientProvider client={queryClient}>
-                                <BidragCommonsProviderMock
-                                    client={queryClient}
-                                    personer={Object.fromEntries(
-                                        Object.values(testpersoner).map((person) => [person.ident, person]),
-                                    )}
-                                >
-                                    <RoutePath />
-                                    {content}
-                                </BidragCommonsProviderMock>
+                                <TestFlagg flagg={flagg}>
+                                    <BidragCommonsProviderMock
+                                        client={queryClient}
+                                        personer={Object.fromEntries(
+                                            Object.values(testpersoner).map((person) => [person.ident, person]),
+                                        )}
+                                    >
+                                        <RoutePath />
+                                        {content}
+                                    </BidragCommonsProviderMock>
+                                </TestFlagg>
                             </QueryClientProvider>
                         ),
                     },
                 ],
                 { initialEntries: ["/sak/ny"] },
             ),
-        [content, queryClient],
+        [content, queryClient, flagg],
     );
 
     return <RouterProvider router={router} />;

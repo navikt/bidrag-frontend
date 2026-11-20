@@ -1,6 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import { BodyLong, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
-import type { ReactNode } from "react";
+import { BodyShort, Box, HStack, InlineMessage, VStack } from "@navikt/ds-react";
+import type { ComponentProps, ReactNode } from "react";
 import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import type { RolleType } from "../sakvisning-schema";
 import DiskresjonAlert from "./DiskresjonAlert";
@@ -37,11 +37,28 @@ type InnholdProps = {
 
 type Props = InnholdProps & {
     actions?: ReactNode;
+    height?: ComponentProps<typeof Box>["height"];
 };
 
-export function KortRamme({ children }: { children: ReactNode }) {
+type KortRammeProps = {
+    children: ReactNode;
+} & Pick<ComponentProps<typeof Box>, "background" | "borderColor" | "height">;
+
+export function KortRamme({
+    children,
+    background = "raised",
+    borderColor = "neutral-subtleA",
+    height,
+}: KortRammeProps) {
     return (
-        <Box background="raised" borderColor="neutral-subtleA" borderWidth="1" borderRadius="12" padding="space-16">
+        <Box
+            background={background}
+            borderColor={borderColor}
+            borderWidth="1"
+            borderRadius="12"
+            padding="space-12"
+            height={height}
+        >
             {children}
         </Box>
     );
@@ -77,21 +94,25 @@ export function PersonRolleKortInnhold({
                     {children}
                 </PersonInfo>
             ) : (
-                <HStack gap="space-8" align="center">
-                    <BodyLong size="small" textColor="subtle" className="italic">
-                        {ukjentTekst}
-                    </BodyLong>
+                <HStack gap="space-4" align="start" wrap={false}>
                     {tags}
-                    {headingActions}
+                    <VStack flexGrow="1" minWidth="0">
+                        <HStack align="start" justify="space-between" wrap={false}>
+                            <BodyShort size="small" weight="semibold">
+                                {ukjentTekst}
+                            </BodyShort>
+                            {headingActions}
+                        </HStack>
+                    </VStack>
                 </HStack>
             )}
         </VStack>
     );
 }
 
-export default function PersonRolleKort({ actions, ...innholdProps }: Props) {
+export default function PersonRolleKort({ actions, height, ...innholdProps }: Props) {
     return (
-        <KortRamme>
+        <KortRamme height={height}>
             <VStack gap="space-8">
                 <PersonRolleKortInnhold {...innholdProps} />
                 {actions && (

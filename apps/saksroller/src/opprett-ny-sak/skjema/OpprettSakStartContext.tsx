@@ -9,60 +9,28 @@ import type { PartISaken, PartRolle } from "./opprett-sak-schema";
 
 export type OpprettSakstype = "BARNEBIDRAG" | "EKTEFELLEBIDRAG" | "OPPFOSTRINGSBIDRAG" | "FARSKAP";
 export type Sakskategori = "Nasjonal" | "Utland";
-export function sakstypeTilTekst(sakstype: OpprettSakstype) {
-    switch (sakstype) {
-        case "BARNEBIDRAG":
-            return "Barnebidrag";
-        case "EKTEFELLEBIDRAG":
-            return "Ektefellebidrag";
-        case "OPPFOSTRINGSBIDRAG":
-            return "Oppfostringsbidrag";
-        case "FARSKAP":
-            return "Farskap";
-    }
-}
-export function sakstypeTilBeskrivelse(sakstype: OpprettSakstype) {
-    switch (sakstype) {
-        case "BARNEBIDRAG":
-            return "Start med å identifisere en part i saken (forelder eller barn).";
-        case "EKTEFELLEBIDRAG":
-            return "Søk opp en av ektefellene eller samboerne.";
-        case "OPPFOSTRINGSBIDRAG":
-            return "Søk opp en av foreldrene.";
-        case "FARSKAP":
-            return "Søk opp bidragsmottakeren.";
-    }
-}
-const TVUNGEN_ROLLE: Partial<Record<OpprettSakstype, PartRolle>> = {
-    OPPFOSTRINGSBIDRAG: "bidragspliktig",
-    FARSKAP: "bidragsmottaker",
-};
-
-export function tvungenRolle(sakstype: OpprettSakstype | null): PartRolle | null {
-    return sakstype ? (TVUNGEN_ROLLE[sakstype] ?? null) : null;
-}
-
 /** Styrer hva som skjer etter innsending og om flyten kan avbrytes. Settes av den som bygger inn flyten. */
 export type OpprettSakFlytValg = {
     inngang?: OpprettSakInngang;
     onOpprettet?: (saksnummer: string) => void;
     onAvbryt?: () => void;
+    onEndret?: (harEndringer: boolean) => void;
 };
 
-/** Personen og rollen skjemaet fylles ut fra, og hvilken flyt som brukes. */
-export type OpprettSakStart = {
-    person: PersonDto;
-    rolle: PartRolle;
-    sakstype: OpprettSakstype;
-};
+/** Sakstype og eventuell person med rolle som skjemaet fylles ut fra. */
+export type OpprettSakStart = { sakstype: OpprettSakstype } & (
+    | { person: PersonDto; rolle: PartRolle }
+    | { person?: undefined; rolle?: undefined }
+);
 
 type OpprettSakStartContext = OpprettSakFlytValg & {
-    startperson: PersonDto;
-    partISaken: PartISaken;
+    startperson?: PersonDto;
+    partISaken?: PartISaken;
     partISakenAlder: number | null;
     sakstype: OpprettSakstype;
     /** Personen flyten ble åpnet for. Kan ikke endres i skjemaet. */
     låstIdent: string | null;
+    kategori?: Sakskategori;
 };
 
 const OpprettSakStartContext = createContext<OpprettSakStartContext>({} as OpprettSakStartContext);
@@ -71,22 +39,28 @@ function OpprettSakStartProvider({
     children,
     start,
     låstIdent = null,
+    kategori,
     inngang,
     onOpprettet,
     onAvbryt,
-}: PropsWithChildren<OpprettSakFlytValg & { start: OpprettSakStart; låstIdent?: string | null }>) {
+    onEndret,
+}: PropsWithChildren<
+    OpprettSakFlytValg & { start: OpprettSakStart; låstIdent?: string | null; kategori?: Sakskategori }
+>) {
     const value = useMemo(
         () => ({
             startperson: start.person,
-            partISaken: tilPartISaken(start.person, start.rolle),
-            partISakenAlder: beregnAlderForPerson(start.person),
+            partISaken: start.person && start.rolle ? tilPartISaken(start.person, start.rolle) : undefined,
+            partISakenAlder: start.person ? beregnAlderForPerson(start.person) : null,
             sakstype: start.sakstype,
             låstIdent,
+            kategori,
             inngang,
             onOpprettet,
             onAvbryt,
+            onEndret,
         }),
-        [start, låstIdent, inngang, onOpprettet, onAvbryt],
+        [start, låstIdent, kategori, inngang, onOpprettet, onAvbryt, onEndret],
     );
 
     return <OpprettSakStartContext value={value}>{children}</OpprettSakStartContext>;
