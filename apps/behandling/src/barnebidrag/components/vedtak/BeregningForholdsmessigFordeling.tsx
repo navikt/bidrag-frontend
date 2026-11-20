@@ -126,13 +126,12 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
     );
 };
 export const BeregningForholdsmessigFordeling = () => {
-    const { forholdsmessigFordeling: ffBehandling, roller } = useGetBehandlingV2();
+    const { forholdsmessigFordeling: ffBehandling } = useGetBehandlingV2();
     const {
         kanFatteVedtakForRevurderingsbarn,
         beregningsdetaljer: { sluttberegning, forholdsmessigFordeling },
     } = useBidragBeregningPeriode();
     if (!forholdsmessigFordeling) return null;
-    const inneholderRevurderingsbarn = roller.some((r) => r.erRevurdering);
     const periodeInneholderRevurderingsbarn =
         forholdsmessigFordeling.beregningFordelingAvBidrag.bidragTilFordelingAlle.some(
             (r) => r.erSøknadsbarn && r.barn.erRevurderingsbarn,
