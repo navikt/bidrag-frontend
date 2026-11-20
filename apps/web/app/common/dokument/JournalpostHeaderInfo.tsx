@@ -6,6 +6,7 @@ import { formaterDato } from "@bidrag/utils";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { Detail, HStack, Tag, VStack } from "@navikt/ds-react";
 import { dokumentKategoriBeskrivelse } from "~/routes/sak/dokumenter/utils/dokumentKategori";
+import { dokumentDato } from "~/routes/sak/sakshistorikk/components/journalpost/journalpostUtils";
 
 interface JPHeaderInfoProps {
     jp: JournalpostDto;
@@ -31,7 +32,8 @@ export function JournalpostHeaderInfo({
     isExpanded = false,
 }: JPHeaderInfoProps) {
     const innhold = jp.innhold || jp.journalpostId || "Ukjent tittel";
-    const dokDato = jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
+    const dato = dokumentDato(jp);
+    const dokDato = dato ? formaterDato(dato) : "";
 
     const getTagVariant = () => {
         switch (jp.status) {

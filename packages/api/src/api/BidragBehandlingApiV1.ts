@@ -3656,6 +3656,8 @@ export interface BidragPeriodeBeregningsdetaljer {
   /** @format double */
   antallBarnIHusstanden?: number | null;
   forskuddssats: number;
+  inntektBBMultiplikator: number;
+  maksInntektBBMultiplikator: number;
   barnetilleggBM: DelberegningBarnetilleggDto;
   barnetilleggBP: DelberegningBarnetilleggDto;
   voksenIHusstanden?: boolean | null;
