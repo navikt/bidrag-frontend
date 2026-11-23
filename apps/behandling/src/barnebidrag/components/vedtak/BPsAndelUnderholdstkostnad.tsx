@@ -19,7 +19,11 @@ export const BPsAndelUnderholdskostnad = () => {
         : beregningsdetaljer.sluttberegning.bpAndelAvUVedDeltBostedBeløp;
     return (
         <VStack gap="space-2">
-            <BPsAndelInntekterTable inntekter={inntekter} forskuddssats={beregningsdetaljer.forskuddssats} />
+            <BPsAndelInntekterTable
+                inntekter={inntekter}
+                forskuddssats={beregningsdetaljer.forskuddssats}
+                inntektBBMultiplikator={beregningsdetaljer.inntektBBMultiplikator}
+            />
             <ResultatDescription
                 data={[
                     {

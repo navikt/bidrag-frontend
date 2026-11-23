@@ -137,3 +137,33 @@ export const ForskjelligeHendelser = () => (
         <SaksLogg saksnummer={saksnummer} hendelser={hendelser} />
     </StoryWrapper>
 );
+
+const langtResultat =
+    "Bidraget ble ikke aldersjustert fordi grunnlaget i vedtaket er justert ned til evne, og det gjelder hele perioden";
+
+const hendelserMedLangtResultat: SakshendelseDto[] = [
+    ...hendelser.slice(0, 4),
+    hendelse({
+        hendelseId: "hendelse-langt-resultat",
+        opprettetTidspunkt: "2024-05-17T12:00:00Z",
+        type: HendelseType.AVVIST,
+        typeBeskrivelse: "Avvist",
+        resultat: langtResultat,
+    }),
+    hendelse({
+        hendelseId: "hendelse-lang-lenke",
+        opprettetTidspunkt: "2024-05-18T12:00:00Z",
+        type: HendelseType.VEDTAK,
+        typeBeskrivelse: "Vedtak",
+        resultat: `${langtResultat} (lenke)`,
+        søknadsid: "soknad-6",
+        behandlingsid: "behandling-6",
+        vedtaksid: "vedtak-6",
+    }),
+];
+
+export const LangtResultat = () => (
+    <StoryWrapper>
+        <SaksLogg saksnummer={saksnummer} hendelser={hendelserMedLangtResultat} />
+    </StoryWrapper>
+);

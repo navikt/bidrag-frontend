@@ -32,12 +32,14 @@ import {
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
+import { Link as RouterLink } from "react-router";
 import { utførSlettForsendelseMutationFn } from "~/api/query/forsendelse.query.ts";
 import { useHentSak } from "~/api/useApi.ts";
 import { medReturMål, RETUR_PARAM, SAKSNR_PARAM } from "~/common/navigation/returLink.ts";
+import { AvkortetCelle, tabellMedAvkortetSisteKolonne } from "../AvkortetCelle";
 import { useSort } from "../useSort";
 import JournalpostStatusTag from "./JournalpostStatusTag";
-import { journalstatusDisplayVerdi, standardSort, visesSomForsendelse } from "./journalpostUtils";
+import { dokumentDato, journalstatusDisplayVerdi, standardSort, visesSomForsendelse } from "./journalpostUtils";
 import PersonIdentMedRolle from "./PersonIdentMedRolle";
 
 interface JournalpostRad {
@@ -46,9 +48,12 @@ interface JournalpostRad {
     dok?: DokumentDto;
     erVedlegg: boolean;
     vedlegg: JournalpostRad[];
+    /** Grå bakgrunn. Vedlegg har samme bakgrunn som journalposten, slik at de synlig hører sammen. */
+    stripet: boolean;
 }
 
-function byggRad(jp: JournalpostDto): JournalpostRad {
+function byggRad(jp: JournalpostDto, indeks: number): JournalpostRad {
+    const stripet = indeks % 2 === 1;
     const dokumenter = jp.dokumenter ?? [];
     const jpId =
         jp.journalpostId ??
@@ -62,10 +67,11 @@ function byggRad(jp: JournalpostDto): JournalpostRad {
                   dok,
                   erVedlegg: true,
                   vedlegg: [],
+                  stripet,
               }))
             : [];
 
-    return { id: jpId, jp, erVedlegg: false, vedlegg };
+    return { id: jpId, jp, erVedlegg: false, vedlegg, stripet };
 }
 
 const erUnderProduksjon = (dok: DokumentDto) => {
@@ -73,14 +79,20 @@ const erUnderProduksjon = (dok: DokumentDto) => {
         dok.status ?? DokumentStatusDto.FERDIGSTILT,
     );
 };
-function TruncatedText(props: { tittel: string; maxWith?: string }) {
+function TruncatedText(props: { tittel: string }) {
     return (
-        <HStack maxWidth={props.maxWith ?? "40ch"}>
-            <BodyShort size={"small"} truncate>
-                {props.tittel}
-            </BodyShort>
-        </HStack>
+        <BodyShort size={"small"} truncate>
+            {props.tittel}
+        </BodyShort>
     );
+}
+
+function beskrivelseTekst(rad: JournalpostRad) {
+    if (rad.erVedlegg && rad.dok) {
+        return rad.dok.tittel ?? rad.dok.dokumentreferanse ?? "";
+    }
+    const antall = rad.jp.dokumenter?.length ?? 0;
+    return antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
 }
 
 export default function JournalpostTabell({
@@ -98,6 +110,7 @@ export default function JournalpostTabell({
         customComparators: {
             status: (a, b) => journalstatusDisplayVerdi(a).localeCompare(journalstatusDisplayVerdi(b)),
             gjelderAktor: (a, b) => (a.gjelderAktor?.ident ?? "").localeCompare(b.gjelderAktor?.ident ?? ""),
+            dokumentDato: (a, b) => (dokumentDato(a) ?? "").localeCompare(dokumentDato(b) ?? ""),
         },
     });
 
@@ -126,10 +139,8 @@ export default function JournalpostTabell({
     };
 
     const finnDokDato = (jp: JournalpostDto) => {
-        if (jp.journalpostId?.startsWith("JOARK") && jp.mottattDato !== null) {
-            return jp.mottattDato ? formaterDato(jp.mottattDato) : "";
-        }
-        return jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
+        const dato = dokumentDato(jp);
+        return dato ? formaterDato(dato) : "";
     };
 
     const lukkSlettBekreftelse = () => {
@@ -176,7 +187,7 @@ export default function JournalpostTabell({
     const erFiltrert = antallJournalposterFiltrert !== antallJournalposterTotalt;
 
     const sorterteJournalposter = sortData(filtrerteJournalposter);
-    const rader: JournalpostRad[] = sorterteJournalposter.map(byggRad);
+    const rader: JournalpostRad[] = sorterteJournalposter.map((jp, indeks) => byggRad(jp, indeks));
 
     const dataGridSort: import("@navikt/ds-react/PREVIEW/DataGrid").DataGrid.Table.SortEntry[] = sort
         ? [
@@ -234,13 +245,11 @@ export default function JournalpostTabell({
         const journalpostId = jp.journalpostId;
         if (rad.erVedlegg && rad.dok) {
             // Håndtering av vedlegg i expandable row
-            const dok = rad.dok;
-            const tekst = dok.tittel ?? dok.dokumentreferanse ?? "";
-            return renderDokumentLink(dok, tekst, journalpostId);
+            return renderDokumentLink(rad.dok, beskrivelseTekst(rad), journalpostId);
         }
 
         const antall = rad.jp.dokumenter?.length ?? 0;
-        const tekst = antall > 1 ? `(${antall}) ${rad.jp.innhold ?? ""}` : (rad.jp.innhold ?? "");
+        const tekst = beskrivelseTekst(rad);
 
         if (jp.status === JournalpostStatus.UNDER_OPPRETTELSE) {
             return <TruncatedText tittel={tekst} />;
@@ -263,7 +272,8 @@ export default function JournalpostTabell({
             id: "expand",
             header: "",
             sortable: false,
-            bodyCell: () => "",
+            // Markøren gir raden grå bakgrunn, se className på DataGrid.
+            bodyCell: (rad: JournalpostRad) => (rad.stripet ? <span data-stripet hidden /> : ""),
         },
         harDokumenterUnderOpprettelse && {
             id: "slett",
@@ -355,7 +365,9 @@ export default function JournalpostTabell({
             id: "innhold",
             header: "Beskrivelse",
             isSortable: true,
-            bodyCell: beskrivelseCelle,
+            bodyCell: (rad: JournalpostRad) => (
+                <AvkortetCelle tekst={beskrivelseTekst(rad)}>{beskrivelseCelle(rad)}</AvkortetCelle>
+            ),
         },
     ];
 
@@ -366,12 +378,13 @@ export default function JournalpostTabell({
         bodyCell: (rad: JournalpostRad) => (rad.erVedlegg ? "" : (rad.jp.fagomrade ?? "-")),
     };
 
-    // "fagomrade" settes inn mellom "gjelderAktor" og "status" når saken har blanding av far/bidrag.
+    // "fagomrade" settes inn etter "journalforendeEnhet" når saken har blanding av far/bidrag.
     const synligeBasisKolonner = basisKolonner.filter(
         (kolonne): kolonne is Exclude<typeof kolonne, false> => kolonne !== false,
     );
+    const etterEnhet = synligeBasisKolonner.findIndex((kolonne) => kolonne.id === "journalforendeEnhet") + 1;
     const columnDefinitions = harBlandingFarBid
-        ? [...synligeBasisKolonner.slice(0, 6), fagomradeKolonne, ...synligeBasisKolonner.slice(6)]
+        ? [...synligeBasisKolonner.slice(0, etterEnhet), fagomradeKolonne, ...synligeBasisKolonner.slice(etterEnhet)]
         : synligeBasisKolonner;
 
     return (
@@ -441,8 +454,8 @@ export default function JournalpostTabell({
                 </HStack>
                 <HStack gap="space-4">
                     <Button
-                        as="a"
-                        href={medReturMål(`/sak/${saksnummer}/dokumenter`, "sakshistorikk", jpParams())}
+                        as={RouterLink}
+                        to={medReturMål(`/sak/${saksnummer}/dokumenter`, "sakshistorikk", jpParams())}
                         variant="tertiary"
                         size="xsmall"
                         icon={<FilePdfIcon aria-hidden />}
@@ -454,16 +467,12 @@ export default function JournalpostTabell({
             <VStack maxHeight="60vh" overflowY="auto">
                 <DataGrid
                     data={rader}
-                    className="[&_tbody_tr:has(td:first-child_button)]:cursor-pointer"
-                    // className={"[&_.aksel-data-table\\\\_\\\\_cell-content]:p-0 " +
-                    //     '[&_.aksel-data-table\\\\_\\\\_cell[data-align="left"]]:text-center'}
+                    // Første kolonne (pil for vedlegg) er smal, og pilen står midt i kolonnen.
+                    className={`[&_tbody_tr:has(td:first-child_button)]:cursor-pointer ${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child]:w-9 [&_tr>*:first-child]:min-w-9 [&_tr>*:first-child]:max-w-9 [&_tr>*:first-child>*]:px-0 [&_[class*=nested-toggle]]:inset-x-0! [&_[class*=nested-toggle]]:justify-center [&_tbody_tr:has([data-stripet])]:bg-(--ax-bg-neutral-soft)`}
                     getRowId={(rad) => rad.id}
                     settings={{
-                        zebraStripes: true,
                         rowDensity: "tight",
                         textSize: "small",
-                        truncateContent: true,
-                        stickyColumns: { end: 1 },
                     }}
                     columns={columnDefinitions}
                 >

@@ -1,5 +1,5 @@
 import { DokumentStatusDto, type JournalpostDto } from "@bidrag/api/BidragDokumentApi";
-import { standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
+import { dokumentDato, standardSort } from "../../sakshistorikk/components/journalpost/journalpostUtils";
 import type { SaksDokument } from "../types";
 
 export function sjekkOmBlandingAvFarOgBidrag(journalposter: JournalpostDto[]): boolean {
@@ -130,7 +130,7 @@ export function byggDokumenter(journalposter: JournalpostDto[]): SaksDokument[] 
                     dokumentreferanse: dokument.dokumentreferanse ?? undefined,
                     dokumentStatus: dokument.status ?? undefined,
                     dokumentType: jp.dokumentType ?? undefined,
-                    dokumentDato: jp.dokumentDato ?? undefined,
+                    dokumentDato: dokumentDato(jp) ?? undefined,
                     tittel,
                     kanÅpnes,
                     åpenForklaring,

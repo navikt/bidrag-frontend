@@ -3,7 +3,7 @@ import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { Bleed, Box, Heading } from "@navikt/ds-react";
 import { QueryClient } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
-import { createMemoryRouter, RouterProvider } from "react-router";
+import { createMemoryRouter, Link, RouterProvider } from "react-router";
 import SakBaseLayout from "./SakBaseLayout";
 import SakFullbreddeLayout from "./SakFullbreddeLayout";
 import SakHeaderLayout from "./SakHeaderLayout";
@@ -128,6 +128,56 @@ export const DokumenterMedSidemeny = () => (
         <RouterProvider router={createStoryRouter("dokumenter")} />
     </StoryProviders>
 );
+
+export const StandardOgDokumenter = () => {
+    const router = createMemoryRouter(
+        [
+            {
+                path: "/sak/:saksnummer",
+                Component: SakBaseLayout,
+                children: [
+                    {
+                        Component: SakHeaderLayout,
+                        children: [
+                            {
+                                Component: SakStandardLayout,
+                                children: [
+                                    {
+                                        path: "standard",
+                                        handle: { sakSideTittel: "Dokumenter" },
+                                        Component: () => (
+                                            <>
+                                                <Link to="/sak/2024-1234/dokumenter">Gå til dokumentvisning</Link>
+                                                <FargetInnhold type="standard" />
+                                            </>
+                                        ),
+                                    },
+                                ],
+                            },
+                            {
+                                Component: SakFullbreddeLayout,
+                                children: [
+                                    {
+                                        path: "dokumenter",
+                                        handle: { sakSideTittel: "Dokumenter" },
+                                        Component: () => <FargetInnhold type="dokumenter" />,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+        { initialEntries: ["/sak/2024-1234/standard"] },
+    );
+
+    return (
+        <StoryProviders>
+            <RouterProvider router={router} />
+        </StoryProviders>
+    );
+};
 
 export const UtenFellesHeader = () => {
     const router = createMemoryRouter(
