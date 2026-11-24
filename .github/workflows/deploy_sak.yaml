@@ -84,11 +84,15 @@ jobs:
           cache-dependency-path: familieveileder/pnpm-lock.yaml
       - if: steps.gate.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
       - name: Last miljøvariabler
         if: steps.gate.outputs.skip != 'true'
         run: cat "${{ matrix.env_file }}" >> "$GITHUB_ENV"
       - if: steps.gate.outputs.skip != 'true'
         run: pnpm build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
       - if: steps.gate.outputs.skip != 'true'
         uses: google-github-actions/auth@v2
         with:
