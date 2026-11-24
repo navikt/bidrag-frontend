@@ -11,22 +11,20 @@ export function createBarnRolleTableData(
     far: PersonInfoDto | undefined | null,
     valgteRoller: Rolleveileder,
 ): IBarnRolleTableData[] {
-    const morRolle = mor &&
-        mor !== null && {
-            rolle: getRolleType(mor.ident, valgteRoller),
-            relasjon: RelasjonType.MOR,
-            fodselsnummer: mor.ident,
-            navn: mor.navn,
-            visningsnavn: mor.visningsnavn,
-        };
-    const farRolle = far &&
-        far !== null && {
-            rolle: getRolleType(far.ident, valgteRoller),
-            relasjon: RelasjonType.FAR,
-            fodselsnummer: far.ident,
-            navn: far.navn,
-            visningsnavn: far.visningsnavn,
-        };
+    const morRolle = mor && {
+        rolle: getRolleType(mor.ident, valgteRoller),
+        relasjon: RelasjonType.MOR,
+        fodselsnummer: mor.ident,
+        navn: mor.navn,
+        visningsnavn: mor.visningsnavn,
+    };
+    const farRolle = far && {
+        rolle: getRolleType(far.ident, valgteRoller),
+        relasjon: RelasjonType.FAR,
+        fodselsnummer: far.ident,
+        navn: far.navn,
+        visningsnavn: far.visningsnavn,
+    };
 
     return [morRolle, farRolle]
         .filter((i) => i !== undefined && i !== null)
