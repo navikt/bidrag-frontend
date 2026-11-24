@@ -56,11 +56,11 @@ jobs:
       matrix:
         include:
           - environment: q1
-            env_file: familieveileder/env/.env.q1
+            env_file: familieveileder/env/.env.dev
             gcp_key: GCP_SERVICEUSER_KEY_DEV
             bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/feature/static
           - environment: q2
-            env_file: familieveileder/env/.env.q2
+            env_file: familieveileder/env/.env.main
             gcp_key: GCP_SERVICEUSER_KEY_DEV
             bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/main/static
           - environment: prod
