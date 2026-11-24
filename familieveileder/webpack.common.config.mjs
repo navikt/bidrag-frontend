@@ -25,6 +25,9 @@ export default {
         topLevelAwait: true,
     },
     resolve: {
+        alias: {
+            "process/browser$": path.resolve(__dirname, "node_modules/process/browser.js"),
+        },
         extensions: [".tsx", ".ts", ".js", ".jsx"],
     },
     optimization: {
@@ -79,6 +82,9 @@ export default {
         ],
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            process: "process/browser",
+        }),
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: "[name].[fullhash].css",
