@@ -1,8 +1,8 @@
 import { merge } from "webpack-merge";
-import { EnvironmentPlugin }  from "webpack";
+import webpack  from "webpack";
 
 import webpackCommon from "./webpack.common.config.mjs";
-
+const { EnvironmentPlugin } = webpack;
 const REQUIRED_ENV_VARS = {
     BIDRAG_PERSON_URL: "",
     BIDRAG_SAK_URL: "",
