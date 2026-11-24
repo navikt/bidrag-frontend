@@ -5,7 +5,7 @@ import {
     Vedtakstype,
 } from "@bidrag/api/BidragBehandlingApiV1";
 import { ModiaLink, RolleTypeAbbreviation } from "@bidrag/common";
-import { BodyShort, Tabs } from "@navikt/ds-react";
+import { BodyShort } from "@navikt/ds-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext, useWatch } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
@@ -13,6 +13,7 @@ import { BehandlingAlert } from "../../../../common/components/BehandlingAlert";
 import { CustomTextareaEditor } from "../../../../common/components/CustomEditor";
 import { NewFormLayout } from "../../../../common/components/layout/grid/NewFormLayout";
 import { QueryErrorWrapper } from "../../../../common/components/query-error-boundary/QueryErrorWrapper";
+import Tabs from "../../../../common/components/wrappingtabs/WrappingTabs";
 import { toUnderholdskostnadTabQueryParameter } from "../../../../common/constants/behandlingQueryKeys";
 import text from "../../../../common/constants/texts";
 import { useBehandlingProvider } from "../../../../common/context/BehandlingContext";

@@ -27,6 +27,8 @@ interface DokumentJournalpostProps {
     visFagomrade: boolean;
     isExpanded: boolean;
     onToggle: (isOpen: boolean) => void;
+    /** Viser dokumentet for headeren igjen når en allerede åpen journalpost klikkes med musen. */
+    onVelgHeaderDokument: () => void;
     selectedId?: string;
     visitedIds: Set<string>;
     onSelectDocument: (id: string) => void;
@@ -101,6 +103,7 @@ export function DokumentTre({ data, menyState, sakRoller, flatListe = false }: D
                         visFagomrade={harBlandingFarBid}
                         isExpanded={expandedIds.has(jpId)}
                         onToggle={handterAccordionEndring}
+                        onVelgHeaderDokument={() => dokumentForHeader && handleSelectDocument(dokumentForHeader.id)}
                         selectedId={selectedId}
                         visitedIds={visitedIds}
                         onSelectDocument={handleSelectDocument}
@@ -118,6 +121,7 @@ function DokumentJournalpost({
     visFagomrade,
     isExpanded,
     onToggle,
+    onVelgHeaderDokument,
     selectedId,
     visitedIds,
     onSelectDocument,
@@ -147,11 +151,22 @@ function DokumentJournalpost({
         >
             <Accordion.Item open={isExpanded} onOpenChange={onToggle}>
                 <Accordion.Header
+                    // Saksbehandler klikker ofte tilbake til en journalpost som allerede er åpen for å se
+                    // dokumentet igjen. Et museklikk på en åpen journalpost lukker den derfor ikke, men
+                    // viser dokumentet; dobbeltklikk lukker. Enter og mellomrom har event.detail 0 og
+                    // åpner og lukker som før. preventDefault hindrer Aksel i å bytte åpen/lukket.
+                    onClick={(event) => {
+                        if (isExpanded && event.detail > 0) {
+                            event.preventDefault();
+                            onVelgHeaderDokument();
+                        }
+                    }}
+                    onDoubleClick={() => onToggle(false)}
                     // Aksel sin Accordion.Header pakker innholdet i en <Heading as="span">, som er
                     // display:inline og derfor ikke krymper i header-radens flex-layout. Uten dette
                     // vokser headingen til full tekstbredde og lange journalposttitler "blør" ut over
                     // komponenten i stedet for å trunkeres med ellipsis.
-                    className={`[&>.aksel-heading]:min-w-0 [&>.aksel-heading]:flex-1 [&>.aksel-heading]:block [&>.aksel-heading]:overflow-hidden ${
+                    className={`select-none [&>.aksel-heading]:min-w-0 [&>.aksel-heading]:flex-1 [&>.aksel-heading]:block [&>.aksel-heading]:overflow-hidden ${
                         isExpanded
                             ? `!pb-2 ${
                                   hoveddokumentErValgt
