@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-
+import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import { EsbuildPlugin } from "esbuild-loader";
 import webpack from "webpack";
 
@@ -78,6 +79,14 @@ export default {
         ],
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            process: "process/browser",
+        }),
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin({
+            filename: "[name].[fullhash].css",
+            ignoreOrder: true,
+        }),
         new ModuleFederationPlugin({
             name: FEDERATION_NAME,
             filename: "remoteEntry.js",
