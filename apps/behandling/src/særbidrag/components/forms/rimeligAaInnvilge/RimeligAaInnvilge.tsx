@@ -105,24 +105,27 @@ const RimeligAaInnvilgeForm = () => {
         [saveUtgifter, prevState, useFormMethods, getValues, setSaveErrorState],
     );
 
-    const onSave = (values: RimeligAaInnvilgeFormValues, name: string) =>
-        updateAndSave({
+    // Leser skjemaverdiene når lagringen sendes, ikke når endringen skjer. Ellers kan en forsinket lagring av begrunnelsen
+    // sende en gammel verdi for avkrysningen og overskrive en nyere lagring.
+    const onSave = (name: string) => {
+        const values = getValues();
+        return updateAndSave({
             triggeredBy: name === "begrunnelse" ? "rimeligÅInnvilgeBegrunnelse" : "rimeligÅInnvilge",
             rimeligÅInnvilge: {
                 rimeligÅInnvilge: values.rimeligÅInnvilge,
                 begrunnelse: values.begrunnelse,
             },
         });
+    };
     const debouncedOnSave = useDebounce(onSave);
 
     useEffect(() => {
-        const subscription = useFormMethods.watch((value, { name, type }) => {
+        const subscription = useFormMethods.watch((_, { name, type }) => {
             if (name === undefined || type === undefined) return;
-            const formValues = value as RimeligAaInnvilgeFormValues;
             if (name === "begrunnelse" && type === "change") {
-                debouncedOnSave(formValues, name);
+                debouncedOnSave(name);
             } else {
-                onSave(formValues, name);
+                onSave(name);
             }
         });
         return () => subscription.unsubscribe();

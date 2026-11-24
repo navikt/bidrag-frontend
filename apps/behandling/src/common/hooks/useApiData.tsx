@@ -53,6 +53,7 @@ import {
     type StonadTilBarnetilsynAktiveGrunnlagDto,
     type StonadTilBarnetilsynDto,
     type TilleggsstonadDto,
+    TypeBehandling,
     type UnderholdDto,
     type VirkningstidspunktBarnDtoV2,
     type VirkningstidspunktFeilV2Dto,
@@ -264,6 +265,14 @@ export const useUpdateInntekt = () => {
         },
         onSuccess: (response) => {
             refetchFF();
+            const erSærbidrag =
+                queryClient.getQueryData<BehandlingDtoV2>(QueryKeys.behandlingV2(behandlingId, vedtakId))?.type ===
+                TypeBehandling.SAeRBIDRAG;
+            if (erSærbidrag) {
+                // Barnets inntekt avgjør om steget "Rimelig å innvilge særbidrag" er aktivt. Svaret på oppdateringen har ikke
+                // denne verdien, så behandlingen må hentes på nytt.
+                queryClient.invalidateQueries({ queryKey: QueryKeys.behandlingV2(behandlingId, vedtakId) });
+            }
             queryClient.setQueryData(QueryKeys.behandlingV2(behandlingId, vedtakId), (currentData: BehandlingDtoV2) => {
                 return {
                     ...currentData,
