@@ -117,6 +117,9 @@ importers:
       prettier:
         specifier: ^3.9.10
         version: 3.9.10
+      process:
+        specifier: 0.11.10
+        version: 0.11.10
       style-loader:
         specifier: ^4.0.0
         version: 4.0.0(webpack@5.112.2)
@@ -2726,6 +2729,10 @@ packages:
 
   process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
+
+  process@0.11.10:
+    resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
+    engines: {node: '>= 0.6.0'}
 
   proxy-addr@2.0.8:
     resolution: {integrity: sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==}
@@ -5861,6 +5868,8 @@ snapshots:
       react-is: 17.0.2
 
   process-nextick-args@2.0.1: {}
+
+  process@0.11.10: {}
 
   proxy-addr@2.0.8:
     dependencies:
