@@ -67,7 +67,7 @@ export default function ForeldreModalContent({
                 setSelectedFamilieenhet(motpart ?? ukjentFamilieenhet(personensFamilieenheter));
             }
         }
-    }, [personensFamilieenheter]);
+    }, [personensFamilieenheter, valgteRoller, rolle]);
 
     if (!selectedFamilieenhet) {
         return null;
