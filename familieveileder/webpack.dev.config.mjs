@@ -3,7 +3,6 @@ import { merge } from "webpack-merge";
 import webpackCommon from "./webpack.common.config.mjs";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import webpack from "webpack";
-import fs from "fs";
 
 const { EnvironmentPlugin, DefinePlugin } = webpack;
 const DEV_SERVER_PORT = 5252;
@@ -12,8 +11,6 @@ export default (env) => { return merge(webpackCommon, config(env)) };
 
 
 const config = (env)=> {
-    const customenvfile = `env/${env.envfile}`;
-    const envfile = fs.existsSync(customenvfile) ? customenvfile : "env/.env.local";
     return {
         mode: "development",
         devtool: "eval-source-map",
