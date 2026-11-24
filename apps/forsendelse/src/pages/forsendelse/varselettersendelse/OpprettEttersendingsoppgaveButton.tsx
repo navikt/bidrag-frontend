@@ -8,6 +8,7 @@ import {
     TrashIcon,
 } from "@navikt/aksel-icons";
 import {
+    Alert,
     BodyShort,
     Box,
     Button,
@@ -27,7 +28,6 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useMemo, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
-
 import {
     mapVarselEttersendelse,
     mapForsendelseResponse as varselForsendelseUpdater,
@@ -44,6 +44,7 @@ import {
     useSlettVarselEttersendelseDokument,
 } from "../../../hooks/varselEnderselseApi";
 import type { KodeBeskrivelse } from "../../../types/KodeverkTypes";
+import { formatApiErrorMessage } from "../../../utils/ErrorUtils";
 import type { IForsendelseFormProps, VarselEttersendelseVedleggProps } from "../context/DokumenterFormContext";
 import { useSession } from "../context/SessionContext";
 import { VarselDetaljer } from "./EttersendingsoppgaveDetaljer";
@@ -51,11 +52,9 @@ export const ettersendingsformPrefiks = "ettersendingsoppgave";
 const navAnnenSkjema = "VANL";
 
 export default function OpprettEttersendelseOppgaveButton() {
-    const { isEttersendingsoppgaveEnabled } = useFeatureToogle();
     const [isOpen, setIsOpen] = useState(false);
     const forsendelse = useHentForsendelseQuery();
 
-    if (!isEttersendingsoppgaveEnabled) return;
     if (forsendelse.gjelderIdent !== forsendelse.mottaker?.ident) return;
     return (
         <Suspense fallback={<Loader size="xsmall" />}>
@@ -107,21 +106,24 @@ function OpprettEttersendelseOppgaveModal({
             return;
         }
 
-        opprettVarselEttersendelseFn
-            .mutateAsync({
+        opprettVarselEttersendelseFn.mutate(
+            {
                 forsendelseId: Number(forsendelseId.replace("BIF-", "")),
                 tittel: data.journalpostId === navAnnenSkjema ? data.tittel : journalpost?.innhold,
                 ettersendelseForJournalpostId: data.journalpostId,
                 skjemaId: journalpost?.brevkode?.kode ?? data.journalpostId,
-            })
-            .then(async (opprettetVarselEttersendelse) => {
-                setValue("ettersendingsoppgave", mapVarselEttersendelse(opprettetVarselEttersendelse.data));
-                qc.setQueryData(
-                    UseForsendelseApiKeys.hentForsendelse(forsendelseId),
-                    varselForsendelseUpdater(opprettetVarselEttersendelse.data),
-                );
-                setIsOpen(false);
-            });
+            },
+            {
+                onSuccess: (opprettetVarselEttersendelse) => {
+                    setValue("ettersendingsoppgave", mapVarselEttersendelse(opprettetVarselEttersendelse.data));
+                    qc.setQueryData(
+                        UseForsendelseApiKeys.hentForsendelse(forsendelseId),
+                        varselForsendelseUpdater(opprettetVarselEttersendelse.data),
+                    );
+                    setIsOpen(false);
+                },
+            },
+        );
     }
     return (
         <form onSubmit={form.handleSubmit(opprett)}>
@@ -136,6 +138,14 @@ function OpprettEttersendelseOppgaveModal({
                     <Heading size="medium">Opprett ettersendingsoppgave</Heading>
                 </Modal.Header>
                 <Modal.Body>
+                    {opprettVarselEttersendelseFn.isError && (
+                        <Alert role="alert" variant="error" size="small">
+                            {formatApiErrorMessage(
+                                "Kunne ikke opprette ettersendingsoppgave",
+                                opprettVarselEttersendelseFn.error,
+                            )}
+                        </Alert>
+                    )}
                     <FormProvider {...form}>
                         <Suspense fallback={<Loader size="xsmall" />}>
                             <EksisterendeOppgaveVarsel />
@@ -188,13 +198,16 @@ function SlettOppgaveButton() {
     const forsendelse = useHentForsendelseQuery();
     const slettVarselEttersendelseFn = useSlettVarselEttersendelse();
     function slettVarsel() {
-        slettVarselEttersendelseFn
-            .mutateAsync({
+        slettVarselEttersendelseFn.mutate(
+            {
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
-            })
-            .then(() => {
-                qc.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse(forsendelse.forsendelseId) });
-            });
+            },
+            {
+                onSuccess: () => {
+                    qc.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse(forsendelse.forsendelseId) });
+                },
+            },
+        );
     }
 
     return (
@@ -214,6 +227,14 @@ function SlettOppgaveButton() {
                     <Heading size="medium">Slett oppgave</Heading>
                 </Modal.Header>
                 <Modal.Body>
+                    {slettVarselEttersendelseFn.isError && (
+                        <Alert role="alert" variant="error" size="small">
+                            {formatApiErrorMessage(
+                                "Kunne ikke slette ettersendingsoppgave",
+                                slettVarselEttersendelseFn.error,
+                            )}
+                        </Alert>
+                    )}
                     <BodyShort>Er du sikker på at du vil slette oppgaven?</BodyShort>
                     <BodyShort>Ettersendingsoppgave vil ikke bli opprettet for søknaden</BodyShort>
                 </Modal.Body>
@@ -248,26 +269,29 @@ function EttersendingsoppgaveVedleggsliste() {
             });
             return;
         }
-        oppdaterEttersendingsoppgaveFn
-            .mutateAsync({
+        oppdaterEttersendingsoppgaveFn.mutate(
+            {
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
                 oppdaterDokument: {
                     id: vedlegg.varselDokumentId,
                     tittel: vedlegg.tittel,
                     skjemaId: vedlegg.skjemaId,
                 },
-            })
-            .then((response) => {
-                setEditableRow(undefined);
-                vedleggsliste.replace(
-                    response.data.vedleggsliste.map((d) => ({
-                        ...d,
-                        varselDokumentId: d.id,
-                        type: d.skjemaId ? "SKJEMA" : "FRITEKST",
-                    })),
-                );
-                reset(undefined, { keepValues: true, keepDirty: false });
-            });
+            },
+            {
+                onSuccess: (response) => {
+                    setEditableRow(undefined);
+                    vedleggsliste.replace(
+                        response.data.vedleggsliste.map((d) => ({
+                            ...d,
+                            varselDokumentId: d.id,
+                            type: d.skjemaId ? "SKJEMA" : "FRITEKST",
+                        })),
+                    );
+                    reset(undefined, { keepValues: true, keepDirty: false });
+                },
+            },
+        );
     }
     function onDeleteRow(index: number) {
         setEditableRow(undefined);
@@ -277,14 +301,17 @@ function EttersendingsoppgaveVedleggsliste() {
             vedleggsliste.remove(index);
             return;
         }
-        slettVarselEttersendelseDokumentFn
-            .mutateAsync({
+        slettVarselEttersendelseDokumentFn.mutate(
+            {
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
                 id: dokument.varselDokumentId,
-            })
-            .then(() => {
-                vedleggsliste.remove(index);
-            });
+            },
+            {
+                onSuccess: () => {
+                    vedleggsliste.remove(index);
+                },
+            },
+        );
     }
 
     function addDokument() {
@@ -293,6 +320,22 @@ function EttersendingsoppgaveVedleggsliste() {
     }
     return (
         <Box>
+            {oppdaterEttersendingsoppgaveFn.isError && (
+                <Alert role="alert" variant="error" size="small">
+                    {formatApiErrorMessage(
+                        "Kunne ikke oppdatere ettersendingsoppgave",
+                        oppdaterEttersendingsoppgaveFn.error,
+                    )}
+                </Alert>
+            )}
+            {slettVarselEttersendelseDokumentFn.isError && (
+                <Alert role="alert" variant="error" size="small">
+                    {formatApiErrorMessage(
+                        "Kunne ikke slette vedlegg fra ettersendingsoppgaven",
+                        slettVarselEttersendelseDokumentFn.error,
+                    )}
+                </Alert>
+            )}
             <HStack>
                 <Button
                     variant="tertiary"
