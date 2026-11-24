@@ -1,7 +1,6 @@
 import { merge } from "webpack-merge";
 
 import webpackCommon from "./webpack.common.config.mjs";
-import Dotenv from "dotenv-webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import webpack from "webpack";
 import fs from "fs";
@@ -36,8 +35,6 @@ const config = (env)=> {
                 publicPath: "/",
                 template: "./src/index.html",
             }),
-            new Dotenv({ path: envfile }),
-            new webpack.HotModuleReplacementPlugin(),
             new HtmlWebpackPlugin({
                 publicPath: "/",
                 template: "./src/index.html",

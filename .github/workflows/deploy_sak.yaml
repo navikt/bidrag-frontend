@@ -32,13 +32,10 @@ jobs:
       matrix:
         include:
           - environment: q1
-            env_file: env/.env.dev
             bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/feature/static
           - environment: q2
-            env_file: env/.env.main
             bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/main/static
           - environment: prod
-            env_file: env/.env.prod
             bucket_path: bidrag-ui-static-files-prod/bidrag_sak_ui/static
     steps:
       - name: Hopp over prod utenfor main
@@ -62,9 +59,6 @@ jobs:
         run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
-      - name: Last miljøvariabler
-        if: steps.gate.outputs.skip != 'true'
-        run: cat "${{ matrix.env_file }}" >> "$GITHUB_ENV"
       - if: steps.gate.outputs.skip != 'true'
         run: pnpm build
         env:
