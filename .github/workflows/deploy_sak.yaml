@@ -79,8 +79,9 @@ jobs:
       - if: steps.gate.outputs.skip != 'true'
         uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
+          node-version-file: familieveileder/.nvmrc
           cache: pnpm
+          cache-dependency-path: familieveileder/pnpm-lock.yaml
       - if: steps.gate.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
       - name: Last miljøvariabler
