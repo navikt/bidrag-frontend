@@ -55,7 +55,7 @@ export default function ForeldreModalContent({
         } else {
             // Motpart and Barn has not been selected, choose the first element as default value
             if (!valgteRoller.barn || valgteRoller.barn.length === 0) {
-                setSelectedFamilieenhet(personensFamilieenheter[0]);
+                setSelectedFamilieenhet(personensFamilieenheter[0] ?? ukjentFamilieenhet(personensFamilieenheter));
             } else {
                 // Motpart has not been selected but Barn has been selected, find Motpart that Barn belongs to
                 const motpart = personensFamilieenheter.find((familie) =>
@@ -64,7 +64,7 @@ export default function ForeldreModalContent({
                         familie.fellesBarn.map((barn) => barn.ident),
                     ),
                 );
-                setSelectedFamilieenhet(motpart);
+                setSelectedFamilieenhet(motpart ?? ukjentFamilieenhet(personensFamilieenheter));
             }
         }
     }, [personensFamilieenheter]);
