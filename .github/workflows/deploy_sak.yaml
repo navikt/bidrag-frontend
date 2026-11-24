@@ -82,6 +82,10 @@ jobs:
           node-version-file: familieveileder/.nvmrc
           cache: pnpm
           cache-dependency-path: familieveileder/pnpm-lock.yaml
+          node-version: '26'
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@navikt"
+
       - if: steps.gate.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
         env:
