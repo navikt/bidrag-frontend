@@ -4,7 +4,7 @@ on:
 
   push:
     paths:
-      - .github/workflows/deploy_sak.yaml
+      - .github/workflows/deploy_familieveileder.yaml
       - 'familieveileder/**'
     branches-ignore:
       - "dependabot/**"
