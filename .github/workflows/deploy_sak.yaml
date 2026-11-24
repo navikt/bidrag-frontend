@@ -70,6 +70,7 @@ jobs:
     steps:
       - name: Hopp over prod utenfor main
         id: gate
+        working-directory: ${{ github.workspace }}
         run: echo "skip=${{ matrix.environment == 'prod' && github.ref != 'refs/heads/main' }}" >> "$GITHUB_OUTPUT"
       - if: steps.gate.outputs.skip != 'true'
         uses: actions/checkout@v6
