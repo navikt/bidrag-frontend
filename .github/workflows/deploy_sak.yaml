@@ -52,7 +52,6 @@ jobs:
       - if: steps.gate.outputs.skip != 'true'
         uses: actions/setup-node@v6
         with:
-          node-version-file: familieveileder/.nvmrc
           cache: pnpm
           cache-dependency-path: familieveileder/pnpm-lock.yaml
           node-version: '26'
