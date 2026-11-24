@@ -49,7 +49,7 @@ const harSamværValideringsfeil = (valideringsfeil?: SamvaerValideringsfeilDto |
  * Hver feil knyttes til saken den tilhører via rollens/barnets eget saksnummer.
  */
 export const getSaksnummerMedValideringsfeil = (behandling: BehandlingDtoV2): Set<string> => {
-    const { roller, erBisysVedtak } = behandling;
+    const { roller, lesemodus } = behandling;
     const saksnummerMedFeil = new Set<string>();
     const leggTil = (saksnummer?: string | null) => {
         if (saksnummer) {
@@ -57,7 +57,7 @@ export const getSaksnummerMedValideringsfeil = (behandling: BehandlingDtoV2): Se
         }
     };
 
-    if (erBisysVedtak) return saksnummerMedFeil;
+    if (lesemodus) return saksnummerMedFeil;
 
     behandling.virkningstidspunktV3?.barn?.forEach((barn) => {
         if (harVirkningstidspunktValideringsfeil(barn.valideringsfeilV2)) {
