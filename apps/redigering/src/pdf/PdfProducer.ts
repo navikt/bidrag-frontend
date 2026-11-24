@@ -27,6 +27,7 @@ import {
     repairPDF,
 } from "./PdfHelpers";
 import { maskPages as maskPagesOnDocument } from "./services/MaskingService";
+import { removeOrphanedContent } from "./services/OrphanedContentCleanupService";
 import {
     getCurrentPageRefOrder as getCurrentPageRefOrderOf,
     remapConfigAfterPageOrderChange as remapConfigAfterPageOrderChangeOf,
@@ -221,15 +222,9 @@ export class PdfProducer {
         await this.convertMaskedPagesToImage(itemsFiltered);
         // Remove pages marked for deletion after masking/conversion is complete.
         await this.removePages(normalizedRemovePages);
-        // Re-run structural repair after edits to recover any non-removed pages
-        // that become detached in corrupt PDFs during page operations.
+        // Repair the surviving page tree without resurrecting orphan page objects
+        // left behind by masking and replacement operations.
         await this.runPostEditFixingScript();
-        // Some PDFs recover pages only in the post-edit repair pass. Reapply the configured
-        // rotations so those recovered pages match the editor state too. Skip pages that were
-        // already rasterized during masking, because their visible rotation is already baked
-        // into the image replacement and applying /Rotate again flips them a second time.
-        const maskedPageNumbers = new Set(itemsFiltered.map((item) => item.pageNumber));
-        this.applyPageRotations(this.config.pageRotations, maskedPageNumbers);
 
         // Masking (convertMaskedPagesToImage), page removal, and the post-edit repair pass all
         // rebuild this.pdfDocument via copyPages()/PDFDocument.create(), which mints brand new
@@ -612,19 +607,14 @@ export class PdfProducer {
         maskPagesOnDocument((pageNumber) => this.pdfDocument.getPage(pageNumber - 1), this.font, items);
     }
 
-    private applyPageRotations(pageRotations?: Record<number, number>, excludedPageNumbers: Set<number> = new Set()) {
+    private applyPageRotations(pageRotations?: Record<number, number>) {
         if (!pageRotations) {
             return;
         }
 
         for (const [pageNumberString, rotationValue] of Object.entries(pageRotations)) {
             const pageNumber = Number(pageNumberString);
-            if (
-                Number.isNaN(pageNumber) ||
-                pageNumber < 1 ||
-                pageNumber > this.pdfDocument.getPageCount() ||
-                excludedPageNumbers.has(pageNumber)
-            ) {
+            if (Number.isNaN(pageNumber) || pageNumber < 1 || pageNumber > this.pdfDocument.getPageCount()) {
                 continue;
             }
 
@@ -801,6 +791,7 @@ export class PdfProducer {
                 await this.normalizePdfAfterFix();
             }
 
+            removeOrphanedContent(this.pdfDocument);
             this.processedDocument = await new PdfAConverter().convertAndSave(this.pdfDocument, this.title, false);
         } catch (e) {
             LoggerService.error("Det skjedde en feil ved lagring av PDF", e);
@@ -881,10 +872,8 @@ export class PdfProducer {
             // page's new ref as "unknown"/newly recovered and push it to the end of the document,
             // silently undoing the mask/removal positioning the editor already applied.
             const pageRefsBeforeFix = this.getCurrentPageRefOrder();
-            // Post-edit repair must still run after mask-only edits because the rebuild path can
-            // expose previously detached pages. Missing pages are recovered unless they were
-            // explicitly removed or replaced by the editor.
-            await fixMissingPages(this.pdfDocument, this.intentionallyRemovedPageRefs);
+            // Missing-page recovery is exhaustive before editing. Re-running it after copy and
+            // removal operations would mistake stale orphan leaves for pages the user expects.
             await repairPDF(this.pdfDocument);
             const pageRefsAfterFix = await this.reorderPagesToPreserveOriginalOrder(pageRefsBeforeFix);
             this.remapConfigAfterPageOrderChange(pageRefsBeforeFix, pageRefsAfterFix);
