@@ -1179,6 +1179,13 @@ export const useOppdatereVirkningstidspunktBegrunnelse = () => {
 
 export interface UtgifterPayload extends BaseMutationVariables, OppdatereUtgiftRequest {}
 
+// Begrunnelsen er HTML fra tekstredigeringen. Den mangler når den ikke har synlig tekst, for eksempel "<p><br/></p>".
+const manglerSynligTekst = (html?: string | null) =>
+    !html
+        ?.replace(/<[^>]*>/g, " ")
+        .replace(/&nbsp;| /g, " ")
+        .trim();
+
 export const useUpdateUtgifter = () => {
     const { behandlingId } = useBehandlingProvider();
     const queryClient = useQueryClient();
@@ -1212,7 +1219,7 @@ export const useUpdateUtgifter = () => {
                                           begrunnelse: response.rimeligÅInnvilge.begrunnelse,
                                           valideringsfeil:
                                               currentData.utgift.rimeligÅInnvilge.barnetsInntektErOverGrensen &&
-                                              !response.rimeligÅInnvilge.begrunnelse?.trim()
+                                              manglerSynligTekst(response.rimeligÅInnvilge.begrunnelse)
                                                   ? { manglerBegrunnelse: true }
                                                   : null,
                                       }
