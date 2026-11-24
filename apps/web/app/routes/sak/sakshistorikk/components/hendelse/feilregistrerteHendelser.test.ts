@@ -18,19 +18,24 @@ describe("filtrerFeilregistrerteHendelser", () => {
     ];
 
     it("skjuler feilregistrerte hendelser og andre hendelser med samme søknadsid", () => {
-        expect(ider(filtrerFeilregistrerteHendelser(hendelser, false))).toEqual(["soknad-b", "uten-soknad"]);
+        expect(ider(filtrerFeilregistrerteHendelser(hendelser, false))).toEqual([
+            "vedtak-a",
+            "soknad-b",
+            "uten-soknad",
+        ]);
     });
 
     it("skjuler ikke hendelser uten søknadsid selv om en feilregistrert hendelse mangler søknadsid", () => {
         const resultat = filtrerFeilregistrerteHendelser(
             [
                 hendelse("uten-soknad"),
+                hendelse("vedtak-a", { søknadsid: "A" }),
                 hendelse("tom-soknad", { søknadsid: "" }),
                 hendelse("feil", { type: HendelseType.FEILREGISTRERT, søknadsid: "" }),
             ],
             false,
         );
-        expect(ider(resultat)).toEqual(["uten-soknad", "tom-soknad"]);
+        expect(ider(resultat)).toEqual(["uten-soknad", "vedtak-a", "tom-soknad"]);
     });
 
     it("returnerer alle hendelser når feilregistrerte skal vises", () => {
