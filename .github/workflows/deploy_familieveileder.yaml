@@ -1,0 +1,77 @@
+name: Deploy familieveileder
+on:
+  workflow_dispatch:
+
+  push:
+    paths:
+      - .github/workflows/deploy_familieveileder.yaml
+      - 'familieveileder/**'
+    branches-ignore:
+      - "dependabot/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  APP_NAME: bidrag_sak_ui
+  BUCKET_DEV: bidrag-ui-static-files-dev
+  BUCKET_PROD: bidrag-ui-static-files-prod
+defaults:
+  run:
+    working-directory: familieveileder
+jobs:
+  build_and_deploy:
+    name: Deploy til ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: q1
+            bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/feature/static
+          - environment: q2
+            bucket_path: bidrag-ui-static-files-dev/bidrag_sak_ui/main/static
+          - environment: prod
+            bucket_path: bidrag-ui-static-files-prod/bidrag_sak_ui/static
+    steps:
+      - name: Hopp over prod utenfor main
+        id: gate
+        working-directory: ${{ github.workspace }}
+        run: echo "skip=${{ matrix.environment == 'prod' && github.ref != 'refs/heads/main' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.gate.outputs.skip != 'true'
+        uses: actions/checkout@v6
+      - if: steps.gate.outputs.skip != 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.gate.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          cache-dependency-path: familieveileder/pnpm-lock.yaml
+          node-version: '26'
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@navikt"
+
+      - if: steps.gate.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+      - if: steps.gate.outputs.skip != 'true'
+        run: pnpm build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+      - if: steps.gate.outputs.skip != 'true' && (matrix.environment == 'q1' || matrix.environment == 'q2')
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICEUSER_KEY_DEV }}
+      - if: steps.gate.outputs.skip != 'true' && matrix.environment == 'prod'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICEUSER_KEY_PROD }}
+      - if: steps.gate.outputs.skip != 'true'
+        uses: google-github-actions/setup-gcloud@v2
+      - if: steps.gate.outputs.skip != 'true'
+        run: gsutil -m rsync -R -d dist "gs://${{ matrix.bucket_path }}"
