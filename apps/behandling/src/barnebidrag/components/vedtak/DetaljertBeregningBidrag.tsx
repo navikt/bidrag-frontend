@@ -10,6 +10,7 @@ import { createContext, type FC, useContext } from "react";
 import { BPsEvne } from "../../../common/components/vedtak/BPsEvneTabell";
 import { AldersjusteringUnderholdskostnader } from "./AldersjusteringUnderholdskostnader";
 import { BarnetilleggSkatteprosent } from "./BarnetilleggSkatteprosent";
+import { BeregningBarnetErSelvforsørget } from "./BeregningBarnetErSelvforsørget";
 import { BeregningBegrensetRevurdering } from "./BeregningBegrensetRevurdering";
 import { EndeligBidragTable } from "./BeregningEndeligBidrag";
 import { BeregningEndringUnderGrense } from "./BeregningEndringUnderGrense";
@@ -21,6 +22,20 @@ import BeregningSamværsfradrag from "./BeregningSamværsfradrag";
 import { BPsAndelUnderholdskostnad } from "./BPsAndelUnderholdstkostnad";
 import { IndeksreguleringDetaljer } from "./IndeksreguleringDetaljer";
 import { NettoBarnetilleggTable } from "./NettoBarnetilleggTable";
+
+// Beregnede avslag der grunnlaget for avslaget vises i detaljene
+const avslagMedBeregningsdetaljer = [
+    Resultatkode.BIDRAG_IKKE_BEREGNET_DELT_BOSTED,
+    Resultatkode.BARNETERSELVFORSORGET,
+    Resultatkode.FULLT_UNDERHOLDT_AV_OFFENTLIG,
+];
+
+// periode.resultatKode er ikke satt for beregnede avslag, så resultatet hentes fra sluttberegningen
+export const sluttberegningResultat = (periode: ResultatBarnebidragsberegningPeriodeDto) =>
+    (periode.beregningsdetaljer as BidragPeriodeBeregningsdetaljer | undefined)?.sluttberegning?.resultat;
+
+export const visBeregningsdetaljerVedAvslag = (periode: ResultatBarnebidragsberegningPeriodeDto) =>
+    periode.erBeregnetAvslag && avslagMedBeregningsdetaljer.includes(sluttberegningResultat(periode));
 
 type DetaljertBeregningBidragProps = {
     periode: ResultatBarnebidragsberegningPeriodeDto;
@@ -84,6 +99,28 @@ export const DetaljertBeregningBidrag: FC<
                 >
                     <AldersjusteringUnderholdskostnader />
                     <EndeligBidragTable />
+                </BidragBeregningContext.Provider>
+            </VStack>
+        );
+    }
+    if (visBeregningsdetaljerVedAvslag(periode)) {
+        return (
+            <VStack gap="space-6" className={"w-[800px]"}>
+                <BidragBeregningContext.Provider
+                    value={{
+                        beregningsdetaljer,
+                        periode,
+                        kanFatteVedtakForRevurderingsbarn,
+                        anbefalesÅFatteVedtakForRevurderingsbarn,
+                        endeligBeløp: periode.faktiskBidrag,
+                        erEndringUnderGrense: false,
+                    }}
+                >
+                    {sluttberegningResultat(periode) === Resultatkode.BARNETERSELVFORSORGET ? (
+                        <BeregningBarnetErSelvforsørget />
+                    ) : (
+                        <BPsAndelUnderholdskostnad />
+                    )}
                 </BidragBeregningContext.Provider>
             </VStack>
         );

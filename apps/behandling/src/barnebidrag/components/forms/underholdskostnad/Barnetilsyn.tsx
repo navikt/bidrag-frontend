@@ -293,7 +293,7 @@ export const Barnetilsyn = ({ index }: { index: number }) => {
                         <BodyShort size="small">{text.alert.manglerPerioderForTilsynsordningDescription}</BodyShort>
                     </BehandlingAlert>
                 )}
-            {(underhold.harTilsynsordning || hasAtLeastOnePeriod) && (
+            {(underhold.harTilsynsordning || hasAtLeastOnePeriod || hasAtLeastOnePeriodOrActiveOpplysninger) && (
                 <>
                     {!lesemodus && displayOver12Alert(calculateAge(underhold.gjelderBarn.fødselsdato)) && (
                         <StatefulAlert

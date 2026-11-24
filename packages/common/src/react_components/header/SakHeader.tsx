@@ -137,6 +137,17 @@ const getEldsteSøknadFomDato = (søknader: RolleSoknadDto[]) =>
         return Number.isNaN(tid) ? eldste : Math.min(eldste, tid);
     }, Number.POSITIVE_INFINITY);
 
+/**
+ * Setter `fødselsdato` på roller der ident finnes i oppslaget. Roller uten treff beholder sin verdi.
+ */
+export const medFodselsdatoer = (roller: HeaderRolle[], identerTilDatoer?: Record<string, string>): HeaderRolle[] => {
+    if (!identerTilDatoer) return roller;
+    return roller.map((rolle) => {
+        const fødselsdato = rolle.ident ? identerTilDatoer[rolle.ident] : undefined;
+        return fødselsdato ? { ...rolle, fødselsdato } : rolle;
+    });
+};
+
 const mapSaksnummerRoller = (roller: HeaderRolle[], hovedsøknadsid?: number | null): SaksnummerRoller[] => {
     const saksnummerOrder = Array.from(new Set(roller.map((rolle) => rolle.saksnummer)));
 
@@ -416,7 +427,8 @@ function HeaderRenderer({
 
     // Calculate grouped saksnummer
     const saksnummerRoller = useMemo(
-        () => mapSaksnummerRoller(rollerMedPersonNavn, hovedsøknadsid),
+        () =>
+            mapSaksnummerRoller(medFodselsdatoer(rollerMedPersonNavn, fodselsdatoer?.identerTilDatoer), hovedsøknadsid),
         [rollerMedPersonNavn, fodselsdatoer, hovedsøknadsid],
     );
     const harFlereSaksnummer = saksnummerRoller.length > 1;

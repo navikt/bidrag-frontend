@@ -63,7 +63,7 @@ export default function SakstilknytningTable({ gjelderBarnIdent, onClose }: Saks
                             fodselsnummer: gjelderBarnIdent,
                             mottagerErVerge: false,
                             rollehistorikk: [],
-                            reellMottaker: erBarnOver18År ? null : { ident: gjelderBarnIdent, verge: false },
+                            reellMottaker: erBarnOver18År ? { ident: gjelderBarnIdent, verge: false } : null,
                         },
                     ],
                 });

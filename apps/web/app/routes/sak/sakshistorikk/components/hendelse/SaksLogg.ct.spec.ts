@@ -2,6 +2,10 @@ import { expect, test } from "@bidrag/common/playwright/testing/ctTest.ts";
 import type { Page } from "@playwright/test";
 
 const STORY = "routes/sak/sakshistorikk/components/hendelse/SaksLogg/ForskjelligeHendelser";
+const STORY_LANGT_RESULTAT = "routes/sak/sakshistorikk/components/hendelse/SaksLogg/LangtResultat";
+
+// Gir en tabell på ca. 1200 px, som på sakshistorikksiden i et vindu på 1536 px.
+const BREDT_VINDU = 1265;
 
 async function mockSkrivetilgang(page: Page) {
     await page.route("**/proxy/bidrag-sak/sak/**/kanSkrive**", async (route) => {
@@ -50,6 +54,24 @@ test.describe("SaksLogg", () => {
         ).toHaveAttribute("href", /\/sak\/2024\/1234\/vedtak\/vedtak-3/);
     });
 
+    test("viser lenkene for forsendelse og notat i én kolonne med overskriften Opprett", async ({ mount, page }) => {
+        await mockSkrivetilgang(page);
+        const component = await mount(STORY);
+
+        const overskrifter = component.getByRole("columnheader");
+        await expect(overskrifter.nth(0)).toHaveText("Behandle");
+        await expect(overskrifter.nth(1)).toHaveText("Opprett");
+        await expect(overskrifter.nth(2)).toHaveText("Dato");
+
+        const opprettCelle = component
+            .getByRole("row")
+            .filter({ hasText: "Søknad fra bidragsmottaker" })
+            .getByRole("cell")
+            .nth(1);
+        await expect(opprettCelle.getByRole("link", { name: "Opprett forsendelse" })).toBeVisible();
+        await expect(opprettCelle.getByRole("link", { name: "Opprett notat" })).toBeVisible();
+    });
+
     test("viser paginering når saksloggen har mer enn seks hendelser", async ({ mount, page }) => {
         await mockSkrivetilgang(page);
         const component = await mount(STORY);
@@ -85,5 +107,57 @@ test.describe("SaksLogg", () => {
 
         await component.getByRole("checkbox", { name: "Vis feilregistrerte" }).uncheck();
         await expect(component.getByText("Feilregistrert søknad")).toHaveCount(0);
+    });
+
+    test("viser alle kolonner uten sideveis rulling i et bredt vindu når resultatet er langt", async ({
+        mount,
+        page,
+    }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        const tabell = component.locator(".aksel-data-table__scroll-wrapper");
+        await expect(component.getByRole("columnheader", { name: "Resultat" })).toBeVisible();
+        expect(await tabell.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+    });
+
+    test("viser hele resultatet i en tooltip når teksten er kuttet", async ({ mount, page }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        await component
+            .getByText(/^Bidraget ble ikke aldersjustert/)
+            .first()
+            .hover();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Bidraget ble ikke aldersjustert fordi grunnlaget i vedtaket er justert ned til evne, og det gjelder hele perioden",
+        );
+    });
+
+    test("viser hele resultatet i en tooltip med tastaturet når teksten er kuttet og ikke er en lenke", async ({
+        mount,
+        page,
+    }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        const celle = component.getByRole("row").filter({ hasText: "Avvist" }).getByRole("cell").last();
+        await celle.locator("[tabindex='0']").focus();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Bidraget ble ikke aldersjustert fordi grunnlaget i vedtaket er justert ned til evne, og det gjelder hele perioden",
+        );
+    });
+
+    test("gjør ikke celler med lenke fokuserbare en gang til", async ({ mount, page }) => {
+        await mockSkrivetilgang(page);
+        await page.setViewportSize({ width: BREDT_VINDU, height: 800 });
+        const component = await mount(STORY_LANGT_RESULTAT);
+
+        const celle = component.getByRole("row").filter({ hasText: "(lenke)" }).getByRole("cell").last();
+        await expect(celle.getByRole("link")).toBeVisible();
+        await expect(celle.locator("[tabindex='0']")).toHaveCount(0);
     });
 });

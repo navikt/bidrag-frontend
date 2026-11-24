@@ -220,8 +220,7 @@ const UnderholdskostnadMenuButton = ({
             !!valideringsfeil?.stønadTilBarnetilsyn ||
             !!valideringsfeil?.tilleggsstønad ||
             !!valideringsfeil?.forpleining ||
-            !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length ||
-            !!valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length
+            !!valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length
         );
     });
 
@@ -265,9 +264,7 @@ const UnderholdskostnadMenuButton = ({
                                     !!underhold.valideringsfeil?.stønadTilBarnetilsyn ||
                                     !!underhold.valideringsfeil?.tilleggsstønad ||
                                     !!underhold.valideringsfeil?.forpleining ||
-                                    !!underhold.valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift
-                                        .length ||
-                                    !!underhold.valideringsfeil?.forpleiningOverstigerUnderholdskostnad.length)
+                                    !!underhold.valideringsfeil?.tilleggsstønadsperioderUtenFaktiskTilsynsutgift.length)
                             }
                             active={
                                 activeButton ===
@@ -393,9 +390,7 @@ const UnderholdskostnadMenuButton = ({
                                                     (!!underhold?.valideringsfeil?.forpleining?.overlappendePerioder
                                                         .length ||
                                                         !!underhold?.valideringsfeil?.forpleining?.fremtidigePerioder
-                                                            .length ||
-                                                        !!underhold.valideringsfeil
-                                                            ?.forpleiningOverstigerUnderholdskostnad.length)
+                                                            .length)
                                                 }
                                                 size="small"
                                                 active={

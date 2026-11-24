@@ -13,7 +13,11 @@ export const BPsAndelUtgifter = () => {
     const utgifter = beregnetSærbidrag.resultat.delberegningUtgift;
     return (
         <>
-            <BPsAndelInntekterTable inntekter={inntekter} forskuddssats={beregnetSærbidrag.resultat.forskuddssats} />
+            <BPsAndelInntekterTable
+                inntekter={inntekter}
+                forskuddssats={beregnetSærbidrag.resultat.forskuddssats}
+                inntektBBMultiplikator={30}
+            />
             <ResultatDescription
                 data={[
                     {

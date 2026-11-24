@@ -47,7 +47,7 @@ const PdfPageMemo = memo(
         const divRef = useRef<HTMLDivElement>(null);
         const isDrawed = useRef<boolean>(false);
         const isPageRenderStarted = useRef<boolean>(false);
-        const pageRotation = rotation ?? 0;
+        const pageRotation = ((((pageObject?.rotate ?? 0) + (rotation ?? 0)) % 360) + 360) % 360;
 
         useEffect(() => {
             if (hasPageNumberChanged()) {

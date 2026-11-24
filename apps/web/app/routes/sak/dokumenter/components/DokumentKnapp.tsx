@@ -32,7 +32,7 @@ export function DokumentKnapp({
         Boolean(dokument.journalpostTittel?.trim()) &&
         dokument.journalpostTittel?.trim() === dokument.tittel.trim();
 
-    const tittelFargeClass = isSelected ? "text-gray-900" : kanÅpnes ? "text-[var(--a-text-action)]" : "text-gray-500";
+    const tittelFargeClass = isSelected || kanÅpnes ? "text-gray-900" : "text-gray-500";
 
     const backgroundClass = isSelected ? "bg-[var(--a-surface-action-subtle,#cce1ff)]" : "bg-transparent";
     const borderClass = isSelected
@@ -60,7 +60,7 @@ export function DokumentKnapp({
             <HStack gap="space-1" align="center" wrap={false} className="w-full min-w-0">
                 {!erHoveddokument && <Detail className="text-gray-500 shrink-0 font-normal">↳</Detail>}
                 <Detail
-                    weight={isSelected || erHoveddokument ? "semibold" : "regular"}
+                    weight={isSelected || erHoveddokument || kanÅpnes ? "semibold" : "regular"}
                     className={`truncate flex-1 min-w-0 ${
                         tittelDupliserer ? "text-gray-600" : tittelFargeClass
                     } ${kanÅpnes && !isSelected && !tittelDupliserer ? "hover:underline" : ""}`}

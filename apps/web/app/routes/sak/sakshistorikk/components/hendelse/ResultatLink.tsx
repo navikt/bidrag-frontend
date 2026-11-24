@@ -2,7 +2,7 @@ import type { SakshendelseDto } from "@bidrag/api/SakApi";
 import { BodyShort, HStack, Link } from "@navikt/ds-react";
 import { useFlag } from "@unleash/proxy-client-react";
 
-const getResultatTekst = (hendelse: SakshendelseDto) => {
+export const getResultatTekst = (hendelse: SakshendelseDto) => {
     if (!hendelse.resultat) {
         switch (hendelse.type) {
             case "INDEKSREGULERT":
@@ -34,8 +34,10 @@ export function ResultatLink({
 
     if (visIBegge && visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl && hendelse.link) {
         return (
-            <HStack gap={"space-12"}>
-                <Link href={bisysResultatUrl}>{resultatTekst}*</Link>
+            <HStack gap={"space-12"} wrap={false}>
+                <Link href={bisysResultatUrl}>
+                    <span className="truncate">{resultatTekst}*</span>
+                </Link>
                 <Link href={resultatUrl} aria-label="Vis i ny løsning">
                     🦄
                 </Link>
@@ -44,18 +46,34 @@ export function ResultatLink({
     }
 
     if (visINyLosning && hendelse.erBisysVedtakOgErOverført && resultatUrl) {
-        return <Link href={resultatUrl}>{resultatTekst}</Link>;
+        return (
+            <Link href={resultatUrl}>
+                <span className="truncate">{resultatTekst}</span>
+            </Link>
+        );
     }
 
     if (hendelse.behandlingsid != null && hendelse.vedtaksid != null && resultatUrl) {
-        return <Link href={resultatUrl}>{resultatTekst}</Link>;
+        return (
+            <Link href={resultatUrl}>
+                <span className="truncate">{resultatTekst}</span>
+            </Link>
+        );
     }
 
     if (hendelse.resultatIBisys && hendelse.link) {
-        return <Link href={bisysResultatUrl}>{resultatTekst}*</Link>;
+        return (
+            <Link href={bisysResultatUrl}>
+                <span className="truncate">{resultatTekst}*</span>
+            </Link>
+        );
     }
 
-    return <BodyShort size={"small"}>{resultatTekst}</BodyShort>;
+    return (
+        <BodyShort size={"small"} truncate>
+            {resultatTekst}
+        </BodyShort>
+    );
 }
 
 function generateBisysResultatUrl(

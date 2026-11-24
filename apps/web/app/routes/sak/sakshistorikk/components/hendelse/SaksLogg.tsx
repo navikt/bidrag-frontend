@@ -3,20 +3,26 @@ import { useBisysLink } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
 import { Checkbox, Heading, HStack, Pagination, VStack } from "@navikt/ds-react";
 import { DataGrid } from "@navikt/ds-react/PREVIEW/DataGrid";
+import { useFlag } from "@unleash/proxy-client-react";
 import { useMemo, useState } from "react";
 import { useHarSkrivetilgang } from "~/api/useApi.ts";
+import { AvkortetCelle, tabellMedAvkortetSisteKolonne } from "../AvkortetCelle";
 import { useSort } from "../useSort";
 import { BehandleLink } from "./BehandleLink";
 import { BrevLink } from "./BrevLink";
 import { filtrerFeilregistrerteHendelser } from "./feilregistrerteHendelser";
+import { hendelseTekst, sammenlignHendelseTekst } from "./hendelseTekst";
 import { NotatLink } from "./NotatLink";
-import { ResultatLink } from "./ResultatLink";
+import { getResultatTekst, ResultatLink } from "./ResultatLink";
 import { SøknadsgruppeBeskrivelseCelle } from "./SøknadsgruppeBeskrivelseCelle";
 
 const ROWS_PER_PAGE = 6;
 
 export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string; hendelser: SakshendelseDto[] }) {
-    const { sort, handleSort, sortData } = useSort<SakshendelseDto>();
+    const tydeligereHendelsetekster = useFlag("bisys.sakshistorikk_tydeligere_hendelsetekster");
+    const { sort, handleSort, sortData } = useSort<SakshendelseDto>({
+        customComparators: { typeBeskrivelse: sammenlignHendelseTekst(tydeligereHendelsetekster) },
+    });
     const [page, setPage] = useState(1);
     const [visFeilregistrerte, setVisFeilregistrerte] = useState(false);
     const { bisysSessionParams } = useBisysLink();
@@ -60,18 +66,17 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
 
             <DataGrid
                 data={paginatedData}
+                className={`${tabellMedAvkortetSisteKolonne} [&_tr>*:first-child>*]:px-4`}
                 getRowId={(h) => h.hendelseId ?? `${h.opprettetTidspunkt}-${h.type}`}
                 settings={{
                     zebraStripes: true,
                     rowDensity: "tight",
                     textSize: "small",
-                    truncateContent: true,
-                    stickyColumns: { start: 1, end: 1 },
                 }}
                 columns={[
                     {
                         id: "behandle",
-                        header: "",
+                        header: "Behandle",
                         bodyCell: (h) => (
                             <BehandleLink
                                 saksnummer={saksnummer}
@@ -83,29 +88,25 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                         ),
                     },
                     {
-                        id: "forsendelelse",
-                        header: "",
+                        id: "opprett",
+                        header: "Opprett",
                         bodyCell: (h) => (
-                            <BrevLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                                kanSkrive={kanSkrive}
-                            />
-                        ),
-                    },
-                    {
-                        id: "notat",
-                        header: "",
-                        bodyCell: (h) => (
-                            <NotatLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                                kanSkrive={kanSkrive}
-                            />
+                            <HStack gap="space-8" wrap={false}>
+                                <BrevLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                    kanSkrive={kanSkrive}
+                                />
+                                <NotatLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                    kanSkrive={kanSkrive}
+                                />
+                            </HStack>
                         ),
                     },
                     {
@@ -124,7 +125,7 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                         id: "typeBeskrivelse",
                         header: "Hendelse",
                         isSortable: true,
-                        bodyCell: (h) => h.typeBeskrivelse,
+                        bodyCell: (h) => hendelseTekst(h, tydeligereHendelsetekster),
                     },
                     {
                         id: "enhet",
@@ -136,12 +137,14 @@ export default function SaksLogg({ saksnummer, hendelser }: { saksnummer: string
                         id: "resultat",
                         header: "Resultat",
                         bodyCell: (h) => (
-                            <ResultatLink
-                                saksnummer={saksnummer}
-                                hendelse={h}
-                                enhet={enhet}
-                                sessionState={sessionState}
-                            />
+                            <AvkortetCelle tekst={getResultatTekst(h) ?? ""}>
+                                <ResultatLink
+                                    saksnummer={saksnummer}
+                                    hendelse={h}
+                                    enhet={enhet}
+                                    sessionState={sessionState}
+                                />
+                            </AvkortetCelle>
                         ),
                     },
                 ]}
