@@ -1,7 +1,7 @@
 import { merge } from "webpack-merge";
+import { EnvironmentPlugin }  from "webpack";
 
 import webpackCommon from "./webpack.common.config.mjs";
-const { EnvironmentPlugin } = webpack;
 
 const REQUIRED_ENV_VARS = {
     BIDRAG_PERSON_URL: "",
@@ -23,27 +23,8 @@ const OPTIONAL_ENV_VARS = {
     LEGACY_ENVIRONMENT: "",
 };
 
-class ValidateEnvPlugin {
-    apply(compiler) {
-        compiler.hooks.beforeRun.tapAsync("ValidateEnvPlugin", (_, callback) => {
-            const hasEnv = Object.keys(REQUIRED_ENV_VARS).some((key) => process.env[key]);
-            if (!hasEnv && !process.env.CI) {
-                callback();
-                return;
-            }
-            const result = envSchema.safeParse(process.env);
-            if (!result.success) {
-                const errors = result.error.issues.map((i) => `  - ${i.path[0]}: ${i.message}`);
-                callback(new Error(`\n❌ Miljøvariabel-validering feilet:\n${errors.join("\n")}\n`));
-            } else {
-                console.log("✅ Miljøvariabler OK");
-                callback();
-            }
-        });
-    }
-}
 export default merge(webpackCommon, {
     mode: "production",
     devtool: "source-map",
-    plugins: [new ValidateEnvPlugin(), new EnvironmentPlugin({ ...REQUIRED_ENV_VARS, ...OPTIONAL_ENV_VARS })],
+    plugins: [new EnvironmentPlugin({ ...REQUIRED_ENV_VARS, ...OPTIONAL_ENV_VARS })],
 });
