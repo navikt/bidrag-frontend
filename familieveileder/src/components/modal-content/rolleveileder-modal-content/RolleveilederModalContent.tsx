@@ -38,9 +38,14 @@ export default function RolleveilederModalContent({
     );
 
     useEffect(() => {
+        let active = true;
+        setFamilierelasjoner(undefined);
         new PersonSearchService().hentFamilierelasjoner(fodselsnummer).then((response) => {
-            setFamilierelasjoner(response);
+            if (active) setFamilierelasjoner(response);
         });
+        return () => {
+            active = false;
+        };
     }, [fodselsnummer, rolle]);
 
     if (!familierelasjoner) {
