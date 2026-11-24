@@ -2,9 +2,11 @@ import type { JournalpostDto } from "@bidrag/api/BidragDokumentApi";
 import { PersonNavnIdent } from "@bidrag/common";
 import { formaterDato } from "@bidrag/utils";
 import { Detail, HStack, VStack } from "@navikt/ds-react";
+import { dokumentDato } from "~/routes/sak/sakshistorikk/components/journalpost/journalpostUtils";
 
 export function JournalpostMetadata({ jp, visFagomrade }: { jp: JournalpostDto; visFagomrade: boolean }) {
-    const dokDato = jp.dokumentDato ? formaterDato(jp.dokumentDato) : "";
+    const dato = dokumentDato(jp);
+    const dokDato = dato ? formaterDato(dato) : "";
     const jourDato = jp.journalfortDato ? formaterDato(jp.journalfortDato) : "";
     const gjelderAktor = jp.gjelderAktor;
     const journalforendeEnhet = jp.journalforendeEnhet;
