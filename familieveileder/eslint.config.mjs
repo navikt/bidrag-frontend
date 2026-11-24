@@ -5,7 +5,6 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import jsonFormat from "eslint-plugin-json-format";
 import prettier from "eslint-plugin-prettier";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import unusedImports from "eslint-plugin-unused-imports";
@@ -25,7 +24,6 @@ export default [
         plugins: {
             "@typescript-eslint": typescriptEslint,
             prettier,
-            "json-format": jsonFormat,
             "simple-import-sort": simpleImportSort,
             "unused-imports": unusedImports,
         },
@@ -43,7 +41,6 @@ export default [
             react: {
                 version: "detect",
             },
-            "json/sort-package-json": ["name", "version", "private", "scripts", "dependencies", "devDependencies"],
         },
         rules: {
             "sort-imports": "off",
