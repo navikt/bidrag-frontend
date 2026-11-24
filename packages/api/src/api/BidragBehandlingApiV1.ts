@@ -2790,6 +2790,8 @@ export interface OppdatereInntektResponse {
   /** Oppdatert begrunnelse */
   begrunnelse?: string | null;
   valideringsfeil: InntektValideringsfeilDto;
+  /** Særbidrag: om barnets inntekt er over grensen for selvforsørget, og saksbehandlers vurdering */
+  særbidragRimeligÅInnvilge?: SaerbidragRimeligAInnvilgeDto | null;
   /**
    * Oppdatert begrunnelse
    * @deprecated
