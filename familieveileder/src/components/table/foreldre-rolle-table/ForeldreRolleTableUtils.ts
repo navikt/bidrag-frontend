@@ -14,7 +14,7 @@ export default function createFamilierelasjonData(
     const { fellesBarn } = familieenhet;
     const role = getMotpartRolleType(rolle);
 
-    const motpartRow: IFamilierelasjonTableData = familieenhet.motpart && {
+    const motpartRow: IFamilierelasjonTableData | undefined = familieenhet.motpart && {
         rolle: role,
         relasjon: familieenhet.forelderrolleMotpart as unknown as RelasjonType,
         fodselsnummer: familieenhet.motpart.ident,
@@ -37,5 +37,7 @@ export default function createFamilierelasjonData(
         [],
     );
 
-    return [motpartRow, ...barnRow].filter((row) => row && row !== null);
+    return [motpartRow, ...barnRow].filter(
+        (row): row is IFamilierelasjonTableData => row !== undefined,
+    );
 }
