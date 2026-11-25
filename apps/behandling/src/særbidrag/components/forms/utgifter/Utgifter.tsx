@@ -684,7 +684,7 @@ const BeregnetUtgifter = () => {
                 <Table size="small" className="table-fixed table bg-[white] w-full">
                     <Table.Header>
                         <Table.Row className="align-baseline">
-                            <Table.HeaderCell textSize="small" scope="col" align="center" className="w-[74px]">
+                            <Table.HeaderCell textSize="small" scope="col" align="center" className="w-[98px]">
                                 {text.label.betaltAvBp}
                             </Table.HeaderCell>
                             <Table.HeaderCell textSize="small" scope="col" align="left" className="min-w-[148px]">

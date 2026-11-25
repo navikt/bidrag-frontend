@@ -57,7 +57,7 @@ const VedtakResultat = () => {
             Resultatkode.GODKJENTBELOPERLAVEREENNFORSKUDDSSATS,
             Resultatkode.ALLE_UTGIFTER_ER_FORELDET,
         ].includes(beregnetSærbidrag.resultat?.resultatKode);
-        const erBeregningeAvslag = !erBisysVedtak && beregnetSærbidrag.resultat?.resultatKode !== Resultatkode.SAeRBIDRAGINNVILGET;
+        const erBeregningeAvslag = beregnetSærbidrag.resultat?.resultatKode !== Resultatkode.SAeRBIDRAGINNVILGET;
         const erInnvilgetVedtak = erBisysVedtak && lesemodus.erManuellVedtak
         const resultat = beregnetSærbidrag.resultat;
         if (erDirekteAvslag) {
