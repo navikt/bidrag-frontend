@@ -129,55 +129,53 @@ export const BpsBeregnedeTotalbidragTabell = ({
                                         expansionDisabled={!visReduksjonAvU}
                                         expandOnRowClick
                                         content={
-                                            visReduksjonAvU && (
-                                                <CalculationTabell
-                                                    zebraStripes={false}
-                                                    className={`${row.bidragJustertForNettoBarnetilleggBP ? "w-[610px]" : "w-[250px]"} [&_Table.DataCell]:w-full [&_.navds-table__row]:bg-inherit`}
-                                                    title="Reduksjon av BPs andel av U"
-                                                    data={[
-                                                        {
-                                                            label: "BPs andel av U",
-                                                            result: formatterBeløpForBeregning(
-                                                                erVedtakKildeBBM
-                                                                    ? row.beregnetBeløp
-                                                                    : row.bruttoBidragEtterBarnetilleggBM,
-                                                                true,
-                                                            ),
-                                                        },
-                                                        {
-                                                            label: (
-                                                                <div className="leading-tight">
-                                                                    <span>Beregnet bidrag </span>
-                                                                    {!erVedtakKildeBBM &&
-                                                                        row.bidragJustertForNettoBarnetilleggBP && (
-                                                                            <BodyShort as="span" size="small">
-                                                                                (justert opp til BPs netto barnetillegg)
-                                                                            </BodyShort>
-                                                                        )}
-                                                                </div>
-                                                            ),
-                                                            result: (
-                                                                <div className="flex flex-row justify-end gap-1">
-                                                                    <div>-</div>
-                                                                    {formatterBeløpForBeregning(
-                                                                        erVedtakKildeBBM
-                                                                            ? row.faktiskBeløp
-                                                                            : row.bruttoBidragEtterBarnetilleggBP,
-                                                                        true,
-                                                                    )}
-                                                                </div>
-                                                            ),
-                                                        },
-                                                    ]}
-                                                    result={{
-                                                        label: "Resultat",
-                                                        value: formatterBeløpForBeregning(
-                                                            row.reduksjonUnderholdskostnad,
+                                            <CalculationTabell
+                                                zebraStripes={false}
+                                                className={`${row.bidragJustertForNettoBarnetilleggBP ? "w-[610px]" : "w-[250px]"} [&_Table.DataCell]:w-full [&_.navds-table__row]:bg-inherit`}
+                                                title="Reduksjon av BPs andel av U"
+                                                data={[
+                                                    {
+                                                        label: "BPs andel av U",
+                                                        result: formatterBeløpForBeregning(
+                                                            erVedtakKildeBBM
+                                                                ? row.beregnetBeløp
+                                                                : row.bruttoBidragEtterBarnetilleggBM,
                                                             true,
                                                         ),
-                                                    }}
-                                                />
-                                            )
+                                                    },
+                                                    {
+                                                        label: (
+                                                            <div className="leading-tight">
+                                                                <span>Beregnet bidrag </span>
+                                                                {!erVedtakKildeBBM &&
+                                                                    row.bidragJustertForNettoBarnetilleggBP && (
+                                                                        <BodyShort as="span" size="small">
+                                                                            (justert opp til BPs netto barnetillegg)
+                                                                        </BodyShort>
+                                                                    )}
+                                                            </div>
+                                                        ),
+                                                        result: (
+                                                            <div className="flex flex-row justify-end gap-1">
+                                                                <div>-</div>
+                                                                {formatterBeløpForBeregning(
+                                                                    erVedtakKildeBBM
+                                                                        ? row.faktiskBeløp
+                                                                        : row.bruttoBidragEtterBarnetilleggBP,
+                                                                    true,
+                                                                )}
+                                                            </div>
+                                                        ),
+                                                    },
+                                                ]}
+                                                result={{
+                                                    label: "Resultat",
+                                                    value: formatterBeløpForBeregning(
+                                                        row.reduksjonUnderholdskostnad,
+                                                        true,
+                                                    ),
+                                                }}
+                                            />
                                         }
                                     >
                                         <Table.DataCell align="left" textSize="small">
