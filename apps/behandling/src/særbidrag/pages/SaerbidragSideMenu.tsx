@@ -17,10 +17,10 @@ import { SærligeutgifterStepper } from "../enum/SærligeutgifterStepper";
 const UtgiftMenuButton = ({ activeButton, step }: { activeButton: string; step: string }) => {
     const { onStepChange, isGrunnlagLoading } = useBehandlingProvider();
     const {
-        erBisysVedtak,
+        lesemodus,
         utgift: { valideringsfeil: utgiftValideringsfeil },
     } = useGetBehandlingV2();
-    const utgiftHasValideringsfeil = !erBisysVedtak &&
+    const utgiftHasValideringsfeil = !lesemodus &&
         utgiftValideringsfeil && Object.values(utgiftValideringsfeil).some((feil) => !!feil);
 
     return (
