@@ -65,10 +65,21 @@ export default function ReellMottakerValgGruppe({
     const påkrevd = regel !== "valgfri";
     const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
     const [error, setError] = useState<string>();
+    const [barnetSøktOppSomSamhandler, setBarnetSøktOppSomSamhandler] = useState(false);
 
     const handleValgChange = (value: string) => {
         setError(undefined);
+        setBarnetSøktOppSomSamhandler(false);
         onValg(valgForMottaker(value, { ident: barnIdent, navn: barnNavn }, lagretSamhandler));
+    };
+
+    const handleVelgSamhandler = (ident: string, navn?: string) => {
+        setError(undefined);
+        const erBarnet = ident === barnIdent;
+        setBarnetSøktOppSomSamhandler(erBarnet && kunSamhandlerSomReellMottaker);
+        if (!erBarnet) onValg({ type: "samhandler", ident, navn });
+        else if (kunSamhandlerSomReellMottaker) onValg({ type: "samhandler" });
+        else onValg({ type: "barnet_selv", ident: barnIdent, navn: barnNavn });
     };
 
     return (
@@ -92,7 +103,7 @@ export default function ReellMottakerValgGruppe({
             </Select>
 
             {kunSamhandlerSomReellMottaker && (
-                <InlineMessage status="info" size="small">
+                <InlineMessage status={barnetSøktOppSomSamhandler ? "error" : "info"} size="small">
                     {KUN_SAMHANDLER_MELDING}
                 </InlineMessage>
             )}
@@ -102,10 +113,7 @@ export default function ReellMottakerValgGruppe({
                     valg={valg}
                     lagretSamhandlerIdent={lagretSamhandler?.ident}
                     skjulValgt={Boolean(feil || error)}
-                    onVelg={(ident, navn) => {
-                        setError(undefined);
-                        onValg({ type: "samhandler", ident, navn });
-                    }}
+                    onVelg={handleVelgSamhandler}
                     onFjern={() => {
                         setError(undefined);
                         onValg({ type: "samhandler" });

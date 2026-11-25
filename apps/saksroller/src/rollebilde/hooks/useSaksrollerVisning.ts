@@ -80,8 +80,11 @@ export function useSaksrollerVisning(saksnummer: string) {
     });
 
     const funnetPersonISak = (fnr: string) => sak.roller.some((r) => r.fodselsnummer === fnr);
+    const harNyForelder = [bp, bm].some(
+        (forelder) => forelder?.fodselsnummer && !funnetPersonISak(forelder.fodselsnummer),
+    );
     const relasjonskontroll = useBarnMedUfullstendigRelasjon({
-        barnIdenter: barnIdenter.filter((ident) => !funnetPersonISak(ident)),
+        barnIdenter: harNyForelder ? barnIdenter : barnIdenter.filter((ident) => !funnetPersonISak(ident)),
         bidragspliktigIdent: bp?.fodselsnummer,
         bidragsmottakerIdent: bm?.fodselsnummer,
         harSak: !!sak,
@@ -90,7 +93,8 @@ export function useSaksrollerVisning(saksnummer: string) {
     const relasjonsregler = useRelasjonsregler({
         ufullstendige: barnMedUfullstendigRelasjon,
         annenForelder: barnMedAnnenForelder,
-        harOppslagsfeil: relasjonskontroll.harOppslagsfeil,
+        oppslagsfeil: relasjonskontroll.barnMedOppslagsfeil,
+        foreldre: [bp?.fodselsnummer, bm?.fodselsnummer],
     });
 
     const { endringsliste, harEndringer } = useEndringssporing({

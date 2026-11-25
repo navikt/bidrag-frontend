@@ -243,18 +243,22 @@ test.describe("Start fra forelder med barn", () => {
         await expect(component.getByRole("checkbox", { name: BEKREFT_RELASJON })).toBeChecked();
     });
 
-    test("🔴 stopper opprettelse når relasjonen ikke kan kontrolleres", async ({ mount, page }) => {
+    test("🔴 feilet relasjonsoppslag må bekreftes før saken opprettes", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page);
         await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, (route) => route.fulfill({ status: 500 }));
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
         await åpneSøskenflokker(component);
 
         await barnCheckboxer(component).first().check();
-        await expect(component.getByText("Kunne ikke kontrollere relasjonene")).toBeVisible();
+        await expect(component.getByRole("heading", { name: /Kunne ikke kontrollere relasjonene/ })).toBeVisible();
         await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
         await component.getByRole("button", { name: /Opprett$/ }).click();
-
+        await expect(component.getByText("Du må bekrefte at du har kontrollert relasjonene selv")).toBeVisible();
         expect(requests.create).toBeUndefined();
+
+        await component.getByRole("checkbox", { name: "Jeg har kontrollert relasjonene selv" }).check();
+        await component.getByRole("button", { name: /Opprett$/ }).click();
+        await expect.poll(() => requests.create).toBeTruthy();
     });
 
     test("🔴 stopper opprettelse når barnet har en annen forelder i Folkeregisteret", async ({ mount, page }) => {

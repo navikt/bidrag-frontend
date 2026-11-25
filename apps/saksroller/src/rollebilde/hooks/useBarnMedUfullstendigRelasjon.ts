@@ -5,8 +5,8 @@ import { harAnnenRegistrertForelder } from "../../felles/relasjon/annen-forelder
 import { harUfullstendigRelasjon, registrerteForeldre } from "../beregninger/ufullstendig-relasjon.ts";
 
 /**
- * Kontrollerer relasjonen mellom nye barn og partene.
- * Mangler BP eller BM, regnes alle barna som ufullstendige. Feilet oppslag er ikke ufullstendig, men stopper lagring.
+ * Kontrollerer relasjonen mellom barna og partene.
+ * Mangler BP eller BM, regnes alle barna som ufullstendige. Feilet oppslag er ikke ufullstendig, men må bekreftes.
  */
 export function useBarnMedUfullstendigRelasjon({
     barnIdenter,
@@ -21,7 +21,7 @@ export function useBarnMedUfullstendigRelasjon({
 }): {
     barnMedUfullstendigRelasjon: string[];
     barnMedAnnenForelder: string[];
-    harOppslagsfeil: boolean;
+    barnMedOppslagsfeil: string[];
     isLoading: boolean;
 } {
     const aktivtOppslag = harSak && Boolean(bidragsmottakerIdent || bidragspliktigIdent);
@@ -64,7 +64,7 @@ export function useBarnMedUfullstendigRelasjon({
     return {
         barnMedUfullstendigRelasjon,
         barnMedAnnenForelder,
-        harOppslagsfeil: aktivtOppslag && relasjonsoppslag.some((resultat) => resultat.isError),
+        barnMedOppslagsfeil: aktivtOppslag ? barnIdenter.filter((_, i) => relasjonsoppslag[i]?.isError) : [],
         isLoading: aktivtOppslag && relasjonsoppslag.some((resultat) => resultat.isFetching),
     };
 }

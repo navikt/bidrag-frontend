@@ -20,19 +20,15 @@ export default function Relasjonsmeldinger({
     const annenForelderTekst = `${annenForelderNavn.join(", ")} har en annen forelder i Folkeregisteret enn den som er valgt.`;
     return (
         <>
-            {regler.harOppslagsfeil && (
-                <LocalAlert status="error" size="small" as="div">
-                    <LocalAlert.Header>
-                        <LocalAlert.Title>Kunne ikke kontrollere relasjonene</LocalAlert.Title>
-                    </LocalAlert.Header>
-                    <LocalAlert.Content>
-                        <BodyLong size="small">
-                            Henting av foreldrene til barna feilet. Saken kan ikke {handling} før relasjonene er
-                            kontrollert. Prøv igjen senere.
-                        </BodyLong>
-                    </LocalAlert.Content>
-                </LocalAlert>
-            )}
+            <BekreftAdvarsel
+                tittel="Kunne ikke kontrollere relasjonene"
+                bekreftTekst="Jeg har kontrollert relasjonene selv"
+                feilmelding="Du må bekrefte at du har kontrollert relasjonene selv"
+                bekreftelse={regler.oppslagsfeilBekreftelse}
+            >
+                Henting av foreldrene til barna i Folkeregisteret feilet. Kontroller relasjonene selv før saken{" "}
+                {handling}.
+            </BekreftAdvarsel>
             {regler.annenForelderStopper && (
                 <LocalAlert status="error" size="small" as="div">
                     <LocalAlert.Header>

@@ -15,6 +15,17 @@ async function leggTilNyttBarn(component: import("@playwright/test").Locator) {
     await component.getByRole("button", { name: "Legg til", exact: true }).click();
 }
 
+const utenBidragspliktig = [
+    lagRolle({ fodselsnummer: testpersoner.bidragsmottaker.ident, type: "BM", rolleType: "BM" }),
+    lagRolle({ fodselsnummer: testpersoner.barn.ident, type: "BA", rolleType: "BA" }),
+];
+
+async function leggTilBidragspliktig(component: import("@playwright/test").Locator, ident: string) {
+    await component.getByRole("button", { name: "Legg til person" }).click();
+    await component.getByRole("searchbox", { name: "Søk etter bidragspliktig" }).fill(ident);
+    await component.getByRole("button", { name: "Søk", exact: true }).click();
+}
+
 test.describe("SaksrollerVisning", () => {
     test("byttet RM vises for riktig barn og bare siste RM lagres", async ({ mount, page }) => {
         const mottaker = { ident: genererFnr(), visningsnavn: "Ny Reell Mottaker", fødselsdato: "1985-01-01" };
@@ -77,6 +88,21 @@ test.describe("SaksrollerVisning", () => {
                     }),
                 ]),
             );
+    });
+
+    test("🔴 barnet søkt opp som samhandler blir barnet selv, uten verge", async ({ mount, page }) => {
+        await mockSaksrollerApi(page);
+        const component = await mount(STORY);
+        await expect(component.getByText(testpersoner.barn.visningsnavn, { exact: true })).toBeVisible();
+        await component.getByRole("button", { name: "Legg til reell mottaker" }).click();
+        const rmValg = component.getByRole("combobox", { name: "Hvem er reell mottaker?" });
+        await rmValg.selectOption("samhandler");
+        const søk = component.getByRole("searchbox", { name: "Person- eller samhandlerident" });
+        await søk.fill(testpersoner.barn.ident);
+        await søk.press("Enter");
+
+        await expect(rmValg).toHaveValue("barnet_selv");
+        await expect(component.getByRole("checkbox", { name: "Reell mottaker er verge for barnet" })).toHaveCount(0);
     });
 
     test("nytt barn som fjernes sendes ikke ved lagring og lagrede roller beholdes", async ({ mount, page }) => {
@@ -195,16 +221,60 @@ test.describe("SaksrollerVisning", () => {
         await expect.poll(() => requests.update).toBeTruthy();
     });
 
-    test("🔴 feilet relasjonsoppslag stopper lagring", async ({ mount, page }) => {
+    test("🔴 feilet relasjonsoppslag må bekreftes før lagring", async ({ mount, page }) => {
         const { requests } = await mockSaksrollerApi(page, { personOverrides: { [nyttBarn.ident]: nyttBarn } });
         await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, (route) => route.fulfill({ status: 500 }));
         const component = await mount(STORY);
         await leggTilNyttBarn(component);
 
-        await expect(component.getByText("Kunne ikke kontrollere relasjonene")).toBeVisible();
+        await expect(component.getByRole("heading", { name: /Kunne ikke kontrollere relasjonene/ })).toBeVisible();
         await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
         await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect(component.getByText("Du må bekrefte at du har kontrollert relasjonene selv")).toBeVisible();
         expect(requests.update).toBeUndefined();
+
+        await component.getByRole("checkbox", { name: "Jeg har kontrollert relasjonene selv" }).check();
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect.poll(() => requests.update).toBeTruthy();
+    });
+
+    test("🔴 lagrede barn kontrolleres når bidragspliktig legges til", async ({ mount, page }) => {
+        const nyBp = { ident: genererFnr(), visningsnavn: "Ny Bidragspliktig", fødselsdato: "1980-01-01" };
+        const { requests } = await mockSaksrollerApi(page, {
+            sak: lagSak({ roller: utenBidragspliktig }),
+            personOverrides: { [nyBp.ident]: nyBp },
+            foreldreTilBarn: () => [testpersoner.bidragsmottaker.ident],
+        });
+        const component = await mount(STORY);
+        await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
+
+        await leggTilBidragspliktig(component, nyBp.ident);
+        await expect(
+            component.getByText(`${testpersoner.barn.visningsnavn} har manglende eller ufullstendig relasjon`, {
+                exact: false,
+            }),
+        ).toBeVisible();
+        await component.getByRole("button", { name: /lagre/i }).filter({ hasNotText: "og" }).click();
+        await expect(component.getByText("Du må bekrefte at du har kontrollert relasjonene")).toBeVisible();
+        expect(requests.update).toBeUndefined();
+    });
+
+    test("🔴 bekreftet relasjon må bekreftes på nytt når bidragspliktig legges til", async ({ mount, page }) => {
+        const nyBp = { ident: genererFnr(), visningsnavn: "Ny Bidragspliktig", fødselsdato: "1980-01-01" };
+        await mockSaksrollerApi(page, {
+            sak: lagSak({ roller: utenBidragspliktig }),
+            personOverrides: { [nyttBarn.ident]: nyttBarn, [nyBp.ident]: nyBp },
+            foreldreTilBarn: () => [testpersoner.bidragsmottaker.ident],
+        });
+        const component = await mount(STORY);
+        await leggTilNyttBarn(component);
+        const bekreft = component.getByRole("checkbox", {
+            name: "Jeg har kontrollert relasjonen mellom barna og foreldrene",
+        });
+        await bekreft.check();
+
+        await leggTilBidragspliktig(component, nyBp.ident);
+        await expect(bekreft).not.toBeChecked();
     });
 
     test("viser eldste barn først uavhengig av rollerekkefølgen", async ({ mount, page }) => {

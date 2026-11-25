@@ -49,7 +49,8 @@ export function useBarnebidragRelasjonsregler({
     const relasjonsregler = useRelasjonsregler({
         ufullstendige: ufullstendigRelasjon.map((barn) => barn.ident),
         annenForelder: annenForelder.map((barn) => barn.ident),
-        harOppslagsfeil: barnMedOppslagsfeil.length > 0,
+        oppslagsfeil: barnMedOppslagsfeil,
+        foreldre: [bidragspliktig.ident, bidragsmottaker.ident],
         skjultForelder: barnMedSkjultForelder.map((barn) => barn.ident),
     });
 
