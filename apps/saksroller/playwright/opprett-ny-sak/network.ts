@@ -15,18 +15,18 @@ type MockOptions = {
 
 /** Åpner søskenflokkene før en test velger barn eller redigerer reell mottaker. */
 export async function åpneSøskenflokker(component: Locator) {
-    await expect(component.getByText("Henter barn...", { exact: true })).toHaveCount(0);
-    const lukkedeFlokker = component
-        .getByRole("region", { name: "Søskenflokker" })
-        .getByRole("button", { expanded: false });
+    const søskenflokker = component.getByRole("region", { name: "Søskenflokker" });
+    const lukkedeFlokker = søskenflokker.getByRole("button", { expanded: false });
+    const henterBarn = component.getByText("Henter barn...", { exact: true });
+    await expect(søskenflokker).toBeAttached();
+    await expect(henterBarn).toHaveCount(0);
     for (const flokk of (await lukkedeFlokker.all()).reverse()) {
         await flokk.click();
     }
-    for (const region of await component.getByRole("region", { name: "Søskenflokker" }).all()) {
-        await region.evaluate(async (element) => {
-            await Promise.all(element.getAnimations({ subtree: true }).map((animasjon) => animasjon.finished));
-        });
-    }
+    await expect(lukkedeFlokker).toHaveCount(0);
+    await søskenflokker.evaluate(async (element) => {
+        await Promise.all(element.getAnimations({ subtree: true }).map((animasjon) => animasjon.finished));
+    });
     await component.page().mouse.move(0, 0);
 }
 

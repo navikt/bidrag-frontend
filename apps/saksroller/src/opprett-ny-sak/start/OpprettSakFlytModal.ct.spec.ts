@@ -101,7 +101,6 @@ test.describe("Opprett sak som modal fra behandling og dokument", () => {
         await mockOpprettSakApi(page);
         const component = await mount<typeof Modal>(STORY, { ident: bp.ident, eierfogd: "4806" });
         const dialog = await åpneModal(page, component);
-        await åpneSøskenflokker(dialog);
 
         await expect(dialog.getByRole("heading", { name: "Velg rolle" })).toBeVisible();
         await expect(dialog.getByRole("searchbox")).toHaveCount(0);
