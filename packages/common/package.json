@@ -23,7 +23,7 @@
         "echarts": "^6.1.0",
         "lodash.debounce": "^4.0.8",
         "react-router": "catalog:",
-        "uuid": "^14.0.0",
+        "uuid": "^14.0.3",
         "zod": "catalog:"
     },
     "peerDependencies": {

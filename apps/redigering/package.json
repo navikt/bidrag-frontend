@@ -34,7 +34,7 @@
         "react-zoom-pan-pinch": "3.6.1",
         "tailwindcss": "catalog:",
         "theme-ui": "^0.17.4",
-        "uuid": "^14.0.0"
+        "uuid": "^14.0.3"
     },
     "devDependencies": {
         "@react-router/dev": "catalog:",

@@ -30,7 +30,7 @@
         "react-hook-form": "^7.86.0",
         "react-tiny-popover": "^8.1.6",
         "tailwindcss": "catalog:",
-        "uuid": "^14.0.0",
+        "uuid": "^14.0.3",
         "zod": "catalog:"
     },
     "devDependencies": {
