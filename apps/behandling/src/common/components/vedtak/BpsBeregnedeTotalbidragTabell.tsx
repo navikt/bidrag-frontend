@@ -2,7 +2,6 @@ import { type BeregnetBidragBarnDto, TypeBehandling } from "@bidrag/api/BidragBe
 import { PersonNavn } from "@bidrag/common";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { BodyShort, Heading, HelpText, Link, Table } from "@navikt/ds-react";
-import { useFlag } from "@unleash/proxy-client-react";
 import { Fragment } from "react";
 import { VedtakLenke } from "../../../barnebidrag/components/vedtak/VedtakCommon";
 import { DateToMMYYYYString } from "../../../utils/date-utils";
@@ -51,12 +50,10 @@ export const BpsBeregnedeTotalbidragTabell = ({
     bidragspliktigesBeregnedeTotalbidrag: number;
     title?: string;
 }) => {
-    const visReduksjonAvUFeature = useFlag("beregning.bidrag_reduksjon_underholdskostnad");
     const { type } = useGetBehandlingV2();
 
     if (type !== TypeBehandling.SAeRBIDRAG && beregning.every((b) => b.erSøknadsbarn || b.privatAvtale)) return null;
-    const visReduksjonAvU =
-        type === TypeBehandling.SAeRBIDRAG || (type === TypeBehandling.BIDRAG && visReduksjonAvUFeature);
+    const visReduksjonAvU = type === TypeBehandling.SAeRBIDRAG;
     const beregningUtenPrivatAvtale = beregning.filter((b) => !b.privatAvtale);
     const inneholderVedtaksid = beregningUtenPrivatAvtale.some((b) => b.beregnetBidragPerBarn.vedtaksid);
 
@@ -126,6 +123,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
                                 <Fragment key={rowIndex}>
                                     <Table.ExpandableRow
                                         className="cursor-pointer"
+                                        expansionDisabled={!visReduksjonAvU}
                                         expandOnRowClick
                                         content={
                                             <CalculationTabell
@@ -248,7 +246,6 @@ export const BpsBeregnedeTotalbidragTabell = ({
 };
 
 export function BpsBeregnedeTotalBidragPerioderTabell({ beregning }: { beregning: BeregnetBidragBarnDto[] }) {
-    const visReduksjonAvUFeature = useFlag("beregning.bidrag_reduksjon_underholdskostnad");
     return (
         <Table size="small" zebraStripes>
             <Table.Header>
@@ -265,18 +262,6 @@ export function BpsBeregnedeTotalBidragPerioderTabell({ beregning }: { beregning
                             Samværsfradraget beregnet etter dagens sats
                         </HelpText>
                     </Table.HeaderCell>
-                    {visReduksjonAvUFeature && (
-                        <Table.HeaderCell textSize="small" align="right">
-                            <div className="inline-block align-middle whitespace-pre-wrap w-[110px]">
-                                Reduksjon av BPs andel av U
-                            </div>
-
-                            <HelpText wrapperClassName="inline-block align-middle" placement="left">
-                                Reduksjon av BPs andel av U er differansen mellom det beregnede bidraget og det faktiske
-                                bidraget i forrige vedtak.
-                            </HelpText>
-                        </Table.HeaderCell>
-                    )}
                     <Table.HeaderCell textSize="small" align="right">
                         Sum
                     </Table.HeaderCell>
@@ -297,11 +282,6 @@ export function BpsBeregnedeTotalBidragPerioderTabell({ beregning }: { beregning
                             <Table.DataCell align="right" textSize="small">
                                 {formatterBeløpForBeregning(row.samværsfradrag, true)}
                             </Table.DataCell>
-                            {visReduksjonAvUFeature && (
-                                <Table.DataCell align="right" textSize="small">
-                                    {formatterBeløpForBeregning(row.reduksjonUnderholdskostnad, true)}
-                                </Table.DataCell>
-                            )}
                             <Table.DataCell align="right" textSize="small">
                                 {formatterBeløpForBeregning(row.beregnetBidrag, true)}
                             </Table.DataCell>

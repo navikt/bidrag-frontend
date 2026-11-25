@@ -1,12 +1,13 @@
 import { dateToDDMMYYYYString } from "@bidrag/common";
 import { FloppydiskIcon, PencilIcon } from "@navikt/aksel-icons";
-import { BodyShort, Button, HStack, Label, Table, TextField } from "@navikt/ds-react";
+import { Alert, BodyShort, Button, HStack, Label, Table, TextField, VStack } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { useHentJournalInngående } from "../../../hooks/useDokumentApi";
 import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { useOppdaterVarselEttersendelse } from "../../../hooks/varselEnderselseApi";
+import { formatApiErrorMessage } from "../../../utils/ErrorUtils";
 import type { IForsendelseFormProps } from "../context/DokumenterFormContext";
 import { ettersendingsformPrefiks, VarselForJournalpostSelect } from "./OpprettEttersendingsoppgaveButton";
 
@@ -43,44 +44,57 @@ export function VarselDetaljer() {
         const originalJournalpost = inngåendeJournalposter.find(
             (jp) => jp.journalpostId === getValues(`${ettersendingsformPrefiks}.journalpostId`),
         );
-        oppdaterVarselEttersendelseFn
-            .mutateAsync({
+        oppdaterVarselEttersendelseFn.mutate(
+            {
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
                 tittel: tittel,
                 ettersendelseForJournalpostId: journalpostId,
                 skjemaId: originalJournalpost?.brevkode?.kode ?? forsendelse.ettersendingsoppgave?.skjemaId,
                 innsendingsfristDager: innsendingsfristDager,
-            })
-            .then(() => {
-                setEndreDetaljer(false);
+            },
+            {
+                onSuccess: () => {
+                    setEndreDetaljer(false);
 
-                setValue(`${ettersendingsformPrefiks}.tittel`, tittel);
-                setValue(`${ettersendingsformPrefiks}.innsendingsfristDager`, innsendingsfristDager);
-                setValue(`${ettersendingsformPrefiks}.journalpostId`, journalpostId);
-                reset(undefined, { keepValues: true });
-            });
+                    setValue(`${ettersendingsformPrefiks}.tittel`, tittel);
+                    setValue(`${ettersendingsformPrefiks}.innsendingsfristDager`, innsendingsfristDager);
+                    setValue(`${ettersendingsformPrefiks}.journalpostId`, journalpostId);
+                    reset(undefined, { keepValues: true });
+                },
+            },
+        );
     }
     return (
-        <HStack gap={"space-2"}>
-            <Table
-                size="small"
-                className="w-fit [&_.navds-table\_\_data-cell]:border-none [&_.navds-table\_\_header-cell]:border-none [&_.navds-table\_\_data-cell]:pl-0"
-            >
-                <Table.Body>
-                    <VarselTittel redigerbar={endreDetaljer} />
-                    <VarselFrist redigerbar={endreDetaljer} />
-                    <VarselForJournalpost redigerbar={endreDetaljer} />
-                </Table.Body>
-            </Table>
-            <div className="self-start">
-                <EditOrSaveButton
-                    index={-1}
-                    editableRow={endreDetaljer}
-                    onSaveRow={onSave}
-                    onEditRow={() => setEndreDetaljer(true)}
-                />
-            </div>
-        </HStack>
+        <VStack gap="space-2">
+            {oppdaterVarselEttersendelseFn.isError && (
+                <Alert role="alert" variant="error" size="small">
+                    {formatApiErrorMessage(
+                        "Kunne ikke oppdatere ettersendingsoppgave",
+                        oppdaterVarselEttersendelseFn.error,
+                    )}
+                </Alert>
+            )}
+            <HStack gap={"space-2"}>
+                <Table
+                    size="small"
+                    className="w-fit [&_.navds-table\_\_data-cell]:border-none [&_.navds-table\_\_header-cell]:border-none [&_.navds-table\_\_data-cell]:pl-0"
+                >
+                    <Table.Body>
+                        <VarselTittel redigerbar={endreDetaljer} />
+                        <VarselFrist redigerbar={endreDetaljer} />
+                        <VarselForJournalpost redigerbar={endreDetaljer} />
+                    </Table.Body>
+                </Table>
+                <div className="self-start">
+                    <EditOrSaveButton
+                        index={-1}
+                        editableRow={endreDetaljer}
+                        onSaveRow={onSave}
+                        onEditRow={() => setEndreDetaljer(true)}
+                    />
+                </div>
+            </HStack>
+        </VStack>
     );
 }
 const EditOrSaveButton = ({

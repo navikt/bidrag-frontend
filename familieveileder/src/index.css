@@ -1,0 +1,14 @@
+@import "tailwindcss/base";
+@import "@navikt/ds-css";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+input {
+    box-sizing: border-box;
+}
+.navds-tabs__tablist-wrapper {
+    width: max-content;
+}
+th {
+    background-color: inherit;
+}
