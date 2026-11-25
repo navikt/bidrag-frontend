@@ -43,10 +43,10 @@ export const BpsBeregnedeTotalbidragTabellSærbidrag = () => {
 };
 
 export const BpsBeregnedeTotalbidragTabell = ({
-    beregning,
-    bidragspliktigesBeregnedeTotalbidrag,
-    title = "BP's beregnede totalbidrag for andre barn",
-}: {
+                                                  beregning,
+                                                  bidragspliktigesBeregnedeTotalbidrag,
+                                                  title = "BP's beregnede totalbidrag for andre barn",
+                                              }: {
     beregning: BeregnetBidragPerBarnDtoAdjusted[];
     bidragspliktigesBeregnedeTotalbidrag: number;
     title?: string;
@@ -68,7 +68,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
                 className={
                     type === TypeBehandling.SAeRBIDRAG
                         ? // eslint-disable-next-line no-useless-escape
-                          "table-auto pb-[5px] border-collapse text-left border-spacing-2 w-full [&_.navds-table__data-cell]:p-0 [&_.navds-table__data-cell]:pl-2 [&_.navds-table__data-cell]:pr-2 "
+                        "table-auto pb-[5px] border-collapse text-left border-spacing-2 w-full [&_.navds-table__data-cell]:p-0 [&_.navds-table__data-cell]:pl-2 [&_.navds-table__data-cell]:pr-2 "
                         : undefined
                 }
             >
@@ -118,96 +118,97 @@ export const BpsBeregnedeTotalbidragTabell = ({
                 </Table.Header>
                 <Table.Body>
                     {beregning
-                        .filter((b) => !b.privatAvtale)
-                        .map(({ beregnetBidragPerBarn: row, personidentBarn, personnavn }, rowIndex) => {
-                            const erVedtakKildeBBM =
-                                row.erVedtakKildeBBM === undefined || row.erVedtakKildeBBM === true;
-                            return (
-                                <Fragment key={rowIndex}>
-                                    <Table.ExpandableRow
-                                        className="cursor-pointer"
-                                        expandOnRowClick
-                                        content={
-                                            <CalculationTabell
-                                                zebraStripes={false}
-                                                className={`${row.bidragJustertForNettoBarnetilleggBP ? "w-[610px]" : "w-[250px]"} [&_Table.DataCell]:w-full [&_.navds-table__row]:bg-inherit`}
-                                                title="Reduksjon av BPs andel av U"
-                                                data={[
-                                                    {
-                                                        label: "BPs andel av U",
-                                                        result: formatterBeløpForBeregning(
-                                                            erVedtakKildeBBM
-                                                                ? row.beregnetBeløp
-                                                                : row.bruttoBidragEtterBarnetilleggBM,
-                                                            true,
-                                                        ),
-                                                    },
-                                                    {
-                                                        label: (
-                                                            <div className="leading-tight">
-                                                                <span>Beregnet bidrag </span>
-                                                                {!erVedtakKildeBBM &&
-                                                                    row.bidragJustertForNettoBarnetilleggBP && (
-                                                                        <BodyShort as="span" size="small">
-                                                                            (justert opp til BPs netto barnetillegg)
-                                                                        </BodyShort>
-                                                                    )}
-                                                            </div>
-                                                        ),
-                                                        result: (
-                                                            <div className="flex flex-row justify-end gap-1">
-                                                                <div>-</div>
-                                                                {formatterBeløpForBeregning(
-                                                                    erVedtakKildeBBM
-                                                                        ? row.faktiskBeløp
-                                                                        : row.bruttoBidragEtterBarnetilleggBP,
-                                                                    true,
-                                                                )}
-                                                            </div>
-                                                        ),
-                                                    },
-                                                ]}
-                                                result={{
-                                                    label: "Resultat",
-                                                    value: formatterBeløpForBeregning(
-                                                        row.reduksjonUnderholdskostnad,
+                    .filter((b) => !b.privatAvtale)
+                    .map(({ beregnetBidragPerBarn: row, personidentBarn, personnavn }, rowIndex) => {
+                        const erVedtakKildeBBM =
+                            row.erVedtakKildeBBM === undefined || row.erVedtakKildeBBM === true;
+                        return (
+                            <Fragment key={rowIndex}>
+                                <Table.ExpandableRow
+                                    className="cursor-pointer"
+                                    expansionDisabled={!visReduksjonAvU}
+                                    expandOnRowClick
+                                    content={visReduksjonAvU &&
+                                        <CalculationTabell
+                                            zebraStripes={false}
+                                            className={`${row.bidragJustertForNettoBarnetilleggBP ? "w-[610px]" : "w-[250px]"} [&_Table.DataCell]:w-full [&_.navds-table__row]:bg-inherit`}
+                                            title="Reduksjon av BPs andel av U"
+                                            data={[
+                                                {
+                                                    label: "BPs andel av U",
+                                                    result: formatterBeløpForBeregning(
+                                                        erVedtakKildeBBM
+                                                            ? row.beregnetBeløp
+                                                            : row.bruttoBidragEtterBarnetilleggBM,
                                                         true,
                                                     ),
-                                                }}
-                                            />
-                                        }
-                                    >
+                                                },
+                                                {
+                                                    label: (
+                                                        <div className="leading-tight">
+                                                            <span>Beregnet bidrag </span>
+                                                            {!erVedtakKildeBBM &&
+                                                                row.bidragJustertForNettoBarnetilleggBP && (
+                                                                    <BodyShort as="span" size="small">
+                                                                        (justert opp til BPs netto barnetillegg)
+                                                                    </BodyShort>
+                                                                )}
+                                                        </div>
+                                                    ),
+                                                    result: (
+                                                        <div className="flex flex-row justify-end gap-1">
+                                                            <div>-</div>
+                                                            {formatterBeløpForBeregning(
+                                                                erVedtakKildeBBM
+                                                                    ? row.faktiskBeløp
+                                                                    : row.bruttoBidragEtterBarnetilleggBP,
+                                                                true,
+                                                            )}
+                                                        </div>
+                                                    ),
+                                                },
+                                            ]}
+                                            result={{
+                                                label: "Resultat",
+                                                value: formatterBeløpForBeregning(
+                                                    row.reduksjonUnderholdskostnad,
+                                                    true,
+                                                ),
+                                            }}
+                                        />
+                                    }
+                                >
+                                    <Table.DataCell align="left" textSize="small">
+                                        <PersonNavn ident={personidentBarn} navn={personnavn} />
+                                    </Table.DataCell>
+                                    <Table.DataCell align="left" textSize="small">
+                                        <SakLenke saksnummer={row.saksnummer} />
+                                    </Table.DataCell>
+                                    {inneholderVedtaksid && (
                                         <Table.DataCell align="left" textSize="small">
-                                            <PersonNavn ident={personidentBarn} navn={personnavn} />
+                                            {row.vedtaksid && (
+                                                <VedtakLenke visText vedtaksid={row.vedtaksid} label="Vedtak" />
+                                            )}
                                         </Table.DataCell>
-                                        <Table.DataCell align="left" textSize="small">
-                                            <SakLenke saksnummer={row.saksnummer} />
-                                        </Table.DataCell>
-                                        {inneholderVedtaksid && (
-                                            <Table.DataCell align="left" textSize="small">
-                                                {row.vedtaksid && (
-                                                    <VedtakLenke visText vedtaksid={row.vedtaksid} label="Vedtak" />
-                                                )}
-                                            </Table.DataCell>
-                                        )}
-                                        <Table.DataCell align="right">
-                                            {formatterBeløpForBeregning(row.løpendeBeløp, true)}
-                                        </Table.DataCell>
+                                    )}
+                                    <Table.DataCell align="right">
+                                        {formatterBeløpForBeregning(row.løpendeBeløp, true)}
+                                    </Table.DataCell>
+                                    <Table.DataCell align="right" textSize="small">
+                                        {formatterBeløpForBeregning(row.samværsfradrag, true)}
+                                    </Table.DataCell>
+                                    {visReduksjonAvU && (
                                         <Table.DataCell align="right" textSize="small">
-                                            {formatterBeløpForBeregning(row.samværsfradrag, true)}
+                                            {formatterBeløpForBeregning(row.reduksjonUnderholdskostnad, true)}
                                         </Table.DataCell>
-                                        {visReduksjonAvU && (
-                                            <Table.DataCell align="right" textSize="small">
-                                                {formatterBeløpForBeregning(row.reduksjonUnderholdskostnad, true)}
-                                            </Table.DataCell>
-                                        )}
-                                        <Table.DataCell align="right" textSize="small">
-                                            {formatterBeløpForBeregning(row.beregnetBidrag, true)}
-                                        </Table.DataCell>
-                                    </Table.ExpandableRow>
-                                </Fragment>
-                            );
-                        })}
+                                    )}
+                                    <Table.DataCell align="right" textSize="small">
+                                        {formatterBeløpForBeregning(row.beregnetBidrag, true)}
+                                    </Table.DataCell>
+                                </Table.ExpandableRow>
+                            </Fragment>
+                        );
+                    })}
                     <Table.Row className="!bg-inherit">
                         <Table.DataCell
                             colSpan={(!visReduksjonAvU ? 5 : 6) + (inneholderVedtaksid ? 1 : 0)}
@@ -314,9 +315,9 @@ export function BpsBeregnedeTotalBidragPerioderTabell({ beregning }: { beregning
 }
 
 export const BpsPrivatAvtalerTabell = ({
-    beregning,
-    sumBidragPrivatAvtale,
-}: {
+                                           beregning,
+                                           sumBidragPrivatAvtale,
+                                       }: {
     beregning: BeregnetBidragPerBarnDtoAdjusted[];
     sumBidragPrivatAvtale: number;
 }) => {
@@ -334,7 +335,7 @@ export const BpsPrivatAvtalerTabell = ({
                 className={
                     type === TypeBehandling.SAeRBIDRAG
                         ? // eslint-disable-next-line no-useless-escape
-                          "table-auto pb-[5px] border-collapse text-left border-spacing-2 w-full [&_.navds-table__data-cell]:p-0 [&_.navds-table__data-cell]:pl-2 [&_.navds-table__data-cell]:pr-2 "
+                        "table-auto pb-[5px] border-collapse text-left border-spacing-2 w-full [&_.navds-table__data-cell]:p-0 [&_.navds-table__data-cell]:pl-2 [&_.navds-table__data-cell]:pr-2 "
                         : undefined
                 }
             >
@@ -406,9 +407,9 @@ export const BpsPrivatAvtalerTabell = ({
 };
 
 export const BpsPrivatAvtalerTabellIkkeTilFordeling = ({
-    beregning,
-    sumBidrag,
-}: {
+                                                           beregning,
+                                                           sumBidrag,
+                                                       }: {
     beregning: BeregnetBidragPerBarnDtoAdjusted[];
     sumBidrag: number;
 }) => {
@@ -431,7 +432,7 @@ export const BpsPrivatAvtalerTabellIkkeTilFordeling = ({
                 className={
                     type === TypeBehandling.SAeRBIDRAG
                         ? // eslint-disable-next-line no-useless-escape
-                          "table-auto pb-[5px] border-collapse text-left border-spacing-2 w-full [&_.navds-table__data-cell]:p-0 [&_.navds-table__data-cell]:pl-2 [&_.navds-table__data-cell]:pr-2 "
+                        "table-auto pb-[5px] border-collapse text-left border-spacing-2 w-full [&_.navds-table__data-cell]:p-0 [&_.navds-table__data-cell]:pl-2 [&_.navds-table__data-cell]:pr-2 "
                         : undefined
                 }
             >
