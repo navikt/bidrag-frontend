@@ -2469,7 +2469,8 @@ export interface OppdatereUtgiftResponse {
   begrunnelse?: string | null;
   beregning?: UtgiftBeregningDto | null;
   maksGodkjentBeløp?: MaksGodkjentBelopDto | null;
-  rimeligÅInnvilge?: RimeligAInnvilgeDto | null;
+  /** Vurderingen av om det er rimelig å innvilge særbidrag, og om barnets inntekt er over grensen etter oppdateringen. Avslag og utgifter påvirker om grensen beregnes */
+  rimeligÅInnvilge?: SaerbidragRimeligAInnvilgeDto | null;
   avslag?: Resultatkode | null;
   valideringsfeil?: UtgiftValideringsfeilDto | null;
   totalBeregning: TotalBeregningUtgifterDto[];

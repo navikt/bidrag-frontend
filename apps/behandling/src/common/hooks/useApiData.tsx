@@ -1174,13 +1174,6 @@ export const useOppdatereVirkningstidspunktBegrunnelse = () => {
 
 export interface UtgifterPayload extends BaseMutationVariables, OppdatereUtgiftRequest {}
 
-// Begrunnelsen er HTML fra tekstredigeringen. Den mangler når den ikke har synlig tekst, for eksempel "<p><br/></p>".
-const manglerSynligTekst = (html?: string | null) =>
-    !html
-        ?.replace(/<[^>]*>/g, " ")
-        .replace(/&nbsp;| /g, " ")
-        .trim();
-
 export const useUpdateUtgifter = () => {
     const { behandlingId } = useBehandlingProvider();
     const queryClient = useQueryClient();
@@ -1206,19 +1199,8 @@ export const useUpdateUtgifter = () => {
                             valideringsfeil: response.valideringsfeil,
                             totalBeregning: response.totalBeregning,
                             maksGodkjentBeløp: response.maksGodkjentBeløp,
-                            rimeligÅInnvilge:
-                                currentData.utgift.rimeligÅInnvilge && response.rimeligÅInnvilge
-                                    ? {
-                                          ...currentData.utgift.rimeligÅInnvilge,
-                                          rimeligÅInnvilge: response.rimeligÅInnvilge.rimeligÅInnvilge,
-                                          begrunnelse: response.rimeligÅInnvilge.begrunnelse,
-                                          valideringsfeil:
-                                              currentData.utgift.rimeligÅInnvilge.barnetsInntektErOverGrensen &&
-                                              manglerSynligTekst(response.rimeligÅInnvilge.begrunnelse)
-                                                  ? { manglerBegrunnelse: true }
-                                                  : null,
-                                      }
-                                    : currentData.utgift.rimeligÅInnvilge,
+                            // Svaret har grensen beregnet etter oppdateringen, fordi avslag og utgifter påvirker den
+                            rimeligÅInnvilge: response.rimeligÅInnvilge ?? currentData.utgift.rimeligÅInnvilge,
                             begrunnelse:
                                 input.triggeredBy === "begrunnelse"
                                     ? { innhold: response.begrunnelse, kunINotat: response.begrunnelse }
