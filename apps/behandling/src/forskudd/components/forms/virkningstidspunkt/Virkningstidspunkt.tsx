@@ -106,10 +106,10 @@ const createPayload = (values: VirkningstidspunktFormValuesPerBarn, rolleId?: nu
 };
 
 const VirkningstidspunktRolle = ({
-    item,
-    rolleIndex,
-    initialValues,
-}: {
+                                     item,
+                                     rolleIndex,
+                                     initialValues,
+                                 }: {
     item: VirkningstidspunktFormValuesPerBarn;
     rolleIndex: number;
     initialValues: VirkningstidspunktFormValuesPerBarn;
@@ -208,7 +208,7 @@ const VirkningstidspunktRolle = ({
             ) {
                 return;
             }
-            const payload = createPayload(value.roller[rolleIndex], selectedVirkningstidspunkt.rolle.id);
+            const payload = createPayload(value.roller[rolleIndex]);
             onSave(payload);
         });
         return () => subscription.unsubscribe();
@@ -223,7 +223,6 @@ const VirkningstidspunktRolle = ({
         const values = getValues(`roller.${rolleIndex}.virkningstidspunkt`);
         const payload = createPayload(
             { ...values, årsakAvslag: value, virkningstidspunkt: virkningsdato },
-            selectedVirkningstidspunkt.rolle.id,
         );
         onSave(payload);
     };
@@ -275,15 +274,15 @@ const VirkningstidspunktRolle = ({
                     {!lesemodus && !erTypeOpphør && (
                         <optgroup label={text.label.årsak}>
                             {årsakListe
-                                .filter((value) => {
-                                    if (kunEtRolleIBehandlingen) return true;
-                                    return value !== TypeArsakstype.FRABARNETSFODSEL;
-                                })
-                                .map((value) => (
-                                    <option key={value} value={value}>
-                                        {hentVisningsnavnVedtakstype(value, behandling.vedtakstype)}
-                                    </option>
-                                ))}
+                            .filter((value) => {
+                                if (kunEtRolleIBehandlingen) return true;
+                                return value !== TypeArsakstype.FRABARNETSFODSEL;
+                            })
+                            .map((value) => (
+                                <option key={value} value={value}>
+                                    {hentVisningsnavnVedtakstype(value, behandling.vedtakstype)}
+                                </option>
+                            ))}
                         </optgroup>
                     )}
                     {!lesemodus && (
@@ -338,8 +337,8 @@ const Main = ({ initialValues }: { initialValues: VirkningstidspunktFormValues }
 
     const defaultTab = useMemo(() => {
         const rolleId = controlledFields
-            .find(({ rolle }) => rolle.id?.toString() === searchParams.get(urlSearchParams.tab))
-            ?.rolle?.id?.toString();
+        .find(({ rolle }) => rolle.id?.toString() === searchParams.get(urlSearchParams.tab))
+        ?.rolle?.id?.toString();
         return rolleId ?? controlledFields[0].rolle.id?.toString();
     }, []);
     const selectedTab = searchParams.get(urlSearchParams.tab) ?? defaultTab;
@@ -426,10 +425,8 @@ const Side = () => {
             if (name === `roller.${fieldIndex}.begrunnelse` && type === "change") {
                 const currentRolleValues = value.roller[fieldIndex];
                 const payload: OppdatereVirkningstidspunktBegrunnelseDto = {
-                    rolleId: currentRolleValues.rolle.id,
                     oppdatereBegrunnelse: {
                         nyBegrunnelse: currentRolleValues.begrunnelse,
-                        rolleid: currentRolleValues.rolle.id,
                     },
                 };
                 debouncedOnSave(name, payload);
