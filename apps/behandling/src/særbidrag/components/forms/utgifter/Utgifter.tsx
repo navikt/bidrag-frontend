@@ -255,6 +255,7 @@ const Main = ({
     const erAvslagValgt =
         avslag !== "" && avslag !== undefined && avslag !== null && !AvslagListeEtterUtgifterErUtfylt.includes(avslag);
     const erManuellVedtak = behandling.lesemodus?.erManuellVedtak
+    const visUtgifter = behandling.lesemodus && behandling.utgift.utgifter.length > 0;
     const erAvslagSomInneholderUtgifter =
         avslag !== "" && avslag !== undefined && avslag !== null && AvslagListeEtterUtgifterErUtfylt.includes(avslag);
     const erKonfirmasjon = behandling.utgift.kategori.kategori === Saerbidragskategori.KONFIRMASJON;
@@ -323,7 +324,7 @@ const Main = ({
                     <BodyShort size="small">{behandling.lesemodus?.resultatkodeVisningsnavn}</BodyShort>
                 </div> }
             </FlexRow>
-            {!erAvslagValgt && !erManuellVedtak && (
+            {(visUtgifter || !erAvslagValgt && !erManuellVedtak) && (
                 <>
                     <Box background="neutral-soft" className="overflow-hidden grid gap-2 py-2 px-4 text-wrap">
                         <FlexRow>
