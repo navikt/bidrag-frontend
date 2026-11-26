@@ -139,7 +139,7 @@ const VedtakResultat = () => {
                     </Heading>
                 )}
                 <VStack gap={"space-2"} className="pt-2">
-                    <HStack gap={"space-24"} style={{ width: "max-content" }}>
+                    <HStack gap={"space-16"} style={{ width: "max-content" }}>
                         <ResultatDescription
                             title="Inntekter"
                             data={[

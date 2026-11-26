@@ -14,6 +14,7 @@ import { useBidragBeregningPeriode } from "./DetaljertBeregningBidrag";
 export const BeregningForholdsmessigFordelingRevurdering = () => {
     const {
         kanFatteVedtakForRevurderingsbarn,
+        anbefalesÅFatteVedtakForRevurderingsbarn,
         periode: { erSistePeriode },
         beregningsdetaljer: { sluttberegning, delberegningBidragsevne, forholdsmessigFordeling },
     } = useBidragBeregningPeriode();
@@ -22,6 +23,21 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
     if (!forholdsmessigFordeling) return null;
     if (!forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk) return null;
 
+    const renderFFTekst = () => {
+        if (forholdsmessigFordeling == null) {
+            if (redusertTil25ProsentAvInntekt && harNokEvne) {
+                return "Det nye beregnede bidraget overstiger 25 prosent av inntekten. Bidraget vil derfor forholdsmessig fordeles.";
+            } else if (harNokEvne) {
+                return "Bidraget vil derfor ikke forholdsmessig fordeles.";
+            } else {
+                return "Bidraget vil derfor forholdsmessig fordeles.";
+            }
+        } else if (kanFatteVedtakForRevurderingsbarn && anbefalesÅFatteVedtakForRevurderingsbarn) {
+            return "Det vil derfor fattes vedtak for revurderingsbarn.";
+        } else if (kanFatteVedtakForRevurderingsbarn && !anbefalesÅFatteVedtakForRevurderingsbarn) {
+            return "Det vil derfor ikke fattes vedtak for revurderingsbarn.";
+        }
+    };
     // biome-ignore lint/style/noNonNullAssertion: Nullsjekket over
     const beregningFordelingAvBidrag = forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk!;
 
@@ -40,12 +56,8 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
         const evneTekst = harNokEvne
             ? `Evnen på ${formatterBeløpForBeregning(evne)} er tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.`
             : `Evnen på ${formatterBeløpForBeregning(evne)} er ikke tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.`;
-        const tekstForholdsmessigFordeles =
-            redusertTil25ProsentAvInntekt && harNokEvne
-                ? "Det nye beregnede bidraget overstiger 25 prosent av inntekten. Bidraget vil derfor forholdsmessig fordeles."
-                : harNokEvne
-                  ? "Bidraget vil derfor ikke forholdsmessig fordeles."
-                  : "Bidraget vil derfor forholdsmessig fordeles.";
+        const tekstForholdsmessigFordeles = renderFFTekst();
+
         return (
             <BodyShort size="small" className="mt-2">
                 {!harNokEvne
@@ -349,7 +361,7 @@ const ForholdsmessigFordelingBeregningAndreBarn = ({
     }));
     const bpsBarnIkkeSøknadsbarn = beregningBarn.filter(
         (b) =>
-            !b.erSøknadsbarn && (nyBeregningRevurdering || !kanFatteVedtakForRevurderingsbarn || !b.erRevurderingsbarn),
+            !b.erSøknadsbarn && (nyBeregningRevurdering || !kanFatteVedtakForRevurderingsbarn || !b.erRevurderingsbarn )
     );
 
     return (
@@ -359,7 +371,7 @@ const ForholdsmessigFordelingBeregningAndreBarn = ({
                 sumBidrag={sumFordeling.sumBidragSomIkkeKanFordeles}
             />
             <BpsBeregnedeTotalbidragTabell
-                beregning={bpsBarnIkkeSøknadsbarn}
+                beregning={bpsBarnIkkeSøknadsbarn.filter(b=>!b.erBidragIkkeTilFordeling)}
                 bidragspliktigesBeregnedeTotalbidrag={sumFordeling.sumBidragTilFordelingIkkeSøknadsbarn}
             />
 
