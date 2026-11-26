@@ -36,10 +36,9 @@ export const BpsBeregnedeTotalbidragTabellSærbidrag = () => {
                     beregnetBidragPerBarn: {
                         ...barn.beregnetBidragPerBarn,
                         beregnetBidrag: barn.beregnetBidragPerBarn.beregnetBidragNOK,
-                        valutakurs: barn.valutakurs
+                        valutakurs: barn.valutakurs,
                     },
                     barn: { ident: barn.personidentBarn, navn: "" },
-
                 })) as unknown as BeregnetBidragPerBarnDtoAdjusted[]
             }
             bidragspliktigesBeregnedeTotalbidrag={delberegning.bidragspliktigesBeregnedeTotalbidrag}
