@@ -24,20 +24,20 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
     if (!forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk) return null;
 
     const renderFFTekst = () => {
-        if (forholdsmessigFordeling == null){
-           if (redusertTil25ProsentAvInntekt && harNokEvne) {
-               return "Det nye beregnede bidraget overstiger 25 prosent av inntekten. Bidraget vil derfor forholdsmessig fordeles."
-           } else if (harNokEvne){
-              return "Bidraget vil derfor ikke forholdsmessig fordeles."
-           } else {
-               return "Bidraget vil derfor forholdsmessig fordeles."
-           }
+        if (forholdsmessigFordeling == null) {
+            if (redusertTil25ProsentAvInntekt && harNokEvne) {
+                return "Det nye beregnede bidraget overstiger 25 prosent av inntekten. Bidraget vil derfor forholdsmessig fordeles.";
+            } else if (harNokEvne) {
+                return "Bidraget vil derfor ikke forholdsmessig fordeles.";
+            } else {
+                return "Bidraget vil derfor forholdsmessig fordeles.";
+            }
         } else if (kanFatteVedtakForRevurderingsbarn && anbefalesÅFatteVedtakForRevurderingsbarn) {
-            return "Det vil derfor fattes vedtak for revurderingsbarn."
-        } else if (kanFatteVedtakForRevurderingsbarn && !anbefalesÅFatteVedtakForRevurderingsbarn){
-            return "Det vil derfor ikke fattes vedtak for revurderingsbarn."
+            return "Det vil derfor fattes vedtak for revurderingsbarn.";
+        } else if (kanFatteVedtakForRevurderingsbarn && !anbefalesÅFatteVedtakForRevurderingsbarn) {
+            return "Det vil derfor ikke fattes vedtak for revurderingsbarn.";
         }
-    }
+    };
     // biome-ignore lint/style/noNonNullAssertion: Nullsjekket over
     const beregningFordelingAvBidrag = forholdsmessigFordeling.beregningFordelingAvBidragSjekkEvnesprekk!;
 
@@ -56,7 +56,7 @@ export const BeregningForholdsmessigFordelingRevurdering = () => {
         const evneTekst = harNokEvne
             ? `Evnen på ${formatterBeløpForBeregning(evne)} er tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.`
             : `Evnen på ${formatterBeløpForBeregning(evne)} er ikke tilstrekkelig for å dekke total andel av U på ${formatterBeløpForBeregning(beregningFordelingAvBidrag.sumBidragTilFordeling)}.`;
-        const tekstForholdsmessigFordeles = renderFFTekst()
+        const tekstForholdsmessigFordeles = renderFFTekst();
 
         return (
             <BodyShort size="small" className="mt-2">
