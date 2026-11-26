@@ -33,7 +33,13 @@ export const BpsBeregnedeTotalbidragTabellSærbidrag = () => {
             beregning={
                 delberegning.beregnetBidragPerBarnListe.map((barn) => ({
                     ...barn,
+                    beregnetBidragPerBarn: {
+                        ...barn.beregnetBidragPerBarn,
+                        beregnetBidrag: barn.beregnetBidragPerBarn.beregnetBidragNOK,
+                        valutakurs: barn.valutakurs
+                    },
                     barn: { ident: barn.personidentBarn, navn: "" },
+
                 })) as unknown as BeregnetBidragPerBarnDtoAdjusted[]
             }
             bidragspliktigesBeregnedeTotalbidrag={delberegning.bidragspliktigesBeregnedeTotalbidrag}
@@ -56,6 +62,7 @@ export const BpsBeregnedeTotalbidragTabell = ({
     const visReduksjonAvU = type === TypeBehandling.SAeRBIDRAG;
     const beregningUtenPrivatAvtale = beregning.filter((b) => !b.privatAvtale);
     const inneholderVedtaksid = beregningUtenPrivatAvtale.some((b) => b.beregnetBidragPerBarn.vedtaksid);
+    const løperIUtlandskValuta = beregningUtenPrivatAvtale.some((b) => b.beregnetBidragPerBarn.valutakode !== "NOK");
 
     function renderTable() {
         return (
@@ -86,6 +93,16 @@ export const BpsBeregnedeTotalbidragTabell = ({
                         <Table.HeaderCell textSize="small" align="right">
                             {"Løpende bidrag"}
                         </Table.HeaderCell>
+                        {løperIUtlandskValuta && (
+                            <Table.HeaderCell textSize="small" align="right">
+                                {"Valutakurs"}
+                            </Table.HeaderCell>
+                        )}
+                        {løperIUtlandskValuta && (
+                            <Table.HeaderCell textSize="small" align="right" className="w-[145px]">
+                                {"Løpende bidrag (NOK)"}
+                            </Table.HeaderCell>
+                        )}
                         <Table.HeaderCell textSize="small" align="right" className="pl-4">
                             <div className="inline-block align-middle">Samvær</div>
                             <HelpText wrapperClassName="inline-block align-middle" className="size-4" placement="top">
@@ -189,8 +206,20 @@ export const BpsBeregnedeTotalbidragTabell = ({
                                             </Table.DataCell>
                                         )}
                                         <Table.DataCell align="right">
-                                            {formatterBeløpForBeregning(row.løpendeBeløp, true)}
+                                            {row.valutakode === "NOK"
+                                                ? formatterBeløpForBeregning(row.løpendeBeløp, true)
+                                                : `${formatterBeløp(row.løpendeBeløp)} (${row.valutakode})`}
                                         </Table.DataCell>
+                                        {løperIUtlandskValuta && (
+                                            <Table.DataCell align="right" textSize="small">
+                                                {formatterBeløp(row.valutakurs)}
+                                            </Table.DataCell>
+                                        )}
+                                        {løperIUtlandskValuta && (
+                                            <Table.DataCell align="right" textSize="small">
+                                                {formatterBeløp(Math.round(row.løpendeBeløp * row.valutakurs))}
+                                            </Table.DataCell>
+                                        )}
                                         <Table.DataCell align="right" textSize="small">
                                             {formatterBeløpForBeregning(row.samværsfradrag, true)}
                                         </Table.DataCell>
@@ -208,7 +237,11 @@ export const BpsBeregnedeTotalbidragTabell = ({
                         })}
                     <Table.Row className="!bg-inherit">
                         <Table.DataCell
-                            colSpan={(!visReduksjonAvU ? 5 : 6) + (inneholderVedtaksid ? 1 : 0)}
+                            colSpan={
+                                (!visReduksjonAvU ? 5 : 6) +
+                                (inneholderVedtaksid ? 1 : 0) +
+                                (løperIUtlandskValuta ? 2 : 0)
+                            }
                             align="right"
                             textSize="small"
                             className="font-ax-bold"
