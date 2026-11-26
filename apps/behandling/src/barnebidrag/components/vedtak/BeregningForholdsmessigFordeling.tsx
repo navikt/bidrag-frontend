@@ -361,7 +361,7 @@ const ForholdsmessigFordelingBeregningAndreBarn = ({
     }));
     const bpsBarnIkkeSøknadsbarn = beregningBarn.filter(
         (b) =>
-            !b.erSøknadsbarn && (nyBeregningRevurdering || !kanFatteVedtakForRevurderingsbarn || !b.erRevurderingsbarn),
+            !b.erSøknadsbarn && (nyBeregningRevurdering || !kanFatteVedtakForRevurderingsbarn || !b.erRevurderingsbarn )
     );
 
     return (
@@ -371,7 +371,7 @@ const ForholdsmessigFordelingBeregningAndreBarn = ({
                 sumBidrag={sumFordeling.sumBidragSomIkkeKanFordeles}
             />
             <BpsBeregnedeTotalbidragTabell
-                beregning={bpsBarnIkkeSøknadsbarn}
+                beregning={bpsBarnIkkeSøknadsbarn.filter(b=>!b.erBidragIkkeTilFordeling)}
                 bidragspliktigesBeregnedeTotalbidrag={sumFordeling.sumBidragTilFordelingIkkeSøknadsbarn}
             />
 
