@@ -267,6 +267,10 @@ export const useUpdateInntekt = () => {
             queryClient.setQueryData(QueryKeys.behandlingV2(behandlingId, vedtakId), (currentData: BehandlingDtoV2) => {
                 return {
                     ...currentData,
+                    // Særbidrag: barnets inntekt avgjør om steget "Rimelig å innvilge særbidrag" er aktivt
+                    ...(response.særbidragRimeligÅInnvilge && currentData.utgift
+                        ? { utgift: { ...currentData.utgift, rimeligÅInnvilge: response.særbidragRimeligÅInnvilge } }
+                        : {}),
                     gebyrV3: response.gebyrV3,
                     inntekterV2: response.inntekterV2.map((inntekt) => {
                         const currentInntekt = currentData.inntekterV2.find((i) => i.gjelder.id === inntekt.gjelder.id);
@@ -891,6 +895,11 @@ export const useAktiveGrunnlagsdata = () => {
                 };
                 return updatedBehandling;
             });
+            // Nye opplysninger om inntekt kan endre om barnets inntekt er over grensen for selvforsørget i særbidrag.
+            // Svaret har ikke grensen, så behandlingen hentes på nytt.
+            if (queryClient.getQueryData<BehandlingDtoV2>(QueryKeys.behandlingV2(behandlingId))?.utgift) {
+                queryClient.invalidateQueries({ queryKey: QueryKeys.behandlingV2(behandlingId) });
+            }
         },
     });
 };
@@ -1195,6 +1204,8 @@ export const useUpdateUtgifter = () => {
                             valideringsfeil: response.valideringsfeil,
                             totalBeregning: response.totalBeregning,
                             maksGodkjentBeløp: response.maksGodkjentBeløp,
+                            // Svaret har grensen beregnet etter oppdateringen, fordi avslag og utgifter påvirker den
+                            rimeligÅInnvilge: response.rimeligÅInnvilge ?? currentData.utgift.rimeligÅInnvilge,
                             begrunnelse:
                                 input.triggeredBy === "begrunnelse"
                                     ? { innhold: response.begrunnelse, kunINotat: response.begrunnelse }

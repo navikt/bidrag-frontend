@@ -83,6 +83,10 @@ const tekster = {
         inntektBegrunnelseBP:
             "Du skal også vurdere partens inntektsevne. Dersom parten har en lavere inntekt enn inntektsevnen, må det også vurderes om parten har en rimelig grunn til dette.",
         velgVedtak: "Velg vedtak som beregning av aldersjustering skal hente grunnlag fra",
+        rimeligÅInnvilge:
+            "Barnets inntekt er lik eller høyere enn 100 ganger forskuddssatsen. Særbidrag skal da normalt ikke innvilges, fordi barnet er selvforsørget. Du må vurdere konkret om det er særlige forhold som gjør det rimelig å innvilge særbidrag. Hvis du krysser av, blir barnets inntekt over 30 ganger forskuddssatsen tatt med i beregningen.",
+        rimeligÅInnvilgeIkkeAktuelt:
+            "Barnets inntekt er lavere enn 100 ganger forskuddssatsen. Du trenger ikke vurdere om det er rimelig å innvilge særbidrag.",
     },
     error: {
         dagsatsVerdi: "Dagsats kan ikke være 0 eller mindre",
@@ -189,6 +193,7 @@ const tekster = {
         gjelderBarn: "Gjelder barn",
         godkjentBeløp: "Godkjent beløp",
         godkjentBeløpSkalSkjønsjusteres: "Godkjent beløp skal skjønnsjusteres",
+        rimeligÅInnvilge: "Det er rimelig å innvilge særbidrag",
         gåVidere: "Gå videre",
         gåVidereUtenÅLagre: "Gå videre uten å lagre",
         historiskInntekt: "Vis historisk inntekt (3 år)",
@@ -339,6 +344,7 @@ const tekster = {
         opplysningerFraFolkeregistret: "Opplysninger fra offentlige registre",
         oppsummering: "Oppsummering",
         oversiktOverUtgifter: "Oversikt over utgifter",
+        rimeligÅInnvilge: "Rimelig å innvilge særbidrag",
         underholdskostnad: "Underholdskostnad",
         samvær: "Samvær",
         utvidetBarnetrygd: "Utvidet barnetrygd",
