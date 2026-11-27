@@ -1,5 +1,6 @@
 import type { PersonDto } from "@bidrag/api/PersonApi";
-import type { ReactNode } from "react";
+import type { Box } from "@navikt/ds-react";
+import type { ComponentProps, ReactNode } from "react";
 import PersonRolleKort, { PersonRolleKortInnhold } from "../../felles/person/PersonRolleKort";
 
 type ForelderKortPerson = {
@@ -14,9 +15,11 @@ type FellesProps = {
     ukjentTekst?: string;
     rolle?: "BP" | "BM";
     tags?: ReactNode;
+    headingActions?: ReactNode;
     actions?: ReactNode;
     søktIdent?: string;
     children?: ReactNode;
+    height?: ComponentProps<typeof Box>["height"];
 };
 
 function tilPerson(forelder: ForelderKortPerson | null): PersonDto | null {
@@ -32,7 +35,7 @@ function tilPerson(forelder: ForelderKortPerson | null): PersonDto | null {
     };
 }
 
-export function ForelderKortInnhold({ forelder, ...resten }: Omit<FellesProps, "ukjentTekst" | "actions">) {
+export function ForelderKortInnhold({ forelder, ...resten }: Omit<FellesProps, "ukjentTekst" | "actions" | "height">) {
     return <PersonRolleKortInnhold person={tilPerson(forelder)} {...resten} />;
 }
 

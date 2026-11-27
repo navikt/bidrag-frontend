@@ -5,6 +5,13 @@ import { useQuery, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-
 import type { AxiosError } from "axios";
 import { QueryKeys } from "./sak.api";
 
+export class InnloggingsFeilError extends Error {
+    constructor() {
+        super("Innloggingen er ikke gyldig.");
+        this.name = "InnloggingsFeilError";
+    }
+}
+
 export const useHentPersonData = (ident?: string) => {
     return useQuery({
         queryKey: QueryKeys.hentPersoninfo(ident ?? ""),
@@ -54,7 +61,7 @@ export function useHentFlerePersoninformasjonSuspense(identer: string[], enabled
     });
 }
 
-function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
+export function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null) {
     return {
         queryKey: ["hent_person_motpart_barn_relasjon", request?.ident],
         queryFn: async (): Promise<MotpartBarnRelasjonDto | undefined> => {
@@ -69,9 +76,7 @@ function hentPersonMotpartBarnRelasjonQueryOptions(request: PersonRequest | null
 
                 if (status === 403 || status === 401) {
                     await SecureLoggerService.warn(`Ingen tilgang til relasjoner for person ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til å hente relasjoner for denne personen ${request.ident}`,
-                    );
+                    throw new TilgangsFeilError("Du har ikke tilgang til å hente personens relasjoner.");
                 }
                 throw e;
             }
@@ -130,17 +135,18 @@ export function hentForeldreinformasjonForBarnQueryOptions(request: PersonReques
                 const axiosError = e as AxiosError;
                 const status = axiosError?.response?.status;
 
-                if (status === 403 || status === 401) {
+                if (status === 403) {
                     await SecureLoggerService.warn(`Ingen tilgang til foreldreinfo for barn ${request.ident}`);
-                    throw new TilgangsFeilError(
-                        `Du har ikke tilgang til foreldreinfo for denne personen ${request.ident}`,
-                    );
+                    throw new TilgangsFeilError("Du har ikke tilgang til foreldreinfo for barnet.");
+                }
+                if (status === 401) {
+                    throw new InnloggingsFeilError();
                 }
                 throw e;
             }
         },
         retry: (failureCount: number, error: Error) => {
-            if (error instanceof TilgangsFeilError) {
+            if (error instanceof TilgangsFeilError || error instanceof InnloggingsFeilError) {
                 return false;
             }
             return failureCount < 1;

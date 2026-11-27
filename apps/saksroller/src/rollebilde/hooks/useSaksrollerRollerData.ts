@@ -14,7 +14,9 @@ export function useSaksrollerRollerData({
 }) {
     const bp = useMemo(() => roller.find((r) => r.type === "BP"), [roller]);
     const bm = useMemo(() => roller.find((r) => r.type === "BM"), [roller]);
-    const barn = roller.filter(erBarn) as BarnRolle[];
+    const barn = (roller.filter(erBarn) as BarnRolle[]).sort(
+        (a, b) => (b.alder ?? -1) - (a.alder ?? -1) || (a.fødselsdato ?? "").localeCompare(b.fødselsdato ?? ""),
+    );
     const barnIdenter = useMemo(() => barn.map((b) => b.fodselsnummer), [barn]);
     const aktiveRoller = useMemo(() => (roller.length > 0 ? roller : berikedeRoller), [roller, berikedeRoller]);
     const muligeBarn =

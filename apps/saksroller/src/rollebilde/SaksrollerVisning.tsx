@@ -4,6 +4,8 @@ import { BodyLong, Box, Heading, HStack, InfoCard, Loader, LocalAlert, Page, VSt
 import { Suspense } from "react";
 import { FormProvider } from "react-hook-form";
 import { ADRESSEBESKYTTELSE_ENHET, EGEN_ANSATT_ENHET } from "../felles/enheter.ts";
+import Relasjonsmeldinger from "../felles/relasjon/Relasjonsmeldinger.tsx";
+import type { Relasjonsregler } from "../felles/relasjon/useRelasjonsregler.ts";
 import type { SakRedigeringData } from "../felles/sakvisning-schema.ts";
 import BarnISaken from "./barn/BarnISaken.tsx";
 import Endringsoppsummering from "./endringer/Endringsoppsummering.tsx";
@@ -13,7 +15,6 @@ import { useSaksrollerVisning } from "./hooks/useSaksrollerVisning.ts";
 import { RedigeringRegisterProvider } from "./RedigeringRegisterContext.tsx";
 import SakButtons, { type SakButtonsProps } from "./SakButtons.tsx";
 import { SakstypeTags } from "./SakstypeTags.tsx";
-import UfullstendigRelasjonAlert from "./UfullstendigRelasjonAlert.tsx";
 
 function sakskategoriTilVisningsnavn(kategori: "U" | "N"): string {
     return kategori === "U" ? "Utland" : "Nasjonal";
@@ -99,14 +100,20 @@ function LagrerOverlay() {
 function EndringerOgLagring({
     endringsliste,
     barnMedUfullstendigRelasjon,
+    barnMedAnnenForelder,
+    relasjonsregler,
     aktiveRoller,
     sakButtons,
 }: {
     endringsliste: Endringsrad[];
     barnMedUfullstendigRelasjon: string[];
+    barnMedAnnenForelder: string[];
+    relasjonsregler: Relasjonsregler;
     aktiveRoller: SakRedigeringData["roller"];
     sakButtons: SakButtonsProps;
 }) {
+    const navn = (identer: string[]) =>
+        identer.map((ident) => aktiveRoller.find((rolle) => rolle.fodselsnummer === ident)?.navn ?? ident);
     return (
         <>
             <Suspense
@@ -125,7 +132,12 @@ function EndringerOgLagring({
                 <Endringsoppsummering endringsliste={endringsliste} />
             </Suspense>
             <VStack gap="space-12">
-                <UfullstendigRelasjonAlert barnIdenter={barnMedUfullstendigRelasjon} roller={aktiveRoller} />
+                <Relasjonsmeldinger
+                    regler={relasjonsregler}
+                    ufullstendigeNavn={navn(barnMedUfullstendigRelasjon)}
+                    annenForelderNavn={navn(barnMedAnnenForelder)}
+                    handling="lagres"
+                />
                 <SakButtons {...sakButtons} />
             </VStack>
         </>
@@ -183,16 +195,18 @@ function SaksrollerVisningInnhold({ saksnummer }: SaksrollerVisningProps) {
                                         <BarnISaken
                                             barn={visning.barn}
                                             roller={visning.roller}
-                                            bidragsmottakerIdent={bm?.fodselsnummer || undefined}
                                             dataUpdatedAt={visning.dataUpdatedAt}
                                             hentOgNullstillSamhandler={visning.hentOgNullstillSamhandler}
                                             sakstype={visning.sakstype}
                                             muligeBarn={visning.muligeBarn}
+                                            advarsler={visning.barnAdvarsler}
                                             funnetPersonISak={visning.funnetPersonISak}
                                         />
                                         <EndringerOgLagring
                                             endringsliste={visning.endringsliste}
                                             barnMedUfullstendigRelasjon={visning.barnMedUfullstendigRelasjon}
+                                            barnMedAnnenForelder={visning.barnMedAnnenForelder}
+                                            relasjonsregler={visning.relasjonsregler}
                                             aktiveRoller={visning.aktiveRoller}
                                             sakButtons={visning.sakButtons}
                                         />

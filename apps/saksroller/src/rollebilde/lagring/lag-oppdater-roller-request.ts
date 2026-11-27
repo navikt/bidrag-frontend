@@ -21,7 +21,7 @@ export function lagOppdaterRollerRequest(data: SakRedigeringData): OppdaterRolle
                 objektnummer: rolle.objektnummer || "",
                 reellMottaker:
                     rolle.rolleType === "BA" && barnRolle?.reellMottaker
-                        ? { ident: barnRolle.reellMottaker || "", verge: false }
+                        ? { ident: barnRolle.reellMottaker || "", verge: barnRolle.reellMottakerErVerge ?? false }
                         : null,
                 mottagerErVerge: rolle.mottagerErVerge,
                 rolleType: bidragSakRolle,

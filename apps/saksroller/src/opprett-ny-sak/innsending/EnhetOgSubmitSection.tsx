@@ -2,7 +2,6 @@ import { InlineMessage, VStack } from "@navikt/ds-react";
 import { useOpprettSakStart } from "../skjema/OpprettSakStartContext";
 import EnhetInfoAlert from "./EnhetInfoAlert";
 import KanIkkeOppretteSakAlert from "./KanIkkeOppretteSakAlert";
-import type { OppsummeringParter } from "./Oppsummering";
 import SubmitButtons from "./SubmitButtons";
 
 export interface EnhetOgSubmitSectionProps {
@@ -16,7 +15,6 @@ export interface EnhetOgSubmitSectionProps {
     saksnummer: string | null;
     harEksisterendeSak?: boolean;
     manglerTilgangUtenBm?: boolean;
-    oppsummering?: OppsummeringParter;
 }
 
 /**

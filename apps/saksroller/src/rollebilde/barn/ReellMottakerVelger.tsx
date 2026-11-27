@@ -8,12 +8,17 @@ import ReellMottakerValgGruppe, {
     type ReellMottakerValgregel,
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
-import { initialiserValg } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
+import {
+    erUendretMottakerUtenType,
+    kanBekrefteReellMottaker,
+} from "../../felles/reell-mottaker/reell-mottaker-regler.ts";
+import { initialiserValg, MANGLER_REELL_MOTTAKER_MELDING } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;
     barnIdent?: string;
     verdi: ReellMottakerValg;
+    opprinneligValg?: { barnIdent: string; valg: ReellMottakerValg };
     onAvbryt: () => void;
     onBekreft: (verdi: ReellMottakerValg) => void;
     regel: ReellMottakerValgregel;
@@ -23,26 +28,21 @@ export default function ReellMottakerVelger({
     barnNavn,
     barnIdent,
     verdi,
+    opprinneligValg,
     onAvbryt,
     onBekreft,
     regel,
 }: ReellMottakerVelgerProps) {
     const [valideringsfeil, setValideringsfeil] = useState<string | undefined>();
-    const påkrevd = regel !== "valgfri";
     // Utkast, slik at endringsoppsummeringen først oppdateres ved bekreftelse.
     const [utkast, setUtkast] = useState<ReellMottakerValg>(() =>
         initialiserValg(verdi, regel, { ident: barnIdent ?? "", navn: barnNavn }),
     );
     const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(utkast);
 
-    const kanBekrefte =
-        utkast.type === "samhandler"
-            ? Boolean(utkast.ident)
-            : !påkrevd || (utkast.type === "barnet_selv" && Boolean(utkast.ident));
-
     const handleBekreft = () => {
-        if (!kanBekrefte) {
-            setValideringsfeil("Velg eller søk opp en reell mottaker før du legger til.");
+        if (!kanBekrefteReellMottaker(utkast, regel, erUendretUkjentLegacyValg(utkast, opprinneligValg, barnIdent))) {
+            setValideringsfeil(MANGLER_REELL_MOTTAKER_MELDING);
             return;
         }
         setValideringsfeil(undefined);
@@ -81,5 +81,19 @@ export default function ReellMottakerVelger({
                 feil={valideringsfeil}
             />
         </RedigeringsRamme>
+    );
+}
+
+function erUendretUkjentLegacyValg(
+    valg: ReellMottakerValg,
+    opprinneligValg: ReellMottakerVelgerProps["opprinneligValg"],
+    barnIdent?: string,
+): boolean {
+    const original = opprinneligValg?.valg;
+    return Boolean(
+        opprinneligValg &&
+            opprinneligValg.barnIdent === barnIdent &&
+            original &&
+            erUendretMottakerUtenType(valg, original),
     );
 }

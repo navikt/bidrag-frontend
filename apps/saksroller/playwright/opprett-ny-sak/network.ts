@@ -13,6 +13,23 @@ type MockOptions = {
     personOverrides?: Record<string, Record<string, unknown>>;
 };
 
+/** Åpner søskenflokkene før en test velger barn eller redigerer reell mottaker. */
+export async function åpneSøskenflokker(component: Locator) {
+    const søskenflokker = component.getByRole("region", { name: "Søskenflokker" });
+    const lukkedeFlokker = søskenflokker.getByRole("button", { expanded: false });
+    const henterBarn = component.getByText("Henter barn...", { exact: true });
+    await expect(søskenflokker).toBeAttached();
+    await expect(henterBarn).toHaveCount(0);
+    for (const flokk of (await lukkedeFlokker.all()).reverse()) {
+        await flokk.click();
+    }
+    await expect(lukkedeFlokker).toHaveCount(0);
+    await søskenflokker.evaluate(async (element) => {
+        await Promise.all(element.getAnimations({ subtree: true }).map((animasjon) => animasjon.finished));
+    });
+    await component.page().mouse.move(0, 0);
+}
+
 export async function mockOpprettSakApi(page: Page, options: MockOptions = {}) {
     const requests: { create?: Record<string, unknown>; unit: Record<string, unknown>[] } = { unit: [] };
     await mockPersonOgRelasjoner(page, {

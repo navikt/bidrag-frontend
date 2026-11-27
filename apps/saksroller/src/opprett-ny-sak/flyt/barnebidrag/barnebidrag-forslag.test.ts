@@ -2,7 +2,7 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { describe, expect, it } from "vitest";
 import { filtrerBortValgteForeldre } from "../../parter/part-utils";
 import { utledBarnkurverForForelder, utledFellesBarn } from "./barnebidrag-barnkurver";
-import { harFullstendigRelasjon, utledForelderforslag } from "./barnebidrag-forelderforslag";
+import { barnMedAnnenForelder, barnMedUfullstendigRelasjon, utledForelderforslag } from "./barnebidrag-forelderforslag";
 import { harMotpartMedUlikeForelderroller } from "./barnebidrag-relasjonsvalidering";
 import { rollerEtterValg } from "./barnebidrag-roller";
 
@@ -14,12 +14,10 @@ const barn = { ident: "44444444444", navn: "Barn" };
 
 describe("utledForelderforslag", () => {
     it("start fra barn: begge registrerte foreldre er forslag", () => {
-        expect(utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor] }], valgteForeldre: [] })).toEqual(
-            {
-                forslag: [far, mor],
-                feil: undefined,
-            },
-        );
+        expect(utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor] }] })).toEqual({
+            forslag: [far, mor],
+            feil: undefined,
+        });
     });
 
     describe("filtrerBortValgteForeldre", () => {
@@ -32,31 +30,47 @@ describe("utledForelderforslag", () => {
     });
 
     it("feil ved mer enn to foreldre", () => {
-        expect(
-            utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor, annen] }], valgteForeldre: [] }).feil,
-        ).toMatch(/flere enn 2 registrerte foreldre/);
-    });
-
-    it("advarer når barnet har to andre foreldre enn en valgt forelder", () => {
-        expect(
-            utledForelderforslag({
-                foreldreTilBarn: [{ barn, foreldre: [mor, annen] }],
-                valgteForeldre: [{ ident: far.ident, navn: "Far" }],
-            }).feil,
-        ).toMatch(/Er du sikker på at dette er riktig barn/);
+        expect(utledForelderforslag({ foreldreTilBarn: [{ barn, foreldre: [far, mor, annen] }] }).feil).toMatch(
+            /flere enn 2 registrerte foreldre/,
+        );
     });
 });
 
-describe("harFullstendigRelasjon", () => {
-    it("er ukjent mens foreldreinfo lastes", () => {
-        expect(harFullstendigRelasjon([{ barn, foreldre: undefined }], far.ident, mor.ident)).toBeUndefined();
+describe("🔴 barnMedAnnenForelder", () => {
+    it("gir barn der registrerte og valgte foreldre er flere enn to personer", () => {
+        expect(barnMedAnnenForelder([{ barn, foreldre: [mor, annen] }], [far.ident, mor.ident])).toEqual([barn]);
+        expect(barnMedAnnenForelder([{ barn, foreldre: [mor, annen] }], [far.ident, undefined])).toEqual([barn]);
+        expect(barnMedAnnenForelder([{ barn, foreldre: [annen] }], [far.ident, mor.ident])).toEqual([barn]);
     });
 
-    it("krever at alle barn har både BP og BM registrert", () => {
-        expect(harFullstendigRelasjon([{ barn, foreldre: [far, mor] }], far.ident, mor.ident)).toBe(true);
-        expect(harFullstendigRelasjon([{ barn, foreldre: [far] }], far.ident, mor.ident)).toBe(false);
-        expect(harFullstendigRelasjon([{ barn, foreldre: [far, mor] }], far.ident, undefined)).toBe(true);
-        expect(harFullstendigRelasjon([{ barn, foreldre: [mor] }], far.ident, undefined)).toBe(false);
+    it("gir ikke barn med manglende relasjon uten en annen registrert forelder", () => {
+        expect(barnMedAnnenForelder([{ barn, foreldre: [mor] }], [far.ident, mor.ident])).toEqual([]);
+        expect(barnMedAnnenForelder([{ barn, foreldre: [far, mor] }], [far.ident, undefined])).toEqual([]);
+        expect(barnMedAnnenForelder([{ barn, foreldre: [annen] }], [far.ident, undefined])).toEqual([]);
+        expect(barnMedAnnenForelder([{ barn, foreldre: [] }], [far.ident, mor.ident])).toEqual([]);
+        expect(barnMedAnnenForelder([{ barn, foreldre: undefined }], [far.ident, mor.ident])).toEqual([]);
+    });
+});
+
+describe("barnMedUfullstendigRelasjon", () => {
+    it("er ukjent mens foreldreinfo lastes", () => {
+        expect(barnMedUfullstendigRelasjon([{ barn, foreldre: undefined }], far.ident, mor.ident)).toBeUndefined();
+    });
+
+    it("gir barn som mangler en kjent forelder som registrert forelder", () => {
+        const annetBarn = { ident: "55555555555", navn: "Annet barn" };
+        expect(
+            barnMedUfullstendigRelasjon(
+                [
+                    { barn, foreldre: [far, mor] },
+                    { barn: annetBarn, foreldre: [far] },
+                ],
+                far.ident,
+                mor.ident,
+            ),
+        ).toEqual([annetBarn]);
+        expect(barnMedUfullstendigRelasjon([{ barn, foreldre: [far, mor] }], far.ident, undefined)).toEqual([]);
+        expect(barnMedUfullstendigRelasjon([{ barn, foreldre: [mor] }], far.ident, undefined)).toEqual([barn]);
     });
 });
 
@@ -69,15 +83,16 @@ describe("utledFellesBarn", () => {
         { motpart: annen, fellesBarn: [halvsøsken] },
     ] as never;
 
-    it("gir bare barn med valgt BM, under maksalder, uten manuelt lagt til", () => {
-        expect(utledFellesBarn(relasjoner, mor.ident, [barn.ident])?.fellesBarn.map((b) => b.ident)).toEqual([
+    it("gir bare barn med valgt BM, under maksalder", () => {
+        expect(utledFellesBarn(relasjoner, mor.ident)?.fellesBarn.map((b) => b.ident)).toEqual([
+            barn.ident,
             søsken.ident,
         ]);
     });
 
     it("gir ingenting uten kjent BM eller felles barn", () => {
-        expect(utledFellesBarn(relasjoner, undefined, [])).toBeNull();
-        expect(utledFellesBarn(relasjoner, far.ident, [])).toBeNull();
+        expect(utledFellesBarn(relasjoner, undefined)).toBeNull();
+        expect(utledFellesBarn(relasjoner, far.ident)).toBeNull();
     });
 });
 

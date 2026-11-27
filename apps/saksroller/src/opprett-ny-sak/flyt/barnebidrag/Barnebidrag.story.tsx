@@ -1,5 +1,11 @@
-import { barnkurver, testpersoner, ukjentBarnkurv } from "../../../../playwright/opprett-ny-sak/fixtures";
+import {
+    barnkurver,
+    kjentOgUkjentBarnkurv,
+    testpersoner,
+    ukjentBarnkurv,
+} from "../../../../playwright/opprett-ny-sak/fixtures";
 import { OpprettSakSkjemaStory } from "../../../../playwright/opprett-ny-sak/OpprettSak.story";
+import { ANNEN_FORELDER_FLAGG } from "../../../felles/relasjon/useRelasjonsregler";
 
 export const ForelderMedBarn = () => (
     <OpprettSakSkjemaStory
@@ -19,6 +25,29 @@ export const ForelderUkjentBidragsmottaker = () => (
             person: testpersoner.bidragspliktig,
             rolle: "bidragspliktig",
             relasjoner: ukjentBarnkurv,
+        }}
+    />
+);
+
+export const ForelderUkjentBidragsmottakerAnnenForelderTillatt = () => (
+    <OpprettSakSkjemaStory
+        scenario={{
+            sakstype: "BARNEBIDRAG",
+            person: testpersoner.bidragspliktig,
+            rolle: "bidragspliktig",
+            relasjoner: ukjentBarnkurv,
+        }}
+        flagg={[ANNEN_FORELDER_FLAGG]}
+    />
+);
+
+export const ForelderMedKjentOgUkjentMotpart = () => (
+    <OpprettSakSkjemaStory
+        scenario={{
+            sakstype: "BARNEBIDRAG",
+            person: testpersoner.bidragspliktig,
+            rolle: "bidragspliktig",
+            relasjoner: kjentOgUkjentBarnkurv,
         }}
     />
 );

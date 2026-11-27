@@ -1,10 +1,11 @@
-import { XMarkIcon } from "@navikt/aksel-icons";
-import { Box, Button, ErrorMessage, HStack, Tag, VStack } from "@navikt/ds-react";
+import { TrashIcon } from "@navikt/aksel-icons";
+import { Box, Button, ErrorMessage, Tag, VStack } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort.tsx";
 import { KortRamme } from "../../felles/person/PersonRolleKort.tsx";
+import type { ReellMottakerValg } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
 import { tilReellMottakerValg } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
-import { reellMottakerRegel, reellMottakerValgregel, type Sakstype } from "../../felles/saksregler.ts";
+import { reellMottakerRegel, type Sakstype } from "../../felles/saksregler.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import RollehistorikkVisning from "../RollehistorikkVisning.tsx";
 import ReellMottakerRad from "./ReellMottakerRad.tsx";
@@ -14,7 +15,6 @@ import { useBarnReellMottaker } from "./useBarnReellMottaker.tsx";
 interface BarnVisningProps {
     rolle: BarnRolle;
     index: number;
-    bidragsmottakerIdent: string | undefined;
     erNyttBarn?: boolean;
     hentOgNullstillSamhandler: (barnIndex: number, isLeggTilBarn: boolean) => { ident: string; navn: string } | null;
     closeEditorSignal?: number;
@@ -24,7 +24,6 @@ interface BarnVisningProps {
 export default function BarnVisning({
     rolle,
     index,
-    bidragsmottakerIdent,
     erNyttBarn,
     hentOgNullstillSamhandler,
     closeEditorSignal,
@@ -41,6 +40,27 @@ export default function BarnVisning({
         handleBekreftReellMottaker,
     } = useBarnReellMottaker({ rolle, index, closeEditorSignal, hentOgNullstillSamhandler });
     const reellMottakerFeil = form.formState.errors.roller?.[index]?.reellMottaker?.message;
+    const opprinneligBarn = !erNyttBarn
+        ? form.formState.defaultValues?.roller?.find(
+              (original) => original?.type === "BA" && original.fodselsnummer === rolle.fodselsnummer,
+          )
+        : undefined;
+    const opprinneligValg: { barnIdent: string; valg: ReellMottakerValg } | undefined = opprinneligBarn
+        ? {
+              barnIdent: opprinneligBarn.fodselsnummer ?? "",
+              valg: {
+                  type:
+                      opprinneligBarn.reellMottakerType === "barnet_selv" ||
+                      opprinneligBarn.reellMottakerType === "samhandler"
+                          ? opprinneligBarn.reellMottakerType
+                          : undefined,
+                  ident: opprinneligBarn.reellMottaker ?? opprinneligBarn.reellMottager,
+                  navn: opprinneligBarn.reellMottakerNavn,
+                  mottakertype: opprinneligBarn.reellMottakerEntitetstype,
+                  verge: opprinneligBarn.reellMottakerErVerge,
+              },
+          }
+        : undefined;
 
     return (
         <KortRamme>
@@ -54,18 +74,26 @@ export default function BarnVisning({
                         erMyndig: rolle.erMyndig,
                         diskresjonskode: rolle.diskresjonskode,
                     }}
-                    headingActions={erNyttBarn && <NyttBarnHandlinger onFjern={handleFjernBarn} />}
+                    tags={
+                        erNyttBarn && (
+                            <Tag variant="strong" data-color="meta-purple" size="xsmall">
+                                Ny
+                            </Tag>
+                        )
+                    }
+                    headingActions={erNyttBarn && <FjernBarnHandling onFjern={handleFjernBarn} />}
                 >
                     {!visReellMottaker && (
-                        <ReellMottakerRad
-                            harReellMottaker={harReellMottaker}
-                            reellMottakerInfo={reellMottakerInfo}
-                            onEndre={handleÅpneReellMottaker}
-                            onLeggTil={handleÅpneReellMottaker}
-                        />
+                        <>
+                            <ReellMottakerRad
+                                harReellMottaker={harReellMottaker}
+                                reellMottakerInfo={reellMottakerInfo}
+                                onEndre={handleÅpneReellMottaker}
+                                onLeggTil={handleÅpneReellMottaker}
+                            />
+                            <ReellMottakerFeil melding={reellMottakerFeil} />
+                        </>
                     )}
-
-                    {!visReellMottaker && <ReellMottakerFeil melding={reellMottakerFeil} />}
                 </BarnKortInnhold>
 
                 {visReellMottaker && (
@@ -73,14 +101,10 @@ export default function BarnVisning({
                         barnNavn={rolle.navn || "Barnet"}
                         barnIdent={rolle.fodselsnummer}
                         verdi={tilReellMottakerValg(rolle)}
+                        opprinneligValg={opprinneligValg}
                         onAvbryt={handleLukkReellMottaker}
                         onBekreft={handleBekreftReellMottaker}
-                        regel={
-                            reellMottakerValgregel(
-                                reellMottakerRegel(sakstype, !bidragsmottakerIdent),
-                                rolle.erMyndig ?? false,
-                            ) ?? "valgfri"
-                        }
+                        regel={reellMottakerRegel(sakstype)(rolle.erMyndig ?? false) ?? "valgfri"}
                     />
                 )}
                 <RollehistorikkVisning
@@ -93,16 +117,16 @@ export default function BarnVisning({
     );
 }
 
-function NyttBarnHandlinger({ onFjern }: { onFjern: () => void }) {
+function FjernBarnHandling({ onFjern }: { onFjern: () => void }) {
     return (
-        <HStack gap="space-12" align="center" flexShrink="0" marginInline="auto space-0">
-            <Tag variant="alt1" size="xsmall">
-                Nytt barn
-            </Tag>
-            <Button type="button" variant="tertiary" size="small" icon={<XMarkIcon aria-hidden />} onClick={onFjern}>
-                Fjern
-            </Button>
-        </HStack>
+        <Button
+            type="button"
+            variant="tertiary"
+            size="small"
+            icon={<TrashIcon aria-hidden />}
+            aria-label="Fjern barn"
+            onClick={onFjern}
+        />
     );
 }
 

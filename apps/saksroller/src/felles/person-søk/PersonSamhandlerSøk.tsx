@@ -1,7 +1,7 @@
-import type { PersonDto } from "@bidrag/api/PersonApi";
 import { PersonSokButton, SamhandlerSokButton } from "@bidrag/common";
 import { BodyShort, Box, HStack, InlineMessage, Loader, Search, VStack } from "@navikt/ds-react";
 import type { KeyboardEvent } from "react";
+import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import { NyttFødselsnummerMelding } from "../person/PersonRolleKort.tsx";
 import { usePersonSamhandlerSøk } from "./usePersonSamhandlerSøk.ts";
 
@@ -18,13 +18,15 @@ export default function PersonSamhandlerSøk({
     onError,
     onQueryChange,
     inkluderSamhandler = false,
+    tømVedTreff = false,
 }: {
     valgIdent?: string;
     label?: string;
-    onResult: (data: PersonDto) => void | Promise<void>;
+    onResult: (data: ISamhandlerPersonInfo) => void | Promise<void>;
     onError: (feil: string) => void;
     onQueryChange?: () => void;
     inkluderSamhandler?: boolean;
+    tømVedTreff?: boolean;
 }) {
     const {
         samhandlerPersonFn,
@@ -40,6 +42,7 @@ export default function PersonSamhandlerSøk({
         onError,
         onQueryChange,
         inkluderSamhandler,
+        tømVedTreff,
     });
 
     function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {

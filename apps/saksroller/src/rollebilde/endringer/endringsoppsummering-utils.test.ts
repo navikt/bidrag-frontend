@@ -26,3 +26,15 @@ describe("lagEndringsoppsummering – advarsel om ufullstendig relasjon", () => 
         expect(endring?.harUfullstendigRelasjon).toBe(forventet);
     });
 });
+
+describe("🔴 lagEndringsoppsummering – verge", () => {
+    it("teller endret verge som endring av reell mottaker", () => {
+        const rm = { reellMottaker: "12345678901", reellMottakerType: "samhandler" as const, reellMottakerNavn: "Ola" };
+        const opprinnelige = [lagBarn({ ...rm, reellMottakerErVerge: false })];
+        const nåværende = [lagBarn({ ...rm, reellMottakerErVerge: true })];
+
+        const [endring] = lagEndringsoppsummering(opprinnelige, nåværende);
+
+        expect(endring).toMatchObject({ type: "endretReellMottaker", tilReellMottakerNavn: "Ola (verge)" });
+    });
+});

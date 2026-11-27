@@ -33,6 +33,7 @@ type NormalisertRolle = {
     fodselsnummer: string;
     reellMottaker: string;
     reellMottakerNavn?: string;
+    reellMottakerErVerge: boolean;
 };
 
 function lagRolleSignatur(rolle: SakRedigeringData["roller"][number]): string {
@@ -57,8 +58,15 @@ function normaliserRoller(roller: SakRedigeringData["roller"]): NormalisertRolle
             fodselsnummer,
             reellMottaker: (rolle as BarnRolle).reellMottaker || "",
             reellMottakerNavn: (rolle as BarnRolle).reellMottakerNavn,
+            reellMottakerErVerge: (rolle as BarnRolle).reellMottakerErVerge ?? false,
         };
     });
+}
+
+function medVerge(rolle: NormalisertRolle): string | undefined {
+    return rolle.reellMottakerErVerge && rolle.reellMottakerNavn
+        ? `${rolle.reellMottakerNavn} (verge)`
+        : rolle.reellMottakerNavn;
 }
 
 export function lagEndringsoppsummering(
@@ -101,7 +109,13 @@ export function lagEndringsoppsummering(
         .filter((rolle) => opprinneligeMap.has(rolle.key) && rolle.rolleType === "BA")
         .flatMap((rolle) => {
             const opprinneligRolle = opprinneligeMap.get(rolle.key);
-            if (!opprinneligRolle || opprinneligRolle.reellMottaker === rolle.reellMottaker) return [];
+            if (
+                !opprinneligRolle ||
+                (opprinneligRolle.reellMottaker === rolle.reellMottaker &&
+                    opprinneligRolle.reellMottakerErVerge === rolle.reellMottakerErVerge)
+            ) {
+                return [];
+            }
 
             return [
                 {
@@ -111,8 +125,8 @@ export function lagEndringsoppsummering(
                     ident: rolle.fodselsnummer,
                     fraReellMottaker: opprinneligRolle.reellMottaker.trim() || "ingen",
                     tilReellMottaker: rolle.reellMottaker.trim() || "ingen",
-                    fraReellMottakerNavn: opprinneligRolle.reellMottakerNavn,
-                    tilReellMottakerNavn: rolle.reellMottakerNavn,
+                    fraReellMottakerNavn: medVerge(opprinneligRolle),
+                    tilReellMottakerNavn: medVerge(rolle),
                     harUfullstendigRelasjon: harUfullstendigRelasjon(rolle.fodselsnummer),
                 } satisfies Endringsrad,
             ];

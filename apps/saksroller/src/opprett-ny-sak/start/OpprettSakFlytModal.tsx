@@ -29,6 +29,7 @@ export function OpprettSakFlytModal({ open, onClose, ...props }: OpprettSakFlytM
             }}
             header={{ heading: "Opprett sak", closeButton: !sending }}
             width="70rem"
+            placement="top"
         >
             <Modal.Body>
                 <Suspense fallback={<Loader size="3xlarge" title="Laster..." variant="interaction" />}>

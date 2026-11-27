@@ -1,3 +1,4 @@
+import type { ISamhandlerPersonInfo, Mottakertype } from "../../api/samhandler.api";
 import PersonSamhandlerSøk from "../person-søk/PersonSamhandlerSøk.tsx";
 
 export default function ReellMottakerSøk({
@@ -6,18 +7,18 @@ export default function ReellMottakerSøk({
     onError,
 }: {
     valgtSamhandlerId?: string;
-    onVelg: (ident: string, navn?: string) => void;
+    onVelg: (ident: string, navn?: string, mottakertype?: Mottakertype) => void;
     onError: (feil: string) => void;
 }) {
     return (
         <PersonSamhandlerSøk
             valgIdent={valgtSamhandlerId}
-            onResult={(data) => {
-                const treff = data as typeof data & { samhandlerId?: string; offentligId?: string };
-                onVelg(treff.samhandlerId ?? treff.ident ?? treff.offentligId ?? "", treff.navn ?? undefined);
+            onResult={(data: ISamhandlerPersonInfo) => {
+                onVelg(data.ident, data.navn ?? undefined, data.mottakertype);
             }}
             onError={onError}
             inkluderSamhandler
+            tømVedTreff
         />
     );
 }
