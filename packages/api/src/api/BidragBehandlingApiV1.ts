@@ -185,43 +185,56 @@ export enum Vedtakstype {
 export enum Valutakode {
   ALL = "ALL",
   ANG = "ANG",
+  ARS = "ARS",
   AUD = "AUD",
   BAM = "BAM",
+  BDT = "BDT",
   BGN = "BGN",
   BRL = "BRL",
+  BYN = "BYN",
   CAD = "CAD",
   CHF = "CHF",
   CNY = "CNY",
   COP = "COP",
   CZK = "CZK",
   DKK = "DKK",
+  DZD = "DZD",
   EEK = "EEK",
   EUR = "EUR",
   GBP = "GBP",
   HKD = "HKD",
   HRK = "HRK",
   HUF = "HUF",
+  IDR = "IDR",
+  ILS = "ILS",
   INR = "INR",
   ISK = "ISK",
   JPY = "JPY",
+  KRW = "KRW",
   LTL = "LTL",
   LVL = "LVL",
   MAD = "MAD",
+  MMK = "MMK",
+  MXN = "MXN",
+  MYR = "MYR",
   NOK = "NOK",
   NZD = "NZD",
+  PHP = "PHP",
   PKR = "PKR",
   PLN = "PLN",
   RON = "RON",
   RSD = "RSD",
+  RUB = "RUB",
   SEK = "SEK",
+  SGD = "SGD",
   THB = "THB",
   TND = "TND",
   TRY = "TRY",
+  TWD = "TWD",
   UAH = "UAH",
   USD = "USD",
   VND = "VND",
   ZAR = "ZAR",
-  PHP = "PHP",
 }
 
 export enum Utgiftstype {
@@ -638,8 +651,8 @@ export enum Resultatkode {
   ORDINAeRTFORSKUDD75PROSENT = "ORDINÆRT_FORSKUDD_75_PROSENT",
   FORHOYETFORSKUDD100PROSENT = "FORHØYET_FORSKUDD_100_PROSENT",
   FORHOYETFORSKUDD11AR125PROSENT = "FORHØYET_FORSKUDD_11_ÅR_125_PROSENT",
-  SAeRTILSKUDDINNVILGET = "SÆRTILSKUDD_INNVILGET",
   SAeRBIDRAGINNVILGET = "SÆRBIDRAG_INNVILGET",
+  SAeRTILSKUDDINNVILGET = "SÆRTILSKUDD_INNVILGET",
   SAeRTILSKUDDIKKEFULLBIDRAGSEVNE = "SÆRTILSKUDD_IKKE_FULL_BIDRAGSEVNE",
   SAeRBIDRAGIKKEFULLBIDRAGSEVNE = "SÆRBIDRAG_IKKE_FULL_BIDRAGSEVNE",
   SAeRBIDRAGMANGLERBIDRAGSEVNE = "SÆRBIDRAG_MANGLER_BIDRAGSEVNE",
@@ -691,6 +704,10 @@ export enum Resultatkode {
   BIDRAG_JUSTERT_FOR_NETTO_BARNETILLEGG_BM = "BIDRAG_JUSTERT_FOR_NETTO_BARNETILLEGG_BM",
   BIDRAG_JUSTERT_TIL_FORSKUDDSSATS = "BIDRAG_JUSTERT_TIL_FORSKUDDSSATS",
   BIDRAG_JUSTERT_MANUELT_TIL_FORSKUDDSSATS = "BIDRAG_JUSTERT_MANUELT_TIL_FORSKUDDSSATS",
+  STADSFESTELSE = "STADSFESTELSE",
+  UTENLANDSK_AVGJORELSE = "UTENLANDSK_AVGJORELSE",
+  VEDTAKINNKREVINGAVSAeRBIDRAG = "VEDTAK_INNKREVING_AV_SÆRBIDRAG",
+  AVVIST = "AVVIST",
 }
 
 export interface VedtakResultatInnhold {
@@ -1449,12 +1466,12 @@ export interface InntektDtoV2 {
   historisk?: boolean | null;
   /** Avrundet månedsbeløp for barnetillegg */
   månedsbeløp?: number | null;
-  /** Avrundet månedsbeløp for barnetillegg */
-  beløpMånedDagsats?: number | null;
   skatteprosent?: number | null;
   /** Avrundet dagsats for barnetillegg */
   dagsats?: number | null;
   beløpstype?: InntektBelopstype | null;
+  /** Avrundet månedsbeløp for barnetillegg */
+  beløpMånedDagsats?: number | null;
 }
 
 export interface InntektPerBarnDto {
@@ -1549,6 +1566,9 @@ export interface LesemodusVedtak {
   erOrkestrertVedtak: boolean;
   /** @format date-time */
   fattetTidspunkt: string;
+  erManuellVedtak: boolean;
+  resultatkodeSærbidrag?: Resultatkode | null;
+  resultatkodeVisningsnavn?: string | null;
 }
 
 export interface LopendeBidragGrunnlagForholdsmessigFordeling {
@@ -1717,8 +1737,8 @@ export interface PrivatAvtaleValideringsfeilDto {
   /** @uniqueItems true */
   overlappendePerioder: OverlappendePeriode[];
   gjelderBarnNavn?: string | null;
-  harPeriodiseringsfeil: boolean;
   gjelderBarn?: string | null;
+  harPeriodiseringsfeil: boolean;
 }
 
 export interface RolleDto {
@@ -1794,8 +1814,8 @@ export interface SamvaerValideringsfeilDto {
   /** Liste med perioder hvor det mangler inntekter. Vil alltid være tom liste for ytelser */
   hullIPerioder: Datoperiode[];
   gjelderBarnNavn?: string | null;
-  harPeriodiseringsfeil: boolean;
   gjelderBarn?: string | null;
+  harPeriodiseringsfeil: boolean;
 }
 
 export interface SamvaerskalkulatorDetaljer {
@@ -2029,6 +2049,7 @@ export interface SaerbidragRimeligAInnvilgeValideringsfeil {
 
 export interface SaerbidragUtgifterDto {
   avslag?: Resultatkode | null;
+  resultatkodeVisningsnavn?: string | null;
   kategori: SaerbidragKategoriDto;
   beregning?: UtgiftBeregningDto | null;
   maksGodkjentBeløp?: MaksGodkjentBelopDto | null;
@@ -3146,9 +3167,9 @@ export interface KanBehandlesINyLosningRequest {
   /** @format date */
   mottattdato?: string | null;
   privatAvtaleAndreBarnIdenter: string[];
-  bidragsmottaker?: SjekkRolleDto | null;
   bidragspliktig?: SjekkRolleDto | null;
   søknadsbarn: SjekkRolleDto[];
+  bidragsmottaker?: SjekkRolleDto | null;
 }
 
 /** Rolle beskrivelse som er brukte til å opprette nye roller */
@@ -3509,10 +3530,10 @@ export interface ResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
-  inntektBarnMånedlig?: number | null;
-  inntektBMMånedlig?: number | null;
-  inntektBPMånedlig?: number | null;
   totalEndeligInntekt: number;
+  inntektBPMånedlig?: number | null;
+  inntektBMMånedlig?: number | null;
+  inntektBarnMånedlig?: number | null;
 }
 
 export interface ResultatSaerbidragsberegningDto {
@@ -3543,10 +3564,10 @@ export interface Skatt {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattAlminneligInntektMånedsbeløp: number;
+  skattMånedsbeløp: number;
   trinnskattMånedsbeløp: number;
   trygdeavgiftMånedsbeløp: number;
-  skattMånedsbeløp: number;
+  skattAlminneligInntektMånedsbeløp: number;
 }
 
 export interface UnderholdEgneBarnIHusstand {
@@ -3839,8 +3860,8 @@ export interface ResultatBarnebidragsberegningPeriodeDto {
   vedtakstype: Vedtakstype;
   klageOmgjøringDetaljer?: KlageOmgjoringDetaljer | null;
   resultatFraVedtak?: ResultatFraVedtakGrunnlag | null;
-  delvedtakstypeVisningsnavn: string;
   resultatkodeVisningsnavn?: string | null;
+  delvedtakstypeVisningsnavn: string;
 }
 
 export interface ResultatBidragberegningDto {
@@ -4064,10 +4085,10 @@ export interface HusstandsmedlemDto {
 export interface MaBekrefteNyeOpplysninger {
   type: OpplysningerType;
   rolle: RolleDto;
-  /** @format int64 */
-  underholdskostnadId?: number | null;
   /** Barn som det må bekreftes nye opplysninger for. Vil bare være satt hvis type = BOFORHOLD */
   gjelderBarn?: HusstandsmedlemDto | null;
+  /** @format int64 */
+  underholdskostnadId?: number | null;
 }
 
 export interface ArbeidOgInntektLenkeRequest {
@@ -4418,10 +4439,10 @@ export interface DokumentmalResultatBeregningInntekterDto {
   inntektBP?: number | null;
   inntektBarn?: number | null;
   barnEndeligInntekt?: number | null;
-  inntektBarnMånedlig?: number | null;
-  inntektBMMånedlig?: number | null;
-  inntektBPMånedlig?: number | null;
   totalEndeligInntekt: number;
+  inntektBPMånedlig?: number | null;
+  inntektBMMånedlig?: number | null;
+  inntektBarnMånedlig?: number | null;
 }
 
 export type DokumentmalResultatBidragsberegningBarnDto = UtilRequiredKeys<
@@ -4445,10 +4466,10 @@ export interface DokumentmalSkattBeregning {
   skattAlminneligInntekt: number;
   trinnskatt: number;
   trygdeavgift: number;
-  skattAlminneligInntektMånedsbeløp: number;
+  skattMånedsbeløp: number;
   trinnskattMånedsbeløp: number;
   trygdeavgiftMånedsbeløp: number;
-  skattMånedsbeløp: number;
+  skattAlminneligInntektMånedsbeløp: number;
 }
 
 export interface DokumentmalUnderholdEgneBarnIHusstand {
@@ -4525,11 +4546,11 @@ export interface NotatBehandlingDetaljerDto {
    * @deprecated
    */
   avslag?: Resultatkode | null;
+  erAvvisning: boolean;
   vedtakstypeVisningsnavn?: string | null;
   avslagVisningsnavn?: string | null;
-  kategoriVisningsnavn?: string | null;
   avslagVisningsnavnUtenPrefiks?: string | null;
-  erAvvisning: boolean;
+  kategoriVisningsnavn?: string | null;
 }
 
 export interface NotatBeregnetBidragPerBarnDto {
@@ -4628,8 +4649,8 @@ export interface NotatGebyrSoknadDetaljerDto {
   søktAvType: SoktAvType;
   behandlingstype?: Behandlingstype | null;
   behandlingstema?: Behandlingstema | null;
-  behandlingstemaVisningsnavn?: string | null;
   søktAvTypeVisningsnavn?: string | null;
+  behandlingstemaVisningsnavn?: string | null;
   behandlingstypeVisningsnavn?: string | null;
 }
 
@@ -4651,17 +4672,17 @@ export interface NotatInntektDto {
   gjelderBarn?: DokumentmalPersonDto | null;
   historisk: boolean;
   inntektsposter: NotatInntektspostDto[];
-  /** Avrundet månedsbeløp for barnetillegg */
-  månedsbeløp?: number | null;
-  /** Avrundet månedsbeløp for barnetillegg */
-  beløpMånedDagsats?: number | null;
-  beløpstypeVisningsnavn: string;
   /** Skattefaktor for barnetillegg. Null når skatteprosent ikke er relevant (skattefrie barnetillegg) */
   skattefaktor?: number | null;
-  visningsnavn: string;
+  /** Avrundet månedsbeløp for barnetillegg */
+  månedsbeløp?: number | null;
   /** Avrundet dagsats for barnetillegg */
   dagsats?: number | null;
   beløpstype?: InntektBelopstype | null;
+  visningsnavn: string;
+  /** Avrundet månedsbeløp for barnetillegg */
+  beløpMånedDagsats?: number | null;
+  beløpstypeVisningsnavn: string;
 }
 
 export interface NotatInntekterDto {
@@ -4748,8 +4769,8 @@ export interface NotatResultatPeriodeDto {
   vedtakstype?: Vedtakstype | null;
   /** @format int32 */
   antallBarnIHusstanden: number;
-  sivilstandVisningsnavn?: string | null;
   resultatKodeVisningsnavn: string;
+  sivilstandVisningsnavn?: string | null;
 }
 
 export type NotatResultatSaerbidragsberegningDto = UtilRequiredKeys<
@@ -5003,10 +5024,10 @@ export interface NotatVirkningstidspunktBarnDto {
    * @deprecated
    */
   notat: NotatBegrunnelseDto;
-  behandlingstypeVisningsnavn?: string | null;
+  erAvvisning: boolean;
   avslagVisningsnavn?: string | null;
   avslagVisningsnavnUtenPrefiks?: string | null;
-  erAvvisning: boolean;
+  behandlingstypeVisningsnavn?: string | null;
   årsakVisningsnavn?: string | null;
 }
 
@@ -6488,25 +6509,6 @@ export class Api<
       }),
 
     /**
-     * @description Sletter skattepliktige inntekter som er lagret på bidragsmottaker men hentet for en annen person, inkludert avledede offentlige inntekter, og henter grunnlaget på nytt. Returnerer id til rollene som ble rettet.
-     *
-     * @tags admin-controller
-     * @name SlettSkattepliktigeInntekterHentetForAnnenPerson
-     * @request POST:/api/v2/admin/feilfiks/skattepliktige-inntekter-annen-person/{behandlingId}
-     * @secure
-     */
-    slettSkattepliktigeInntekterHentetForAnnenPerson: (
-      behandlingId: number,
-      params: RequestParams = {},
-    ) =>
-      this.request<number[], any>({
-        path: `/api/v2/admin/feilfiks/skattepliktige-inntekter-annen-person/${behandlingId}`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
      * @description Fjerner referanser i behandlingen som peker på en rolle som ikke lenger finnes i databasen (f.eks etter at en rolle har blitt slettet uten at alle referanser ble ryddet opp)
      *
      * @tags admin-controller
@@ -6596,25 +6598,6 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/api/v2/admin/feilfiks/boforhold/perioder/fomtom/${behandlingId}`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Oppretter manglende bearbeidede boforholdsgrunnlag for bidragsmottakere
-     *
-     * @tags admin-controller
-     * @name OpprettManglendeBearbeidetBoforholdBmSoknadsbarn
-     * @request POST:/api/v2/admin/feilfiks/boforhold-bm-bearbeidet/{behandlingId}
-     * @secure
-     */
-    opprettManglendeBearbeidetBoforholdBmSoknadsbarn: (
-      behandlingId: number,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, any>({
-        path: `/api/v2/admin/feilfiks/boforhold-bm-bearbeidet/${behandlingId}`,
         method: "POST",
         secure: true,
         ...params,

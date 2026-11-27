@@ -1,12 +1,12 @@
-import { Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
+import { Resultatkode, Vedtakstype } from "@bidrag/api/BidragBehandlingApiV1";
 import { type PropsWithChildren, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import text from "../../common/constants/texts";
-import { BehandlingProvider } from "../../common/context/BehandlingContext";
-import { useBehandlingV2 } from "../../common/hooks/useApiData";
+import {BehandlingProvider} from "../../common/context/BehandlingContext";
+import {useBehandlingV2} from "../../common/hooks/useApiData";
 
-import { STEPS, STEPS as SærligeutgifterSteps } from "../constants/steps";
-import { SærligeutgifterStepper } from "../enum/SærligeutgifterStepper";
+import {STEPS, STEPS as SærligeutgifterSteps} from "../constants/steps";
+import {SærligeutgifterStepper} from "../enum/SærligeutgifterStepper";
 
 export type InntektTables =
     | `småbarnstillegg.${string}`
@@ -36,18 +36,18 @@ export type PageErrorsOrUnsavedState = {
     };
 };
 
-function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
-    const { behandlingId, vedtakId } = useParams<{
+function SærligeugifterProviderWrapper({children}: PropsWithChildren) {
+    const {behandlingId, vedtakId} = useParams<{
         behandlingId?: string;
         vedtakId?: string;
     }>();
     const behandling = useBehandlingV2(behandlingId, vedtakId);
     const [pageErrorsOrUnsavedState, setPageErrorsOrUnsavedState] = useState<PageErrorsOrUnsavedState>({
-        utgifter: { error: false },
-        boforhold: { error: false },
-        inntekt: { error: false },
+        utgifter: {error: false},
+        boforhold: {error: false},
+        inntekt: {error: false},
     });
-    const formSteps = { defaultStep: SærligeutgifterStepper.UTGIFT, steps: SærligeutgifterSteps };
+    const formSteps = {defaultStep: SærligeutgifterStepper.UTGIFT, steps: SærligeutgifterSteps};
 
     function getPageErrorTexts(): { title: string; description: string } {
         return {
@@ -66,14 +66,14 @@ function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
             step: SærligeutgifterStepper.INNTEKT,
             visible: true,
             interactive:
-                behandling.vedtakstype !== Vedtakstype.OPPHOR &&
+                behandling.vedtakstype !== Vedtakstype.OPPHOR && !behandling.lesemodus?.erManuellVedtak &&
                 (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
         },
         {
             step: SærligeutgifterStepper.BOFORHOLD,
             visible: true,
             interactive:
-                behandling.vedtakstype !== Vedtakstype.OPPHOR &&
+                behandling.vedtakstype !== Vedtakstype.OPPHOR && !behandling.lesemodus?.erManuellVedtak &&
                 (behandling.utgift.avslag === undefined || behandling.utgift.avslag === null),
         },
         {
@@ -112,4 +112,4 @@ function SærligeugifterProviderWrapper({ children }: PropsWithChildren) {
     return <BehandlingProvider props={value}>{children}</BehandlingProvider>;
 }
 
-export { SærligeugifterProviderWrapper };
+export {SærligeugifterProviderWrapper};

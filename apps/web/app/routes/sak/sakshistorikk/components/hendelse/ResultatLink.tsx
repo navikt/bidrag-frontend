@@ -11,7 +11,7 @@ export const getResultatTekst = (hendelse: SakshendelseDto) => {
                 return "Indeksregulert";
         }
     }
-    return hendelse.resultat;
+    return hendelse.resultat ?? "Vedtak";
 };
 
 export function ResultatLink({
