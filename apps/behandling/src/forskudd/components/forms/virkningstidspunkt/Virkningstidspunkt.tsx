@@ -91,11 +91,10 @@ const createInitialValues = (response: VirkningstidspunktDtoV3): Virkningstidspu
     };
 };
 
-const createPayload = (values: VirkningstidspunktFormValuesPerBarn, rolleId?: number): OppdatereVirkningstidspunkt => {
+const createPayload = (values: VirkningstidspunktFormValuesPerBarn): OppdatereVirkningstidspunkt => {
     const årsak = årsakListe.find((value) => value === values.årsakAvslag);
     const avslag = opphørAvslagsListe.find((value) => value === values.årsakAvslag);
     return {
-        rolleId,
         virkningstidspunkt: values.virkningstidspunkt,
         årsak,
         avslag,
@@ -208,7 +207,7 @@ const VirkningstidspunktRolle = ({
             ) {
                 return;
             }
-            const payload = createPayload(value.roller[rolleIndex], selectedVirkningstidspunkt.rolle.id);
+            const payload = createPayload(value.roller[rolleIndex]);
             onSave(payload);
         });
         return () => subscription.unsubscribe();
@@ -221,10 +220,7 @@ const VirkningstidspunktRolle = ({
         clearErrors(`roller.${rolleIndex}.virkningstidspunkt`);
 
         const values = getValues(`roller.${rolleIndex}.virkningstidspunkt`);
-        const payload = createPayload(
-            { ...values, årsakAvslag: value, virkningstidspunkt: virkningsdato },
-            selectedVirkningstidspunkt.rolle.id,
-        );
+        const payload = createPayload({ ...values, årsakAvslag: value, virkningstidspunkt: virkningsdato });
         onSave(payload);
     };
 
@@ -426,10 +422,8 @@ const Side = () => {
             if (name === `roller.${fieldIndex}.begrunnelse` && type === "change") {
                 const currentRolleValues = value.roller[fieldIndex];
                 const payload: OppdatereVirkningstidspunktBegrunnelseDto = {
-                    rolleId: currentRolleValues.rolle.id,
                     oppdatereBegrunnelse: {
                         nyBegrunnelse: currentRolleValues.begrunnelse,
-                        rolleid: currentRolleValues.rolle.id,
                     },
                 };
                 debouncedOnSave(name, payload);
