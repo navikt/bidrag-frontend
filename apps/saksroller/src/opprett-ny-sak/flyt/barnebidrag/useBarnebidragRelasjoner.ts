@@ -30,14 +30,18 @@ export function useBarnebidragRelasjonsregler({
     bidragsmottaker,
     barnMedSkjultForelder,
     barnMedOppslagsfeil,
+    barnMedInnloggingsfeil = [],
 }: {
     foreldreTilBarn: ForeldreTilBarn[];
     bidragspliktig: ForelderPart;
     bidragsmottaker: ForelderPart;
     barnMedSkjultForelder: Barn[];
     barnMedOppslagsfeil: string[];
+    barnMedInnloggingsfeil?: string[];
 }) {
-    const foreldreTilBarnUtenFeil = foreldreTilBarn.filter(({ barn }) => !barnMedOppslagsfeil.includes(barn.ident));
+    const foreldreTilBarnUtenFeil = foreldreTilBarn.filter(
+        ({ barn }) => !barnMedOppslagsfeil.includes(barn.ident) && !barnMedInnloggingsfeil.includes(barn.ident),
+    );
     const annenForelder = barnMedAnnenForelder(foreldreTilBarnUtenFeil, [bidragspliktig.ident, bidragsmottaker.ident]);
     const ufullstendigRelasjon = (
         barnMedUfullstendigRelasjon(foreldreTilBarnUtenFeil, bidragspliktig.ident, bidragsmottaker.ident) ?? []
@@ -50,6 +54,7 @@ export function useBarnebidragRelasjonsregler({
         ufullstendige: ufullstendigRelasjon.map((barn) => barn.ident),
         annenForelder: annenForelder.map((barn) => barn.ident),
         oppslagsfeil: barnMedOppslagsfeil,
+        innloggingsfeil: barnMedInnloggingsfeil,
         foreldre: [bidragspliktig.ident, bidragsmottaker.ident],
         skjultForelder: barnMedSkjultForelder.map((barn) => barn.ident),
     });

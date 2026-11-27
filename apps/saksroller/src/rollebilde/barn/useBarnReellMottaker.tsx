@@ -7,7 +7,10 @@ import { useHentSamhandler } from "../../api/samhandler.api";
 import { FunnetPersonInnhold } from "../../felles/person/FunnetPersonInfo.tsx";
 import SamhandlerInfo from "../../felles/person/SamhandlerInfo.tsx";
 import type { ReellMottakerValg } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
-import { erPersonSomReellMottaker } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
+import {
+    erPersonSomReellMottaker,
+    erSammeMottakerUtenType,
+} from "../../felles/reell-mottaker/reell-mottaker-regler.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
 import { fjernRolle } from "../endringer/rolle-endringer.ts";
 import { useRegistrerÅpenRedigering } from "../RedigeringRegisterContext.tsx";
@@ -36,42 +39,55 @@ export function useBarnReellMottaker({
 
     useRegistrerÅpenRedigering(`barn-reell-mottaker-${rolle.fodselsnummer || index}`, visReellMottaker);
 
-    const handleEndreReellMottaker = (
-        type?: "barnet_selv" | "samhandler",
-        ident?: string,
-        navn?: string,
-        verge?: boolean,
-    ) => {
+    const handleEndreReellMottaker = (valg: ReellMottakerValg) => {
         const oppdaterteRoller = [...roller];
         const currentRolle = oppdaterteRoller[index] as BarnRolle;
+        const erUendretUkjentLegacy = erSammeMottakerUtenType(
+            {
+                type: currentRolle.reellMottakerType,
+                ident: currentRolle.reellMottaker,
+                mottakertype: currentRolle.reellMottakerEntitetstype,
+                verge: currentRolle.reellMottakerErVerge,
+            },
+            valg,
+        );
 
-        currentRolle.reellMottakerType = type;
-        if (type === "barnet_selv") {
-            currentRolle.reellMottaker = currentRolle.fodselsnummer;
-            currentRolle.reellMottakerNavn = currentRolle.navn;
-        } else if (type === "samhandler") {
-            currentRolle.reellMottaker = ident;
-            currentRolle.reellMottakerNavn = navn;
-        } else {
-            currentRolle.reellMottaker = undefined;
-            currentRolle.reellMottakerNavn = undefined;
+        currentRolle.reellMottakerType = valg.type;
+        currentRolle.reellMottaker = valg.ident;
+        currentRolle.reellMottakerEntitetstype =
+            valg.mottakertype ?? (valg.type === "barnet_selv" ? "PERSON" : undefined);
+        currentRolle.reellMottakerNavn = valg.navn;
+
+        if (erPersonSomReellMottaker(valg)) {
+            currentRolle.reellMottakerErVerge = valg.verge ?? false;
+        } else if (!erUendretUkjentLegacy) {
+            currentRolle.reellMottakerErVerge = false;
         }
-
-        currentRolle.reellMottakerErVerge = erPersonSomReellMottaker({ type, ident }) ? (verge ?? false) : false;
 
         form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
     };
 
     useEffect(() => {
-        if (samhandlerInfo && rolle.reellMottakerType === "samhandler" && !rolle.reellMottakerNavn) {
-            handleEndreReellMottaker(
-                "samhandler",
-                rolle.reellMottaker,
-                samhandlerInfo.navn,
-                rolle.reellMottakerErVerge,
-            );
+        const informasjon = samhandlerInfo;
+        if (
+            informasjon &&
+            informasjon.samhandlerId === rolle.reellMottaker &&
+            informasjon.navn &&
+            rolle.reellMottakerType === "samhandler" &&
+            !rolle.reellMottakerNavn
+        ) {
+            const oppdaterteRoller = [...(form.getValues("roller") || [])];
+            const currentRolle = oppdaterteRoller[index] as BarnRolle;
+            if (
+                currentRolle.reellMottakerType === "samhandler" &&
+                currentRolle.reellMottaker === rolle.reellMottaker &&
+                !currentRolle.reellMottakerNavn
+            ) {
+                currentRolle.reellMottakerNavn = informasjon.navn;
+                form.setValue("roller", oppdaterteRoller, { shouldValidate: true });
+            }
         }
-    }, [samhandlerInfo]);
+    }, [form, index, rolle.reellMottaker, rolle.reellMottakerNavn, rolle.reellMottakerType, samhandlerInfo]);
 
     useEffect(() => {
         if (samhandlerError) {
@@ -90,7 +106,7 @@ export function useBarnReellMottaker({
         if (visReellMottaker) {
             const nyData = hentOgNullstillSamhandler(index, false);
             if (nyData) {
-                handleEndreReellMottaker("samhandler", nyData.ident, nyData.navn);
+                handleEndreReellMottaker({ type: "samhandler", ident: nyData.ident, navn: nyData.navn });
                 setVisReellMottaker(false);
             }
         }
@@ -121,7 +137,7 @@ export function useBarnReellMottaker({
         handleÅpneReellMottaker: () => setVisReellMottaker(true),
         handleLukkReellMottaker: () => setVisReellMottaker(false),
         handleBekreftReellMottaker: (valg: ReellMottakerValg) => {
-            handleEndreReellMottaker(valg.type, valg.ident, valg.navn, valg.verge);
+            handleEndreReellMottaker(valg);
             setVisReellMottaker(false);
         },
     };

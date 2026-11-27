@@ -243,7 +243,7 @@ test.describe("Start fra forelder med barn", () => {
         await expect(component.getByRole("checkbox", { name: BEKREFT_RELASJON })).toBeChecked();
     });
 
-    test("🔴 feilet relasjonsoppslag må bekreftes før saken opprettes", async ({ mount, page }) => {
+    test("🔴 teknisk relasjonsfeil sperrer opprettelse uten bekreftelse", async ({ mount, page }) => {
         const requests = await mockOpprettSakApi(page);
         await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, (route) => route.fulfill({ status: 500 }));
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
@@ -252,13 +252,51 @@ test.describe("Start fra forelder med barn", () => {
         await barnCheckboxer(component).first().check();
         await expect(component.getByRole("heading", { name: /Kunne ikke kontrollere relasjonene/ })).toBeVisible();
         await expect(component.getByText(/manglende eller ufullstendig relasjon/)).toHaveCount(0);
+        await expect(component.getByRole("checkbox", { name: "Jeg har kontrollert relasjonene selv" })).toHaveCount(0);
         await component.getByRole("button", { name: /Opprett$/ }).click();
-        await expect(component.getByText("Du må bekrefte at du har kontrollert relasjonene selv")).toBeVisible();
         expect(requests.create).toBeUndefined();
+    });
 
-        await component.getByRole("checkbox", { name: "Jeg har kontrollert relasjonene selv" }).check();
+    test("🔴 relasjonsoppslag fjernes etter vellykket ny henting", async ({ mount, page }) => {
+        const requests = await mockOpprettSakApi(page);
+        let status = 500;
+        let relasjonskall = 0;
+        await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, async (route) => {
+            relasjonskall += 1;
+            await route.fulfill(status === 500 ? { status } : { json: { forelderBarnRelasjon: [] } });
+        });
+        const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
+        await åpneSøskenflokker(component);
+        const barn = barnCheckboxer(component).first();
+
+        await barn.check();
+        await expect(component.getByRole("heading", { name: /Kunne ikke kontrollere relasjonene/ })).toBeVisible();
+        const feiledeOppslag = relasjonskall;
+        status = 200;
+        await barn.uncheck();
+        await barn.check();
+
+        await expect.poll(() => relasjonskall).toBeGreaterThan(feiledeOppslag);
+        await expect(component.getByRole("heading", { name: /Kunne ikke kontrollere relasjonene/ })).toHaveCount(0);
+        expect(requests.create).toBeUndefined();
+    });
+
+    test("🔴 401 sperrer opprettelse med innloggingsmelding, ikke skjult forelder", async ({ mount, page }) => {
+        const requests = await mockOpprettSakApi(page);
+        await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, (route) => route.fulfill({ status: 401 }));
+        const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
+        await åpneSøskenflokker(component);
+
+        await barnCheckboxer(component).first().check();
+        await expect(component.getByRole("heading", { name: "Innloggingen er ikke gyldig" })).toBeVisible();
+        await expect(component.getByRole("heading", { name: /Kunne ikke kontrollere relasjonene/ })).toHaveCount(0);
+        await expect(
+            component.getByRole("checkbox", { name: "Jeg forstår at saken må behandles av en enhet som har tilgang" }),
+        ).toHaveCount(0);
+        await expect(component.getByRole("checkbox", { name: "Jeg har kontrollert relasjonene selv" })).toHaveCount(0);
+
         await component.getByRole("button", { name: /Opprett$/ }).click();
-        await expect.poll(() => requests.create).toBeTruthy();
+        expect(requests.create).toBeUndefined();
     });
 
     test("🔴 stopper opprettelse når barnet har en annen forelder i Folkeregisteret", async ({ mount, page }) => {
@@ -296,7 +334,7 @@ test.describe("Start fra forelder med barn", () => {
     });
 
     test("🔴 forelder saksbehandler ikke har tilgang til må bekreftes før saken opprettes", async ({ mount, page }) => {
-        await mockOpprettSakApi(page);
+        const requests = await mockOpprettSakApi(page);
         await page.route(/\/proxy\/bidrag-person\/forelderbarnrelasjon$/, (route) => route.fulfill({ status: 403 }));
         const component = await mount(`${STORY}/ForelderUkjentBidragsmottaker`);
         await åpneSøskenflokker(component);
@@ -312,6 +350,9 @@ test.describe("Start fra forelder med barn", () => {
             .getByRole("checkbox", { name: "Jeg forstår at saken må behandles av en enhet som har tilgang" })
             .check();
         await expect(component.getByText("Du må bekrefte at saken kan flyttes til en annen enhet")).toHaveCount(0);
+
+        await component.getByRole("button", { name: /Opprett$/ }).click();
+        await expect.poll(() => requests.create).toBeTruthy();
     });
 
     test("barn med ukjent forelder velges ett om gangen, uten Velg alle", async ({ mount, page }) => {

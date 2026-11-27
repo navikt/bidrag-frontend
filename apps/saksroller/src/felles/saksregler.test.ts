@@ -1,3 +1,4 @@
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { describe, expect, it } from "vitest";
 import {
     finnSaksadvarsler,
@@ -9,22 +10,26 @@ import {
     validerSak,
 } from "./saksregler";
 
-const BP = "22222222222";
-const BM = "11111111111";
+const BP = genererFnr();
+const BM = genererFnr();
 
 function barn(ident: string, felter: Partial<SakParter["barn"][number]> = {}): SakParter["barn"][number] {
     return { ident, erMyndig: false, ...felter };
 }
 
-const BARN = barn("10987654321");
-const BARN_2 = barn("10987654322");
-const MYNDIG_BARN = barn("01010012345", { erMyndig: true });
+const BARN = barn(genererFnr());
+const BARN_2 = barn(genererFnr());
+const MYNDIG_BARN = barn(genererFnr(), { erMyndig: true });
 const MYNDIG_BARN_MED_RM = {
     ...MYNDIG_BARN,
     reellMottakerType: "barnet_selv" as const,
     reellMottaker: MYNDIG_BARN.ident,
 };
-const BARN_MED_SAMHANDLER = { ...BARN, reellMottakerType: "samhandler" as const, reellMottaker: "80000123456" };
+const BARN_MED_SAMHANDLER = { ...BARN, reellMottakerType: "samhandler" as const, reellMottaker: genererFnr() };
+const BARN_MED_REGISTRERT_SAMHANDLER = {
+    ...BARN_MED_SAMHANDLER,
+    reellMottakerEntitetstype: "SAMHANDLER" as const,
+};
 
 function parter(felter: Partial<SakParter>): SakParter {
     return { bidragsmottakerErUkjent: !felter.bm, barn: [], ...felter };
@@ -113,7 +118,7 @@ describe("validerSak", () => {
         {
             sakstype: "Oppfostringsbidrag",
             beskrivelse: "BP og barn med samhandler",
-            sak: parter({ bp: BP, barn: [BARN_MED_SAMHANDLER] }),
+            sak: parter({ bp: BP, barn: [BARN_MED_REGISTRERT_SAMHANDLER] }),
             forventet: [],
         },
         {
@@ -137,6 +142,20 @@ describe("validerSak", () => {
         },
     ])("$sakstype: $beskrivelse", ({ sakstype, sak, forventet }) => {
         expect(meldinger(sakstype, sak)).toEqual(forventet);
+    });
+
+    it.each([
+        { mottakertype: "PERSON" as const, beskrivelse: "person" },
+        { mottakertype: undefined, beskrivelse: "ukjent mottakertype" },
+    ])("oppfostringsbidrag avviser $beskrivelse som reell mottaker", ({ mottakertype }) => {
+        const barnMedMottakertype = {
+            ...BARN_MED_SAMHANDLER,
+            ...(mottakertype ? { reellMottakerEntitetstype: mottakertype } : {}),
+        };
+
+        expect(meldinger("Oppfostringsbidrag", parter({ bp: BP, barn: [barnMedMottakertype] }))).toEqual([
+            "barn: Reell mottaker må være en registrert samhandler",
+        ]);
     });
 });
 

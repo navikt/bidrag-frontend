@@ -9,10 +9,10 @@ import ReellMottakerValgGruppe, {
     type ReellMottakerValgregel,
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
+import { kanBekrefteReellMottaker } from "../../felles/reell-mottaker/reell-mottaker-regler.ts";
 import {
     fraReellMottakerValg,
     initialiserValg,
-    kanBekrefteReellMottaker,
     MANGLER_REELL_MOTTAKER_MELDING,
 } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 import { MYNDYG_BARN_ALDER, reellMottakerRegel, type Sakstype } from "../../felles/saksregler.ts";

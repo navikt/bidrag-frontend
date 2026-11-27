@@ -3,6 +3,7 @@ import { Box, Button, ErrorMessage, Tag, VStack } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
 import { BarnKortInnhold } from "../../felles/person/BarnKort.tsx";
 import { KortRamme } from "../../felles/person/PersonRolleKort.tsx";
+import type { ReellMottakerValg } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
 import { tilReellMottakerValg } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 import { reellMottakerRegel, type Sakstype } from "../../felles/saksregler.ts";
 import type { BarnRolle, SakRedigeringData } from "../../felles/sakvisning-schema.ts";
@@ -39,6 +40,27 @@ export default function BarnVisning({
         handleBekreftReellMottaker,
     } = useBarnReellMottaker({ rolle, index, closeEditorSignal, hentOgNullstillSamhandler });
     const reellMottakerFeil = form.formState.errors.roller?.[index]?.reellMottaker?.message;
+    const opprinneligBarn = !erNyttBarn
+        ? form.formState.defaultValues?.roller?.find(
+              (original) => original?.type === "BA" && original.fodselsnummer === rolle.fodselsnummer,
+          )
+        : undefined;
+    const opprinneligValg: { barnIdent: string; valg: ReellMottakerValg } | undefined = opprinneligBarn
+        ? {
+              barnIdent: opprinneligBarn.fodselsnummer ?? "",
+              valg: {
+                  type:
+                      opprinneligBarn.reellMottakerType === "barnet_selv" ||
+                      opprinneligBarn.reellMottakerType === "samhandler"
+                          ? opprinneligBarn.reellMottakerType
+                          : undefined,
+                  ident: opprinneligBarn.reellMottaker ?? opprinneligBarn.reellMottager,
+                  navn: opprinneligBarn.reellMottakerNavn,
+                  mottakertype: opprinneligBarn.reellMottakerEntitetstype,
+                  verge: opprinneligBarn.reellMottakerErVerge,
+              },
+          }
+        : undefined;
 
     return (
         <KortRamme>
@@ -79,6 +101,7 @@ export default function BarnVisning({
                         barnNavn={rolle.navn || "Barnet"}
                         barnIdent={rolle.fodselsnummer}
                         verdi={tilReellMottakerValg(rolle)}
+                        opprinneligValg={opprinneligValg}
                         onAvbryt={handleLukkReellMottaker}
                         onBekreft={handleBekreftReellMottaker}
                         regel={reellMottakerRegel(sakstype)(rolle.erMyndig ?? false) ?? "valgfri"}

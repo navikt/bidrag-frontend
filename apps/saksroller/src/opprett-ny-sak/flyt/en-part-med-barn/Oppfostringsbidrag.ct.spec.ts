@@ -9,8 +9,15 @@ import {
 
 const STORY = "opprett-ny-sak/flyt/en-part-med-barn/Oppfostringsbidrag/Standard";
 
-test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppretter sak", async ({ mount, page }) => {
+test("avviser person som reell mottaker, men godtar registrert samhandler og oppretter OPS-sak", async ({
+    mount,
+    page,
+}) => {
     const requests = await mockOpprettSakApi(page);
+    const samhandlerMedFnr = { ...samhandler, offentligId: genererFnr() };
+    await page.route(/\/proxy\/bidrag-samhandler\/samhandler$/, async (route) => {
+        await route.fulfill({ json: samhandlerMedFnr });
+    });
     const component = await mount(STORY);
     await åpneSøskenflokker(component);
 
@@ -34,6 +41,16 @@ test("krever samhandler som reell mottaker, bruker arbeidsfordeling OPS og oppre
     await expect(component.getByText("Du må registrere reell mottaker")).toBeVisible();
 
     const search = component.getByRole("searchbox", { name: "Person- eller samhandlerident" });
+    await search.fill(testpersoner.annenForelder.ident);
+    await search.press("Enter");
+    await expect(
+        component.getByText("Velg mottakeren med samhandler-ID, ikke personident.", { exact: true }),
+    ).toBeVisible();
+    await expect(component.getByRole("button", { name: "Fjern reell mottaker" })).toHaveCount(0);
+    await opprettKnapp.click();
+    await expect(component.getByText("Du må registrere reell mottaker")).toBeVisible();
+    expect(requests.create).toBeUndefined();
+
     await search.fill(samhandler.samhandlerId);
     await search.press("Enter");
     await expect(component.getByText(samhandler.navn).first()).toBeVisible();

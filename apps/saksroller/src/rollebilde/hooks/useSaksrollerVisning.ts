@@ -28,7 +28,7 @@ function useSaksrollerForm({
     onDataReset: () => void;
 }) {
     const formMethods = useForm<SakRedigeringData>({
-        resolver: zodResolver(lagSakRedigeringSchema(sakstype)),
+        resolver: zodResolver(lagSakRedigeringSchema(sakstype, berikedeRoller)),
         mode: "onSubmit",
     });
     const { reset, watch } = formMethods;
@@ -94,6 +94,7 @@ export function useSaksrollerVisning(saksnummer: string) {
         ufullstendige: barnMedUfullstendigRelasjon,
         annenForelder: barnMedAnnenForelder,
         oppslagsfeil: relasjonskontroll.barnMedOppslagsfeil,
+        innloggingsfeil: relasjonskontroll.barnMedInnloggingsfeil,
         foreldre: [bp?.fodselsnummer, bm?.fodselsnummer],
     });
 
@@ -109,7 +110,8 @@ export function useSaksrollerVisning(saksnummer: string) {
         setFeilmelding,
         setValideringsFeil,
         setSuksessmelding,
-        lagringBlokkert: relasjonskontroll.isLoading,
+        lagringBlokkert:
+            relasjonskontroll.isLoading || relasjonsregler.harOppslagsfeil || relasjonsregler.harInnloggingsfeil,
     });
 
     const erNyPerson = (fnr?: string) => (fnr ? !funnetPersonISak(fnr) : undefined);

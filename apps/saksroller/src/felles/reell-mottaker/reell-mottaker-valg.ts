@@ -1,20 +1,10 @@
-import { IdentUtils } from "@bidrag/common";
-import type { z } from "zod";
-import type { ReellMottakerFelterSchema } from "../sakvisning-schema";
 import type { ReellMottakerValg, ReellMottakerValgregel } from "./ReellMottakerValgGruppe";
-
-export type ReellMottakerSkjemaverdi = z.infer<typeof ReellMottakerFelterSchema>;
+import type { ReellMottakerSkjemaverdi } from "./reell-mottaker-regler";
+import { erPersonSomReellMottaker } from "./reell-mottaker-regler";
 
 type Barn = {
     ident: string;
     navn: string;
-};
-
-export type ReellMottakerValideringsgrunn = "myndig-barn" | "ukjent-bidragsmottaker" | "alltid";
-
-export type ReellMottakerFeil = {
-    felt: "reellMottakerType" | "reellMottaker";
-    melding: string;
 };
 
 export function tilReellMottakerValg(verdi: ReellMottakerSkjemaverdi): ReellMottakerValg {
@@ -22,22 +12,23 @@ export function tilReellMottakerValg(verdi: ReellMottakerSkjemaverdi): ReellMott
         type: verdi.reellMottakerType,
         ident: verdi.reellMottaker,
         navn: verdi.reellMottakerNavn,
+        mottakertype: verdi.reellMottakerType === "barnet_selv" ? "PERSON" : verdi.reellMottakerEntitetstype,
         verge: verdi.reellMottakerErVerge,
     };
 }
 
 export function fraReellMottakerValg(valg: ReellMottakerValg): ReellMottakerSkjemaverdi {
+    const mottakertype = valg.type === "barnet_selv" ? "PERSON" : valg.mottakertype;
+    const kanBevareUkjentVerge = valg.type === "samhandler" && valg.mottakertype === undefined;
     return {
         reellMottakerType: valg.type,
         reellMottaker: valg.ident,
+        ...(mottakertype ? { reellMottakerEntitetstype: mottakertype } : {}),
         reellMottakerNavn: valg.navn,
-        reellMottakerErVerge: erPersonSomReellMottaker(valg) ? valg.verge : undefined,
+        ...((erPersonSomReellMottaker(valg) || kanBevareUkjentVerge) && valg.verge !== undefined
+            ? { reellMottakerErVerge: valg.verge }
+            : {}),
     };
-}
-
-/** Verge kan bare registreres når reell mottaker er en annen person enn barnet, som i Bisys. */
-export function erPersonSomReellMottaker(valg: ReellMottakerValg): boolean {
-    return valg.type === "samhandler" && Boolean(valg.ident) && !IdentUtils.isSamhandlerId(valg.ident ?? "");
 }
 
 /** Startvalg når regelen krever reell mottaker. Beholder valget når det allerede oppfyller regelen. */
@@ -55,14 +46,6 @@ export function initialiserValg(valg: ReellMottakerValg, regel: ReellMottakerVal
 
 export const MANGLER_REELL_MOTTAKER_MELDING = "Velg eller søk opp en reell mottaker før du legger til.";
 
-export function kanBekrefteReellMottaker(valg: ReellMottakerValg, regel: ReellMottakerValgregel | undefined): boolean {
-    if (valg.type === "samhandler") {
-        return Boolean(valg.ident);
-    }
-    const påkrevd = regel !== undefined && regel !== "valgfri";
-    return !påkrevd || (valg.type === "barnet_selv" && Boolean(valg.ident));
-}
-
 export function initialiserReellMottaker(
     verdi: ReellMottakerSkjemaverdi,
     regel: ReellMottakerValgregel,
@@ -71,32 +54,4 @@ export function initialiserReellMottaker(
     const valg = tilReellMottakerValg(verdi);
     const initialisert = initialiserValg(valg, regel, barn);
     return initialisert === valg ? verdi : fraReellMottakerValg(initialisert);
-}
-
-export function validerReellMottaker(
-    verdi: ReellMottakerSkjemaverdi,
-    grunn: ReellMottakerValideringsgrunn | null,
-): ReellMottakerFeil[] {
-    if (!grunn) {
-        return [];
-    }
-
-    const feil: ReellMottakerFeil[] = [];
-
-    if (!verdi.reellMottakerType) {
-        const melding =
-            grunn === "myndig-barn"
-                ? "Reell mottaker må registreres for barn over 18 år"
-                : grunn === "ukjent-bidragsmottaker"
-                  ? "Reell mottaker må registreres når bidragsmottaker er ukjent"
-                  : "Reell mottaker må registreres for hvert barn";
-
-        feil.push({ felt: "reellMottakerType", melding });
-    }
-
-    if (verdi.reellMottakerType === "samhandler" && !verdi.reellMottaker?.trim()) {
-        feil.push({ felt: "reellMottaker", melding: "Du må registrere reell mottaker" });
-    }
-
-    return feil;
 }

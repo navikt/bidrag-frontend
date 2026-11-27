@@ -3,7 +3,11 @@ import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { type UseFormReturn, useFormContext } from "react-hook-form";
-import { hentForeldreinformasjonForBarnQueryOptions, useHentPersonMotpartBarnRelasjon } from "../../../api/person.api";
+import {
+    hentForeldreinformasjonForBarnQueryOptions,
+    InnloggingsFeilError,
+    useHentPersonMotpartBarnRelasjon,
+} from "../../../api/person.api";
 import { reellMottakerRegel, reellMottakerRegelUkjentBidragsmottaker } from "../../../felles/saksregler";
 import { useFlowSubmission } from "../../innsending/useFlowSubmission";
 import type { ForelderKortProps } from "../../parter/ParterSeksjon";
@@ -72,10 +76,18 @@ function useForelderforslag(form: UseFormReturn<BarnebidragSkjemaData>, roller: 
     const barnMedSkjultForelder = valgteBarn.filter(
         (_, index) => foreldreinfo[index]?.error instanceof TilgangsFeilError,
     );
+    const barnMedInnloggingsfeil = valgteBarn
+        .filter((_, index) => foreldreinfo[index]?.error instanceof InnloggingsFeilError)
+        .map((barn) => barn.ident);
     const barnMedOppslagsfeil = valgteBarn
-        .filter(
-            (_, index) => foreldreinfo[index]?.isError && !(foreldreinfo[index]?.error instanceof TilgangsFeilError),
-        )
+        .filter((_, index) => {
+            const error = foreldreinfo[index]?.error;
+            return (
+                foreldreinfo[index]?.isError &&
+                !(error instanceof TilgangsFeilError) &&
+                !(error instanceof InnloggingsFeilError)
+            );
+        })
         .map((barn) => barn.ident);
     const lasterForeldre = foreldreinfo.some((query) => query.isPending);
     return {
@@ -85,6 +97,7 @@ function useForelderforslag(form: UseFormReturn<BarnebidragSkjemaData>, roller: 
         forslagsfeil: feil,
         barnMedSkjultForelder,
         barnMedOppslagsfeil,
+        barnMedInnloggingsfeil,
         lasterForeldre,
     };
 }
@@ -168,6 +181,7 @@ export function useBarnebidragFlyt() {
         forslagsfeil,
         barnMedSkjultForelder,
         barnMedOppslagsfeil,
+        barnMedInnloggingsfeil,
         lasterForeldre,
     } = useForelderforslag(form, roller);
     const tilgjengeligeForeldre = useTilgjengeligeForeldre([...registrerteForeldre, ...forslag], roller);
@@ -207,6 +221,7 @@ export function useBarnebidragFlyt() {
         bidragsmottaker,
         barnMedSkjultForelder,
         barnMedOppslagsfeil,
+        barnMedInnloggingsfeil,
     });
 
     const { onSubmit, sakStatus, innsending } = useFlowSubmission({

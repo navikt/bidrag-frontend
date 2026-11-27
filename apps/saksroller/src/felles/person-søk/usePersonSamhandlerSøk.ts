@@ -1,4 +1,3 @@
-import type { PersonDto } from "@bidrag/api/PersonApi";
 import { useEffect, useRef, useState } from "react";
 import type { ISamhandlerPersonInfo } from "../../api/samhandler.api";
 import { useHentSamhandlerEllerPersonForIdent } from "../../api/samhandler.api";
@@ -12,7 +11,7 @@ export function usePersonSamhandlerSøk({
     tømVedTreff = false,
 }: {
     valgIdent?: string;
-    onResult: (data: PersonDto) => void | Promise<void>;
+    onResult: (data: ISamhandlerPersonInfo) => void | Promise<void>;
     onError: (feil: string) => void;
     onQueryChange?: () => void;
     inkluderSamhandler: boolean;

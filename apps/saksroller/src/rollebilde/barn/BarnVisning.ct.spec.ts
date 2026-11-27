@@ -46,7 +46,7 @@ test.describe("BarnVisning", () => {
         const søkefelt = component.getByRole("searchbox", { name: "Person- eller samhandlerident" });
         await søkefelt.fill(ukjentIdent);
         await søkefelt.press("Enter");
-        await expect(component.getByText("Finnes ingen person eller samhandler med oppgitt ident")).toBeVisible();
+        await expect(component.getByText("Ingen treff på oppgitt ident")).toBeVisible();
 
         await søkefelt.fill(samhandlerIdent);
         await søkefelt.press("Enter");

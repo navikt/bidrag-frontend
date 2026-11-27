@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { erUendretMottakerUtenType, type ReellMottakerSammenligning } from "./reell-mottaker/reell-mottaker-regler";
 import { finnSaksadvarsler, type SakParter, type Saksfeil, type Sakstype, validerSak } from "./saksregler";
 
 const RolleTypeSchema = z.enum(["BP", "BM", "BA", "RM"]);
@@ -21,6 +22,7 @@ const RolleSchema = z.object({
     reellMottager: z.string().optional(),
     reellMottaker: z.string().optional(),
     reellMottakerType: z.string().optional(),
+    reellMottakerEntitetstype: z.enum(["PERSON", "SAMHANDLER"]).optional(),
     reellMottakerNavn: z.string().optional(),
     reellMottakerErVerge: z.boolean().optional(),
     mottagerErVerge: z.boolean(),
@@ -39,6 +41,7 @@ const RolleSchema = z.object({
 export const ReellMottakerFelterSchema = z.object({
     reellMottakerType: z.enum(["barnet_selv", "samhandler"]).optional(),
     reellMottaker: z.string().optional(),
+    reellMottakerEntitetstype: z.enum(["PERSON", "SAMHANDLER"]).optional(),
     reellMottakerNavn: z.string().optional(),
     reellMottakerErVerge: z.boolean().optional(),
 });
@@ -50,7 +53,7 @@ const SakRedigeringObjektSchema = z.object({
     roller: z.array(RolleSchema),
 });
 
-function tilSakParter(roller: Rolle[], lagredeIdenter: string[] = []): SakParter {
+function tilSakParter(roller: Rolle[], lagredeIdenter: string[] = [], opprinneligeRoller: Rolle[] = []): SakParter {
     const ident = (type: RolleType) => roller.find((r) => r.type === type && r.fodselsnummer?.trim())?.fodselsnummer;
     const bm = ident("BM");
     return {
@@ -62,7 +65,32 @@ function tilSakParter(roller: Rolle[], lagredeIdenter: string[] = []): SakParter
             ident: barn.fodselsnummer,
             erMyndig: barn.erMyndig === true,
             erLagret: lagredeIdenter.includes(barn.fodselsnummer),
+            reellMottakerErUendret: harUendretUkjentReellMottaker(barn, opprinneligeRoller),
         })),
+    };
+}
+
+function harUendretUkjentReellMottaker(barn: Rolle, opprinneligeRoller: Rolle[]): boolean {
+    const barnIdent = barn.fodselsnummer.trim();
+    if (!barnIdent) return false;
+
+    const original = opprinneligeRoller.find((rolle) => erBarn(rolle) && rolle.fodselsnummer.trim() === barnIdent);
+    return Boolean(
+        original &&
+            erUendretMottakerUtenType(tilReellMottakerSammenligning(barn), tilReellMottakerSammenligning(original)),
+    );
+}
+
+function reellMottakerIdent(rolle: Rolle): string | undefined {
+    return rolle.reellMottaker ?? rolle.reellMottager;
+}
+
+function tilReellMottakerSammenligning(rolle: Rolle): ReellMottakerSammenligning {
+    return {
+        type: rolle.reellMottakerType,
+        ident: reellMottakerIdent(rolle)?.trim(),
+        mottakertype: rolle.reellMottakerEntitetstype,
+        verge: rolle.reellMottakerErVerge,
     };
 }
 
@@ -83,9 +111,9 @@ export function finnRolleadvarsler(roller: Rolle[], sakstype: Sakstype, lagredeI
 }
 
 /** Skjema for endring av roller. Reglene er de samme som når saken opprettes, gitt sakens faste sakstype. */
-export function lagSakRedigeringSchema(sakstype: Sakstype) {
+export function lagSakRedigeringSchema(sakstype: Sakstype, opprinneligeRoller: Rolle[] = []) {
     return SakRedigeringObjektSchema.superRefine((data, ctx) => {
-        for (const feil of validerSak(tilSakParter(data.roller), sakstype, "endre")) {
+        for (const feil of validerSak(tilSakParter(data.roller, [], opprinneligeRoller), sakstype, "endre")) {
             ctx.addIssue({ code: "custom", path: feltsti(data.roller, feil), message: feil.melding });
         }
     });

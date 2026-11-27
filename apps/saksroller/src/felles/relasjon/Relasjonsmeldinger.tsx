@@ -20,15 +20,29 @@ export default function Relasjonsmeldinger({
     const annenForelderTekst = `${annenForelderNavn.join(", ")} har en annen forelder i Folkeregisteret enn den som er valgt.`;
     return (
         <>
-            <BekreftAdvarsel
-                tittel="Kunne ikke kontrollere relasjonene"
-                bekreftTekst="Jeg har kontrollert relasjonene selv"
-                feilmelding="Du må bekrefte at du har kontrollert relasjonene selv"
-                bekreftelse={regler.oppslagsfeilBekreftelse}
-            >
-                Henting av foreldrene til barna i Folkeregisteret feilet. Kontroller relasjonene selv før saken{" "}
-                {handling}.
-            </BekreftAdvarsel>
+            {regler.harInnloggingsfeil ? (
+                <LocalAlert status="error" size="small" as="div">
+                    <LocalAlert.Header>
+                        <LocalAlert.Title>Innloggingen er ikke gyldig</LocalAlert.Title>
+                    </LocalAlert.Header>
+                    <LocalAlert.Content>
+                        <BodyLong size="small">Last siden på nytt, eller logg inn igjen før du fortsetter.</BodyLong>
+                    </LocalAlert.Content>
+                </LocalAlert>
+            ) : (
+                regler.harOppslagsfeil && (
+                    <LocalAlert status="error" size="small" as="div">
+                        <LocalAlert.Header>
+                            <LocalAlert.Title>Kunne ikke kontrollere relasjonene</LocalAlert.Title>
+                        </LocalAlert.Header>
+                        <LocalAlert.Content>
+                            <BodyLong size="small">
+                                Vi fikk ikke kontrollert relasjonene mellom barna og foreldrene. Prøv igjen senere.
+                            </BodyLong>
+                        </LocalAlert.Content>
+                    </LocalAlert>
+                )
+            )}
             {regler.annenForelderStopper && (
                 <LocalAlert status="error" size="small" as="div">
                     <LocalAlert.Header>

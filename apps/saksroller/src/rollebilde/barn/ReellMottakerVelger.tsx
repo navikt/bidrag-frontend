@@ -9,15 +9,16 @@ import ReellMottakerValgGruppe, {
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe.tsx";
 import {
-    initialiserValg,
+    erUendretMottakerUtenType,
     kanBekrefteReellMottaker,
-    MANGLER_REELL_MOTTAKER_MELDING,
-} from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
+} from "../../felles/reell-mottaker/reell-mottaker-regler.ts";
+import { initialiserValg, MANGLER_REELL_MOTTAKER_MELDING } from "../../felles/reell-mottaker/reell-mottaker-valg.ts";
 
 interface ReellMottakerVelgerProps {
     barnNavn: string;
     barnIdent?: string;
     verdi: ReellMottakerValg;
+    opprinneligValg?: { barnIdent: string; valg: ReellMottakerValg };
     onAvbryt: () => void;
     onBekreft: (verdi: ReellMottakerValg) => void;
     regel: ReellMottakerValgregel;
@@ -27,6 +28,7 @@ export default function ReellMottakerVelger({
     barnNavn,
     barnIdent,
     verdi,
+    opprinneligValg,
     onAvbryt,
     onBekreft,
     regel,
@@ -39,7 +41,7 @@ export default function ReellMottakerVelger({
     const { lagretSamhandler, huskSamhandler } = useLagretSamhandler(utkast);
 
     const handleBekreft = () => {
-        if (!kanBekrefteReellMottaker(utkast, regel)) {
+        if (!kanBekrefteReellMottaker(utkast, regel, erUendretUkjentLegacyValg(utkast, opprinneligValg, barnIdent))) {
             setValideringsfeil(MANGLER_REELL_MOTTAKER_MELDING);
             return;
         }
@@ -79,5 +81,19 @@ export default function ReellMottakerVelger({
                 feil={valideringsfeil}
             />
         </RedigeringsRamme>
+    );
+}
+
+function erUendretUkjentLegacyValg(
+    valg: ReellMottakerValg,
+    opprinneligValg: ReellMottakerVelgerProps["opprinneligValg"],
+    barnIdent?: string,
+): boolean {
+    const original = opprinneligValg?.valg;
+    return Boolean(
+        opprinneligValg &&
+            opprinneligValg.barnIdent === barnIdent &&
+            original &&
+            erUendretMottakerUtenType(valg, original),
     );
 }

@@ -1,3 +1,4 @@
+import { genererFnr } from "@bidrag/common/playwright/testing/fnrGenerator.ts";
 import { describe, expect, it } from "vitest";
 import {
     type BarnebidragSkjemaData,
@@ -7,9 +8,11 @@ import {
     OppfostringsbidragSkjemaSchema,
 } from "./opprett-sak-schema";
 
-const bp = "11111111111";
-const bm = "22222222222";
-const barnIdent = "33333333333";
+const bp = genererFnr();
+const bm = genererFnr();
+const barnIdent = genererFnr();
+const annetBarnIdent = genererFnr();
+const feilReellMottakerIdent = genererFnr();
 const barn = { ident: barnIdent, navn: "Barn", alder: 8, erMyndig: false };
 const kjent = (ident: string) => ({ ident, navn: ident, erKjent: true });
 
@@ -63,9 +66,47 @@ describe("BarnebidragSkjemaSchema", () => {
                     { ...kjent(bp), type: "BP" },
                     { ident: "", erKjent: false, type: "BM" },
                 ],
-                valgteBarn: [{ ...barn, reellMottakerType: "barnet_selv" }],
+                valgteBarn: [
+                    {
+                        ...barn,
+                        reellMottakerType: "barnet_selv",
+                        reellMottaker: barnIdent,
+                        reellMottakerEntitetstype: "PERSON",
+                    },
+                ],
             }),
         ).toEqual([]);
+    });
+
+    it.each([
+        { beskrivelse: "mangler ident", reellMottaker: undefined },
+        { beskrivelse: "har feil ident", reellMottaker: feilReellMottakerIdent },
+        {
+            beskrivelse: "har samhandlermetadata",
+            reellMottaker: barnIdent,
+            reellMottakerEntitetstype: "SAMHANDLER" as const,
+        },
+    ])("avviser barnet selv som reell mottaker når det $beskrivelse", ({
+        reellMottaker,
+        reellMottakerEntitetstype,
+    }) => {
+        const resultat = BarnebidragSkjemaSchema.safeParse({
+            ...gyldig,
+            roller: [
+                { ...kjent(bp), type: "BP" },
+                { ident: "", erKjent: false, type: "BM" },
+            ],
+            valgteBarn: [
+                {
+                    ...barn,
+                    reellMottakerType: "barnet_selv",
+                    reellMottaker,
+                    reellMottakerEntitetstype,
+                },
+            ],
+        });
+
+        expect(resultat.success).toBe(false);
     });
 
     it("validerer roller uavhengig av rekkefølgen i listen", () => {
@@ -163,7 +204,7 @@ describe("EnPartMedBarn-skjemaene", () => {
         const resultat = FarskapsSkjemaSchema.safeParse({
             arbeidsfordeling: "FRS",
             roller: farskapRoller,
-            valgteBarn: [barn, { ...barn, ident: "12345678902" }],
+            valgteBarn: [barn, { ...barn, ident: annetBarnIdent }],
             kategori: "Nasjonal",
         });
         expect(resultat.error?.issues).toEqual([

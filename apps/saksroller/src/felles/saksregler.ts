@@ -4,7 +4,7 @@ import {
     type ReellMottakerSkjemaverdi,
     type ReellMottakerValideringsgrunn,
     validerReellMottaker,
-} from "./reell-mottaker/reell-mottaker-valg";
+} from "./reell-mottaker/reell-mottaker-regler";
 
 export const MYNDYG_BARN_ALDER = 18;
 export const MAKS_ALDER_BARN = 24;
@@ -40,6 +40,7 @@ export type SakParter = {
             alder?: number;
             navn?: string;
             erLagret?: boolean;
+            reellMottakerErUendret?: boolean;
         }
     >;
 };
@@ -153,7 +154,12 @@ function validerReellMottakere(parter: SakParter, sakstype: Sakstype, kontekst: 
         kontekst === "opprett" && sakstype === "Barnebidrag" && parter.bidragsmottakerErUkjent;
     const regel = ukjentBidragsmottaker ? reellMottakerRegelUkjentBidragsmottaker : reellMottakerRegel(sakstype);
     return parter.barn.flatMap((barn, indeks) =>
-        validerReellMottaker(barn, reellMottakerGrunn(regel, barn.erMyndig)).map(({ felt, melding }) => ({
+        validerReellMottaker(
+            barn,
+            reellMottakerGrunn(regel, barn.erMyndig),
+            kontekst === "endre" && barn.reellMottakerErUendret === true,
+            barn.ident,
+        ).map(({ felt, melding }) => ({
             gjelder: "barn" as const,
             indeks,
             felt,

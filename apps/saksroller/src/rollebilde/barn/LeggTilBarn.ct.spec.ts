@@ -47,7 +47,7 @@ test.describe("LeggTilBarn", () => {
         await søkefelt.fill(ukjentIdent);
         await expect(component.getByTitle("Lite Barn")).toHaveCount(0);
         await søkefelt.press("Enter");
-        await expect(component.getByText("Finnes ingen person eller samhandler med oppgitt ident")).toHaveCount(1);
+        await expect(component.getByText("Ingen treff på oppgitt ident")).toHaveCount(1);
         await leggTil.click();
         await expect(dialog).toBeVisible();
 

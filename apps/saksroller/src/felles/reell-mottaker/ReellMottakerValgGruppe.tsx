@@ -2,23 +2,27 @@ import { TrashIcon } from "@navikt/aksel-icons";
 import { Button, Checkbox, InlineMessage, Select, VStack } from "@navikt/ds-react";
 
 import { useState } from "react";
+import type { Mottakertype } from "../../api/samhandler.api";
 import FunnetPersonInfo from "../person/FunnetPersonInfo.tsx";
 import ReellMottakerSøk from "./ReellMottakerSøk.tsx";
-import { erPersonSomReellMottaker } from "./reell-mottaker-valg.ts";
+import { erPersonSomReellMottaker, kanBekrefteReellMottaker } from "./reell-mottaker-regler.ts";
 
 export type ReellMottakerValg = {
     type?: "barnet_selv" | "samhandler";
     ident?: string;
     navn?: string;
+    mottakertype?: Mottakertype;
     verge?: boolean;
 };
 
 export type ReellMottakerValgregel = "valgfri" | "påkrevd" | "kun-samhandler";
 
-type Samhandler = { ident: string; navn: string };
+type Samhandler = { ident: string; navn?: string; mottakertype?: Mottakertype };
 
 function somSamhandler(valg: ReellMottakerValg): Samhandler | null {
-    return valg.type === "samhandler" && valg.ident && valg.navn ? { ident: valg.ident, navn: valg.navn } : null;
+    return valg.type === "samhandler" && valg.ident
+        ? { ident: valg.ident, navn: valg.navn, mottakertype: valg.mottakertype }
+        : null;
 }
 
 /** Husker sist valgte samhandler, slik at den kan velges igjen etter bytte til et annet alternativ. */
@@ -39,7 +43,7 @@ export function useLagretSamhandler(startvalg: ReellMottakerValg) {
 }
 
 const KUN_SAMHANDLER_MELDING =
-    "Barnet selv kan ikke velges som reell mottaker i oppfostringsbidrag. Velg samhandler (kommune).";
+    "Barnet selv kan ikke velges som reell mottaker i oppfostringsbidrag. Velg en registrert samhandler.";
 
 type Props = {
     barnNavn: string;
@@ -65,21 +69,41 @@ export default function ReellMottakerValgGruppe({
     const påkrevd = regel !== "valgfri";
     const kunSamhandlerSomReellMottaker = regel === "kun-samhandler";
     const [error, setError] = useState<string>();
+    const [valideringsmelding, setValideringsmelding] = useState<string>();
     const [barnetSøktOppSomSamhandler, setBarnetSøktOppSomSamhandler] = useState(false);
 
     const handleValgChange = (value: string) => {
         setError(undefined);
+        setValideringsmelding(undefined);
         setBarnetSøktOppSomSamhandler(false);
-        onValg(valgForMottaker(value, { ident: barnIdent, navn: barnNavn }, lagretSamhandler));
+        const lagretSamhandlerKanBekreftes =
+            lagretSamhandler !== null &&
+            kanBekrefteReellMottaker({ type: "samhandler", ...lagretSamhandler }, "kun-samhandler");
+        const samhandlerForRegel =
+            kunSamhandlerSomReellMottaker && !lagretSamhandlerKanBekreftes ? null : lagretSamhandler;
+        onValg(valgForMottaker(value, { ident: barnIdent, navn: barnNavn }, samhandlerForRegel));
     };
 
-    const handleVelgSamhandler = (ident: string, navn?: string) => {
+    const handleVelgSamhandler = (ident: string, navn?: string, mottakertype?: Mottakertype) => {
         setError(undefined);
+        setValideringsmelding(undefined);
         const erBarnet = ident === barnIdent;
-        setBarnetSøktOppSomSamhandler(erBarnet && kunSamhandlerSomReellMottaker);
-        if (!erBarnet) onValg({ type: "samhandler", ident, navn });
-        else if (kunSamhandlerSomReellMottaker) onValg({ type: "samhandler" });
-        else onValg({ type: "barnet_selv", ident: barnIdent, navn: barnNavn });
+        const faktiskMottakertype = erBarnet ? "PERSON" : mottakertype;
+        const valgt: ReellMottakerValg = erBarnet
+            ? { type: "barnet_selv", ident: barnIdent, navn: barnNavn, mottakertype: "PERSON" }
+            : { type: "samhandler", ident, navn, mottakertype };
+        if (kunSamhandlerSomReellMottaker && !kanBekrefteReellMottaker(valgt, "kun-samhandler")) {
+            setBarnetSøktOppSomSamhandler(erBarnet);
+            setValideringsmelding(
+                faktiskMottakertype === "PERSON"
+                    ? "Velg mottakeren med samhandler-ID, ikke personident."
+                    : "Søketreffet mangler mottakertype. Søk opp en registrert samhandler på nytt.",
+            );
+            onValg({ type: "samhandler" });
+        } else {
+            setBarnetSøktOppSomSamhandler(false);
+            onValg(valgt);
+        }
     };
 
     return (
@@ -99,12 +123,20 @@ export default function ReellMottakerValgGruppe({
                 <option disabled={kunSamhandlerSomReellMottaker} value="barnet_selv" className="personnavn">
                     {barnNavn} (barnet selv)
                 </option>
-                <option value="samhandler">Annen person eller samhandler</option>
+                <option value="samhandler">
+                    {kunSamhandlerSomReellMottaker ? "Samhandler" : "Annen person eller samhandler"}
+                </option>
             </Select>
 
             {kunSamhandlerSomReellMottaker && (
                 <InlineMessage status={barnetSøktOppSomSamhandler ? "error" : "info"} size="small">
                     {KUN_SAMHANDLER_MELDING}
+                </InlineMessage>
+            )}
+
+            {valideringsmelding && (
+                <InlineMessage status="error" size="small">
+                    {valideringsmelding}
                 </InlineMessage>
             )}
 
@@ -116,6 +148,7 @@ export default function ReellMottakerValgGruppe({
                     onVelg={handleVelgSamhandler}
                     onFjern={() => {
                         setError(undefined);
+                        setValideringsmelding(undefined);
                         onValg({ type: "samhandler" });
                     }}
                     onError={setError}
@@ -150,11 +183,16 @@ function VergeValg({ valg, disabled, onValg }: Pick<Props, "valg" | "disabled" |
 function valgForMottaker(
     value: string,
     barn: { ident: string; navn: string },
-    lagretSamhandler: { ident: string; navn: string } | null,
+    lagretSamhandler: Samhandler | null,
 ): ReellMottakerValg {
     if (value === "ingen") return {};
-    if (value === "barnet_selv") return { type: "barnet_selv", ...barn };
-    return { type: "samhandler", ident: lagretSamhandler?.ident, navn: lagretSamhandler?.navn };
+    if (value === "barnet_selv") return { type: "barnet_selv", ...barn, mottakertype: "PERSON" };
+    return {
+        type: "samhandler",
+        ident: lagretSamhandler?.ident,
+        navn: lagretSamhandler?.navn,
+        mottakertype: lagretSamhandler?.mottakertype,
+    };
 }
 
 function SamhandlerValg({
@@ -168,7 +206,7 @@ function SamhandlerValg({
     valg: ReellMottakerValg;
     lagretSamhandlerIdent?: string;
     skjulValgt: boolean;
-    onVelg: (ident: string, navn?: string) => void;
+    onVelg: (ident: string, navn?: string, mottakertype?: Mottakertype) => void;
     onFjern: () => void;
     onError: (feil: string) => void;
 }) {

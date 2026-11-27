@@ -6,10 +6,10 @@ import ReellMottakerValgGruppe, {
     type ReellMottakerValgregel,
     useLagretSamhandler,
 } from "../../felles/reell-mottaker/ReellMottakerValgGruppe";
+import type { ReellMottakerSkjemaverdi } from "../../felles/reell-mottaker/reell-mottaker-regler";
 import {
     fraReellMottakerValg,
     initialiserReellMottaker,
-    type ReellMottakerSkjemaverdi,
     tilReellMottakerValg,
 } from "../../felles/reell-mottaker/reell-mottaker-valg";
 import type { ReellMottakerRegel } from "../../felles/saksregler";
@@ -31,6 +31,7 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
 }: Props<TFieldValues>) {
     const reellMottakerTypePath = `${fieldPath}.reellMottakerType` as FieldPath<TFieldValues>;
     const reellMottakerPath = `${fieldPath}.reellMottaker` as FieldPath<TFieldValues>;
+    const reellMottakerEntitetstypePath = `${fieldPath}.reellMottakerEntitetstype` as FieldPath<TFieldValues>;
     const reellMottakerNavnPath = `${fieldPath}.reellMottakerNavn` as FieldPath<TFieldValues>;
     const reellMottakerErVergePath = `${fieldPath}.reellMottakerErVerge` as FieldPath<TFieldValues>;
     const setDynamiskFeltVerdi = (
@@ -41,11 +42,13 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
 
     const reellMottakerType = form.watch(reellMottakerTypePath);
     const reellMottaker = form.watch(reellMottakerPath);
+    const reellMottakerEntitetstype = form.watch(reellMottakerEntitetstypePath);
     const reellMottakerNavn = form.watch(reellMottakerNavnPath);
     const reellMottakerErVerge = form.watch(reellMottakerErVergePath);
     const skjemaverdi: ReellMottakerSkjemaverdi = {
         reellMottakerType,
         reellMottaker,
+        reellMottakerEntitetstype,
         reellMottakerNavn,
         reellMottakerErVerge,
     };
@@ -56,6 +59,7 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
     const settSkjemaverdi = (nyVerdi: ReellMottakerSkjemaverdi, options: Parameters<typeof form.setValue>[2]) => {
         setDynamiskFeltVerdi(reellMottakerTypePath, nyVerdi.reellMottakerType, options);
         setDynamiskFeltVerdi(reellMottakerPath, nyVerdi.reellMottaker, options);
+        setDynamiskFeltVerdi(reellMottakerEntitetstypePath, nyVerdi.reellMottakerEntitetstype, options);
         setDynamiskFeltVerdi(reellMottakerNavnPath, nyVerdi.reellMottakerNavn, options);
         setDynamiskFeltVerdi(reellMottakerErVergePath, nyVerdi.reellMottakerErVerge, options);
     };
@@ -78,6 +82,8 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
         if (
             initialisert.reellMottakerType === skjemaverdi.reellMottakerType &&
             initialisert.reellMottaker === skjemaverdi.reellMottaker &&
+            initialisert.reellMottakerEntitetstype === skjemaverdi.reellMottakerEntitetstype &&
+            initialisert.reellMottakerErVerge === skjemaverdi.reellMottakerErVerge &&
             initialisert.reellMottakerNavn === skjemaverdi.reellMottakerNavn
         ) {
             return;
@@ -94,6 +100,8 @@ function ReellMottakerInline<TFieldValues extends FieldValues>({
         form,
         regel,
         reellMottaker,
+        reellMottakerEntitetstype,
+        reellMottakerEntitetstypePath,
         reellMottakerNavnPath,
         reellMottakerNavn,
         reellMottakerPath,
