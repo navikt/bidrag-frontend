@@ -11,11 +11,10 @@ import { useDebounce } from "../../../../common/hooks/useDebounce";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
 import { useOnSaveBoforhold } from "../../../../common/hooks/useOnSaveBoforhold";
 import type { BoforholdFormValues } from "../../../../common/types/boforholdFormValues";
-import { STEPS } from "../../../constants/steps";
 import { SærligeutgifterStepper } from "../../../enum/SærligeutgifterStepper";
 
 export const Begrunnelse = () => {
-    const { onStepChange, setSaveErrorState } = useBehandlingProvider();
+    const { onStepChange, setSaveErrorState, getNextStep } = useBehandlingProvider();
     const {
         erBisysVedtak,
         vedtakstype,
@@ -48,7 +47,7 @@ export const Begrunnelse = () => {
             ),
         [saveBoforhold, setPreviousValues, setSaveErrorState, previousValue, setValue],
     );
-    const onNext = () => onStepChange(STEPS[SærligeutgifterStepper.VEDTAK]);
+    const onNext = () => onStepChange(getNextStep(SærligeutgifterStepper.BOFORHOLD));
 
     const debouncedOnSave = useDebounce(onSave);
 

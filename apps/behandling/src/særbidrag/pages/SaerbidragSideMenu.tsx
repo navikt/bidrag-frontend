@@ -20,8 +20,8 @@ const UtgiftMenuButton = ({ activeButton, step }: { activeButton: string; step: 
         lesemodus,
         utgift: { valideringsfeil: utgiftValideringsfeil },
     } = useGetBehandlingV2();
-    const utgiftHasValideringsfeil = !lesemodus &&
-        utgiftValideringsfeil && Object.values(utgiftValideringsfeil).some((feil) => !!feil);
+    const utgiftHasValideringsfeil =
+        !lesemodus && utgiftValideringsfeil && Object.values(utgiftValideringsfeil).some((feil) => !!feil);
 
     return (
         <MenuButton

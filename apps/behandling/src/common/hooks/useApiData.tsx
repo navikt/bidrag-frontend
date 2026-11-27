@@ -895,6 +895,11 @@ export const useAktiveGrunnlagsdata = () => {
                 };
                 return updatedBehandling;
             });
+            // Nye opplysninger om inntekt kan endre om barnets inntekt er over grensen for selvforsørget i særbidrag.
+            // Svaret har ikke grensen, så behandlingen hentes på nytt.
+            if (queryClient.getQueryData<BehandlingDtoV2>(QueryKeys.behandlingV2(behandlingId))?.utgift) {
+                queryClient.invalidateQueries({ queryKey: QueryKeys.behandlingV2(behandlingId) });
+            }
         },
     });
 };

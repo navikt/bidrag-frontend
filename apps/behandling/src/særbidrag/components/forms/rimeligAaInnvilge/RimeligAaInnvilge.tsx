@@ -1,7 +1,7 @@
 import type { OppdatereUtgiftResponse } from "@bidrag/api/BidragBehandlingApiV1";
 import { Alert, BodyLong } from "@navikt/ds-react";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ActionButtons } from "../../../../common/components/ActionButtons";
 import { FormControlledCheckbox } from "../../../../common/components/formFields/FormControlledCheckbox";
@@ -16,6 +16,7 @@ import { useDebounce } from "../../../../common/hooks/useDebounce";
 import { useFieldMutationStatus } from "../../../../common/hooks/useFieldMutationStatus";
 import { SærligeutgifterStepper } from "../../../enum/SærligeutgifterStepper";
 import { useOnSaveUtgifter } from "../../../hooks/useOnSaveUtgifter";
+import { opprettSekvensiellLagring } from "./sekvensiellLagring";
 
 type RimeligAaInnvilgeFormValues = {
     rimeligÅInnvilge: boolean;
@@ -89,34 +90,32 @@ const RimeligAaInnvilgeForm = () => {
     const useFormMethods = useForm<RimeligAaInnvilgeFormValues>({ defaultValues: initialValues });
     const { getValues } = useFormMethods;
 
-    const updateAndSave = useCallback(
-        async (payload: UtgifterPayload) => {
-            try {
-                await saveUtgifter.mutation.mutateAsync(payload);
-                prevState.current = { ...getValues() };
-            } catch {
-                setSaveErrorState({
-                    error: true,
-                    retryFn: () => updateAndSave(payload),
-                    rollbackFn: () => useFormMethods.reset(prevState.current),
-                });
-            }
-        },
-        [saveUtgifter, prevState, useFormMethods, getValues, setSaveErrorState],
-    );
-
-    // Leser skjemaverdiene når lagringen sendes, ikke når endringen skjer. Ellers kan en forsinket lagring av begrunnelsen
-    // sende en gammel verdi for avkrysningen og overskrive en nyere lagring.
-    const onSave = (name: string) => {
-        const values = getValues();
-        return updateAndSave({
+    // Leser skjemaverdiene når lagringen sendes, ikke når endringen skjer
+    const lagre = async (name: string) => {
+        const values = { ...getValues() };
+        const payload: UtgifterPayload = {
             triggeredBy: name === "begrunnelse" ? "rimeligÅInnvilgeBegrunnelse" : "rimeligÅInnvilge",
             rimeligÅInnvilge: {
                 rimeligÅInnvilge: values.rimeligÅInnvilge,
                 begrunnelse: values.begrunnelse,
             },
-        });
+        };
+        try {
+            await saveUtgifter.mutation.mutateAsync(payload);
+            // Angre går tilbake til verdiene som sist ble lagret, ikke til verdier som er endret etter at lagringen ble sendt
+            prevState.current = values;
+        } catch {
+            setSaveErrorState({
+                error: true,
+                retryFn: () => onSave(name),
+                rollbackFn: () => useFormMethods.reset(prevState.current),
+            });
+        }
     };
+    const sisteLagre = useRef(lagre);
+    sisteLagre.current = lagre;
+    const sekvensiellLagring = useRef(opprettSekvensiellLagring((name: string) => sisteLagre.current(name)));
+    const onSave = (name: string) => sekvensiellLagring.current(name);
     const debouncedOnSave = useDebounce(onSave);
 
     useEffect(() => {
